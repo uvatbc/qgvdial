@@ -1,0 +1,16 @@
+unix {
+PREFIX = ../debian/qgvdial/usr
+BINDIR = $$PREFIX/bin
+DATADIR =$$PREFIX/share
+
+DEFINES += DATADIR=\"$$DATADIR\" PKGDATADIR=\"$$PKGDATADIR\"
+
+#MAKE INSTALL
+
+INSTALLS += target desktop icon 
+
+  target.path =$$BINDIR
+
+  icon.path = $$DATADIR/qgvdial
+  icon.files += qgvdial.png
+}
