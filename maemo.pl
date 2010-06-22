@@ -1,4 +1,5 @@
 my $mad = '/home/uv/apps/mad';
+my $repo = "https://qgvdial.googlecode.com/svn/trunk";
 my $cmd;
 
 # Delete any existing version file
@@ -7,7 +8,7 @@ if (-f ver.cfg)
     unlink(ver.cfg);
 }
 # Get the latest version file from the repository
-$cmd = "svn export http://uv-desktop/svn/home/cpp/qgvdial/ver.cfg";
+$cmd = "svn export $repo/ver.cfg";
 system($cmd);
 
 # Pull out the version from the file
@@ -16,7 +17,7 @@ my $qver = <QVARFILE>;
 close QVARFILE;
 
 # Get the subversion checkin version
-system("svn log http://uv-desktop/svn/home/cpp/qgvdial --limit=1 | grep \"^r\" > svnlog.txt");
+system("svn log $repo --limit=1 | grep \"^r\" > svnlog.txt");
 open(QVARFILE, "svnlog.txt") or die;
 my $svnver = <QVARFILE>;
 close QVARFILE;
@@ -29,7 +30,7 @@ $svnver = $1;
 $qver = "$qver.$svnver";
 
 system("rm -rf qgvdial*");
-$cmd = "svn export http://uv-desktop/svn/home/cpp/qgvdial qgvdial-$qver";
+$cmd = "svn export $repo qgvdial-$qver";
 system($cmd);
 system("cp qgvdial-$qver/icons/Google.png qgvdial-$qver/src/qgvdial.png");
 
