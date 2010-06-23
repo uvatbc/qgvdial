@@ -66,6 +66,9 @@ open(CONTROL_OUT, ">qgvdial-$qver/debian/control.new") or die "Cannot open new c
 open(CONTROL, "<qgvdial-$qver/debian/control") or die "Cannot open control";
 while (<CONTROL>) {
     $line = $_;
+    if ($line =~ m/^Section:/) {
+        $line = "Section: user/network\n";
+    }
     if ($line =~ m/Description:/) {
         last;
     }
