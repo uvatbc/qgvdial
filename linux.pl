@@ -57,7 +57,7 @@ system($cmd);
 
 # Add a post install file to add the executable bit after installation on the device
 open(POSTINST, ">qgvdial-$qver/debian/postinst") or die "Cannot create postinst";
-print(POSTINST "#!/bin/bash\n");
+print(POSTINST "#!/bin/sh\n");
 print(POSTINST "chmod +x /opt/qgvdial/bin/qgvdial\n");
 close(POSTINST);
 system("chmod +x qgvdial-$qver/debian/postinst");
