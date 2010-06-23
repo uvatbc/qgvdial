@@ -12,6 +12,8 @@ dispChar (chr)
 #ifdef Q_WS_MAEMO_5
     this->setValueText (strSubText);
     this->setValueLayout (QMaemo5ValueButton::ValueUnderTextCentered);
+#else
+    Q_UNUSED (strSubText);
 #endif
 }//DigitButton::DigitButton
 

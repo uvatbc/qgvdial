@@ -175,6 +175,8 @@ GVHistory::type_to_string (GVH_Event_Type Type)
     case GVHE_TextMessage:
         strReturn = "SMS";
         break;
+    default:
+        break;
     }
     return (strReturn);
 }//GVHistory::type_to_string
@@ -282,7 +284,7 @@ GVHistory::clearAllItems ()
 
 void
 GVHistory::onCurrentItemChanged (QTreeWidgetItem *current,
-                                 QTreeWidgetItem *previous)
+                                 QTreeWidgetItem */*previous*/)
 {
     QMutexLocker locker(&mutex);
     if (NULL == current)
@@ -306,7 +308,7 @@ GVHistory::onCurrentItemChanged (QTreeWidgetItem *current,
 }//GVHistory::onCurrentItemChanged
 
 void
-GVHistory::onItemActivated (QTreeWidgetItem *item, int/* column*/)
+GVHistory::onItemActivated (QTreeWidgetItem */*item*/, int/* column*/)
 {
     placeCall ();
 }//GVHistory::onItemActivated

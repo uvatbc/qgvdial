@@ -219,6 +219,6 @@ GVSettings::cbNumbers_currentIndexChanged (int index)
 }//GVSettings::cbNumbers_currentIndexChanged
 
 void
-GVSettings::updateMenu (QMenuBar *menuBar)
+GVSettings::updateMenu (QMenuBar */*menuBar*/)
 {
 }//GVSettings::updateMenu

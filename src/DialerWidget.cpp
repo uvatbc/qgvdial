@@ -106,6 +106,6 @@ DialerWidget::btnCallClicked ()
 }//DialerWidget::btnCallClicked
 
 void
-DialerWidget::updateMenu (QMenuBar *menuBar)
+DialerWidget::updateMenu (QMenuBar */*menuBar*/)
 {
 }//DialerWidget::updateMenu
