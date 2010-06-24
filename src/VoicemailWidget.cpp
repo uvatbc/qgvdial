@@ -1,13 +1,13 @@
 #include "VoicemailWidget.h"
 
 VoicemailWidget::VoicemailWidget (QWidget *parent, Qt::WindowFlags f)
-    : QWidget (parent, f)
-    , player (NULL)
-    , slider (Qt::Horizontal, this)
-    , grid (this)
-    , updater (this)
-    , btnPlay (this)
-    , btnStop (this)
+: QWidget (parent, f)
+, player (NULL)
+, slider (Qt::Horizontal, this)
+, grid (this)
+, updater (this)
+, btnPlay (this)
+, btnStop (this)
 {
     btnPlay.setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
     btnStop.setIcon(style()->standardIcon(QStyle::SP_MediaStop));

@@ -438,11 +438,7 @@ GVWebPage::loginStage2 (bool bOk)
 bool
 GVWebPage::logout ()
 {
-    QString strQuery, strHost;
-    this->getHostAndQuery (strHost, strQuery);
-    QString strLink = strHost
-                    + "/voice/account/msignout"
-                    + strQuery;
+    QString strLink = GV_HTTPS "/account/signout";
 
     QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
                        this   , SLOT   (logoutDone (bool)));
@@ -477,12 +473,7 @@ GVWebPage::retrieveContacts ()
     }
 
     nCurrent = 1;
-
-    QString strQuery, strHost;
-    this->getHostAndQuery (strHost, strQuery);
-    QString strLink = strHost
-                    + "/voice/m/contacts?p=1";
-
+    QString strLink = GV_HTTPS_M "/contacts?p=1";
     QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
                        this   , SLOT   (contactsLoaded (bool)));
     this->loadUrlString (strLink);
@@ -546,10 +537,7 @@ GVWebPage::contactsLoaded (bool bOk)
         }
 
         nCurrent++;
-        QString strQuery, strHost;
-        this->getHostAndQuery (strHost, strQuery);
-        QString strNextPage = QString ("%1/voice/m/contacts?p=%2")
-                              .arg(strHost)
+        QString strNextPage = QString (GV_HTTPS_M "/contacts?p=%1")
                               .arg(nCurrent);
 
         QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
@@ -589,10 +577,7 @@ GVWebPage::dialCallback ()
                        this   , SLOT   (callStage1 (bool)));
     workCurrent.cancel = &GVWebPage::cancelDialStage1;
 
-    QString strQuery, strHost;
-    this->getHostAndQuery (strHost, strQuery);
-    QString strLink = QString ("%1/voice/m/caller?number=%2")
-                      .arg(strHost)
+    QString strLink = QString (GV_HTTPS_M "/caller?number=%1")
                       .arg(workCurrent.arrParams[0].toString());
 
     QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
@@ -819,10 +804,7 @@ GVWebPage::getRegisteredPhones ()
         return (false);
     }
 
-    QString strQuery, strHost;
-    this->getHostAndQuery (strHost, strQuery);
-    QString strGoto = strHost
-                    + "/voice/m/phones";
+    QString strGoto = GV_HTTPS_M "/phones";
     QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
                        this   , SLOT   (phonesListLoaded (bool)));
     this->loadUrlString (strGoto);
@@ -883,10 +865,7 @@ GVWebPage::selectRegisteredPhone ()
         return (false);
     }
 
-    QString strQuery, strHost;
-    this->getHostAndQuery (strHost, strQuery);
-    QString strGoto = strHost
-                    + "/voice/m/selectphone";
+    QString strGoto = GV_HTTPS_M "/selectphone";
     QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
                        this   , SLOT   (selectPhoneLoaded (bool)));
     this->loadUrlString (strGoto);
@@ -1028,10 +1007,7 @@ GVWebPage::getHistory ()
     QString strWhich = workCurrent.arrParams[0].toString();
     nFirstPage = nCurrent = workCurrent.arrParams[1].toString().toInt ();
 
-    QString strQuery, strHost;
-    this->getHostAndQuery (strHost, strQuery);
-    QString strLink = QString ("%1/voice/m/i/%2?p=%3")
-                               .arg(strHost)
+    QString strLink = QString (GV_HTTPS_M "/i/%1?p=%2")
                                .arg(strWhich)
                                .arg(nCurrent);
 
@@ -1291,10 +1267,7 @@ GVWebPage::historyPageLoaded (bool bOk)
         }
 
         QString strWhich = workCurrent.arrParams[0].toString();
-        QString strQuery, strHost;
-        this->getHostAndQuery (strHost, strQuery);
-        QString strLink = QString ("%1/voice/m/i/%2/?p=%3")
-                                   .arg(strHost)
+        QString strLink = QString (GV_HTTPS_M "/i/%1/?p=%2")
                                    .arg(strWhich)
                                    .arg(nCurrent);
 
@@ -1488,10 +1461,7 @@ GVWebPage::sendSMS ()
         return (false);
     }
 
-    QString strQuery, strHost;
-    this->getHostAndQuery (strHost, strQuery);
-    QString strGoto = strHost
-                    + "/voice/m/sms";
+    QString strGoto = GV_HTTPS_M "/sms";
     QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
                        this   , SLOT   (sendSMSPage1 (bool)));
     this->loadUrlString (strGoto);

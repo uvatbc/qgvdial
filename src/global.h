@@ -16,7 +16,9 @@
 // #define NO_DBGINFO 1
 
 //#define GV_URL              "http://www.google.com/voice"
-#define GV_URL              "http://m.google.com/voice"
+#define GV_URL          "http://m.google.com/voice"
+#define GV_HTTPS        "https://www.google.com/voice"
+#define GV_HTTPS_M      "https://www.google.com/voice/m"
 
 struct GVContactNumber
 {
