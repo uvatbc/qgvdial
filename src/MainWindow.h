@@ -1,9 +1,9 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QtCore>
+#include "global.h"
+
 #include <QtGui>
-#include <QtWebKit>
 
 #include "DialerWidget.h"
 #include "GVContactsTable.h"
@@ -13,16 +13,7 @@
 #include "SMSDlg.h"
 #include "VoicemailWidget.h"
 #include "CacheDatabase.h"
-
-#if !NO_DBGINFO
-class MyWebView : public QWebView
-{
-    Q_OBJECT
-
-public:
-    MyWebView (QWidget * parent = 0) : QWebView (parent) {}
-};
-#endif
+#include "MyWebView.h"
 
 class MainWindow : public QMainWindow
 {

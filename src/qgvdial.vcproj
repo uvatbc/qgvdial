@@ -114,6 +114,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MyWebView.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\OsDependent.cpp"
 				>
 			</File>
@@ -177,6 +181,10 @@
 			</File>
 			<File
 				RelativePath=".\MobileWebPage.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MyWebView.h"
 				>
 			</File>
 			<File

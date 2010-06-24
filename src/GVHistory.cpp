@@ -284,7 +284,7 @@ GVHistory::clearAllItems ()
 
 void
 GVHistory::onCurrentItemChanged (QTreeWidgetItem *current,
-                                 QTreeWidgetItem */*previous*/)
+                                 QTreeWidgetItem * /*previous*/)
 {
     QMutexLocker locker(&mutex);
     if (NULL == current)
@@ -308,7 +308,7 @@ GVHistory::onCurrentItemChanged (QTreeWidgetItem *current,
 }//GVHistory::onCurrentItemChanged
 
 void
-GVHistory::onItemActivated (QTreeWidgetItem */*item*/, int/* column*/)
+GVHistory::onItemActivated (QTreeWidgetItem * /*item*/, int /* column*/)
 {
     placeCall ();
 }//GVHistory::onItemActivated

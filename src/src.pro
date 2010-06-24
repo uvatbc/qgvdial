@@ -17,6 +17,7 @@ maemo5 {
 
 # Input
 HEADERS +=  MainWindow.h                \
+            MyWebView.h                 \
             DialerWidget.h              \
             DigitButton.h               \
             MobileWebPage.h             \
@@ -35,6 +36,7 @@ HEADERS +=  MainWindow.h                \
 
 SOURCES +=  main.cpp                    \
             MainWindow.cpp              \
+            MyWebView.cpp               \
             DialerWidget.cpp            \
             DigitButton.cpp             \
             MobileWebPage.cpp           \
