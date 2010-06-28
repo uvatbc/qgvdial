@@ -1,10 +1,10 @@
 #include "SMSDlg.h"
 
-SMSDlg::SMSDlg(QWidget * parent/* = 0*/, Qt::WindowFlags f/* = 0*/) :
-QWidget (parent, f),
-edSMSText (this),
-lblTextCount ("Letters = 0", this),
-btnSendSMS ("Send", this)
+SMSDlg::SMSDlg(QWidget * parent/* = 0*/, Qt::WindowFlags f/* = 0*/)
+: ChildWindowBase (parent, f)
+, edSMSText (this)
+, lblTextCount ("Letters = 0", this)
+, btnSendSMS ("Send", this)
 {
     // btnSendSMS.clicked -> this.btnSendSMSClicked
     QObject::connect (&btnSendSMS, SIGNAL (clicked ()),
@@ -111,7 +111,7 @@ SMSDlg::btnSendSMSClicked ()
     QStringList arrNumbers;
     for (int i = 0; i < smsEntries.size(); i++)
     {
-    	arrNumbers += smsEntries[i].sNumber.strNumber;
+        arrNumbers += smsEntries[i].sNumber.strNumber;
         delEntry (i);
     }
     repopulateGrid ();
@@ -160,3 +160,14 @@ SMSDlg::smsTextChanged ()
 
     lblTextCount.setText (strLen);
 }//SMSDlg::smsTextChanged
+
+bool
+SMSDlg::setStacked ()
+{
+    bool rv = false;
+#ifdef Q_WS_MAEMO_5
+    this->setAttribute (Qt::WA_Maemo5StackedWindow);
+    rv = true;
+#endif
+    return (rv);
+}//SMSDlg::setStacked

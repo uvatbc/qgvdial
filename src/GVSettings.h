@@ -2,12 +2,9 @@
 #define __GVSETTINGS_H__
 
 #include "global.h"
-
-#include <QtCore>
-#include <QtGui>
 #include "CacheDatabase.h"
 
-class GVSettings : public QWidget
+class GVSettings : public ChildWindowBase
 {
     Q_OBJECT
 
@@ -21,6 +18,7 @@ public:
     QString getSelectedNumber ();
 
     bool causeLogin ();
+    bool setStacked ();
 
 signals:
     //! Log emitter
@@ -42,7 +40,6 @@ signals:
 public slots:
     void loginDone (bool bOk = true);
     void logoutDone (bool bOk = true);
-    void updateMenu (QMenuBar *menuBar);
 
 private slots:
     void btnLogin_clicked ();

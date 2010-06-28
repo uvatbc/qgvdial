@@ -1,7 +1,6 @@
 #ifndef __SMSDLG_H__
 #define __SMSDLG_H__
 
-#include <QtGui>
 #include "global.h"
 #include "SMSEntryDeleteButton.h"
 
@@ -18,7 +17,7 @@ struct SMSGuiElement
     SMSEntryDeleteButton *btnDelete;
 };
 
-class SMSDlg : public QWidget
+class SMSDlg : public ChildWindowBase
 {
     Q_OBJECT
 
@@ -27,6 +26,7 @@ public:
     ~SMSDlg(void);
 
     bool addSMSEntry (const SMSEntry &entry);
+    bool setStacked ();
 
 signals:
     void sendSMS (const QStringList &arrNumbers, const QString &strText);
@@ -47,7 +47,7 @@ private:
     QVector<SMSGuiElement>  smsGuiEntries;
 
     //! Edit box where the user will write the text message
-    QPlainTextEdit  edSMSText; 
+    QPlainTextEdit  edSMSText;
 
     //! Label which hold the count of characters in the text message
     QLabel          lblTextCount;

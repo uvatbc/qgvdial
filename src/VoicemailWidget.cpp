@@ -1,7 +1,7 @@
 #include "VoicemailWidget.h"
 
 VoicemailWidget::VoicemailWidget (QWidget *parent, Qt::WindowFlags f)
-: QWidget (parent, f)
+: ChildWindowBase (parent, f)
 , player (NULL)
 , slider (Qt::Horizontal, this)
 , grid (this)
@@ -155,3 +155,14 @@ VoicemailWidget::stop_clicked ()
 
     player->stop ();
 }//VoicemailWidget::stop_clicked
+
+bool
+VoicemailWidget::setStacked ()
+{
+    bool rv = false;
+#ifdef Q_WS_MAEMO_5
+    this->setAttribute (Qt::WA_Maemo5StackedWindow);
+    rv = true;
+#endif
+    return (rv);
+}//VoicemailWidget::setStacked

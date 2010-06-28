@@ -1,16 +1,17 @@
 #ifndef __VOICEMAILWIDGET_H__
 #define __VOICEMAILWIDGET_H__
 
-#include <QtGui>
+#include "global.h"
 #include <QMediaPlayer>
 
-class VoicemailWidget : public QWidget
+class VoicemailWidget : public ChildWindowBase
 {
     Q_OBJECT
 
 public:
     VoicemailWidget (QWidget *parent = 0, Qt::WindowFlags f = 0);
     bool play (const QString &strVmail);
+    bool setStacked ();
 
 signals:
     void log(const QString &strText, int level = 10);

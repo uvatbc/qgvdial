@@ -73,6 +73,8 @@ public:
 signals:
     //! Log emitter
     void log(const QString &strText, int level = 10);
+    //! Log emitter
+    void status(const QString &strText, int timeout = 2000);
 
     //! Emitted every time a new contact is parsed from the contacts page
     void gotContact (const QString &strName, const QString &strLink);

@@ -2,9 +2,6 @@
 #define MAINWINDOW_H
 
 #include "global.h"
-
-#include <QtGui>
-
 #include "DialerWidget.h"
 #include "GVContactsTable.h"
 #include "GVSettings.h"
@@ -170,6 +167,10 @@ private:
     GVContactsTable*pContactsTable;
     GVSettings     *pGVSettings;
     GVHistory      *pGVHistory;
+
+    //! Menu actions
+    QAction         actSettings;
+    QAction         actExit;
 
     //! SMS Window
     SMSDlg          dlgSMS;

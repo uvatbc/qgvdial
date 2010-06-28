@@ -5,31 +5,33 @@
 #include <iostream>
 using namespace std;
 
-MainWindow::MainWindow (QWidget *parent/* = 0*/, Qt::WindowFlags f/* = 0*/):
-QMainWindow(parent, f),
-fLogfile(this),
-tabMain(NULL),
-txtLogs(NULL),
-progressBar(NULL),
-btnCancel(NULL),
-gridMain(NULL),
-icoGoogle(":/Google.png"),
-icoSkype(":/Skype.png"),
-icoSMS(":/SMS.png"),
-icoPhone(":/Phone.png"),
-pSystray(NULL),
-dlgSMS (this),
-vmailPlayer (this, Qt::Window),
-stateMachine(this),
-dbMain(QSqlDatabase::addDatabase ("QSQLITE"), this),
-modelContacts(NULL)
+MainWindow::MainWindow (QWidget *parent/* = 0*/, Qt::WindowFlags f/* = 0*/)
+: QMainWindow(parent, f)
+, fLogfile(this)
+, tabMain(NULL)
+, txtLogs(NULL)
+, progressBar(NULL)
+, btnCancel(NULL)
+, gridMain(NULL)
+, icoGoogle(":/Google.png")
+, icoSkype(":/Skype.png")
+, icoSMS(":/SMS.png")
+, icoPhone(":/Phone.png")
+, pSystray(NULL)
+, actSettings("Settings", this)
+, actExit ("Exit", this)
+, dlgSMS (this, ChildWindowBase_flags)
+, vmailPlayer (this, ChildWindowBase_flags)
+, stateMachine(this)
+, dbMain(QSqlDatabase::addDatabase ("QSQLITE"), this)
+, modelContacts(NULL)
 {
     initLogging ();
 
+    dlgSMS.setStacked ();
+    vmailPlayer.setStacked ();
 #ifdef Q_WS_MAEMO_5
     this->setAttribute (Qt::WA_Maemo5StackedWindow);
-    dlgSMS.setAttribute (Qt::WA_Maemo5StackedWindow);
-    vmailPlayer.setAttribute (Qt::WA_Maemo5StackedWindow);
 #endif
 
     dlgSMS.setWindowFlags (dlgSMS.windowFlags () | Qt::Window);
@@ -38,9 +40,11 @@ modelContacts(NULL)
     GVWebPage::initParent (this);
     GVWebPage &webPage = GVWebPage::getRef ();
 
-    // webPage.log -> this.log
+    // webPage log and status
     QObject::connect (&webPage, SIGNAL (log(const QString &, int)),
                        this   , SLOT   (log(const QString &, int)));
+    QObject::connect (&webPage, SIGNAL (status(const QString &, int)),
+                       this   , SLOT   (setStatus(const QString &, int)));
 
     // sInit.exited -> this.init
     // This trick is so that immediately after init we go to next state
@@ -195,8 +199,9 @@ MainWindow::init ()
     tabMain->addTab (pGVHistory, "History");
 
     // GV settings
-    pGVSettings = new GVSettings (dbMain);
-    tabMain->addTab (pGVSettings, "Settings");
+    pGVSettings = new GVSettings (dbMain, this, ChildWindowBase_flags);
+    pGVSettings->setStacked ();
+    pGVSettings->hide ();
 
     gridMain->addWidget (tabMain, 0,0, 1,4);
 #if !NO_DBGINFO
@@ -206,6 +211,11 @@ MainWindow::init ()
 
     tabMain->setTabsClosable (false);
     tabMain->setTabPosition (QTabWidget::West);
+
+    // This action needs to be added to the menubar ALWAYS
+    QMenuBar *mbar = this->menuBar ();
+    mbar->clear ();
+    mbar->addAction (&actSettings);
 
     // tabMain.currentChanged -> this.currentChanged
     QObject::connect (tabMain, SIGNAL (currentChanged (int)),
@@ -222,6 +232,10 @@ MainWindow::init ()
     // btnCancel.clicked -> webPage.userCancel
     QObject::connect ( btnCancel, SIGNAL (clicked ()),
                       &webPage  , SLOT   (userCancel ()));
+
+    // actSettings.triggered -> pGVSettings.show
+    QObject::connect (&actSettings, SIGNAL (triggered ()),
+                       pGVSettings, SLOT   (show ()));
 
     // Dialing handshake
     QObject::connect (&webPage    , SIGNAL (dialInProgress ()),
@@ -854,6 +868,8 @@ MainWindow::tabChanged (int index)
     emit updateMenu (mbar);
     QObject::disconnect (this  , SIGNAL (updateMenu (QMenuBar *)),
                          widget, SLOT   (updateMenu (QMenuBar *)));
+
+    mbar->addAction (&actSettings);
 }//MainWindow::tabChanged
 
 void

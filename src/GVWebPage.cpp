@@ -1581,6 +1581,7 @@ void
 GVWebPage::vmailDataRecv (QNetworkReply *reply)
 {
     emit log ("Request for vmail unsupported content");
+    emit status ("Downloading vmail", 0);
 
     QVariant var = VConv<QNetworkReply>::toQVariant (reply);
     workCurrent.arrParams += var;
@@ -1592,56 +1593,66 @@ GVWebPage::vmailDataRecv (QNetworkReply *reply)
 void
 GVWebPage::vmailDataDone ()
 {
-    QVariant var = workCurrent.arrParams[workCurrent.arrParams.size()-1];
-    if (var.isNull ())
-    {
-        emit log ("No network reply stored while downloading vmail");
-        QObject::disconnect (this, SLOT (vmailDataDone ()));
-        return;
-    }
-    QNetworkReply *reply = VConv<QNetworkReply>::toPtr (var);
-    if (NULL == reply)
-    {
-        emit log ("Invalid network reply while downloading vmail");
-        QObject::disconnect (this, SLOT (vmailDataDone ()));
-        return;
-    }
-
-    bool bDisc =
-    QObject::disconnect (reply, SIGNAL (finished ()),
-                         this , SLOT   (vmailDataDone ()));
-    if (!bDisc)
-    {
-        emit log ("This reply was never connected. Did we fuck up?");
-        // move on brotha!
-    }
-
     bool bOk = false;
-    do // Begin cleanup block (not a loop)
-    {
-        if (GVWW_playVmail != workCurrent.whatwork)
+    do { // Begin cleanup block (not a loop)
+        QVariant var = workCurrent.arrParams[workCurrent.arrParams.size()-1];
+        if (var.isNull ())
         {
-            emit log ("Delayed response to our data??");
+            emit log ("No network reply stored while downloading vmail");
+            QObject::disconnect (this, SLOT (vmailDataDone ()));
             break;
         }
-        if (workCurrent.arrParams.size () < 2)
+        QNetworkReply *reply = VConv<QNetworkReply>::toPtr (var);
+        if (NULL == reply)
         {
-            emit log ("Something wrong with the parameter count. Abort!");
+            emit log ("Invalid network reply while downloading vmail");
+            QObject::disconnect (this, SLOT (vmailDataDone ()));
             break;
         }
 
-        QFile file(workCurrent.arrParams[1].toString());
-        if (!file.open(QFile::ReadWrite))
+        bool bDisc =
+        QObject::disconnect (reply, SIGNAL (finished ()),
+                             this , SLOT   (vmailDataDone ()));
+        if (!bDisc)
         {
-            emit log ("Failed to open the vmail file. Abort!");
-            break;
+            emit log ("This reply was never connected. Did we fuck up?");
+            // move on brotha!
         }
-        file.write(reply->readAll());
 
-        emit log ("Finally the content is all downloaded");
-        bOk = true;
+        do // Begin cleanup block (not a loop)
+        {
+            if (GVWW_playVmail != workCurrent.whatwork)
+            {
+                emit log ("Delayed response to our data??");
+                break;
+            }
+            if (workCurrent.arrParams.size () < 2)
+            {
+                emit log ("Something wrong with the parameter count. Abort!");
+                break;
+            }
+
+            QFile file(workCurrent.arrParams[1].toString());
+            if (!file.open(QFile::ReadWrite))
+            {
+                emit log ("Failed to open the vmail file. Abort!");
+                break;
+            }
+            file.write(reply->readAll());
+
+            emit log ("Finally the content is all downloaded");
+            bOk = true;
+        } while (0); // End cleanup block (not a loop)
+
+        reply->deleteLater ();
+        completeCurrentWork (GVWW_playVmail, bOk);
     } while (0); // End cleanup block (not a loop)
-
-    reply->deleteLater ();
-    completeCurrentWork (GVWW_playVmail, bOk);
+    if (bOk)
+    {
+        emit status ("Voice mail downloaded.");
+    }
+    else
+    {
+        emit status ("Voice mail could not be downloaded");
+    }
 }//GVWebPage::vmailDataDone

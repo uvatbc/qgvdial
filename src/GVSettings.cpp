@@ -6,17 +6,17 @@
 
 GVSettings::GVSettings(CacheDatabase   &db              ,
                        QWidget         *parent  /* = 0*/,
-                       Qt::WindowFlags  f       /* = 0*/):
-QWidget(parent, f),
-grid(this),
-lblUser("User name", this),
-edUser(this),
-lblPass("Password", this),
-edPass(this),
-lblNumbers("Phones", this),
-cbNumbers(this),
-btnLogin(this),
-dbMain(db)
+                       Qt::WindowFlags  f       /* = 0*/)
+: ChildWindowBase (parent, f)
+, grid(this)
+, lblUser("User name", this)
+, edUser(this)
+, lblPass("Password", this)
+, edPass(this)
+, lblNumbers("Phones", this)
+, cbNumbers(this)
+, btnLogin(this)
+, dbMain(db)
 {
     edPass.setEchoMode (QLineEdit::Password);
     btnLogin.setText ("Login");
@@ -218,7 +218,13 @@ GVSettings::cbNumbers_currentIndexChanged (int index)
     }
 }//GVSettings::cbNumbers_currentIndexChanged
 
-void
-GVSettings::updateMenu (QMenuBar * /*menuBar*/)
+bool
+GVSettings::setStacked ()
 {
-}//GVSettings::updateMenu
+    bool rv = false;
+#ifdef Q_WS_MAEMO_5
+    this->setAttribute (Qt::WA_Maemo5StackedWindow);
+    rv = true;
+#endif
+    return (rv);
+}//GVSettings::setStacked
