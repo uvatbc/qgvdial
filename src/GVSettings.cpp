@@ -217,14 +217,3 @@ GVSettings::cbNumbers_currentIndexChanged (int index)
         emit regNumChanged (strCallback);
     }
 }//GVSettings::cbNumbers_currentIndexChanged
-
-bool
-GVSettings::setStacked ()
-{
-    bool rv = false;
-#ifdef Q_WS_MAEMO_5
-    this->setAttribute (Qt::WA_Maemo5StackedWindow);
-    rv = true;
-#endif
-    return (rv);
-}//GVSettings::setStacked

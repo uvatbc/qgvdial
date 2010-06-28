@@ -2,6 +2,7 @@
 #define __VOICEMAILWIDGET_H__
 
 #include "global.h"
+#include "ChildWindowBase.h"
 #include <QMediaPlayer>
 
 class VoicemailWidget : public ChildWindowBase
@@ -11,11 +12,6 @@ class VoicemailWidget : public ChildWindowBase
 public:
     VoicemailWidget (QWidget *parent = 0, Qt::WindowFlags f = 0);
     bool play (const QString &strVmail);
-    bool setStacked ();
-
-signals:
-    void log(const QString &strText, int level = 10);
-    void status(const QString &strText, int timeout = 2000);
 
 private slots:
     //! Slider value changed

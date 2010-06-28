@@ -2,6 +2,7 @@
 #define __GVSETTINGS_H__
 
 #include "global.h"
+#include "ChildWindowBase.h"
 #include "CacheDatabase.h"
 
 class GVSettings : public ChildWindowBase
@@ -18,14 +19,8 @@ public:
     QString getSelectedNumber ();
 
     bool causeLogin ();
-    bool setStacked ();
 
 signals:
-    //! Log emitter
-    void log(const QString &strText, int level = 10);
-    //! Status emitter
-    void status(const QString &strText, int timeout = 2000);
-
     //! Emitted when the login button has been clicked with valid credentials
     void login (const QString &strUser, const QString &strPass);
     //! Emitted when the logout button has been clicked

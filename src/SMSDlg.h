@@ -2,6 +2,7 @@
 #define __SMSDLG_H__
 
 #include "global.h"
+#include "ChildWindowBase.h"
 #include "SMSEntryDeleteButton.h"
 
 struct SMSEntry
@@ -26,7 +27,6 @@ public:
     ~SMSDlg(void);
 
     bool addSMSEntry (const SMSEntry &entry);
-    bool setStacked ();
 
 signals:
     void sendSMS (const QStringList &arrNumbers, const QString &strText);

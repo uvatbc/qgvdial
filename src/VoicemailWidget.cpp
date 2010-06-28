@@ -155,14 +155,3 @@ VoicemailWidget::stop_clicked ()
 
     player->stop ();
 }//VoicemailWidget::stop_clicked
-
-bool
-VoicemailWidget::setStacked ()
-{
-    bool rv = false;
-#ifdef Q_WS_MAEMO_5
-    this->setAttribute (Qt::WA_Maemo5StackedWindow);
-    rv = true;
-#endif
-    return (rv);
-}//VoicemailWidget::setStacked

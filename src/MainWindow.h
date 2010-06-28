@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include "global.h"
+#include "ChildWindowBase.h"
 #include "DialerWidget.h"
 #include "GVContactsTable.h"
 #include "GVSettings.h"

@@ -160,14 +160,3 @@ SMSDlg::smsTextChanged ()
 
     lblTextCount.setText (strLen);
 }//SMSDlg::smsTextChanged
-
-bool
-SMSDlg::setStacked ()
-{
-    bool rv = false;
-#ifdef Q_WS_MAEMO_5
-    this->setAttribute (Qt::WA_Maemo5StackedWindow);
-    rv = true;
-#endif
-    return (rv);
-}//SMSDlg::setStacked

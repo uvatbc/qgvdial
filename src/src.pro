@@ -32,7 +32,8 @@ HEADERS +=  MainWindow.h                \
             SMSEntryDeleteButton.h      \
             VoicemailWidget.h           \
             DialerValidator.h           \
-            CacheDatabase.h
+            CacheDatabase.h             \
+            ChildWindowBase.h
 
 SOURCES +=  main.cpp                    \
             MainWindow.cpp              \
@@ -51,7 +52,8 @@ SOURCES +=  main.cpp                    \
             SMSEntryDeleteButton.cpp    \
             VoicemailWidget.cpp         \
             DialerValidator.cpp         \
-            CacheDatabase.cpp
+            CacheDatabase.cpp           \
+            ChildWindowBase.cpp
 
 RESOURCES = qgvdial.qrc
 

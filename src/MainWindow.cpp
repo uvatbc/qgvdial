@@ -28,8 +28,6 @@ MainWindow::MainWindow (QWidget *parent/* = 0*/, Qt::WindowFlags f/* = 0*/)
 {
     initLogging ();
 
-    dlgSMS.setStacked ();
-    vmailPlayer.setStacked ();
 #ifdef Q_WS_MAEMO_5
     this->setAttribute (Qt::WA_Maemo5StackedWindow);
 #endif
@@ -200,7 +198,6 @@ MainWindow::init ()
 
     // GV settings
     pGVSettings = new GVSettings (dbMain, this, ChildWindowBase_flags);
-    pGVSettings->setStacked ();
     pGVSettings->hide ();
 
     gridMain->addWidget (tabMain, 0,0, 1,4);

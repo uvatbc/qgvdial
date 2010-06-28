@@ -86,12 +86,4 @@ public:
     }
 };
 
-#ifdef Q_WS_MAEMO_5
-typedef QWidget ChildWindowBase;
-#define ChildWindowBase_flags (Qt::Window)
-#else
-typedef QDialog ChildWindowBase;
-#define ChildWindowBase_flags (0)
-#endif
-
 #endif //__GLOBAL_H__
