@@ -18,7 +18,7 @@ MainWindow::MainWindow (QWidget *parent/* = 0*/, Qt::WindowFlags f/* = 0*/)
 , icoSMS(":/SMS.png")
 , icoPhone(":/Phone.png")
 , pSystray(NULL)
-, actSettings("Settings", this)
+, actSettings ("Settings", this)
 , actExit ("Exit", this)
 , dlgSMS (this, ChildWindowBase_flags)
 , vmailPlayer (this, ChildWindowBase_flags)
@@ -213,6 +213,7 @@ MainWindow::init ()
     QMenuBar *mbar = this->menuBar ();
     mbar->clear ();
     mbar->addAction (&actSettings);
+    mbar->addAction (&actExit);
 
     // tabMain.currentChanged -> this.currentChanged
     QObject::connect (tabMain, SIGNAL (currentChanged (int)),
@@ -233,6 +234,8 @@ MainWindow::init ()
     // actSettings.triggered -> pGVSettings.show
     QObject::connect (&actSettings, SIGNAL (triggered ()),
                        pGVSettings, SLOT   (show ()));
+    QObject::connect (&actExit, SIGNAL (triggered ()),
+                       qApp   , SLOT   (quit ()));
 
     // Dialing handshake
     QObject::connect (&webPage    , SIGNAL (dialInProgress ()),
@@ -867,6 +870,7 @@ MainWindow::tabChanged (int index)
                          widget, SLOT   (updateMenu (QMenuBar *)));
 
     mbar->addAction (&actSettings);
+    mbar->addAction (&actExit);
 }//MainWindow::tabChanged
 
 void
