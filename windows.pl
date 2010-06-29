@@ -31,18 +31,19 @@ $svnver = $1;
 $qver = "$qver.$svnver";
 
 system("powershell Remove-Item -Recurse -Force qgvdial*");
-system("svn export $repo qgvdial-$qver");
-system("copy qgvdial-$qver/icons/Google.png qgvdial-$qver/src/qgvdial.png");
+$cmd = "svn export $repo qgvdial-$qver";
+system($cmd);
+system("copy qgvdial-$qver\\icons\\Google.png qgvdial-$qver\\src\\qgvdial.png");
 
-$cmd = "cd qgvdial-$qver ; perl ../version.pl __QGVDIAL_VERSION__ $qver";
+$cmd = "cd qgvdial-$qver/src & perl ../version.pl __QGVDIAL_VERSION__ $qver";
 system($cmd);
 
 # Do everything upto the preparation of the debian directory. Code is still not compiled.
 $cmd = "cd qgvdial-$qver & qmake & make all";
 system($cmd);
 
-$cmd = "copy qgvdial-$qver/src/release/qgvdial.exe I:/Uv/releases/qgvdial/win-install/qgvdial/bin";
+$cmd = "copy qgvdial-$qver\\src\\release\\qgvdial.exe I:\\Uv\\releases\\qgvdial\\win-install\\qgvdial\\bin";
 system($cmd);
 
-$cmd = "$nsis qgvdial-$qver/src/setup.nsi";
+$cmd = "$nsis qgvdial-$qver\\src\\setup.nsi";
 system($cmd);
