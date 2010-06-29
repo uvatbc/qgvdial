@@ -1,6 +1,7 @@
 #include "MainWindow.h"
 #include "GVWebPage.h"
 #include "DlgSelectContactNumber.h"
+#include "UniqueAppHelper.h"
 
 #include <iostream>
 using namespace std;
@@ -25,6 +26,7 @@ MainWindow::MainWindow (QWidget *parent/* = 0*/, Qt::WindowFlags f/* = 0*/)
 , stateMachine(this)
 , dbMain(QSqlDatabase::addDatabase ("QSQLITE"), this)
 , modelContacts(NULL)
+, wakeupTimer (this)
 {
     initLogging ();
 
@@ -34,6 +36,10 @@ MainWindow::MainWindow (QWidget *parent/* = 0*/, Qt::WindowFlags f/* = 0*/)
 
     dlgSMS.setWindowFlags (dlgSMS.windowFlags () | Qt::Window);
     vmailPlayer.hide ();
+
+    UniqueAppHelper &unique = UniqueAppHelper::getRef ();
+    QObject::connect (&unique, SIGNAL (log(const QString &, int)),
+                      this   , SLOT   (log(const QString &, int)));
 
     GVWebPage::initParent (this);
     GVWebPage &webPage = GVWebPage::getRef ();
@@ -86,6 +92,8 @@ MainWindow::~MainWindow ()
     {
         QFile::remove (i.value ());
     }
+
+    wakeupTimer.stop ();
 }//MainWindow::~MainWindow
 
 void
@@ -340,6 +348,13 @@ MainWindow::init ()
                        this       , SLOT   (setStatus(const QString &, int)));
     this->setCentralWidget (new QWidget (this));
     this->centralWidget()->setLayout (gridMain);
+
+    // Set up the timer
+    QObject::connect (&wakeupTimer, SIGNAL (timeout()),
+                       this       , SLOT   (wakeupTimedOut()));
+    wakeupTimer.setInterval (3*1000);
+    wakeupTimer.setSingleShot (true);
+    wakeupTimer.start ();
 }//MainWindow::init
 
 void
@@ -1136,3 +1151,14 @@ MainWindow::playVoicemailDone (bool bOk, const QVariantList &arrParams)
         QFile::remove (strFilename);
     }
 }//MainWindow::playVoicemailDone
+
+void
+MainWindow::wakeupTimedOut ()
+{
+    UniqueAppHelper &unique = UniqueAppHelper::getRef ();
+    if (unique.isWakeSignaled ())
+    {
+        this->show ();
+    }
+    wakeupTimer.start ();
+}//MainWindow::wakeupTimedOut

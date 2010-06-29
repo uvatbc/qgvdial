@@ -39,6 +39,9 @@ private slots:
     //! Initialize GUI components, prepare for next state: not-logged-in
     void init ();
 
+    //! Invoked periodically for us to check if someone has requested we wake up
+    void wakeupTimedOut ();
+
     //! Called when about blank is done
     void aboutBlankDone (bool bOk);
 
@@ -200,6 +203,9 @@ private:
 
     //! Map between the voice mail link and its temp file name
     QMap<QString,QString> mapVmail;
+
+    //! The timer used to check for a wake up signal
+    QTimer          wakeupTimer;
 };
 
 #endif // MAINWINDOW_H

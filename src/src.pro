@@ -33,7 +33,8 @@ HEADERS +=  MainWindow.h                \
             VoicemailWidget.h           \
             DialerValidator.h           \
             CacheDatabase.h             \
-            ChildWindowBase.h
+            ChildWindowBase.h           \
+            UniqueAppHelper.h
 
 SOURCES +=  main.cpp                    \
             MainWindow.cpp              \
@@ -53,7 +54,8 @@ SOURCES +=  main.cpp                    \
             VoicemailWidget.cpp         \
             DialerValidator.cpp         \
             CacheDatabase.cpp           \
-            ChildWindowBase.cpp
+            ChildWindowBase.cpp         \
+            UniqueAppHelper.cpp
 
 RESOURCES = qgvdial.qrc
 
