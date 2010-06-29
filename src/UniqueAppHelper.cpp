@@ -2,13 +2,17 @@
 #include <iostream>
 using namespace std;
 
-#ifdef Q_OS_UNIX
+#if defined(Q_OS_UNIX)
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
-#elif Q_OS_WIN
+#elif defined(Q_OS_WIN)
 #include <windows.h>
+#include <io.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #else
 #error Unsupported platform
 #endif
@@ -43,9 +47,15 @@ UniqueAppHelper::UniqueAppHelper ()
     }
 
     // Open a handle in the most cross platform way possible
-    int createflags = O_CREAT | O_RDWR;
-    int shareflags  = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP;
-    int fd = open(strName.toUtf8 (), createflags, shareflags);
+    int createflags, shareflags, fd;
+#if defined(Q_OS_UNIX)
+    createflags = O_CREAT | O_RDWR;
+    shareflags  = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP;
+#elif defined(Q_OS_WIN)
+    createflags = _O_CREAT | _O_RDWR;
+    shareflags  = _S_IREAD | _S_IWRITE;
+#endif
+    fd = open (strName.toUtf8 (), createflags, shareflags);
     if (-1 == fd)
     {
         cerr << "Failed to open uniqueness file" << endl;
