@@ -1,5 +1,5 @@
 my $repo = "https://qgvdial.googlecode.com/svn/trunk";
-my $nsis = "& 'C:\\Program Files (x86)\\NSIS\\makensis.exe'";
+my $nsis = "\"C:\\Program Files (x86)\\NSIS\\makensis.exe\"";
 my $cmd;
 my $line;
 
@@ -30,13 +30,11 @@ $svnver = $1;
 # Create the version suffix
 $qver = "$qver.$svnver";
 
-system("rm -rf qgvdial*");
-$cmd = "svn export $repo qgvdial-$qver";
-system($cmd);
-system("cp qgvdial-$qver/icons/Google.png qgvdial-$qver/src/qgvdial.png");
+system("powershell Remove-Item -Recurse -Force qgvdial*");
+system("svn export $repo qgvdial-$qver");
+system("copy qgvdial-$qver/icons/Google.png qgvdial-$qver/src/qgvdial.png");
 
 $cmd = "cd qgvdial-$qver ; perl ../version.pl __QGVDIAL_VERSION__ $qver";
-print "$cmd\n";
 system($cmd);
 
 # Do everything upto the preparation of the debian directory. Code is still not compiled.
