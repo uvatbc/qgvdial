@@ -2,6 +2,8 @@
 #include "GVWebPage.h"
 #include "DlgSelectContactNumber.h"
 #include "UniqueAppHelper.h"
+#include "DialCancelDlg.h"
+#include "ObserverFactory.h"
 
 #include <iostream>
 using namespace std;
@@ -43,6 +45,13 @@ MainWindow::MainWindow (QWidget *parent/* = 0*/, Qt::WindowFlags f/* = 0*/)
 
     GVWebPage::initParent (this);
     GVWebPage &webPage = GVWebPage::getRef ();
+
+    // Observer factory log and status
+    ObserverFactory &obFactory = ObserverFactory::getRef ();
+    QObject::connect (&obFactory, SIGNAL (log(const QString &, int)),
+                       this     , SLOT   (log(const QString &, int)));
+    QObject::connect (&obFactory, SIGNAL (status(const QString &, int)),
+                       this     , SLOT   (setStatus(const QString &, int)));
 
     // webPage log and status
     QObject::connect (&webPage, SIGNAL (log(const QString &, int)),
@@ -755,12 +764,8 @@ MainWindow::dialInProgress ()
 {
     bDialCancelled = false;
 
-    QMessageBox msgBox;
-    msgBox.setText (QString("Dialing %1. Abort / Cancel ends the call")
-                    .arg(strCurrentDialed));
-    msgBox.setStandardButtons (QMessageBox::Ok | QMessageBox::Abort);
-    msgBox.setDefaultButton (QMessageBox::Ok);
-    int ret = msgBox.exec ();
+    DialCancelDlg msgBox(strCurrentDialed, this);
+    int ret = msgBox.doModal ();
     if (QMessageBox::Ok == ret)
     {
         emit dialCanFinish ();

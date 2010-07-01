@@ -1,6 +1,6 @@
 TEMPLATE = app
 TARGET   = qgvdial
-QT      *= core gui webkit sql
+QT      *= core gui webkit sql dbus
 INCLUDEPATH += .
 
 CONFIG  += mobility
@@ -34,7 +34,11 @@ HEADERS +=  MainWindow.h                \
             DialerValidator.h           \
             CacheDatabase.h             \
             ChildWindowBase.h           \
-            UniqueAppHelper.h
+            UniqueAppHelper.h           \
+            DialCancelDlg.h             \
+            ObserverFactory.h           \
+            IObserver.h
+
 
 SOURCES +=  main.cpp                    \
             MainWindow.cpp              \
@@ -55,7 +59,9 @@ SOURCES +=  main.cpp                    \
             DialerValidator.cpp         \
             CacheDatabase.cpp           \
             ChildWindowBase.cpp         \
-            UniqueAppHelper.cpp
+            UniqueAppHelper.cpp         \
+            DialCancelDlg.cpp           \
+            ObserverFactory.cpp
 
 RESOURCES = qgvdial.qrc
 
@@ -64,5 +70,13 @@ win32 {
 RC_FILE = winrsrc.rc
 }
 
-OTHER_FILES += \
-    qgvdial.desktop
+# In Linux and maemo, add the telepathy libraries, sources and headers
+unix {
+    INCLUDEPATH += /usr/include/telepathy-1.0
+    LIBS += -ltelepathy-qt4
+
+    HEADERS += TpObserver.h
+    SOURCES += TpObserver.cpp
+}
+
+OTHER_FILES += qgvdial.desktop
