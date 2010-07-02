@@ -1,6 +1,6 @@
 TEMPLATE = app
 TARGET   = qgvdial
-QT      *= core gui webkit sql dbus
+QT      *= core gui webkit sql
 INCLUDEPATH += .
 
 CONFIG  += mobility
@@ -72,6 +72,7 @@ RC_FILE = winrsrc.rc
 
 # In Linux and maemo, add the telepathy libraries, sources and headers
 unix {
+    QT *= dbus
     INCLUDEPATH += /usr/include/telepathy-1.0
     LIBS += -ltelepathy-qt4
 
