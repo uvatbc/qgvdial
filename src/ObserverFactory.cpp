@@ -1,6 +1,6 @@
 #include "ObserverFactory.h"
 
-#if defined (Q_OS_UNIX)
+#if defined (Q_OS_UNIX) && !defined (Q_OS_SYMBIAN)
 #include "TpObserver.h"
 #include <TelepathyQt4/ClientRegistrar>
 
@@ -10,7 +10,7 @@ ClientRegistrarPtr  clientRegistrar;
 ObserverFactory::ObserverFactory(QObject *parent)
 : QObject(parent)
 {
-#if defined (Q_OS_UNIX)
+#if defined (Q_OS_UNIX) && !defined (Q_OS_SYMBIAN)
     clientRegistrar = ClientRegistrar::create();
 
     ChannelClassList filters;

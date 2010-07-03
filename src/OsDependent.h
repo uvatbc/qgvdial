@@ -4,12 +4,22 @@
 #include <QtCore>
 #include <QtGui>
 
+#if defined (Q_OS_UNIX) && !defined (Q_OS_SYMBIAN)
+#include <TelepathyQt4/Constants>
+#include <TelepathyQt4/Types>
+#if !NO_DBGINFO
+#include <TelepathyQt4/Debug>
+#endif
+#endif
+
 class OsDependent : public QObject
 {
     Q_OBJECT
 
 public:
     static OsDependent &getRef ();
+    void init ();
+
 private:
     OsDependent(QObject *parent = 0);
 };

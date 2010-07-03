@@ -11,6 +11,18 @@ OsDependent::getRef ()
     return (singleton);
 }//OsDependent::getRef
 
+void
+OsDependent::init ()
+{
+#if defined (Q_OS_UNIX) && !defined (Q_OS_SYMBIAN)
+    Tp::registerTypes();
+#if !NO_DBGINFO
+    Tp::enableDebug(true);
+    Tp::enableWarnings(true);
+#endif
+#endif
+}//OsDependent::init
+
 #ifdef QT_NO_SYSTEMTRAYICON
 QSystemTrayIcon::QSystemTrayIcon(QWidget *parent/* = 0*/) : QWidget (parent)
 {

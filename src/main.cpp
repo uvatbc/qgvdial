@@ -1,14 +1,7 @@
 #include <QtGui/QApplication>
 #include "MainWindow.h"
 #include "UniqueAppHelper.h"
-
-#if defined (Q_OS_UNIX)
-#include <TelepathyQt4/Constants>
-#include <TelepathyQt4/Types>
-#if !NO_DBGINFO
-#include <TelepathyQt4/Debug>
-#endif
-#endif
+#include "OsDependent.h"
 
 int
 main(int argc, char *argv[])
@@ -16,13 +9,8 @@ main(int argc, char *argv[])
     QApplication app(argc, argv);
     app.setQuitOnLastWindowClosed (false);
 
-#if defined (Q_OS_UNIX)
-    Tp::registerTypes();
-#if !NO_DBGINFO
-    Tp::enableDebug(true);
-    Tp::enableWarnings(true);
-#endif
-#endif
+    OsDependent &osd = OsDependent::getRef ();
+    osd.init ();
 
     UniqueAppHelper &unique = UniqueAppHelper::getRef ();
     if (!unique.setUnique ())

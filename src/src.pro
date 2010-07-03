@@ -13,6 +13,7 @@ CONFIG *= embed_manifest_exe
 maemo5 {
     message("Maemo5 your world")
     QT *= maemo5
+    OTHER_FILES += qgvdial.desktop
 }
 
 # Input
@@ -71,7 +72,7 @@ RC_FILE = winrsrc.rc
 }
 
 # In Linux and maemo, add the telepathy libraries, sources and headers
-unix {
+unix:!symbian {
     QT *= dbus
     INCLUDEPATH += /usr/include/telepathy-1.0
     LIBS += -ltelepathy-qt4
@@ -79,5 +80,3 @@ unix {
     HEADERS += TpObserver.h
     SOURCES += TpObserver.cpp
 }
-
-OTHER_FILES += qgvdial.desktop
