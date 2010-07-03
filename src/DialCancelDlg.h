@@ -7,13 +7,13 @@
 class DialCancelDlg : public QMessageBox
 {
     Q_OBJECT
+
 public:
     DialCancelDlg (const QString &strNum, QWidget *parent = 0);
-    int doModal ();
+    int doModal (const QString &strMyNumber);
 
-signals:
-
-public slots:
+private slots:
+    void callStarted ();
 
 private:
     QString         strContact;

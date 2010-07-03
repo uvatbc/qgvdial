@@ -12,6 +12,12 @@ signals:
     void status(const QString &strText, int timeout = 2000);
 
     void callStarted ();
+
+protected:
+    virtual void startMonitoring (const QString &strC) = 0;
+    virtual void stopMonitoring () = 0;
+
+    friend class ObserverFactory;
 };
 typedef QList<IObserver *> IObserverList;
 

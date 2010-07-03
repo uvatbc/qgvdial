@@ -2,10 +2,27 @@
 #include "MainWindow.h"
 #include "UniqueAppHelper.h"
 
-int main(int argc, char *argv[])
+#if defined (Q_OS_UNIX)
+#include <TelepathyQt4/Constants>
+#include <TelepathyQt4/Types>
+#if !NO_DBGINFO
+#include <TelepathyQt4/Debug>
+#endif
+#endif
+
+int
+main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
     app.setQuitOnLastWindowClosed (false);
+
+#if defined (Q_OS_UNIX)
+    Tp::registerTypes();
+#if !NO_DBGINFO
+    Tp::enableDebug(true);
+    Tp::enableWarnings(true);
+#endif
+#endif
 
     UniqueAppHelper &unique = UniqueAppHelper::getRef ();
     if (!unique.setUnique ())
@@ -22,4 +39,4 @@ int main(int argc, char *argv[])
 #endif
 
     return app.exec();
-}
+}//main

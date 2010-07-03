@@ -14,7 +14,7 @@
 #define GV_C_NAME           "name"
 #define GV_C_LINK           "partial_url"
 ////////////////////////////////////////////////////////////////////////////////
-////////////////////////////// GV links table ///////////////////////////////
+/////////////////////////////// GV links table /////////////////////////////////
 #define GV_LINKS_TABLE      "gvlinks"
 #define GV_L_LINK           "link"
 #define GV_L_TYPE           "data_type"
@@ -22,6 +22,11 @@
 
 #define GV_L_TYPE_NAME      "contact name"
 #define GV_L_TYPE_NUMBER    "contact number"
+////////////////////////////////////////////////////////////////////////////////
+///////////////////////// GV registered numbers table //////////////////////////
+#define GV_REG_NUMS_TABLE   "gvregnumbers"
+#define GV_RN_NAME          "name"
+#define GV_RN_NUM           "number"
 ////////////////////////////////////////////////////////////////////////////////
 
 CacheDatabase::CacheDatabase(const QSqlDatabase & other, QObject *parent)
@@ -77,6 +82,17 @@ CacheDatabase::init ()
                     "(" GV_L_LINK   " varchar, "
                         GV_L_TYPE   " varchar, "
                         GV_L_DATA   " varchar)");
+    }
+
+    // Ensure that the registered numbers table is present. If not, create it.
+    query.exec ("SELECT * FROM sqlite_master "
+                "WHERE type='table' "
+                "AND name='" GV_REG_NUMS_TABLE "'");
+    if (!query.next ())
+    {
+        query.exec ("CREATE TABLE " GV_REG_NUMS_TABLE " "
+                    "(" GV_RN_NAME  " varchar, "
+                        GV_RN_NUM   " varchar)");
     }
 }//CacheDatabase::init
 
@@ -201,6 +217,53 @@ CacheDatabase::putCallback (const QString &strCallback)
 
     return (true);
 }//CacheDatabase::putCallback
+
+bool
+CacheDatabase::getRegisteredNumbers (GVRegisteredNumberArray &listNumbers)
+{
+    QSqlQuery query(dbMain);
+    query.setForwardOnly (true);
+
+    query.exec ("SELECT " GV_RN_NAME ", " GV_RN_NUM " FROM " GV_REG_NUMS_TABLE);
+    while (query.next ())
+    {
+        GVRegisteredNumber num;
+        num.strDisplayName = query.value(0).toString();
+        num.strNumber      = query.value(1).toString();
+        listNumbers += num;
+    }
+
+    return (true);
+}//CacheDatabase::getRegisteredNumbers
+
+bool
+CacheDatabase::putRegisteredNumbers (const GVRegisteredNumberArray &listNumbers)
+{
+    QSqlQuery query(dbMain);
+    query.setForwardOnly (true);
+
+    QString strQ;
+    query.exec ("DELETE FROM " GV_REG_NUMS_TABLE);
+
+    do { // Begin cleanup block (not a loop)
+        if (0 == listNumbers.size ())
+        {
+            break;
+        }
+
+        foreach (GVRegisteredNumber num, listNumbers)
+        {
+            strQ = QString ("INSERT INTO " GV_REG_NUMS_TABLE
+                            " (" GV_RN_NAME ", " GV_RN_NUM ") "
+                            "VALUES ('%1', '%2')")
+                    .arg (num.strDisplayName)
+                    .arg (num.strNumber);
+            query.exec (strQ);
+        }
+    } while (0); // End cleanup block (not a loop)
+
+    return (true);
+}//CacheDatabase::putRegisteredNumbers
 
 bool
 CacheDatabase::insertContact (QSqlTableModel *modelContacts,

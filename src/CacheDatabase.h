@@ -23,6 +23,9 @@ public:
     bool getCallback (QString &strCallback);
     bool putCallback (const QString &strCallback);
 
+    bool getRegisteredNumbers (GVRegisteredNumberArray &listNumbers);
+    bool putRegisteredNumbers (const GVRegisteredNumberArray &listNumbers);
+
     bool insertContact (QSqlTableModel *modelContacts,
                         int             cnt,
                         const QString  &strName,

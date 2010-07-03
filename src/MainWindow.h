@@ -86,11 +86,6 @@ private slots:
     //! Invoked if the credentials in DB do not match logged in credentials
     void beginGetAccountDetails ();
 
-    //! Invoked every time a new registered phone is retrieved
-    void gotRegisteredPhone (const GVRegisteredNumber &info);
-    //! Invoked every time a new registered phone is retrieved
-    void gotAllRegisteredPhones (bool bOk, const QVariantList &arrParams);
-
     //! Invoked when the user changes the currently selected number
     void regNumChanged (const QString &strNumber);
     //! Invoked when the registered number has been saved
@@ -193,8 +188,8 @@ private:
     CacheDatabase   dbMain;
     QSqlTableModel *modelContacts;
 
-    //! Registered numbers stored here
-    QVector<GVRegisteredNumber> arrRegisteredNumbers;
+    //! This is the Google Voice number
+    QString         strSelfNumber;
 
     //! This is the number currently being dialed
     QString         strCurrentDialed;

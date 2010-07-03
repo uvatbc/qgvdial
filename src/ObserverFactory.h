@@ -13,7 +13,10 @@ private:
 
 public:
     static ObserverFactory & getRef ();
-    IObserverList createObservers (const QString &strContact);
+    void startObservers (const QString &strContact,
+                               QObject *receiver  ,
+                         const char    *method    );
+    void stopObservers ();
 
 signals:
     void log(const QString &strText, int level = 10);
@@ -21,6 +24,8 @@ signals:
 
 public slots:
 
+private:
+    IObserverList listObservers;
 };
 
 #endif // OBSERVERFACTORY_H

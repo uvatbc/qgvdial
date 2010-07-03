@@ -136,6 +136,8 @@ private slots:
 
     //! Invoked when the select phone page is loaded
     void selectPhoneLoaded (bool bOk);
+    //! Invokes when the phone is selected
+    void onRegPhoneSelected (bool bOk);
 
     //! Invoked when the history page is loaded
     void historyPageLoaded (bool bOk);

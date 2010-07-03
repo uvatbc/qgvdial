@@ -12,22 +12,7 @@ ObserverFactory::ObserverFactory(QObject *parent)
 {
 #if defined (Q_OS_UNIX)
     clientRegistrar = ClientRegistrar::create();
-#endif
-}//ObserverFactory::ObserverFactory
 
-ObserverFactory &
-ObserverFactory::getRef ()
-{
-    static ObserverFactory singleton;
-    return (singleton);
-}//ObserverFactory::getRef
-
-IObserverList
-ObserverFactory::createObservers (const QString &strContact)
-{
-    IObserverList list;
-
-#if defined (Q_OS_UNIX)
     ChannelClassList filters;
     QMap<QString, QDBusVariant> filter;
     filter.insert(
@@ -37,7 +22,7 @@ ObserverFactory::createObservers (const QString &strContact)
             QLatin1String(TELEPATHY_INTERFACE_CHANNEL ".TargetHandleType"),
             QDBusVariant((uint) Tp::HandleTypeContact));
     filters.append(filter);
-    TpObserver *myobserver = new TpObserver(filters, strContact);
+    TpObserver *myobserver = new TpObserver(filters);
     AbstractClientPtr appr = (AbstractClientPtr) myobserver;
     clientRegistrar->registerClient(appr, "QGVStreamObserver");
 
@@ -48,7 +33,36 @@ ObserverFactory::createObservers (const QString &strContact)
             myobserver, SIGNAL (status(const QString &, int)),
             this      , SIGNAL (status(const QString &, int)));
 
-    list += (IObserver*) myobserver;
+    listObservers += (IObserver*) myobserver;
 #endif
-    return (list);
+}//ObserverFactory::ObserverFactory
+
+ObserverFactory &
+ObserverFactory::getRef ()
+{
+    static ObserverFactory singleton;
+    return (singleton);
+}//ObserverFactory::getRef
+
+void
+ObserverFactory::startObservers (const QString &strContact,
+                                       QObject *receiver  ,
+                                 const char    *method    )
+{
+    foreach (IObserver *observer, listObservers)
+    {
+        QObject::connect (observer, SIGNAL (callStarted()),
+                          receiver, method);
+        observer->startMonitoring (strContact);
+    }
 }//ObserverFactory::createObservers
+
+void
+ObserverFactory::stopObservers ()
+{
+    foreach (IObserver *observer, listObservers)
+    {
+        observer->stopMonitoring ();
+        observer->disconnect (SIGNAL (callStarted()));
+    }
+}//ObserverFactory::stopObservers

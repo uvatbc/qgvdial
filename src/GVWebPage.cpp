@@ -357,6 +357,7 @@ GVWebPage::loginStage1 (bool bOk)
     {
         if (isLoadFailed (bOk))
         {
+            bOk = false;
             emit log ("Main login page load failed");
             break;
         }
@@ -409,6 +410,7 @@ GVWebPage::loginStage2 (bool bOk)
     {
         if (isLoadFailed (bOk))
         {
+            bOk = false;
             emit log ("Page load actual login failed", 3);
             break;
         }
@@ -426,6 +428,20 @@ GVWebPage::loginStage2 (bool bOk)
             emit log ("Failed to log in!", 3);
             break;
         }
+
+        // Whats the GV number?
+#define GVSELECTOR "div b[class=\"ms3\"]"
+        QWebElement num = doc().findFirst (GVSELECTOR);
+#undef GVSELECTOR
+        if (num.isNull ())
+        {
+            emit log ("Failed to get a google voice number!!", 3);
+            break;
+        }
+        QString strNumber = num.toPlainText ();
+        strNumber.remove(QChar (' ')).remove(QChar ('(')).remove(QChar (')'));
+        strNumber.remove(QChar ('-'));
+        workCurrent.arrParams += QVariant (strNumber);
 
         QMutexLocker locker(&mutex);
         bLoggedIn = true;
@@ -491,6 +507,7 @@ GVWebPage::contactsLoaded (bool bOk)
     {
         if (isLoadFailed (bOk))
         {
+            bOk = false;
             emit log ("Failed to load contacts page", 3);
             break;
         }
@@ -606,6 +623,7 @@ GVWebPage::callStage1 (bool bOk)
     {
         if (isLoadFailed (bOk))
         {
+            bOk = false;
             emit log ("Failed to load page for call stage 1");
             break;
         }
@@ -651,6 +669,7 @@ GVWebPage::callStage2 (bool bOk)
     {
         if (isLoadFailed (bOk))
         {
+            bOk = false;
             emit log ("Failed to load call page 2");
             break;
         }
@@ -731,6 +750,7 @@ GVWebPage::contactInfoLoaded (bool bOk)
     {
         if (isLoadFailed (bOk))
         {
+            bOk = false;
             emit log ("Failed to load call page 2");
             break;
         }
@@ -821,6 +841,7 @@ GVWebPage::phonesListLoaded (bool bOk)
     {
         if (isLoadFailed (bOk))
         {
+            bOk = false;
             emit log ("Failed to load phones settings page");
             break;
         }
@@ -861,6 +882,7 @@ GVWebPage::selectRegisteredPhone ()
     QMutexLocker locker(&mutex);
     if (!bLoggedIn)
     {
+        emit log ("Not logged in. Cannot select registered phone");
         completeCurrentWork (GVWW_selectRegisteredPhone, false);
         return (false);
     }
@@ -882,6 +904,7 @@ GVWebPage::selectPhoneLoaded (bool bOk)
     {
         if (isLoadFailed (bOk))
         {
+            bOk = false;
             emit log ("Failed to load the select phone page");
             break;
         }
@@ -927,13 +950,38 @@ GVWebPage::selectPhoneLoaded (bool bOk)
             break;
         }
 
+        QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
+                           this   , SLOT   (onRegPhoneSelected (bool)));
         call.evaluateJavaScript("this.click();");
 
         bOk = true;
     } while (0); // End cleanup block (not a loop)
 
-    completeCurrentWork (GVWW_selectRegisteredPhone, bOk);
+    if (!bOk)
+    {
+        completeCurrentWork (GVWW_selectRegisteredPhone, bOk);
+    }
 }//GVWebPage::selectPhoneLoaded
+
+void
+GVWebPage::onRegPhoneSelected (bool bOk)
+{
+    QObject::disconnect (&webPage, SIGNAL (loadFinished (bool)),
+                          this   , SLOT   (onRegPhoneSelected (bool)));
+    do // Begin cleanup block (not a loop)
+    {
+        if (isLoadFailed (bOk))
+        {
+            bOk = false;
+            emit log ("Failed to load the phone selected page");
+            break;
+        }
+
+        bOk = true;
+    } while (0); // End cleanup block (not a loop)
+
+    completeCurrentWork (GVWW_selectRegisteredPhone, bOk);
+}//GVWebPage::onRegPhoneSelected
 
 bool
 GVWebPage::cancelWork (GVWeb_Work whatwork)
@@ -1028,6 +1076,7 @@ GVWebPage::historyPageLoaded (bool bOk)
     {
         if (isLoadFailed (bOk))
         {
+            bOk = false;
             emit log ("Failed to load history page", 3);
             break;
         }
@@ -1319,6 +1368,7 @@ GVWebPage::getContactFromHistoryLinkLoaded (bool bOk)
     {
         if (isLoadFailed (bOk))
         {
+            bOk = false;
             emit log ("Failed to load call history link page");
             break;
         }
@@ -1478,6 +1528,7 @@ GVWebPage::sendSMSPage1 (bool bOk)
     {
         if (isLoadFailed (bOk))
         {
+            bOk = false;
             emit log ("Failed to load the select phone page");
             break;
         }

@@ -24,9 +24,12 @@ class TpObserver : public IObserver, public AbstractClientObserver
     Q_OBJECT
 
 public:
-    TpObserver (const ChannelClassList &channelFilter,
-                const QString          &strC         );
+    TpObserver (const ChannelClassList &channelFilter);
     void setId (int i);
+
+protected:
+    void startMonitoring (const QString &strC);
+    void stopMonitoring ();
 
 private slots:
 

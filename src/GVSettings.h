@@ -15,7 +15,7 @@ public:
                Qt::WindowFlags  f      = 0);
     ~GVSettings(void);
 
-    void setRegisteredNumbers (const GVRegisteredNumberArray &src);
+    bool refreshRegisteredNumbers ();
     QString getSelectedNumber ();
 
     bool causeLogin ();
@@ -39,6 +39,17 @@ public slots:
 private slots:
     void btnLogin_clicked ();
     void cbNumbers_currentIndexChanged (int index);
+
+    //! Invoked every time a new registered phone is retrieved
+    void gotRegisteredPhone (const GVRegisteredNumber &info);
+    //! Invoked every time a new registered phone is retrieved
+    void gotAllRegisteredPhones (bool bOk, const QVariantList &arrParams);
+
+    //! Invoked when any button on the message box is clicked
+    void msgBox_buttonClicked (QAbstractButton *button);
+
+private:
+    void setRegNumWidget (bool bSave = true);
 
 private:
     QGridLayout grid;

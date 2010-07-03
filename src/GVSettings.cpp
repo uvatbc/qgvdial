@@ -1,5 +1,5 @@
 #include "GVSettings.h"
-#include <QMessageBox>
+#include "GVWebPage.h"
 
 #define ROW_BELOW_PASS 2
 #define CB_TEXT_BUILDER "%1 : %2"
@@ -98,9 +98,13 @@ GVSettings::btnLogin_clicked ()
 void
 GVSettings::loginDone (bool bOk/* = true*/)
 {
-    logoutDone (!bOk);
-    if (bOk)
-    {
+    do { // Begin cleanup block (not a loop)
+        logoutDone (!bOk);
+        if (!bOk)
+        {
+            break;
+        }
+
         bool bSameUser = false;
         QString strUser, strPass;
         if (dbMain.getUserPass (strUser, strPass))
@@ -117,8 +121,18 @@ GVSettings::loginDone (bool bOk/* = true*/)
         if (!bSameUser)
         {
             emit newUser ();
+            break;
         }
-    }
+
+        if ((!dbMain.getRegisteredNumbers (arrNumbers)) ||
+            (0 == arrNumbers.size ()))
+        {
+            refreshRegisteredNumbers ();
+            break;
+        }
+
+        this->setRegNumWidget (false);
+    } while (0); // End cleanup block (not a loop)
 }//GVSettings::loginDone
 
 void
@@ -165,23 +179,93 @@ GVSettings::logoutDone (bool bOk/* = true*/)
     }
 }//GVSettings::logoutDone
 
-void
-GVSettings::setRegisteredNumbers (const GVRegisteredNumberArray &src)
+bool
+GVSettings::refreshRegisteredNumbers ()
 {
-    if (bBtnLogin)
-    {
-        // Means we aren't logged in. So don't do this shit
-        return;
-    }
+    GVWebPage &webPage = GVWebPage::getRef ();
 
+    bool rv = false;
+    do { // Begin cleanup block (not a loop)
+        if (bBtnLogin)
+        {
+            // Means we aren't logged in. So don't do this shit
+            break;
+        }
+
+        cbNumbers.setEnabled (false);
+        arrNumbers.clear ();
+        cbNumbers.clear ();
+
+        QVariantList l;
+        QObject::connect(
+            &webPage, SIGNAL (registeredPhone    (const GVRegisteredNumber &)),
+             this   , SLOT   (gotRegisteredPhone (const GVRegisteredNumber &)));
+        if (!webPage.enqueueWork (GVWW_getRegisteredPhones, l, this,
+                SLOT (gotAllRegisteredPhones (bool, const QVariantList &))))
+        {
+            QObject::disconnect(
+                &webPage, SIGNAL (registeredPhone    (const GVRegisteredNumber &)),
+                 this   , SLOT   (gotRegisteredPhone (const GVRegisteredNumber &)));
+            emit log ("Failed to retrieve registered contacts!!", 3);
+            break;
+        }
+
+        rv = true;
+    } while (0); // End cleanup block (not a loop)
+
+    return (rv);
+}//GVSettings::refreshRegisteredNumbers
+
+void
+GVSettings::gotRegisteredPhone (const GVRegisteredNumber &info)
+{
+    QString msg = QString("\"%1\"=\"%2\"")
+                    .arg (info.strDisplayName)
+                    .arg (info.strNumber);
+    emit log (msg);
+
+    arrNumbers += info;
+}//GVSettings::gotRegisteredPhone
+
+void
+GVSettings::gotAllRegisteredPhones (bool bOk, const QVariantList &)
+{
+    GVWebPage &webPage = GVWebPage::getRef ();
+    QObject::disconnect(
+        &webPage, SIGNAL (registeredPhone    (const GVRegisteredNumber &)),
+         this   , SLOT   (gotRegisteredPhone (const GVRegisteredNumber &)));
+
+    do { // Begin cleanup block (not a loop)
+        if (!bOk)
+        {
+            QMessageBox *msgBox = new QMessageBox(
+                    QMessageBox::Critical,
+                    "Error",
+                    "Failed to retrieve registered phones",
+                    QMessageBox::Close);
+            msgBox->setModal (false);
+            QObject::connect (
+                    msgBox, SIGNAL (buttonClicked (QAbstractButton *)),
+                    this  , SLOT   (msgBox_buttonClicked (QAbstractButton *)));
+            msgBox->show ();
+            emit status ("Failed to retrieve all registered phones");
+            break;
+        }
+
+        this->setRegNumWidget (true);
+
+        emit status ("GV callbacks retrieved.");
+    } while (0); // End cleanup block (not a loop)
+}//GVSettings::gotAllRegisteredPhones
+
+void
+GVSettings::setRegNumWidget (bool bSave)
+{
+    // Set the correct callback
     QString strCallback;
     bool bGotCallback = dbMain.getCallback (strCallback);
-    int iCallback = -1;
-
-    cbNumbers.setEnabled (true);
-    arrNumbers.clear ();
     cbNumbers.clear ();
-    arrNumbers = src;
+    cbNumbers.setEnabled (true);
     for (int i = 0; i < arrNumbers.size (); i++)
     {
         QString strText = QString (CB_TEXT_BUILDER)
@@ -191,15 +275,16 @@ GVSettings::setRegisteredNumbers (const GVRegisteredNumberArray &src)
 
         if ((bGotCallback) && (strCallback == arrNumbers[i].strNumber))
         {
-            iCallback = i;
+            cbNumbers.setCurrentIndex (i);
         }
     }
 
-    if ((bGotCallback) && (-1 != iCallback))
+    if (bSave)
     {
-        cbNumbers.setCurrentIndex (iCallback);
+        // Save all callbacks into the cache
+        dbMain.putRegisteredNumbers (arrNumbers);
     }
-}//GVSettings::setRegisteredNumbers
+}//GVSettings::setRegNumWidget
 
 QString
 GVSettings::getSelectedNumber ()
@@ -217,3 +302,12 @@ GVSettings::cbNumbers_currentIndexChanged (int index)
         emit regNumChanged (strCallback);
     }
 }//GVSettings::cbNumbers_currentIndexChanged
+
+void
+GVSettings::msgBox_buttonClicked (QAbstractButton *button)
+{
+    if (NULL != button->parent ())
+    {
+        button->parent()->deleteLater ();
+    }
+}//GVSettings::msgBox_buttonClicked

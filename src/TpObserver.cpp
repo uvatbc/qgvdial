@@ -1,14 +1,9 @@
 #include "TpObserver.h"
-#include <iostream>
-using namespace std;
 
-TpObserver::TpObserver (const ChannelClassList &channelFilter,
-                        const QString          &strC         )
+TpObserver::TpObserver (const ChannelClassList &channelFilter)
 : AbstractClientObserver(channelFilter)
 , id(1) // Always ignore
-, strContact (strC)
 {
-    cout << "Observer Constructed" << endl;
 }//TpObserver::TpObserver
 
 void
@@ -16,6 +11,18 @@ TpObserver::setId (int i)
 {
     id = i;
 }//TpObserver::setId
+
+void
+TpObserver::startMonitoring (const QString &strC)
+{
+    strContact = strC;
+}//TpObserver::startMonitoring
+
+void
+TpObserver::stopMonitoring ()
+{
+    strContact.clear ();
+}//TpObserver::stopMonitoring
 
 void
 TpObserver::observeChannels(
@@ -30,6 +37,13 @@ TpObserver::observeChannels(
     bool bOk;
     QString msg;
     emit log ("Observer got something!");
+
+    if (strContact.isEmpty ())
+    {
+        context->setFinished ();
+        emit log ("But we weren't asked to notify anything, so go away");
+        return;
+    }
 
     msg = QString("There are %1 channels in channels list")
           .arg (channels.size ());

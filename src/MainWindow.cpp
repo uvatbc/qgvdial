@@ -378,6 +378,7 @@ void
 MainWindow::enterNotLoggedIn ()
 {
     pGVSettings->logoutDone (true);
+    strSelfNumber.clear ();
 }//MainWindow::enterNotLoggedIn
 
 void
@@ -417,7 +418,7 @@ MainWindow::doLogin (const QString &strU, const QString &strP)
 }//MainWindow::doLogin
 
 void
-MainWindow::loginCompleted (bool bOk, const QVariantList &)
+MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
 {
     if (!bOk)
     {
@@ -436,6 +437,7 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &)
     }
     else
     {
+        strSelfNumber = varList[varList.size()-1].toString ();
         emit loginSuccess ();
     }
 }//MainWindow::loginCompleted
@@ -448,24 +450,8 @@ MainWindow::exitNotLoggedIn ()
 void
 MainWindow::enterLoggedIn ()
 {
-    GVWebPage &webPage = GVWebPage::getRef ();
-
     // Model init
     initContactsModel ();
-
-    arrRegisteredNumbers.clear ();
-    QVariantList l;
-    QObject::connect(
-        &webPage, SIGNAL (registeredPhone    (const GVRegisteredNumber &)),
-         this   , SLOT   (gotRegisteredPhone (const GVRegisteredNumber &)));
-    if (!webPage.enqueueWork (GVWW_getRegisteredPhones, l, this,
-            SLOT (gotAllRegisteredPhones (bool, const QVariantList &))))
-    {
-        QObject::disconnect(
-            &webPage, SIGNAL (registeredPhone    (const GVRegisteredNumber &)),
-             this   , SLOT   (gotRegisteredPhone (const GVRegisteredNumber &)));
-        log ("Failed to retrieve contacts!!", 3);
-    }
 
     // Do this the first time (always)
     pGVHistory->refreshHistory ();
@@ -475,6 +461,7 @@ void
 MainWindow::beginGetAccountDetails ()
 {
     pContactsTable->refreshContacts ();
+    pGVSettings->refreshRegisteredNumbers ();
 }//MainWindow::beginGetAccountDetails
 
 void
@@ -513,44 +500,6 @@ MainWindow::getContactsDone (bool bOk)
 
     //TODO: Retrieve user settings
 }//MainWindow::getContactsDone
-
-void
-MainWindow::gotRegisteredPhone (const GVRegisteredNumber &info)
-{
-    QString msg = QString("\"%1\"=\"%2\"")
-                    .arg (info.strDisplayName)
-                    .arg (info.strNumber);
-    log (msg);
-    arrRegisteredNumbers += info;
-}//MainWindow::gotRegisteredPhone
-
-void
-MainWindow::gotAllRegisteredPhones (bool bOk, const QVariantList &)
-{
-    GVWebPage &webPage = GVWebPage::getRef ();
-    QObject::disconnect(
-        &webPage, SIGNAL (registeredPhone    (const GVRegisteredNumber &)),
-         this   , SLOT   (gotRegisteredPhone (const GVRegisteredNumber &)));
-
-    if (!bOk)
-    {
-        QMessageBox *msgBox = new QMessageBox(QMessageBox::Critical,
-            "Error",
-            "Failed to retrieve registered phones",
-            QMessageBox::Close);
-        msgBox->setModal (false);
-        QObject::connect (
-            msgBox, SIGNAL (buttonClicked (QAbstractButton *)),
-            this  , SLOT   (msgBox_buttonClicked (QAbstractButton *)));
-        msgBox->show ();
-        setStatus ("Failed to retrieve registered phones");
-    }
-    else
-    {
-        pGVSettings->setRegisteredNumbers (arrRegisteredNumbers);
-        setStatus("GV callbacks retrieved.");
-    }
-}//MainWindow::gotAllRegisteredPhones
 
 void
 MainWindow::doLogout ()
@@ -765,7 +714,7 @@ MainWindow::dialInProgress ()
     bDialCancelled = false;
 
     DialCancelDlg msgBox(strCurrentDialed, this);
-    int ret = msgBox.doModal ();
+    int ret = msgBox.doModal (strSelfNumber);
     if (QMessageBox::Ok == ret)
     {
         emit dialCanFinish ();
@@ -851,7 +800,7 @@ MainWindow::msgBox_buttonClicked (QAbstractButton *button)
 {
     if (NULL != button->parent ())
     {
-        button->parent ()->deleteLater ();
+        button->parent()->deleteLater ();
     }
 }//MainWindow::msgBox_buttonClicked
 

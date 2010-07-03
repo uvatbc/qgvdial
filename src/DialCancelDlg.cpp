@@ -11,15 +11,20 @@ DialCancelDlg::DialCancelDlg (const QString &strNum, QWidget *parent)
 }//DialCancelDlg::DialCancelDlg
 
 int
-DialCancelDlg::doModal ()
+DialCancelDlg::doModal (const QString &strMyNumber)
 {
     ObserverFactory &obsFactory = ObserverFactory::getRef ();
-    listObservers = obsFactory.createObservers (strContact);
-    foreach (IObserver *observer, listObservers)
-    {
-        QObject::connect (observer, SIGNAL (callStarted()),
-                          this    , SLOT   (accept()));
-    }
+    obsFactory.startObservers (strMyNumber, this, SLOT (callStarted()));
 
-    return (this->exec ());
+    int rv = this->exec ();
+
+    obsFactory.stopObservers ();
+
+    return (rv);
 }//DialCancelDlg::doModal
+
+void
+DialCancelDlg::callStarted ()
+{
+    this->done (QMessageBox::Ok);
+}//DialCancelDlg::callStarted
