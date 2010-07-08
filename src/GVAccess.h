@@ -109,7 +109,7 @@ protected:
     void completeCurrentWork (GVAccess_Work whatwork, bool bOk);
 
     //! Simplify a phone number
-    void simplify_number (QString &strNumber);
+    void simplify_number (QString &strNumber, bool bAddIntPrefix = true);
 
     //! Load the about:blank page
     virtual bool aboutBlank () = 0;
@@ -147,6 +147,16 @@ protected:
     GVAccess_WorkItem           workCurrent;
     //! Are we logged in?
     bool                        bLoggedIn;
+
+    //! The subscribers google voice number
+    QString                     strSelfNumber;
+
+    //! The currently selected registered callback number
+    QString                     strCurrentCallback;
+    //! The currently selected registered callback number's type
+    char                        chCurrentCallbackType;
+    //! The probably selected registered callback number's type
+    char                        chProbableCallbackType;
 
     friend class SingletonFactory;
 };

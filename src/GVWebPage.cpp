@@ -220,10 +220,10 @@ GVWebPage::loginStage2 (bool bOk)
             emit log ("Failed to get a google voice number!!", 3);
             break;
         }
-        QString strNumber = num.toPlainText ();
-        strNumber.remove(QChar (' ')).remove(QChar ('(')).remove(QChar (')'));
-        strNumber.remove(QChar ('-'));
-        workCurrent.arrParams += QVariant (strNumber);
+        
+        strSelfNumber = num.toPlainText ();
+        simplify_number (strSelfNumber, false);
+        workCurrent.arrParams += QVariant (strSelfNumber);
 
         QMutexLocker locker(&mutex);
         bLoggedIn = true;
@@ -379,12 +379,55 @@ GVWebPage::dialCallback ()
     QString strLink = QString (GV_HTTPS_M "/caller?number=%1")
                       .arg(workCurrent.arrParams[0].toString());
 
+#if 1
     QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
                        this   , SLOT   (callStage1 (bool)));
     this->loadUrlString (strLink);
+#else
+    QNetworkAccessManager *mgr = webPage.networkAccessManager ();
+    QVariantList &arrParams = workCurrent.arrParams;
+    QStringPairList arrPairs;
+    arrPairs += QStringPair("outgoingNumber",
+                                workCurrent.arrParams[0].toString());
+    arrPairs += QStringPair("forwardingNumber",
+                                strCurrentCallback);
+    arrPairs += QStringPair("subscriberNumber",
+                                strSelfNumber);
+    arrPairs += QStringPair("phoneType",
+                                QString(chCurrentCallbackType));
+    arrPairs += QStringPair("remember", "1");
 
+    QStringList arrstrParams;
+    foreach (QStringPair pairParam, arrPairs)
+    {
+        arrstrParams += QString("%1=%2")
+            .arg(pairParam.first)
+            .arg(pairParam.second);
+    }
+    QString strParams = arrstrParams.join ("&");
+
+    QUrl url ("https://www.google.com/voice/call/connect/");
+    QNetworkRequest request(url);
+    request.setHeader (QNetworkRequest::ContentTypeHeader,
+        "application/x-www-form-urlencoded");
+    QByteArray byPostData = strParams.toAscii ();
+
+    QObject::connect (mgr , SIGNAL (finished (QNetworkReply *)),
+                      this, SLOT (callDone (QNetworkReply *)));
+    QNetworkReply *reply = mgr->post (request, byPostData);
+#endif
     return (true);
 }//GVWebPage::dialCallback
+
+void
+GVWebPage::callDone (QNetworkReply * reply)
+{
+    QNetworkAccessManager *mgr = webPage.networkAccessManager ();
+    QObject::disconnect (mgr , SIGNAL (finished (QNetworkReply *)),
+                         this, SLOT (callDone (QNetworkReply *)));
+    QByteArray ba = reply->readAll ();
+    reply->deleteLater ();
+}
 
 void
 GVWebPage::cancelDialStage1 ()
@@ -705,14 +748,17 @@ GVWebPage::selectPhoneLoaded (bool bOk)
             QWebElement number = numbers[i];
             QString strNumber = number.attribute ("value");
             int pos = strNumber.lastIndexOf ('|');
+            char chType = 0;
             if (-1 != pos)
             {
-                strNumber.chop (strNumber.size()-pos);
+                chType = strNumber[strNumber.size() - 1].toAscii ();
+                strNumber.chop (strNumber.size() - pos);
             }
 
             if (strNumber == workCurrent.arrParams[0].toString())
             {
                 NumberToUse = number;
+                chProbableCallbackType = chType;
                 break;
             }
         }
@@ -758,6 +804,10 @@ GVWebPage::onRegPhoneSelected (bool bOk)
             emit log ("Failed to load the phone selected page");
             break;
         }
+
+        strCurrentCallback = workCurrent.arrParams[0].toString();
+        simplify_number (strCurrentCallback);
+        chCurrentCallbackType = chProbableCallbackType;
 
         bOk = true;
     } while (0); // End cleanup block (not a loop)

@@ -302,14 +302,17 @@ GVAccess::cancelWork (GVAccess_Work whatwork)
 }//GVAccess::cancelWork
 
 void
-GVAccess::simplify_number (QString &strNumber)
+GVAccess::simplify_number (QString &strNumber, bool bAddIntPrefix /*= true*/)
 {
     strNumber.remove(QChar (' ')).remove(QChar ('(')).remove(QChar (')'));
     strNumber.remove(QChar ('-'));
 
     if (!strNumber.startsWith ("+"))
     {
-        strNumber = "+1" + strNumber;
+        if (bAddIntPrefix)
+        {
+            strNumber = "+1" + strNumber;
+        }
     }
 }//GVAccess::simplify_number
 

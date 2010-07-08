@@ -26,6 +26,7 @@ public slots:
     void userCancel ();
 
 private slots:
+    void callDone (QNetworkReply * reply);
     //! Invoked when the about:blank page has finished loading
     void aboutBlankDone (bool bOk);
 
