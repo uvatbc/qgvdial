@@ -1,32 +1,9 @@
 #include "GVWebPage.h"
 
-GVWebPage *pWebPage = NULL;
-
-void
-GVWebPage::initParent (QWidget *parent)
-{
-    if (NULL == pWebPage)
-    {
-        getRef().setParent (parent);
-    }
-}//GVWebPage::initParent
-
-GVWebPage &
-GVWebPage::getRef ()
-{
-    if (NULL == pWebPage)
-    {
-        pWebPage = new GVWebPage ();
-    }
-    return (*pWebPage);
-}//GVWebPage::getRef
-
-GVWebPage::GVWebPage(QObject *parent/* = NULL*/) :
-QObject(parent),
-webPage(this),
-garbageTimer(this),
-bLoggedIn(false),
-mutex(QMutex::Recursive)
+GVWebPage::GVWebPage(QObject *parent/* = NULL*/)
+: GVAccess (parent)
+, webPage (this)
+, garbageTimer (this)
 {
     webPage.settings()->setAttribute (QWebSettings::PluginsEnabled, false);
     webPage.settings()->setAttribute (QWebSettings::JavaEnabled   , false);
@@ -54,209 +31,14 @@ GVWebPage::~GVWebPage(void)
 {
 }//GVWebPage::~GVWebPage
 
+#if !NO_DBGINFO
 void
-GVWebPage::setView (QWebView *view)
+GVWebPage::setView (QWidget *view)
 {
-    view->setPage (&webPage);
+    QWebView *wv = (QWebView *)view;
+    wv->setPage (&webPage);
 }//GVWebPage::setView
-
-bool
-GVWebPage::enqueueWork (GVWeb_Work whatwork, const QVariantList &params,
-                        QObject   *receiver, const char         *method)
-{
-    if ((NULL == receiver) || (NULL == method))
-    {
-        emit log ("Invalid slot");
-        return (false);
-    }
-
-    QString msg;
-    GVWeb_WorkItem workItem;
-    workItem.whatwork = whatwork;
-    workItem.receiver = receiver;
-    workItem.method   = method;
-
-    bool bValid = true;
-    switch (whatwork)
-    {
-    case GVWW_aboutBlank:
-    case GVWW_logout:
-    case GVWW_getAllContacts:
-    case GVWW_getRegisteredPhones:
-        // No params needed here
-        if (0 != params.size ())
-        {
-            msg = "Invalid parameter count";
-            bValid = false;
-        }
-        break;
-
-    case GVWW_selectRegisteredPhone:    // Phone number needed
-    case GVWW_dialCallback:             // Destination number needed
-    case GVWW_getContactFromHistoryLink:// History link
-        if (1 != params.size ())
-        {
-            msg = "Invalid parameter count";
-            bValid = false;
-        }
-        break;
-
-    case GVWW_getContactFromLink:   // Page link and default number
-    case GVWW_login:                // user and password
-    case GVWW_sendSMS:              // Number, text
-    case GVWW_playVmail:            // Voicemail link, destination filename
-        if (2 != params.size ())
-        {
-            msg = "Invalid parameter count";
-            bValid = false;
-        }
-        break;
-
-    case GVWW_getHistory:           // type, start page, page count
-        if (3 != params.size ())
-        {
-            msg = "Invalid parameter count";
-            bValid = false;
-        }
-        break;
-
-    default:
-        msg = "Invalid work code";
-        bValid = false;
-        break;
-    }
-
-    if (!bValid)
-    {
-        emit log (msg);
-        return (false);
-    }
-
-    workItem.arrParams = params;
-
-    QMutexLocker locker(&mutex);
-    workList.push_back (workItem);
-
-    emit log (QString ("Enqueued %1.").arg (getNameForWork (whatwork)));
-
-    // If there is no current work in progress...
-    doNextWork ();// ... this takes care of when some work is in progress
-
-    // We've come this far. Always return true because enqueue has succeeded.
-    return (true);
-}//GVWebPage::enqueueWork
-
-void
-GVWebPage::doNextWork ()
-{
-    QMutexLocker locker(&mutex);
-
-    do // Begin cleanup block (not a loop)
-    {
-        if (0 == workList.size ())
-        {
-            emit log ("No work to be done. Sleep now.");
-            break;
-        }
-        if (GVWW_Nothing != workCurrent.whatwork)
-        {
-            emit log (QString ("Work %1 in progress. Wait for it to finish.")
-                      .arg (getNameForWork (workCurrent.whatwork)));
-            break;
-        }
-
-        workCurrent = workList.takeFirst ();
-        emit log (QString ("Starting work %1")
-                  .arg(getNameForWork (workCurrent.whatwork)));
-        switch (workCurrent.whatwork)
-        {
-        case GVWW_aboutBlank:
-            aboutBlank ();
-            break;
-        case GVWW_login:
-            login ();
-            break;
-        case GVWW_logout:
-            logout ();
-            break;
-        case GVWW_getAllContacts:
-            retrieveContacts ();
-            break;
-        case GVWW_getContactFromLink:
-            getContactInfoFromLink ();
-            break;
-        case GVWW_dialCallback:
-            dialCallback ();
-            break;
-        case GVWW_getRegisteredPhones:
-            getRegisteredPhones ();
-            break;
-        case GVWW_selectRegisteredPhone:
-            selectRegisteredPhone ();
-            break;
-        case GVWW_getHistory:
-            getHistory ();
-            break;
-        case GVWW_getContactFromHistoryLink:
-            getContactFromHistoryLink ();
-            break;
-        case GVWW_sendSMS:
-            sendSMS ();
-            break;
-        case GVWW_playVmail:
-            playVmail ();
-            break;
-        default:
-            emit log ("Invalid work specified. Moving on to next work.");
-            workCurrent.init ();
-            continue;
-        }
-
-        break;
-    } while (1); // End cleanup block (not a loop)
-}//GVWebPage::doNextWork
-
-void
-GVWebPage::completeCurrentWork (GVWeb_Work whatwork, bool bOk)
-{
-    QMutexLocker locker(&mutex);
-    if (whatwork != workCurrent.whatwork)
-    {
-        emit log (QString ("Cannot complete the work because it is not "
-                           "current! current = %1. requested = %2")
-                  .arg(getNameForWork (workCurrent.whatwork)
-                  .arg(getNameForWork (whatwork)), 3));
-        return;
-    }
-
-
-    do // Begin cleanup block (not a loop)
-    {
-        if (GVWW_Nothing == workCurrent.whatwork)
-        {
-            emit log ("Completing null work!", 3);
-            break;
-        }
-
-        emit log (QString("Completing work %1")
-                  .arg(getNameForWork (whatwork)));
-
-        QObject::connect (
-            this, SIGNAL (workCompleted (bool, const QVariantList &)),
-            workCurrent.receiver, workCurrent.method);
-
-        emit workCompleted (bOk, workCurrent.arrParams);
-
-        QObject::disconnect (
-            this, SIGNAL (workCompleted (bool, const QVariantList &)),
-            workCurrent.receiver, workCurrent.method);
-    } while (0); // End cleanup block (not a loop)
-
-    // Init MUST be done after the workCompleted emit to prevent races
-    // and to let the stack unwind.
-    workCurrent.init ();
-    doNextWork ();
-}//GVWebPage::completeCurrentWork
+#endif
 
 void
 GVWebPage::getHostAndQuery (QString &strHost, QString &strQuery)
@@ -292,7 +74,7 @@ GVWebPage::isLoadFailed (bool bOk)
             emit log ("Work canceled. Fail safely");
             break;
         }
-        if (GVWW_Nothing == workCurrent.whatwork)
+        if (GVAW_Nothing == workCurrent.whatwork)
         {
             emit log ("Invalid work. Fail safely");
             break;
@@ -334,7 +116,7 @@ GVWebPage::aboutBlankDone (bool bOk)
     QObject::disconnect (&webPage, SIGNAL (loadFinished (bool)),
                           this   , SLOT   (aboutBlankDone (bool)));
 
-    completeCurrentWork (GVWW_aboutBlank, bOk);
+    completeCurrentWork (GVAW_aboutBlank, bOk);
 }//GVWebPage::aboutBlankDone
 
 bool
@@ -376,7 +158,7 @@ GVWebPage::loginStage1 (bool bOk)
             {
                 // We logged in using prior credentials. Go directly to the end!
                 bOk = true;
-                completeCurrentWork (GVWW_login, true);
+                completeCurrentWork (GVAW_login, true);
             }
             else
             {
@@ -397,7 +179,7 @@ GVWebPage::loginStage1 (bool bOk)
 
     if (!bOk)
     {
-        completeCurrentWork (GVWW_login, false);
+        completeCurrentWork (GVAW_login, false);
     }
 }//GVWebPage::loginStage1
 
@@ -448,7 +230,7 @@ GVWebPage::loginStage2 (bool bOk)
         bOk = true;
     } while (0); // End cleanup block (not a loop)
 
-    completeCurrentWork (GVWW_login, bOk);
+    completeCurrentWork (GVAW_login, bOk);
 }//GVWebPage::loginStage2
 
 bool
@@ -475,7 +257,7 @@ GVWebPage::logoutDone (bool bOk)
         bLoggedIn = false;
     }
 
-    completeCurrentWork (GVWW_logout, bOk);
+    completeCurrentWork (GVAW_logout, bOk);
 }//GVWebPage::logoutDone
 
 bool
@@ -484,7 +266,7 @@ GVWebPage::retrieveContacts ()
     QMutexLocker locker(&mutex);
     if (!bLoggedIn)
     {
-        completeCurrentWork (GVWW_getAllContacts, false);
+        completeCurrentWork (GVAW_getAllContacts, false);
         return (false);
     }
 
@@ -549,7 +331,7 @@ GVWebPage::contactsLoaded (bool bOk)
         else
         {
             bOk = true;
-            completeCurrentWork (GVWW_getAllContacts, true);
+            completeCurrentWork (GVAW_getAllContacts, true);
             break;
         }
 
@@ -566,7 +348,7 @@ GVWebPage::contactsLoaded (bool bOk)
 
     if (!bOk)
     {
-        completeCurrentWork (GVWW_getAllContacts, false);
+        completeCurrentWork (GVAW_getAllContacts, false);
     }
 }//GVWebPage::contactsLoaded
 
@@ -586,13 +368,13 @@ GVWebPage::dialCallback ()
     QMutexLocker locker(&mutex);
     if (!bLoggedIn)
     {
-        completeCurrentWork (GVWW_dialCallback, false);
+        completeCurrentWork (GVAW_dialCallback, false);
         return (false);
     }
 
     QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
                        this   , SLOT   (callStage1 (bool)));
-    workCurrent.cancel = &GVWebPage::cancelDialStage1;
+    workCurrent.cancel = (WebPageCancel) &GVWebPage::cancelDialStage1;
 
     QString strLink = QString (GV_HTTPS_M "/caller?number=%1")
                       .arg(workCurrent.arrParams[0].toString());
@@ -638,7 +420,7 @@ GVWebPage::callStage1 (bool bOk)
             break;
         }
 
-        workCurrent.cancel = &GVWebPage::cancelDialStage2;
+        workCurrent.cancel = (WebPageCancel) &GVWebPage::cancelDialStage2;
         QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
                            this   , SLOT   (callStage2 (bool)));
         call.evaluateJavaScript ("this.click();");
@@ -646,7 +428,7 @@ GVWebPage::callStage1 (bool bOk)
     } while (0); // End cleanup block (not a loop)
     if (!bOk)
     {
-        completeCurrentWork (GVWW_dialCallback, false);
+        completeCurrentWork (GVAW_dialCallback, false);
     }
 }//GVWebPage::callStage1
 
@@ -675,7 +457,7 @@ GVWebPage::callStage2 (bool bOk)
         }
         bOk = false;
 
-        workCurrent.cancel = &GVWebPage::cancelDialStage3;
+        workCurrent.cancel = (WebPageCancel) &GVWebPage::cancelDialStage3;
 
         QWebElementCollection numbers = doc().findAll ("input[type=\"radio\"]");
         if (0 != numbers.count ())
@@ -691,7 +473,7 @@ GVWebPage::callStage2 (bool bOk)
     } while (0); // End cleanup block (not a loop)
     if (!bOk)
     {
-        completeCurrentWork (GVWW_dialCallback, false);
+        completeCurrentWork (GVAW_dialCallback, false);
     }
     else
     {
@@ -716,7 +498,7 @@ GVWebPage::cancelDialStage3 ()
         btnCancel.evaluateJavaScript ("this.click();");
     } while (0); // End cleanup block (not a loop)
 
-    completeCurrentWork (GVWW_dialCallback, false);
+    completeCurrentWork (GVAW_dialCallback, false);
 }//GVWebPage::cancelDialStage3
 
 bool
@@ -725,7 +507,7 @@ GVWebPage::getContactInfoFromLink ()
     QMutexLocker locker(&mutex);
     if (!bLoggedIn)
     {
-        completeCurrentWork (GVWW_getContactFromLink, false);
+        completeCurrentWork (GVAW_getContactFromLink, false);
         return (false);
     }
 
@@ -811,7 +593,7 @@ GVWebPage::contactInfoLoaded (bool bOk)
         emit contactInfo (info);
     }
 
-    completeCurrentWork (GVWW_getContactFromLink, bOk);
+    completeCurrentWork (GVAW_getContactFromLink, bOk);
 }//GVWebPage::contactInfoLoaded
 
 bool
@@ -820,7 +602,7 @@ GVWebPage::getRegisteredPhones ()
     QMutexLocker locker(&mutex);
     if (!bLoggedIn)
     {
-        completeCurrentWork (GVWW_getRegisteredPhones, false);
+        completeCurrentWork (GVAW_getRegisteredPhones, false);
         return (false);
     }
 
@@ -873,7 +655,7 @@ GVWebPage::phonesListLoaded (bool bOk)
         bOk = true;
     } while (0); // End cleanup block (not a loop)
 
-    completeCurrentWork (GVWW_getRegisteredPhones, bOk);
+    completeCurrentWork (GVAW_getRegisteredPhones, bOk);
 }//GVWebPage::phonesListLoaded
 
 bool
@@ -883,7 +665,7 @@ GVWebPage::selectRegisteredPhone ()
     if (!bLoggedIn)
     {
         emit log ("Not logged in. Cannot select registered phone");
-        completeCurrentWork (GVWW_selectRegisteredPhone, false);
+        completeCurrentWork (GVAW_selectRegisteredPhone, false);
         return (false);
     }
 
@@ -959,7 +741,7 @@ GVWebPage::selectPhoneLoaded (bool bOk)
 
     if (!bOk)
     {
-        completeCurrentWork (GVWW_selectRegisteredPhone, bOk);
+        completeCurrentWork (GVAW_selectRegisteredPhone, bOk);
     }
 }//GVWebPage::selectPhoneLoaded
 
@@ -980,60 +762,8 @@ GVWebPage::onRegPhoneSelected (bool bOk)
         bOk = true;
     } while (0); // End cleanup block (not a loop)
 
-    completeCurrentWork (GVWW_selectRegisteredPhone, bOk);
+    completeCurrentWork (GVAW_selectRegisteredPhone, bOk);
 }//GVWebPage::onRegPhoneSelected
-
-bool
-GVWebPage::cancelWork (GVWeb_Work whatwork)
-{
-    bool rv = false;
-    QMutexLocker locker(&mutex);
-    do // Begin cleanup block (not a loop)
-    {
-        if (whatwork == workCurrent.whatwork)
-        {
-            workCurrent.bCancel = true;
-
-            if (NULL != workCurrent.cancel)
-            {
-                (this->*(workCurrent.cancel)) ();
-            }
-
-            workCurrent.init ();
-            doNextWork ();
-
-            rv = true;
-            break;
-        }
-
-        for (int i = 0; i < workList.size (); i++)
-        {
-            if (whatwork == workList[i].whatwork)
-            {
-                GVWeb_WorkItem item = workList.takeAt (i);
-                if (NULL != item.cancel)
-                {
-                    (this->*(workCurrent.cancel)) ();
-                }
-
-                rv = true;
-                break;
-            }
-        }
-    } while (0); // End cleanup block (not a loop)
-
-    return (rv);
-}//GVWebPage::cancelWork
-
-void
-GVWebPage::dialCanFinish ()
-{
-    QMutexLocker locker(&mutex);
-    if (GVWW_dialCallback == workCurrent.whatwork)
-    {
-        completeCurrentWork (GVWW_dialCallback, true);
-    }
-}//GVWebPage::dialCanFinish
 
 void
 GVWebPage::userCancel ()
@@ -1048,7 +778,7 @@ GVWebPage::getHistory ()
     QMutexLocker locker(&mutex);
     if (!bLoggedIn)
     {
-        completeCurrentWork (GVWW_getHistory, false);
+        completeCurrentWork (GVAW_getHistory, false);
         return (false);
     }
 
@@ -1296,7 +1026,7 @@ GVWebPage::historyPageLoaded (bool bOk)
         {
             // Events are all over. get out
             bOk = true;
-            completeCurrentWork (GVWW_getHistory, true);
+            completeCurrentWork (GVAW_getHistory, true);
             break;
         }
 
@@ -1311,7 +1041,7 @@ GVWebPage::historyPageLoaded (bool bOk)
         if ((nFirstPage + nNeeded) <= nCurrent)
         {
             bOk = true;
-            completeCurrentWork (GVWW_getHistory, true);
+            completeCurrentWork (GVAW_getHistory, true);
             break;
         }
 
@@ -1329,7 +1059,7 @@ GVWebPage::historyPageLoaded (bool bOk)
 
     if (!bOk)
     {
-        completeCurrentWork (GVWW_getHistory, false);
+        completeCurrentWork (GVAW_getHistory, false);
     }
 }//GVWebPage::historyPageLoaded
 
@@ -1340,7 +1070,7 @@ GVWebPage::getContactFromHistoryLink ()
     if (!bLoggedIn)
     {
         emit log ("User not logged in when calling history link");
-        completeCurrentWork (GVWW_getContactFromHistoryLink, false);
+        completeCurrentWork (GVAW_getContactFromHistoryLink, false);
         return (false);
     }
 
@@ -1422,20 +1152,8 @@ GVWebPage::getContactFromHistoryLinkLoaded (bool bOk)
         emit contactInfo (info);
     }
 
-    completeCurrentWork (GVWW_getContactFromHistoryLink, bOk);
+    completeCurrentWork (GVAW_getContactFromHistoryLink, bOk);
 }//GVWebPage::getContactFromHistoryLinkLoaded
-
-void
-GVWebPage::simplify_number (QString &strNumber)
-{
-    strNumber.remove(QChar (' ')).remove(QChar ('(')).remove(QChar (')'));
-    strNumber.remove(QChar ('-'));
-
-    if (!strNumber.startsWith ("+"))
-    {
-        strNumber = "+1" + strNumber;
-    }
-}//GVWebPage::simplify_number
 
 void
 GVWebPage::garbageTimerTimeout ()
@@ -1446,60 +1164,6 @@ GVWebPage::garbageTimerTimeout ()
     garbageTimer.start ();
 }//GVWebPage::garbageTimerTimeout
 
-QString
-GVWebPage::getNameForWork (GVWeb_Work whatwork)
-{
-    QString strResult = QString ("%1: %2");
-    const char *func = NULL;
-
-    switch (whatwork)
-    {
-    case GVWW_aboutBlank:
-        func = "aboutBlank";
-        break;
-    case GVWW_logout:
-        func = "logout";
-        break;
-    case GVWW_getAllContacts:
-        func = "getAllContacts";
-        break;
-    case GVWW_getRegisteredPhones:
-        func = "getRegisteredPhones";
-        break;
-    case GVWW_selectRegisteredPhone:
-        func = "selectRegisteredPhone";
-        break;
-    case GVWW_dialCallback:
-        func = "dialCallback";
-        break;
-    case GVWW_getContactFromHistoryLink:
-        func = "getContactFromHistoryLink";
-        break;
-    case GVWW_getContactFromLink:
-        func = "getContactFromLink";
-        break;
-    case GVWW_login:
-        func = "login";
-        break;
-    case GVWW_getHistory:
-        func = "getHistory";
-        break;
-    case GVWW_sendSMS:
-        func = "sendSMS";
-        break;
-    case GVWW_playVmail:
-        func = "playVmail";
-        break;
-    default:
-        func = "unknown";
-        break;
-    }
-
-    strResult = strResult.arg(whatwork).arg(func);
-
-    return (strResult);
-}//GVWebPage::getNameForWork
-
 bool
 GVWebPage::sendSMS ()
 {
@@ -1507,7 +1171,7 @@ GVWebPage::sendSMS ()
     if (!bLoggedIn)
     {
         emit log ("User not logged in when attempting to send an SMS");
-        completeCurrentWork (GVWW_sendSMS, false);
+        completeCurrentWork (GVAW_sendSMS, false);
         return (false);
     }
 
@@ -1571,7 +1235,7 @@ GVWebPage::sendSMSPage1 (bool bOk)
         bOk = true;
     } while (0); // End cleanup block (not a loop)
 
-    completeCurrentWork (GVWW_sendSMS, bOk);
+    completeCurrentWork (GVAW_sendSMS, bOk);
 }//GVWebPage::sendSMSPage1
 
 bool
@@ -1581,7 +1245,7 @@ GVWebPage::playVmail ()
     if (!bLoggedIn)
     {
         emit log ("User not logged in when attempting to play vmail");
-        completeCurrentWork (GVWW_playVmail, false);
+        completeCurrentWork (GVAW_playVmail, false);
         return (false);
     }
 
@@ -1624,7 +1288,7 @@ GVWebPage::playVmailPageDone (bool bOk)
     } while (0); // End cleanup block (not a loop)
     if (!bOk)
     {
-        completeCurrentWork (GVWW_playVmail, false);
+        completeCurrentWork (GVAW_playVmail, false);
     }
 }//GVWebPage::playVmailPageDone
 
@@ -1672,7 +1336,7 @@ GVWebPage::vmailDataDone ()
 
         do // Begin cleanup block (not a loop)
         {
-            if (GVWW_playVmail != workCurrent.whatwork)
+            if (GVAW_playVmail != workCurrent.whatwork)
             {
                 emit log ("Delayed response to our data??");
                 break;
@@ -1696,7 +1360,7 @@ GVWebPage::vmailDataDone ()
         } while (0); // End cleanup block (not a loop)
 
         reply->deleteLater ();
-        completeCurrentWork (GVWW_playVmail, bOk);
+        completeCurrentWork (GVAW_playVmail, bOk);
     } while (0); // End cleanup block (not a loop)
     if (bOk)
     {

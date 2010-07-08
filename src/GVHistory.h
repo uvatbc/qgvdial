@@ -1,16 +1,14 @@
 #ifndef __GVHISTORY_H__
 #define __GVHISTORY_H__
 
-#include <QtGui>
-#include "GVWebPage.h"
-#include "CacheDatabase.h"
+#include "global.h"
 
 class GVHistory : public QTreeWidget
 {
     Q_OBJECT
 
 public:
-    GVHistory(CacheDatabase &db, QWidget *parent = 0);
+    GVHistory (QWidget *parent = 0);
     ~GVHistory(void);
 
 signals:
@@ -60,9 +58,6 @@ private:
     GVH_Event_Type  string_to_type (const QString  &strType);
 
 private:
-    //! Reference to the main database
-    CacheDatabase  &dbMain;
-
     //! Refresh action for history
     QAction         actRefresh;
     //! Menu to hold the various history types:

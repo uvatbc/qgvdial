@@ -2,14 +2,13 @@
 #define __GVCONTACTSTABLE_H__
 
 #include <QtGui>
-#include "CacheDatabase.h"
 
 class GVContactsTable : public QTreeView
 {
     Q_OBJECT
 
 public:
-    GVContactsTable (CacheDatabase &db, QWidget *parent = 0);
+    GVContactsTable (QWidget *parent = 0);
 
 signals:
     //! Log emitter
@@ -53,9 +52,6 @@ private:
     void contextMenuEvent (QContextMenuEvent * event);
 
 private:
-    //! Reference to the main database
-    CacheDatabase  &dbMain;
-
     //! Refresh action for contacts
     QAction         actRefresh;
 

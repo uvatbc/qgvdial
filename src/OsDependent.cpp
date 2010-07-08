@@ -4,13 +4,6 @@ OsDependent::OsDependent(QObject *parent) : QObject(parent)
 {
 }//OsDependent::OsDependent
 
-OsDependent &
-OsDependent::getRef ()
-{
-    static OsDependent singleton(NULL);
-    return (singleton);
-}//OsDependent::getRef
-
 void
 OsDependent::init ()
 {

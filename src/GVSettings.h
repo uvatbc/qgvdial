@@ -10,10 +10,8 @@ class GVSettings : public ChildWindowBase
     Q_OBJECT
 
 public:
-    GVSettings(CacheDatabase   &db        ,
-               QWidget         *parent = 0,
-               Qt::WindowFlags  f      = 0);
-    ~GVSettings(void);
+    GVSettings (QWidget *parent = 0, Qt::WindowFlags f = 0);
+    ~GVSettings (void);
 
     bool refreshRegisteredNumbers ();
     QString getSelectedNumber ();
@@ -66,9 +64,6 @@ private:
     QPushButton btnLogin;
     //! Is the button in login?
     bool        bBtnLogin;
-
-    // Reference to the main SQLITE db
-    CacheDatabase &dbMain;
 
     //! The users registered numbers
     GVRegisteredNumberArray arrNumbers;

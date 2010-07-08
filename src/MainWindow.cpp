@@ -1,5 +1,5 @@
 #include "MainWindow.h"
-#include "GVWebPage.h"
+#include "SingletonFactory.h"
 #include "DlgSelectContactNumber.h"
 #include "UniqueAppHelper.h"
 #include "DialCancelDlg.h"
@@ -26,7 +26,6 @@ MainWindow::MainWindow (QWidget *parent/* = 0*/, Qt::WindowFlags f/* = 0*/)
 , dlgSMS (this, ChildWindowBase_flags)
 , vmailPlayer (this, ChildWindowBase_flags)
 , stateMachine(this)
-, dbMain(QSqlDatabase::addDatabase ("QSQLITE"), this)
 , modelContacts(NULL)
 , wakeupTimer (this)
 {
@@ -43,8 +42,8 @@ MainWindow::MainWindow (QWidget *parent/* = 0*/, Qt::WindowFlags f/* = 0*/)
     QObject::connect (&unique, SIGNAL (log(const QString &, int)),
                       this   , SLOT   (log(const QString &, int)));
 
-    GVWebPage::initParent (this);
-    GVWebPage &webPage = GVWebPage::getRef ();
+    GVAccess &webPage = SingletonFactory::getRef().getGVAccess ();
+    webPage.setParent (this);
 
     // Observer factory log and status
     ObserverFactory &obFactory = ObserverFactory::getRef ();
@@ -166,7 +165,8 @@ MainWindow::hideProgress ()
 void
 MainWindow::init ()
 {
-    GVWebPage &webPage = GVWebPage::getRef ();
+    GVAccess &webPage = SingletonFactory::getRef().getGVAccess ();
+    CacheDatabase &dbMain = SingletonFactory::getRef().getDBMain ();
 
     dbMain.init ();
 
@@ -206,15 +206,15 @@ MainWindow::init ()
     tabMain->addTab (pDialer, "Dialer");
 
     // Contacts
-    pContactsTable = new GVContactsTable (dbMain);
+    pContactsTable = new GVContactsTable ();
     tabMain->addTab (pContactsTable, "Contacts");
 
     // GV History
-    pGVHistory = new GVHistory (dbMain);
+    pGVHistory = new GVHistory ();
     tabMain->addTab (pGVHistory, "History");
 
     // GV settings
-    pGVSettings = new GVSettings (dbMain, this, ChildWindowBase_flags);
+    pGVSettings = new GVSettings (this, ChildWindowBase_flags);
     pGVSettings->hide ();
 
     gridMain->addWidget (tabMain, 0,0, 1,4);
@@ -389,7 +389,7 @@ MainWindow::aboutBlankDone (bool)
 void
 MainWindow::doLogin (const QString &strU, const QString &strP)
 {
-    GVWebPage &webPage = GVWebPage::getRef ();
+    GVAccess &webPage = SingletonFactory::getRef().getGVAccess ();
 
     bool bOk = false;
     do // Begin cleanup block (not a loop)
@@ -400,7 +400,7 @@ MainWindow::doLogin (const QString &strU, const QString &strP)
 
         log ("Beginning login");
         // webPage.workCompleted -> this.loginCompleted
-        if (!webPage.enqueueWork (GVWW_login, l, this,
+        if (!webPage.enqueueWork (GVAW_login, l, this,
                 SLOT (loginCompleted (bool, const QVariantList &))))
         {
             log ("Login returned immediately with failure!", 3);
@@ -467,6 +467,7 @@ MainWindow::beginGetAccountDetails ()
 void
 MainWindow::gotContact (int cnt, const QString &strName, const QString &strLink)
 {
+    CacheDatabase &dbMain = SingletonFactory::getRef().getDBMain ();
     dbMain.insertContact (modelContacts, cnt, strName, strLink);
 }//MainWindow::gotContact
 
@@ -504,9 +505,9 @@ MainWindow::getContactsDone (bool bOk)
 void
 MainWindow::doLogout ()
 {
-    GVWebPage &webPage = GVWebPage::getRef ();
+    GVAccess &webPage = SingletonFactory::getRef().getGVAccess ();
     QVariantList l;
-    webPage.enqueueWork (GVWW_logout, l, this,
+    webPage.enqueueWork (GVAW_logout, l, this,
                          SLOT (logoutCompleted (bool, const QVariantList &)));
 }//MainWindow::doLogout
 
@@ -531,6 +532,7 @@ MainWindow::initContactsModel ()
 {
     deinitContactsModel ();
 
+    CacheDatabase &dbMain = SingletonFactory::getRef().getDBMain ();
     modelContacts = dbMain.newSqlTableModel ();
     pContactsTable->setModel (modelContacts);
     pContactsTable->hideColumn (1);
@@ -555,7 +557,8 @@ MainWindow::deinitContactsModel ()
 void
 MainWindow::callNameLink (const QString &strNameLink, const QString &strNumber)
 {
-    GVWebPage &webPage = GVWebPage::getRef ();
+    GVAccess &webPage = SingletonFactory::getRef().getGVAccess ();
+    CacheDatabase &dbMain = SingletonFactory::getRef().getDBMain ();
 
     bool bOk = false;
     do // Begin cleanup block (not a loop)
@@ -575,7 +578,7 @@ MainWindow::callNameLink (const QString &strNameLink, const QString &strNumber)
         QVariantList l;
         l += strNameLink;
         l += strNumber;
-        if (!webPage.enqueueWork (GVWW_getContactFromLink, l, this,
+        if (!webPage.enqueueWork (GVAW_getContactFromLink, l, this,
                 SLOT (contactsLinkWorkDone (bool, const QVariantList &))))
         {
             QObject::disconnect (
@@ -605,7 +608,8 @@ MainWindow::callNameLink (const QString &strNameLink, const QString &strNumber)
 void
 MainWindow::callHistoryLink (const QString &strLink)
 {
-    GVWebPage &webPage = GVWebPage::getRef ();
+    GVAccess &webPage = SingletonFactory::getRef().getGVAccess ();
+    CacheDatabase &dbMain = SingletonFactory::getRef().getDBMain ();
 
     bool bOk = false;
     do // Begin cleanup block (not a loop)
@@ -624,7 +628,7 @@ MainWindow::callHistoryLink (const QString &strLink)
              this   , SLOT   (gotContactInfo (const GVContactInfo &)));
         QVariantList l;
         l += strLink;
-        if (!webPage.enqueueWork (GVWW_getContactFromHistoryLink, l, this,
+        if (!webPage.enqueueWork (GVAW_getContactFromHistoryLink, l, this,
                 SLOT (contactsLinkWorkDone (bool, const QVariantList &))))
         {
             QObject::disconnect (
@@ -654,6 +658,7 @@ MainWindow::callHistoryLink (const QString &strLink)
 void
 MainWindow::gotContactInfo (const GVContactInfo &info, bool bCallback)
 {
+    CacheDatabase &dbMain = SingletonFactory::getRef().getDBMain ();
     if (bCallback)
     {
         dbMain.putContactInfo (info);
@@ -686,7 +691,7 @@ MainWindow::gotContactInfo (const GVContactInfo &info, bool bCallback)
 void
 MainWindow::contactsLinkWorkDone (bool, const QVariantList &)
 {
-    GVWebPage &webPage = GVWebPage::getRef ();
+    GVAccess &webPage = SingletonFactory::getRef().getGVAccess ();
     QObject::disconnect (
         &webPage, SIGNAL (contactInfo (const GVContactInfo &)),
          this   , SLOT   (gotContactInfo (const GVContactInfo &)));
@@ -698,10 +703,10 @@ void
 MainWindow::dialNow (const QString &strTarget)
 {
     strCurrentDialed = strTarget;
-    GVWebPage &webPage = GVWebPage::getRef ();
+    GVAccess &webPage = SingletonFactory::getRef().getGVAccess ();
     QVariantList l;
     l += strTarget;
-    if (!webPage.enqueueWork (GVWW_dialCallback, l, this,
+    if (!webPage.enqueueWork (GVAW_dialCallback, l, this,
             SLOT (dialComplete (bool, const QVariantList &))))
     {
         log ("Dialing failed instantly", 3);
@@ -722,8 +727,8 @@ MainWindow::dialInProgress ()
     else
     {
         bDialCancelled = true;
-        GVWebPage &webPage = GVWebPage::getRef ();
-        webPage.cancelWork (GVWW_dialCallback);
+        GVAccess &webPage = SingletonFactory::getRef().getGVAccess ();
+        webPage.cancelWork (GVAW_dialCallback);
     }
 }//MainWindow::dialInProgress
 
@@ -762,10 +767,10 @@ MainWindow::regNumChanged (const QString &strNumber)
 {
     log (QString ("Changing callback to %1").arg(strNumber));
 
-    GVWebPage &webPage = GVWebPage::getRef ();
+    GVAccess &webPage = SingletonFactory::getRef().getGVAccess ();
     QVariantList l;
     l += strNumber;
-    if (!webPage.enqueueWork (GVWW_selectRegisteredPhone, l, this,
+    if (!webPage.enqueueWork (GVAW_selectRegisteredPhone, l, this,
             SLOT (regNumChangeComplete (bool, const QVariantList &))))
     {
         log ("Failed to save the callback number instantly", 3);
@@ -845,7 +850,8 @@ MainWindow::tabChanged (int index)
 void
 MainWindow::sendSMSToLink (const QString &strLink)
 {
-    GVWebPage &webPage = GVWebPage::getRef ();
+    GVAccess &webPage = SingletonFactory::getRef().getGVAccess ();
+    CacheDatabase &dbMain = SingletonFactory::getRef().getDBMain ();
 
     bool bOk = false;
     do // Begin cleanup block (not a loop)
@@ -864,7 +870,7 @@ MainWindow::sendSMSToLink (const QString &strLink)
              this   , SLOT   (gotSMSContactInfo (const GVContactInfo &)));
         QVariantList l;
         l += strLink;
-        if (!webPage.enqueueWork (GVWW_getContactFromHistoryLink, l, this,
+        if (!webPage.enqueueWork (GVAW_getContactFromHistoryLink, l, this,
                 SLOT (contactsLinkWorkDoneSMS (bool, const QVariantList &))))
         {
             QObject::disconnect (
@@ -895,7 +901,8 @@ void
 MainWindow::sendSMSToNameLink (const QString &strNameLink,
                                const QString &strNumber)
 {
-    GVWebPage &webPage = GVWebPage::getRef ();
+    GVAccess &webPage = SingletonFactory::getRef().getGVAccess ();
+    CacheDatabase &dbMain = SingletonFactory::getRef().getDBMain ();
 
     bool bOk = false;
     do // Begin cleanup block (not a loop)
@@ -915,7 +922,7 @@ MainWindow::sendSMSToNameLink (const QString &strNameLink,
         QVariantList l;
         l += strNameLink;
         l += strNumber;
-        if (!webPage.enqueueWork (GVWW_getContactFromLink, l, this,
+        if (!webPage.enqueueWork (GVAW_getContactFromLink, l, this,
                 SLOT (contactsLinkWorkDoneSMS (bool, const QVariantList &))))
         {
             QObject::disconnect (
@@ -945,6 +952,7 @@ MainWindow::sendSMSToNameLink (const QString &strNameLink,
 void
 MainWindow::gotSMSContactInfo (const GVContactInfo &info, bool bCallback)
 {
+    CacheDatabase &dbMain = SingletonFactory::getRef().getDBMain ();
     if (bCallback)
     {
         dbMain.putContactInfo (info);
@@ -986,7 +994,7 @@ MainWindow::gotSMSContactInfo (const GVContactInfo &info, bool bCallback)
 void
 MainWindow::contactsLinkWorkDoneSMS (bool, const QVariantList &)
 {
-    GVWebPage &webPage = GVWebPage::getRef ();
+    GVAccess &webPage = SingletonFactory::getRef().getGVAccess ();
     QObject::disconnect (
         &webPage, SIGNAL (contactInfo       (const GVContactInfo &)),
          this   , SLOT   (gotSMSContactInfo (const GVContactInfo &)));
@@ -997,7 +1005,7 @@ MainWindow::contactsLinkWorkDoneSMS (bool, const QVariantList &)
 void
 MainWindow::sendSMS (const QStringList &arrNumbers, const QString &strText)
 {
-    GVWebPage &webPage = GVWebPage::getRef ();
+    GVAccess &webPage = SingletonFactory::getRef().getGVAccess ();
     QStringList arrFailed;
 
     for (int i = 0; i < arrNumbers.size (); i++)
@@ -1005,7 +1013,7 @@ MainWindow::sendSMS (const QStringList &arrNumbers, const QString &strText)
         QVariantList l;
         l += arrNumbers[i];
         l += strText;
-        if (!webPage.enqueueWork (GVWW_sendSMS, l, this,
+        if (!webPage.enqueueWork (GVAW_sendSMS, l, this,
                 SLOT (sendSMSDone (bool, const QVariantList &))))
         {
             arrFailed += arrNumbers[i];
@@ -1047,7 +1055,7 @@ MainWindow::sendSMSDone (bool bOk, const QVariantList &)
 void
 MainWindow::playVoicemail (const QString &strVmailLink)
 {
-    GVWebPage &webPage = GVWebPage::getRef ();
+    GVAccess &webPage = SingletonFactory::getRef().getGVAccess ();
 
     do // Begin cleanup block (not a loop)
     {
@@ -1073,7 +1081,7 @@ MainWindow::playVoicemail (const QString &strVmailLink)
         QVariantList l;
         l += strVmailLink;
         l += strTemp;
-        if (!webPage.enqueueWork (GVWW_playVmail, l, this,
+        if (!webPage.enqueueWork (GVAW_playVmail, l, this,
                 SLOT (playVoicemailDone (bool, const QVariantList &))))
         {
             log ("Failed to play Voice mail", 3);

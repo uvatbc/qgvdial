@@ -1,12 +1,10 @@
 #include "GVSettings.h"
-#include "GVWebPage.h"
+#include "SingletonFactory.h"
 
 #define ROW_BELOW_PASS 2
 #define CB_TEXT_BUILDER "%1 : %2"
 
-GVSettings::GVSettings(CacheDatabase   &db              ,
-                       QWidget         *parent  /* = 0*/,
-                       Qt::WindowFlags  f       /* = 0*/)
+GVSettings::GVSettings(QWidget *parent /* = 0*/, Qt::WindowFlags f /* = 0*/)
 : ChildWindowBase (parent, f)
 , grid(this)
 , lblUser("User name", this)
@@ -16,8 +14,8 @@ GVSettings::GVSettings(CacheDatabase   &db              ,
 , lblNumbers("Phones", this)
 , cbNumbers(this)
 , btnLogin(this)
-, dbMain(db)
 {
+    CacheDatabase &dbMain = SingletonFactory::getRef().getDBMain ();
     edPass.setEchoMode (QLineEdit::Password);
     btnLogin.setText ("Login");
     bBtnLogin = true;
@@ -98,6 +96,7 @@ GVSettings::btnLogin_clicked ()
 void
 GVSettings::loginDone (bool bOk/* = true*/)
 {
+    CacheDatabase &dbMain = SingletonFactory::getRef().getDBMain ();
     do { // Begin cleanup block (not a loop)
         logoutDone (!bOk);
         if (!bOk)
@@ -182,7 +181,7 @@ GVSettings::logoutDone (bool bOk/* = true*/)
 bool
 GVSettings::refreshRegisteredNumbers ()
 {
-    GVWebPage &webPage = GVWebPage::getRef ();
+    GVAccess &webPage = SingletonFactory::getRef().getGVAccess ();
 
     bool rv = false;
     do { // Begin cleanup block (not a loop)
@@ -200,7 +199,7 @@ GVSettings::refreshRegisteredNumbers ()
         QObject::connect(
             &webPage, SIGNAL (registeredPhone    (const GVRegisteredNumber &)),
              this   , SLOT   (gotRegisteredPhone (const GVRegisteredNumber &)));
-        if (!webPage.enqueueWork (GVWW_getRegisteredPhones, l, this,
+        if (!webPage.enqueueWork (GVAW_getRegisteredPhones, l, this,
                 SLOT (gotAllRegisteredPhones (bool, const QVariantList &))))
         {
             QObject::disconnect(
@@ -230,7 +229,7 @@ GVSettings::gotRegisteredPhone (const GVRegisteredNumber &info)
 void
 GVSettings::gotAllRegisteredPhones (bool bOk, const QVariantList &)
 {
-    GVWebPage &webPage = GVWebPage::getRef ();
+    GVAccess &webPage = SingletonFactory::getRef().getGVAccess ();
     QObject::disconnect(
         &webPage, SIGNAL (registeredPhone    (const GVRegisteredNumber &)),
          this   , SLOT   (gotRegisteredPhone (const GVRegisteredNumber &)));
@@ -262,6 +261,7 @@ void
 GVSettings::setRegNumWidget (bool bSave)
 {
     // Set the correct callback
+    CacheDatabase &dbMain = SingletonFactory::getRef().getDBMain ();
     QString strCallback;
     bool bGotCallback = dbMain.getCallback (strCallback);
     cbNumbers.clear ();
@@ -295,6 +295,7 @@ GVSettings::getSelectedNumber ()
 void
 GVSettings::cbNumbers_currentIndexChanged (int index)
 {
+    CacheDatabase &dbMain = SingletonFactory::getRef().getDBMain ();
     if ((index >= 0) && (arrNumbers.size () > index))
     {
         QString strCallback = arrNumbers[index].strNumber;

@@ -86,4 +86,7 @@ public:
     }
 };
 
+typedef QPair<QString,QString> QStringPair;
+typedef QList<QStringPair> QStringPairList;
+
 #endif //__GLOBAL_H__

@@ -1,9 +1,9 @@
 #include "global.h"
 #include "GVHistory.h"
+#include "SingletonFactory.h"
 
-GVHistory::GVHistory(CacheDatabase &db, QWidget *parent/* = 0*/)
+GVHistory::GVHistory (QWidget *parent/* = 0*/)
 : QTreeWidget(parent)
-, dbMain(db)
 , actRefresh("&Refresh", this)
 , mnuSelectInbox("Select", this)
 , menubarActions("Event actions", this)
@@ -138,7 +138,7 @@ GVHistory::refreshHistory ()
         return;
     }
 
-    GVWebPage &webPage = GVWebPage::getRef ();
+    GVAccess &webPage = SingletonFactory::getRef().getGVAccess ();
     QVariantList l;
     l += strSelected;
     l += "1";
@@ -147,7 +147,7 @@ GVHistory::refreshHistory ()
         &webPage, SIGNAL (oneHistoryEvent (const GVHistoryEvent &)),
          this   , SLOT   (oneHistoryEvent (const GVHistoryEvent &)));
     emit status ("Retrieving history events...");
-    if (!webPage.enqueueWork (GVWW_getHistory, l, this,
+    if (!webPage.enqueueWork (GVAW_getHistory, l, this,
             SLOT (getHistoryDone (bool, const QVariantList &))))
     {
         getHistoryDone (false, l);
@@ -255,7 +255,7 @@ GVHistory::oneHistoryEvent (const GVHistoryEvent &hevent)
 void
 GVHistory::getHistoryDone (bool, const QVariantList &)
 {
-    GVWebPage &webPage = GVWebPage::getRef ();
+    GVAccess &webPage = SingletonFactory::getRef().getGVAccess ();
     QObject::disconnect (
         &webPage, SIGNAL (oneHistoryEvent (const GVHistoryEvent &)),
          this   , SLOT   (oneHistoryEvent (const GVHistoryEvent &)));

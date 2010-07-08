@@ -1,7 +1,7 @@
 #include <QtGui/QApplication>
 #include "MainWindow.h"
 #include "UniqueAppHelper.h"
-#include "OsDependent.h"
+#include "SingletonFactory.h"
 
 int
 main(int argc, char *argv[])
@@ -9,7 +9,7 @@ main(int argc, char *argv[])
     QApplication app(argc, argv);
     app.setQuitOnLastWindowClosed (false);
 
-    OsDependent &osd = OsDependent::getRef ();
+    OsDependent &osd = SingletonFactory::getRef().getOSD ();
     osd.init ();
 
     UniqueAppHelper &unique = UniqueAppHelper::getRef ();

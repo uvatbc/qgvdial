@@ -9,10 +9,11 @@ class CacheDatabase : public QObject
 {
     Q_OBJECT
 
-public:
+private:
     CacheDatabase(const QSqlDatabase &other, QObject *parent = 0);
     ~CacheDatabase(void);
 
+public:
     void init ();
     QSqlTableModel *newSqlTableModel();
     void clearContacts ();
@@ -40,6 +41,8 @@ signals:
 
 private:
     QSqlDatabase    dbMain;
+
+    friend class SingletonFactory;
 };
 
 #endif //__CACHEDATABASE_H__

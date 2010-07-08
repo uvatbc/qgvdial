@@ -17,11 +17,12 @@ class OsDependent : public QObject
     Q_OBJECT
 
 public:
-    static OsDependent &getRef ();
     void init ();
 
 private:
     OsDependent(QObject *parent = 0);
+
+    friend class SingletonFactory;
 };
 
 #ifdef QT_NO_SYSTEMTRAYICON

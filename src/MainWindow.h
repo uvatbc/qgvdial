@@ -2,15 +2,14 @@
 #define MAINWINDOW_H
 
 #include "global.h"
+#include <QtSql>
 #include "ChildWindowBase.h"
 #include "DialerWidget.h"
 #include "GVContactsTable.h"
 #include "GVSettings.h"
 #include "GVHistory.h"
-#include "OsDependent.h"
 #include "SMSDlg.h"
 #include "VoicemailWidget.h"
-#include "CacheDatabase.h"
 #include "MyWebView.h"
 
 class MainWindow : public QMainWindow
@@ -184,8 +183,6 @@ private:
     QState          sLoggedIn;
     QFinalState     sFinal;
 
-    // The SQLITE database
-    CacheDatabase   dbMain;
     QSqlTableModel *modelContacts;
 
     //! This is the Google Voice number

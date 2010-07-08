@@ -38,7 +38,10 @@ HEADERS +=  MainWindow.h                \
             UniqueAppHelper.h           \
             DialCancelDlg.h             \
             ObserverFactory.h           \
-            IObserver.h
+            IObserver.h                 \
+            GVAccess.h                  \
+            SingletonFactory.h          \
+            GVDataAccess.h
 
 
 SOURCES +=  main.cpp                    \
@@ -62,7 +65,10 @@ SOURCES +=  main.cpp                    \
             ChildWindowBase.cpp         \
             UniqueAppHelper.cpp         \
             DialCancelDlg.cpp           \
-            ObserverFactory.cpp
+            ObserverFactory.cpp         \
+            GVAccess.cpp                \
+            SingletonFactory.cpp        \
+            GVDataAccess.cpp
 
 RESOURCES = qgvdial.qrc
 

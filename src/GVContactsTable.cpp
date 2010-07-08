@@ -1,16 +1,15 @@
 #include "global.h"
 #include "GVContactsTable.h"
-#include "GVWebPage.h"
+#include "SingletonFactory.h"
 
-GVContactsTable::GVContactsTable (CacheDatabase &db, QWidget *parent) :
-QTreeView(parent),
-dbMain(db),
-actRefresh("&Refresh", this),
-mnuContext("Action", this),
-actPlaceCall("Call", this),
-actSendSMS("SMS", this),
-mutex(QMutex::Recursive),
-bLoggedIn(false)
+GVContactsTable::GVContactsTable (QWidget *parent)
+: QTreeView(parent)
+, actRefresh("&Refresh", this)
+, mnuContext("Action", this)
+, actPlaceCall("Call", this)
+, actSendSMS("SMS", this)
+, mutex(QMutex::Recursive)
+, bLoggedIn(false)
 {
     // Not modifyable
     this->setEditTriggers (QAbstractItemView::NoEditTriggers);
@@ -48,18 +47,19 @@ bLoggedIn(false)
 void
 GVContactsTable::refreshContacts ()
 {
+    CacheDatabase &dbMain = SingletonFactory::getRef().getDBMain ();
     QMutexLocker locker(&mutex);
     dbMain.clearContacts ();
     strSavedLink.clear ();
 
-    GVWebPage &webPage = GVWebPage::getRef ();
+    GVAccess &webPage = SingletonFactory::getRef().getGVAccess ();
     QVariantList l;
     nContacts = 0;
     QObject::connect (
         &webPage, SIGNAL (gotContact (const QString &, const QString &)),
          this   , SLOT   (gotContact (const QString &, const QString &)));
     emit status ("Retrieving all contacts...", 0);
-    if (!webPage.enqueueWork (GVWW_getAllContacts, l, this,
+    if (!webPage.enqueueWork (GVAW_getAllContacts, l, this,
             SLOT (getContactsDone (bool, const QVariantList &))))
     {
         getContactsDone (false, l);
@@ -78,7 +78,7 @@ GVContactsTable::gotContact (const QString &strName, const QString &strLink)
 void
 GVContactsTable::getContactsDone (bool bOk, const QVariantList &)
 {
-    GVWebPage &webPage = GVWebPage::getRef ();
+    GVAccess &webPage = SingletonFactory::getRef().getGVAccess ();
     QObject::disconnect(
         &webPage, SIGNAL (gotContact(const QString &, const QString &)),
         this    , SLOT   (gotContact(const QString &, const QString &)));

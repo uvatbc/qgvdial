@@ -86,7 +86,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\GVAccess.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\GVContactsTable.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GVDataAccess.cpp"
 				>
 			</File>
 			<File
@@ -119,6 +127,10 @@
 			</File>
 			<File
 				RelativePath=".\OsDependent.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SingletonFactory.cpp"
 				>
 			</File>
 			<File
@@ -160,7 +172,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\GVAccess.h"
+				>
+			</File>
+			<File
 				RelativePath=".\GVContactsTable.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GVDataAccess.h"
 				>
 			</File>
 			<File
@@ -189,6 +209,10 @@
 			</File>
 			<File
 				RelativePath=".\OsDependent.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SingletonFactory.h"
 				>
 			</File>
 			<File
