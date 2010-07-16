@@ -2,8 +2,8 @@
 #define __SINGLETONFACTORY_H__
 
 #include "global.h"
-#include "GVAccess.h"
 
+class GVAccess;
 class OsDependent;
 class CacheDatabase;
 
@@ -21,6 +21,7 @@ private:
     virtual ~SingletonFactory ();
 
 private:
+    GVAccess *pGVAccess;
 };
 
 #include "GVWebPage.h"

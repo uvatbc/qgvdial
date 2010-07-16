@@ -43,7 +43,6 @@ MainWindow::MainWindow (QWidget *parent/* = 0*/, Qt::WindowFlags f/* = 0*/)
                       this   , SLOT   (log(const QString &, int)));
 
     GVAccess &webPage = SingletonFactory::getRef().getGVAccess ();
-    webPage.setParent (this);
 
     // Observer factory log and status
     ObserverFactory &obFactory = ObserverFactory::getRef ();
@@ -94,7 +93,6 @@ MainWindow::MainWindow (QWidget *parent/* = 0*/, Qt::WindowFlags f/* = 0*/)
 
 MainWindow::~MainWindow ()
 {
-    deinit ();
 }//MainWindow::~MainWindow
 
 void

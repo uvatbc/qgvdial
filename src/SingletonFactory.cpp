@@ -2,6 +2,7 @@
 
 SingletonFactory::SingletonFactory (QObject *parent/* = 0*/)
 : QObject (parent)
+, pGVAccess (NULL)
 {
 }//SingletonFactory::SingletonFactory
 
@@ -19,9 +20,14 @@ SingletonFactory::getRef ()
 GVAccess &
 SingletonFactory::getGVAccess ()
 {
-    static GVWebPage gvAccess (this);
+    // The parent is purposefully NULL. Otherwise the app crashes on exit.
+    // Allocation is purposely dynamic for the same reason.
+    if (NULL == pGVAccess)
+    {
+        pGVAccess = new GVWebPage (NULL);
+    }
 
-    return (gvAccess);
+    return (*pGVAccess);
 }//SingletonFactory::getGVAccess
 
 OsDependent &

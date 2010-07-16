@@ -1,7 +1,7 @@
 #ifndef __GVWEBPAGE_H__
 #define __GVWEBPAGE_H__
 
-#define USE_GV_DATA_API 1
+#define USE_GV_DATA_API 0
 
 #include "global.h"
 #include "MobileWebPage.h"
@@ -16,7 +16,7 @@ class GVWebPage : public GVAccess
 
 private:
     GVWebPage(QObject *parent = NULL);
-    virtual ~GVWebPage(void);
+    ~GVWebPage(void);
 
 public:
 #if !NO_DBGINFO

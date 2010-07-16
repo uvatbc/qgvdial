@@ -1,9 +1,5 @@
 #include "GVWebPage.h"
 
-#ifndef USE_GV_DATA_API
-#define USE_GV_DATA_API 1
-#endif
-
 #define GV_DATA_BASE "https://www.google.com/voice"
 
 GVWebPage::GVWebPage(QObject *parent/* = NULL*/)
