@@ -1,5 +1,11 @@
 #include "GVWebPage.h"
 
+#ifndef USE_GV_DATA_API
+#define USE_GV_DATA_API 1
+#endif
+
+#define GV_DATA_BASE "https://www.google.com/voice"
+
 GVWebPage::GVWebPage(QObject *parent/* = NULL*/)
 : GVAccess (parent)
 , webPage (this)
@@ -85,6 +91,16 @@ GVWebPage::isLoadFailed (bool bOk)
 
     return (rv);
 }//GVWebPage::isLoadFailed
+
+QNetworkReply *
+GVWebPage::postRequest (QString            strUrl  ,
+                        QStringPairList    arrPairs,
+                        QObject           *receiver,
+                        const char        *method  )
+{
+    return GVAccess::postRequest (webPage.networkAccessManager (),
+                                  strUrl, arrPairs, receiver, method);
+}//GVWebPage::postRequest
 
 QWebElement
 GVWebPage::doc ()
@@ -224,6 +240,16 @@ GVWebPage::loginStage2 (bool bOk)
         strSelfNumber = num.toPlainText ();
         simplify_number (strSelfNumber, false);
         workCurrent.arrParams += QVariant (strSelfNumber);
+
+#define GVSELECTOR "input[name=\"_rnr_se\"]"
+        QWebElement rnr_se = doc().findFirst (GVSELECTOR);
+#undef GVSELECTOR
+        if (rnr_se.isNull ())
+        {
+            emit log ("Could not find rnr_se", 3);
+            break;
+        }
+        strRnr_se = rnr_se.attribute ("value");
 
         QMutexLocker locker(&mutex);
         bLoggedIn = true;
@@ -372,6 +398,25 @@ GVWebPage::dialCallback ()
         return (false);
     }
 
+#if USE_GV_DATA_API
+
+    QNetworkAccessManager *mgr = webPage.networkAccessManager ();
+    QVariantList &arrParams = workCurrent.arrParams;
+    QStringPairList arrPairs;
+    arrPairs += QStringPair("outgoingNumber",
+                                workCurrent.arrParams[0].toString());
+    arrPairs += QStringPair("forwardingNumber", strCurrentCallback);
+    arrPairs += QStringPair("subscriberNumber", strSelfNumber);
+    arrPairs += QStringPair("phoneType"       , QString(chCurrentCallbackType));
+    arrPairs += QStringPair("remember"        , "1");
+    arrPairs += QStringPair("_rnr_se"         , strRnr_se);
+
+    workCurrent.cancel = (WebPageCancel) &GVWebPage::cancelDataDial2;
+    postRequest (GV_DATA_BASE "/call/connect/", arrPairs,
+                 this, SLOT (onDataCallDone (QNetworkReply *)));
+
+#else //!USE_GV_DATA_API
+
     QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
                        this   , SLOT   (callStage1 (bool)));
     workCurrent.cancel = (WebPageCancel) &GVWebPage::cancelDialStage1;
@@ -379,55 +424,74 @@ GVWebPage::dialCallback ()
     QString strLink = QString (GV_HTTPS_M "/caller?number=%1")
                       .arg(workCurrent.arrParams[0].toString());
 
-#if 1
     QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
                        this   , SLOT   (callStage1 (bool)));
     this->loadUrlString (strLink);
-#else
-    QNetworkAccessManager *mgr = webPage.networkAccessManager ();
-    QVariantList &arrParams = workCurrent.arrParams;
-    QStringPairList arrPairs;
-    arrPairs += QStringPair("outgoingNumber",
-                                workCurrent.arrParams[0].toString());
-    arrPairs += QStringPair("forwardingNumber",
-                                strCurrentCallback);
-    arrPairs += QStringPair("subscriberNumber",
-                                strSelfNumber);
-    arrPairs += QStringPair("phoneType",
-                                QString(chCurrentCallbackType));
-    arrPairs += QStringPair("remember", "1");
 
-    QStringList arrstrParams;
-    foreach (QStringPair pairParam, arrPairs)
-    {
-        arrstrParams += QString("%1=%2")
-            .arg(pairParam.first)
-            .arg(pairParam.second);
-    }
-    QString strParams = arrstrParams.join ("&");
-
-    QUrl url ("https://www.google.com/voice/call/connect/");
-    QNetworkRequest request(url);
-    request.setHeader (QNetworkRequest::ContentTypeHeader,
-        "application/x-www-form-urlencoded");
-    QByteArray byPostData = strParams.toAscii ();
-
-    QObject::connect (mgr , SIGNAL (finished (QNetworkReply *)),
-                      this, SLOT (callDone (QNetworkReply *)));
-    QNetworkReply *reply = mgr->post (request, byPostData);
 #endif
     return (true);
 }//GVWebPage::dialCallback
 
+#if USE_GV_DATA_API
+
 void
-GVWebPage::callDone (QNetworkReply * reply)
+GVWebPage::onDataCallDone (QNetworkReply * reply)
 {
     QNetworkAccessManager *mgr = webPage.networkAccessManager ();
     QObject::disconnect (mgr , SIGNAL (finished (QNetworkReply *)),
-                         this, SLOT (callDone (QNetworkReply *)));
+                         this, SLOT (onDataCallDone (QNetworkReply *)));
     QByteArray ba = reply->readAll ();
+    QString msg = ba;
+
+    bool bOk = false;
+    do { // Begin cleanup block (not a loop)
+        msg = msg.simplified ();
+        msg.remove(QRegExp("[ \t\n]*"));
+        if (!msg.contains ("\"ok\":true", Qt::CaseSensitive))
+        {
+            emit log ("Failed to dial out");
+            break;
+        }
+
+        emit dialInProgress ();
+        bOk = true;
+    } while (0); // End cleanup block (not a loop)
+    if (!bOk)
+    {
+        completeCurrentWork (GVAW_dialCallback, false);
+    }
     reply->deleteLater ();
-}
+}//GVWebPage::onDataCallDone
+
+void
+GVWebPage::cancelDataDial2 ()
+{
+    QNetworkAccessManager *mgr = webPage.networkAccessManager ();
+    QVariantList &arrParams = workCurrent.arrParams;
+    QStringPairList arrPairs;
+    arrPairs += QStringPair("outgoingNumber"  , "undefined");
+    arrPairs += QStringPair("forwardingNumber", strCurrentCallback);
+    arrPairs += QStringPair("cancelType"      , "C2C");
+    arrPairs += QStringPair("_rnr_se"         , strRnr_se);
+
+    postRequest (GV_DATA_BASE "/call/cancel/", arrPairs,
+                 this, SLOT (onDataCallCanceled (QNetworkReply *)));
+}//GVWebPage::cancelDataDial2
+
+void
+GVWebPage::onDataCallCanceled (QNetworkReply * reply)
+{
+    QNetworkAccessManager *mgr = webPage.networkAccessManager ();
+    QObject::disconnect (mgr , SIGNAL (finished (QNetworkReply *)),
+                         this, SLOT (onDataCallCanceled (QNetworkReply *)));
+    QByteArray ba = reply->readAll ();
+    QString msg = ba;
+
+    completeCurrentWork (GVAW_dialCallback, false);
+    reply->deleteLater ();
+}//GVWebPage::onDataCallCanceled
+
+#else //!USE_GV_DATA_API
 
 void
 GVWebPage::cancelDialStage1 ()
@@ -481,6 +545,7 @@ GVWebPage::cancelDialStage2 ()
     webPage.triggerAction (QWebPage::Stop);
     cancelDialStage3 ();
 }//GVWebPage::cancelDialStage2
+
 
 void
 GVWebPage::callStage2 (bool bOk)
@@ -543,6 +608,8 @@ GVWebPage::cancelDialStage3 ()
 
     completeCurrentWork (GVAW_dialCallback, false);
 }//GVWebPage::cancelDialStage3
+
+#endif
 
 bool
 GVWebPage::getContactInfoFromLink ()

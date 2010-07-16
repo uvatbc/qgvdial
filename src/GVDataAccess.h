@@ -17,10 +17,11 @@ private:
     virtual ~GVDataAccess();
 
     QNetworkReply *
-    sendRequest (QString         strUrl,
-                 QStringPairList arrPairs,
-                 QObject        *receiver,
-                 const char     *method);
+    postRequest (QString            strUrl  ,
+                 QStringPairList    arrPairs,
+                 QObject           *receiver,
+                 const char        *method  );
+
 
 ///////////////////////////////////// Work /////////////////////////////////////
     //! Load the about:blank page

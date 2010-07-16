@@ -230,7 +230,6 @@ GVAccess::completeCurrentWork (GVAccess_Work whatwork, bool bOk)
         return;
     }
 
-
     do // Begin cleanup block (not a loop)
     {
         if (GVAW_Nothing == workCurrent.whatwork)
@@ -274,9 +273,11 @@ GVAccess::cancelWork (GVAccess_Work whatwork)
             {
                 (this->*(workCurrent.cancel)) ();
             }
-
-            workCurrent.init ();
-            doNextWork ();
+            else
+            {
+                workCurrent.init ();
+                doNextWork ();
+            }
 
             rv = true;
             break;
@@ -316,6 +317,34 @@ GVAccess::simplify_number (QString &strNumber, bool bAddIntPrefix /*= true*/)
     }
 }//GVAccess::simplify_number
 
+QNetworkReply *
+GVAccess::postRequest (QNetworkAccessManager   *mgr     ,
+                       QString                  strUrl  ,
+                       QStringPairList          arrPairs,
+                       QObject                 *receiver,
+                       const char              *method  )
+{
+    QStringList arrParams;
+    foreach (QStringPair pairParam, arrPairs)
+    {
+        arrParams += QString("%1=%2")
+                        .arg(pairParam.first)
+                        .arg(pairParam.second);
+    }
+    QString strParams = arrParams.join ("&");
+
+    QUrl url (strUrl);
+    QNetworkRequest request(url);
+    request.setHeader (QNetworkRequest::ContentTypeHeader,
+                       "application/x-www-form-urlencoded");
+    QByteArray byPostData = strParams.toAscii ();
+
+    QObject::connect (mgr     , SIGNAL (finished (QNetworkReply *)),
+                      receiver, method);
+    QNetworkReply *reply = mgr->post (request, byPostData);
+    return (reply);
+}//GVAccess::postRequest
+
 void
 GVAccess::dialCanFinish ()
 {
@@ -323,6 +352,10 @@ GVAccess::dialCanFinish ()
     if (GVAW_dialCallback == workCurrent.whatwork)
     {
         completeCurrentWork (GVAW_dialCallback, true);
+    }
+    else
+    {
+        emit log ("Cannot cancel a call that is not in progress", 3);
     }
 }//GVAccess::dialCanFinish
 

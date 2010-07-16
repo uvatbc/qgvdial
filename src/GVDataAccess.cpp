@@ -14,6 +14,15 @@ GVDataAccess::~GVDataAccess ()
     userCancel ();
 }//GVDataAccess::~GVDataAccess
 
+QNetworkReply *
+GVDataAccess::postRequest (QString            strUrl  ,
+                           QStringPairList    arrPairs,
+                           QObject           *receiver,
+                           const char        *method  )
+{
+    return GVAccess::postRequest (&nwMgr, strUrl, arrPairs, receiver, method);
+}//GVDataAccess::postRequest
+
 void
 GVDataAccess::userCancel ()
 {
@@ -25,33 +34,6 @@ GVDataAccess::userCancel ()
         nwReply = NULL;
     }
 }//GVDataAccess::userCancel
-
-QNetworkReply *
-GVDataAccess::sendRequest (QString         strUrl,
-                           QStringPairList arrPairs,
-                           QObject        *receiver,
-                           const char     *method)
-{
-    QStringList arrParams;
-    foreach (QStringPair pairParam, arrPairs)
-    {
-        arrParams += QString("%1=%2")
-                        .arg(pairParam.first)
-                        .arg(pairParam.second);
-    }
-    QString strParams = arrParams.join ("&");
-
-    QUrl url (strUrl);
-    QNetworkRequest request(url);
-    request.setHeader (QNetworkRequest::ContentTypeHeader,
-                       "application/x-www-form-urlencoded");
-    QByteArray byPostData = strParams.toAscii ();
-
-    QObject::connect (&nwMgr   , SIGNAL (finished (QNetworkReply *)),
-                       receiver, method);
-    QNetworkReply *reply = nwMgr.post (request, byPostData);
-    return (reply);
-}//GVDataAccess::sendRequest
 
 bool
 GVDataAccess::aboutBlank ()
@@ -81,8 +63,8 @@ GVDataAccess::loginCaptcha (const QString &strToken, const QString &strCaptcha)
         arrPairs += QStringPair("logintoken"  , strToken);
         arrPairs += QStringPair("logincaptcha", strCaptcha);
     }
-    sendRequest (GV_CLIENTLOGIN, arrPairs,
-                 this , SLOT (onLoginResponse (QNetworkReply *)));
+    postRequest (GV_CLIENTLOGIN, arrPairs,
+                 this, SLOT (onLoginResponse (QNetworkReply *)));
 
     return (true);
 }//GVDataAccess::loginCaptcha
@@ -162,7 +144,7 @@ GVDataAccess::logout ()
 
     QStringPairList arrPairs;
     arrPairs += QStringPair("Auth", strAuth);
-    sendRequest (GV_BASE "account/signout", arrPairs,
+    postRequest (GV_BASE "account/signout", arrPairs,
                  this , SLOT (onLogout (QNetworkReply *)));
     return (true);
 }//GVDataAccess::logout
@@ -186,7 +168,7 @@ GVDataAccess::retrieveContacts ()
 
     QStringPairList arrPairs;
     arrPairs += QStringPair("Auth", strAuth);
-    sendRequest (GV_BASE "contacts/", arrPairs,
+    postRequest (GV_BASE "contacts/", arrPairs,
                  this , SLOT (onRetrieveContacts (QNetworkReply *)));
     return (true);
 }//GVDataAccess::retrieveContacts

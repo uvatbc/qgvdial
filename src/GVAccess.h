@@ -111,6 +111,14 @@ protected:
     //! Simplify a phone number
     void simplify_number (QString &strNumber, bool bAddIntPrefix = true);
 
+    //! To be used for Data Access API ONLY
+    QNetworkReply *
+    postRequest (QNetworkAccessManager   *mgr     ,
+                 QString                  strUrl  ,
+                 QStringPairList          arrPairs,
+                 QObject                 *receiver,
+                 const char              *method  );
+
     //! Load the about:blank page
     virtual bool aboutBlank () = 0;
     //! Login to Google voice
@@ -150,6 +158,8 @@ protected:
 
     //! The subscribers google voice number
     QString                     strSelfNumber;
+    //! rnr_se: Pulled off the login page
+    QString                     strRnr_se;
 
     //! The currently selected registered callback number
     QString                     strCurrentCallback;

@@ -1,6 +1,8 @@
 #ifndef __GVWEBPAGE_H__
 #define __GVWEBPAGE_H__
 
+#define USE_GV_DATA_API 1
+
 #include "global.h"
 #include "MobileWebPage.h"
 #include "GVAccess.h"
@@ -26,7 +28,6 @@ public slots:
     void userCancel ();
 
 private slots:
-    void callDone (QNetworkReply * reply);
     //! Invoked when the about:blank page has finished loading
     void aboutBlankDone (bool bOk);
 
@@ -41,10 +42,15 @@ private slots:
     //! Repeatedly invoked when the next page in the contacts list is loaded
     void contactsLoaded (bool bOk);
 
+#if USE_GV_DATA_API
+    void onDataCallDone (QNetworkReply * reply);
+    void onDataCallCanceled (QNetworkReply * reply);
+#else
     //! Invoked when the main page is loaded
     void callStage1 (bool bOk);
     //! Invoked when the actual call page is loaded
     void callStage2 (bool bOk);
+#endif
 
     //! Invoked when the contact info link is loaded
     void contactInfoLoaded (bool bOk);
@@ -86,6 +92,12 @@ private:
     void loadUrlString (const QString &strUrl);
     bool isLoadFailed (bool bOk);
 
+    QNetworkReply *
+    postRequest (QString            strUrl  ,
+                 QStringPairList    arrPairs,
+                 QObject           *receiver,
+                 const char        *method  );
+
     //! Load the about:blank page
     bool aboutBlank ();
     //! Login to Google voice
@@ -111,9 +123,13 @@ private:
     //! Play a voicemail
     bool playVmail ();
 
+#if USE_GV_DATA_API
+    void cancelDataDial2 ();
+#else
     void cancelDialStage1 ();
     void cancelDialStage2 ();
     void cancelDialStage3 ();
+#endif
 
 private:
     //! The webkit page that does all our work
