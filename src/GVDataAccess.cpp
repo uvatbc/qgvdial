@@ -77,11 +77,13 @@ GVDataAccess::onLoginResponse (QNetworkReply *reply)
 
     bool bOk = false;
     bool bError = (reply->error () != QNetworkReply::NoError);
+    Q_UNUSED (bError);
 
     do // Begin cleanup block (not a loop)
     {
         int iRetCode = reply->attribute (
                        QNetworkRequest::HttpStatusCodeAttribute).toInt (&bOk);
+        Q_UNUSED (iRetCode);
         QString strReply = reply->readAll ();
         QString strCaptchaToken, strCaptchaUrl;
 

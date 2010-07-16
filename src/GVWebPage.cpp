@@ -400,11 +400,9 @@ GVWebPage::dialCallback ()
 
 #if USE_GV_DATA_API
 
-    QNetworkAccessManager *mgr = webPage.networkAccessManager ();
     QVariantList &arrParams = workCurrent.arrParams;
     QStringPairList arrPairs;
-    arrPairs += QStringPair("outgoingNumber",
-                                workCurrent.arrParams[0].toString());
+    arrPairs += QStringPair("outgoingNumber"  , arrParams[0].toString());
     arrPairs += QStringPair("forwardingNumber", strCurrentCallback);
     arrPairs += QStringPair("subscriberNumber", strSelfNumber);
     arrPairs += QStringPair("phoneType"       , QString(chCurrentCallbackType));
@@ -466,8 +464,6 @@ GVWebPage::onDataCallDone (QNetworkReply * reply)
 void
 GVWebPage::cancelDataDial2 ()
 {
-    QNetworkAccessManager *mgr = webPage.networkAccessManager ();
-    QVariantList &arrParams = workCurrent.arrParams;
     QStringPairList arrPairs;
     arrPairs += QStringPair("outgoingNumber"  , "undefined");
     arrPairs += QStringPair("forwardingNumber", strCurrentCallback);

@@ -2,8 +2,8 @@
 
 GVAccess::GVAccess (QObject *parent/* = NULL*/)
 : QObject (parent)
-, bLoggedIn(false)
 , mutex(QMutex::Recursive)
+, bLoggedIn(false)
 {
 }//GVAccess::GVAccess
 
