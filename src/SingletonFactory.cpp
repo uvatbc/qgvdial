@@ -2,12 +2,17 @@
 
 SingletonFactory::SingletonFactory (QObject *parent/* = 0*/)
 : QObject (parent)
-, pGVAccess (NULL)
+, dbMain (NULL)
 {
 }//SingletonFactory::SingletonFactory
 
 SingletonFactory::~SingletonFactory ()
 {
+    if (NULL != dbMain)
+    {
+        delete dbMain;
+        dbMain = NULL;
+    }
 }//SingletonFactory::~SingletonFactory
 
 SingletonFactory &
@@ -20,13 +25,9 @@ SingletonFactory::getRef ()
 GVAccess &
 SingletonFactory::getGVAccess ()
 {
-    if (NULL == pGVAccess)
-    {
-        pGVAccess = new GVWebPage (this);
-//         pGVAccess = new GVDataAccess (this);
-    }
+    static GVWebPage gvAccess (this);
 
-    return (*pGVAccess);
+    return (gvAccess);
 }//SingletonFactory::getGVAccess
 
 OsDependent &
@@ -39,6 +40,10 @@ SingletonFactory::getOSD ()
 CacheDatabase &
 SingletonFactory::getDBMain ()
 {
-    static CacheDatabase dbMain (QSqlDatabase::addDatabase ("QSQLITE"), this);
-    return (dbMain);
+    if (NULL == dbMain)
+    {
+        dbMain = new CacheDatabase(QSqlDatabase::addDatabase ("QSQLITE"), this);
+    }
+
+    return (*dbMain);
 }//SingletonFactory::getDBMain

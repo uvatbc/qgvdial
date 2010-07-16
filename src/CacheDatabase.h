@@ -15,6 +15,8 @@ private:
 
 public:
     void init ();
+    void deinit ();
+
     QSqlTableModel *newSqlTableModel();
     void clearContacts ();
 

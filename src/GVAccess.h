@@ -57,6 +57,7 @@ class GVAccess : public QObject
 
 protected:
     GVAccess (QObject *parent = NULL);
+    virtual ~GVAccess ();
 
 public:
     bool enqueueWork (GVAccess_Work whatwork, const QVariantList &params,

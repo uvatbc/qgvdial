@@ -7,6 +7,18 @@ GVAccess::GVAccess (QObject *parent/* = NULL*/)
 {
 }//GVAccess::GVAccess
 
+GVAccess::~GVAccess ()
+{
+    QMutexLocker locker(&mutex);
+
+    while (0 != workList.size ())
+    {
+        GVAccess_WorkItem wi = workList.takeFirst ();
+
+        //TODO: Some cleanup?
+    }
+}//GVAccess::~GVAccess
+
 QString
 GVAccess::getNameForWork (GVAccess_Work whatwork)
 {

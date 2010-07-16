@@ -37,8 +37,18 @@ CacheDatabase::CacheDatabase(const QSqlDatabase & other, QObject *parent)
 
 CacheDatabase::~CacheDatabase(void)
 {
-    dbMain.close ();
+    deinit ();
 }//CacheDatabase::~CacheDatabase
+
+void
+CacheDatabase::deinit ()
+{
+    if (dbMain.isOpen ())
+    {
+        dbMain.close ();
+        dbMain = QSqlDatabase ();
+    }
+}//CacheDatabase::deinit
 
 void
 CacheDatabase::init ()

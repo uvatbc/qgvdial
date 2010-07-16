@@ -37,6 +37,7 @@ public slots:
 private slots:
     //! Initialize GUI components, prepare for next state: not-logged-in
     void init ();
+    void deinit ();
 
     //! Invoked periodically for us to check if someone has requested we wake up
     void wakeupTimedOut ();

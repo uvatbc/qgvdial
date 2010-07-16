@@ -94,15 +94,39 @@ MainWindow::MainWindow (QWidget *parent/* = 0*/, Qt::WindowFlags f/* = 0*/)
 
 MainWindow::~MainWindow ()
 {
+    deinit ();
+}//MainWindow::~MainWindow
+
+void
+MainWindow::deinit ()
+{
     for (QMap<QString,QString>::iterator i  = mapVmail.begin ();
                                          i != mapVmail.end ();
                                          i++)
     {
         QFile::remove (i.value ());
     }
+    mapVmail.clear ();
 
     wakeupTimer.stop ();
-}//MainWindow::~MainWindow
+
+    if (NULL != tabMain)
+    {
+        delete tabMain;
+        tabMain = NULL;
+    }
+
+    if (NULL != modelContacts)
+    {
+        delete modelContacts;
+        modelContacts = NULL;
+    }
+
+    CacheDatabase &dbMain = SingletonFactory::getRef().getDBMain ();
+    dbMain.deinit ();
+
+    qApp->quit ();
+}//MainWindow::deinit
 
 void
 MainWindow::initLogging ()
@@ -252,7 +276,7 @@ MainWindow::init ()
     QObject::connect (&actSettings, SIGNAL (triggered ()),
                        pGVSettings, SLOT   (show ()));
     QObject::connect (&actExit, SIGNAL (triggered ()),
-                       qApp   , SLOT   (quit ()));
+                       this   , SLOT   (deinit ()));
 
     // Dialing handshake
     QObject::connect (&webPage    , SIGNAL (dialInProgress ()),

@@ -35,6 +35,10 @@ GVWebPage::GVWebPage(QObject *parent/* = NULL*/)
 
 GVWebPage::~GVWebPage(void)
 {
+    if (garbageTimer.isActive ())
+    {
+        garbageTimer.stop ();
+    }
 }//GVWebPage::~GVWebPage
 
 #if !NO_DBGINFO
@@ -236,7 +240,7 @@ GVWebPage::loginStage2 (bool bOk)
             emit log ("Failed to get a google voice number!!", 3);
             break;
         }
-        
+
         strSelfNumber = num.toPlainText ();
         simplify_number (strSelfNumber, false);
         workCurrent.arrParams += QVariant (strSelfNumber);
