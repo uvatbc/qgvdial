@@ -12,6 +12,9 @@
 #include "VoicemailWidget.h"
 #include "MyWebView.h"
 
+// Required for Symbian (QSystemTrayIcon)
+#include "OsDependent.h"
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
