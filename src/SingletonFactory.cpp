@@ -2,17 +2,11 @@
 
 SingletonFactory::SingletonFactory (QObject *parent/* = 0*/)
 : QObject (parent)
-, dbMain (NULL)
 {
 }//SingletonFactory::SingletonFactory
 
 SingletonFactory::~SingletonFactory ()
 {
-    if (NULL != dbMain)
-    {
-        delete dbMain;
-        dbMain = NULL;
-    }
 }//SingletonFactory::~SingletonFactory
 
 SingletonFactory &
@@ -40,10 +34,6 @@ SingletonFactory::getOSD ()
 CacheDatabase &
 SingletonFactory::getDBMain ()
 {
-    if (NULL == dbMain)
-    {
-        dbMain = new CacheDatabase(QSqlDatabase::addDatabase ("QSQLITE"), this);
-    }
-
-    return (*dbMain);
+    static CacheDatabase dbMain(QSqlDatabase::addDatabase ("QSQLITE"), this);
+    return (dbMain);
 }//SingletonFactory::getDBMain

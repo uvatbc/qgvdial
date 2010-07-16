@@ -21,7 +21,6 @@ private:
     virtual ~SingletonFactory ();
 
 private:
-    CacheDatabase  *dbMain;
 };
 
 #include "GVWebPage.h"

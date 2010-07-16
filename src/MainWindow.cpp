@@ -122,9 +122,6 @@ MainWindow::deinit ()
         modelContacts = NULL;
     }
 
-    CacheDatabase &dbMain = SingletonFactory::getRef().getDBMain ();
-    dbMain.deinit ();
-
     qApp->quit ();
 }//MainWindow::deinit
 
