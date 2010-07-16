@@ -21,7 +21,8 @@ private:
     virtual ~SingletonFactory ();
 
 private:
-    GVAccess *pGVAccess;
+    GVAccess        *pGVAccess;
+    CacheDatabase   *dbMain;
 };
 
 #include "GVWebPage.h"

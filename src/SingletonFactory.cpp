@@ -3,6 +3,7 @@
 SingletonFactory::SingletonFactory (QObject *parent/* = 0*/)
 : QObject (parent)
 , pGVAccess (NULL)
+, dbMain (NULL)
 {
 }//SingletonFactory::SingletonFactory
 
@@ -24,7 +25,7 @@ SingletonFactory::getGVAccess ()
     // Allocation is purposely dynamic for the same reason.
     if (NULL == pGVAccess)
     {
-        pGVAccess = new GVWebPage (NULL);
+        pGVAccess = new GVWebPage;
     }
 
     return (*pGVAccess);
@@ -40,6 +41,9 @@ SingletonFactory::getOSD ()
 CacheDatabase &
 SingletonFactory::getDBMain ()
 {
-    static CacheDatabase dbMain(QSqlDatabase::addDatabase ("QSQLITE"), this);
-    return (dbMain);
+    if (NULL == dbMain)
+    {
+        dbMain = new CacheDatabase (QSqlDatabase::addDatabase("QSQLITE"));
+    }
+    return (*dbMain);
 }//SingletonFactory::getDBMain
