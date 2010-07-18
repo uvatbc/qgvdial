@@ -1,4 +1,4 @@
-#include <QtGui/QApplication>
+#include "MainApp.h"
 #include "MainWindow.h"
 #include "UniqueAppHelper.h"
 #include "SingletonFactory.h"
@@ -6,7 +6,7 @@
 int
 main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
+    MainApp app(argc, argv);
     app.setQuitOnLastWindowClosed (false);
 
     OsDependent &osd = SingletonFactory::getRef().getOSD ();

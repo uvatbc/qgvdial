@@ -16,8 +16,16 @@ maemo5 {
     OTHER_FILES += qgvdial.desktop
 }
 
+# In Linux and maemo, add the telepathy libraries, sources and headers
+unix:!symbian {
+    QT *= dbus
+    INCLUDEPATH += /usr/include/telepathy-1.0
+    LIBS += -ltelepathy-qt4
+}
+
 # Input
-HEADERS +=  MainWindow.h                \
+HEADERS +=  MainApp.h                   \
+            MainWindow.h                \
             MyWebView.h                 \
             DialerWidget.h              \
             DigitButton.h               \
@@ -41,10 +49,12 @@ HEADERS +=  MainWindow.h                \
             IObserver.h                 \
             GVAccess.h                  \
             SingletonFactory.h          \
-            GVDataAccess.h
-
+            GVDataAccess.h              \
+            SkypeClient.h               \
+            SkypeClientFactory.h
 
 SOURCES +=  main.cpp                    \
+            MainApp.cpp                 \
             MainWindow.cpp              \
             MyWebView.cpp               \
             DialerWidget.cpp            \
@@ -68,21 +78,28 @@ SOURCES +=  main.cpp                    \
             ObserverFactory.cpp         \
             GVAccess.cpp                \
             SingletonFactory.cpp        \
-            GVDataAccess.cpp
+            GVDataAccess.cpp            \
+            SkypeClient.cpp             \
+            SkypeClientFactory.cpp
 
 RESOURCES = qgvdial.qrc
 
-# Resource file is for windows only - for the icon
-win32 {
-RC_FILE = winrsrc.rc
-}
-
 # In Linux and maemo, add the telepathy libraries, sources and headers
 unix:!symbian {
-    QT *= dbus
-    INCLUDEPATH += /usr/include/telepathy-1.0
-    LIBS += -ltelepathy-qt4
-
     HEADERS += TpObserver.h
     SOURCES += TpObserver.cpp
+}
+
+# In desktop Linux, add the Skype client
+unix:!symbian:!maemo5 {
+    HEADERS += SkypeLinuxClient.h
+    SOURCES += SkypeLinuxClient.cpp
+}
+
+win32 {
+# Resource file is for windows only - for the icon
+    RC_FILE = winrsrc.rc
+    
+    HEADERS += SkypeWinClient.h
+    SOURCES += SkypeWinClient.cpp
 }

@@ -114,6 +114,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MainApp.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\MainWindow.cpp"
 				>
 			</File>
@@ -131,6 +135,22 @@
 			</File>
 			<File
 				RelativePath=".\SingletonFactory.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SkypeClient.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SkypeClientFactory.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SkypeLinuxClient.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SkypeWinClient.cpp"
 				>
 			</File>
 			<File
@@ -196,6 +216,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MainApp.h"
+				>
+			</File>
+			<File
 				RelativePath=".\MainWindow.h"
 				>
 			</File>
@@ -213,6 +237,22 @@
 			</File>
 			<File
 				RelativePath=".\SingletonFactory.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SkypeClient.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SkypeClientFactory.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SkypeLinuxClient.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SkypeWinClient.h"
 				>
 			</File>
 			<File

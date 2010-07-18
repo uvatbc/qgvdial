@@ -242,9 +242,6 @@ GVAccess::completeCurrentWork (GVAccess_Work whatwork, bool bOk)
             break;
         }
 
-        emit log (QString("Completing work %1")
-                  .arg(getNameForWork (whatwork)));
-
         QObject::connect (
             this, SIGNAL (workCompleted (bool, const QVariantList &)),
             workCurrent.receiver, workCurrent.method);
@@ -254,6 +251,8 @@ GVAccess::completeCurrentWork (GVAccess_Work whatwork, bool bOk)
         QObject::disconnect (
             this, SIGNAL (workCompleted (bool, const QVariantList &)),
             workCurrent.receiver, workCurrent.method);
+
+        emit log (QString("Completed work %1").arg(getNameForWork(whatwork)));
     } while (0); // End cleanup block (not a loop)
 
     // Init MUST be done after the workCompleted emit to prevent races
