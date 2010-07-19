@@ -109,7 +109,7 @@ SkypeWinClient::invoke (const QString &strCommand)
             DWORD dw = GetLastError ();
             bInvokeInProgress = false;
 
-            if (ERROR_INVALID_HANDLE == dw)
+            if (ERROR_INVALID_WINDOW_HANDLE == dw)
             {
                 theApp->clearSkypeHandle ();
             }

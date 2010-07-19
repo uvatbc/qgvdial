@@ -92,13 +92,13 @@ signals:
     //! Emitted at the end of every work item
     void workCompleted (bool bSuccess, const QVariantList &params);
 
-    //! Emitted at the end of every internal work
-    void internalCompleted (int status, const QString &strOutput);
-
     //! Emitted for any change in a call
     void callStatusChanged (uint callId, const QString &strStatus);
     //! Emitted for every single contact
     void gotSingleContact (const QString &strContact);
+
+    //! Emitted at the end of every internal work (PRIVATE)
+    void internalCompleted (int status, const QString &strOutput);
 
 protected slots:
     //! Invoked when the call initiation is over

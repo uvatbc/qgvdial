@@ -1,7 +1,9 @@
 #include "TpObserver.h"
 
-TpObserver::TpObserver (const ChannelClassList &channelFilter)
+TpObserver::TpObserver (const ChannelClassList &channelFilter,
+                              QObject          *parent       )
 : AbstractClientObserver(channelFilter)
+, IObserver (parent)
 , id(1) // Always ignore
 {
 }//TpObserver::TpObserver

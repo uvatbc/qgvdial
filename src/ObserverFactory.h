@@ -12,6 +12,8 @@ private:
     explicit ObserverFactory(QObject *parent = 0);
 
 public:
+    bool init (QWidget &win);
+
     void startObservers (const QString &strContact,
                                QObject *receiver  ,
                          const char    *method    );

@@ -7,9 +7,19 @@
 ClientRegistrarPtr  clientRegistrar;
 #endif
 
+#if (defined (Q_WS_X11) && !defined (Q_WS_MAEMO_5)) || defined(Q_WS_WIN32)
+#include "SkypeObserver.h"
+#endif
+
 ObserverFactory::ObserverFactory(QObject *parent)
 : QObject(parent)
 {
+}//ObserverFactory::ObserverFactory
+
+bool
+ObserverFactory::init (QWidget &win)
+{
+    // Observer for Telepathy on desktop Linux and Maemo 5
 #if defined (Q_OS_UNIX) && !defined (Q_OS_SYMBIAN)
     clientRegistrar = ClientRegistrar::create();
 
@@ -22,7 +32,7 @@ ObserverFactory::ObserverFactory(QObject *parent)
             QLatin1String(TELEPATHY_INTERFACE_CHANNEL ".TargetHandleType"),
             QDBusVariant((uint) Tp::HandleTypeContact));
     filters.append(filter);
-    TpObserver *myobserver = new TpObserver(filters);
+    TpObserver *myobserver = new TpObserver(filters, this);
     AbstractClientPtr appr = (AbstractClientPtr) myobserver;
     clientRegistrar->registerClient(appr, "QGVStreamObserver");
 
@@ -35,7 +45,23 @@ ObserverFactory::ObserverFactory(QObject *parent)
 
     listObservers += (IObserver*) myobserver;
 #endif
-}//ObserverFactory::ObserverFactory
+
+    // Observer for Skype on desktop Linux and desktop Windows
+#if (defined (Q_WS_X11) && !defined (Q_WS_MAEMO_5)) || defined(Q_WS_WIN32)
+    SkypeObserver *skypeObs = new SkypeObserver (win);
+
+    QObject::connect (
+        skypeObs, SIGNAL (log(const QString &, int)),
+        this    , SIGNAL (log(const QString &, int)));
+    QObject::connect (
+        skypeObs, SIGNAL (status(const QString &, int)),
+        this    , SIGNAL (status(const QString &, int)));
+
+    listObservers += (IObserver*) skypeObs;
+#endif
+
+    return (true);
+}//ObserverFactory::init
 
 void
 ObserverFactory::startObservers (const QString &strContact,

@@ -24,7 +24,8 @@ class TpObserver : public IObserver, public AbstractClientObserver
     Q_OBJECT
 
 public:
-    TpObserver (const ChannelClassList &channelFilter);
+    TpObserver (const ChannelClassList &channelFilter,
+                      QObject          *parent = NULL);
     void setId (int i);
 
 protected:
@@ -45,7 +46,6 @@ protected:
 
 private:
     int     id;
-    QString strContact;
 };
 typedef SharedPtr<TpObserver> TpObserverPtr;
 

@@ -92,14 +92,14 @@ unix:!symbian {
 
 # In desktop Linux, add the Skype client
 unix:!symbian:!maemo5 {
-    HEADERS += SkypeLinuxClient.h
-    SOURCES += SkypeLinuxClient.cpp
+    HEADERS += SkypeLinuxClient.h SkypeObserver.h
+    SOURCES += SkypeLinuxClient.cpp SkypeObserver.cpp
 }
 
 win32 {
 # Resource file is for windows only - for the icon
     RC_FILE = winrsrc.rc
 
-    HEADERS += SkypeWinClient.h
-    SOURCES += SkypeWinClient.cpp
+    HEADERS += SkypeWinClient.h SkypeObserver.h
+    SOURCES += SkypeWinClient.cpp SkypeObserver.cpp
 }

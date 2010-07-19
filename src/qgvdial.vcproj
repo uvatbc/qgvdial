@@ -166,6 +166,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\SkypeObserver.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\SkypeWinClient.cpp"
 				>
 			</File>
@@ -293,6 +297,10 @@
 			</File>
 			<File
 				RelativePath=".\SkypeLinuxClient.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SkypeObserver.h"
 				>
 			</File>
 			<File

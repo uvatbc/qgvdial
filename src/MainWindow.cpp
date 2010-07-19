@@ -26,7 +26,6 @@ MainWindow::MainWindow (QWidget *parent/* = 0*/, Qt::WindowFlags f/* = 0*/)
 , stateMachine(this)
 , modelContacts(NULL)
 , wakeupTimer (this)
-, skypeClient (NULL)
 {
     initLogging ();
 
@@ -45,6 +44,7 @@ MainWindow::MainWindow (QWidget *parent/* = 0*/, Qt::WindowFlags f/* = 0*/)
 
     // Observer factory log and status
     ObserverFactory &obF = Singletons::getRef().getObserverFactory ();
+    obF.init (*this);
     QObject::connect (&obF , SIGNAL (log(const QString &, int)),
                        this, SLOT   (log(const QString &, int)));
     QObject::connect (&obF , SIGNAL (status(const QString &, int)),
@@ -128,12 +128,6 @@ MainWindow::deinit ()
         modelContacts = NULL;
     }
 
-    if (NULL != skypeClient)
-    {
-        Singletons::getRef().getSkypeFactory().deleteClient (skypeClient);
-        skypeClient = NULL;
-    }
-
     qApp->quit ();
 }//MainWindow::deinit
 
@@ -200,9 +194,6 @@ MainWindow::init ()
 {
     GVAccess &webPage = Singletons::getRef().getGVAccess ();
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-
-    SkypeClientFactory &skypeFactory = Singletons::getRef().getSkypeFactory ();
-    skypeClient = skypeFactory.createSkypeClient (*this, "QGVDial");
 
     dbMain.init ();
 

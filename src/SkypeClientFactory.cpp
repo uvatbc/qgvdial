@@ -38,13 +38,6 @@ SkypeClientFactory::createSkypeClient (QWidget &mainwin, const QString &name)
 
     if (NULL != client)
     {
-        QObject::connect (
-            client, SIGNAL (log (const QString &, int)),
-            this  , SIGNAL (log (const QString &, int)));
-        QObject::connect (
-            client, SIGNAL (status (const QString &, int)),
-            this  , SIGNAL (status (const QString &, int)));
-
         listClients += client;
         client->start ();
     }
