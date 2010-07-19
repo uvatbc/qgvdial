@@ -28,7 +28,7 @@
 				ReBuildCommandLine="nmake -nologo clean all"
 				CleanCommandLine="nmake -nologo clean"
 				Output="debug\qgvdial.exe"
-				PreprocessorDefinitions="WIN32;_DEBUG"
+				PreprocessorDefinitions="WIN32;_DEBUG;Q_WS_WIN32"
 				IncludeSearchPath=""
 				ForcedIncludes=""
 				AssemblySearchPath=""
@@ -48,7 +48,7 @@
 				ReBuildCommandLine="nmake -nologo clean all"
 				CleanCommandLine="nmake -nologo clean"
 				Output="release\qgvdial.exe"
-				PreprocessorDefinitions="WIN32;NDEBUG"
+				PreprocessorDefinitions="WIN32;NDEBUG;Q_WS_WIN32"
 				IncludeSearchPath=""
 				ForcedIncludes=""
 				AssemblySearchPath=""
@@ -67,6 +67,18 @@
 			>
 			<File
 				RelativePath=".\CacheDatabase.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ChildWindowBase.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\DialCancelDlg.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\DialerValidator.cpp"
 				>
 			</File>
 			<File
@@ -130,6 +142,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ObserverFactory.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\OsDependent.cpp"
 				>
 			</File>
@@ -162,6 +178,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\TpObserver.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\UniqueAppHelper.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\VoicemailWidget.cpp"
 				>
 			</File>
@@ -173,6 +197,18 @@
 			>
 			<File
 				RelativePath=".\CacheDatabase.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ChildWindowBase.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DialCancelDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DialerValidator.h"
 				>
 			</File>
 			<File
@@ -216,6 +252,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\IObserver.h"
+				>
+			</File>
+			<File
 				RelativePath=".\MainApp.h"
 				>
 			</File>
@@ -229,6 +269,10 @@
 			</File>
 			<File
 				RelativePath=".\MyWebView.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ObserverFactory.h"
 				>
 			</File>
 			<File
@@ -261,6 +305,14 @@
 			</File>
 			<File
 				RelativePath=".\SMSEntryDeleteButton.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TpObserver.h"
+				>
+			</File>
+			<File
+				RelativePath=".\UniqueAppHelper.h"
 				>
 			</File>
 			<File

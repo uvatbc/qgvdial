@@ -19,7 +19,7 @@ maemo5 {
 # In Linux and maemo, add the telepathy libraries, sources and headers
 unix:!symbian {
     QT *= dbus
-    INCLUDEPATH += /usr/include/telepathy-1.0
+    INCLUDEPATH += $$QMAKESPEC/usr/include/telepathy-1.0/
     LIBS += -ltelepathy-qt4
 }
 
@@ -99,7 +99,7 @@ unix:!symbian:!maemo5 {
 win32 {
 # Resource file is for windows only - for the icon
     RC_FILE = winrsrc.rc
-    
+
     HEADERS += SkypeWinClient.h
     SOURCES += SkypeWinClient.cpp
 }
