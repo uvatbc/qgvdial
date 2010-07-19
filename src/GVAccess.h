@@ -117,6 +117,7 @@ protected:
     postRequest (QNetworkAccessManager   *mgr     ,
                  QString                  strUrl  ,
                  QStringPairList          arrPairs,
+                 QString                  strUA   ,
                  QObject                 *receiver,
                  const char              *method  );
 

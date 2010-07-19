@@ -17,10 +17,12 @@ GVDataAccess::~GVDataAccess ()
 QNetworkReply *
 GVDataAccess::postRequest (QString            strUrl  ,
                            QStringPairList    arrPairs,
+                           QString            strUA   ,
                            QObject           *receiver,
                            const char        *method  )
 {
-    return GVAccess::postRequest (&nwMgr, strUrl, arrPairs, receiver, method);
+    return GVAccess::postRequest (&nwMgr, strUrl, arrPairs, strUA,
+                                  receiver, method);
 }//GVDataAccess::postRequest
 
 void
@@ -63,7 +65,7 @@ GVDataAccess::loginCaptcha (const QString &strToken, const QString &strCaptcha)
         arrPairs += QStringPair("logintoken"  , strToken);
         arrPairs += QStringPair("logincaptcha", strCaptcha);
     }
-    postRequest (GV_CLIENTLOGIN, arrPairs,
+    postRequest (GV_CLIENTLOGIN, arrPairs, QString (),
                  this, SLOT (onLoginResponse (QNetworkReply *)));
 
     return (true);
@@ -146,7 +148,7 @@ GVDataAccess::logout ()
 
     QStringPairList arrPairs;
     arrPairs += QStringPair("Auth", strAuth);
-    postRequest (GV_BASE "account/signout", arrPairs,
+    postRequest (GV_BASE "account/signout", arrPairs, QString (),
                  this , SLOT (onLogout (QNetworkReply *)));
     return (true);
 }//GVDataAccess::logout
@@ -170,7 +172,7 @@ GVDataAccess::retrieveContacts ()
 
     QStringPairList arrPairs;
     arrPairs += QStringPair("Auth", strAuth);
-    postRequest (GV_BASE "contacts/", arrPairs,
+    postRequest (GV_BASE "contacts/", arrPairs, QString (),
                  this , SLOT (onRetrieveContacts (QNetworkReply *)));
     return (true);
 }//GVDataAccess::retrieveContacts

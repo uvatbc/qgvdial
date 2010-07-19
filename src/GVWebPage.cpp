@@ -1,6 +1,7 @@
 #include "GVWebPage.h"
 
 #define GV_DATA_BASE "https://www.google.com/voice"
+#define USE_GV_CALLOUT_METHOD 1
 
 GVWebPage::GVWebPage(QObject *parent/* = NULL*/)
 : GVAccess (parent)
@@ -95,11 +96,13 @@ GVWebPage::isLoadFailed (bool bOk)
 QNetworkReply *
 GVWebPage::postRequest (QString            strUrl  ,
                         QStringPairList    arrPairs,
+                        QString            strUA   ,
                         QObject           *receiver,
                         const char        *method  )
 {
     return GVAccess::postRequest (webPage.networkAccessManager (),
-                                  strUrl, arrPairs, receiver, method);
+                                  strUrl, arrPairs, strUA,
+                                  receiver, method);
 }//GVWebPage::postRequest
 
 QWebElement
@@ -399,9 +402,22 @@ GVWebPage::dialCallback ()
     }
 
 #if USE_GV_DATA_API
-
     QVariantList &arrParams = workCurrent.arrParams;
     QStringPairList arrPairs;
+    workCurrent.cancel = (WebPageCancel) &GVWebPage::cancelDataDial2;
+
+#if USE_GV_CALLOUT_METHOD
+    arrPairs += QStringPair("m"      , "call");
+    arrPairs += QStringPair("n"      , arrParams[0].toString());
+    arrPairs += QStringPair("f"      , "");
+    arrPairs += QStringPair("v"      , "6");
+    arrPairs += QStringPair("_rnr_se", strRnr_se);
+
+    QString strUA = "Mozilla/5.0 (iPhone; U; CPU iPhone OS 3_0 like Mac OS X; en-us) AppleWebKit/528.18 (KHTML, like Gecko) Version/4.0 Mobile/7A341 Safari/528.16";
+    postRequest ("https://www.google.com/voice/m/x", arrPairs, strUA,
+                 this, SLOT (onDataCallDone (QNetworkReply *)));
+
+#else
     arrPairs += QStringPair("outgoingNumber"  , arrParams[0].toString());
     arrPairs += QStringPair("forwardingNumber", strCurrentCallback);
     arrPairs += QStringPair("subscriberNumber", strSelfNumber);
@@ -409,9 +425,9 @@ GVWebPage::dialCallback ()
     arrPairs += QStringPair("remember"        , "1");
     arrPairs += QStringPair("_rnr_se"         , strRnr_se);
 
-    workCurrent.cancel = (WebPageCancel) &GVWebPage::cancelDataDial2;
-    postRequest (GV_DATA_BASE "/call/connect/", arrPairs,
+    postRequest (GV_DATA_BASE "/call/connect/", arrPairs, QString (),
                  this, SLOT (onDataCallDone (QNetworkReply *)));
+#endif
 
 #else //!USE_GV_DATA_API
 
@@ -470,7 +486,7 @@ GVWebPage::cancelDataDial2 ()
     arrPairs += QStringPair("cancelType"      , "C2C");
     arrPairs += QStringPair("_rnr_se"         , strRnr_se);
 
-    postRequest (GV_DATA_BASE "/call/cancel/", arrPairs,
+    postRequest (GV_DATA_BASE "/call/cancel/", arrPairs, QString (),
                  this, SLOT (onDataCallCanceled (QNetworkReply *)));
 }//GVWebPage::cancelDataDial2
 

@@ -95,6 +95,7 @@ private:
     QNetworkReply *
     postRequest (QString            strUrl  ,
                  QStringPairList    arrPairs,
+                 QString            strUA   ,
                  QObject           *receiver,
                  const char        *method  );
 

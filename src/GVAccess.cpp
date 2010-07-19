@@ -324,6 +324,7 @@ QNetworkReply *
 GVAccess::postRequest (QNetworkAccessManager   *mgr     ,
                        QString                  strUrl  ,
                        QStringPairList          arrPairs,
+                       QString                  strUA   ,
                        QObject                 *receiver,
                        const char              *method  )
 {
@@ -340,6 +341,13 @@ GVAccess::postRequest (QNetworkAccessManager   *mgr     ,
     QNetworkRequest request(url);
     request.setHeader (QNetworkRequest::ContentTypeHeader,
                        "application/x-www-form-urlencoded");
+    if (0 != strUA.size ())
+    {
+        QByteArray baUA = strUA.toAscii ();
+        QByteArray baUAMeta = "User-Agent";
+        request.setRawHeader (baUAMeta, baUA);
+    }
+
     QByteArray byPostData = strParams.toAscii ();
 
     QObject::connect (mgr     , SIGNAL (finished (QNetworkReply *)),
