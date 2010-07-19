@@ -1,4 +1,5 @@
 #include "DialCancelDlg.h"
+#include "SingletonFactory.h"
 
 DialCancelDlg::DialCancelDlg (const QString &strNum, QWidget *parent)
 : QMessageBox (parent)
@@ -13,12 +14,12 @@ DialCancelDlg::DialCancelDlg (const QString &strNum, QWidget *parent)
 int
 DialCancelDlg::doModal (const QString &strMyNumber)
 {
-    ObserverFactory &obsFactory = ObserverFactory::getRef ();
-    obsFactory.startObservers (strMyNumber, this, SLOT (callStarted()));
+    ObserverFactory &obsF = Singletons::getRef().getObserverFactory ();
+    obsF.startObservers (strMyNumber, this, SLOT (callStarted()));
 
     int rv = this->exec ();
 
-    obsFactory.stopObservers ();
+    obsF.stopObservers ();
 
     return (rv);
 }//DialCancelDlg::doModal

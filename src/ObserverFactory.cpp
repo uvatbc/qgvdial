@@ -37,13 +37,6 @@ ObserverFactory::ObserverFactory(QObject *parent)
 #endif
 }//ObserverFactory::ObserverFactory
 
-ObserverFactory &
-ObserverFactory::getRef ()
-{
-    static ObserverFactory singleton;
-    return (singleton);
-}//ObserverFactory::getRef
-
 void
 ObserverFactory::startObservers (const QString &strContact,
                                        QObject *receiver  ,

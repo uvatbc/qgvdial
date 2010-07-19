@@ -23,13 +23,6 @@ enum UniqueSignals {
     WakeUp,
 };
 
-UniqueAppHelper &
-UniqueAppHelper::getRef ()
-{
-    static UniqueAppHelper singleton;
-    return (singleton);
-}//UniqueAppHelper::getRef
-
 UniqueAppHelper::UniqueAppHelper ()
 : fUnique (this)
 , bOwner (false)

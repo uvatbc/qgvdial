@@ -1,25 +1,25 @@
 #include "SingletonFactory.h"
 
-SingletonFactory::SingletonFactory (QObject *parent/* = 0*/)
+Singletons::Singletons (QObject *parent/* = 0*/)
 : QObject (parent)
 , pGVAccess (NULL)
 , dbMain (NULL)
 {
-}//SingletonFactory::SingletonFactory
+}//Singletons::Singletons
 
-SingletonFactory::~SingletonFactory ()
+Singletons::~Singletons ()
 {
-}//SingletonFactory::~SingletonFactory
+}//Singletons::~Singletons
 
-SingletonFactory &
-SingletonFactory::getRef ()
+Singletons &
+Singletons::getRef ()
 {
-    static SingletonFactory singleton;
+    static Singletons singleton;
     return (singleton);
-}//SingletonFactory::getRef
+}//Singletons::getRef
 
 GVAccess &
-SingletonFactory::getGVAccess ()
+Singletons::getGVAccess ()
 {
     // The parent is purposefully NULL. Otherwise the app crashes on exit.
     // Allocation is purposely dynamic for the same reason.
@@ -29,21 +29,42 @@ SingletonFactory::getGVAccess ()
     }
 
     return (*pGVAccess);
-}//SingletonFactory::getGVAccess
+}//Singletons::getGVAccess
 
 OsDependent &
-SingletonFactory::getOSD ()
+Singletons::getOSD ()
 {
     static OsDependent osd (this);
     return (osd);
-}//SingletonFactory::getOSD
+}//Singletons::getOSD
 
 CacheDatabase &
-SingletonFactory::getDBMain ()
+Singletons::getDBMain ()
 {
     if (NULL == dbMain)
     {
         dbMain = new CacheDatabase (QSqlDatabase::addDatabase("QSQLITE"));
     }
     return (*dbMain);
-}//SingletonFactory::getDBMain
+}//Singletons::getDBMain
+
+ObserverFactory &
+Singletons::getObserverFactory ()
+{
+    static ObserverFactory observerFactory (this);
+    return (observerFactory);
+}//Singletons::getObserverFactory
+
+SkypeClientFactory &
+Singletons::getSkypeFactory ()
+{
+    static SkypeClientFactory skypeFactory (this);
+    return (skypeFactory);
+}//Singletons::getSkypeFactory
+
+UniqueAppHelper &
+Singletons::getUAH ()
+{
+    static UniqueAppHelper uniqueAppHelper;
+    return (uniqueAppHelper);
+}//Singletons::getUAH

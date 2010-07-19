@@ -12,7 +12,6 @@ private:
     explicit ObserverFactory(QObject *parent = 0);
 
 public:
-    static ObserverFactory & getRef ();
     void startObservers (const QString &strContact,
                                QObject *receiver  ,
                          const char    *method    );
@@ -26,6 +25,8 @@ public slots:
 
 private:
     IObserverList listObservers;
+
+    friend class Singletons;
 };
 
 #endif // OBSERVERFACTORY_H

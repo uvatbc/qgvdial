@@ -6,19 +6,25 @@
 class GVAccess;
 class OsDependent;
 class CacheDatabase;
+class SkypeClientFactory;
+class ObserverFactory;
+class UniqueAppHelper;
 
-class SingletonFactory : public QObject
+class Singletons : public QObject
 {
 public:
-    static SingletonFactory & getRef ();
+    static Singletons & getRef ();
 
-    GVAccess        & getGVAccess ();
-    OsDependent     & getOSD ();
-    CacheDatabase   & getDBMain ();
+    GVAccess            & getGVAccess ();
+    OsDependent         & getOSD ();
+    CacheDatabase       & getDBMain ();
+    ObserverFactory     & getObserverFactory ();
+    SkypeClientFactory  & getSkypeFactory ();
+    UniqueAppHelper     & getUAH ();
 
 private:
-    SingletonFactory (QObject *parent = 0);
-    virtual ~SingletonFactory ();
+    Singletons (QObject *parent = 0);
+    virtual ~Singletons ();
 
 private:
     GVAccess        *pGVAccess;
@@ -29,5 +35,8 @@ private:
 #include "GVDataAccess.h"
 #include "OsDependent.h"
 #include "CacheDatabase.h"
+#include "ObserverFactory.h"
+#include "SkypeClientFactory.h"
+#include "UniqueAppHelper.h"
 
 #endif //__SINGLETONFACTORY_H__

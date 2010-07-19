@@ -13,13 +13,6 @@ QObject(parent)
 {
 }//SkypeClientFactory::SkypeClientFactory
 
-SkypeClientFactory &
-SkypeClientFactory::getRef ()
-{
-    static SkypeClientFactory singleton;
-    return (singleton);
-}//SkypeClientFactory::getRef
-
 SkypeClient *
 SkypeClientFactory::createSkypeClient (QWidget &mainwin, const QString &name)
 {

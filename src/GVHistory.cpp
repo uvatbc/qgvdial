@@ -138,7 +138,7 @@ GVHistory::refreshHistory ()
         return;
     }
 
-    GVAccess &webPage = SingletonFactory::getRef().getGVAccess ();
+    GVAccess &webPage = Singletons::getRef().getGVAccess ();
     QVariantList l;
     l += strSelected;
     l += "1";
@@ -255,7 +255,7 @@ GVHistory::oneHistoryEvent (const GVHistoryEvent &hevent)
 void
 GVHistory::getHistoryDone (bool, const QVariantList &)
 {
-    GVAccess &webPage = SingletonFactory::getRef().getGVAccess ();
+    GVAccess &webPage = Singletons::getRef().getGVAccess ();
     QObject::disconnect (
         &webPage, SIGNAL (oneHistoryEvent (const GVHistoryEvent &)),
          this   , SLOT   (oneHistoryEvent (const GVHistoryEvent &)));

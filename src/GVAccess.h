@@ -169,7 +169,7 @@ protected:
     //! The probably selected registered callback number's type
     char                        chProbableCallbackType;
 
-    friend class SingletonFactory;
+    friend class Singletons;
 };
 
 #endif //__GVACCESS_H__

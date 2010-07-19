@@ -8,7 +8,6 @@ class UniqueAppHelper : public QObject
     Q_OBJECT
 
 public:
-    static UniqueAppHelper &getRef ();
     bool setUnique ();
     void signalOriginal ();
     bool isWakeSignaled ();
@@ -30,6 +29,8 @@ private:
 private:
     QFile fUnique;
     bool  bOwner;
+
+    friend class Singletons;
 };
 
 #endif // UNIQUEAPPHELPER_H

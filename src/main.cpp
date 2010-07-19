@@ -1,6 +1,5 @@
 #include "MainApp.h"
 #include "MainWindow.h"
-#include "UniqueAppHelper.h"
 #include "SingletonFactory.h"
 
 int
@@ -9,10 +8,10 @@ main(int argc, char *argv[])
     MainApp app(argc, argv);
     app.setQuitOnLastWindowClosed (false);
 
-    OsDependent &osd = SingletonFactory::getRef().getOSD ();
+    OsDependent &osd = Singletons::getRef().getOSD ();
     osd.init ();
 
-    UniqueAppHelper &unique = UniqueAppHelper::getRef ();
+    UniqueAppHelper &unique = Singletons::getRef().getUAH ();
     if (!unique.setUnique ())
     {
         unique.signalOriginal ();

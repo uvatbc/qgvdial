@@ -2,7 +2,6 @@
 #define DIALCANCELDLG_H
 
 #include <QtGui>
-#include "ObserverFactory.h"
 
 class DialCancelDlg : public QMessageBox
 {
@@ -17,7 +16,6 @@ private slots:
 
 private:
     QString         strContact;
-    IObserverList   listObservers;
 };
 
 #endif // DIALCANCELDLG_H

@@ -44,7 +44,7 @@ signals:
 private:
     QSqlDatabase    dbMain;
 
-    friend class SingletonFactory;
+    friend class Singletons;
 };
 
 #endif //__CACHEDATABASE_H__

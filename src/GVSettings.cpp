@@ -15,7 +15,7 @@ GVSettings::GVSettings(QWidget *parent /* = 0*/, Qt::WindowFlags f /* = 0*/)
 , cbNumbers(this)
 , btnLogin(this)
 {
-    CacheDatabase &dbMain = SingletonFactory::getRef().getDBMain ();
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     edPass.setEchoMode (QLineEdit::Password);
     btnLogin.setText ("Login");
     bBtnLogin = true;
@@ -96,7 +96,7 @@ GVSettings::btnLogin_clicked ()
 void
 GVSettings::loginDone (bool bOk/* = true*/)
 {
-    CacheDatabase &dbMain = SingletonFactory::getRef().getDBMain ();
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     do { // Begin cleanup block (not a loop)
         logoutDone (!bOk);
         if (!bOk)
@@ -181,7 +181,7 @@ GVSettings::logoutDone (bool bOk/* = true*/)
 bool
 GVSettings::refreshRegisteredNumbers ()
 {
-    GVAccess &webPage = SingletonFactory::getRef().getGVAccess ();
+    GVAccess &webPage = Singletons::getRef().getGVAccess ();
 
     bool rv = false;
     do { // Begin cleanup block (not a loop)
@@ -229,7 +229,7 @@ GVSettings::gotRegisteredPhone (const GVRegisteredNumber &info)
 void
 GVSettings::gotAllRegisteredPhones (bool bOk, const QVariantList &)
 {
-    GVAccess &webPage = SingletonFactory::getRef().getGVAccess ();
+    GVAccess &webPage = Singletons::getRef().getGVAccess ();
     QObject::disconnect(
         &webPage, SIGNAL (registeredPhone    (const GVRegisteredNumber &)),
          this   , SLOT   (gotRegisteredPhone (const GVRegisteredNumber &)));
@@ -261,7 +261,7 @@ void
 GVSettings::setRegNumWidget (bool bSave)
 {
     // Set the correct callback
-    CacheDatabase &dbMain = SingletonFactory::getRef().getDBMain ();
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     QString strCallback;
     bool bGotCallback = dbMain.getCallback (strCallback);
     cbNumbers.clear ();
@@ -295,7 +295,7 @@ GVSettings::getSelectedNumber ()
 void
 GVSettings::cbNumbers_currentIndexChanged (int index)
 {
-    CacheDatabase &dbMain = SingletonFactory::getRef().getDBMain ();
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     if ((index >= 0) && (arrNumbers.size () > index))
     {
         QString strCallback = arrNumbers[index].strNumber;

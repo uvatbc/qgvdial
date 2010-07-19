@@ -65,7 +65,7 @@ private:
     //! The auth string returned by the ClientLogin Auth token
     QString                 strAuth;
 
-    friend class SingletonFactory;
+    friend class Singletons;
 };
 
 #endif //__GVDATAACCESS_H__

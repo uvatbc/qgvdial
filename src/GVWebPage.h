@@ -144,7 +144,7 @@ private:
     //! The current page (contacts or history)
     int                     nCurrent;
 
-    friend class SingletonFactory;
+    friend class Singletons;
 };
 
 #endif //__GVWEBPAGE_H__

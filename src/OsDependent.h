@@ -22,7 +22,7 @@ public:
 private:
     OsDependent(QObject *parent = 0);
 
-    friend class SingletonFactory;
+    friend class Singletons;
 };
 
 #ifdef QT_NO_SYSTEMTRAYICON

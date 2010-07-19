@@ -47,12 +47,12 @@ GVContactsTable::GVContactsTable (QWidget *parent)
 void
 GVContactsTable::refreshContacts ()
 {
-    CacheDatabase &dbMain = SingletonFactory::getRef().getDBMain ();
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     QMutexLocker locker(&mutex);
     dbMain.clearContacts ();
     strSavedLink.clear ();
 
-    GVAccess &webPage = SingletonFactory::getRef().getGVAccess ();
+    GVAccess &webPage = Singletons::getRef().getGVAccess ();
     QVariantList l;
     nContacts = 0;
     QObject::connect (
@@ -78,7 +78,7 @@ GVContactsTable::gotContact (const QString &strName, const QString &strLink)
 void
 GVContactsTable::getContactsDone (bool bOk, const QVariantList &)
 {
-    GVAccess &webPage = SingletonFactory::getRef().getGVAccess ();
+    GVAccess &webPage = Singletons::getRef().getGVAccess ();
     QObject::disconnect(
         &webPage, SIGNAL (gotContact(const QString &, const QString &)),
         this    , SLOT   (gotContact(const QString &, const QString &)));
