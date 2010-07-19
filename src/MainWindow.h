@@ -11,6 +11,7 @@
 #include "SMSDlg.h"
 #include "VoicemailWidget.h"
 #include "MyWebView.h"
+#include "SkypeClient.h"
 
 // Required for Symbian (QSystemTrayIcon)
 #include "OsDependent.h"
@@ -202,6 +203,9 @@ private:
 
     //! The timer used to check for a wake up signal
     QTimer          wakeupTimer;
+
+    //! The skype client if one can be created
+    SkypeClient    *skypeClient;
 };
 
 #endif // MAINWINDOW_H

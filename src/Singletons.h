@@ -1,5 +1,5 @@
-#ifndef __SINGLETONFACTORY_H__
-#define __SINGLETONFACTORY_H__
+#ifndef __SINGLETONS_H__
+#define __SINGLETONS_H__
 
 #include "global.h"
 
@@ -39,4 +39,4 @@ private:
 #include "SkypeClientFactory.h"
 #include "UniqueAppHelper.h"
 
-#endif //__SINGLETONFACTORY_H__
+#endif //__SINGLETONS_H__

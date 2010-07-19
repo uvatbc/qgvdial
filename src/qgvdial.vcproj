@@ -150,7 +150,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\SingletonFactory.cpp"
+				RelativePath=".\Singletons.cpp"
 				>
 			</File>
 			<File
@@ -280,7 +280,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\SingletonFactory.h"
+				RelativePath=".\Singletons.h"
 				>
 			</File>
 			<File

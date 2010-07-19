@@ -1,6 +1,6 @@
 #include "global.h"
 #include "GVContactsTable.h"
-#include "SingletonFactory.h"
+#include "Singletons.h"
 
 GVContactsTable::GVContactsTable (QWidget *parent)
 : QTreeView(parent)

@@ -1,6 +1,6 @@
 #include "MainApp.h"
 #include "MainWindow.h"
-#include "SingletonFactory.h"
+#include "Singletons.h"
 
 int
 main(int argc, char *argv[])

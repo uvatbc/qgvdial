@@ -48,7 +48,7 @@ HEADERS +=  MainApp.h                   \
             ObserverFactory.h           \
             IObserver.h                 \
             GVAccess.h                  \
-            SingletonFactory.h          \
+            Singletons.h                \
             GVDataAccess.h              \
             SkypeClient.h               \
             SkypeClientFactory.h
@@ -77,7 +77,7 @@ SOURCES +=  main.cpp                    \
             DialCancelDlg.cpp           \
             ObserverFactory.cpp         \
             GVAccess.cpp                \
-            SingletonFactory.cpp        \
+            Singletons.cpp              \
             GVDataAccess.cpp            \
             SkypeClient.cpp             \
             SkypeClientFactory.cpp

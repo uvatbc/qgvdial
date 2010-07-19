@@ -1,5 +1,5 @@
 #include "MainWindow.h"
-#include "SingletonFactory.h"
+#include "Singletons.h"
 #include "DlgSelectContactNumber.h"
 #include "DialCancelDlg.h"
 
@@ -26,6 +26,7 @@ MainWindow::MainWindow (QWidget *parent/* = 0*/, Qt::WindowFlags f/* = 0*/)
 , stateMachine(this)
 , modelContacts(NULL)
 , wakeupTimer (this)
+, skypeClient (NULL)
 {
     initLogging ();
 
@@ -127,6 +128,12 @@ MainWindow::deinit ()
         modelContacts = NULL;
     }
 
+    if (NULL != skypeClient)
+    {
+        Singletons::getRef().getSkypeFactory().deleteClient (skypeClient);
+        skypeClient = NULL;
+    }
+
     qApp->quit ();
 }//MainWindow::deinit
 
@@ -193,6 +200,9 @@ MainWindow::init ()
 {
     GVAccess &webPage = Singletons::getRef().getGVAccess ();
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+
+    SkypeClientFactory &skypeFactory = Singletons::getRef().getSkypeFactory ();
+    skypeClient = skypeFactory.createSkypeClient (*this, "QGVDial");
 
     dbMain.init ();
 

@@ -1,5 +1,5 @@
 #include "GVSettings.h"
-#include "SingletonFactory.h"
+#include "Singletons.h"
 
 #define ROW_BELOW_PASS 2
 #define CB_TEXT_BUILDER "%1 : %2"

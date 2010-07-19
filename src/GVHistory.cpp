@@ -1,6 +1,6 @@
 #include "global.h"
 #include "GVHistory.h"
-#include "SingletonFactory.h"
+#include "Singletons.h"
 
 GVHistory::GVHistory (QWidget *parent/* = 0*/)
 : QTreeWidget(parent)

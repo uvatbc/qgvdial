@@ -1,4 +1,4 @@
-#include "SingletonFactory.h"
+#include "Singletons.h"
 
 Singletons::Singletons (QObject *parent/* = 0*/)
 : QObject (parent)

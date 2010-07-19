@@ -1,5 +1,5 @@
 #include "DialCancelDlg.h"
-#include "SingletonFactory.h"
+#include "Singletons.h"
 
 DialCancelDlg::DialCancelDlg (const QString &strNum, QWidget *parent)
 : QMessageBox (parent)
