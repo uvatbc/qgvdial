@@ -15,6 +15,8 @@ protected:
     void startMonitoring (const QString &strC);
     void stopMonitoring ();
 
+    void initClient ();
+
 private slots:
     //! Invoked when Skype is initialized
     void onInitSkype (bool bSuccess, const QVariantList &params);
@@ -29,6 +31,8 @@ private:
     SkypeClient    *skypeClient;
     //! Array of active call IDs
     QVector<ulong>  arrCalls;
+
+    QWidget &mainwin;
 
     friend class ObserverFactory;
 };

@@ -320,13 +320,10 @@ GVAccess::simplify_number (QString &strNumber, bool bAddIntPrefix /*= true*/)
     }
 }//GVAccess::simplify_number
 
-QNetworkReply *
-GVAccess::postRequest (QNetworkAccessManager   *mgr     ,
-                       QString                  strUrl  ,
-                       QStringPairList          arrPairs,
-                       QString                  strUA   ,
-                       QObject                 *receiver,
-                       const char              *method  )
+QNetworkRequest
+GVAccess::createRequest (QString         strUrl    ,
+                         QStringPairList arrPairs  ,
+                         QByteArray     &byPostData)
 {
     QStringList arrParams;
     foreach (QStringPair pairParam, arrPairs)
@@ -335,20 +332,30 @@ GVAccess::postRequest (QNetworkAccessManager   *mgr     ,
                         .arg(pairParam.first)
                         .arg(pairParam.second);
     }
-    QString strParams = arrParams.join ("&");
+    byPostData = arrParams.join ("&").toAscii ();
 
     QUrl url (strUrl);
     QNetworkRequest request(url);
     request.setHeader (QNetworkRequest::ContentTypeHeader,
                        "application/x-www-form-urlencoded");
+
+    return (request);
+}//GVAccess::createRequest
+
+QNetworkReply *
+GVAccess::postRequest (QNetworkAccessManager   *mgr     ,
+                       QString                  strUrl  ,
+                       QStringPairList          arrPairs,
+                       QString                  strUA   ,
+                       QObject                 *receiver,
+                       const char              *method  )
+{
+    QByteArray byPostData;
+    QNetworkRequest request = createRequest (strUrl, arrPairs, byPostData);
     if (0 != strUA.size ())
     {
-        QByteArray baUA = strUA.toAscii ();
-        QByteArray baUAMeta = "User-Agent";
-        request.setRawHeader (baUAMeta, baUA);
+        request.setRawHeader ("User-Agent", strUA.toAscii ());
     }
-
-    QByteArray byPostData = strParams.toAscii ();
 
     QObject::connect (mgr     , SIGNAL (finished (QNetworkReply *)),
                       receiver, method);

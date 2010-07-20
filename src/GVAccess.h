@@ -112,6 +112,13 @@ protected:
     //! Simplify a phone number
     void simplify_number (QString &strNumber, bool bAddIntPrefix = true);
 
+    
+    //! To be used for Data Access API ONLY
+    QNetworkRequest
+    createRequest (QString         strUrl    ,
+                   QStringPairList arrPairs  ,
+                   QByteArray     &byPostData);
+
     //! To be used for Data Access API ONLY
     QNetworkReply *
     postRequest (QNetworkAccessManager   *mgr     ,

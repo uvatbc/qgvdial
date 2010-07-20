@@ -1,16 +1,17 @@
 #include "GVWebPage.h"
 
 #define GV_DATA_BASE "https://www.google.com/voice"
-#define USE_GV_CALLOUT_METHOD 0
+#define USE_GV_CALLOUT_METHOD 1
 
 GVWebPage::GVWebPage(QObject *parent/* = NULL*/)
 : GVAccess (parent)
+, bUseIphoneUA (true)
 , webPage (this)
 , garbageTimer (this)
 {
-    webPage.settings()->setAttribute (QWebSettings::PluginsEnabled, false);
     webPage.settings()->setAttribute (QWebSettings::JavaEnabled   , false);
-    webPage.settings()->setAttribute (QWebSettings::AutoLoadImages, false);
+//     webPage.settings()->setAttribute (QWebSettings::PluginsEnabled, false);
+//     webPage.settings()->setAttribute (QWebSettings::AutoLoadImages, false);
     webPage.setForwardUnsupportedContent (true);
 
     garbageTimer.setSingleShot (true);
@@ -141,6 +142,8 @@ GVWebPage::aboutBlankDone (bool bOk)
 bool
 GVWebPage::login ()
 {
+    webPage.setUA (bUseIphoneUA);
+
     // GV page load complete will begin the login process.
     QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
                        this   , SLOT   (loginStage1 (bool)));
@@ -217,45 +220,62 @@ GVWebPage::loginStage2 (bool bOk)
         }
         bOk = false;
 
-        QWebFrame *frame = doc().webFrame();
-        if (NULL == frame)
+        QMutexLocker locker(&mutex);
+        if (bUseIphoneUA)
         {
-            emit log ("No frame!!", 3);
-            break;
+            QNetworkCookieJar *jar = webPage.networkAccessManager()->cookieJar();
+            QList<QNetworkCookie> cookies =
+                jar->cookiesForUrl (webPage.mainFrame()->url ());
+            foreach (QNetworkCookie cookie, cookies)
+            {
+                if (cookie.name() == "gvx")
+                {
+                    bLoggedIn = true;
+                }
+            }
         }
-
-        if (!isLoggedIn ())
+        else
         {
-            emit log ("Failed to log in!", 3);
-            break;
-        }
+            QWebFrame *frame = doc().webFrame();
+            if (NULL == frame)
+            {
+                emit log ("No frame!!", 3);
+                break;
+            }
 
-        // Whats the GV number?
+            if (!isLoggedIn ())
+            {
+                emit log ("Failed to log in!", 3);
+                break;
+            }
+
+            // Whats the GV number?
 #define GVSELECTOR "div b[class=\"ms3\"]"
-        QWebElement num = doc().findFirst (GVSELECTOR);
+            QWebElement num = doc().findFirst (GVSELECTOR);
 #undef GVSELECTOR
-        if (num.isNull ())
-        {
-            emit log ("Failed to get a google voice number!!", 3);
-            break;
-        }
+            if (num.isNull ())
+            {
+                emit log ("Failed to get a google voice number!!", 3);
+                break;
+            }
 
-        strSelfNumber = num.toPlainText ();
-        simplify_number (strSelfNumber, false);
-        workCurrent.arrParams += QVariant (strSelfNumber);
+            strSelfNumber = num.toPlainText ();
+            simplify_number (strSelfNumber, false);
+            workCurrent.arrParams += QVariant (strSelfNumber);
 
 #define GVSELECTOR "input[name=\"_rnr_se\"]"
-        QWebElement rnr_se = doc().findFirst (GVSELECTOR);
+            QWebElement rnr_se = doc().findFirst (GVSELECTOR);
 #undef GVSELECTOR
-        if (rnr_se.isNull ())
-        {
-            emit log ("Could not find rnr_se", 3);
-            break;
-        }
-        strRnr_se = rnr_se.attribute ("value");
+            if (rnr_se.isNull ())
+            {
+                emit log ("Could not find rnr_se", 3);
+                break;
+            }
+            strRnr_se = rnr_se.attribute ("value");
 
-        QMutexLocker locker(&mutex);
-        bLoggedIn = true;
+            bLoggedIn = true;
+        }
+
         bOk = true;
     } while (0); // End cleanup block (not a loop)
 
@@ -406,28 +426,64 @@ GVWebPage::dialCallback ()
     QStringPairList arrPairs;
     workCurrent.cancel = (WebPageCancel) &GVWebPage::cancelDataDial2;
 
-#if USE_GV_CALLOUT_METHOD
-    arrPairs += QStringPair("m"      , "call");
-    arrPairs += QStringPair("n"      , arrParams[0].toString());
-    arrPairs += QStringPair("f"      , "");
-    arrPairs += QStringPair("v"      , "6");
-    arrPairs += QStringPair("_rnr_se", strRnr_se);
+    if (bUseIphoneUA)
+    {
+        QString strUA = UA_IPHONE;
+        QString strUrl = QString("https://www.google.com/voice/m/x"
+                                 "?m=call"
+                                 "&n=%1"
+                                 "&f="
+                                 "&v=6")
+                                 .arg(arrParams[0].toString());
 
-    QString strUA = "Mozilla/5.0 (iPhone; U; CPU iPhone OS 3_0 like Mac OS X; en-us) AppleWebKit/528.18 (KHTML, like Gecko) Version/4.0 Mobile/7A341 Safari/528.16";
-    postRequest ("https://www.google.com/voice/m/x", arrPairs, strUA,
-                 this, SLOT (onDataCallDone (QNetworkReply *)));
+        QNetworkRequest request(strUrl);
+        request.setRawHeader ("User-Agent", strUA.toAscii ());
 
-#else
-    arrPairs += QStringPair("outgoingNumber"  , arrParams[0].toString());
-    arrPairs += QStringPair("forwardingNumber", strCurrentCallback);
-    arrPairs += QStringPair("subscriberNumber", strSelfNumber);
-    arrPairs += QStringPair("phoneType"       , QString(chCurrentCallbackType));
-    arrPairs += QStringPair("remember"        , "1");
-    arrPairs += QStringPair("_rnr_se"         , strRnr_se);
+        QNetworkAccessManager *mgr = webPage.networkAccessManager ();
+        QNetworkCookieJar *jar = mgr->cookieJar();
+        QList<QNetworkCookie> cookies =
+            jar->cookiesForUrl (webPage.mainFrame()->url ());
+        QList<QNetworkCookie> sendCookies;
+        QString gvxVal;
+        foreach (QNetworkCookie cookie, cookies)
+        {
+            if ((cookie.name() == "gv-ph")||
+                (cookie.name() == "gv")   ||
+                (cookie.name() == "gvx")  ||
+                (cookie.name() == "PREF") ||
+                (cookie.name() == "S")    ||
+                (cookie.name() == "SID")  ||
+                (cookie.name() == "HSID") ||
+                (cookie.name() == "SSID"))
+            {
+                sendCookies += cookie;
+            }
 
-    postRequest (GV_DATA_BASE "/call/connect/", arrPairs, QString (),
-                 this, SLOT (onDataCallDone (QNetworkReply *)));
-#endif
+            if (cookie.name () == "gvx")
+            {
+                gvxVal = cookie.value ();
+            }
+        }
+        QString strContent = QString("{\"gvx\":\"%1\"}").arg(gvxVal);
+
+        request.setHeader (QNetworkRequest::CookieHeader,
+                           QVariant::fromValue(sendCookies));
+
+        QObject::connect (mgr , SIGNAL (finished (QNetworkReply *)),
+                          this, SLOT (onDataCallDone (QNetworkReply *)));
+        QNetworkReply *reply = mgr->post (request, strContent.toAscii());
+    }
+    else
+    {
+        arrPairs += QStringPair("outgoingNumber"  , arrParams[0].toString());
+        arrPairs += QStringPair("forwardingNumber", strCurrentCallback);
+        arrPairs += QStringPair("subscriberNumber", strSelfNumber);
+        arrPairs += QStringPair("phoneType"       , QString(chCurrentCallbackType));
+        arrPairs += QStringPair("remember"        , "1");
+        arrPairs += QStringPair("_rnr_se"         , strRnr_se);
+        postRequest (GV_DATA_BASE "/call/connect/", arrPairs, QString (),
+                     this, SLOT (onDataCallDone (QNetworkReply *)));
+    }
 
 #else //!USE_GV_DATA_API
 
@@ -459,16 +515,31 @@ GVWebPage::onDataCallDone (QNetworkReply * reply)
 
     bool bOk = false;
     do { // Begin cleanup block (not a loop)
-        msg = msg.simplified ();
-        msg.remove(QRegExp("[ \t\n]*"));
-        if (!msg.contains ("\"ok\":true", Qt::CaseSensitive))
+        if (bUseIphoneUA)
         {
-            emit log ("Failed to dial out");
-            break;
-        }
+            QRegExp rx("\"access_number\":\"([+\\d]*)\"");
+            if (!msg.contains (rx) || (1 != rx.captureCount ()))
+            {
+                emit log ("GV didn't return an access number");
+                break;
+            }
 
-        emit dialInProgress ();
-        bOk = true;
+            QString strAccess = rx.cap(1);
+            emit log (QString ("access number = \"%1\"").arg(strAccess));
+        }
+        else
+        {
+            msg = msg.simplified ();
+            msg.remove(QRegExp("[ \t\n]*"));
+            if (!msg.contains ("\"ok\":true", Qt::CaseSensitive))
+            {
+                emit log ("Failed to dial out");
+                break;
+            }
+
+            emit dialInProgress ();
+            bOk = true;
+        }
     } while (0); // End cleanup block (not a loop)
     if (!bOk)
     {
@@ -1287,8 +1358,8 @@ GVWebPage::getContactFromHistoryLinkLoaded (bool bOk)
 void
 GVWebPage::garbageTimerTimeout ()
 {
-    webPage.settings()->clearIconDatabase ();
-    webPage.settings()->clearMemoryCaches ();
+//     webPage.settings()->clearIconDatabase ();
+//     webPage.settings()->clearMemoryCaches ();
 
     garbageTimer.start ();
 }//GVWebPage::garbageTimerTimeout

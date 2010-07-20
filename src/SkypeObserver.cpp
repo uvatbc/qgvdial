@@ -4,27 +4,9 @@
 SkypeObserver::SkypeObserver (QWidget &win, QObject *parent)
 : IObserver(parent)
 , skypeClient (NULL)
+, mainwin (win)
 {
-    SkypeClientFactory &skypeFactory = Singletons::getRef().getSkypeFactory ();
-    skypeClient = skypeFactory.createSkypeClient (win, "QGVDial");
-    if (NULL != skypeClient)
-    {
-        QObject::connect (
-            skypeClient, SIGNAL (log (const QString &, int)),
-            this       , SIGNAL (log (const QString &, int)));
-        QObject::connect (
-            skypeClient, SIGNAL (status (const QString &, int)),
-            this       , SIGNAL (status (const QString &, int)));
-
-        QVariantList l;
-        bool bret = skypeClient->enqueueWork (SW_Connect, l,
-                        this, SLOT (onInitSkype (bool, const QVariantList &)));
-        if (!bret)
-        {
-            skypeFactory.deleteClient (skypeClient);
-            skypeClient = NULL;
-        }
-    }
+    initClient ();
 }//SkypeObserver::SkypeObserver
 
 SkypeObserver::~SkypeObserver(void)
@@ -36,6 +18,36 @@ SkypeObserver::~SkypeObserver(void)
         skypeClient = NULL;
     }
 }//SkypeObserver::~SkypeObserver
+
+void
+SkypeObserver::initClient ()
+{
+    if (NULL != skypeClient)
+    {
+        return;
+    }
+
+    SkypeClientFactory &skypeFactory = Singletons::getRef().getSkypeFactory ();
+    skypeClient = skypeFactory.createSkypeClient (mainwin, "QGVDial");
+    if (NULL != skypeClient)
+    {
+        QObject::connect (
+            skypeClient, SIGNAL (log (const QString &, int)),
+            this       , SIGNAL (log (const QString &, int)));
+        QObject::connect (
+            skypeClient, SIGNAL (status (const QString &, int)),
+            this       , SIGNAL (status (const QString &, int)));
+
+        QVariantList l;
+        bool bret = skypeClient->enqueueWork (SW_Connect, l,
+            this, SLOT (onInitSkype (bool, const QVariantList &)));
+        if (!bret)
+        {
+            skypeFactory.deleteClient (skypeClient);
+            skypeClient = NULL;
+        }
+    }
+}//SkypeObserver::initClient
 
 void
 SkypeObserver::onInitSkype (bool bSuccess, const QVariantList & /*params*/)
@@ -63,6 +75,7 @@ SkypeObserver::onInitSkype (bool bSuccess, const QVariantList & /*params*/)
 void
 SkypeObserver::startMonitoring (const QString &strC)
 {
+    initClient ();
     strContact = strC;
 }//SkypeObserver::startMonitoring
 
@@ -77,6 +90,12 @@ SkypeObserver::onCallStatusChanged (uint callId, const QString &strStatus)
 {
     do // Begin cleanup block (not a loop)
     {
+        if (NULL == skypeClient)
+        {
+            emit log ("WTF?? skypeClient == NULL");
+            break;
+        }
+
         if (arrCalls.contains (callId))
         {
             QString strText = strStatus;

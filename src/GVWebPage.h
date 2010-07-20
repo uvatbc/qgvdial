@@ -1,8 +1,6 @@
 #ifndef __GVWEBPAGE_H__
 #define __GVWEBPAGE_H__
 
-#define USE_GV_DATA_API 1
-
 #include "global.h"
 #include "MobileWebPage.h"
 #include "GVAccess.h"
@@ -133,6 +131,8 @@ private:
 #endif
 
 private:
+    bool                    bUseIphoneUA;
+
     //! The webkit page that does all our work
     MobileWebPage           webPage;
 

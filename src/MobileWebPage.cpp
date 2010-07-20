@@ -3,11 +3,21 @@
 
 MobileWebPage::MobileWebPage (QObject *parent/* = NULL*/)
 : QWebPage(parent)
+, bUAIsIphone (false)
 {
 }//MobileWebPage::MobileWebPage
 
 QString
 MobileWebPage::userAgentForUrl (const QUrl &) const
 {
-    return ("Mozilla/5.0 (X11; U; Linux armv7l; en-GB; rv:1.9.2a1pre) Gecko/20090928 Firefox/3.5 Maemo Browser 1.4.1.21 RX-51 N900");
+    if (bUAIsIphone)
+        return (UA_IPHONE);
+    else
+        return (UA_N900);
 }//MobileWebPage::userAgentForUrl
+
+void
+MobileWebPage::setUA (bool bSetIphone /*= false*/)
+{
+    bUAIsIphone = bSetIphone;
+}//MobileWebPage::setUA
