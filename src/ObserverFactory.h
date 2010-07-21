@@ -10,6 +10,7 @@ class ObserverFactory : public QObject
 
 private:
     explicit ObserverFactory(QObject *parent = 0);
+    ~ObserverFactory();
 
 public:
     bool init (QWidget &win);

@@ -16,6 +16,20 @@ ObserverFactory::ObserverFactory(QObject *parent)
 {
 }//ObserverFactory::ObserverFactory
 
+ObserverFactory::~ObserverFactory ()
+{
+#if defined (Q_OS_UNIX) && !defined (Q_OS_SYMBIAN)
+    if (!clientRegistrar.isNull ())
+    {
+        // Don't know why deleting this object causes a segfault
+        // ClientRegistrar *data = clientRegistrar.data ();
+        // delete data;
+
+        clientRegistrar.reset ();
+    }
+#endif
+}//ObserverFactory::~ObserverFactory
+
 bool
 ObserverFactory::init (QWidget &win)
 {

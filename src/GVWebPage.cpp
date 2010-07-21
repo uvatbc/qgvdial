@@ -473,7 +473,7 @@ GVWebPage::dialCallback ()
 
         QObject::connect (mgr , SIGNAL (finished (QNetworkReply *)),
                           this, SLOT (onDataCallDone (QNetworkReply *)));
-        QNetworkReply *reply = mgr->post (request, strContent.toAscii());
+        mgr->post (request, strContent.toAscii());
     }
     else
     {

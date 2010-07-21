@@ -53,7 +53,8 @@ SkypeClientFactory::deleteClient (SkypeClient *skypeClient)
     if (-1 != pos)
     {
         listClients.removeAt (pos);
-        delete skypeClient;
+        skypeClient->exit ();
+        skypeClient->deleteLater ();
         rv = true;
     }
 
