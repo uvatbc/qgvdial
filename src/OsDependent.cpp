@@ -16,6 +16,17 @@ OsDependent::init ()
 #endif
 }//OsDependent::init
 
+bool
+OsDependent::isN900 ()
+{
+#if defined (Q_WS_MAEMO_5)
+    return (true);
+#else
+    return (false);
+#endif
+}//OsDependent::isN900
+
+
 #ifdef QT_NO_SYSTEMTRAYICON
 QSystemTrayIcon::QSystemTrayIcon(QWidget *parent/* = 0*/) : QWidget (parent)
 {

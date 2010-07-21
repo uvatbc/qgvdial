@@ -1,4 +1,5 @@
 #include "GVWebPage.h"
+#include "Singletons.h"
 
 #define GV_DATA_BASE "https://www.google.com/voice"
 #define USE_GV_CALLOUT_METHOD 1
@@ -414,6 +415,7 @@ GVWebPage::isNextContactsPageAvailable ()
 bool
 GVWebPage::dialCallback ()
 {
+    OsDependent &osd = Singletons::getRef().getOSD();
     QMutexLocker locker(&mutex);
     if (!bLoggedIn)
     {
@@ -426,7 +428,7 @@ GVWebPage::dialCallback ()
     QStringPairList arrPairs;
     workCurrent.cancel = (WebPageCancel) &GVWebPage::cancelDataDial2;
 
-    if (bUseIphoneUA)
+    if ((bUseIphoneUA) && (!osd.isN900 ()))
     {
         QString strUA = UA_IPHONE;
         QString strUrl = QString("https://www.google.com/voice/m/x"
@@ -507,6 +509,7 @@ GVWebPage::dialCallback ()
 void
 GVWebPage::onDataCallDone (QNetworkReply * reply)
 {
+    OsDependent &osd = Singletons::getRef().getOSD();
     QNetworkAccessManager *mgr = webPage.networkAccessManager ();
     QObject::disconnect (mgr , SIGNAL (finished (QNetworkReply *)),
                          this, SLOT (onDataCallDone (QNetworkReply *)));
@@ -515,7 +518,7 @@ GVWebPage::onDataCallDone (QNetworkReply * reply)
 
     bool bOk = false;
     do { // Begin cleanup block (not a loop)
-        if (bUseIphoneUA)
+        if ((bUseIphoneUA) && (!osd.isN900 ()))
         {
             QRegExp rx("\"access_number\":\"([+\\d]*)\"");
             if (!msg.contains (rx) || (1 != rx.captureCount ()))

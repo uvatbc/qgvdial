@@ -18,6 +18,7 @@ class OsDependent : public QObject
 
 public:
     void init ();
+    bool isN900 ();
 
 private:
     OsDependent(QObject *parent = 0);
