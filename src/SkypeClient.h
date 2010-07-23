@@ -6,17 +6,17 @@
 
 enum Skype_Work {
     SW_Nothing = 0,
-    SW_Connect,
-    SW_InitiateCall,
-    SW_GetContacts,
-    SW_GetCallInfo,
+    SW_Connect,         // No params
+    SW_InitiateCall,    // Target contacts (1 or more)
+    SW_GetContacts,     // No params
+    SW_GetCallInfo,     // Call id
 };
 
 struct Skype_CallInfo
 {
     Skype_CallInfo () {init ();}
     void init () {
-        bPSTN_valid = bIncoming_valid = bPartnerHandle_valid = 
+        bPSTN_valid = bIncoming_valid = bPartnerHandle_valid =
         bPartnerName_valid = bSelfNumber_valid = bPSTN = bIncoming
         = false;
 
@@ -78,6 +78,8 @@ class SkypeClient : public QThread
 
 protected:
     SkypeClient(const QString &name, QObject *parent = 0);
+    int addRef ();
+    int decRef ();
 
 public:
     bool enqueueWork (Skype_Work whatwork, const QVariantList &params,
@@ -163,6 +165,8 @@ protected:
     QList<Skype_WorkItem>   workList;
     //! Whats the current work being done
     Skype_WorkItem          workCurrent;
+
+    int                     nRefCount;
 
     Skype_CallInfoMap       mapCallInfo;
 

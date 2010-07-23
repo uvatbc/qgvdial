@@ -10,22 +10,39 @@
 
 SkypeClientFactory::SkypeClientFactory(QObject *parent)
 : QObject(parent)
+, mainwin (NULL)
 {
 }//SkypeClientFactory::SkypeClientFactory
 
 SkypeClientFactory::~SkypeClientFactory ()
 {
-    while (0 != listClients.size ())
+    while (0 != mapClients.size ())
     {
-        SkypeClient *client = listClients[0];
-        deleteClient (client);
+        deleteClient (mapClients.begin().key ());
     }
 }//SkypeClientFactory::~SkypeClientFactory
 
-SkypeClient *
-SkypeClientFactory::createSkypeClient (QWidget &mainwin, const QString &name)
+void
+SkypeClientFactory::setMainWidget (QWidget *win)
 {
+    mainwin = win;
+}//SkypeClientFactory::setMainWidget
+
+SkypeClient *
+SkypeClientFactory::ensureSkypeClient (const QString &name)
+{
+    if (NULL == mainwin) {
+        emit log ("Main window not set");
+        return (NULL);
+    }
+
     SkypeClient *client = NULL;
+
+    if (mapClients.contains (name)) {
+        client = mapClients[name];
+        client->addRef ();
+        return (client);
+    }
 
 #if defined(Q_WS_X11) && !defined(Q_WS_MAEMO_5)
     client = new SkypeLinuxClient (name);
@@ -33,12 +50,12 @@ SkypeClientFactory::createSkypeClient (QWidget &mainwin, const QString &name)
 #endif
 
 #ifdef Q_WS_WIN32
-    client = new SkypeWinClient (mainwin, name);
+    client = new SkypeWinClient (*mainwin, name);
 #endif
 
     if (NULL != client)
     {
-        listClients += client;
+        mapClients[name] = client;
         client->start ();
     }
 
@@ -46,17 +63,17 @@ SkypeClientFactory::createSkypeClient (QWidget &mainwin, const QString &name)
 }//SkypeClientFactory::createSkypeClient
 
 bool
-SkypeClientFactory::deleteClient (SkypeClient *skypeClient)
+SkypeClientFactory::deleteClient (const QString &name)
 {
-    bool rv = false;
-    int pos = listClients.indexOf (skypeClient);
-    if (-1 != pos)
-    {
-        listClients.removeAt (pos);
-        skypeClient->exit ();
-        skypeClient->deleteLater ();
-        rv = true;
+    if (!mapClients.contains (name)) {
+        return (false);
     }
 
-    return (rv);
+    SkypeClient *skypeClient = mapClients[name];
+    if (0 == skypeClient->decRef ()) {
+        skypeClient = NULL;
+        mapClients.remove (name);
+    }
+
+    return (true);
 }//SkypeClientFactory::deleteClient

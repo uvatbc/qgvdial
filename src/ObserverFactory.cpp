@@ -31,7 +31,7 @@ ObserverFactory::~ObserverFactory ()
 }//ObserverFactory::~ObserverFactory
 
 bool
-ObserverFactory::init (QWidget &win)
+ObserverFactory::init ()
 {
     // Observer for Telepathy on desktop Linux and Maemo 5
 #if defined (Q_OS_UNIX) && !defined (Q_OS_SYMBIAN)
@@ -62,7 +62,7 @@ ObserverFactory::init (QWidget &win)
 
     // Observer for Skype on desktop Linux and desktop Windows
 #if (defined (Q_WS_X11) && !defined (Q_WS_MAEMO_5)) || defined(Q_WS_WIN32)
-    SkypeObserver *skypeObs = new SkypeObserver (win);
+    SkypeObserver *skypeObs = new SkypeObserver ();
 
     QObject::connect (
         skypeObs, SIGNAL (log(const QString &, int)),

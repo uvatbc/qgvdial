@@ -68,3 +68,10 @@ Singletons::getUAH ()
     static UniqueAppHelper uniqueAppHelper;
     return (uniqueAppHelper);
 }//Singletons::getUAH
+
+CallInitiatorFactory &
+Singletons::getCIFactory ()
+{
+    static CallInitiatorFactory callInitiatorFactory(this);
+    return (callInitiatorFactory);
+}//Singletons::getCIFactory

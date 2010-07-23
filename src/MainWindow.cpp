@@ -42,9 +42,19 @@ MainWindow::MainWindow (QWidget *parent/* = 0*/, Qt::WindowFlags f/* = 0*/)
 
     GVAccess &webPage = Singletons::getRef().getGVAccess ();
 
+    // Skype client factory log and status
+    SkypeClientFactory &skypeFactory = Singletons::getRef().getSkypeFactory ();
+    skypeFactory.setMainWidget (this);
+    QObject::connect (
+        &skypeFactory, SIGNAL (log(const QString &, int)),
+         this        , SLOT   (log(const QString &, int)));
+    QObject::connect (
+        &skypeFactory, SIGNAL (status(const QString &, int)),
+         this        , SLOT   (setStatus(const QString &, int)));
+
     // Observer factory log and status
     ObserverFactory &obF = Singletons::getRef().getObserverFactory ();
-    obF.init (*this);
+    obF.init ();
     QObject::connect (&obF , SIGNAL (log(const QString &, int)),
                        this, SLOT   (log(const QString &, int)));
     QObject::connect (&obF , SIGNAL (status(const QString &, int)),
@@ -55,15 +65,6 @@ MainWindow::MainWindow (QWidget *parent/* = 0*/, Qt::WindowFlags f/* = 0*/)
                        this   , SLOT   (log(const QString &, int)));
     QObject::connect (&webPage, SIGNAL (status(const QString &, int)),
                        this   , SLOT   (setStatus(const QString &, int)));
-
-    // Skype client factory log and status
-    SkypeClientFactory &skypeFactory = Singletons::getRef().getSkypeFactory ();
-    QObject::connect (
-        &skypeFactory, SIGNAL (log(const QString &, int)),
-         this        , SLOT   (log(const QString &, int)));
-    QObject::connect (
-        &skypeFactory, SIGNAL (status(const QString &, int)),
-         this        , SLOT   (setStatus(const QString &, int)));
 
     // sInit.exited -> this.init
     // This trick is so that immediately after init we go to next state

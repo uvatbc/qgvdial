@@ -1,13 +1,37 @@
 #include "SkypeClient.h"
 
-SkypeClient::SkypeClient(const QString &name, QObject *parent) :
-QThread(parent),
-strName (name),
-bConnected(false),
-mutex(QMutex::Recursive)
+SkypeClient::SkypeClient(const QString &name, QObject *parent)
+: QThread(parent)
+, strName (name)
+, bConnected(false)
+, mutex(QMutex::Recursive)
+, nRefCount (1)
 {
     qRegisterMetaType<Skype_CallInfo> ("Skype_CallInfo");
 }//SkypeClient::SkypeClient
+
+int
+SkypeClient::addRef ()
+{
+    QMutexLocker locker(&mutex);
+    nRefCount++;
+
+    return (nRefCount);
+}//SkypeClient::addRef
+
+int
+SkypeClient::decRef ()
+{
+    QMutexLocker locker(&mutex);
+    nRefCount--;
+
+    if (0 == nRefCount) {
+        this->exit ();
+        this->deleteLater ();
+    }
+
+    return (nRefCount);
+}//SkypeClient::decRef
 
 bool
 SkypeClient::enqueueWork (Skype_Work whatwork, const QVariantList &params,

@@ -4,15 +4,17 @@
 #include <QtCore>
 
 class SkypeClient;
-typedef QList<SkypeClient *> SkypeClientList;
+typedef QMap<QString, SkypeClient *> SkypeClientMap;
 
 class SkypeClientFactory : public QObject
 {
     Q_OBJECT
 
 public:
-    SkypeClient *createSkypeClient (QWidget &mainwin, const QString &name);
-    bool deleteClient (SkypeClient *skypeClient);
+    void setMainWidget (QWidget *win);
+
+    SkypeClient *ensureSkypeClient (const QString &name);
+    bool deleteClient (const QString &name);
 
 private:
     explicit SkypeClientFactory(QObject *parent = 0);
@@ -23,7 +25,9 @@ signals:
     void status (const QString &txt, int timeout = 0);
 
 private:
-    SkypeClientList listClients;
+    SkypeClientMap mapClients;
+
+    QWidget *mainwin;
 
     friend class Singletons;
 };

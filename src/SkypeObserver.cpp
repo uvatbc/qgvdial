@@ -1,22 +1,15 @@
 #include "SkypeObserver.h"
 #include "Singletons.h"
 
-SkypeObserver::SkypeObserver (QWidget &win, QObject *parent)
+SkypeObserver::SkypeObserver (QObject *parent)
 : IObserver(parent)
 , skypeClient (NULL)
-, mainwin (win)
 {
     initClient ();
 }//SkypeObserver::SkypeObserver
 
 SkypeObserver::~SkypeObserver(void)
 {
-    SkypeClientFactory &skypeFactory = Singletons::getRef().getSkypeFactory ();
-    if (NULL != skypeClient)
-    {
-        skypeFactory.deleteClient (skypeClient);
-        skypeClient = NULL;
-    }
 }//SkypeObserver::~SkypeObserver
 
 void
@@ -28,24 +21,28 @@ SkypeObserver::initClient ()
     }
 
     SkypeClientFactory &skypeFactory = Singletons::getRef().getSkypeFactory ();
-    skypeClient = skypeFactory.createSkypeClient (mainwin, "QGVDial");
-    if (NULL != skypeClient)
+    skypeClient = skypeFactory.ensureSkypeClient (SKYPE_CLIENT_NAME);
+    if (NULL == skypeClient)
     {
-        QObject::connect (
-            skypeClient, SIGNAL (log (const QString &, int)),
-            this       , SIGNAL (log (const QString &, int)));
-        QObject::connect (
-            skypeClient, SIGNAL (status (const QString &, int)),
-            this       , SIGNAL (status (const QString &, int)));
+        emit log ("Failed to create skype client");
+        return;
+    }
 
-        QVariantList l;
-        bool bret = skypeClient->enqueueWork (SW_Connect, l,
-            this, SLOT (onInitSkype (bool, const QVariantList &)));
-        if (!bret)
-        {
-            skypeFactory.deleteClient (skypeClient);
-            skypeClient = NULL;
-        }
+    QObject::connect (
+        skypeClient, SIGNAL (log (const QString &, int)),
+        this       , SIGNAL (log (const QString &, int)));
+    QObject::connect (
+        skypeClient, SIGNAL (status (const QString &, int)),
+        this       , SIGNAL (status (const QString &, int)));
+
+    QVariantList l;
+    bool bret = skypeClient->enqueueWork (SW_Connect, l,
+                                          this, SLOT (onInitSkype (bool, const QVariantList &)));
+    if (!bret)
+    {
+        emit log ("Failed to initiate skype client init!");
+        skypeFactory.deleteClient (SKYPE_CLIENT_NAME);
+        skypeClient = NULL;
     }
 }//SkypeObserver::initClient
 
@@ -54,17 +51,17 @@ SkypeObserver::onInitSkype (bool bSuccess, const QVariantList & /*params*/)
 {
     if (!bSuccess)
     {
-        log ("Failed to init skype. Deleting");
+        emit log ("Failed to init skype. Deleting");
 
         SkypeClientFactory &skypeFactory =
         Singletons::getRef().getSkypeFactory ();
 
-        skypeFactory.deleteClient (skypeClient);
+        skypeFactory.deleteClient (SKYPE_CLIENT_NAME);
         skypeClient = NULL;
     }
     else
     {
-        log ("Skype initialized");
+        emit log ("Skype initialized");
 
         QObject::connect (
             skypeClient, SIGNAL (callStatusChanged   (uint, const QString &)),
@@ -106,7 +103,7 @@ SkypeObserver::onCallStatusChanged (uint callId, const QString &strStatus)
                     (strText.contains ("FINISHED")))
                 {
                     arrCalls.remove (arrCalls.indexOf (callId));
-                    log (QString("Remove call id=%1").arg(callId));
+                    emit log (QString("Remove call id=%1").arg(callId));
                 }
             }
 
@@ -114,7 +111,7 @@ SkypeObserver::onCallStatusChanged (uint callId, const QString &strStatus)
         }
 
         arrCalls += callId;
-        log (QString("Add call id=%1. Begin get info").arg(callId));
+        emit log (QString("Add call id=%1. Begin get info").arg(callId));
 
         // Invoke get call info
         QVariantList l;
@@ -123,7 +120,7 @@ SkypeObserver::onCallStatusChanged (uint callId, const QString &strStatus)
                     SLOT (onCallInfoDone(bool, const QVariantList &)));
         if (!rv)
         {
-            log ("Failed to get call info");
+            emit log ("Failed to get call info");
         }
     } while (0); // End cleanup block (not a loop)
 }//SkypeObserver::onCallStatusChanged

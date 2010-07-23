@@ -39,7 +39,7 @@ public:
 
 signals:
     void log(const QString &strText, int level = 10);
-    void setStatus(const QString &strText, int timeout = 2000);
+    void status(const QString &strText, int timeout = 2000);
 
 private:
     QSqlDatabase    dbMain;

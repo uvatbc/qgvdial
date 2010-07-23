@@ -13,7 +13,7 @@ private:
     ~ObserverFactory();
 
 public:
-    bool init (QWidget &win);
+    bool init ();
 
     void startObservers (const QString &strContact,
                                QObject *receiver  ,

@@ -9,6 +9,7 @@ class CacheDatabase;
 class SkypeClientFactory;
 class ObserverFactory;
 class UniqueAppHelper;
+class CallInitiatorFactory;
 
 class Singletons : public QObject
 {
@@ -21,6 +22,7 @@ public:
     ObserverFactory     & getObserverFactory ();
     SkypeClientFactory  & getSkypeFactory ();
     UniqueAppHelper     & getUAH ();
+    CallInitiatorFactory& getCIFactory ();
 
 private:
     Singletons (QObject *parent = 0);
@@ -38,5 +40,6 @@ private:
 #include "ObserverFactory.h"
 #include "SkypeClientFactory.h"
 #include "UniqueAppHelper.h"
+#include "CallInitiatorFactory.h"
 
 #endif //__SINGLETONS_H__

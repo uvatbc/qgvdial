@@ -90,7 +90,7 @@ signals:
     void contactInfo (const GVContactInfo &info);
     //! Emitted for each registered phone number
     void registeredPhone (const GVRegisteredNumber &info);
-    //! Emitted when dialing has started
+    //! Emitted when dialing has started (for callback method)
     void dialInProgress ();
     //! Emitted for every history event
     void oneHistoryEvent (const GVHistoryEvent &hevent);
@@ -112,7 +112,7 @@ protected:
     //! Simplify a phone number
     void simplify_number (QString &strNumber, bool bAddIntPrefix = true);
 
-    
+
     //! To be used for Data Access API ONLY
     QNetworkRequest
     createRequest (QString         strUrl    ,

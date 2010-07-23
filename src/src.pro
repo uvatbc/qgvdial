@@ -4,7 +4,7 @@ QT      *= core gui webkit sql
 INCLUDEPATH += .
 
 CONFIG  += mobility
-MOBILITY = multimedia
+MOBILITY = multimedia bearer
 
 win32 {
 CONFIG *= embed_manifest_exe
@@ -51,7 +51,10 @@ HEADERS +=  MainApp.h                   \
             Singletons.h                \
             GVDataAccess.h              \
             SkypeClient.h               \
-            SkypeClientFactory.h
+            SkypeClientFactory.h        \
+            CalloutInitiator.h          \
+            CallInitiatorFactory.h      \
+            DesktopSkypeCallInitiator.h
 
 SOURCES +=  main.cpp                    \
             MainApp.cpp                 \
@@ -80,7 +83,9 @@ SOURCES +=  main.cpp                    \
             Singletons.cpp              \
             GVDataAccess.cpp            \
             SkypeClient.cpp             \
-            SkypeClientFactory.cpp
+            SkypeClientFactory.cpp      \
+            CalloutInitiator.cpp        \
+            CallInitiatorFactory.cpp
 
 RESOURCES = qgvdial.qrc
 
@@ -92,14 +97,23 @@ unix:!symbian {
 
 # In desktop Linux, add the Skype client
 unix:!symbian:!maemo5 {
-    HEADERS += SkypeLinuxClient.h SkypeObserver.h
-    SOURCES += SkypeLinuxClient.cpp SkypeObserver.cpp
+    HEADERS += SkypeLinuxClient.h           \
+               SkypeObserver.h              \
+               DesktopSkypeCallInitiator.h
+    SOURCES += SkypeLinuxClient.cpp         \
+               SkypeObserver.cpp            \
+               DesktopSkypeCallInitiator.cpp
 }
 
 win32 {
 # Resource file is for windows only - for the icon
     RC_FILE = winrsrc.rc
 
-    HEADERS += SkypeWinClient.h SkypeObserver.h
-    SOURCES += SkypeWinClient.cpp SkypeObserver.cpp
+# In desktop Windows, add the Skype client
+    HEADERS += SkypeWinClient.h             \
+               SkypeObserver.h              \
+               DesktopSkypeCallInitiator.h
+    SOURCES += SkypeWinClient.cpp           \
+               SkypeObserver.cpp            \
+               DesktopSkypeCallInitiator.cpp
 }
