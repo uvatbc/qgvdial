@@ -31,6 +31,13 @@ CallInitiatorFactory::init ()
 #if (defined(Q_WS_X11) && !defined(Q_WS_MAEMO_5)) || defined (Q_WS_WIN32)
     CalloutInitiator *initiator = new DesktopSkypeCallInitiator (this);
     listInitiators += initiator;
+
+    QObject::connect (
+        initiator, SIGNAL (log(const QString &, int)),
+        this     , SIGNAL (log(const QString &, int)));
+    QObject::connect (
+        initiator, SIGNAL (status(const QString &, int)),
+        this     , SIGNAL (status(const QString &, int)));
 #endif
 
 #if defined(Q_WS_X11)
@@ -107,6 +114,13 @@ CallInitiatorFactory::onAllAccountsReady ()
 
         CalloutInitiator *initiator = new TpCalloutInitiator (act, this);
         listInitiators += initiator;
+
+        QObject::connect (
+            initiator, SIGNAL (log(const QString &, int)),
+            this     , SIGNAL (log(const QString &, int)));
+        QObject::connect (
+            initiator, SIGNAL (status(const QString &, int)),
+            this     , SIGNAL (status(const QString &, int)));
 
         msg += "\tADDED!";
         emit log (msg);

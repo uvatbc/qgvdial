@@ -5,25 +5,49 @@ DesktopSkypeCallInitiator::DesktopSkypeCallInitiator (QObject *parent)
 : CalloutInitiator(parent)
 , skypeClient (NULL)
 {
-    // Observer for Skype on desktop Linux and desktop Windows
-    skypeClient = Singletons::getRef().getSkypeFactory()
-                    .ensureSkypeClient (SKYPE_CLIENT_NAME);
 }//DesktopSkypeCallInitiator::DesktopSkypeCallInitiator
 
 void
 DesktopSkypeCallInitiator::initiateCall (const QString &strDestination)
 {
+    bool bOk;
     do { // Begin cleanup block (not a loop)
         if (NULL == skypeClient) {
-            //TODO: We might be able to fix this
-            emit log ("Skype not initialized!");
+            skypeClient = Singletons::getRef().getSkypeFactory()
+                            .ensureSkypeClient (SKYPE_CLIENT_NAME);
+        }
+
+        // Save it for onSkypeConnected
+        strNumber = strDestination;
+
+        QVariantList l;
+        if (!skypeClient->isConnected ()) {
+            bOk =
+            skypeClient->enqueueWork (SW_Connect, l, this,
+                SLOT (onSkypeConnected (bool, const QVariantList &)));
+            if (!bOk) {
+                emit log ("Could not connect skype!!!");
+            }
+            break;
+        }
+
+        onSkypeConnected (true, l);
+    } while (0); // End cleanup block (not a loop)
+}//DesktopSkypeCallInitiator::initiateCall
+
+void
+DesktopSkypeCallInitiator::onSkypeConnected (bool bSuccess, const QVariantList&)
+{
+    bool bOk;
+    do { // Begin cleanup block (not a loop)
+        if (!bSuccess) {
+            emit log ("Failed to connect to skype");
             break;
         }
 
         QVariantList l;
-        l += strDestination;
-
-        bool bOk =
+        l += strNumber;
+        bOk =
         skypeClient->enqueueWork (SW_InitiateCall, l, this,
             SLOT (onCallInitiated (bool, const QVariantList &)));
         if (!bOk) {
@@ -31,7 +55,7 @@ DesktopSkypeCallInitiator::initiateCall (const QString &strDestination)
             break;
         }
     } while (0); // End cleanup block (not a loop)
-}//DesktopSkypeCallInitiator::initiateCall
+}//DesktopSkypeCallInitiator::onSkypeConnected
 
 void
 DesktopSkypeCallInitiator::onCallInitiated (bool, const QVariantList &)

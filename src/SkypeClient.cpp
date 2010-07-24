@@ -225,7 +225,7 @@ SkypeClient::initiateCall (const QString &strTarget)
     do {
         if (!bConnected)
         {
-            emit log ("Skype not connected");
+            emit log ("Skype not connected", 3);
             break;
         }
 
@@ -339,7 +339,7 @@ SkypeClient::getContacts ()
     do {
         if (!bConnected)
         {
-            emit log ("Skype not connected");
+            emit log ("Skype not connected", 3);
             break;
         }
 
@@ -480,7 +480,7 @@ SkypeClient::getCallInfo ()
     do {
         if (!bConnected)
         {
-            emit log ("Skype not connected");
+            emit log ("Skype not connected", 3);
             break;
         }
 

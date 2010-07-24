@@ -33,26 +33,32 @@ SkypeLinuxClient::ensureConnected ()
     bool rv = false;
     do // Begin cleanup block (not a loop)
     {
-        if (NULL == skypeIface)
+        for (int i = 0; i < 2; i++)
         {
-            skypeIface = new QDBusInterface ("com.Skype.API",
-                                             "/com/Skype",
-                                             QString (),
-                                             QDBusConnection::sessionBus(),
-                                             this);
-            if (NULL == skypeIface)
-            {
-                emit log ("malloc fail");
-                break;
+            if (NULL == skypeIface) {
+                skypeIface = new QDBusInterface ("com.Skype.API",
+                                                 "/com/Skype",
+                                                 QString (),
+                                                 QDBusConnection::sessionBus(),
+                                                 this);
+                if (NULL == skypeIface) {
+                    emit log ("malloc fail");
+                    break;
+                }
+            }
+            if (!skypeIface->isValid()) {
+                emit log ("Skype interface was not valid", 3);
+                delete skypeIface;
+                skypeIface = NULL;
             }
         }
-        if (!skypeIface->isValid())
+
+        if ((NULL == skypeIface) || (!skypeIface->isValid ()))
         {
-            emit log ("Invalid skype interface", 3);
-            delete skypeIface;
-            skypeIface = NULL;
+            emit log ("Failed to initialize skype");
             break;
         }
+
         if (NULL == notifyTarget)
         {
             notifyTarget = new SkypeClientAdapter (this);
@@ -161,8 +167,12 @@ SkypeLinuxClient::protocolResponse (int status, const QString &strOutput)
 bool
 SkypeLinuxClient::invoke (const QString &strCommand)
 {
-    if (NULL == skypeIface)
-    {
+    if (NULL == skypeIface) {
+        return (false);
+    }
+    if (!skypeIface->isValid ()) {
+        delete skypeIface;
+        skypeIface = NULL;
         return (false);
     }
 

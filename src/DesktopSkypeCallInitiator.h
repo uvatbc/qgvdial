@@ -18,10 +18,12 @@ public slots:
     void initiateCall (const QString &strDestination);
 
 private slots:
+    void onSkypeConnected (bool bSuccess, const QVariantList &params);
     void onCallInitiated (bool bSuccess, const QVariantList &params);
 
 private:
     SkypeClient *skypeClient;
+    QString      strNumber;
 
     friend class CallInitiatorFactory;
 };
