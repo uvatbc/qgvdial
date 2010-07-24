@@ -107,6 +107,9 @@ CallInitiatorFactory::onAllAccountsReady ()
 
         CalloutInitiator *initiator = new TpCalloutInitiator (act, this);
         listInitiators += initiator;
+
+        msg += "\tADDED!";
+        emit log (msg);
     }
 }//CallInitiatorFactory::onAllAccountsReady
 

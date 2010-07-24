@@ -13,6 +13,8 @@ GVSettings::GVSettings(QWidget *parent /* = 0*/, Qt::WindowFlags f /* = 0*/)
 , edPass(this)
 , lblNumbers("Phones", this)
 , cbNumbers(this)
+, lblCallouts ("Callouts", this)
+, cbCallouts(this)
 , btnLogin(this)
 {
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
@@ -29,6 +31,8 @@ GVSettings::GVSettings(QWidget *parent /* = 0*/, Qt::WindowFlags f /* = 0*/)
 
     lblNumbers.hide ();
     cbNumbers.hide ();
+    lblCallouts.hide ();
+    cbCallouts.hide ();
 
     grid.addWidget (&lblUser , 0,0);
     grid.addWidget (&edUser  , 0,1);
@@ -43,6 +47,10 @@ GVSettings::GVSettings(QWidget *parent /* = 0*/, Qt::WindowFlags f /* = 0*/)
     // cbNumbers.currentIndexChanged -> this.cbNumbers_currentIndexChanged
     QObject::connect (&cbNumbers, SIGNAL (currentIndexChanged (int)),
                        this     , SLOT   (cbNumbers_currentIndexChanged (int)));
+    // cbCallouts.currentIndexChanged -> this.cbCallouts_currentIndexChanged
+    QObject::connect (
+        &cbCallouts, SIGNAL (currentIndexChanged (int)),
+         this      , SLOT   (cbCallouts_currentIndexChanged (int)));
 }//GVSettings::GVSettings
 
 GVSettings::~GVSettings(void)
@@ -61,6 +69,7 @@ GVSettings::causeLogin ()
     btnLogin.setText ("Logging in...");
     btnLogin.setEnabled (false);
     cbNumbers.setEnabled (false);
+    cbCallouts.setEnabled (false);
 
     emit status ("Logging in...");
     emit login (edUser.text (), edPass.text ());
@@ -151,6 +160,10 @@ GVSettings::logoutDone (bool bOk/* = true*/)
 
         lblNumbers.hide ();
         cbNumbers.hide ();
+        lblCallouts.hide ();
+        cbCallouts.hide ();
+        grid.removeWidget (&cbCallouts);
+        grid.removeWidget (&lblCallouts);
         grid.removeWidget (&cbNumbers);
         grid.removeWidget (&lblNumbers);
         grid.removeWidget (&btnLogin);
@@ -169,12 +182,25 @@ GVSettings::logoutDone (bool bOk/* = true*/)
         btnLogin.setEnabled (true);
 
         grid.removeWidget (&btnLogin);
-        grid.addWidget (&lblNumbers, ROW_BELOW_PASS,0);
-        grid.addWidget (&cbNumbers , ROW_BELOW_PASS,1);
-        grid.addWidget (&btnLogin  , ROW_BELOW_PASS+1,0, 1,2);
+        grid.addWidget (&lblNumbers , ROW_BELOW_PASS  , 0);
+        grid.addWidget (&cbNumbers  , ROW_BELOW_PASS  , 1);
+        grid.addWidget (&lblCallouts, ROW_BELOW_PASS+1, 0);
+        grid.addWidget (&cbCallouts , ROW_BELOW_PASS+1, 1);
+        grid.addWidget (&btnLogin   , ROW_BELOW_PASS+2, 0, 1,2);
         lblNumbers.show ();
         cbNumbers.show ();
         cbNumbers.setEnabled (false);
+        lblCallouts.show ();
+
+        // Fill up cbCallouts
+        CallInitiatorFactory& cif = Singletons::getRef().getCIFactory ();
+        CalloutInitiatorList listCi = cif.getInitiators ();
+        foreach (CalloutInitiator *ci, listCi) {
+            void * store = ci;
+            cbCallouts.addItem (ci->name (), QVariant::fromValue (store));
+        }
+        cbCallouts.show ();
+        cbCallouts.setEnabled (true);
     }
 }//GVSettings::logoutDone
 
@@ -194,6 +220,7 @@ GVSettings::refreshRegisteredNumbers ()
         cbNumbers.setEnabled (false);
         arrNumbers.clear ();
         cbNumbers.clear ();
+        cbCallouts.clear ();
 
         QVariantList l;
         QObject::connect(
@@ -207,6 +234,14 @@ GVSettings::refreshRegisteredNumbers ()
                  this   , SLOT   (gotRegisteredPhone (const GVRegisteredNumber &)));
             emit log ("Failed to retrieve registered contacts!!", 3);
             break;
+        }
+
+        // Fill up cbCallouts
+        CallInitiatorFactory& cif = Singletons::getRef().getCIFactory ();
+        CalloutInitiatorList listCi = cif.getInitiators ();
+        foreach (CalloutInitiator *ci, listCi) {
+            void * store = ci;
+            cbCallouts.addItem (ci->name (), QVariant::fromValue (store));
         }
 
         rv = true;
@@ -312,3 +347,19 @@ GVSettings::msgBox_buttonClicked (QAbstractButton *button)
         button->parent()->deleteLater ();
     }
 }//GVSettings::msgBox_buttonClicked
+
+void
+GVSettings::cbCallouts_currentIndexChanged (int index)
+{
+    // Is there anything to be done here?
+}//GVSettings::cbCallouts_currentIndexChanged
+
+CalloutInitiator *
+GVSettings::getCallInitiator ()
+{
+    cbCallouts.currentIndex ();
+    QVariant var = cbCallouts.itemData (cbCallouts.currentIndex ());
+    CalloutInitiator *ci = (CalloutInitiator *) var.value<void *> ();
+
+    return (ci);
+}//GVSettings::getCallInitiator

@@ -4,6 +4,7 @@
 #include "global.h"
 #include "ChildWindowBase.h"
 #include "CacheDatabase.h"
+#include "CalloutInitiator.h"
 
 class GVSettings : public ChildWindowBase
 {
@@ -17,6 +18,7 @@ public:
     QString getSelectedNumber ();
 
     bool causeLogin ();
+    CalloutInitiator *getCallInitiator ();
 
 signals:
     //! Emitted when the login button has been clicked with valid credentials
@@ -37,6 +39,7 @@ public slots:
 private slots:
     void btnLogin_clicked ();
     void cbNumbers_currentIndexChanged (int index);
+    void cbCallouts_currentIndexChanged (int index);
 
     //! Invoked every time a new registered phone is retrieved
     void gotRegisteredPhone (const GVRegisteredNumber &info);
@@ -59,6 +62,8 @@ private:
     //! The users registered numbers
     QLabel      lblNumbers;
     QComboBox   cbNumbers;
+    QLabel      lblCallouts;
+    QComboBox   cbCallouts;
 
     //! Login or logout
     QPushButton btnLogin;

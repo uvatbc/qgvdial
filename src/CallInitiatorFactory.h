@@ -24,6 +24,7 @@ private:
     void init ();
 
 #if defined(Q_WS_X11)
+private slots:
     void onAccountManagerReady(Tp::PendingOperation *op);
     void onAccountReady(Tp::PendingOperation *op);
     void onAllAccountsReady();

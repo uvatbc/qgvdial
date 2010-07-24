@@ -11,7 +11,8 @@ class DesktopSkypeCallInitiator : public CalloutInitiator
 private:
     explicit DesktopSkypeCallInitiator(QObject *parent = 0);
 
-signals:
+public:
+    QString name ();
 
 public slots:
     void initiateCall (const QString &strDestination);

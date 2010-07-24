@@ -94,6 +94,8 @@ signals:
     void dialInProgress ();
     //! Emitted for every history event
     void oneHistoryEvent (const GVHistoryEvent &hevent);
+    //! Emitted when GV returns an access number to dial out
+    void dialAccessNumber (const QString &strAccessNumber);
 
 public slots:
     //! To be invoked to complete a dial

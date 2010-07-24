@@ -14,6 +14,9 @@ class TpCalloutInitiator : public CalloutInitiator
 private:
     TpCalloutInitiator (Tp::AccountPtr act, QObject *parent = 0);
 
+public:
+    QString name ();
+
 public slots:
     void initiateCall (const QString &strDestination);
 

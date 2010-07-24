@@ -96,6 +96,8 @@ private slots:
 
     //! Invoked when dialing has started
     void dialInProgress ();
+    //! Invoked to perform a dial
+    void dialAccessNumber (const QString &strAccessNumber);
 
     //! Invoked when any button on the message box is clicked
     void msgBox_buttonClicked (QAbstractButton *button);

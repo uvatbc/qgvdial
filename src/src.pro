@@ -53,8 +53,7 @@ HEADERS +=  MainApp.h                   \
             SkypeClient.h               \
             SkypeClientFactory.h        \
             CalloutInitiator.h          \
-            CallInitiatorFactory.h      \
-            DesktopSkypeCallInitiator.h
+            CallInitiatorFactory.h
 
 SOURCES +=  main.cpp                    \
             MainApp.cpp                 \

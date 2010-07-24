@@ -66,6 +66,13 @@ MainWindow::MainWindow (QWidget *parent/* = 0*/, Qt::WindowFlags f/* = 0*/)
     QObject::connect (&webPage, SIGNAL (status(const QString &, int)),
                        this   , SLOT   (setStatus(const QString &, int)));
 
+    // call initiator log status and init
+    CallInitiatorFactory& cif = Singletons::getRef().getCIFactory ();
+    QObject::connect (&cif , SIGNAL (log(const QString &, int)),
+                       this, SLOT   (log(const QString &, int)));
+    QObject::connect (&cif , SIGNAL (status(const QString &, int)),
+                       this, SLOT   (setStatus(const QString &, int)));
+
     // sInit.exited -> this.init
     // This trick is so that immediately after init we go to next state
     QObject::connect (&sInit, SIGNAL (exited ()),
@@ -287,6 +294,9 @@ MainWindow::init ()
                        this       , SLOT   (dialInProgress ()));
     QObject::connect ( this       , SIGNAL (dialCanFinish ()),
                       &webPage    , SLOT   (dialCanFinish ()));
+    QObject::connect (
+        &webPage, SIGNAL (dialAccessNumber (const QString &)),
+         this   , SLOT   (dialAccessNumber (const QString &)));
 
     // pContactsTable.oneContact -> this.gotContact
     QObject::connect (pContactsTable,
@@ -759,6 +769,12 @@ MainWindow::dialInProgress ()
         webPage.cancelWork (GVAW_dialCallback);
     }
 }//MainWindow::dialInProgress
+
+void
+MainWindow::dialAccessNumber (const QString &strAccessNumber)
+{
+    pGVSettings->getCallInitiator()->initiateCall (strAccessNumber);
+}//MainWindow::dialAccessNumber
 
 void
 MainWindow::dialComplete (bool bOk, const QVariantList &)

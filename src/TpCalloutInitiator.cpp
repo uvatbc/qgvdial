@@ -38,3 +38,9 @@ TpCalloutInitiator::onChannelReady (Tp::PendingOperation*op)
 
      op->deleteLater ();
 }//TpCalloutInitiator::onChannelReady
+
+QString
+TpCalloutInitiator::name ()
+{
+    return (account->cmName ());
+}//TpCalloutInitiator::name

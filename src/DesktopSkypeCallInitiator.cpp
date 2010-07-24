@@ -38,3 +38,9 @@ DesktopSkypeCallInitiator::onCallInitiated (bool, const QVariantList &)
 {
     emit log ("Callout is successful");
 }//DesktopSkypeCallInitiator::onCallInitiated
+
+QString
+DesktopSkypeCallInitiator::name ()
+{
+    return ("skype");
+}//DesktopSkypeCallInitiator::
