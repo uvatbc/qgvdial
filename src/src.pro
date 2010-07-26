@@ -123,19 +123,27 @@ win32 {
 # Installation related line go here
 ###############################################################
 
+exists (../../buildit.pl) {
+PREFIX = ../debian/qgvdial/usr
+message("Build using my scripts")
+}
+!exists (../../buildit.pl) {
+PREFIX = ../maemo/debian/qgvdial/usr
+message("Build using qtcreator")
+}
+
 # Installation for maemo
 maemo5 {
-PREFIX = ../debian/qgvdial/usr
-OPTPREFIX = ../debian/qgvdial/opt/qgvdial
-BINDIR = $$OPTPREFIX/bin
-DATADIR =$$PREFIX/share
-OPTDATADIR =$$OPTPREFIX/share
+OPTPREFIX  = $$PREFIX/../opt/qgvdial
+BINDIR     = $$OPTPREFIX/bin
+DATADIR    = $$PREFIX/share
+OPTDATADIR = $$OPTPREFIX/share
 
 DEFINES += DATADIR=\"$$DATADIR\" PKGDATADIR=\"$$PKGDATADIR\"
 
 #MAKE INSTALL
 
-INSTALLS += target desktop icon 
+INSTALLS += target desktop icon
 
   target.path =$$BINDIR
 
@@ -148,15 +156,14 @@ INSTALLS += target desktop icon
 
 # Installation for Linux
 unix:!symbian:!maemo5 {
-PREFIX = ../debian/qgvdial/usr
-BINDIR = $$PREFIX/bin
-DATADIR =$$PREFIX/share
+BINDIR  = $$PREFIX/bin
+DATADIR = $$PREFIX/share
 
 DEFINES += DATADIR=\"$$DATADIR\" PKGDATADIR=\"$$PKGDATADIR\"
 
 #MAKE INSTALL
 
-INSTALLS += target desktop icon 
+INSTALLS += target desktop icon
 
   target.path =$$BINDIR
 
