@@ -31,22 +31,13 @@ $svnver = $1;
 # Create the version suffix
 $qver = "$qver.$svnver";
 
+# Delete any previous checkout directories
 system("rm -rf qgvdial*");
 $cmd = "svn export $repo qgvdial-$qver";
 system($cmd);
 system("cp qgvdial-$qver/icons/Google.png qgvdial-$qver/src/qgvdial.png");
 
-# Append the linux.pro.suffix to the src.pro
-open(PRO, ">>qgvdial-$qver/src/src.pro") or die "Cannot open source pro file";
-open(PRO_SUFFIX, "<qgvdial-$qver/src/linux.pro.suffix") or die "Cannot open suffix file";
-my $holdTerminator = $/;
-undef $/;
-my $buf = <PRO_SUFFIX>;
-$/ = $holdTerminator;
-print(PRO "$buf");
-close(PRO_SUFFIX);
-close(PRO);
-
+# Version replacement
 $cmd = "cd qgvdial-$qver ; perl ../version.pl __QGVDIAL_VERSION__ $qver";
 print "$cmd\n";
 system($cmd);

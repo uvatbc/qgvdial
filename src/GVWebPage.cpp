@@ -448,8 +448,7 @@ GVWebPage::dialCallback ()
         QString gvxVal;
         foreach (QNetworkCookie cookie, cookies)
         {
-            if ((cookie.name() == "gv-ph")||
-                (cookie.name() == "gv")   ||
+            if ((cookie.name() == "gv")   ||
                 (cookie.name() == "gvx")  ||
                 (cookie.name() == "PREF") ||
                 (cookie.name() == "S")    ||
@@ -465,10 +464,19 @@ GVWebPage::dialCallback ()
                 gvxVal = cookie.value ();
             }
         }
-        QString strContent = QString("{\"gvx\":\"%1\"}").arg(gvxVal);
 
+        // Our own number is added separately
+        QString gvph = QString ("%1|%2")
+                        .arg (strCurrentCallback)
+                        .arg (chCurrentCallbackType);
+        sendCookies += QNetworkCookie ("gv-ph", gvph.toAscii ());
+
+        // Set up the cookies in the request
         request.setHeader (QNetworkRequest::CookieHeader,
                            QVariant::fromValue(sendCookies));
+
+        // This cookie needs to also be added as contect data
+        QString strContent = QString("{\"gvx\":\"%1\"}").arg(gvxVal);
 
         QObject::connect (mgr , SIGNAL (finished (QNetworkReply *)),
                           this, SLOT (onDataCallDone (QNetworkReply *)));

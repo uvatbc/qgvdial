@@ -118,3 +118,48 @@ win32 {
                SkypeObserver.cpp            \
                DesktopSkypeCallInitiator.cpp
 }
+
+###############################################################
+# Installation related line go here
+###############################################################
+
+# Installation for maemo
+maemo5 {
+PREFIX = ../debian/qgvdial/usr
+OPTPREFIX = ../debian/qgvdial/opt/qgvdial
+BINDIR = $$OPTPREFIX/bin
+DATADIR =$$PREFIX/share
+OPTDATADIR =$$OPTPREFIX/share
+
+DEFINES += DATADIR=\"$$DATADIR\" PKGDATADIR=\"$$PKGDATADIR\"
+
+#MAKE INSTALL
+
+INSTALLS += target desktop icon 
+
+  target.path =$$BINDIR
+
+  desktop.path = $$DATADIR/applications/hildon
+  desktop.files += qgvdial.desktop
+
+  icon.path = $$OPTDATADIR
+  icon.files += qgvdial.png
+}
+
+# Installation for Linux
+unix:!symbian:!maemo5 {
+PREFIX = ../debian/qgvdial/usr
+BINDIR = $$PREFIX/bin
+DATADIR =$$PREFIX/share
+
+DEFINES += DATADIR=\"$$DATADIR\" PKGDATADIR=\"$$PKGDATADIR\"
+
+#MAKE INSTALL
+
+INSTALLS += target desktop icon 
+
+  target.path =$$BINDIR
+
+  icon.path = $$DATADIR/qgvdial
+  icon.files += qgvdial.png
+}
