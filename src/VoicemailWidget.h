@@ -3,7 +3,9 @@
 
 #include "global.h"
 #include "ChildWindowBase.h"
+
 #include <QMediaPlayer>
+#include <QMediaPlaylist>
 
 class VoicemailWidget : public ChildWindowBase
 {
@@ -28,10 +30,17 @@ private slots:
 
 private:
     void closeEvent (QCloseEvent *event);
+    void cleanup ();
+
+private slots:
+    void done (int r);
 
 private:
     //! Qt Mobility's media player object
-    QMediaPlayer   *player;
+    QMediaPlayer    player;
+
+    //! Qt Mobility's media playlist object
+    QMediaPlaylist  playlist;
 
     //! The slider control for the vmail
     QSlider         slider;

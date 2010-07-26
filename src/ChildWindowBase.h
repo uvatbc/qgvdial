@@ -18,6 +18,11 @@ public:
     ChildWindowBase (QWidget *parent    = 0,
                      Qt::WindowFlags  f = 0);
 
+#if defined (Q_WS_MAEMO_5)
+protected slots:
+    virtual void done (int) {}
+#endif
+
 signals:
     //! Log emitter
     void log(const QString &strText, int level = 10);

@@ -2,7 +2,8 @@
 
 VoicemailWidget::VoicemailWidget (QWidget *parent, Qt::WindowFlags f)
 : ChildWindowBase (parent, f)
-, player (NULL)
+, player (this)
+, playlist (this)
 , slider (Qt::Horizontal, this)
 , grid (this)
 , updater (this)
@@ -26,6 +27,8 @@ VoicemailWidget::VoicemailWidget (QWidget *parent, Qt::WindowFlags f)
     this->setLayout (&grid);
     this->setAttribute (Qt::WA_QuitOnClose, false);
 
+    playlist.setMediaObject (&player);
+
     // slider.valueChanged -> this.valueChanged
     QObject::connect (&slider, SIGNAL (sliderMoved (int)),
                        this  , SLOT   (valueChanged (int)));
@@ -39,6 +42,10 @@ VoicemailWidget::VoicemailWidget (QWidget *parent, Qt::WindowFlags f)
                        this   , SLOT (play_pause ()));
     QObject::connect (&btnStop, SIGNAL (clicked ()),
                        this   , SLOT (stop_clicked()));
+
+    // player.positionChanged -> this.positionChanged
+    QObject::connect (&player, SIGNAL (positionChanged (qint64)),
+                       this  , SLOT   (positionChanged (qint64)));
 }//VoicemailWidget::VoicemailWidget
 
 bool
@@ -51,23 +58,12 @@ VoicemailWidget::play (const QString &strVmail)
         return (false);
     }
 
-    if (NULL != player)
-    {
-        player->deleteLater ();
-        player = NULL;
-    }
-
-    player = new QMediaPlayer (this);
-
-    // player.positionChanged -> this.positionChanged
-    QObject::connect (player, SIGNAL (positionChanged (qint64)),
-                      this  , SLOT   (positionChanged (qint64)));
-
     QString strFullname = info.absoluteFilePath ();
-    player->setMedia (QUrl::fromLocalFile(strFullname));
-    player->setVolume (50);
+    playlist.addMedia (QUrl::fromLocalFile(strFullname));
+    player.setVolume (50);
     btnPlay.setIcon(style()->standardIcon(QStyle::SP_MediaPause));
-    player->play ();
+    playlist.next ();
+    player.play ();
     updater.start ();
     this->show ();
 
@@ -77,15 +73,10 @@ VoicemailWidget::play (const QString &strVmail)
 void
 VoicemailWidget::valueChanged (int value)
 {
-    if (NULL == player)
-    {
-        return;
-    }
-
     // value : 100
     // pos   : duration
-    quint64 pos = (quint64) (((double)value * player->duration ()) / 100);
-    player->setPosition (pos);
+    quint64 pos = (quint64) (((double)value * player.duration ()) / 100);
+    player.setPosition (pos);
 }//VoicemailWidget::valueChanged
 
 void
@@ -94,9 +85,9 @@ VoicemailWidget::positionChanged (qint64 pos)
     // pos   :: duration
     // value :: 100
     int value = 0;
-    if (0 != player->duration ())
+    if (0 != player.duration ())
     {
-        value = (int) ((pos * 100) / player->duration ());
+        value = (int) ((pos * 100) / player.duration ());
     }
     slider.setValue (value);
 }//VoicemailWidget::positionChanged
@@ -104,39 +95,50 @@ VoicemailWidget::positionChanged (qint64 pos)
 void
 VoicemailWidget::closeEvent (QCloseEvent *)
 {
-    updater.stop ();
-
-    player->stop ();
-    player->deleteLater ();
-    player = NULL;
+    cleanup ();
 }//VoicemailWidget::closeEvent
+
+void
+VoicemailWidget::done (int r)
+{
+    cleanup ();
+    ChildWindowBase::done (r);
+}//VoicemailWidget::done
+
+void
+VoicemailWidget::cleanup ()
+{
+    updater.stop ();
+    player.stop ();
+    playlist.clear ();
+}//VoicemailWidget::cleanup
 
 void
 VoicemailWidget::sliderUpdate ()
 {
-    positionChanged (player->position ());
+    positionChanged (player.position ());
     updater.start ();
 }//VoicemailWidget::sliderUpdate
 
 void
 VoicemailWidget::play_pause ()
 {
-    if (NULL == player)
+    if (playlist.isEmpty ())
     {
         btnPlay.setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
         return;
     }
 
-    switch (player->state ())
+    switch (player.state ())
     {
     case QMediaPlayer::PlayingState:
         btnPlay.setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
-        player->pause ();
+        player.pause ();
         break;
     case QMediaPlayer::StoppedState:
     case QMediaPlayer::PausedState:
         btnPlay.setIcon(style()->standardIcon(QStyle::SP_MediaPause));
-        player->play ();
+        player.play ();
         break;
     default:
         break;
@@ -147,11 +149,5 @@ void
 VoicemailWidget::stop_clicked ()
 {
     btnPlay.setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
-
-    if (NULL == player)
-    {
-        return;
-    }
-
-    player->stop ();
+    player.stop ();
 }//VoicemailWidget::stop_clicked
