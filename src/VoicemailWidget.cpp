@@ -3,7 +3,6 @@
 VoicemailWidget::VoicemailWidget (QWidget *parent, Qt::WindowFlags f)
 : ChildWindowBase (parent, f)
 , player (this)
-, playlist (this)
 , slider (Qt::Horizontal, this)
 , grid (this)
 , updater (this)
@@ -26,8 +25,6 @@ VoicemailWidget::VoicemailWidget (QWidget *parent, Qt::WindowFlags f)
     grid.addItem (box, 1,0);
     this->setLayout (&grid);
     this->setAttribute (Qt::WA_QuitOnClose, false);
-
-    playlist.setMediaObject (&player);
 
     // slider.valueChanged -> this.valueChanged
     QObject::connect (&slider, SIGNAL (sliderMoved (int)),
@@ -59,10 +56,9 @@ VoicemailWidget::play (const QString &strVmail)
     }
 
     QString strFullname = info.absoluteFilePath ();
-    playlist.addMedia (QUrl::fromLocalFile(strFullname));
+    player.setMedia (QUrl::fromLocalFile(strFullname));
     player.setVolume (50);
     btnPlay.setIcon(style()->standardIcon(QStyle::SP_MediaPause));
-    playlist.next ();
     player.play ();
     updater.start ();
     this->show ();
@@ -110,7 +106,6 @@ VoicemailWidget::cleanup ()
 {
     updater.stop ();
     player.stop ();
-    playlist.clear ();
 }//VoicemailWidget::cleanup
 
 void
@@ -123,12 +118,6 @@ VoicemailWidget::sliderUpdate ()
 void
 VoicemailWidget::play_pause ()
 {
-    if (playlist.isEmpty ())
-    {
-        btnPlay.setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
-        return;
-    }
-
     switch (player.state ())
     {
     case QMediaPlayer::PlayingState:

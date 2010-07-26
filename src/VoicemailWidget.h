@@ -39,9 +39,6 @@ private:
     //! Qt Mobility's media player object
     QMediaPlayer    player;
 
-    //! Qt Mobility's media playlist object
-    QMediaPlaylist  playlist;
-
     //! The slider control for the vmail
     QSlider         slider;
 
