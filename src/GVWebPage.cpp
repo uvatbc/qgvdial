@@ -466,9 +466,13 @@ GVWebPage::dialCallback ()
         }
 
         // Our own number is added separately
-        QString gvph = QString ("%1|%2")
-                        .arg (strCurrentCallback)
-                        .arg (chCurrentCallbackType);
+        // The expected format is "number|type" but it seems just "number" also
+        // works. Of course not sending this cookie also works...
+//        QString gvph = QString ("%1|%2")
+//                        .arg (strCurrentCallback)
+//                        .arg (chCurrentCallbackType);
+        QString gvph = QString ("%1")
+                        .arg (strCurrentCallback);
         sendCookies += QNetworkCookie ("gv-ph", gvph.toAscii ());
 
         // Set up the cookies in the request
@@ -876,10 +880,17 @@ GVWebPage::selectRegisteredPhone ()
         return (false);
     }
 
+#if USE_GV_DATA_API
+    strCurrentCallback = workCurrent.arrParams[0].toString();
+    simplify_number (strCurrentCallback);
+    completeCurrentWork (GVAW_selectRegisteredPhone, true);
+    //@@UV: chCurrentCallbackType needs to be fixed.
+#else
     QString strGoto = GV_HTTPS_M "/selectphone";
     QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
                        this   , SLOT   (selectPhoneLoaded (bool)));
     this->loadUrlString (strGoto);
+#endif
 
     return (true);
 }//GVWebPage::selectRegisteredPhone

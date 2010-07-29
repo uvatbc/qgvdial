@@ -1,4 +1,10 @@
-my $mad = '/home/uv/apps/mad';
+my $machine = `uname -m`;
+my $mad;
+if ($machine ne "arm") {
+    $mad = '/home/uv/apps/mad';
+}
+$machine = "armel";
+
 my $repo = "https://qgvdial.googlecode.com/svn/trunk";
 my $cmd;
 my $line;
@@ -18,12 +24,7 @@ my $qver = <QVARFILE>;
 close QVARFILE;
 
 # Get the subversion checkin version
-system("svn log $repo --limit=1 | grep \"^r\" > svnlog.txt");
-open(QVARFILE, "svnlog.txt") or die;
-my $svnver = <QVARFILE>;
-close QVARFILE;
-unlink "svnlog.txt";
-
+my $svnver = `svn log $repo --limit=1 | grep \"^r\"`;
 # Parse out the version number from the output we pulled out
 $svnver =~ m/^r(\d+)*/;
 $svnver = $1;
@@ -73,7 +74,7 @@ close(CONTROL_OUT);
 system("mv qgvdial-$qver/debian/control.new qgvdial-$qver/debian/control");
 
 # Execute the rest of the build command
-$cmd = "cd qgvdial-$qver && $mad dpkg-buildpackage && $mad remote -r org.maemo.qgvdial send ../qgvdial_$qver-1_armel.deb && $mad remote -r org.maemo.qgvdial install qgvdial_$qver-1_armel.deb";
+$cmd = "cd qgvdial-$qver && $mad dpkg-buildpackage && $mad remote -r org.maemo.qgvdial send ../qgvdial_$qver-1_$machine.deb && $mad remote -r org.maemo.qgvdial install qgvdial_$qver-1_$machine.deb";
 system($cmd);
 
 exit();

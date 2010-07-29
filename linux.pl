@@ -19,12 +19,7 @@ my $qver = <QVARFILE>;
 close QVARFILE;
 
 # Get the subversion checkin version
-system("svn log $repo --limit=1 | grep \"^r\" > svnlog.txt");
-open(QVARFILE, "svnlog.txt") or die;
-my $svnver = <QVARFILE>;
-close QVARFILE;
-unlink "svnlog.txt";
-
+my $svnver = `svn log $repo --limit=1 | grep \"^r\"`;
 # Parse out the version number from the output we pulled out
 $svnver =~ m/^r(\d+)*/;
 $svnver = $1;
