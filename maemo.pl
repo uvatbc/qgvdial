@@ -1,7 +1,11 @@
 my $machine = `uname -m`;
+chomp $machine;
 my $mad;
+my $asroot;
 if ($machine ne "arm") {
     $mad = '/home/uv/apps/mad';
+} else {
+    $asroot = "fakeroot";
 }
 $machine = "armel";
 
@@ -74,7 +78,7 @@ close(CONTROL_OUT);
 system("mv qgvdial-$qver/debian/control.new qgvdial-$qver/debian/control");
 
 # Execute the rest of the build command
-$cmd = "cd qgvdial-$qver && $mad dpkg-buildpackage && $mad remote -r org.maemo.qgvdial send ../qgvdial_$qver-1_$machine.deb && $mad remote -r org.maemo.qgvdial install qgvdial_$qver-1_$machine.deb";
+$cmd = "cd qgvdial-$qver && $asroot $mad dpkg-buildpackage && $mad remote -r org.maemo.qgvdial send ../qgvdial_$qver-1_$machine.deb && $mad remote -r org.maemo.qgvdial install qgvdial_$qver-1_$machine.deb";
 system($cmd);
 
 exit();
