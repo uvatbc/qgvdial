@@ -13,6 +13,7 @@ private:
 
 public:
     QString name ();
+    QString selfNumber ();
 
 public slots:
     void initiateCall (const QString &strDestination);

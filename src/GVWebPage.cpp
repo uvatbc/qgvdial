@@ -413,7 +413,7 @@ GVWebPage::isNextContactsPageAvailable ()
 }//GVWebPage::isNextContactsPageAvailable
 
 bool
-GVWebPage::dialCallback ()
+GVWebPage::dialCallback (bool bCallback)
 {
     QMutexLocker locker(&mutex);
     if (!bLoggedIn)
@@ -422,13 +422,19 @@ GVWebPage::dialCallback ()
         return (false);
     }
 
-#if USE_GV_DATA_API
     QVariantList &arrParams = workCurrent.arrParams;
     QStringPairList arrPairs;
     workCurrent.cancel = (WebPageCancel) &GVWebPage::cancelDataDial2;
 
-    if (bUseIphoneUA)
+    if (!bCallback)
     {
+        if (!bUseIphoneUA)
+        {
+            emit log ("Cannot callout if the UA is not the iPhone UA");
+            completeCurrentWork (GVAW_dialOut, false);
+            return (false);
+        }
+
         QString strUA = UA_IPHONE;
         QString strUrl = QString("https://www.google.com/voice/m/x"
                                  "?m=call"
@@ -489,33 +495,18 @@ GVWebPage::dialCallback ()
     else
     {
         arrPairs += QStringPair("outgoingNumber"  , arrParams[0].toString());
-        arrPairs += QStringPair("forwardingNumber", strCurrentCallback);
+        arrPairs += QStringPair("forwardingNumber", arrParams[1].toString());
         arrPairs += QStringPair("subscriberNumber", strSelfNumber);
-        arrPairs += QStringPair("phoneType"       , QString(chCurrentCallbackType));
+        //arrPairs += QStringPair("phoneType"       , QString(chCurrentCallbackType));
+        arrPairs += QStringPair("phoneType"       , "undefined");
         arrPairs += QStringPair("remember"        , "1");
         arrPairs += QStringPair("_rnr_se"         , strRnr_se);
         postRequest (GV_DATA_BASE "/call/connect/", arrPairs, QString (),
                      this, SLOT (onDataCallDone (QNetworkReply *)));
     }
 
-#else //!USE_GV_DATA_API
-
-    QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
-                       this   , SLOT   (callStage1 (bool)));
-    workCurrent.cancel = (WebPageCancel) &GVWebPage::cancelDialStage1;
-
-    QString strLink = QString (GV_HTTPS_M "/caller?number=%1")
-                      .arg(workCurrent.arrParams[0].toString());
-
-    QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
-                       this   , SLOT   (callStage1 (bool)));
-    this->loadUrlString (strLink);
-
-#endif
     return (true);
 }//GVWebPage::dialCallback
-
-#if USE_GV_DATA_API
 
 void
 GVWebPage::onDataCallDone (QNetworkReply * reply)
@@ -528,41 +519,40 @@ GVWebPage::onDataCallDone (QNetworkReply * reply)
 
     bool bOk = false;
     do { // Begin cleanup block (not a loop)
-        if (bUseIphoneUA)
+        QRegExp rx("\"access_number\":\"([+\\d]*)\"");
+        if (msg.contains (rx) && (1 == rx.captureCount ()))
         {
-            QRegExp rx("\"access_number\":\"([+\\d]*)\"");
-            if (!msg.contains (rx) || (1 != rx.captureCount ()))
+            QMutexLocker locker(&mutex);
+            if (GVAW_dialOut != workCurrent.whatwork)
             {
-                emit log ("GV didn't return an access number");
+                emit log ("What the hell??");
                 break;
             }
 
             QString strAccess = rx.cap(1);
             emit log (QString ("access number = \"%1\"").arg(strAccess));
 
-            emit dialAccessNumber (strAccess);
+            emit dialAccessNumber (strAccess, workCurrent.arrParams[2]);
 
-            completeCurrentWork (GVAW_dialCallback, true);
+            completeCurrentWork (GVAW_dialOut, true);
             bOk = true;
+            break;
         }
-        else
+
+        // Old style callout
+        msg = msg.simplified ();
+        msg.remove(QRegExp("[ \t\n]*"));
+        if (!msg.contains ("\"ok\":true", Qt::CaseSensitive))
         {
-            msg = msg.simplified ();
-            msg.remove(QRegExp("[ \t\n]*"));
-            if (!msg.contains ("\"ok\":true", Qt::CaseSensitive))
-            {
-                emit log ("Failed to dial out");
-                break;
-            }
-
-            emit dialInProgress ();
-            bOk = true;
+            emit log ("Failed to dial out");
+            completeCurrentWork (GVAW_dialCallback, false);
+            break;
         }
+
+        emit dialInProgress (workCurrent.arrParams[0].toString ());
+        bOk = true;
     } while (0); // End cleanup block (not a loop)
-    if (!bOk)
-    {
-        completeCurrentWork (GVAW_dialCallback, false);
-    }
+
     reply->deleteLater ();
 }//GVWebPage::onDataCallDone
 
@@ -588,129 +578,15 @@ GVWebPage::onDataCallCanceled (QNetworkReply * reply)
     QByteArray ba = reply->readAll ();
     QString msg = ba;
 
-    completeCurrentWork (GVAW_dialCallback, false);
+    QMutexLocker locker(&mutex);
+    if ((GVAW_dialCallback == workCurrent.whatwork) ||
+        (GVAW_dialOut      == workCurrent.whatwork))
+    {
+        completeCurrentWork (workCurrent.whatwork, false);
+    }
+
     reply->deleteLater ();
 }//GVWebPage::onDataCallCanceled
-
-#else //!USE_GV_DATA_API
-
-void
-GVWebPage::cancelDialStage1 ()
-{
-    QMutexLocker locker(&mutex);
-    webPage.triggerAction (QWebPage::Stop);
-}//GVWebPage::cancelDialStage1
-
-void
-GVWebPage::callStage1 (bool bOk)
-{
-    QMutexLocker locker(&mutex);
-    workCurrent.cancel = NULL;
-
-    QObject::disconnect (&webPage, SIGNAL (loadFinished (bool)),
-                          this   , SLOT   (callStage1 (bool)));
-    do // Begin cleanup block (not a loop)
-    {
-        if (isLoadFailed (bOk))
-        {
-            bOk = false;
-            emit log ("Failed to load page for call stage 1");
-            break;
-        }
-        bOk = false;
-
-#define GVSELECTOR "div form div input[name=\"call\"]"
-        QWebElement call = doc().findFirst (GVSELECTOR);
-#undef GVSELECTOR
-        if (call.isNull ())
-        {
-            emit log ("Invalid call page");
-            break;
-        }
-
-        workCurrent.cancel = (WebPageCancel) &GVWebPage::cancelDialStage2;
-        QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
-                           this   , SLOT   (callStage2 (bool)));
-        call.evaluateJavaScript ("this.click();");
-        bOk = true;
-    } while (0); // End cleanup block (not a loop)
-    if (!bOk)
-    {
-        completeCurrentWork (GVAW_dialCallback, false);
-    }
-}//GVWebPage::callStage1
-
-void
-GVWebPage::cancelDialStage2 ()
-{
-    webPage.triggerAction (QWebPage::Stop);
-    cancelDialStage3 ();
-}//GVWebPage::cancelDialStage2
-
-
-void
-GVWebPage::callStage2 (bool bOk)
-{
-    QMutexLocker locker(&mutex);
-    workCurrent.cancel = NULL;
-
-    QObject::disconnect (&webPage, SIGNAL (loadFinished (bool)),
-                          this   , SLOT   (callStage2 (bool)));
-    do // Begin cleanup block (not a loop)
-    {
-        if (isLoadFailed (bOk))
-        {
-            bOk = false;
-            emit log ("Failed to load call page 2");
-            break;
-        }
-        bOk = false;
-
-        workCurrent.cancel = (WebPageCancel) &GVWebPage::cancelDialStage3;
-
-        QWebElementCollection numbers = doc().findAll ("input[type=\"radio\"]");
-        if (0 != numbers.count ())
-        {
-            // This means that we have never set up numbers before
-            emit log ("Callback number not set. aborting");
-            break;
-        }
-
-        emit dialInProgress ();
-
-        bOk = true;
-    } while (0); // End cleanup block (not a loop)
-    if (!bOk)
-    {
-        completeCurrentWork (GVAW_dialCallback, false);
-    }
-    else
-    {
-        // We DO NOT complete current work so that its possible to cancel
-    }
-}//GVWebPage::callStage2
-
-void
-GVWebPage::cancelDialStage3 ()
-{
-    do // Begin cleanup block (not a loop)
-    {
-#define GVSELECTOR "div form div input[type=\"submit\"]"
-        QWebElement btnCancel = doc().findFirst (GVSELECTOR);
-#undef GVSELECTOR
-        if (btnCancel.isNull ())
-        {
-            emit log ("Cancel button not present", 7);
-            break;
-        }
-
-        btnCancel.evaluateJavaScript ("this.click();");
-    } while (0); // End cleanup block (not a loop)
-
-    completeCurrentWork (GVAW_dialCallback, false);
-}//GVWebPage::cancelDialStage3
-
-#endif
 
 bool
 GVWebPage::getContactInfoFromLink ()
@@ -868,127 +744,6 @@ GVWebPage::phonesListLoaded (bool bOk)
 
     completeCurrentWork (GVAW_getRegisteredPhones, bOk);
 }//GVWebPage::phonesListLoaded
-
-bool
-GVWebPage::selectRegisteredPhone ()
-{
-    QMutexLocker locker(&mutex);
-    if (!bLoggedIn)
-    {
-        emit log ("Not logged in. Cannot select registered phone");
-        completeCurrentWork (GVAW_selectRegisteredPhone, false);
-        return (false);
-    }
-
-#if USE_GV_DATA_API
-    strCurrentCallback = workCurrent.arrParams[0].toString();
-    simplify_number (strCurrentCallback);
-    completeCurrentWork (GVAW_selectRegisteredPhone, true);
-    //@@UV: chCurrentCallbackType needs to be fixed.
-#else
-    QString strGoto = GV_HTTPS_M "/selectphone";
-    QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
-                       this   , SLOT   (selectPhoneLoaded (bool)));
-    this->loadUrlString (strGoto);
-#endif
-
-    return (true);
-}//GVWebPage::selectRegisteredPhone
-
-void
-GVWebPage::selectPhoneLoaded (bool bOk)
-{
-    QObject::disconnect (&webPage, SIGNAL (loadFinished (bool)),
-                          this   , SLOT   (selectPhoneLoaded (bool)));
-    do // Begin cleanup block (not a loop)
-    {
-        if (isLoadFailed (bOk))
-        {
-            bOk = false;
-            emit log ("Failed to load the select phone page");
-            break;
-        }
-        bOk = false;
-
-        QWebElementCollection numbers = doc().findAll ("input[type=\"radio\"]");
-        if (0 == numbers.count ())
-        {
-            emit log ("Failed to get any numbers to select");
-            break;
-        }
-
-        QWebElement NumberToUse;
-        for (int i = 0; i < numbers.count (); i++)
-        {
-            QWebElement number = numbers[i];
-            QString strNumber = number.attribute ("value");
-            int pos = strNumber.lastIndexOf ('|');
-            char chType = 0;
-            if (-1 != pos)
-            {
-                chType = strNumber[strNumber.size() - 1].toAscii ();
-                strNumber.chop (strNumber.size() - pos);
-            }
-
-            if (strNumber == workCurrent.arrParams[0].toString())
-            {
-                NumberToUse = number;
-                chProbableCallbackType = chType;
-                break;
-            }
-        }
-
-        if (NumberToUse.isNull ())
-        {
-            emit log ("Didn't find any number that matches the one we want");
-            break;
-        }
-
-        NumberToUse.evaluateJavaScript ("this.click();");
-
-        QWebElement call = doc().findFirst ("div input[value=\"Save\"]");
-        if (call.isNull ())
-        {
-            emit log ("Could not find save button on select phone page!");
-            break;
-        }
-
-        QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
-                           this   , SLOT   (onRegPhoneSelected (bool)));
-        call.evaluateJavaScript("this.click();");
-
-        bOk = true;
-    } while (0); // End cleanup block (not a loop)
-
-    if (!bOk)
-    {
-        completeCurrentWork (GVAW_selectRegisteredPhone, bOk);
-    }
-}//GVWebPage::selectPhoneLoaded
-
-void
-GVWebPage::onRegPhoneSelected (bool bOk)
-{
-    QObject::disconnect (&webPage, SIGNAL (loadFinished (bool)),
-                          this   , SLOT   (onRegPhoneSelected (bool)));
-    do // Begin cleanup block (not a loop)
-    {
-        if (isLoadFailed (bOk))
-        {
-            bOk = false;
-            emit log ("Failed to load the phone selected page");
-            break;
-        }
-
-        strCurrentCallback = workCurrent.arrParams[0].toString();
-        simplify_number (strCurrentCallback);
-        chCurrentCallbackType = chProbableCallbackType;
-
-        bOk = true;
-    } while (0); // End cleanup block (not a loop)
-
-    completeCurrentWork (GVAW_selectRegisteredPhone, bOk);
-}//GVWebPage::onRegPhoneSelected
 
 void
 GVWebPage::userCancel ()

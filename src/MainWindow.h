@@ -89,15 +89,14 @@ private slots:
     //! Invoked if the credentials in DB do not match logged in credentials
     void beginGetAccountDetails ();
 
-    //! Invoked when the user changes the currently selected number
-    void regNumChanged (const QString &strNumber);
     //! Invoked when the registered number has been saved
     void regNumChangeComplete (bool bOk, const QVariantList &arrParams);
 
     //! Invoked when dialing has started
-    void dialInProgress ();
+    void dialInProgress (const QString &strNumber);
     //! Invoked to perform a dial
-    void dialAccessNumber (const QString &strAccessNumber);
+    void dialAccessNumber (const QString  &strAccessNumber,
+                           const QVariant &context        );
 
     //! Invoked when any button on the message box is clicked
     void msgBox_buttonClicked (QAbstractButton *button);
@@ -194,8 +193,11 @@ private:
     //! This is the Google Voice number
     QString         strSelfNumber;
 
-    //! This is the number currently being dialed
-    QString         strCurrentDialed;
+    //! This is the currently selected callback / callout number
+    QString         strCallbackNumber;
+    //! This flag specifies if the number is call-back or call-out
+    bool            bCallback;
+
     //! Set this flag if the user cancels the dialed number
     bool            bDialCancelled;
 

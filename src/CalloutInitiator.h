@@ -16,6 +16,7 @@ signals:
 
 public:
     virtual QString name () = 0;
+    virtual QString selfNumber () = 0;
 
 public slots:
     virtual void initiateCall (const QString &strDestination) = 0;

@@ -36,11 +36,9 @@ private:
     //! Get the contact info for the link provided
     bool getContactInfoFromLink ();
     //! Make a phone call to an arbitrary number
-    bool dialCallback ();
+    bool dialCallback (bool bCallback);
     //! Get registered phones from the settings page
     bool getRegisteredPhones ();
-    //! Select the given registered phone
-    bool selectRegisteredPhone ();
     //! Begin the process to get history
     bool getHistory ();
     //! Call a number given the history entry's link

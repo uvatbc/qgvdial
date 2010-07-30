@@ -14,9 +14,9 @@ enum GVAccess_Work {
     GVAW_logout,
     GVAW_getAllContacts,
     GVAW_getContactFromLink,        // Page link and default number
-    GVAW_dialCallback,              // Destination number
+    GVAW_dialCallback,              // Destination number, callback number
+    GVAW_dialOut,                   // Destination number, callout number
     GVAW_getRegisteredPhones,
-    GVAW_selectRegisteredPhone,     // Phone number
     GVAW_getHistory,                // type, start page, page count
     GVAW_getContactFromHistoryLink, // History link
     GVAW_sendSMS,                   // Number, text
@@ -91,11 +91,12 @@ signals:
     //! Emitted for each registered phone number
     void registeredPhone (const GVRegisteredNumber &info);
     //! Emitted when dialing has started (for callback method)
-    void dialInProgress ();
+    void dialInProgress (const QString &strNumber);
     //! Emitted for every history event
     void oneHistoryEvent (const GVHistoryEvent &hevent);
     //! Emitted when GV returns an access number to dial out
-    void dialAccessNumber (const QString &strAccessNumber);
+    void dialAccessNumber (const QString  &strAccessNumber,
+                           const QVariant &context        );
 
 public slots:
     //! To be invoked to complete a dial
@@ -141,11 +142,9 @@ protected:
     //! Get the contact info for the link provided
     virtual bool getContactInfoFromLink () = 0;
     //! Make a phone call to an arbitrary number
-    virtual bool dialCallback () = 0;
+    virtual bool dialCallback (bool bCallback) = 0;
     //! Get registered phones from the settings page
     virtual bool getRegisteredPhones () = 0;
-    //! Select the given registered phone
-    virtual bool selectRegisteredPhone () = 0;
     //! Begin the process to get history
     virtual bool getHistory () = 0;
     //! Call a number given the history entry's link
@@ -175,9 +174,7 @@ protected:
     //! The currently selected registered callback number
     QString                     strCurrentCallback;
     //! The currently selected registered callback number's type
-    char                        chCurrentCallbackType;
-    //! The probably selected registered callback number's type
-    char                        chProbableCallbackType;
+    //char                        chCurrentCallbackType;
 
     friend class Singletons;
 };

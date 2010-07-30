@@ -290,13 +290,15 @@ MainWindow::init ()
                        this   , SLOT   (deinit ()));
 
     // Dialing handshake
-    QObject::connect (&webPage    , SIGNAL (dialInProgress ()),
-                       this       , SLOT   (dialInProgress ()));
+    QObject::connect (&webPage    , SIGNAL (dialInProgress (const QString &)),
+                       this       , SLOT   (dialInProgress (const QString &)));
     QObject::connect ( this       , SIGNAL (dialCanFinish ()),
                       &webPage    , SLOT   (dialCanFinish ()));
     QObject::connect (
-        &webPage, SIGNAL (dialAccessNumber (const QString &)),
-         this   , SLOT   (dialAccessNumber (const QString &)));
+        &webPage, SIGNAL (dialAccessNumber (const QString &,
+                                            const QVariant &)),
+         this   , SLOT   (dialAccessNumber (const QString &,
+                                            const QVariant &)));
 
     // pContactsTable.oneContact -> this.gotContact
     QObject::connect (pContactsTable,
@@ -319,9 +321,6 @@ MainWindow::init ()
     // pGVSettings.newUser -> this.beginGetAccountDetails
     QObject::connect (pGVSettings, SIGNAL (newUser ()),
                       this       , SLOT   (beginGetAccountDetails ()));
-    // pGVSettings.regNumChanged -> this.regNumChanged
-    QObject::connect (pGVSettings, SIGNAL (regNumChanged (const QString &)),
-                      this       , SLOT   (regNumChanged (const QString &)));
 
     // pContactsTable.call -> this.call
     QObject::connect (
@@ -740,23 +739,50 @@ MainWindow::contactsLinkWorkDone (bool, const QVariantList &)
 void
 MainWindow::dialNow (const QString &strTarget)
 {
-    strCurrentDialed = strTarget;
-    GVAccess &webPage = Singletons::getRef().getGVAccess ();
-    QVariantList l;
-    l += strTarget;
-    if (!webPage.enqueueWork (GVAW_dialCallback, l, this,
-            SLOT (dialComplete (bool, const QVariantList &))))
+    bool bDialout;
+    QString strCallback;
+    CalloutInitiator *ci;
+
+    do // Begin cleanup block (not a loop)
     {
-        log ("Dialing failed instantly", 3);
-    }
+        if (!pGVSettings->getDialSettings (bDialout, strCallback, ci))
+        {
+            setStatus ("Unable to dial out because settings are not valid");
+            break;
+        }
+
+        GVAccess &webPage = Singletons::getRef().getGVAccess ();
+        QVariantList l;
+        l += strTarget;     // The destination number is common between the two
+
+        if (bDialout)
+        {
+            l += ci->selfNumber ();
+            l += QVariant::fromValue<void*>(ci) ;
+            if (!webPage.enqueueWork (GVAW_dialOut, l, this,
+                            SLOT (dialComplete (bool, const QVariantList &))))
+            {
+                setStatus ("Dialing failed instantly");
+            }
+        }
+        else
+        {
+            l += strCallback;
+            if (!webPage.enqueueWork (GVAW_dialCallback, l, this,
+                            SLOT (dialComplete (bool, const QVariantList &))))
+            {
+                setStatus ("Dialing failed instantly");
+            }
+        }
+    } while (0); // End cleanup block (not a loop)
 }//MainWindow::dialNow
 
 void
-MainWindow::dialInProgress ()
+MainWindow::dialInProgress (const QString &strNumber)
 {
     bDialCancelled = false;
 
-    DialCancelDlg msgBox(strCurrentDialed, this);
+    DialCancelDlg msgBox(strNumber, this);
     int ret = msgBox.doModal (strSelfNumber);
     if (QMessageBox::Ok == ret)
     {
@@ -771,13 +797,24 @@ MainWindow::dialInProgress ()
 }//MainWindow::dialInProgress
 
 void
-MainWindow::dialAccessNumber (const QString &strAccessNumber)
+MainWindow::dialAccessNumber (const QString  &strAccessNumber,
+                              const QVariant &context        )
 {
-    pGVSettings->getCallInitiator()->initiateCall (strAccessNumber);
+    CalloutInitiator *ci = (CalloutInitiator *) context.value<void *>();
+    if (NULL != ci)
+    {
+        ci->initiateCall (strAccessNumber);
+        setStatus ("Callout in progress");
+    }
+    else
+    {
+        log ("Invalid call out initiator", 3);
+        setStatus ("Callout failed");
+    }
 }//MainWindow::dialAccessNumber
 
 void
-MainWindow::dialComplete (bool bOk, const QVariantList &)
+MainWindow::dialComplete (bool bOk, const QVariantList &params)
 {
     if (!bOk)
     {
@@ -802,24 +839,9 @@ MainWindow::dialComplete (bool bOk, const QVariantList &)
     }
     else
     {
-        setStatus (QString("Dial successful to %1.").arg(strCurrentDialed));
+        setStatus (QString("Dial successful to %1.").arg(params[0].toString()));
     }
 }//MainWindow::dialComplete
-
-void
-MainWindow::regNumChanged (const QString &strNumber)
-{
-    log (QString ("Changing callback to %1").arg(strNumber));
-
-    GVAccess &webPage = Singletons::getRef().getGVAccess ();
-    QVariantList l;
-    l += strNumber;
-    if (!webPage.enqueueWork (GVAW_selectRegisteredPhone, l, this,
-            SLOT (regNumChangeComplete (bool, const QVariantList &))))
-    {
-        log ("Failed to save the callback number instantly", 3);
-    }
-}//MainWindow::regNumChanged
 
 void
 MainWindow::regNumChangeComplete (bool bOk, const QVariantList &)

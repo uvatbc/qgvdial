@@ -19,6 +19,9 @@ public:
 
     bool causeLogin ();
     CalloutInitiator *getCallInitiator ();
+    bool getDialSettings (bool              &bDialout  ,
+                          QString           &strCallout,
+                          CalloutInitiator *&initiator);
 
 signals:
     //! Emitted when the login button has been clicked with valid credentials
@@ -29,9 +32,6 @@ signals:
     //! Emitted when the logged in user is different from the user cached in DB
     void newUser ();
 
-    //! Emitted when the user changes the currently selected number
-    void regNumChanged (const QString &strNumber);
-
 public slots:
     void loginDone (bool bOk = true);
     void logoutDone (bool bOk = true);
@@ -39,7 +39,6 @@ public slots:
 private slots:
     void btnLogin_clicked ();
     void cbNumbers_currentIndexChanged (int index);
-    void cbCallouts_currentIndexChanged (int index);
 
     //! Invoked every time a new registered phone is retrieved
     void gotRegisteredPhone (const GVRegisteredNumber &info);
@@ -62,8 +61,6 @@ private:
     //! The users registered numbers
     QLabel      lblNumbers;
     QComboBox   cbNumbers;
-    QLabel      lblCallouts;
-    QComboBox   cbCallouts;
 
     //! Login or logout
     QPushButton btnLogin;

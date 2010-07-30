@@ -40,26 +40,14 @@ private slots:
     //! Repeatedly invoked when the next page in the contacts list is loaded
     void contactsLoaded (bool bOk);
 
-#if USE_GV_DATA_API
     void onDataCallDone (QNetworkReply * reply);
     void onDataCallCanceled (QNetworkReply * reply);
-#else
-    //! Invoked when the main page is loaded
-    void callStage1 (bool bOk);
-    //! Invoked when the actual call page is loaded
-    void callStage2 (bool bOk);
-#endif
 
     //! Invoked when the contact info link is loaded
     void contactInfoLoaded (bool bOk);
 
     //! Invoked when the registered phone list page is loaded
     void phonesListLoaded (bool bOk);
-
-    //! Invoked when the select phone page is loaded
-    void selectPhoneLoaded (bool bOk);
-    //! Invokes when the phone is selected
-    void onRegPhoneSelected (bool bOk);
 
     //! Invoked when the history page is loaded
     void historyPageLoaded (bool bOk);
@@ -108,11 +96,9 @@ private:
     //! Get the contact info for the link provided
     bool getContactInfoFromLink ();
     //! Make a phone call to an arbitrary number
-    bool dialCallback ();
+    bool dialCallback (bool bCallback);
     //! Get registered phones from the settings page
     bool getRegisteredPhones ();
-    //! Select the given registered phone
-    bool selectRegisteredPhone ();
     //! Begin the process to get history
     bool getHistory ();
     //! Call a number given the history entry's link
@@ -122,13 +108,7 @@ private:
     //! Play a voicemail
     bool playVmail ();
 
-#if USE_GV_DATA_API
     void cancelDataDial2 ();
-#else
-    void cancelDialStage1 ();
-    void cancelDialStage2 ();
-    void cancelDialStage3 ();
-#endif
 
 private:
     bool                    bUseIphoneUA;

@@ -193,7 +193,7 @@ GVDataAccess::getContactInfoFromLink ()
 }//GVDataAccess::getContactInfoFromLink
 
 bool
-GVDataAccess::dialCallback ()
+GVDataAccess::dialCallback (bool /*bCallback*/)
 {
     completeCurrentWork (GVAW_dialCallback, false);
     return (false);
@@ -205,13 +205,6 @@ GVDataAccess::getRegisteredPhones ()
     completeCurrentWork (GVAW_getRegisteredPhones, false);
     return (false);
 }//GVDataAccess::getRegisteredPhones
-
-bool
-GVDataAccess::selectRegisteredPhone ()
-{
-    completeCurrentWork (GVAW_selectRegisteredPhone, false);
-    return (false);
-}//GVDataAccess::selectRegisteredPhone
 
 bool
 GVDataAccess::getHistory ()

@@ -31,11 +31,11 @@ GVAccess::getNameForWork (GVAccess_Work whatwork)
     case GVAW_getRegisteredPhones:
         func = "getRegisteredPhones";
         break;
-    case GVAW_selectRegisteredPhone:
-        func = "selectRegisteredPhone";
-        break;
     case GVAW_dialCallback:
         func = "dialCallback";
+        break;
+    case GVAW_dialOut:
+        func = "dialOut";
         break;
     case GVAW_getContactFromHistoryLink:
         func = "getContactFromHistoryLink";
@@ -96,8 +96,6 @@ GVAccess::enqueueWork (GVAccess_Work whatwork, const QVariantList &params,
         }
         break;
 
-    case GVAW_selectRegisteredPhone:    // Phone number needed
-    case GVAW_dialCallback:             // Destination number needed
     case GVAW_getContactFromHistoryLink:// History link
         if (1 != params.size ())
         {
@@ -106,6 +104,7 @@ GVAccess::enqueueWork (GVAccess_Work whatwork, const QVariantList &params,
         }
         break;
 
+    case GVAW_dialCallback:         // Destination number and callback
     case GVAW_getContactFromLink:   // Page link and default number
     case GVAW_login:                // user and password
     case GVAW_sendSMS:              // Number, text
@@ -117,6 +116,7 @@ GVAccess::enqueueWork (GVAccess_Work whatwork, const QVariantList &params,
         }
         break;
 
+    case GVAW_dialOut:              // Destination, callout, and context var
     case GVAW_getHistory:           // type, start page, page count
         if (3 != params.size ())
         {
@@ -191,13 +191,11 @@ GVAccess::doNextWork ()
             getContactInfoFromLink ();
             break;
         case GVAW_dialCallback:
-            dialCallback ();
+        case GVAW_dialOut:
+            dialCallback (workCurrent.whatwork == GVAW_dialCallback);
             break;
         case GVAW_getRegisteredPhones:
             getRegisteredPhones ();
-            break;
-        case GVAW_selectRegisteredPhone:
-            selectRegisteredPhone ();
             break;
         case GVAW_getHistory:
             getHistory ();

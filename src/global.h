@@ -26,8 +26,6 @@
 #define GV_HTTPS        "https://www.google.com/voice"
 #define GV_HTTPS_M      "https://www.google.com/voice/m"
 
-#define USE_GV_DATA_API 1
-
 struct GVContactNumber
 {
     GVContactNumber () : chType ('?') {}

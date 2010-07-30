@@ -67,4 +67,10 @@ QString
 DesktopSkypeCallInitiator::name ()
 {
     return ("skype");
-}//DesktopSkypeCallInitiator::
+}//DesktopSkypeCallInitiator::name
+
+QString
+DesktopSkypeCallInitiator::selfNumber ()
+{
+    return ("undefined");
+}//DesktopSkypeCallInitiator::selfNumber

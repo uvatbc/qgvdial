@@ -16,15 +16,18 @@ private:
 
 public:
     QString name ();
+    QString selfNumber ();
 
 public slots:
     void initiateCall (const QString &strDestination);
 
 private slots:
-    void onChannelReady (Tp::PendingOperation*op);
+    void onChannelReady (Tp::PendingOperation *op);
+    void onConnectionReady (Tp::PendingOperation *op);
 
 private:
-    Tp::AccountPtr account;
+    Tp::AccountPtr      account;
+    QString             strSelfNumber;
 
     friend class CallInitiatorFactory;
 };
