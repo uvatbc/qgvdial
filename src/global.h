@@ -26,6 +26,8 @@
 #define GV_HTTPS        "https://www.google.com/voice"
 #define GV_HTTPS_M      "https://www.google.com/voice/m"
 
+#define GV_CLIENTLOGIN "https://www.google.com/accounts/ClientLogin"
+
 struct GVContactNumber
 {
     GVContactNumber () : chType ('?') {}
@@ -93,5 +95,39 @@ public:
 
 typedef QPair<QString,QString> QStringPair;
 typedef QList<QStringPair> QStringPairList;
+
+///////////////////////// Google contacts API related //////////////////////////
+enum PhoneType {
+    PType_Unknown = 0,
+    PType_Mobile,
+    PType_Home,
+    PType_Other,
+};
+
+struct PhoneInfo
+{
+    PhoneType   Type;
+    QString     strNumber;
+
+    void init () {
+        Type = PType_Unknown;
+        strNumber.clear ();
+    }
+};
+typedef QVector<PhoneInfo> PhoneInfoArray;
+
+struct ContactInfo
+{
+    QString         strId;
+    QString         strTitle;
+    PhoneInfoArray  arrPhones;
+
+    void init () {
+        strId.clear ();
+        strTitle.clear ();
+        arrPhones.clear ();
+    }
+};
+////////////////////////////////////////////////////////////////////////////////
 
 #endif //__GLOBAL_H__

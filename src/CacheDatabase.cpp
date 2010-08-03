@@ -8,11 +8,17 @@
 #define GV_S_VAR_USER       "user"
 #define GV_S_VAR_PASS       "password"
 #define GV_S_VAR_CALLBACK   "callback"
+#define GV_S_VAR_DB_VER     "db_ver"
 ////////////////////////////////////////////////////////////////////////////////
+#define GV_S_VALUE_DB_VER   "2010-08-03 11:08:00"
 ////////////////////////////// GV Contacts table ///////////////////////////////
 #define GV_CONTACTS_TABLE   "gvcontacts"
-#define GV_C_NAME           "name"
-#define GV_C_LINK           "partial_url"
+#define GV_C_ID             "id"
+#define GV_C_TYPE           "data_type"
+#define GV_C_DATA           "data"
+
+#define GV_C_TYPE_NAME      "contact name"
+#define GV_C_TYPE_NUMBER    "contact number"
 ////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////// GV links table /////////////////////////////////
 #define GV_LINKS_TABLE      "gvlinks"
@@ -70,6 +76,27 @@ CacheDatabase::init ()
                     " PRIMARY KEY (" GV_S_NAME "))");
     }
 
+    query.exec ("SELECT * from " GV_SETTINGS_TABLE " "
+                "WHERE " GV_S_NAME "='" GV_S_VAR_DB_VER "'");
+    bool bBlowAway = true;
+    if (query.next ())
+    {
+        // Then ensure that the version matches what we have hardcoded into
+        // this binary. If not drop all cache tables.
+        QString strVer = query.value(0).toString ();
+        if (strVer == GV_S_VALUE_DB_VER)
+        {
+            bBlowAway = false;
+        }
+    }
+    if (bBlowAway)
+    {
+        // Drop it all!
+        query.exec ("DROP TABLE " GV_CONTACTS_TABLE);
+        query.exec ("DROP TABLE " GV_LINKS_TABLE);
+        query.exec ("DROP TABLE " GV_REG_NUMS_TABLE);
+    }
+
     // Ensure that the contacts table is present. If not, create it.
     query.exec ("SELECT * FROM sqlite_master "
                 "WHERE type='table' "
@@ -77,9 +104,9 @@ CacheDatabase::init ()
     if (!query.next ())
     {
         query.exec ("CREATE TABLE " GV_CONTACTS_TABLE " "
-                    "(" GV_C_NAME " varchar, "
-                        GV_C_LINK " varchar, "
-                    " PRIMARY KEY (" GV_C_NAME "))");
+                    "(" GV_C_ID     " varchar, "
+                        GV_C_TYPE   " varchar, "
+                        GV_C_DATA   " varchar)");
     }
 
     // Ensure that the cached links table is present. If not, create it.

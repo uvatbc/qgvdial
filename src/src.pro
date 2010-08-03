@@ -1,6 +1,6 @@
 TEMPLATE = app
 TARGET   = qgvdial
-QT      *= core gui webkit sql
+QT      *= core gui webkit sql xml
 INCLUDEPATH += .
 
 CONFIG  += mobility
@@ -53,7 +53,9 @@ HEADERS +=  MainApp.h                   \
             SkypeClient.h               \
             SkypeClientFactory.h        \
             CalloutInitiator.h          \
-            CallInitiatorFactory.h
+            CallInitiatorFactory.h      \
+            CaptchaWidget.h             \
+            ContactsXmlHandler.h
 
 SOURCES +=  main.cpp                    \
             MainApp.cpp                 \
@@ -84,7 +86,9 @@ SOURCES +=  main.cpp                    \
             SkypeClient.cpp             \
             SkypeClientFactory.cpp      \
             CalloutInitiator.cpp        \
-            CallInitiatorFactory.cpp
+            CallInitiatorFactory.cpp    \
+            CaptchaWidget.cpp           \
+            ContactsXmlHandler.cpp
 
 RESOURCES = qgvdial.qrc
 

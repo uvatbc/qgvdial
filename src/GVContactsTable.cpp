@@ -1,9 +1,12 @@
 #include "global.h"
 #include "GVContactsTable.h"
 #include "Singletons.h"
+#include "CaptchaWidget.h"
+#include "ContactsXmlHandler.h"
 
 GVContactsTable::GVContactsTable (QWidget *parent)
 : QTreeView(parent)
+, nwMgr (this)
 , actRefresh("&Refresh", this)
 , mnuContext("Action", this)
 , actPlaceCall("Call", this)
@@ -47,6 +50,13 @@ GVContactsTable::GVContactsTable (QWidget *parent)
 void
 GVContactsTable::refreshContacts ()
 {
+    refreshContactsFromContactsAPI ();
+}//GVContactsTable::refreshContacts
+
+#if 0
+void
+GVContactsTable::refreshContactsFromWebGV ()
+{
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     QMutexLocker locker(&mutex);
     dbMain.clearContacts ();
@@ -64,7 +74,7 @@ GVContactsTable::refreshContacts ()
     {
         getContactsDone (false, l);
     }
-}//GVContactsTable::refreshContacts
+}//GVContactsTable::refreshContactsFromWebGV
 
 void
 GVContactsTable::gotContact (const QString &strName, const QString &strLink)
@@ -85,6 +95,73 @@ GVContactsTable::getContactsDone (bool bOk, const QVariantList &)
 
     emit allContacts (bOk);
 }//GVContactsTable::getContactsDone
+#endif
+
+QNetworkReply *
+GVContactsTable::postRequest (QString         strUrl,
+                              QStringPairList arrPairs,
+                              QObject        *receiver,
+                              const char     *method)
+{
+    QStringList arrParams;
+    foreach (QStringPair pairParam, arrPairs)
+    {
+        arrParams += QString("%1=%2")
+                        .arg(pairParam.first)
+                        .arg(pairParam.second);
+    }
+    QString strParams = arrParams.join ("&");
+
+    QUrl url (strUrl);
+    QNetworkRequest request(url);
+    request.setHeader (QNetworkRequest::ContentTypeHeader,
+                       "application/x-www-form-urlencoded");
+    if (0 != strGoogleAuth.size ())
+    {
+        QByteArray byAuth = QString("GoogleLogin auth=%1")
+                                    .arg(strGoogleAuth).toAscii ();
+        request.setRawHeader ("Authorization", byAuth);
+    }
+    QByteArray byPostData = strParams.toAscii ();
+
+    QObject::connect (&nwMgr   , SIGNAL (finished (QNetworkReply *)),
+                       receiver, method);
+    QNetworkReply *reply = nwMgr.post (request, byPostData);
+    return (reply);
+}//GVContactsTable::postRequest
+
+QNetworkReply *
+GVContactsTable::getRequest (QString         strUrl,
+                             QObject        *receiver,
+                             const char     *method)
+{
+    QUrl url (strUrl);
+    QNetworkRequest request(url);
+    request.setHeader (QNetworkRequest::ContentTypeHeader,
+                       "application/x-www-form-urlencoded");
+    if (0 != strGoogleAuth.size ())
+    {
+        QByteArray byAuth = QString("GoogleLogin auth=%1")
+                                    .arg(strGoogleAuth).toAscii ();
+        request.setRawHeader ("Authorization", byAuth);
+    }
+
+    QObject::connect (&nwMgr   , SIGNAL (finished (QNetworkReply *)),
+                       receiver, method);
+    QNetworkReply *reply = nwMgr.get (request);
+    return (reply);
+}//GVContactsTable::getRequest
+
+void
+GVContactsTable::refreshContactsFromContactsAPI ()
+{
+    QString strUrl = QString ("http://www.google.com/m8/feeds/contacts/%1/full"
+                              "?max-results=10000")
+                        .arg (strUser);
+    //strUrl.replace ('@', "%40");
+
+    getRequest (strUrl, this , SLOT (onGotContacts (QNetworkReply *)));
+}//GVContactsTable::refreshContactsFromContactsAPI
 
 void
 GVContactsTable::updateMenu (QMenuBar *menuBar)
@@ -105,6 +182,15 @@ GVContactsTable::loginSuccess ()
 {
     QMutexLocker locker(&mutex);
     bLoggedIn = true;
+
+    QStringPairList arrPairs;
+    arrPairs += QStringPair("accountType", "GOOGLE");
+    arrPairs += QStringPair("Email"      , strUser);
+    arrPairs += QStringPair("Passwd"     , strPass);
+    arrPairs += QStringPair("service"    , "cp"); // name for contacts service
+    arrPairs += QStringPair("source"     , "MyCompany-qgvdial-ver01");
+    postRequest (GV_CLIENTLOGIN, arrPairs,
+                 this , SLOT (onLoginResponse (QNetworkReply *)));
 }//GVContactsTable::loginSuccess
 
 void
@@ -112,6 +198,8 @@ GVContactsTable::loggedOut ()
 {
     QMutexLocker locker(&mutex);
     bLoggedIn = false;
+
+    strGoogleAuth.clear ();
 }//GVContactsTable::loggedOut
 
 void
@@ -135,7 +223,7 @@ GVContactsTable::selectionChanged (const QItemSelection &selected,
     strSavedLink = linkIndex.data(Qt::EditRole).toString();
     if (strSavedLink.isEmpty ())
     {
-        log ("Failed to get contact information", 3);
+        emit log ("Failed to get contact information", 3);
     }
 }//GVContactsTable::selectionChanged
 
@@ -172,3 +260,143 @@ GVContactsTable::sendSMS ()
         emit status ("Nothing selected");
     }
 }//GVContactsTable::sendSMS
+
+void
+GVContactsTable::setUserPass (const QString &strU, const QString &strP)
+{
+    QMutexLocker locker(&mutex);
+    strUser = strU;
+    strPass = strP;
+}//GVContactsTable::setUserPass
+
+void
+GVContactsTable::onLoginResponse (QNetworkReply *reply)
+{
+    QObject::disconnect (&nwMgr, SIGNAL (finished (QNetworkReply *)),
+                          this , SLOT   (onLoginResponse (QNetworkReply *)));
+
+    QString msg;
+    QString strReply = reply->readAll ();
+    QString strCaptchaToken, strCaptchaUrl;
+
+    strGoogleAuth.clear ();
+    do // Begin cleanup block (not a loop)
+    {
+        QStringList arrParsed = strReply.split ('\n');
+        foreach (QString strPair, arrParsed)
+        {
+            QStringList arrPair = strPair.split ('=');
+            if (arrPair[0] == "Auth")
+            {
+                strGoogleAuth = arrPair[1];
+            }
+            else if (arrPair[0] == "CaptchaToken")
+            {
+                strCaptchaToken = arrPair[1];
+            }
+            else if (arrPair[0] == "CaptchaUrl")
+            {
+                strCaptchaUrl = arrPair[1];
+            }
+            else
+            {
+                if (2 == arrPair.size ())
+                {
+                    msg = QString ("key = \"%1\", value = \"%2\"")
+                            .arg (arrPair[0]).arg (arrPair[1]);
+                }
+                else if (1 == arrPair.size ())
+                {
+                    msg = QString ("key = \"%1\"")
+                            .arg (arrPair[0]);
+                }
+                else
+                {
+                    msg = "Empty pair?!?";
+                }
+                emit log (msg);
+            }
+        }
+
+        if (0 != strCaptchaUrl.size ())
+        {
+            strCaptchaUrl = "http://www.google.com/accounts/"
+                          + strCaptchaUrl;
+            emit log ("Loading captcha");
+            CaptchaWidget *captcha = new CaptchaWidget(strCaptchaUrl, this);
+            QObject::connect (
+                captcha, SIGNAL (done (bool, const QString &)),
+                this   , SLOT   (onCaptchaDone (bool, const QString &)));
+            break;
+        }
+
+        if (0 == strGoogleAuth.size ())
+        {
+            emit log ("Failed to login!!");
+            break;
+        }
+
+        emit log ("Login success");
+    } while (0); // End cleanup block (not a loop)
+    reply->deleteLater ();
+}//GVContactsTable::onLoginResponse
+
+void
+GVContactsTable::onCaptchaDone (bool bOk, const QString &strCaptcha)
+{
+    // No point disconnecting anything because the widget is going to delete
+    // itself anyway.
+
+    do { // Begin cleanup block (not a loop)
+        if (!bOk)
+        {
+            log ("Captcha failed");
+            break;
+        }
+
+        QStringPairList arrPairs;
+        arrPairs += QStringPair("accountType", "GOOGLE");
+        arrPairs += QStringPair("Email"      , strUser);
+        arrPairs += QStringPair("Passwd"     , strPass);
+        arrPairs += QStringPair("service"    , "grandcentral");
+        arrPairs += QStringPair("source"     , "MyCompany-testapp16-ver01");
+        //TODO: add captcha params
+        postRequest (GV_CLIENTLOGIN, arrPairs,
+                     this , SLOT (onLoginResponse (QNetworkReply *)));
+    } while (0); // End cleanup block (not a loop)
+}//GVContactsTable::onCaptchaDone
+
+void
+GVContactsTable::onGotContacts (QNetworkReply *reply)
+{
+    QXmlInputSource inputSource (reply);
+    QXmlSimpleReader simpleReader;
+    ContactsXmlHandler contactsHandler;
+
+    QObject::connect (&contactsHandler, SIGNAL (log(const QString &, int)),
+                       this,            SLOT   (log(const QString &, int)));
+    QObject::connect (&contactsHandler, SIGNAL (status(const QString &, int)),
+                       this,            SLOT   (status(const QString &, int)));
+
+    QObject::connect (
+        &contactsHandler, SIGNAL (oneContact (const ContactInfo &)),
+         this,            SLOT   (gotOneContact (const ContactInfo &)));
+
+    simpleReader.setContentHandler (&contactsHandler);
+    simpleReader.setErrorHandler (&contactsHandler);
+
+    simpleReader.parse (&inputSource, false);
+
+    QString msg = QString("All done. total = %1. usable = %2")
+                    .arg (contactsHandler.getTotalContacts ())
+                    .arg (contactsHandler.getUsableContacts ());
+    emit log (msg);
+
+    reply->deleteLater ();
+}//GVContactsTable::onGotContacts
+
+void
+GVContactsTable::gotOneContact (const ContactInfo &contactInfo)
+{
+
+}//GVContactsTable::gotOneContact

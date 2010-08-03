@@ -1,7 +1,8 @@
 #ifndef __GVCONTACTSTABLE_H__
 #define __GVCONTACTSTABLE_H__
 
-#include <QtGui>
+#include "global.h"
+#include <QtNetwork>
 
 class GVContactsTable : public QTreeView
 {
@@ -9,6 +10,8 @@ class GVContactsTable : public QTreeView
 
 public:
     GVContactsTable (QWidget *parent = 0);
+    //! Use this to set the username and password for the contacts API login
+    void setUserPass (const QString &strU, const QString &strP);
 
 signals:
     //! Log emitter
@@ -48,10 +51,40 @@ private slots:
     //! Invoked when the send SMS action is triggered
     void sendSMS ();
 
-private:
-    void contextMenuEvent (QContextMenuEvent * event);
+    //! Invoked on response to login to contacts API
+    void onLoginResponse (QNetworkReply *reply);
+    //! Invoked when the captcha is done
+    void onCaptchaDone (bool bOk, const QString &strCaptcha);
+
+    // Invoked when the google contacts API responds with the contacts
+    void onGotContacts (QNetworkReply *reply);
+    // Invoked when one contact is parsed out of the XML
+    void gotOneContact (const ContactInfo &contactInfo);
 
 private:
+    void contextMenuEvent (QContextMenuEvent * event);
+    void refreshContactsFromWebGV ();
+    void refreshContactsFromContactsAPI ();
+
+    QNetworkReply *
+    postRequest (QString         strUrl,
+                 QStringPairList arrPairs,
+                 QObject        *receiver,
+                 const char     *method);
+    QNetworkReply *
+    getRequest (QString         strUrl,
+                QObject        *receiver,
+                const char     *method);
+
+private:
+    //! Username and password for google authentication
+    QString strUser, strPass;
+    //! The authentication string returned by the contacts API
+    QString         strGoogleAuth;
+
+    //! The network manager for contacts API
+    QNetworkAccessManager nwMgr;
+
     //! Refresh action for contacts
     QAction         actRefresh;
 
