@@ -2,7 +2,6 @@
 #include "Singletons.h"
 
 #define GV_DATA_BASE "https://www.google.com/voice"
-#define USE_GV_CALLOUT_METHOD 1
 
 GVWebPage::GVWebPage(QObject *parent/* = NULL*/)
 : GVAccess (parent)

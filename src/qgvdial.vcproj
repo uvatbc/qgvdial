@@ -70,7 +70,27 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CallInitiatorFactory.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CalloutInitiator.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CaptchaWidget.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\ChildWindowBase.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ContactsXmlHandler.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\DesktopSkypeCallInitiator.cpp"
 				>
 			</File>
 			<File
@@ -182,6 +202,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\TpCalloutInitiator.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\TpObserver.cpp"
 				>
 			</File>
@@ -204,7 +228,27 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CallInitiatorFactory.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CalloutInitiator.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CaptchaWidget.h"
+				>
+			</File>
+			<File
 				RelativePath=".\ChildWindowBase.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ContactsXmlHandler.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DesktopSkypeCallInitiator.h"
 				>
 			</File>
 			<File
@@ -313,6 +357,10 @@
 			</File>
 			<File
 				RelativePath=".\SMSEntryDeleteButton.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TpCalloutInitiator.h"
 				>
 			</File>
 			<File

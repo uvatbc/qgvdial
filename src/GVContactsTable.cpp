@@ -50,52 +50,15 @@ GVContactsTable::GVContactsTable (QWidget *parent)
 void
 GVContactsTable::refreshContacts ()
 {
-    refreshContactsFromContactsAPI ();
-}//GVContactsTable::refreshContacts
-
-#if 0
-void
-GVContactsTable::refreshContactsFromWebGV ()
-{
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     QMutexLocker locker(&mutex);
     dbMain.clearContacts ();
     strSavedLink.clear ();
-
-    GVAccess &webPage = Singletons::getRef().getGVAccess ();
-    QVariantList l;
     nContacts = 0;
-    QObject::connect (
-        &webPage, SIGNAL (gotContact (const QString &, const QString &)),
-         this   , SLOT   (gotContact (const QString &, const QString &)));
-    emit status ("Retrieving all contacts...", 0);
-    if (!webPage.enqueueWork (GVAW_getAllContacts, l, this,
-            SLOT (getContactsDone (bool, const QVariantList &))))
-    {
-        getContactsDone (false, l);
-    }
-}//GVContactsTable::refreshContactsFromWebGV
 
-void
-GVContactsTable::gotContact (const QString &strName, const QString &strLink)
-{
-    emit oneContact (nContacts, strName, strLink);
-
-    QMutexLocker locker(&mutex);
-    nContacts++;
-}//GVContactsTable::gotContact
-
-void
-GVContactsTable::getContactsDone (bool bOk, const QVariantList &)
-{
-    GVAccess &webPage = Singletons::getRef().getGVAccess ();
-    QObject::disconnect(
-        &webPage, SIGNAL (gotContact(const QString &, const QString &)),
-        this    , SLOT   (gotContact(const QString &, const QString &)));
-
-    emit allContacts (bOk);
-}//GVContactsTable::getContactsDone
-#endif
+    emit status ("Retrieving contacts", 0);
+    refreshContactsFromContactsAPI ();
+}//GVContactsTable::refreshContacts
 
 QNetworkReply *
 GVContactsTable::postRequest (QString         strUrl,
@@ -369,6 +332,8 @@ GVContactsTable::onCaptchaDone (bool bOk, const QString &strCaptcha)
 void
 GVContactsTable::onGotContacts (QNetworkReply *reply)
 {
+    emit status ("Contacts retrieved, parsing", 0);
+
     QXmlInputSource inputSource (reply);
     QXmlSimpleReader simpleReader;
     ContactsXmlHandler contactsHandler;
@@ -385,12 +350,13 @@ GVContactsTable::onGotContacts (QNetworkReply *reply)
     simpleReader.setContentHandler (&contactsHandler);
     simpleReader.setErrorHandler (&contactsHandler);
 
-    simpleReader.parse (&inputSource, false);
+    bool rv = simpleReader.parse (&inputSource, false);
 
-    QString msg = QString("All done. total = %1. usable = %2")
+    QString msg = QString("Contact parsing done. total = %1. usable = %2")
                     .arg (contactsHandler.getTotalContacts ())
                     .arg (contactsHandler.getUsableContacts ());
-    emit log (msg);
+    emit status (msg);
+    emit allContacts (rv);
 
     reply->deleteLater ();
 }//GVContactsTable::onGotContacts
@@ -398,5 +364,8 @@ GVContactsTable::onGotContacts (QNetworkReply *reply)
 void
 GVContactsTable::gotOneContact (const ContactInfo &contactInfo)
 {
+    emit oneContact (nContacts, contactInfo);
 
+    QMutexLocker locker(&mutex);
+    nContacts++;
 }//GVContactsTable::gotOneContact

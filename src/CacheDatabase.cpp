@@ -14,11 +14,7 @@
 ////////////////////////////// GV Contacts table ///////////////////////////////
 #define GV_CONTACTS_TABLE   "gvcontacts"
 #define GV_C_ID             "id"
-#define GV_C_TYPE           "data_type"
-#define GV_C_DATA           "data"
-
-#define GV_C_TYPE_NAME      "contact name"
-#define GV_C_TYPE_NUMBER    "contact number"
+#define GV_C_NAME           "name"
 ////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////// GV links table /////////////////////////////////
 #define GV_LINKS_TABLE      "gvlinks"
@@ -83,7 +79,7 @@ CacheDatabase::init ()
     {
         // Then ensure that the version matches what we have hardcoded into
         // this binary. If not drop all cache tables.
-        QString strVer = query.value(0).toString ();
+        QString strVer = query.value(1).toString ();
         if (strVer == GV_S_VALUE_DB_VER)
         {
             bBlowAway = false;
@@ -95,6 +91,11 @@ CacheDatabase::init ()
         query.exec ("DROP TABLE " GV_CONTACTS_TABLE);
         query.exec ("DROP TABLE " GV_LINKS_TABLE);
         query.exec ("DROP TABLE " GV_REG_NUMS_TABLE);
+
+        // Delete the DB version number (if it exists)
+        query.exec ("INSERT INTO " GV_SETTINGS_TABLE " "
+                    "(" GV_S_NAME "," GV_S_VALUE ") VALUES "
+                    "('" GV_S_VAR_DB_VER "','" GV_S_VALUE_DB_VER "')");
     }
 
     // Ensure that the contacts table is present. If not, create it.
@@ -104,9 +105,8 @@ CacheDatabase::init ()
     if (!query.next ())
     {
         query.exec ("CREATE TABLE " GV_CONTACTS_TABLE " "
-                    "(" GV_C_ID     " varchar, "
-                        GV_C_TYPE   " varchar, "
-                        GV_C_DATA   " varchar)");
+                    "(" GV_C_NAME " varchar, "
+                        GV_C_ID   " varchar)");
     }
 
     // Ensure that the cached links table is present. If not, create it.
@@ -310,14 +310,14 @@ CacheDatabase::insertContact (QSqlTableModel *modelContacts,
 {
     // Define fields and the record
     QSqlField fldName(GV_C_NAME, QVariant::String);
-    QSqlField fldLink(GV_C_LINK, QVariant::String);
+    QSqlField fldLink(GV_C_ID, QVariant::String);
     QSqlRecord sqlRecord;
     sqlRecord.append (fldName);
     sqlRecord.append (fldLink);
 
     // Add values to the record
     sqlRecord.setValue (GV_C_NAME, QVariant (strName));
-    sqlRecord.setValue (GV_C_LINK, QVariant (strLink));
+    sqlRecord.setValue (GV_C_ID, QVariant (strLink));
 
     bool rv = false;
     do // Begin cleanup block (not a loop)

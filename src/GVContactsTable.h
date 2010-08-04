@@ -20,7 +20,7 @@ signals:
     void status(const QString &strText, int timeout = 2000);
 
     //! Emitted every time a new contact is parsed from the contacts page
-    void oneContact (int count, const QString &strName, const QString &strLink);
+    void oneContact (int count, const ContactInfo &cInfo);
     //! Emitted when all contacts are done
     void allContacts (bool bOk);
 
@@ -38,10 +38,6 @@ public slots:
     void loggedOut ();
 
 private slots:
-    //! Invoked every time a new contact is parsed from the contacts page
-    void gotContact (const QString &strName, const QString &strLink);
-    //! Invoked after all contacts have been parsed
-    void getContactsDone (bool bOk, const QVariantList &arrParams);
     void activatedContact (const QModelIndex &);
     void selectionChanged (const QItemSelection &selected,
                            const QItemSelection &deselected);
@@ -63,7 +59,6 @@ private slots:
 
 private:
     void contextMenuEvent (QContextMenuEvent * event);
-    void refreshContactsFromWebGV ();
     void refreshContactsFromContactsAPI ();
 
     QNetworkReply *

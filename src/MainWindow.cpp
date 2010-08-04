@@ -302,8 +302,8 @@ MainWindow::init ()
 
     // pContactsTable.oneContact -> this.gotContact
     QObject::connect (pContactsTable,
-                SIGNAL (oneContact (int, const QString &, const QString &)),
-          this, SLOT   (gotContact (int, const QString &, const QString &)));
+                SIGNAL (oneContact (int, const ContactInfo &)),
+          this, SLOT   (gotContact (int, const ContactInfo &)));
     // pContactsTable.allContacts -> this.getContactsDone
     QObject::connect (pContactsTable, SIGNAL (allContacts (bool)),
                       this          , SLOT   (getContactsDone (bool)));
@@ -314,7 +314,7 @@ MainWindow::init ()
         this       , SLOT   (doLogin (const QString &, const QString &)));
     // this.loginSuccess -> pGVSettings.loginDone
     QObject::connect (this       , SIGNAL (loginSuccess ()),
-                      pGVSettings, SLOT (loginDone ()));
+                      pGVSettings, SLOT   (loginDone ()));
     // pGVSettings.logout -> this.doLogout
     QObject::connect (pGVSettings, SIGNAL (logout ()),
                       this       , SLOT   (doLogout ()));
@@ -475,6 +475,9 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
     else
     {
         strSelfNumber = varList[varList.size()-1].toString ();
+
+        pContactsTable->setUserPass (varList[0].toString (),
+                                     varList[1].toString ());
         emit loginSuccess ();
     }
 }//MainWindow::loginCompleted
@@ -502,10 +505,42 @@ MainWindow::beginGetAccountDetails ()
 }//MainWindow::beginGetAccountDetails
 
 void
-MainWindow::gotContact (int cnt, const QString &strName, const QString &strLink)
+MainWindow::gotContact (int cnt, const ContactInfo &contactInfo)
 {
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    dbMain.insertContact (modelContacts, cnt, strName, strLink);
+    dbMain.insertContact (modelContacts, cnt,
+                          contactInfo.strTitle,
+                          contactInfo.strId);
+
+    GVContactInfo gvContactInfo;
+    gvContactInfo.strLink = contactInfo.strId;
+    gvContactInfo.strName = contactInfo.strTitle;
+
+    foreach (PhoneInfo pInfo, contactInfo.arrPhones)
+    {
+        GVContactNumber gvcn;
+        switch (pInfo.Type)
+        {
+        case PType_Mobile:
+            gvcn.chType = 'M';
+            break;
+        case PType_Home:
+            gvcn.chType = 'H';
+            break;
+        case PType_Other:
+            gvcn.chType = 'O';
+            break;
+        default:
+            gvcn.chType = '?';
+            break;
+        }
+
+        gvcn.strNumber = pInfo.strNumber;
+
+        gvContactInfo.arrPhones += gvcn;
+    }
+
+    dbMain.putContactInfo (gvContactInfo);
 }//MainWindow::gotContact
 
 void
@@ -572,8 +607,10 @@ MainWindow::initContactsModel ()
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     modelContacts = dbMain.newSqlTableModel ();
     pContactsTable->setModel (modelContacts);
-    pContactsTable->hideColumn (1);
     modelContacts->submitAll ();
+
+    pContactsTable->hideColumn (1);
+    pContactsTable->sortByColumn (0, Qt::AscendingOrder);
 }//MainWindow::initContactsModel
 
 void

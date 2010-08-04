@@ -1,9 +1,8 @@
 #ifndef __CACHEDATABASE_H__
 #define __CACHEDATABASE_H__
 
-#include <QtCore>
-#include <QtSql>
 #include "global.h"
+#include <QtSql>
 
 class CacheDatabase : public QObject
 {

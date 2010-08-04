@@ -72,7 +72,7 @@ private slots:
     void hideProgress ();
 
     //! Invoked every time a new contact is parsed from the contacts page
-    void gotContact (int cnt, const QString &strName, const QString &strLink);
+    void gotContact (int cnt, const ContactInfo &contactInfo);
     //! Invoked after all contacts have been parsed
     void getContactsDone (bool bOk);
 
