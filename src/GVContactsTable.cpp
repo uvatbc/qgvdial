@@ -117,8 +117,9 @@ GVContactsTable::refreshContacts ()
     bRefreshIsUpdate = false;
     if ((dbMain.getLastContactUpdate (strUpdate)) && (0 != strUpdate.size ()))
     {
-        strUrl += QString ("&updated-min=%1").arg (strUpdate);
+        strUrl += QString ("&updated-min=%1&showdeleted=true").arg (strUpdate);
         bRefreshIsUpdate = true;
+        nContacts = this->model()->rowCount();
     }
     else
     {
@@ -379,64 +380,108 @@ GVContactsTable::gotOneContact (const ContactInfo &contactInfo)
 {
     QMutexLocker locker(&mutex);
 
-    if (!bRefreshIsUpdate)
+    QModelIndexList listMatches;
+    char whatWork = 0;
+    do // Begin cleanup block (not a loop)
+    {
+        if (!bRefreshIsUpdate)
+        {
+            whatWork = 'a'; // add
+            break;
+        }
+
+        QModelIndex idxStart = this->model()->index (0,1);
+        if (!idxStart.isValid ())
+        {
+            emit log ("Invalid starting index for contact update", 3);
+            whatWork = 'a'; // add
+            break;
+        }
+
+        listMatches =
+        this->model()->match (idxStart, Qt::DisplayRole, contactInfo.strId);
+        if (0 == listMatches.size ())
+        {
+            emit log ("No matches found for ID to update contact");
+            whatWork = 'a'; // add
+            break;
+        }
+
+        if (contactInfo.bDeleted)
+        {
+            whatWork = 'd'; // delete
+            break;
+        }
+
+        whatWork = 'm';
+
+    } while (0); // End cleanup block (not a loop)
+
+    GVContactInfo gvContactInfo;
+    convert (contactInfo, gvContactInfo);
+
+    if ('a' == whatWork)
     {
         emit oneContact (nContacts, contactInfo);
         nContacts++;
         return;
     }
-
-    do // Begin cleanup block (not a loop)
+    
+    QModelIndex idxId = listMatches[0];
+    if (!idxId.isValid ())
     {
-        QModelIndex idxStart = this->model()->index (0,1);
-        if (!idxStart.isValid ())
-        {
-            emit log ("Invalid starting index for contact update", 3);
-            break;
-        }
-        QModelIndexList listMatches =
-        this->model()->match (idxStart, Qt::DisplayRole, contactInfo.strId);
-        if (0 == listMatches.size ())
-        {
-            emit log ("No matches found for ID to update contact", 3);
-            break;
-        }
+        emit log ("Invalid title ID during delete or modify contact");
+        return;
+    }
 
+    if ('m' == whatWork)
+    {
         // update the model entry
-        QModelIndex idxId = listMatches[0];
         QModelIndex idxName = idxId.sibling (idxId.row (), 0);
         this->model()->setData (idxName, contactInfo.strTitle);
 
         // update dbMain.CACHE
-        GVContactInfo gvContactInfo;
-        gvContactInfo.strLink = contactInfo.strId;
-        gvContactInfo.strName = contactInfo.strTitle;
-
-        foreach (PhoneInfo pInfo, contactInfo.arrPhones)
-        {
-            GVContactNumber gvcn;
-            switch (pInfo.Type)
-            {
-            case PType_Mobile:
-                gvcn.chType = 'M';
-                break;
-            case PType_Home:
-                gvcn.chType = 'H';
-                break;
-            case PType_Other:
-                gvcn.chType = 'O';
-                break;
-            default:
-                gvcn.chType = '?';
-                break;
-            }
-
-            gvcn.strNumber = pInfo.strNumber;
-
-            gvContactInfo.arrPhones += gvcn;
-        }
 
         CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
         dbMain.putContactInfo (gvContactInfo);
-    } while (0); // End cleanup block (not a loop)
+    }
+    else if ('d' == whatWork)
+    {
+        this->model()->removeRow (idxId.row ());
+        nContacts--;
+    }
+
 }//GVContactsTable::gotOneContact
+
+bool
+GVContactsTable::convert (const ContactInfo &cInfo, GVContactInfo &gvcInfo)
+{
+    gvcInfo.strLink = cInfo.strId;
+    gvcInfo.strName = cInfo.strTitle;
+
+    foreach (PhoneInfo pInfo, cInfo.arrPhones)
+    {
+        GVContactNumber gvcn;
+        switch (pInfo.Type)
+        {
+        case PType_Mobile:
+            gvcn.chType = 'M';
+            break;
+        case PType_Home:
+            gvcn.chType = 'H';
+            break;
+        case PType_Other:
+            gvcn.chType = 'O';
+            break;
+        default:
+            gvcn.chType = '?';
+            break;
+        }
+
+        gvcn.strNumber = pInfo.strNumber;
+
+        gvcInfo.arrPhones += gvcn;
+    }
+
+    return (true);
+}//GVContactsTable::convert

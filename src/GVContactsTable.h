@@ -12,6 +12,7 @@ public:
     GVContactsTable (QWidget *parent = 0);
     //! Use this to set the username and password for the contacts API login
     void setUserPass (const QString &strU, const QString &strP);
+    bool convert (const ContactInfo &cInfo, GVContactInfo &gvcInfo);
 
 signals:
     //! Log emitter
@@ -69,6 +70,7 @@ private:
     getRequest (QString         strUrl,
                 QObject        *receiver,
                 const char     *method);
+
 
 private:
     //! Username and password for google authentication

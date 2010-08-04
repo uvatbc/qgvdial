@@ -513,32 +513,7 @@ MainWindow::gotContact (int cnt, const ContactInfo &contactInfo)
                           contactInfo.strId);
 
     GVContactInfo gvContactInfo;
-    gvContactInfo.strLink = contactInfo.strId;
-    gvContactInfo.strName = contactInfo.strTitle;
-
-    foreach (PhoneInfo pInfo, contactInfo.arrPhones)
-    {
-        GVContactNumber gvcn;
-        switch (pInfo.Type)
-        {
-        case PType_Mobile:
-            gvcn.chType = 'M';
-            break;
-        case PType_Home:
-            gvcn.chType = 'H';
-            break;
-        case PType_Other:
-            gvcn.chType = 'O';
-            break;
-        default:
-            gvcn.chType = '?';
-            break;
-        }
-
-        gvcn.strNumber = pInfo.strNumber;
-
-        gvContactInfo.arrPhones += gvcn;
-    }
+    pContactsTable->convert (contactInfo, gvContactInfo);
 
     dbMain.putContactInfo (gvContactInfo);
 }//MainWindow::gotContact

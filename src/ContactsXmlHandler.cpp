@@ -56,6 +56,11 @@ ContactsXmlHandler::startElement (const QString        &namespaceURI,
                 currPhone.Type = PType_Other;
             }
         }
+
+        if (qName == "gd:deleted")
+        {
+            currInfo.bDeleted = true;
+        }
     } while (0); // End cleanup block (not a loop)
     return (true);
 }//ContactsXmlHandler::startElement
@@ -86,7 +91,8 @@ ContactsXmlHandler::endElement (const QString &namespaceURI,
         {
             bEntryStarted = false;
 
-            if (0 != currInfo.arrPhones.size ())
+            if ((0 != currInfo.arrPhones.size ()) ||
+                (currInfo.bDeleted))
             {
                 countUsableContacts ++;
                 emit oneContact (currInfo);

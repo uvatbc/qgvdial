@@ -118,14 +118,21 @@ typedef QVector<PhoneInfo> PhoneInfoArray;
 
 struct ContactInfo
 {
+    //! Unique ID for this contact
     QString         strId;
+    //! Contact title a.k.a. the contact name
     QString         strTitle;
+    //! Array of phones for this contact
     PhoneInfoArray  arrPhones;
+
+    //! Is this contact deleted?
+    bool            bDeleted;
 
     void init () {
         strId.clear ();
         strTitle.clear ();
         arrPhones.clear ();
+        bDeleted = false;
     }
 };
 ////////////////////////////////////////////////////////////////////////////////
