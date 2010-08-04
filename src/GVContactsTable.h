@@ -59,7 +59,6 @@ private slots:
 
 private:
     void contextMenuEvent (QContextMenuEvent * event);
-    void refreshContactsFromContactsAPI ();
 
     QNetworkReply *
     postRequest (QString         strUrl,
@@ -98,6 +97,9 @@ private:
 
     //! Is the user logged in?
     bool            bLoggedIn;
+
+    //! Is the contacts refresh an update process?
+    bool            bRefreshIsUpdate;
 
     //! The link to the current contact
     QString         strSavedLink;

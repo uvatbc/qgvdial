@@ -36,6 +36,9 @@ public:
     bool putContactInfo (const GVContactInfo &info);
     bool getContactInfo (GVContactInfo &info);
 
+    bool setLastContactUpdate (const QString &strDateTime);
+    bool getLastContactUpdate (QString &strDateTime);
+
 signals:
     void log(const QString &strText, int level = 10);
     void status(const QString &strText, int timeout = 2000);

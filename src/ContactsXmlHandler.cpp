@@ -1,6 +1,6 @@
 #include "ContactsXmlHandler.h"
 
-ContactsXmlHandler::ContactsXmlHandler(QObject *parent)
+ContactsXmlHandler::ContactsXmlHandler (QObject *parent)
 : QObject(parent)
 , QXmlDefaultHandler ()
 , bEntryStarted (false)

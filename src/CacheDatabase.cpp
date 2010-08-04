@@ -5,10 +5,11 @@
 #define GV_S_NAME           "name"
 #define GV_S_VALUE          "value"
 
-#define GV_S_VAR_USER       "user"
-#define GV_S_VAR_PASS       "password"
-#define GV_S_VAR_CALLBACK   "callback"
-#define GV_S_VAR_DB_VER     "db_ver"
+#define GV_S_VAR_USER           "user"
+#define GV_S_VAR_PASS           "password"
+#define GV_S_VAR_CALLBACK       "callback"
+#define GV_S_VAR_DB_VER         "db_ver"
+#define GV_S_VAR_CONTACT_UPDATE "contact update"
 ////////////////////////////////////////////////////////////////////////////////
 #define GV_S_VALUE_DB_VER   "2010-08-03 11:08:00"
 ////////////////////////////// GV Contacts table ///////////////////////////////
@@ -410,3 +411,42 @@ CacheDatabase::getContactInfo (GVContactInfo &info)
 
     return (rv);
 }//CacheDatabase::saveContactInfo
+
+bool
+CacheDatabase::setLastContactUpdate (const QString &strDateTime)
+{
+    QSqlQuery query(dbMain);
+    query.setForwardOnly (true);
+
+    QString strQ;
+    if (getLastContactUpdate (strQ))
+    {
+        query.exec ("DELETE FROM " GV_SETTINGS_TABLE
+                    " WHERE " GV_S_NAME "='" GV_S_VAR_CONTACT_UPDATE "'");
+    }
+
+    strQ = QString ("INSERT INTO " GV_SETTINGS_TABLE
+                    " (" GV_S_NAME "," GV_S_VALUE ")"
+                    " VALUES ('" GV_S_VAR_CONTACT_UPDATE "', '%1')")
+           .arg(strDateTime);
+    query.exec (strQ);
+
+    return (true);
+}//CacheDatabase::setLastContactUpdate
+
+bool
+CacheDatabase::getLastContactUpdate (QString &strDateTime)
+{
+    QSqlQuery query(dbMain);
+    query.setForwardOnly (true);
+
+    query.exec ("SELECT " GV_S_VALUE " FROM " GV_SETTINGS_TABLE
+                " WHERE " GV_S_NAME "='" GV_S_VAR_CONTACT_UPDATE "'");
+    if (query.next ())
+    {
+        strDateTime = query.value(0).toString();
+        return (true);
+    }
+
+    return (false);
+}//CacheDatabase::getLastContactUpdate

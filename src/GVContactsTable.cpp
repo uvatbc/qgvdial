@@ -47,19 +47,6 @@ GVContactsTable::GVContactsTable (QWidget *parent)
         this, SLOT   (activatedContact (const QModelIndex &)));
 }//GVContactsTable::GVContactsTable
 
-void
-GVContactsTable::refreshContacts ()
-{
-    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    QMutexLocker locker(&mutex);
-    dbMain.clearContacts ();
-    strSavedLink.clear ();
-    nContacts = 0;
-
-    emit status ("Retrieving contacts", 0);
-    refreshContactsFromContactsAPI ();
-}//GVContactsTable::refreshContacts
-
 QNetworkReply *
 GVContactsTable::postRequest (QString         strUrl,
                               QStringPairList arrPairs,
@@ -116,13 +103,30 @@ GVContactsTable::getRequest (QString         strUrl,
 }//GVContactsTable::getRequest
 
 void
-GVContactsTable::refreshContactsFromContactsAPI ()
+GVContactsTable::refreshContacts ()
 {
-    QString strUrl = QString ("http://www.google.com/m8/feeds/contacts/%1/full"
-                              "?max-results=10000")
-                        .arg (strUser);
-    //strUrl.replace ('@', "%40");
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    QMutexLocker locker(&mutex);
+    QString strUpdate, strUrl;
 
+    strSavedLink.clear ();
+    strUrl = QString ("http://www.google.com/m8/feeds/contacts/%1/full"
+                      "?max-results=10000")
+                        .arg (strUser);
+
+    bRefreshIsUpdate = false;
+    if ((dbMain.getLastContactUpdate (strUpdate)) && (0 != strUpdate.size ()))
+    {
+        strUrl += QString ("&updated-min=%1").arg (strUpdate);
+        bRefreshIsUpdate = true;
+    }
+    else
+    {
+        dbMain.clearContacts ();
+        nContacts = 0;
+    }
+
+    emit status ("Retrieving contacts", 0);
     getRequest (strUrl, this , SLOT (onGotContacts (QNetworkReply *)));
 }//GVContactsTable::refreshContactsFromContactsAPI
 
@@ -332,7 +336,16 @@ GVContactsTable::onCaptchaDone (bool bOk, const QString &strCaptcha)
 void
 GVContactsTable::onGotContacts (QNetworkReply *reply)
 {
+    QObject::disconnect (&nwMgr, SIGNAL (finished (QNetworkReply *)),
+                          this , SLOT   (onGotContacts (QNetworkReply *)));
     emit status ("Contacts retrieved, parsing", 0);
+
+    QDateTime currDT = QDateTime::currentDateTime().toUTC ();
+    QString strDateTime = QString ("%1T%2")
+                            .arg (currDT.toString ("yyyy-MM-dd"))
+                            .arg (currDT.toString ("hh:mm:ss"));
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    dbMain.setLastContactUpdate (strDateTime);
 
     QXmlInputSource inputSource (reply);
     QXmlSimpleReader simpleReader;
@@ -364,8 +377,66 @@ GVContactsTable::onGotContacts (QNetworkReply *reply)
 void
 GVContactsTable::gotOneContact (const ContactInfo &contactInfo)
 {
-    emit oneContact (nContacts, contactInfo);
-
     QMutexLocker locker(&mutex);
-    nContacts++;
+
+    if (!bRefreshIsUpdate)
+    {
+        emit oneContact (nContacts, contactInfo);
+        nContacts++;
+        return;
+    }
+
+    do // Begin cleanup block (not a loop)
+    {
+        QModelIndex idxStart = this->model()->index (0,1);
+        if (!idxStart.isValid ())
+        {
+            emit log ("Invalid starting index for contact update", 3);
+            break;
+        }
+        QModelIndexList listMatches =
+        this->model()->match (idxStart, Qt::DisplayRole, contactInfo.strId);
+        if (0 == listMatches.size ())
+        {
+            emit log ("No matches found for ID to update contact", 3);
+            break;
+        }
+
+        // update the model entry
+        QModelIndex idxId = listMatches[0];
+        QModelIndex idxName = idxId.sibling (idxId.row (), 0);
+        this->model()->setData (idxName, contactInfo.strTitle);
+
+        // update dbMain.CACHE
+        GVContactInfo gvContactInfo;
+        gvContactInfo.strLink = contactInfo.strId;
+        gvContactInfo.strName = contactInfo.strTitle;
+
+        foreach (PhoneInfo pInfo, contactInfo.arrPhones)
+        {
+            GVContactNumber gvcn;
+            switch (pInfo.Type)
+            {
+            case PType_Mobile:
+                gvcn.chType = 'M';
+                break;
+            case PType_Home:
+                gvcn.chType = 'H';
+                break;
+            case PType_Other:
+                gvcn.chType = 'O';
+                break;
+            default:
+                gvcn.chType = '?';
+                break;
+            }
+
+            gvcn.strNumber = pInfo.strNumber;
+
+            gvContactInfo.arrPhones += gvcn;
+        }
+
+        CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+        dbMain.putContactInfo (gvContactInfo);
+    } while (0); // End cleanup block (not a loop)
 }//GVContactsTable::gotOneContact
