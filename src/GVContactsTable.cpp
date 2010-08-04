@@ -266,24 +266,6 @@ GVContactsTable::onLoginResponse (QNetworkReply *reply)
             {
                 strCaptchaUrl = arrPair[1];
             }
-            else
-            {
-                if (2 == arrPair.size ())
-                {
-                    msg = QString ("key = \"%1\", value = \"%2\"")
-                            .arg (arrPair[0]).arg (arrPair[1]);
-                }
-                else if (1 == arrPair.size ())
-                {
-                    msg = QString ("key = \"%1\"")
-                            .arg (arrPair[0]);
-                }
-                else
-                {
-                    msg = "Empty pair?!?";
-                }
-                emit log (msg);
-            }
         }
 
         if (0 != strCaptchaUrl.size ())
@@ -353,9 +335,9 @@ GVContactsTable::onGotContacts (QNetworkReply *reply)
     ContactsXmlHandler contactsHandler;
 
     QObject::connect (&contactsHandler, SIGNAL (log(const QString &, int)),
-                       this,            SLOT   (log(const QString &, int)));
+                       this,            SIGNAL (log(const QString &, int)));
     QObject::connect (&contactsHandler, SIGNAL (status(const QString &, int)),
-                       this,            SLOT   (status(const QString &, int)));
+                       this,            SIGNAL (status(const QString &, int)));
 
     QObject::connect (
         &contactsHandler, SIGNAL (oneContact (const ContactInfo &)),
@@ -426,7 +408,7 @@ GVContactsTable::gotOneContact (const ContactInfo &contactInfo)
         nContacts++;
         return;
     }
-    
+
     QModelIndex idxId = listMatches[0];
     if (!idxId.isValid ())
     {
