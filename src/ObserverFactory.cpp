@@ -7,7 +7,7 @@
 ClientRegistrarPtr  clientRegistrar;
 #endif
 
-#if (defined (Q_WS_X11) && !defined (Q_WS_MAEMO_5)) || defined(Q_WS_WIN32)
+#if LINUX_DESKTOP || defined(Q_WS_WIN32)
 #include "SkypeObserver.h"
 #endif
 
@@ -61,7 +61,7 @@ ObserverFactory::init ()
 #endif
 
     // Observer for Skype on desktop Linux and desktop Windows
-#if (defined (Q_WS_X11) && !defined (Q_WS_MAEMO_5)) || defined(Q_WS_WIN32)
+#if LINUX_DESKTOP || defined(Q_WS_WIN32)
     SkypeObserver *skypeObs = new SkypeObserver ();
 
     QObject::connect (

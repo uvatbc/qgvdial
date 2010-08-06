@@ -14,7 +14,7 @@ ContactsXmlHandler::~ContactsXmlHandler(void)
 }//ContactsXmlHandler::~ContactsXmlHandler
 
 bool
-ContactsXmlHandler::startElement (const QString        &namespaceURI,
+ContactsXmlHandler::startElement (const QString        & /*namespaceURI*/,
                                   const QString        &localName   ,
                                   const QString        &qName       ,
                                   const QXmlAttributes &atts        )
@@ -66,9 +66,9 @@ ContactsXmlHandler::startElement (const QString        &namespaceURI,
 }//ContactsXmlHandler::startElement
 
 bool
-ContactsXmlHandler::endElement (const QString &namespaceURI,
-                                const QString &localName   ,
-                                const QString &qName       )
+ContactsXmlHandler::endElement (const QString & /*namespaceURI*/,
+                                const QString &localName        ,
+                                const QString & /*qName*/       )
 {
     QString msg;
     do // Begin cleanup block (not a loop)

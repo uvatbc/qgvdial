@@ -1,4 +1,5 @@
 #include "OsDependent.h"
+#include "QGVDbusServer.h"
 
 OsDependent::OsDependent(QObject *parent) : QObject(parent)
 {
@@ -26,6 +27,20 @@ OsDependent::isN900 ()
 #endif
 }//OsDependent::isN900
 
+void
+OsDependent::initDialServer (QObject *receiver, const char *method)
+{
+#if TELEPATHY_CAPABLE
+    static QGVDbusServer *pDialServer = NULL;
+    if (NULL == pDialServer) {
+        pDialServer = new QGVDbusServer (this);
+        pDialServer->addCallReceiver (receiver, method);
+
+        QDBusConnection::sessionBus().registerObject (
+                "/org/QGVDial/CallServer", this);
+    }
+#endif
+}//OsDependent::initDialServer
 
 #ifdef QT_NO_SYSTEMTRAYICON
 QSystemTrayIcon::QSystemTrayIcon(QWidget *parent/* = 0*/) : QWidget (parent)

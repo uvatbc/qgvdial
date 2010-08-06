@@ -1,7 +1,7 @@
 #include "SkypeClientFactory.h"
 #include "SkypeClient.h"
 
-#if defined(Q_WS_X11) && !defined(Q_WS_MAEMO_5)
+#if LINUX_DESKTOP
 #include "SkypeLinuxClient.h"
 #endif
 #ifdef Q_WS_WIN32
@@ -44,7 +44,7 @@ SkypeClientFactory::ensureSkypeClient (const QString &name)
         return (client);
     }
 
-#if defined(Q_WS_X11) && !defined(Q_WS_MAEMO_5)
+#if LINUX_DESKTOP
     client = new SkypeLinuxClient (name);
     Q_UNUSED (mainwin);
 #endif

@@ -307,7 +307,7 @@ GVContactsTable::onLoginResponse (QNetworkReply *reply)
 }//GVContactsTable::onLoginResponse
 
 void
-GVContactsTable::onCaptchaDone (bool bOk, const QString &strCaptcha)
+GVContactsTable::onCaptchaDone (bool bOk, const QString & /*strCaptcha*/)
 {
     // No point disconnecting anything because the widget is going to delete
     // itself anyway.

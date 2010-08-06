@@ -202,8 +202,10 @@ MainWindow::init ()
 {
     GVAccess &webPage = Singletons::getRef().getGVAccess ();
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    OsDependent &osd = Singletons::getRef().getOSD ();
 
     dbMain.init ();
+    osd.initDialServer (this, SLOT (dialNow (const QString &)));
 
     this->setWindowIcon (icoGoogle);
     if (QSystemTrayIcon::isSystemTrayAvailable ())

@@ -1,8 +1,7 @@
 #ifndef __OSDEPENDENT_H__
 #define __OSDEPENDENT_H__
 
-#include <QtCore>
-#include <QtGui>
+#include "global.h"
 
 #if defined (Q_OS_UNIX) && !defined (Q_OS_SYMBIAN)
 #include <TelepathyQt4/Constants>
@@ -19,6 +18,7 @@ class OsDependent : public QObject
 public:
     void init ();
     bool isN900 ();
+    void initDialServer (QObject *receiver, const char *method);
 
 private:
     OsDependent(QObject *parent = 0);

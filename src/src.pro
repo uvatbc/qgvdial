@@ -92,12 +92,14 @@ SOURCES +=  main.cpp                    \
 
 RESOURCES = qgvdial.qrc
 
-# In Linux and maemo, add the telepathy libraries, sources and headers
+# In Linux and maemo, add the telepathy related sources and headers
 unix:!symbian {
     HEADERS +=  TpObserver.h            \
-                TpCalloutInitiator.h
+                TpCalloutInitiator.h    \
+                QGVDbusServer.h
     SOURCES +=  TpObserver.cpp          \
-                TpCalloutInitiator.cpp
+                TpCalloutInitiator.cpp  \
+                QGVDbusServer.cpp
 }
 
 # In desktop Linux, add the Skype client

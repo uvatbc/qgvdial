@@ -4,7 +4,7 @@
 #include "global.h"
 #include "CalloutInitiator.h"
 
-#if defined(Q_WS_X11)
+#if TELEPATHY_CAPABLE
 #include <TelepathyQt4/AccountManager>
 #include <TelepathyQt4/SharedPtr>
 #include <TelepathyQt4/PendingReady>
@@ -23,12 +23,12 @@ public:
 private:
     void init ();
 
-#if defined(Q_WS_X11)
+#if TELEPATHY_CAPABLE
 private slots:
     void onAccountManagerReady(Tp::PendingOperation *op);
     void onAccountReady(Tp::PendingOperation *op);
     void onAllAccountsReady();
-#endif
+#endif // TELEPATHY_CAPABLE
 
 signals:
     void log(const QString &strText, int level = 10);
@@ -39,7 +39,7 @@ private:
 
     QMutex  mutex;
 
-#if defined(Q_WS_X11)
+#if TELEPATHY_CAPABLE
     Tp::AccountManagerPtr   actMgr;
     QList<Tp::AccountPtr>   allAccounts;
 

@@ -1,17 +1,17 @@
 #include "CallInitiatorFactory.h"
 
-#if (defined(Q_WS_X11) && !defined(Q_WS_MAEMO_5)) || defined (Q_WS_WIN32)
+#if LINUX_DESKTOP || defined (Q_WS_WIN32)
 #include "DesktopSkypeCallInitiator.h"
 #endif
 
-#if defined(Q_WS_X11)
+#if TELEPATHY_CAPABLE
 #include "TpCalloutInitiator.h"
 #endif
 
 CallInitiatorFactory::CallInitiatorFactory (QObject *parent)
 : QObject(parent)
 , mutex (QMutex::Recursive)
-#if defined(Q_WS_X11)
+#if TELEPATHY_CAPABLE
 , actMgr (Tp::AccountManager::create ())
 , bAccountsReady (false)
 #endif
@@ -28,7 +28,7 @@ CallInitiatorFactory::getInitiators ()
 void
 CallInitiatorFactory::init ()
 {
-#if (defined(Q_WS_X11) && !defined(Q_WS_MAEMO_5)) || defined (Q_WS_WIN32)
+#if LINUX_DESKTOP || defined (Q_WS_WIN32)
     CalloutInitiator *initiator = new DesktopSkypeCallInitiator (this);
     listInitiators += initiator;
 
@@ -40,14 +40,14 @@ CallInitiatorFactory::init ()
         this     , SIGNAL (status(const QString &, int)));
 #endif
 
-#if defined(Q_WS_X11)
+#if TELEPATHY_CAPABLE
     QObject::connect (
          actMgr->becomeReady (), SIGNAL (finished(Tp::PendingOperation*)),
          this, SLOT (onAccountManagerReady (Tp::PendingOperation *)));
 #endif
 }//CallInitiatorFactory::init
 
-#if defined(Q_WS_X11)
+#if TELEPATHY_CAPABLE
 
 void
 CallInitiatorFactory::onAccountManagerReady (Tp::PendingOperation *op)
@@ -127,4 +127,4 @@ CallInitiatorFactory::onAllAccountsReady ()
     }
 }//CallInitiatorFactory::onAllAccountsReady
 
-#endif
+#endif// TELEPATHY_CAPABLE

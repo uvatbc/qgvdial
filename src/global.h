@@ -137,4 +137,17 @@ struct ContactInfo
 };
 ////////////////////////////////////////////////////////////////////////////////
 
+#if defined(Q_WS_X11) && !defined(Q_WS_MAEMO_5)
+#define LINUX_DESKTOP 1
+#else
+#define LINUX_DESKTOP 0
+#endif
+
+#if defined(Q_WS_X11)
+#define TELEPATHY_CAPABLE 1
+#else
+#define TELEPATHY_CAPABLE 0
+#endif
+
+
 #endif //__GLOBAL_H__
