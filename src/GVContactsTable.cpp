@@ -13,6 +13,7 @@ GVContactsTable::GVContactsTable (QWidget *parent)
 , actSendSMS("SMS", this)
 , mutex(QMutex::Recursive)
 , bLoggedIn(false)
+, bRefreshRequested (false)
 {
     // Not modifyable
     this->setEditTriggers (QAbstractItemView::NoEditTriggers);
@@ -105,8 +106,15 @@ GVContactsTable::getRequest (QString         strUrl,
 void
 GVContactsTable::refreshContacts ()
 {
-    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     QMutexLocker locker(&mutex);
+    if (!bLoggedIn)
+    {
+        bRefreshRequested = true;
+        return;
+    }
+    bRefreshRequested = false;
+
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     QString strUpdate, strUrl;
 
     strSavedLink.clear ();
@@ -149,7 +157,6 @@ void
 GVContactsTable::loginSuccess ()
 {
     QMutexLocker locker(&mutex);
-    bLoggedIn = true;
 
     QStringPairList arrPairs;
     arrPairs += QStringPair("accountType", "GOOGLE");
@@ -286,7 +293,15 @@ GVContactsTable::onLoginResponse (QNetworkReply *reply)
             break;
         }
 
+        QMutexLocker locker (&mutex);
+        bLoggedIn = true;
+
         emit log ("Login success");
+
+        if (bRefreshRequested)
+        {
+            refreshContacts ();
+        }
     } while (0); // End cleanup block (not a loop)
     reply->deleteLater ();
 }//GVContactsTable::onLoginResponse
@@ -323,6 +338,8 @@ GVContactsTable::onGotContacts (QNetworkReply *reply)
                           this , SLOT   (onGotContacts (QNetworkReply *)));
     emit status ("Contacts retrieved, parsing", 0);
 
+    bool rv = false;
+    QString msg;
     QDateTime currDT = QDateTime::currentDateTime().toUTC ();
     QString strDateTime = QString ("%1T%2")
                             .arg (currDT.toString ("yyyy-MM-dd"))
@@ -330,27 +347,39 @@ GVContactsTable::onGotContacts (QNetworkReply *reply)
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     dbMain.setLastContactUpdate (strDateTime);
 
-    QXmlInputSource inputSource (reply);
+    QXmlInputSource inputSource;
     QXmlSimpleReader simpleReader;
     ContactsXmlHandler contactsHandler;
 
-    QObject::connect (&contactsHandler, SIGNAL (log(const QString &, int)),
-                       this,            SIGNAL (log(const QString &, int)));
-    QObject::connect (&contactsHandler, SIGNAL (status(const QString &, int)),
-                       this,            SIGNAL (status(const QString &, int)));
+    do // Begin cleanup block (not a loop)
+    {
+        QString strData = reply->readAll ();
+        if (strData.contains ("Authorization required"))
+        {
+            msg = "Authorization failed.";
+            break;
+        }
+        inputSource.setData (strData);
 
-    QObject::connect (
-        &contactsHandler, SIGNAL (oneContact (const ContactInfo &)),
-         this,            SLOT   (gotOneContact (const ContactInfo &)));
+        QObject::connect (&contactsHandler, SIGNAL (log(const QString &, int)),
+            this,            SIGNAL (log(const QString &, int)));
+        QObject::connect (&contactsHandler, SIGNAL (status(const QString &, int)),
+            this,            SIGNAL (status(const QString &, int)));
 
-    simpleReader.setContentHandler (&contactsHandler);
-    simpleReader.setErrorHandler (&contactsHandler);
+        QObject::connect (
+            &contactsHandler, SIGNAL (oneContact (const ContactInfo &)),
+            this,            SLOT   (gotOneContact (const ContactInfo &)));
 
-    bool rv = simpleReader.parse (&inputSource, false);
+        simpleReader.setContentHandler (&contactsHandler);
+        simpleReader.setErrorHandler (&contactsHandler);
 
-    QString msg = QString("Contact parsing done. total = %1. usable = %2")
-                    .arg (contactsHandler.getTotalContacts ())
-                    .arg (contactsHandler.getUsableContacts ());
+        rv = simpleReader.parse (&inputSource, false);
+
+        msg = QString("Contact parsing done. total = %1. usable = %2")
+                .arg (contactsHandler.getTotalContacts ())
+                .arg (contactsHandler.getUsableContacts ());
+    } while (0); // End cleanup block (not a loop)
+
     emit status (msg);
     emit allContacts (rv);
 

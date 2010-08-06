@@ -100,6 +100,9 @@ private:
     //! Is the user logged in?
     bool            bLoggedIn;
 
+    //! Refresh requested but waiting for login
+    bool            bRefreshRequested;
+
     //! Is the contacts refresh an update process?
     bool            bRefreshIsUpdate;
 

@@ -431,6 +431,8 @@ MainWindow::doLogin (const QString &strU, const QString &strP)
     bool bOk = false;
     do // Begin cleanup block (not a loop)
     {
+        pContactsTable->setUserPass (strU, strP);
+
         QVariantList l;
         l += strU;
         l += strP;
@@ -475,9 +477,6 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
     else
     {
         strSelfNumber = varList[varList.size()-1].toString ();
-
-        pContactsTable->setUserPass (varList[0].toString (),
-                                     varList[1].toString ());
         emit loginSuccess ();
     }
 }//MainWindow::loginCompleted
