@@ -1,5 +1,8 @@
 #include "OsDependent.h"
+
+#if TELEPATHY_CAPABLE
 #include "QGVDbusServer.h"
+#endif
 
 OsDependent::OsDependent(QObject *parent) : QObject(parent)
 {
@@ -8,7 +11,7 @@ OsDependent::OsDependent(QObject *parent) : QObject(parent)
 void
 OsDependent::init ()
 {
-#if defined (Q_OS_UNIX) && !defined (Q_OS_SYMBIAN)
+#if TELEPATHY_CAPABLE
     Tp::registerTypes();
 #if !NO_DBGINFO
     Tp::enableDebug(true);
