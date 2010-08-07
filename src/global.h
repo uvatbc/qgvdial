@@ -50,6 +50,9 @@ struct GVRegisteredNumber
 {
     QString     strDisplayName;
     QString     strNumber;
+    char        chType;
+
+    GVRegisteredNumber () {chType = 0;}
 };
 typedef QVector<GVRegisteredNumber> GVRegisteredNumberArray;
 

@@ -737,7 +737,7 @@ GVWebPage::getRegisteredPhones ()
         return (false);
     }
 
-    QString strGoto = GV_HTTPS_M "/phones";
+    QString strGoto = GV_HTTPS_M "/selectphone";
     QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
                        this   , SLOT   (phonesListLoaded (bool)));
     this->loadUrlString (strGoto);
@@ -759,7 +759,7 @@ GVWebPage::phonesListLoaded (bool bOk)
             break;
         }
 
-#define GVSELECTOR "div form div input[name=\"ephones\"]"
+#define GVSELECTOR "div form div input[type=\"radio\"]"
         QWebElementCollection numbers = doc().findAll (GVSELECTOR);
 #undef GVSELECTOR
         if (0 == numbers.count ())
@@ -770,6 +770,7 @@ GVWebPage::phonesListLoaded (bool bOk)
 
         QString strText = numbers[0].parent().toPlainText ();
         QStringList astrPhones = strText.split ("\n", QString::SkipEmptyParts);
+        int index = 0;
         foreach (strText, astrPhones)
         {
             GVRegisteredNumber regNumber;
@@ -780,7 +781,19 @@ GVWebPage::phonesListLoaded (bool bOk)
             // Make the actual number follow the form: +1aaabbbcccc
             regNumber.strNumber.remove (QRegExp("[ \t\n()-]"));
             regNumber.strNumber = "+1" + regNumber.strNumber;
+
+            QString strFromInput = numbers[index].attribute("value");
+            QRegExp rx1("(\\+{0,1}\\d*)\\|(.)");
+            if ((strFromInput.contains (rx1)) && (2 == rx1.captureCount ()))
+            {
+                QString strTemp = rx1.cap (1);
+                simplify_number (strTemp);
+                if (strTemp == regNumber.strNumber) {
+                    regNumber.chType = rx1.cap (2)[0].toAscii ();
+                }
+            }
             emit registeredPhone (regNumber);
+            index++;
         }
 
         bOk = true;

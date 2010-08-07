@@ -11,7 +11,10 @@
 #define GV_S_VAR_DB_VER         "db_ver"
 #define GV_S_VAR_CONTACT_UPDATE "contact update"
 ////////////////////////////////////////////////////////////////////////////////
-#define GV_S_VALUE_DB_VER   "2010-08-03 11:08:00"
+// Started using Google Contacts API
+//#define GV_S_VALUE_DB_VER   "2010-08-03 11:08:00"
+// Registered numbers now include the phone type.
+#define GV_S_VALUE_DB_VER   "2010-08-07 13:48:26"
 ////////////////////////////// GV Contacts table ///////////////////////////////
 #define GV_CONTACTS_TABLE   "gvcontacts"
 #define GV_C_ID             "id"
@@ -30,6 +33,7 @@
 #define GV_REG_NUMS_TABLE   "gvregnumbers"
 #define GV_RN_NAME          "name"
 #define GV_RN_NUM           "number"
+#define GV_RN_TYPE          "type"
 ////////////////////////////////////////////////////////////////////////////////
 
 CacheDatabase::CacheDatabase(const QSqlDatabase & other, QObject *parent)
@@ -93,6 +97,9 @@ CacheDatabase::init ()
         query.exec ("DROP TABLE " GV_LINKS_TABLE);
         query.exec ("DROP TABLE " GV_REG_NUMS_TABLE);
 
+        // Clear out all settings as well
+        query.exec ("DELETE FROM " GV_SETTINGS_TABLE);
+
         // Delete the DB version number (if it exists)
         query.exec ("INSERT INTO " GV_SETTINGS_TABLE " "
                     "(" GV_S_NAME "," GV_S_VALUE ") VALUES "
@@ -130,7 +137,8 @@ CacheDatabase::init ()
     {
         query.exec ("CREATE TABLE " GV_REG_NUMS_TABLE " "
                     "(" GV_RN_NAME  " varchar, "
-                        GV_RN_NUM   " varchar)");
+                        GV_RN_NUM   " varchar, "
+                        GV_RN_TYPE  " tinyint)");
     }
 }//CacheDatabase::init
 
@@ -262,12 +270,15 @@ CacheDatabase::getRegisteredNumbers (GVRegisteredNumberArray &listNumbers)
     QSqlQuery query(dbMain);
     query.setForwardOnly (true);
 
-    query.exec ("SELECT " GV_RN_NAME ", " GV_RN_NUM " FROM " GV_REG_NUMS_TABLE);
+    query.exec ("SELECT " GV_RN_NAME ", " GV_RN_NUM ", " GV_RN_TYPE " "
+                "FROM " GV_REG_NUMS_TABLE);
     while (query.next ())
     {
         GVRegisteredNumber num;
         num.strDisplayName = query.value(0).toString();
         num.strNumber      = query.value(1).toString();
+        num.chType         = QString("%1").arg (query.value(2).toInt())[0].toAscii ();
+        num.chType         = query.value(2).toString()[0].toAscii ();
         listNumbers += num;
     }
 
@@ -292,10 +303,11 @@ CacheDatabase::putRegisteredNumbers (const GVRegisteredNumberArray &listNumbers)
         foreach (GVRegisteredNumber num, listNumbers)
         {
             strQ = QString ("INSERT INTO " GV_REG_NUMS_TABLE
-                            " (" GV_RN_NAME ", " GV_RN_NUM ") "
-                            "VALUES ('%1', '%2')")
+                            " (" GV_RN_NAME ", " GV_RN_NUM ", " GV_RN_TYPE ") "
+                            "VALUES ('%1', '%2'', %3)")
                     .arg (num.strDisplayName)
-                    .arg (num.strNumber);
+                    .arg (num.strNumber)
+                    .arg (num.chType);
             query.exec (strQ);
         }
     } while (0); // End cleanup block (not a loop)
