@@ -33,6 +33,8 @@ private slots:
     void loginStage1 (bool bOk);
     //! Invoked when the google voice main page (after login) is loaded
     void loginStage2 (bool bOk);
+    //! Invoked when we look at the inbox page for the rnr_se
+    void loginStage3 (bool bOk);
 
     //! Invoked when the logout page has loaded
     void logoutDone (bool bOk);

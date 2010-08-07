@@ -233,16 +233,12 @@ GVWebPage::loginStage2 (bool bOk)
                     bLoggedIn = true;
                 }
             }
+            QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
+                               this   , SLOT   (loginStage3 (bool)));
+            this->loadUrlString (GV_HTTPS_M "/i/all");
         }
         else
         {
-            QWebFrame *frame = doc().webFrame();
-            if (NULL == frame)
-            {
-                emit log ("No frame!!", 3);
-                break;
-            }
-
             if (!isLoggedIn ())
             {
                 emit log ("Failed to log in!", 3);
@@ -274,13 +270,62 @@ GVWebPage::loginStage2 (bool bOk)
             strRnr_se = rnr_se.attribute ("value");
 
             bLoggedIn = true;
+            completeCurrentWork (GVAW_login, true);
         }
 
         bOk = true;
     } while (0); // End cleanup block (not a loop)
 
-    completeCurrentWork (GVAW_login, bOk);
+    if (!bOk) {
+        completeCurrentWork (GVAW_login, false);
+    }
 }//GVWebPage::loginStage2
+
+void
+GVWebPage::loginStage3 (bool bOk)
+{
+    QObject::disconnect (&webPage, SIGNAL (loadFinished (bool)),
+                          this   , SLOT   (loginStage3 (bool)));
+    do // Begin cleanup block (not a loop)
+    {
+        if (isLoadFailed (bOk))
+        {
+            bOk = false;
+            emit log ("Page load actual login failed", 3);
+            break;
+        }
+        bOk = false;
+
+        // Whats the GV number?
+#define GVSELECTOR "div b[class=\"ms3\"]"
+        QWebElement num = doc().findFirst (GVSELECTOR);
+#undef GVSELECTOR
+        if (num.isNull ())
+        {
+            emit log ("Failed to get a google voice number!!", 3);
+            break;
+        }
+
+        strSelfNumber = num.toPlainText ();
+        simplify_number (strSelfNumber, false);
+        workCurrent.arrParams += QVariant (strSelfNumber);
+
+#define GVSELECTOR "input[name=\"_rnr_se\"]"
+        QWebElement rnr_se = doc().findFirst (GVSELECTOR);
+#undef GVSELECTOR
+        if (rnr_se.isNull ())
+        {
+            emit log ("Could not find rnr_se", 3);
+            break;
+        }
+        strRnr_se = rnr_se.attribute ("value");
+
+        bLoggedIn = true;
+        bOk = true;
+    } while (0); // End cleanup block (not a loop)
+
+    completeCurrentWork (GVAW_login, bOk);
+}//GVWebPage::loginStage3
 
 bool
 GVWebPage::logout ()
@@ -497,10 +542,10 @@ GVWebPage::dialCallback (bool bCallback)
         arrPairs += QStringPair("forwardingNumber", arrParams[1].toString());
         arrPairs += QStringPair("subscriberNumber", strSelfNumber);
         //arrPairs += QStringPair("phoneType"       , QString(chCurrentCallbackType));
-        arrPairs += QStringPair("phoneType"       , "undefined");
+        arrPairs += QStringPair("phoneType"       , "7"); //"undefined");
         arrPairs += QStringPair("remember"        , "1");
         arrPairs += QStringPair("_rnr_se"         , strRnr_se);
-        postRequest (GV_DATA_BASE "/call/connect/", arrPairs, QString (),
+        postRequest (GV_DATA_BASE "/call/connect/", arrPairs, UA_N900,
                      this, SLOT (onDataCallDone (QNetworkReply *)));
     }
 
