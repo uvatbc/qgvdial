@@ -39,8 +39,9 @@ OsDependent::initDialServer (QObject *receiver, const char *method)
         pDialServer = new QGVDbusServer (this);
         pDialServer->addCallReceiver (receiver, method);
 
-        QDBusConnection::sessionBus().registerObject (
-                "/org/QGVDial/CallServer", this);
+        QDBusConnection sessionBus = QDBusConnection::sessionBus();
+        sessionBus.registerObject ("/org/QGVDial/CallServer", this);
+        sessionBus.registerService("org.QGVDial.CallServer");
     }
 #endif
 }//OsDependent::initDialServer

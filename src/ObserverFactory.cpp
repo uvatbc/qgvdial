@@ -1,3 +1,4 @@
+#include "global.h"
 #include "ObserverFactory.h"
 
 #if defined (Q_OS_UNIX) && !defined (Q_OS_SYMBIAN)

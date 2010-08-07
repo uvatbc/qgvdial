@@ -1,3 +1,4 @@
+#include "global.h"
 #include "CallInitiatorFactory.h"
 
 #if LINUX_DESKTOP || defined (Q_WS_WIN32)

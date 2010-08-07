@@ -15,6 +15,10 @@ DesktopSkypeCallInitiator::initiateCall (const QString &strDestination)
         if (NULL == skypeClient) {
             skypeClient = Singletons::getRef().getSkypeFactory()
                             .ensureSkypeClient (SKYPE_CLIENT_NAME);
+            if (NULL == skypeClient) {
+                emit log ("Failed to create skype Client!");
+                break;
+            }
         }
 
         // Save it for onSkypeConnected
