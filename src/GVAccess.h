@@ -14,7 +14,7 @@ enum GVAccess_Work {
     GVAW_logout,
     GVAW_getAllContacts,
     GVAW_getContactFromLink,        // Page link and default number
-    GVAW_dialCallback,              // Destination number, callback number
+    GVAW_dialCallback,              // Destination number, callback number, type
     GVAW_dialOut,                   // Destination number, callout number
     GVAW_getRegisteredPhones,
     GVAW_getHistory,                // type, start page, page count

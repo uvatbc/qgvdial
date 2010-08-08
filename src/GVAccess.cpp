@@ -104,7 +104,6 @@ GVAccess::enqueueWork (GVAccess_Work whatwork, const QVariantList &params,
         }
         break;
 
-    case GVAW_dialCallback:         // Destination number and callback
     case GVAW_getContactFromLink:   // Page link and default number
     case GVAW_login:                // user and password
     case GVAW_sendSMS:              // Number, text
@@ -116,6 +115,7 @@ GVAccess::enqueueWork (GVAccess_Work whatwork, const QVariantList &params,
         }
         break;
 
+    case GVAW_dialCallback:         // Destination number, callback and type
     case GVAW_dialOut:              // Destination, callout, and context var
     case GVAW_getHistory:           // type, start page, page count
         if (3 != params.size ())
@@ -371,7 +371,7 @@ GVAccess::dialCanFinish ()
     }
     else
     {
-        emit log ("Cannot cancel a call that is not in progress", 3);
+        emit log ("Cannot complete a call that is not in progress", 3);
     }
 }//GVAccess::dialCanFinish
 

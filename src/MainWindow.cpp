@@ -753,12 +753,12 @@ void
 MainWindow::dialNow (const QString &strTarget)
 {
     bool bDialout;
-    QString strCallback;
     CalloutInitiator *ci;
 
     do // Begin cleanup block (not a loop)
     {
-        if (!pGVSettings->getDialSettings (bDialout, strCallback, ci))
+        GVRegisteredNumber gvRegNumber;
+        if (!pGVSettings->getDialSettings (bDialout, gvRegNumber, ci))
         {
             setStatus ("Unable to dial out because settings are not valid");
             break;
@@ -780,7 +780,8 @@ MainWindow::dialNow (const QString &strTarget)
         }
         else
         {
-            l += strCallback;
+            l += gvRegNumber.strNumber;
+            l += QString (gvRegNumber.chType);
             if (!webPage.enqueueWork (GVAW_dialCallback, l, this,
                             SLOT (dialComplete (bool, const QVariantList &))))
             {

@@ -299,12 +299,6 @@ GVSettings::setRegNumWidget (bool bSave)
     }
 }//GVSettings::setRegNumWidget
 
-QString
-GVSettings::getSelectedNumber ()
-{
-    return (arrNumbers[cbNumbers.currentIndex()].strNumber);
-}//GVSettings::getSelectedNumber
-
 void
 GVSettings::cbNumbers_currentIndexChanged (int index)
 {
@@ -349,11 +343,10 @@ GVSettings::getCallInitiator ()
 }//GVSettings::getCallInitiator
 
 bool
-GVSettings::getDialSettings (bool              &bDialout  ,
-                             QString           &strCallout,
-                             CalloutInitiator *&initiator)
+GVSettings::getDialSettings (bool                 &bDialout   ,
+                             GVRegisteredNumber   &gvRegNumber,
+                             CalloutInitiator    *&initiator  )
 {
-    strCallout.clear ();
     initiator = NULL;
 
     bool rv = false;
@@ -361,7 +354,7 @@ GVSettings::getDialSettings (bool              &bDialout  ,
         int index = cbNumbers.currentIndex ();
         if (index < arrNumbers.size ())
         {
-            strCallout = arrNumbers[index].strNumber;
+            gvRegNumber = arrNumbers[index];
             bDialout = false;
         }
         else

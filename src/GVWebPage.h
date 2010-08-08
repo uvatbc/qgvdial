@@ -16,8 +16,8 @@ private:
     GVWebPage(QObject *parent = NULL);
     ~GVWebPage(void);
 
-public:
 #if !NO_DBGINFO
+public:
     void setView (QWidget *view);
 #endif
 

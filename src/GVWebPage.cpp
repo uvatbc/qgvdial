@@ -541,11 +541,10 @@ GVWebPage::dialCallback (bool bCallback)
         arrPairs += QStringPair("outgoingNumber"  , arrParams[0].toString());
         arrPairs += QStringPair("forwardingNumber", arrParams[1].toString());
         arrPairs += QStringPair("subscriberNumber", strSelfNumber);
-        //arrPairs += QStringPair("phoneType"       , QString(chCurrentCallbackType));
-        arrPairs += QStringPair("phoneType"       , "7"); //"undefined");
+        arrPairs += QStringPair("phoneType"       , arrParams[2].toString());
         arrPairs += QStringPair("remember"        , "1");
         arrPairs += QStringPair("_rnr_se"         , strRnr_se);
-        postRequest (GV_DATA_BASE "/call/connect/", arrPairs, UA_N900,
+        postRequest (GV_DATA_BASE "/call/connect/", arrPairs, UA_IPHONE,
                      this, SLOT (onDataCallDone (QNetworkReply *)));
     }
 

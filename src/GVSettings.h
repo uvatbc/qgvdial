@@ -15,13 +15,12 @@ public:
     ~GVSettings (void);
 
     bool refreshRegisteredNumbers ();
-    QString getSelectedNumber ();
 
     bool causeLogin ();
     CalloutInitiator *getCallInitiator ();
-    bool getDialSettings (bool              &bDialout  ,
-                          QString           &strCallout,
-                          CalloutInitiator *&initiator);
+    bool getDialSettings (bool                 &bDialout   ,
+                          GVRegisteredNumber   &gvRegNumber,
+                          CalloutInitiator    *&initiator  );
 
 signals:
     //! Emitted when the login button has been clicked with valid credentials
