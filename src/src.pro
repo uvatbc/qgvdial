@@ -1,6 +1,6 @@
 TEMPLATE = app
 TARGET   = qgvdial
-QT      *= core gui webkit sql xml
+QT      *= core gui webkit sql xml script
 INCLUDEPATH += .
 
 CONFIG  += mobility
@@ -55,7 +55,8 @@ HEADERS +=  MainApp.h                   \
             CalloutInitiator.h          \
             CallInitiatorFactory.h      \
             CaptchaWidget.h             \
-            ContactsXmlHandler.h
+            ContactsXmlHandler.h        \
+            GVH_XMLJsonHandler.h
 
 SOURCES +=  main.cpp                    \
             MainApp.cpp                 \
@@ -88,7 +89,8 @@ SOURCES +=  main.cpp                    \
             CalloutInitiator.cpp        \
             CallInitiatorFactory.cpp    \
             CaptchaWidget.cpp           \
-            ContactsXmlHandler.cpp
+            ContactsXmlHandler.cpp      \
+            GVH_XMLJsonHandler.cpp
 
 RESOURCES = qgvdial.qrc
 

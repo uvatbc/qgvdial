@@ -43,6 +43,9 @@ OsDependent::initDialServer (QObject *receiver, const char *method)
         sessionBus.registerObject ("/org/QGVDial/CallServer", this);
         sessionBus.registerService("org.QGVDial.CallServer");
     }
+#else
+    Q_UNUSED (receiver);
+    Q_UNUSED (method);
 #endif
 }//OsDependent::initDialServer
 

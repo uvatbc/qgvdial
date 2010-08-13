@@ -1,4 +1,5 @@
 TODO:
+-> Call cancel for callout and callback both need to work
 -> Call and SMS buttons from contacts page and history page
 -> SMS needs to be handled in history: Add children of the SMS as representation of the SMS texts
 -> Dialer page buttons need to be mapped to some work

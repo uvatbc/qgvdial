@@ -130,6 +130,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\GVH_XMLJsonHandler.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\GVHistory.cpp"
 				>
 			</File>
@@ -285,6 +289,10 @@
 			</File>
 			<File
 				RelativePath=".\GVDataAccess.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GVH_XMLJsonHandler.h"
 				>
 			</File>
 			<File

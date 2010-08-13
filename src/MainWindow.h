@@ -141,8 +141,10 @@ private slots:
 
 private:
     void initLogging ();
-    void initContactsModel ();
     void deinitContactsModel ();
+    void initContactsModel ();
+    void deinitInboxModel ();
+    void initInboxModel ();
 
 private:
     //! The log file
@@ -188,7 +190,10 @@ private:
     QState          sLoggedIn;
     QFinalState     sFinal;
 
+    //! Model for the contacts table
     QSqlTableModel *modelContacts;
+    //! Model for the inbox table
+    QSqlTableModel *modelInbox;
 
     //! This is the Google Voice number
     QString         strSelfNumber;

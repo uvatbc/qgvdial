@@ -3,7 +3,7 @@
 
 #include "global.h"
 
-class GVHistory : public QTreeWidget
+class GVHistory : public QTreeView
 {
     Q_OBJECT
 
@@ -51,7 +51,6 @@ private slots:
     void playVoicemail ();
 
 private:
-    void clearAllItems ();
     void contextMenuEvent (QContextMenuEvent * event);
 
     QString         type_to_string (GVH_Event_Type  Type);

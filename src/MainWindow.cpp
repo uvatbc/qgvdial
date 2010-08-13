@@ -25,6 +25,7 @@ MainWindow::MainWindow (QWidget *parent/* = 0*/, Qt::WindowFlags f/* = 0*/)
 , vmailPlayer (this, ChildWindowBase_flags)
 , stateMachine(this)
 , modelContacts(NULL)
+, modelInbox(NULL)
 , wakeupTimer (this)
 {
     initLogging ();
@@ -128,13 +129,14 @@ MainWindow::deinit ()
     {
         delete tabMain;
         tabMain = NULL;
+
+        pDialer = NULL;
+        pContactsTable = NULL;
+        pGVHistory = NULL;
     }
 
-    if (NULL != modelContacts)
-    {
-        delete modelContacts;
-        modelContacts = NULL;
-    }
+    deinitContactsModel ();
+    deinitInboxModel ();
 
     qApp->quit ();
 }//MainWindow::deinit
@@ -493,6 +495,7 @@ MainWindow::enterLoggedIn ()
 {
     // Model init
     initContactsModel ();
+    initInboxModel ();
 
     // Do this the first time (always)
     pGVHistory->refreshHistory ();
@@ -564,6 +567,7 @@ MainWindow::logoutCompleted (bool, const QVariantList &)
 {
     // This clears out the table and the view as well
     deinitContactsModel ();
+    deinitInboxModel ();
 
     emit loggedOut ();
 
@@ -574,20 +578,6 @@ void
 MainWindow::exitLoggedIn ()
 {
 }//MainWindow::exitLoggedIn
-
-void
-MainWindow::initContactsModel ()
-{
-    deinitContactsModel ();
-
-    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    modelContacts = dbMain.newSqlTableModel ();
-    pContactsTable->setModel (modelContacts);
-    modelContacts->submitAll ();
-
-    pContactsTable->hideColumn (1);
-    pContactsTable->sortByColumn (0, Qt::AscendingOrder);
-}//MainWindow::initContactsModel
 
 void
 MainWindow::deinitContactsModel ()
@@ -603,6 +593,47 @@ MainWindow::deinitContactsModel ()
         modelContacts = NULL;
     }
 }//MainWindow::deinitContactsModel
+
+void
+MainWindow::initContactsModel ()
+{
+    deinitContactsModel ();
+
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    modelContacts = dbMain.newContactsModel ();
+    pContactsTable->setModel (modelContacts);
+    modelContacts->submitAll ();
+
+    pContactsTable->hideColumn (1);
+    pContactsTable->sortByColumn (0, Qt::AscendingOrder);
+}//MainWindow::initContactsModel
+
+void
+MainWindow::deinitInboxModel ()
+{
+    if (NULL != pGVHistory)
+    {
+        pGVHistory->reset ();
+    }
+
+    if (NULL != modelInbox)
+    {
+        delete modelInbox;
+        modelInbox = NULL;
+    }
+}//MainWindow::deinitHistoryModel
+
+void
+MainWindow::initInboxModel ()
+{
+    deinitInboxModel ();
+
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    modelInbox = dbMain.newInboxModel ();
+    modelInbox->setSort (4, Qt::AscendingOrder);    // Time when the event happened
+    pGVHistory->setModel (modelInbox);
+    modelInbox->submitAll ();
+}//MainWindow::initHistoryModel
 
 void
 MainWindow::callNameLink (const QString &strNameLink, const QString &strNumber)

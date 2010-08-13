@@ -3,23 +3,23 @@
 #include "Singletons.h"
 
 GVHistory::GVHistory (QWidget *parent/* = 0*/)
-: QTreeWidget(parent)
-, actRefresh("&Refresh", this)
-, mnuSelectInbox("Select", this)
-, menubarActions("Event actions", this)
-, actionGroup(this)
-, actSelectAll("All", this)
-, actSelectPlaced("Placed", this)
-, actSelectReceived("Received", this)
-, actSelectMissed("Missed", this)
+: QTreeView (parent)
+, actRefresh ("&Refresh", this)
+, mnuSelectInbox ("Select", this)
+, menubarActions ("Event actions", this)
+, actionGroup (this)
+, actSelectAll      ("All", this)
+, actSelectPlaced   ("Placed", this)
+, actSelectReceived ("Received", this)
+, actSelectMissed   ("Missed", this)
 , actSelectVoicemail("Voicemail", this)
-, actSelectSMS ("SMS", this)
+, actSelectSMS      ("SMS", this)
 , mnuContext("Action", this)
-, actPlaceCall("Call", this)
-, actSendSMS("SMS", this)
-, actPlayVmail("Play", this)
-, mutex(QMutex::Recursive)
-, bLoggedIn(false)
+, actPlaceCall  ("Call", this)
+, actSendSMS    ("SMS", this)
+, actPlayVmail  ("Play", this)
+, mutex (QMutex::Recursive)
+, bLoggedIn (false)
 {
     // Menu item for this page
     QKeySequence keyRefresh(Qt::ControlModifier + Qt::Key_R);
@@ -59,15 +59,6 @@ GVHistory::GVHistory (QWidget *parent/* = 0*/)
     // Initially, all are to be selected
     actSelectAll.setChecked (true);
     strSelected = "all";
-
-    // Column headers
-    this->setColumnCount (4);
-    QStringList labels;
-    labels += "Type";
-    labels += "When";
-    labels += "Who";
-    labels += "Number";
-    this->setHeaderLabels (labels);
 
     // Double click OR Enter press on an item
     QObject::connect (
@@ -110,7 +101,7 @@ GVHistory::GVHistory (QWidget *parent/* = 0*/)
 
 GVHistory::~GVHistory(void)
 {
-    clearAllItems ();
+    this->setModel (NULL);
 }//GVHistory::~GVHistory
 
 void
@@ -130,7 +121,7 @@ GVHistory::updateMenu (QMenuBar *menuBar)
 void
 GVHistory::refreshHistory ()
 {
-    clearAllItems ();
+    //clearAllItems ();
 
     QMutexLocker locker(&mutex);
     if (!bLoggedIn)
@@ -228,28 +219,8 @@ GVHistory::oneHistoryEvent (const GVHistoryEvent &hevent)
         return;
     }
 
-    arrItems += strType;            // 0
-    arrItems += hevent.strWhen;     // 1
-    arrItems += hevent.strName;     // 2
-    arrItems += hevent.strNumber;   // 3
-    arrItems += hevent.strNameLink; // 4
-
-    QTreeWidgetItem *item = new QTreeWidgetItem (arrItems);
-    QVariant var;
-    GVHistoryEvent tempEvent = hevent;
-    var.setValue (tempEvent);
-    item->setData (5, Qt::EditRole, var);
-    this->insertTopLevelItem (this->topLevelItemCount (), item);
-    if (GVHE_TextMessage == hevent.Type)
-    {
-        QStringList arrText;
-        arrText += hevent.strSMS;
-        QTreeWidgetItem *child = new QTreeWidgetItem (arrText);
-        item->addChild (child);
-        child->setFirstColumnSpanned (true);
-        item->setToolTip (0, hevent.strSMS);
-        child->setToolTip (0, hevent.strSMS);
-    }
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    dbMain.insertHistory (this->model (), hevent);
 }//GVHistory::oneHistoryEvent
 
 void
@@ -265,22 +236,6 @@ GVHistory::getHistoryDone (bool, const QVariantList &)
         this->resizeColumnToContents (i);
     }
 }//GVHistory::getHistoryDone
-
-void
-GVHistory::clearAllItems ()
-{
-    QTreeWidgetItem *item = this->takeTopLevelItem (0);
-    while (NULL != item)
-    {
-        QList <QTreeWidgetItem *> children = item->takeChildren ();
-        foreach (QTreeWidgetItem *child, children)
-        {
-            delete child;
-        }
-        delete item;
-        item = this->takeTopLevelItem (0);
-    }
-}//GVHistory::clearAllItems
 
 void
 GVHistory::onCurrentItemChanged (QTreeWidgetItem *current,
@@ -339,7 +294,7 @@ GVHistory::loggedOut ()
     QMutexLocker locker(&mutex);
     bLoggedIn = false;
 
-    this->clearAllItems ();
+    this->setModel (NULL);
 }//GVHistory::loggedOut
 
 void
@@ -373,14 +328,14 @@ GVHistory::placeCall ()
         return;
     }
 
-    if (0 == historyEvent.strNameLink.size ())
+    if (0 == historyEvent.id.size ())
     {
         // In case it's an unknown number, call by link
-        emit callLink (historyEvent.strLink);
+        emit callLink (historyEvent.id);
     }
     else
     {
-        emit callNameLink (historyEvent.strNameLink, historyEvent.strNumber);
+        emit callNameLink (historyEvent.id, historyEvent.strPhoneNumber);
     }
 }//GVHistory::placeCall
 
@@ -394,15 +349,15 @@ GVHistory::sendSMS ()
         return;
     }
 
-    if (0 == historyEvent.strNameLink.size ())
+    if (0 == historyEvent.id.size ())
     {
         // In case it's an unknown number, SMS by link
-        emit sendSMSToLink (historyEvent.strLink);
+        emit sendSMSToLink (historyEvent.id);
     }
     else
     {
-        emit sendSMSToNameLink (historyEvent.strNameLink,
-                                historyEvent.strNumber);
+        emit sendSMSToNameLink (historyEvent.id,
+                                historyEvent.strPhoneNumber);
     }
 }//GVHistory::sendSMS
 
@@ -421,5 +376,5 @@ GVHistory::playVoicemail ()
         return;
     }
 
-    emit playVoicemail (historyEvent.strVmail);
+    emit playVoicemail (historyEvent.id);
 }//GVHistory::playVoicemail

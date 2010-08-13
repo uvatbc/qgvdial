@@ -51,8 +51,8 @@ private slots:
     //! Invoked when the registered phone list page is loaded
     void phonesListLoaded (bool bOk);
 
-    //! Invoked when the history page is loaded
-    void historyPageLoaded (bool bOk);
+    //! Invoked when GV responds with a history page.
+    void onGotHistoryXML (QNetworkReply *reply);
 
     //! Invoked when the history entry link  for an unknown number is loaded
     void getContactFromHistoryLinkLoaded (bool bOk);
@@ -103,6 +103,8 @@ private:
     bool getRegisteredPhones ();
     //! Begin the process to get history
     bool getHistory ();
+    //! Create and send an inbox request
+    bool sendInboxRequest ();
     //! Call a number given the history entry's link
     bool getContactFromHistoryLink ();
     //! This sends SMSes

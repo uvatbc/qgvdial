@@ -1,5 +1,6 @@
 #include "GVWebPage.h"
 #include "Singletons.h"
+#include "GVH_XMLJsonHandler.h"
 
 #define GV_DATA_BASE "https://www.google.com/voice"
 
@@ -533,7 +534,7 @@ GVWebPage::dialCallback (bool bCallback)
         QString strContent = QString("{\"gvx\":\"%1\"}").arg(gvxVal);
 
         QObject::connect (mgr , SIGNAL (finished (QNetworkReply *)),
-                          this, SLOT (onDataCallDone (QNetworkReply *)));
+                          this, SLOT   (onDataCallDone (QNetworkReply *)));
         mgr->post (request, strContent.toAscii());
     }
     else
@@ -809,6 +810,62 @@ GVWebPage::userCancel ()
 }//GVWebPage::userCancel
 
 bool
+GVWebPage::sendInboxRequest ()
+{
+    QMutexLocker locker(&mutex);
+    if (!bLoggedIn)
+    {
+        completeCurrentWork (GVAW_getHistory, false);
+        return (false);
+    }
+
+    do // Begin cleanup block (not a loop)
+    {
+        QString strWhich = workCurrent.arrParams[0].toString();
+
+        QString strLink = QString (GV_HTTPS "/inbox/recent/%1?page=p%2")
+                            .arg(strWhich).arg(nCurrent);
+        QNetworkRequest request(strLink);
+        request.setRawHeader ("User-Agent", UA_IPHONE);
+
+        QNetworkAccessManager *mgr = webPage.networkAccessManager ();
+        QNetworkCookieJar *jar = mgr->cookieJar();
+        QList<QNetworkCookie> cookies =
+            jar->cookiesForUrl (webPage.mainFrame()->url ());
+        QList<QNetworkCookie> sendCookies;
+        QString gvxVal;
+        foreach (QNetworkCookie cookie, cookies)
+        {
+            if ((cookie.name() == "gv")   ||
+                (cookie.name() == "gvx")  ||
+                (cookie.name() == "PREF") ||
+                (cookie.name() == "S")    ||
+                (cookie.name() == "SID")  ||
+                (cookie.name() == "HSID") ||
+                (cookie.name() == "SSID"))
+            {
+                sendCookies += cookie;
+            }
+
+            if (cookie.name () == "gvx")
+            {
+                gvxVal = cookie.value ();
+            }
+        }
+
+        // Set up the cookies in the request
+        request.setHeader (QNetworkRequest::CookieHeader,
+                           QVariant::fromValue(sendCookies));
+
+        QObject::connect (mgr , SIGNAL (finished (QNetworkReply *)),
+                          this, SLOT   (onGotHistoryXML (QNetworkReply *)));
+        mgr->get (request);
+    } while (0); // End cleanup block (not a loop)
+
+    return (true);
+}//GVWebPage::sendInboxRequest
+
+bool
 GVWebPage::getHistory ()
 {
     QMutexLocker locker(&mutex);
@@ -818,286 +875,72 @@ GVWebPage::getHistory ()
         return (false);
     }
 
-    QString strWhich = workCurrent.arrParams[0].toString();
     nFirstPage = nCurrent = workCurrent.arrParams[1].toString().toInt ();
 
-    QString strLink = QString (GV_HTTPS_M "/i/%1?p=%2")
-                               .arg(strWhich)
-                               .arg(nCurrent);
-
-    QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
-                       this   , SLOT   (historyPageLoaded (bool)));
-    this->loadUrlString (strLink);
-
-    return (true);
+    return sendInboxRequest ();
 }//GVWebPage::getHistory
 
 void
-GVWebPage::historyPageLoaded (bool bOk)
+GVWebPage::onGotHistoryXML (QNetworkReply *reply)
 {
-    QObject::disconnect (&webPage, SIGNAL (loadFinished (bool)),
-                          this   , SLOT   (historyPageLoaded (bool)));
+    QNetworkAccessManager *mgr = webPage.networkAccessManager ();
+    QObject::disconnect (mgr , SIGNAL (finished (QNetworkReply *)),
+                         this, SLOT   (onGotHistoryXML (QNetworkReply *)));
 
+    QString strReply = reply->readAll ();
+    QXmlInputSource inputSource;
+    QXmlSimpleReader simpleReader;
+    inputSource.setData (strReply);
+    GVH_XMLJsonHandler xmlHandler;
+
+    QObject::connect (&xmlHandler, SIGNAL (log(const QString &, int)),
+                       this      , SIGNAL (log(const QString &, int)));
+    QObject::connect (
+        &xmlHandler, SIGNAL (oneElement (const GVHistoryEvent &)),
+         this      , SIGNAL (oneHistoryEvent (const GVHistoryEvent &)));
+
+    bool bOk = false;
     do // Begin cleanup block (not a loop)
     {
-        if (isLoadFailed (bOk))
+        simpleReader.setContentHandler (&xmlHandler);
+        simpleReader.setErrorHandler (&xmlHandler);
+
+        emit log ("Begin parsing");
+        if (!simpleReader.parse (&inputSource, false))
         {
-            bOk = false;
-            emit log ("Failed to load history page", 3);
+            emit log ("Failed to parse XML");
             break;
         }
-        bOk = false;
+        emit log ("End parsing");
 
-        QString msg;
-        QWebFrame *frame = webPage.mainFrame();
-        if (NULL == frame)
+        if (!xmlHandler.parseJSON ())
         {
-            emit log ("No frame!!", 3);
-            break;
-        }
-
-        QWebElementCollection images;
-        images = frame->findAllElements("img[class=\"mi\"]");
-        int max = images.count ();
-        int nEventsCount = 0;
-        for (int i = 0; i < max; i++)
-        {
-            GVHistoryEvent hevent;
-
-            QWebElement img = images.at(i);
-            if (img.isNull ())
-            {
-                emit log ("Did not find GV History Event type image");
-                continue;
-            }
-
-            hevent.Type = GVHE_Unknown;
-            QString img_alt = img.attribute ("alt");
-            if (0 == img_alt.compare("Call_placed", Qt::CaseInsensitive))
-            {
-                hevent.Type = GVHE_Placed;
-            }
-            else if (0 == img_alt.compare("Call_received", Qt::CaseInsensitive))
-            {
-                hevent.Type = GVHE_Received;
-            }
-            else if (0 == img_alt.compare("Call_missed", Qt::CaseInsensitive))
-            {
-                hevent.Type = GVHE_Missed;
-            }
-            else if (0 == img_alt.compare("Voicemail", Qt::CaseInsensitive))
-            {
-                hevent.Type = GVHE_Voicemail;
-            }
-            else if (0 == img_alt.compare("Text_message", Qt::CaseInsensitive))
-            {
-                hevent.Type = GVHE_TextMessage;
-            }
-            else
-            {
-                emit log ("Invalid GV History Event type");
-                continue;
-            }
-
-            if (img.parent().isNull ())
-            {
-                emit log ("No way to get to the next field of the GV History "
-                          "Event");
-                continue;
-            }
-
-            // The next element will be the href to the contact
-            QWebElement nextElement = img.parent().nextSibling ();
-            if (nextElement.isNull ())
-            {
-                emit log ("Could not find the name HREF in GV History entry");
-                continue;
-            }
-
-            if (0 != nextElement.attribute ("href").size ())
-            {
-                hevent.strName     = nextElement.toPlainText ();
-                hevent.strNameLink = nextElement.attribute ("href");
-            }
-            else
-            {
-                // This happens if the contact is unknown.
-                hevent.strName     = nextElement.toPlainText ();
-            }
-
-            // The next element is "when did this event happen"
-            nextElement = nextElement.nextSibling ();
-            if (nextElement.isNull ())
-            {
-                emit log ("Could not get when the GV History event happened");
-                continue;
-            }
-            hevent.strWhen = nextElement.toPlainText ();
-
-            // The next element is a link to directly call this number
-            nextElement = nextElement.nextSibling ();
-            if (nextElement.isNull ())
-            {
-                emit log ("Could not get the call link in GV History Element");
-                continue;
-            }
-            hevent.strLink = nextElement.attribute ("href");
-
-#define GVSELECTOR "?number="
-            int pos = hevent.strLink.lastIndexOf ("?number=");
-            if (-1 != pos)
-            {
-                // Pull out the number that this link provides
-                // The link itself in not important. The number is important.
-                hevent.strNumber =
-                hevent.strLink.mid (pos + sizeof(GVSELECTOR) - 1);
-            }
-#undef GVSELECTOR
-
-            // Cleanup the values
-            if (hevent.strWhen.startsWith ("(") &&
-                hevent.strWhen.endsWith (")"))
-            {
-                hevent.strWhen = hevent.strWhen.mid(1);
-                hevent.strWhen.chop(1);
-            }
-            hevent.strWhen.remove ("ago");
-            hevent.strWhen.replace ("seconds"  , "s", Qt::CaseInsensitive);
-            hevent.strWhen.replace ("minutes"  , "m", Qt::CaseInsensitive);
-            hevent.strWhen.replace ("hours"    , "h", Qt::CaseInsensitive);
-            hevent.strWhen.replace ("days"     , "d", Qt::CaseInsensitive);
-            hevent.strWhen.replace ("weeks"    , "w", Qt::CaseInsensitive);
-            hevent.strWhen = hevent.strWhen.simplified ();
-
-            if (hevent.strNumber.startsWith ("+1"))
-            {
-                QChar space(' '), dash('-');
-                hevent.strNumber.insert(2, space)
-                                .insert(6, dash)
-                                .insert(10,dash);
-            }
-
-            if (GVHE_Voicemail == hevent.Type)
-            {
-                do // Begin cleanup block (not a loop)
-                {
-                    QString strText;
-
-                    nextElement = nextElement.parent ();
-                    if (nextElement.isNull ())
-                    {
-                        emit log ("Cannot get to voicemail info in GV history "
-                                  "element - location 1");
-                        break;
-                    }
-
-                    // This gets us to a div thats the grandparent of the href
-                    nextElement = nextElement.nextSibling ();
-                    if (nextElement.isNull ())
-                    {
-                        emit log ("Cannot get to voicemail info in GV history "
-                                  "element - location 2");
-                        break;
-                    }
-
-                    nextElement = nextElement.findFirst ("div");
-                    if (nextElement.isNull ())
-                    {
-                        emit log ("Cannot get to voicemail info in GV history "
-                                  "element - location 3");
-                        break;
-                    }
-
-                    QWebElementCollection col = nextElement.findAll("a");
-                    foreach (nextElement, col)
-                    {
-                        strText = nextElement.toPlainText ();
-                        if (0 == strText.compare ("play", Qt::CaseInsensitive))
-                        {
-                            hevent.strVmail = nextElement.attribute("href");
-                            break;
-                        }
-                    }
-                } while (0); // End cleanup block (not a loop)
-                emit oneHistoryEvent (hevent);
-                nEventsCount++;
-            }
-            else if (GVHE_TextMessage == hevent.Type)
-            {
-                do // Begin cleanup block (not a loop)
-                {
-                    nextElement = nextElement.parent ();
-                    if (nextElement.isNull ())
-                    {
-                        emit log ("Couldn't get the parent of the text message "
-                                  "href field");
-                        break;
-                    }
-                    nextElement = nextElement.nextSibling ();
-                    QWebElementCollection spans;
-                    spans = nextElement.findAll ("span[class=\"\"]");
-                    foreach (QWebElement spanText, spans)
-                    {
-                        hevent.strSMS = spanText.toPlainText ();
-                        emit oneHistoryEvent (hevent);
-                        nEventsCount++;
-                    }
-                } while (0); // End cleanup block (not a loop)
-            }
-            else
-            {
-                emit oneHistoryEvent (hevent);
-                nEventsCount++;
-            }
-        }
-
-        if (0 != nEventsCount)
-        {
-            msg = QString ("Found %1 history events on page %2")
-                  .arg(nEventsCount)
-                  .arg(nCurrent);
-            emit log (msg);
-        }
-        else
-        {
-            // Events are all over. get out
-            bOk = true;
-            completeCurrentWork (GVAW_getHistory, true);
+            emit log ("Failed to parse GV History JSON");
             break;
         }
 
-        // How many pages were expected?
-        int nNeeded = workCurrent.arrParams[2].toString().toInt (&bOk);
-        if (!bOk)
-        {
-            emit log ("Failed to convert count to into");
-            break;
-        }
+        QMutexLocker locker(&mutex);
         nCurrent++;
-        if ((nFirstPage + nNeeded) <= nCurrent)
-        {
-            bOk = true;
-            completeCurrentWork (GVAW_getHistory, true);
-            break;
-        }
-
-        QString strWhich = workCurrent.arrParams[0].toString();
-        QString strLink = QString (GV_HTTPS_M "/i/%1/?p=%2")
-                                   .arg(strWhich)
-                                   .arg(nCurrent);
-
-        QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
-                           this   , SLOT   (historyPageLoaded (bool)));
-        this->loadUrlString (strLink);
 
         bOk = true;
+
+        int count = workCurrent.arrParams[2].toString().toInt ();
+        if ((nCurrent-nFirstPage) >= count)
+        {
+            completeCurrentWork (GVAW_getHistory, true);
+            break;
+        }
+
+        sendInboxRequest ();
     } while (0); // End cleanup block (not a loop)
 
     if (!bOk)
     {
         completeCurrentWork (GVAW_getHistory, false);
     }
-}//GVWebPage::historyPageLoaded
+
+    reply->deleteLater ();
+}//GVWebPage::onGotHistoryXML
 
 bool
 GVWebPage::getContactFromHistoryLink ()

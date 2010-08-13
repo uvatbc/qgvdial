@@ -67,16 +67,30 @@ enum GVH_Event_Type {
 
 struct GVHistoryEvent
 {
-    GVHistoryEvent ():Type(GVHE_Unknown) {}
+    QString         id;
+    QString         strPhoneNumber;
+    QString         strDisplayNumber;
+    QDateTime       startTime;
+    GVH_Event_Type  Type;
+    bool            bRead;
+    bool            bSpam;
+    bool            bTrash;
+    bool            bStar;
 
-    GVH_Event_Type  Type        ;
-    QString         strName     ;
-    QString         strNameLink ;
-    QString         strNumber   ;
-    QString         strWhen     ;
-    QString         strLink     ;
-    QString         strVmail    ;
-    QString         strSMS      ;
+    GVHistoryEvent () {
+        init ();
+    }
+
+    void init () {
+        id.clear ();
+        strPhoneNumber.clear ();
+        strDisplayNumber.clear ();
+
+        startTime = QDateTime();
+        Type = GVHE_Unknown;
+
+        bRead = bSpam = bTrash = bStar = false;
+    }
 };
 Q_DECLARE_METATYPE (GVHistoryEvent)
 

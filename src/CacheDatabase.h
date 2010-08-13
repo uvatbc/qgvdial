@@ -16,7 +16,7 @@ public:
     void init ();
     void deinit ();
 
-    QSqlTableModel *newSqlTableModel();
+    QSqlTableModel *newContactsModel();
     void clearContacts ();
 
     bool getUserPass (QString &strUser, QString &strPass);
@@ -39,12 +39,20 @@ public:
     bool setLastContactUpdate (const QString &strDateTime);
     bool getLastContactUpdate (QString &strDateTime);
 
+    bool insertHistory (      QAbstractItemModel *modelHistory,
+                        const GVHistoryEvent     &hEvent      );
+
+    QSqlTableModel *newInboxModel();
+
 signals:
     void log(const QString &strText, int level = 10);
     void status(const QString &strText, int timeout = 2000);
 
 private:
     QSqlDatabase    dbMain;
+
+    //! Count of the entries in the inbox
+    quint32         nCountInbox;
 
     friend class Singletons;
 };
