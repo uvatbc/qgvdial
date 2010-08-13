@@ -39,7 +39,7 @@ GVH_XMLJsonHandler::characters (const QString &ch)
 }//GVH_XMLJsonHandler::characters
 
 bool
-GVH_XMLJsonHandler::parseJSON ()
+GVH_XMLJsonHandler::parseJSON (const QDateTime &dtUpdate)
 {
     bool rv = false;
     do // Begin cleanup block (not a loop)
@@ -158,10 +158,16 @@ GVH_XMLJsonHandler::parseJSON ()
                 continue;
             }
 
+            // Check to see if it is too old to show
+            if (dtUpdate.isValid () && (dtUpdate > oneHistory.startTime))
+            {
+                emit log ("This entry is old.");
+                continue;
+            }
+
             // emit the history element
             emit oneElement (oneHistory);
             nUsableMsgs++;
-            emit log ("Got a valid history element");
         }
 
         emit log (QString ("Valid messages = %1").arg (nUsableMsgs));

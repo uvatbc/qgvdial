@@ -115,7 +115,7 @@ GVContactsTable::refreshContacts ()
     bRefreshRequested = false;
 
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    QString strUpdate, strUrl;
+    QString strUrl;
 
     strSavedLink.clear ();
     strUrl = QString ("http://www.google.com/m8/feeds/contacts/%1/full"
@@ -123,8 +123,10 @@ GVContactsTable::refreshContacts ()
                         .arg (strUser);
 
     bRefreshIsUpdate = false;
-    if ((dbMain.getLastContactUpdate (strUpdate)) && (0 != strUpdate.size ()))
+    QDateTime dtUpdate;
+    if ((dbMain.getLastContactUpdate (dtUpdate)) && (dtUpdate.isValid ()))
     {
+        QString strUpdate = dtUpdate.toString ("yyyy-MM-ddThh:mm:ss");
         strUrl += QString ("&updated-min=%1&showdeleted=true").arg (strUpdate);
         bRefreshIsUpdate = true;
         nContacts = this->model()->rowCount();
@@ -341,11 +343,8 @@ GVContactsTable::onGotContacts (QNetworkReply *reply)
     bool rv = false;
     QString msg;
     QDateTime currDT = QDateTime::currentDateTime().toUTC ();
-    QString strDateTime = QString ("%1T%2")
-                            .arg (currDT.toString ("yyyy-MM-dd"))
-                            .arg (currDT.toString ("hh:mm:ss"));
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    dbMain.setLastContactUpdate (strDateTime);
+    dbMain.setLastContactUpdate (currDT);
 
     QXmlInputSource inputSource;
     QXmlSimpleReader simpleReader;

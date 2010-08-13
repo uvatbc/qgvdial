@@ -3,6 +3,7 @@
 
 #include "global.h"
 #include <QtSql>
+#include "InboxModel.h"
 
 class CacheDatabase : public QObject
 {
@@ -36,13 +37,17 @@ public:
     bool putContactInfo (const GVContactInfo &info);
     bool getContactInfo (GVContactInfo &info);
 
-    bool setLastContactUpdate (const QString &strDateTime);
-    bool getLastContactUpdate (QString &strDateTime);
+    bool setLastContactUpdate (const QDateTime &dateTime);
+    bool getLastContactUpdate (QDateTime &dateTime);
 
-    bool insertHistory (      QAbstractItemModel *modelHistory,
-                        const GVHistoryEvent     &hEvent      );
+    InboxModel *newInboxModel();
+    void clearInbox ();
 
-    QSqlTableModel *newInboxModel();
+    bool setLastInboxUpdate (const QDateTime &dateTime);
+    bool getLastInboxUpdate (QDateTime &dateTime);
+
+    bool insertHistory (      InboxModel     *modelInbox,
+                        const GVHistoryEvent &hEvent    );
 
 signals:
     void log(const QString &strText, int level = 10);

@@ -56,7 +56,8 @@ HEADERS +=  MainApp.h                   \
             CallInitiatorFactory.h      \
             CaptchaWidget.h             \
             ContactsXmlHandler.h        \
-            GVH_XMLJsonHandler.h
+            GVH_XMLJsonHandler.h        \
+            InboxModel.h
 
 SOURCES +=  main.cpp                    \
             MainApp.cpp                 \
@@ -90,7 +91,8 @@ SOURCES +=  main.cpp                    \
             CallInitiatorFactory.cpp    \
             CaptchaWidget.cpp           \
             ContactsXmlHandler.cpp      \
-            GVH_XMLJsonHandler.cpp
+            GVH_XMLJsonHandler.cpp      \
+            InboxModel.cpp
 
 RESOURCES = qgvdial.qrc
 

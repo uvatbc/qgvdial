@@ -146,6 +146,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\InboxModel.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\main.cpp"
 				>
 			</File>
@@ -305,6 +309,10 @@
 			</File>
 			<File
 				RelativePath=".\GVWebPage.h"
+				>
+			</File>
+			<File
+				RelativePath=".\InboxModel.h"
 				>
 			</File>
 			<File

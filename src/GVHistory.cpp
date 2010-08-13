@@ -1,6 +1,7 @@
 #include "global.h"
 #include "GVHistory.h"
 #include "Singletons.h"
+#include "InboxModel.h"
 
 GVHistory::GVHistory (QWidget *parent/* = 0*/)
 : QTreeView (parent)
@@ -129,16 +130,21 @@ GVHistory::refreshHistory ()
         return;
     }
 
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    QDateTime dtUpdate;
+    dbMain.getLastInboxUpdate (dtUpdate);
+
     GVAccess &webPage = Singletons::getRef().getGVAccess ();
     QVariantList l;
-    l += strSelected;
+    l += "all";
     l += "1";
-    l += "5";
+    l += "10";
+    l += dtUpdate;
     QObject::connect (
         &webPage, SIGNAL (oneHistoryEvent (const GVHistoryEvent &)),
          this   , SLOT   (oneHistoryEvent (const GVHistoryEvent &)));
     emit status ("Retrieving history events...");
-    if (!webPage.enqueueWork (GVAW_getHistory, l, this,
+    if (!webPage.enqueueWork (GVAW_getInbox, l, this,
             SLOT (getHistoryDone (bool, const QVariantList &))))
     {
         getHistoryDone (false, l);
@@ -220,7 +226,8 @@ GVHistory::oneHistoryEvent (const GVHistoryEvent &hevent)
     }
 
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    dbMain.insertHistory (this->model (), hevent);
+    InboxModel *tModel = (InboxModel *) this->model ();
+    dbMain.insertHistory (tModel, hevent);
 }//GVHistory::oneHistoryEvent
 
 void
@@ -231,10 +238,21 @@ GVHistory::getHistoryDone (bool, const QVariantList &)
         &webPage, SIGNAL (oneHistoryEvent (const GVHistoryEvent &)),
          this   , SLOT   (oneHistoryEvent (const GVHistoryEvent &)));
 
+    InboxModel *tModel = (InboxModel *) this->model ();
+    tModel->submitAll ();
+
+    this->hideColumn (0);
+    this->hideColumn (4);
+    this->hideColumn (5);
+
     for (int i = 0; i < 4; i++)
     {
         this->resizeColumnToContents (i);
     }
+
+    QDateTime dtUpdate = QDateTime::currentDateTime().toUTC ();
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    dbMain.setLastInboxUpdate (dtUpdate);
 }//GVHistory::getHistoryDone
 
 void

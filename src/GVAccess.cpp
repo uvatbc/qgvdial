@@ -46,7 +46,7 @@ GVAccess::getNameForWork (GVAccess_Work whatwork)
     case GVAW_login:
         func = "login";
         break;
-    case GVAW_getHistory:
+    case GVAW_getInbox:
         func = "getHistory";
         break;
     case GVAW_sendSMS:
@@ -117,8 +117,15 @@ GVAccess::enqueueWork (GVAccess_Work whatwork, const QVariantList &params,
 
     case GVAW_dialCallback:         // Destination number, callback and type
     case GVAW_dialOut:              // Destination, callout, and context var
-    case GVAW_getHistory:           // type, start page, page count
         if (3 != params.size ())
+        {
+            msg = "Invalid parameter count";
+            bValid = false;
+        }
+        break;
+
+    case GVAW_getInbox:             // type, start page, page count, last update
+        if (4 != params.size ())
         {
             msg = "Invalid parameter count";
             bValid = false;
@@ -197,7 +204,7 @@ GVAccess::doNextWork ()
         case GVAW_getRegisteredPhones:
             getRegisteredPhones ();
             break;
-        case GVAW_getHistory:
+        case GVAW_getInbox:
             getHistory ();
             break;
         case GVAW_getContactFromHistoryLink:

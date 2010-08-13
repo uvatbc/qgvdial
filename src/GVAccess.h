@@ -17,7 +17,7 @@ enum GVAccess_Work {
     GVAW_dialCallback,              // Destination number, callback number, type
     GVAW_dialOut,                   // Destination number, callout number
     GVAW_getRegisteredPhones,
-    GVAW_getHistory,                // type, start page, page count
+    GVAW_getInbox,                  // type, start page, page count, last update
     GVAW_getContactFromHistoryLink, // History link
     GVAW_sendSMS,                   // Number, text
     GVAW_playVmail,                 // Voicemail link

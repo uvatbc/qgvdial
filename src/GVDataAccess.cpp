@@ -209,7 +209,7 @@ GVDataAccess::getRegisteredPhones ()
 bool
 GVDataAccess::getHistory ()
 {
-    completeCurrentWork (GVAW_getHistory, false);
+    completeCurrentWork (GVAW_getInbox, false);
     return (false);
 }//GVDataAccess::getHistory
 

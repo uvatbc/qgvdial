@@ -815,7 +815,7 @@ GVWebPage::sendInboxRequest ()
     QMutexLocker locker(&mutex);
     if (!bLoggedIn)
     {
-        completeCurrentWork (GVAW_getHistory, false);
+        completeCurrentWork (GVAW_getInbox, false);
         return (false);
     }
 
@@ -871,7 +871,7 @@ GVWebPage::getHistory ()
     QMutexLocker locker(&mutex);
     if (!bLoggedIn)
     {
-        completeCurrentWork (GVAW_getHistory, false);
+        completeCurrentWork (GVAW_getInbox, false);
         return (false);
     }
 
@@ -913,7 +913,8 @@ GVWebPage::onGotHistoryXML (QNetworkReply *reply)
         }
         emit log ("End parsing");
 
-        if (!xmlHandler.parseJSON ())
+        QDateTime dtUpdate = workCurrent.arrParams[3].toDateTime ();
+        if (!xmlHandler.parseJSON (dtUpdate))
         {
             emit log ("Failed to parse GV History JSON");
             break;
@@ -927,7 +928,7 @@ GVWebPage::onGotHistoryXML (QNetworkReply *reply)
         int count = workCurrent.arrParams[2].toString().toInt ();
         if ((nCurrent-nFirstPage) >= count)
         {
-            completeCurrentWork (GVAW_getHistory, true);
+            completeCurrentWork (GVAW_getInbox, true);
             break;
         }
 
@@ -936,7 +937,7 @@ GVWebPage::onGotHistoryXML (QNetworkReply *reply)
 
     if (!bOk)
     {
-        completeCurrentWork (GVAW_getHistory, false);
+        completeCurrentWork (GVAW_getInbox, false);
     }
 
     reply->deleteLater ();

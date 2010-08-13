@@ -10,7 +10,7 @@ class GVH_XMLJsonHandler : public QObject, public QXmlDefaultHandler
 
 public:
     explicit GVH_XMLJsonHandler(QObject *parent = 0);
-    bool parseJSON ();
+    bool parseJSON (const QDateTime &dtUpdate);
 
 signals:
     void log(const QString &strText, int level = 10);

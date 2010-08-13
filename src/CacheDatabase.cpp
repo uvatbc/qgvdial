@@ -9,12 +9,13 @@
 #define GV_S_VAR_PASS           "password"
 #define GV_S_VAR_CALLBACK       "callback"
 #define GV_S_VAR_DB_VER         "db_ver"
-#define GV_S_VAR_CONTACT_UPDATE "contact update"
 ////////////////////////////////////////////////////////////////////////////////
 // Started using Google Contacts API
 //#define GV_S_VALUE_DB_VER   "2010-08-03 11:08:00"
 // Registered numbers now include the phone type.
-#define GV_S_VALUE_DB_VER   "2010-08-07 13:48:26"
+// #define GV_S_VALUE_DB_VER   "2010-08-07 13:48:26"
+// Contact updates moved out of main table into updates table
+#define GV_S_VALUE_DB_VER   "2010-08-13 09:15:49"
 ////////////////////////////// GV Contacts table ///////////////////////////////
 #define GV_CONTACTS_TABLE   "gvcontacts"
 #define GV_C_ID             "id"
@@ -43,6 +44,17 @@
 #define GV_IN_ATTIME        "happened_at"
 #define GV_IN_TYPE          "type"          // voicemail,missed,etc.
 #define GV_IN_FLAGS         "flags"         // read, starred, etc.
+////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////// GV inbox table ////////////////////////////////
+#define GV_UPDATES_TABLE    "gvupdates"
+#define GV_UP_WHAT          "update_what"
+#define GV_UP_WHEN          "updated_when"
+
+#define UPDATE_DATE_FORMAT "yyyy-MM-dd hh:mm:ss"
+#define UPDATE_DATE_REGEXP "(\\d{4})-(\\d{2})-(\\d{2}) (\\d{2}):(\\d{2}):(\\d{2})"
+
+#define GV_UP_CONTACTS      "contacts"
+#define GV_UP_INBOX         "inbox"
 ////////////////////////////////////////////////////////////////////////////////
 
 CacheDatabase::CacheDatabase(const QSqlDatabase & other, QObject *parent)
@@ -164,6 +176,16 @@ CacheDatabase::init ()
                         GV_IN_ATTIME    " bigint, "
                         GV_IN_TYPE      " tinyint, "
                         GV_IN_FLAGS     " integer)");
+    }
+    // Ensure that the inbox table is present. If not, create it.
+    query.exec ("SELECT * FROM sqlite_master "
+                "WHERE type='table' "
+                "AND name='" GV_UPDATES_TABLE "'");
+    if (!query.next ())
+    {
+        query.exec ("CREATE TABLE " GV_UPDATES_TABLE " "
+                    "(" GV_UP_WHAT  " varchar, "
+                        GV_UP_WHEN  " varchar)");
     }
 }//CacheDatabase::init
 
@@ -449,21 +471,24 @@ CacheDatabase::getContactInfo (GVContactInfo &info)
 }//CacheDatabase::saveContactInfo
 
 bool
-CacheDatabase::setLastContactUpdate (const QString &strDateTime)
+CacheDatabase::setLastContactUpdate (const QDateTime &dateTime)
 {
     QSqlQuery query(dbMain);
     query.setForwardOnly (true);
 
     QString strQ;
-    if (getLastContactUpdate (strQ))
+    QDateTime dtUpdate;
+    if (getLastContactUpdate (dtUpdate))
     {
-        query.exec ("DELETE FROM " GV_SETTINGS_TABLE
-                    " WHERE " GV_S_NAME "='" GV_S_VAR_CONTACT_UPDATE "'");
+        query.exec ("DELETE FROM " GV_UPDATES_TABLE
+                    " WHERE " GV_UP_WHAT "='" GV_UP_CONTACTS "'");
     }
 
-    strQ = QString ("INSERT INTO " GV_SETTINGS_TABLE
-                    " (" GV_S_NAME "," GV_S_VALUE ")"
-                    " VALUES ('" GV_S_VAR_CONTACT_UPDATE "', '%1')")
+    QString strDateTime = dateTime.toString (UPDATE_DATE_FORMAT);
+
+    strQ = QString ("INSERT INTO " GV_UPDATES_TABLE
+                    " (" GV_UP_WHAT "," GV_UP_WHEN ")"
+                    " VALUES ('" GV_UP_CONTACTS "', '%1')")
            .arg(strDateTime);
     query.exec (strQ);
 
@@ -471,26 +496,45 @@ CacheDatabase::setLastContactUpdate (const QString &strDateTime)
 }//CacheDatabase::setLastContactUpdate
 
 bool
-CacheDatabase::getLastContactUpdate (QString &strDateTime)
+CacheDatabase::getLastContactUpdate (QDateTime &dateTime)
 {
     QSqlQuery query(dbMain);
     query.setForwardOnly (true);
 
-    query.exec ("SELECT " GV_S_VALUE " FROM " GV_SETTINGS_TABLE
-                " WHERE " GV_S_NAME "='" GV_S_VAR_CONTACT_UPDATE "'");
-    if (query.next ())
-    {
-        strDateTime = query.value(0).toString();
-        return (true);
-    }
+    dateTime = QDateTime();
 
-    return (false);
+    bool rv = false;
+    query.exec ("SELECT " GV_UP_WHEN " FROM " GV_UPDATES_TABLE
+                " WHERE " GV_UP_WHAT "='" GV_UP_CONTACTS "'");
+    do // Begin cleanup block (not a loop)
+    {
+        if (!query.next ())
+        {
+            emit log ("No last contact update", 5);
+            break;
+        }
+
+        QString strDateTime = query.value(0).toString();
+
+        QRegExp rx(UPDATE_DATE_REGEXP);
+        if (!strDateTime.contains (rx) || (6 != rx.captureCount ()))
+        {
+            emit log ("Last updated contact update does not match regexp");
+            break;
+        }
+
+        dateTime = QDateTime::fromString (strDateTime, UPDATE_DATE_FORMAT);
+
+        rv = true;
+    } while (0); // End cleanup block (not a loop)
+
+    return (rv);
 }//CacheDatabase::getLastContactUpdate
 
-QSqlTableModel *
+InboxModel *
 CacheDatabase::newInboxModel()
 {
-    QSqlTableModel *modelInbox = new QSqlTableModel(this, dbMain);
+    InboxModel *modelInbox = new InboxModel(this, dbMain);
     modelInbox->setTable (GV_INBOX_TABLE);
     modelInbox->setEditStrategy (QSqlTableModel::OnManualSubmit);
     modelInbox->setHeaderData (0, Qt::Horizontal, QObject::tr("Name"));
@@ -510,11 +554,80 @@ CacheDatabase::newInboxModel()
     return (modelInbox);
 }//CacheDatabase::newHistoryModel
 
-bool
-CacheDatabase::insertHistory (      QAbstractItemModel *modelHistory,
-                              const GVHistoryEvent     &hEvent      )
+void
+CacheDatabase::clearInbox ()
 {
-    QSqlTableModel *modelInbox = (QSqlTableModel *) modelHistory;
+    QSqlQuery query(dbMain);
+    query.setForwardOnly (true);
+    query.exec ("DELETE FROM " GV_INBOX_TABLE);
+}//CacheDatabase::clearInbox
+
+bool
+CacheDatabase::setLastInboxUpdate (const QDateTime &dateTime)
+{
+    QSqlQuery query(dbMain);
+    query.setForwardOnly (true);
+
+    QString strQ;
+    QDateTime dtUpdate;
+    if (getLastContactUpdate (dtUpdate))
+    {
+        query.exec ("DELETE FROM " GV_UPDATES_TABLE
+                    " WHERE " GV_UP_WHAT "='" GV_UP_INBOX "'");
+    }
+
+    QString strDateTime = dateTime.toString (UPDATE_DATE_FORMAT);
+
+    strQ = QString ("INSERT INTO " GV_UPDATES_TABLE
+                    " (" GV_UP_WHAT "," GV_UP_WHEN ")"
+                    " VALUES ('" GV_UP_INBOX "', '%1')")
+           .arg(strDateTime);
+    query.exec (strQ);
+
+    return (true);
+}//CacheDatabase::setLastInboxUpdate
+
+bool
+CacheDatabase::getLastInboxUpdate (QDateTime &dateTime)
+{
+    QSqlQuery query(dbMain);
+    query.setForwardOnly (true);
+
+    dateTime = QDateTime();
+
+    bool rv = false;
+    query.exec ("SELECT " GV_UP_WHEN " FROM " GV_UPDATES_TABLE
+                " WHERE " GV_UP_WHAT "='" GV_UP_INBOX "'");
+    do // Begin cleanup block (not a loop)
+    {
+        if (!query.next ())
+        {
+            emit log ("No last contact update", 5);
+            break;
+        }
+
+        QString strDateTime = query.value(0).toString();
+
+        QRegExp rx(UPDATE_DATE_REGEXP);
+        if (!strDateTime.contains (rx) || (6 != rx.captureCount ()))
+        {
+            emit log ("Last updated contact update does not match regexp");
+            break;
+        }
+
+        dateTime = QDateTime::fromString (strDateTime, UPDATE_DATE_FORMAT);
+
+        rv = true;
+    } while (0); // End cleanup block (not a loop)
+
+    return (rv);
+
+}//CacheDatabase::getLastInboxUpdate
+
+bool
+CacheDatabase::insertHistory (      InboxModel *modelInbox,
+                              const GVHistoryEvent &hEvent    )
+{
     // Define fields and the record
     QSqlField fldId     (GV_IN_ID     , QVariant::String);
     QSqlField fldPhone  (GV_IN_PHONE  , QVariant::String);
