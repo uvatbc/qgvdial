@@ -53,9 +53,6 @@ private slots:
 private:
     void contextMenuEvent (QContextMenuEvent * event);
 
-    QString         type_to_string (GVH_Event_Type  Type);
-    GVH_Event_Type  string_to_type (const QString  &strType);
-
 private:
     //! Refresh action for history
     QAction         actRefresh;

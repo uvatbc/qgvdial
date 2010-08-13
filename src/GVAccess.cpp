@@ -325,6 +325,40 @@ GVAccess::simplify_number (QString &strNumber, bool bAddIntPrefix /*= true*/)
     }
 }//GVAccess::simplify_number
 
+bool
+GVAccess::isNumberValid (const QString &strNumber)
+{
+    QString strTemp = strNumber;
+    simplify_number (strTemp);
+    strTemp.remove ('+');
+    strTemp.remove (QRegExp ("\\d"));
+
+    return (strTemp.size () == 0);
+}//GVAccess::isNumberValid
+
+void
+GVAccess::beautify_number (QString &strNumber)
+{
+    do { // Begin cleanup block (not a loop)
+        if (!GVAccess::isNumberValid (strNumber))   break;
+
+        QString strTemp = strNumber;
+        GVAccess::simplify_number (strTemp);
+
+        if (!strTemp.startsWith ("+1"))   break;
+        if (strTemp.size () < 10)         break;
+
+        // +1aaabbbcccc -> +1 aaa bbb cccc
+        // 012345678901
+        strNumber = "+1 "
+                  + strTemp.mid (2, 3)
+                  + " "
+                  + strTemp.mid (5, 3)
+                  + " "
+                  + strTemp.mid (8);
+    } while (0); // End cleanup block (not a loop)
+}//GVAccess::beautify_number
+
 QNetworkRequest
 GVAccess::createRequest (QString         strUrl    ,
                          QStringPairList arrPairs  ,

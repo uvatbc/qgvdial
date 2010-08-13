@@ -35,7 +35,8 @@ public:
                         const QString  &strLink);
 
     bool putContactInfo (const GVContactInfo &info);
-    bool getContactInfo (GVContactInfo &info);
+    bool getContactFromLink (GVContactInfo &info);
+    bool getContactFromNumber (const QString &strNumber, GVContactInfo &info);
 
     bool setLastContactUpdate (const QDateTime &dateTime);
     bool getLastContactUpdate (QDateTime &dateTime);

@@ -65,6 +65,12 @@ public:
     //! Cancel the work specified
     bool cancelWork (GVAccess_Work whatwork);
 
+    //! Simplify a phone number
+    static void simplify_number (QString &strNumber, bool bAddIntPrefix = true);
+    static bool isNumberValid (const QString &strNumber);
+    static void beautify_number (QString &strNumber);
+
+
 #if !NO_DBGINFO
     virtual void setView (QWidget *view);
 #endif
@@ -111,10 +117,6 @@ protected:
     void doNextWork ();
     //! Complete the work so that the next one can begin
     void completeCurrentWork (GVAccess_Work whatwork, bool bOk);
-
-    //! Simplify a phone number
-    void simplify_number (QString &strNumber, bool bAddIntPrefix = true);
-
 
     //! To be used for Data Access API ONLY
     QNetworkRequest

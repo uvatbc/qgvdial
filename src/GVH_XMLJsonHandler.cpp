@@ -161,7 +161,7 @@ GVH_XMLJsonHandler::parseJSON (const QDateTime &dtUpdate)
             // Check to see if it is too old to show
             if (dtUpdate.isValid () && (dtUpdate > oneHistory.startTime))
             {
-                emit log ("This entry is old.");
+                // emit log ("This entry is old.");
                 continue;
             }
 

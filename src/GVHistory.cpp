@@ -151,82 +151,17 @@ GVHistory::refreshHistory ()
     }
 }//GVHistory::refreshHistory
 
-QString
-GVHistory::type_to_string (GVH_Event_Type Type)
-{
-    QString strReturn;
-    switch (Type)
-    {
-    case GVHE_Placed:
-        strReturn = "Placed";
-        break;
-    case GVHE_Received:
-        strReturn = "Received";
-        break;
-    case GVHE_Missed:
-        strReturn = "Missed";
-        break;
-    case GVHE_Voicemail:
-        strReturn = "Voicemail";
-        break;
-    case GVHE_TextMessage:
-        strReturn = "SMS";
-        break;
-    default:
-        break;
-    }
-    return (strReturn);
-}//GVHistory::type_to_string
-
-GVH_Event_Type
-GVHistory::string_to_type (const QString &strType)
-{
-    GVH_Event_Type Type = GVHE_Unknown;
-
-    do // Begin cleanup block (not a loop)
-    {
-        if (0 == strType.compare ("Placed"))
-        {
-            Type = GVHE_Placed;
-            break;
-        }
-        if (0 == strType.compare ("Received"))
-        {
-            Type = GVHE_Received;
-            break;
-        }
-        if (0 == strType.compare ("Missed"))
-        {
-            Type = GVHE_Missed;
-            break;
-        }
-        if (0 == strType.compare ("Voicemail"))
-        {
-            Type = GVHE_Voicemail;
-            break;
-        }
-        if (0 == strType.compare ("SMS"))
-        {
-            Type = GVHE_TextMessage;
-            break;
-        }
-    } while (0); // End cleanup block (not a loop)
-
-    return (Type);
-}//GVHistory::string_to_type
-
 void
 GVHistory::oneHistoryEvent (const GVHistoryEvent &hevent)
 {
-    QStringList arrItems;
-    QString     strType = type_to_string (hevent.Type);
+    InboxModel *tModel = (InboxModel *) this->model ();
+    QString     strType = tModel->type_to_string (hevent.Type);
     if (0 == strType.size ())
     {
         return;
     }
 
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    InboxModel *tModel = (InboxModel *) this->model ();
     dbMain.insertHistory (tModel, hevent);
 }//GVHistory::oneHistoryEvent
 
@@ -242,8 +177,8 @@ GVHistory::getHistoryDone (bool, const QVariantList &)
     tModel->submitAll ();
 
     this->hideColumn (0);
-    this->hideColumn (4);
     this->hideColumn (5);
+    this->sortByColumn (2);
 
     for (int i = 0; i < 4; i++)
     {

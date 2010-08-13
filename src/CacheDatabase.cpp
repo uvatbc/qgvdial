@@ -1,4 +1,5 @@
 #include "CacheDatabase.h"
+#include "GVAccess.h"
 
 //////////////////////////////// Settings table ////////////////////////////////
 #define GV_SETTINGS_TABLE   "gvsettings"
@@ -15,7 +16,7 @@
 // Registered numbers now include the phone type.
 // #define GV_S_VALUE_DB_VER   "2010-08-07 13:48:26"
 // Contact updates moved out of main table into updates table
-#define GV_S_VALUE_DB_VER   "2010-08-13 09:15:49"
+#define GV_S_VALUE_DB_VER   "2010-08-13 15:24:15"
 ////////////////////////////// GV Contacts table ///////////////////////////////
 #define GV_CONTACTS_TABLE   "gvcontacts"
 #define GV_C_ID             "id"
@@ -39,13 +40,13 @@
 //////////////////////////////// GV inbox table ////////////////////////////////
 #define GV_INBOX_TABLE      "gvinbox"
 #define GV_IN_ID            "id"
-#define GV_IN_PHONE         "number"
-#define GV_IN_DISPNUM       "display_number"
-#define GV_IN_ATTIME        "happened_at"
 #define GV_IN_TYPE          "type"          // voicemail,missed,etc.
+#define GV_IN_ATTIME        "happened_at"
+#define GV_IN_DISPNUM       "display_number"
+#define GV_IN_PHONE         "number"
 #define GV_IN_FLAGS         "flags"         // read, starred, etc.
 ////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////// GV inbox table ////////////////////////////////
+/////////////////////////////// GV updates table ///////////////////////////////
 #define GV_UPDATES_TABLE    "gvupdates"
 #define GV_UP_WHAT          "update_what"
 #define GV_UP_WHEN          "updated_when"
@@ -118,6 +119,8 @@ CacheDatabase::init ()
         query.exec ("DROP TABLE " GV_CONTACTS_TABLE);
         query.exec ("DROP TABLE " GV_LINKS_TABLE);
         query.exec ("DROP TABLE " GV_REG_NUMS_TABLE);
+        query.exec ("DROP TABLE " GV_INBOX_TABLE);
+        query.exec ("DROP TABLE " GV_UPDATES_TABLE);
 
         // Clear out all settings as well
         query.exec ("DELETE FROM " GV_SETTINGS_TABLE);
@@ -171,10 +174,10 @@ CacheDatabase::init ()
     {
         query.exec ("CREATE TABLE " GV_INBOX_TABLE " "
                     "(" GV_IN_ID        " varchar, "
-                        GV_IN_PHONE     " varchar, "
-                        GV_IN_DISPNUM   " varchar, "
-                        GV_IN_ATTIME    " bigint, "
                         GV_IN_TYPE      " tinyint, "
+                        GV_IN_ATTIME    " bigint, "
+                        GV_IN_DISPNUM   " varchar, "
+                        GV_IN_PHONE     " varchar, "
                         GV_IN_FLAGS     " integer)");
     }
     // Ensure that the inbox table is present. If not, create it.
@@ -420,22 +423,29 @@ CacheDatabase::putContactInfo (const GVContactInfo &info)
     // Then insert numbers
     foreach (GVContactNumber entry, info.arrPhones)
     {
+        QString strNum = entry.strNumber;
+        if (GVAccess::isNumberValid (strNum))
+        {
+            GVAccess::simplify_number (strNum);
+        }
+
         strQ = strTemplate.arg (GV_L_TYPE_NUMBER,
-                                QString (entry.chType + entry.strNumber));
+                                QString (entry.chType + strNum));
         query.exec (strQ);
     }
     return (true);
 }//CacheDatabase::putContactInfo
 
 bool
-CacheDatabase::getContactInfo (GVContactInfo &info)
+CacheDatabase::getContactFromLink (GVContactInfo &info)
 {
     QSqlQuery query(dbMain);
-    QString strQ;
-    quint16 count = 0;
-    bool rv = false;
     query.setForwardOnly (true);
 
+    quint16 count = 0;
+    bool rv = false;
+
+    QString strQ;
     strQ = QString ("SELECT " GV_L_TYPE ", " GV_L_DATA
                     " FROM " GV_LINKS_TABLE " WHERE "
                     GV_L_LINK "='%1'").arg (info.strLink);
@@ -469,6 +479,32 @@ CacheDatabase::getContactInfo (GVContactInfo &info)
 
     return (rv);
 }//CacheDatabase::saveContactInfo
+
+bool
+CacheDatabase::getContactFromNumber (const QString &strNumber,
+                                     GVContactInfo &info)
+{
+    QSqlQuery query(dbMain);
+    query.setForwardOnly (true);
+
+    bool rv = false;
+    do {// Begin cleanup block (not a loop)
+        QString strQ;
+        strQ = QString ("SELECT " GV_L_LINK " FROM " GV_LINKS_TABLE " "
+                        "WHERE " GV_L_TYPE "='" GV_L_TYPE_NUMBER "' "
+                        "AND " GV_L_DATA " LIKE '%%%1'")
+                        .arg (strNumber);
+        query.exec (strQ);
+
+        if (query.next ())
+        {
+            info.strLink = query.value(0).toString ();
+
+            rv = getContactFromLink (info);
+        }
+    } while (0); // End cleanup block (not a loop)
+    return (rv);
+}//CacheDatabase::getContactFromNumber
 
 bool
 CacheDatabase::setLastContactUpdate (const QDateTime &dateTime)

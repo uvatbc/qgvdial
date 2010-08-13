@@ -1,4 +1,6 @@
 TODO:
+-> Inbox selection of entries: all voicemail, etc.
+-> Inbox call, SMS and play voicemail
 -> Call cancel for callout and callback both need to work
 -> Call and SMS buttons from contacts page and history page
 -> SMS needs to be handled in history: Add children of the SMS as representation of the SMS texts
@@ -6,6 +8,10 @@ TODO:
 -> Default button on GVSettings page should map to Login button
 
 Changelog:
+
+2010-08-13:
+-> GV Inbox now uses data API
+
 2010-08-07:
 -> Dial callback works.
 

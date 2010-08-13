@@ -646,7 +646,7 @@ MainWindow::callNameLink (const QString &strNameLink, const QString &strNumber)
     {
         GVContactInfo info;
         info.strLink = strNameLink;
-        if (dbMain.getContactInfo (info))
+        if (dbMain.getContactFromLink (info))
         {
             gotContactInfo (info, false);
             bOk = true;
@@ -697,7 +697,7 @@ MainWindow::callHistoryLink (const QString &strLink)
     {
         GVContactInfo info;
         info.strLink = strLink;
-        if (dbMain.getContactInfo (info))
+        if (dbMain.getContactFromLink (info))
         {
             gotContactInfo (info, false);
             bOk = true;
@@ -969,7 +969,7 @@ MainWindow::sendSMSToLink (const QString &strLink)
     {
         GVContactInfo info;
         info.strLink = strLink;
-        if (dbMain.getContactInfo (info))
+        if (dbMain.getContactFromLink (info))
         {
             gotSMSContactInfo (info, false);
             bOk = true;
@@ -1020,7 +1020,7 @@ MainWindow::sendSMSToNameLink (const QString &strNameLink,
     {
         GVContactInfo info;
         info.strLink = strNameLink;
-        if (dbMain.getContactInfo (info))
+        if (dbMain.getContactFromLink (info))
         {
             gotSMSContactInfo (info, false);
             bOk = true;
