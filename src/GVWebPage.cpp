@@ -914,7 +914,8 @@ GVWebPage::onGotHistoryXML (QNetworkReply *reply)
         emit log ("End parsing");
 
         QDateTime dtUpdate = workCurrent.arrParams[3].toDateTime ();
-        if (!xmlHandler.parseJSON (dtUpdate))
+        bool bGotOld = false;
+        if (!xmlHandler.parseJSON (dtUpdate, bGotOld))
         {
             emit log ("Failed to parse GV History JSON");
             break;
@@ -926,7 +927,7 @@ GVWebPage::onGotHistoryXML (QNetworkReply *reply)
         bOk = true;
 
         int count = workCurrent.arrParams[2].toString().toInt ();
-        if ((nCurrent-nFirstPage) >= count)
+        if (((nCurrent-nFirstPage) >= count) || (bGotOld))
         {
             completeCurrentWork (GVAW_getInbox, true);
             break;
@@ -1124,130 +1125,81 @@ GVWebPage::playVmail ()
     QMutexLocker locker(&mutex);
     if (!bLoggedIn)
     {
-        emit log ("User not logged in when attempting to play vmail");
         completeCurrentWork (GVAW_playVmail, false);
         return (false);
     }
 
-    QString strQuery, strHost;
-    this->getHostAndQuery (strHost, strQuery);
-    QString strGoto = strHost
-                    + workCurrent.arrParams[0].toString();
-    QObject::connect (
-        &webPage, SIGNAL (unsupportedContent (QNetworkReply *)),
-         this   , SLOT   (vmailDataRecv      (QNetworkReply *)));
-    QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
-                       this   , SLOT   (playVmailPageDone (bool)));
-    emit log ("Loading vmail");
-    this->loadUrlString (strGoto);
+    do // Begin cleanup block (not a loop)
+    {
+        QString strWhich = workCurrent.arrParams[0].toString();
+
+        QString strLink = QString (GV_HTTPS "/media/send_voicemail/%1")
+                            .arg(workCurrent.arrParams[0].toString());
+        QNetworkRequest request(strLink);
+        request.setRawHeader ("User-Agent", UA_IPHONE);
+
+        QNetworkAccessManager *mgr = webPage.networkAccessManager ();
+        QNetworkCookieJar *jar = mgr->cookieJar();
+        QList<QNetworkCookie> cookies =
+            jar->cookiesForUrl (webPage.mainFrame()->url ());
+        QList<QNetworkCookie> sendCookies;
+        QString gvxVal;
+        foreach (QNetworkCookie cookie, cookies)
+        {
+            if ((cookie.name() == "gv")   ||
+                (cookie.name() == "gvx")  ||
+                (cookie.name() == "PREF") ||
+                (cookie.name() == "S")    ||
+                (cookie.name() == "SID")  ||
+                (cookie.name() == "HSID") ||
+                (cookie.name() == "SSID"))
+            {
+                sendCookies += cookie;
+            }
+
+            if (cookie.name () == "gvx")
+            {
+                gvxVal = cookie.value ();
+            }
+        }
+
+        // Set up the cookies in the request
+        request.setHeader (QNetworkRequest::CookieHeader,
+                           QVariant::fromValue(sendCookies));
+
+        emit status ("Starting vmail download");
+        QObject::connect (mgr , SIGNAL (finished          (QNetworkReply *)),
+                          this, SLOT   (onVmailDownloaded (QNetworkReply *)));
+        mgr->get (request);
+    } while (0); // End cleanup block (not a loop)
 
     return (true);
 }//GVWebPage::playVmail
 
 void
-GVWebPage::playVmailPageDone (bool bOk)
+GVWebPage::onVmailDownloaded (QNetworkReply *reply)
 {
-    QObject::disconnect (
-        &webPage, SIGNAL (unsupportedContent (QNetworkReply *)),
-         this   , SLOT   (vmailDataRecv      (QNetworkReply *)));
-    QObject::disconnect (&webPage, SIGNAL (loadFinished (bool)),
-                          this   , SLOT   (playVmailPageDone (bool)));
+    QNetworkAccessManager *mgr = webPage.networkAccessManager ();
+    QObject::disconnect (mgr , SIGNAL (finished          (QNetworkReply *)),
+                         this, SLOT   (onVmailDownloaded (QNetworkReply *)));
 
+    bool rv = true;
     do // Begin cleanup block (not a loop)
     {
-        bOk = false;
-
-        if (workCurrent.arrParams.size () < 3)
+        QFile file(workCurrent.arrParams[1].toString());
+        if (!file.open(QFile::ReadWrite))
         {
-            emit log ("Did our data recv never get called??");
+            emit log ("Failed to open the vmail file. Abort!");
             break;
         }
 
-        emit log ("vmail in progress");
-        bOk = true;
+        emit log (QString ("Saving vmail in %1").arg(file.fileName ()));
+        file.write(reply->readAll());
+        emit status ("vmail saved");
+
+        rv = true;
     } while (0); // End cleanup block (not a loop)
-    if (!bOk)
-    {
-        completeCurrentWork (GVAW_playVmail, false);
-    }
-}//GVWebPage::playVmailPageDone
 
-void
-GVWebPage::vmailDataRecv (QNetworkReply *reply)
-{
-    emit log ("Request for vmail unsupported content");
-    emit status ("Downloading vmail", 0);
-
-    QVariant var = VConv<QNetworkReply>::toQVariant (reply);
-    workCurrent.arrParams += var;
-
-    QObject::connect (reply, SIGNAL (finished ()),
-                      this , SLOT   (vmailDataDone ()));
-}//GVWebPage::vmailDataRecv
-
-void
-GVWebPage::vmailDataDone ()
-{
-    bool bOk = false;
-    do { // Begin cleanup block (not a loop)
-        QVariant var = workCurrent.arrParams[workCurrent.arrParams.size()-1];
-        if (var.isNull ())
-        {
-            emit log ("No network reply stored while downloading vmail");
-            QObject::disconnect (this, SLOT (vmailDataDone ()));
-            break;
-        }
-        QNetworkReply *reply = VConv<QNetworkReply>::toPtr (var);
-        if (NULL == reply)
-        {
-            emit log ("Invalid network reply while downloading vmail");
-            QObject::disconnect (this, SLOT (vmailDataDone ()));
-            break;
-        }
-
-        bool bDisc =
-        QObject::disconnect (reply, SIGNAL (finished ()),
-                             this , SLOT   (vmailDataDone ()));
-        if (!bDisc)
-        {
-            emit log ("This reply was never connected. Did we fuck up?");
-            // move on brotha!
-        }
-
-        do // Begin cleanup block (not a loop)
-        {
-            if (GVAW_playVmail != workCurrent.whatwork)
-            {
-                emit log ("Delayed response to our data??");
-                break;
-            }
-            if (workCurrent.arrParams.size () < 2)
-            {
-                emit log ("Something wrong with the parameter count. Abort!");
-                break;
-            }
-
-            QFile file(workCurrent.arrParams[1].toString());
-            if (!file.open(QFile::ReadWrite))
-            {
-                emit log ("Failed to open the vmail file. Abort!");
-                break;
-            }
-            file.write(reply->readAll());
-
-            emit log ("Finally the content is all downloaded");
-            bOk = true;
-        } while (0); // End cleanup block (not a loop)
-
-        reply->deleteLater ();
-        completeCurrentWork (GVAW_playVmail, bOk);
-    } while (0); // End cleanup block (not a loop)
-    if (bOk)
-    {
-        emit status ("Voice mail downloaded.");
-    }
-    else
-    {
-        emit status ("Voice mail could not be downloaded");
-    }
-}//GVWebPage::vmailDataDone
+    completeCurrentWork (GVAW_playVmail, rv);
+    reply->deleteLater ();
+}//GVWebPage::onVmailDownloaded

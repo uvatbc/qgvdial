@@ -39,9 +39,6 @@ public slots:
 private slots:
     void oneHistoryEvent (const GVHistoryEvent &hevent);
     void getHistoryDone (bool bOk, const QVariantList &arrParams);
-    void onCurrentItemChanged (QTreeWidgetItem *current,
-                               QTreeWidgetItem *previous);
-    void onItemActivated (QTreeWidgetItem *item, int column);
     void onInboxSelected (QAction *action);
     void placeCall ();
     void sendSMS ();

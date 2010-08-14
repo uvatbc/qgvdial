@@ -191,30 +191,6 @@ GVHistory::getHistoryDone (bool, const QVariantList &)
 }//GVHistory::getHistoryDone
 
 void
-GVHistory::onCurrentItemChanged (QTreeWidgetItem *current,
-                                 QTreeWidgetItem * /*previous*/)
-{
-    QMutexLocker locker(&mutex);
-    if (NULL == current)
-    {
-        historyEvent = GVHistoryEvent();
-        return;
-    }
-
-    // To ensure that we get to the topmost item - required for SMS items
-    while (NULL != current->parent ())
-    {
-        current = current->parent ();
-    }
-
-    QVariant var = current->data(5, Qt::EditRole);
-    if (var.canConvert <GVHistoryEvent> ())
-    {
-        historyEvent = var.value <GVHistoryEvent> ();
-    }
-}//GVHistory::onCurrentItemChanged
-
-void
 GVHistory::selectionChanged (const QItemSelection &selected,
                              const QItemSelection & /*deselected*/)
 {
@@ -274,12 +250,6 @@ GVHistory::selectionChanged (const QItemSelection &selected,
         strContactId = info.strLink;
     } while (0); // End cleanup block (not a loop)
 }//GVHistory::selectionChanged
-
-void
-GVHistory::onItemActivated (QTreeWidgetItem * /*item*/, int /* column*/)
-{
-    placeCall ();
-}//GVHistory::onItemActivated
 
 void
 GVHistory::onInboxSelected (QAction *action)

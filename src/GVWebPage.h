@@ -63,14 +63,8 @@ private slots:
     //! Invoked when the SMS main page is loaded
     void sendSMSPage1 (bool bOk);
 
-    //! Invoked when the play vmail page is loaded
-    void playVmailPageDone (bool bOk);
-
-    //! Invoked when the page requests download of the vmail
-    void vmailDataRecv (QNetworkReply *reply);
-
-    //! Invoked when all the data in the vmail mp3 has finished downloading
-    void vmailDataDone ();
+    //! Invoked when th vmail is downloaded
+    void onVmailDownloaded (QNetworkReply *reply);
 
 private:
     QWebElement doc ();
