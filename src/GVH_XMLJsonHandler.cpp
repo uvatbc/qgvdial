@@ -8,9 +8,9 @@ GVH_XMLJsonHandler::GVH_XMLJsonHandler (QObject *parent)
 
 bool
 GVH_XMLJsonHandler::startElement (const QString        & /*namespaceURI*/,
-                                 const QString        &localName   ,
-                                 const QString        & /*qName       */,
-                                 const QXmlAttributes & /*atts        */)
+                                  const QString        & /*localName   */,
+                                  const QString        & /*qName       */,
+                                  const QXmlAttributes & /*atts        */)
 {
     //emit log (QString ("start name=%1").arg (localName));
     strChars.clear ();
