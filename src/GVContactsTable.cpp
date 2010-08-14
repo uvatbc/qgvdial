@@ -216,7 +216,7 @@ GVContactsTable::placeCall ()
     QMutexLocker locker(&mutex);
     if (0 != strSavedLink.size ())
     {
-        emit callNameLink (strSavedLink, "");
+        emit callNumber (QString (), strSavedLink);
     }
     else
     {
@@ -230,7 +230,7 @@ GVContactsTable::sendSMS ()
     QMutexLocker locker(&mutex);
     if (0 != strSavedLink.size ())
     {
-        emit sendSMSToNameLink (strSavedLink, "");
+        emit textANumber (QString(), strSavedLink);
     }
     else
     {

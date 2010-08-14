@@ -17,16 +17,13 @@ signals:
     //! Status emitter for status bar
     void status(const QString &strText, int timeout = 2000);
 
-    //! Emitted on user request to call an unknown number
-    void callLink (const QString &strLink);
     //! Emitted on user request to call a known contact
-    void callNameLink (const QString &strNameLink, const QString &strNumber);
+    void callNumber (const QString &strNumber,
+                     const QString &strNameLink = QString ());
 
     //! Emitted on user request to send an SMS to an unknown number
-    void sendSMSToLink (const QString &strLink);
-    //! Emitted on user request to send an SMS to a known contact
-    void sendSMSToNameLink (const QString &strNameLink,
-                            const QString &strNumber);
+    void textANumber (const QString &strNumber,
+                      const QString &strNameLink = QString ());
 
     void playVoicemail (const QString &strVmailLink);
 
@@ -48,7 +45,10 @@ private slots:
     void onInboxSelected (QAction *action);
     void placeCall ();
     void sendSMS ();
-    void playVoicemail ();
+    void actPlayVmailTriggered ();
+
+    void selectionChanged (const QItemSelection &selected,
+                           const QItemSelection &deselected);
 
 private:
     void contextMenuEvent (QContextMenuEvent * event);
@@ -86,9 +86,13 @@ private:
 
     //! Mutex for the following variables
     QMutex          mutex;
-    //! Current selection
-    QString         strSelected;
 
+    //! The currently selected messages: all, voicemail, etc
+    QString         strSelectedMessages;
+
+    //! Contact ID of the currently selected inbox entry
+    QString         strContactId;
+    //! More details about the currently selected inbox entry
     GVHistoryEvent  historyEvent;
 
     //! Are we logged in?

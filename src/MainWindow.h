@@ -82,7 +82,7 @@ private slots:
     void dialComplete (bool bOk, const QVariantList &arrParams);
 
     //! Invoked when contact details have been obtained
-    void gotContactInfo (const GVContactInfo &info, bool bCallback = true);
+    void callWithContactInfo (const GVContactInfo &info, bool bCallback = true);
     //! Invoked when work for getting contact details is done - success or fail.
     void contactsLinkWorkDone (bool bOk, const QVariantList &arrParams);
 
@@ -110,18 +110,18 @@ private slots:
     //! Invoked when the tab is switched
     void tabChanged (int index);
 
-    //! Invoked on user request to call an unknown number
-    void callHistoryLink (const QString &strLink);
-    //! Invoked on user request to call a known contact
-    void callNameLink (const QString &strNameLink, const QString &strNumber);
+    bool getInfoFrom (const QString &strNumber,
+                      const QString &strNameLink,
+                      GVContactInfo &info);
+    //! Invoked on user request to call a number
+    void callNumber (const QString &strNumber,
+                     const QString &strNameLink = QString());
     //! Invoked on user request to send an SMS to an unknown number
-    void sendSMSToLink (const QString &strLink);
-    //! Invoked on user request to send an SMS to a known contact
-    void sendSMSToNameLink (const QString &strNameLink,
-                            const QString &strNumber);
+    void textANumber (const QString &strNumber,
+                      const QString &strNameLink = QString());
 
     //! Callback for the webpage when it gets a contacts info
-    void gotSMSContactInfo (const GVContactInfo &info, bool bCallback = true);
+    void sendTextToContact (const GVContactInfo &info, bool bCallback = true);
     //! Invoked when the webpage is done sending all contact info for an SMS
     void contactsLinkWorkDoneSMS (bool bOk, const QVariantList &arrParams);
 
@@ -169,7 +169,7 @@ private:
     MyWebView      *webView;
 #endif
     DialerWidget   *pDialer;
-    GVContactsTable*pContactsTable;
+    GVContactsTable*pContactsView;
     GVSettings     *pGVSettings;
     GVHistory      *pGVHistory;
 
@@ -201,7 +201,7 @@ private:
     //! This is the currently selected callback / callout number
     QString         strCallbackNumber;
     //! This flag specifies if the number is call-back or call-out
-    bool            bCallback;
+    bool            bSaveIt;
 
     //! Set this flag if the user cancels the dialed number
     bool            bDialCancelled;

@@ -26,10 +26,9 @@ signals:
     void allContacts (bool bOk);
 
     //! Emitted on user request to call a known contact
-    void callNameLink (const QString &strNameLink, const QString &strNumber);
+    void callNumber (const QString &strNumber, const QString &strNameLink);
     //! Emitted on user request to send an SMS to a known contact
-    void sendSMSToNameLink (const QString &strNameLink,
-                            const QString &strNumber);
+    void textANumber (const QString &strNumber, const QString &strNameLink);
 
 public slots:
     void refreshContacts ();

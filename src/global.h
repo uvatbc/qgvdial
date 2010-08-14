@@ -68,10 +68,10 @@ enum GVH_Event_Type {
 struct GVHistoryEvent
 {
     QString         id;
-    QString         strPhoneNumber;
-    QString         strDisplayNumber;
-    QDateTime       startTime;
     GVH_Event_Type  Type;
+    QDateTime       startTime;
+    QString         strDisplayNumber;
+    QString         strPhoneNumber;
     bool            bRead;
     bool            bSpam;
     bool            bTrash;

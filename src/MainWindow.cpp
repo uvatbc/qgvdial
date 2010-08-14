@@ -131,7 +131,7 @@ MainWindow::deinit ()
         tabMain = NULL;
 
         pDialer = NULL;
-        pContactsTable = NULL;
+        pContactsView = NULL;
         pGVHistory = NULL;
     }
 
@@ -245,8 +245,8 @@ MainWindow::init ()
     tabMain->addTab (pDialer, "Dialer");
 
     // Contacts
-    pContactsTable = new GVContactsTable ();
-    tabMain->addTab (pContactsTable, "Contacts");
+    pContactsView = new GVContactsTable ();
+    tabMain->addTab (pContactsView, "Contacts");
 
     // GV History
     pGVHistory = new GVHistory ();
@@ -304,13 +304,13 @@ MainWindow::init ()
          this   , SLOT   (dialAccessNumber (const QString &,
                                             const QVariant &)));
 
-    // pContactsTable.oneContact -> this.gotContact
-    QObject::connect (pContactsTable,
+    // pContactsView.oneContact -> this.gotContact
+    QObject::connect (pContactsView,
                 SIGNAL (oneContact (int, const ContactInfo &)),
           this, SLOT   (gotContact (int, const ContactInfo &)));
-    // pContactsTable.allContacts -> this.getContactsDone
-    QObject::connect (pContactsTable, SIGNAL (allContacts (bool)),
-                      this          , SLOT   (getContactsDone (bool)));
+    // pContactsView.allContacts -> this.getContactsDone
+    QObject::connect (pContactsView, SIGNAL (allContacts (bool)),
+                      this         , SLOT   (getContactsDone (bool)));
 
     // pGVSettings.login -> this.doLogin
     QObject::connect (
@@ -326,39 +326,27 @@ MainWindow::init ()
     QObject::connect (pGVSettings, SIGNAL (newUser ()),
                       this       , SLOT   (beginGetAccountDetails ()));
 
-    // pContactsTable.call -> this.call
+    // pContactsView.call -> this.call
     QObject::connect (
-        pContactsTable, SIGNAL(callNameLink(const QString &, const QString &)),
-        this          , SLOT  (callNameLink(const QString &, const QString &)));
-    // pContactsTable.SMS -> this.SMS
+        pContactsView, SIGNAL(callNumber(const QString &, const QString &)),
+        this         , SLOT  (callNumber(const QString &, const QString &)));
+    // pContactsView.SMS -> this.SMS
     QObject::connect (
-        pContactsTable,
-            SIGNAL (sendSMSToNameLink (const QString &, const QString &)),
-        this      ,
-            SLOT   (sendSMSToNameLink (const QString &, const QString &)));
+        pContactsView, SIGNAL (textANumber (const QString &, const QString &)),
+        this         , SLOT   (textANumber (const QString &, const QString &)));
 
     // pGVHistory.call -> this.call
     QObject::connect (
-        pGVHistory, SIGNAL (callNameLink (const QString &, const QString &)),
-        this      , SLOT   (callNameLink (const QString &, const QString &)));
-    QObject::connect (
-        pGVHistory, SIGNAL (callLink (const QString &)),
-        this      , SLOT   (callHistoryLink (const QString &)));
-
+        pGVHistory, SIGNAL (callNumber (const QString &, const QString &)),
+        this      , SLOT   (callNumber (const QString &, const QString &)));
     // pGVHistory.SMS -> this.SMS
     QObject::connect (
-        pGVHistory,
-            SIGNAL (sendSMSToNameLink (const QString &, const QString &)),
-        this      ,
-            SLOT   (sendSMSToNameLink (const QString &, const QString &)));
+        pGVHistory, SIGNAL (textANumber (const QString &, const QString &)),
+        this      , SLOT   (textANumber (const QString &, const QString &)));
+    // pGVHistory.playVoicemail -> this.playVoicemail
     QObject::connect (
         pGVHistory, SIGNAL (playVoicemail (const QString &)),
         this      , SLOT   (playVoicemail (const QString &)));
-
-    // pGVHistory.playVoicemail -> this.playVoicemail
-    QObject::connect (
-        pGVHistory, SIGNAL (sendSMSToLink (const QString &)),
-        this      , SLOT   (sendSMSToLink (const QString &)));
 
     // dlgSMS.sendSMS -> this.sendSMS
     QObject::connect (
@@ -366,10 +354,10 @@ MainWindow::init ()
          this  , SLOT   (sendSMS (const QStringList &, const QString &)));
 
     // Logged in and logged out for all
-    QObject::connect (this          , SIGNAL (loginSuccess ()),
-                      pContactsTable, SLOT   (loginSuccess ()));
-    QObject::connect (this          , SIGNAL (loggedOut ()),
-                      pContactsTable, SLOT   (loggedOut ()));
+    QObject::connect (this         , SIGNAL (loginSuccess ()),
+                      pContactsView, SLOT   (loginSuccess ()));
+    QObject::connect (this         , SIGNAL (loggedOut ()),
+                      pContactsView, SLOT   (loggedOut ()));
     QObject::connect (this      , SIGNAL (loginSuccess ()),
                       pGVHistory, SLOT   (loginSuccess ()));
     QObject::connect (this      , SIGNAL (loggedOut ()),
@@ -380,10 +368,10 @@ MainWindow::init ()
                       this   , SLOT   (log(const QString &, int)));
     QObject::connect (pDialer, SIGNAL (status(const QString &, int)),
                       this   , SLOT   (setStatus(const QString &, int)));
-    QObject::connect (pContactsTable, SIGNAL (log(const QString &, int)),
-                      this          , SLOT   (log(const QString &, int)));
-    QObject::connect (pContactsTable, SIGNAL (status(const QString &, int)),
-                      this          , SLOT   (setStatus(const QString &, int)));
+    QObject::connect (pContactsView, SIGNAL (log(const QString &, int)),
+                      this         , SLOT   (log(const QString &, int)));
+    QObject::connect (pContactsView, SIGNAL (status(const QString &, int)),
+                      this         , SLOT   (setStatus(const QString &, int)));
     QObject::connect (pGVSettings, SIGNAL (log(const QString &, int)),
                       this       , SLOT   (log(const QString &, int)));
     QObject::connect (pGVSettings, SIGNAL (status(const QString &, int)),
@@ -435,7 +423,7 @@ MainWindow::doLogin (const QString &strU, const QString &strP)
     bool bOk = false;
     do // Begin cleanup block (not a loop)
     {
-        pContactsTable->setUserPass (strU, strP);
+        pContactsView->setUserPass (strU, strP);
 
         QVariantList l;
         l += strU;
@@ -504,7 +492,7 @@ MainWindow::enterLoggedIn ()
 void
 MainWindow::beginGetAccountDetails ()
 {
-    pContactsTable->refreshContacts ();
+    pContactsView->refreshContacts ();
     pGVSettings->refreshRegisteredNumbers ();
 }//MainWindow::beginGetAccountDetails
 
@@ -517,7 +505,7 @@ MainWindow::gotContact (int cnt, const ContactInfo &contactInfo)
                           contactInfo.strId);
 
     GVContactInfo gvContactInfo;
-    pContactsTable->convert (contactInfo, gvContactInfo);
+    pContactsView->convert (contactInfo, gvContactInfo);
 
     dbMain.putContactInfo (gvContactInfo);
 }//MainWindow::gotContact
@@ -582,9 +570,9 @@ MainWindow::exitLoggedIn ()
 void
 MainWindow::deinitContactsModel ()
 {
-    if (NULL != pContactsTable)
+    if (NULL != pContactsView)
     {
-        pContactsTable->reset ();
+        pContactsView->reset ();
     }
 
     if (NULL != modelContacts)
@@ -601,11 +589,11 @@ MainWindow::initContactsModel ()
 
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     modelContacts = dbMain.newContactsModel ();
-    pContactsTable->setModel (modelContacts);
+    pContactsView->setModel (modelContacts);
     modelContacts->submitAll ();
 
-    pContactsTable->hideColumn (1);
-    pContactsTable->sortByColumn (0, Qt::AscendingOrder);
+    pContactsView->hideColumn (1);
+    pContactsView->sortByColumn (0, Qt::AscendingOrder);
 }//MainWindow::initContactsModel
 
 void
@@ -635,112 +623,80 @@ MainWindow::initInboxModel ()
     modelInbox->submitAll ();
 }//MainWindow::initHistoryModel
 
-void
-MainWindow::callNameLink (const QString &strNameLink, const QString &strNumber)
+bool
+MainWindow::getInfoFrom (const QString &strNumber,
+                         const QString &strNameLink,
+                         GVContactInfo &info)
 {
-    GVAccess &webPage = Singletons::getRef().getGVAccess ();
-    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    info = GVContactInfo();
 
-    bool bOk = false;
-    do // Begin cleanup block (not a loop)
+    if (0 != strNameLink.size ())
     {
-        GVContactInfo info;
+        CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
         info.strLink = strNameLink;
-        if (dbMain.getContactFromLink (info))
+
+        if (!dbMain.getContactFromLink (info))
         {
-            gotContactInfo (info, false);
-            bOk = true;
-            break;
+            QMessageBox *msgBox = new QMessageBox(QMessageBox::Critical,
+                                        "Get Contact failure",
+                                        "Failed to get contact information",
+                                        QMessageBox::Close,
+                                        this);
+            msgBox->setModal (false);
+            QObject::connect (
+                msgBox, SIGNAL (buttonClicked (QAbstractButton *)),
+                this  , SLOT   (msgBox_buttonClicked (QAbstractButton *)));
+            msgBox->show ();
+
+            return (false);
         }
 
-        QObject::connect (
-            &webPage, SIGNAL (contactInfo (const GVContactInfo &)),
-             this   , SLOT   (gotContactInfo (const GVContactInfo &)));
-        QVariantList l;
-        l += strNameLink;
-        l += strNumber;
-        if (!webPage.enqueueWork (GVAW_getContactFromLink, l, this,
-                SLOT (contactsLinkWorkDone (bool, const QVariantList &))))
+        for (int i = 0; i < info.arrPhones.size (); i++)
         {
-            QObject::disconnect (
-                &webPage, SIGNAL (contactInfo (const GVContactInfo &)),
-                 this   , SLOT   (gotContactInfo (const GVContactInfo &)));
-            log ("Getting contact info failed immediately", 3);
-            break;
-        }
+            QString lhs = strNumber;
+            QString rhs = info.arrPhones[i].strNumber;
 
-        bOk = true;
-    } while (0); // End cleanup block (not a loop)
-    if (!bOk)
-    {
-        QMessageBox *msgBox = new QMessageBox(QMessageBox::Critical,
-                                    "Get Contact failure",
-                                    "Failed to get contact information",
-                                    QMessageBox::Close,
-                                    this);
-        msgBox->setModal (false);
-        QObject::connect (
-            msgBox, SIGNAL (buttonClicked (QAbstractButton *)),
-            this  , SLOT   (msgBox_buttonClicked (QAbstractButton *)));
-        msgBox->show ();
+            GVAccess::simplify_number (lhs);
+            GVAccess::simplify_number (rhs);
+            if (lhs == rhs)
+            {
+                info.selected = i;
+                break;
+            }
+        }
     }
-}//MainWindow::callNameLink
+    else
+    {
+        info.strName = strNumber;
+        GVContactNumber num;
+        num.chType = 'O';
+        num.strNumber = strNumber;
+        info.arrPhones += num;
+        info.selected = 0;
+    }
+
+    return (true);
+}//MainWindow::getInfoFrom
 
 void
-MainWindow::callHistoryLink (const QString &strLink)
+MainWindow::callNumber (const QString &strNumber,
+                        const QString &strNameLink)
 {
-    GVAccess &webPage = Singletons::getRef().getGVAccess ();
-    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    GVContactInfo info;
 
-    bool bOk = false;
-    do // Begin cleanup block (not a loop)
+    if (!getInfoFrom (strNumber, strNameLink, info))
     {
-        GVContactInfo info;
-        info.strLink = strLink;
-        if (dbMain.getContactFromLink (info))
-        {
-            gotContactInfo (info, false);
-            bOk = true;
-            break;
-        }
-
-        QObject::connect (
-            &webPage, SIGNAL (contactInfo (const GVContactInfo &)),
-             this   , SLOT   (gotContactInfo (const GVContactInfo &)));
-        QVariantList l;
-        l += strLink;
-        if (!webPage.enqueueWork (GVAW_getContactFromHistoryLink, l, this,
-                SLOT (contactsLinkWorkDone (bool, const QVariantList &))))
-        {
-            QObject::disconnect (
-                &webPage, SIGNAL (contactInfo (const GVContactInfo &)),
-                 this   , SLOT   (gotContactInfo (const GVContactInfo &)));
-            log ("Getting contact info failed immediately", 3);
-            break;
-        }
-
-        bOk = true;
-    } while (0); // End cleanup block (not a loop)
-    if (!bOk)
-    {
-        QMessageBox *msgBox = new QMessageBox(QMessageBox::Critical,
-                                    "Get Contact failure",
-                                    "Failed to get contact information",
-                                    QMessageBox::Close,
-                                    this);
-        msgBox->setModal (false);
-        QObject::connect (
-            msgBox, SIGNAL (buttonClicked (QAbstractButton *)),
-            this  , SLOT   (msgBox_buttonClicked (QAbstractButton *)));
-        msgBox->show ();
+        return;
     }
-}//MainWindow::callHistoryLink
+
+    callWithContactInfo (info, false);
+}//MainWindow::callNumber
 
 void
-MainWindow::gotContactInfo (const GVContactInfo &info, bool bCallback)
+MainWindow::callWithContactInfo (const GVContactInfo &info, bool bSaveIt)
 {
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    if (bCallback)
+    if (bSaveIt)
     {
         dbMain.putContactInfo (info);
     }
@@ -775,7 +731,7 @@ MainWindow::contactsLinkWorkDone (bool, const QVariantList &)
     GVAccess &webPage = Singletons::getRef().getGVAccess ();
     QObject::disconnect (
         &webPage, SIGNAL (contactInfo (const GVContactInfo &)),
-         this   , SLOT   (gotContactInfo (const GVContactInfo &)));
+         this   , SLOT   (callWithContactInfo (const GVContactInfo &)));
 
     setStatus ("Retrieved contact info");
 }//MainWindow::contactsLinkWorkDone
@@ -959,112 +915,24 @@ MainWindow::tabChanged (int index)
 }//MainWindow::tabChanged
 
 void
-MainWindow::sendSMSToLink (const QString &strLink)
+MainWindow::textANumber (const QString &strNumber,
+                         const QString &strNameLink)
 {
-    GVAccess &webPage = Singletons::getRef().getGVAccess ();
-    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    GVContactInfo info;
 
-    bool bOk = false;
-    do // Begin cleanup block (not a loop)
+    if (!getInfoFrom (strNumber, strNameLink, info))
     {
-        GVContactInfo info;
-        info.strLink = strLink;
-        if (dbMain.getContactFromLink (info))
-        {
-            gotSMSContactInfo (info, false);
-            bOk = true;
-            break;
-        }
-
-        QObject::connect (
-            &webPage, SIGNAL (contactInfo (const GVContactInfo &)),
-             this   , SLOT   (gotSMSContactInfo (const GVContactInfo &)));
-        QVariantList l;
-        l += strLink;
-        if (!webPage.enqueueWork (GVAW_getContactFromHistoryLink, l, this,
-                SLOT (contactsLinkWorkDoneSMS (bool, const QVariantList &))))
-        {
-            QObject::disconnect (
-                &webPage, SIGNAL (contactInfo       (const GVContactInfo &)),
-                 this   , SLOT   (gotSMSContactInfo (const GVContactInfo &)));
-            log ("Getting contact info failed immediately", 3);
-            break;
-        }
-
-        bOk = true;
-    } while (0); // End cleanup block (not a loop)
-    if (!bOk)
-    {
-        QMessageBox *msgBox = new QMessageBox(QMessageBox::Critical,
-                                    "Get Contact failure",
-                                    "Failed to get contact information",
-                                    QMessageBox::Close,
-                                    this);
-        msgBox->setModal (false);
-        QObject::connect (
-            msgBox, SIGNAL (buttonClicked (QAbstractButton *)),
-            this  , SLOT   (msgBox_buttonClicked (QAbstractButton *)));
-        msgBox->show ();
+        return;
     }
-}//MainWindow::sendSMSToLink
+
+    sendTextToContact (info, false);
+}//MainWindow::textANumber
 
 void
-MainWindow::sendSMSToNameLink (const QString &strNameLink,
-                               const QString &strNumber)
-{
-    GVAccess &webPage = Singletons::getRef().getGVAccess ();
-    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-
-    bool bOk = false;
-    do // Begin cleanup block (not a loop)
-    {
-        GVContactInfo info;
-        info.strLink = strNameLink;
-        if (dbMain.getContactFromLink (info))
-        {
-            gotSMSContactInfo (info, false);
-            bOk = true;
-            break;
-        }
-
-        QObject::connect (
-            &webPage, SIGNAL (contactInfo       (const GVContactInfo &)),
-             this   , SLOT   (gotSMSContactInfo (const GVContactInfo &)));
-        QVariantList l;
-        l += strNameLink;
-        l += strNumber;
-        if (!webPage.enqueueWork (GVAW_getContactFromLink, l, this,
-                SLOT (contactsLinkWorkDoneSMS (bool, const QVariantList &))))
-        {
-            QObject::disconnect (
-                &webPage, SIGNAL (contactInfo (const GVContactInfo &)),
-                 this   , SLOT   (gotContactInfo (const GVContactInfo &)));
-            log ("Getting contact info failed immediately", 3);
-            break;
-        }
-
-        bOk = true;
-    } while (0); // End cleanup block (not a loop)
-    if (!bOk)
-    {
-        QMessageBox *msgBox = new QMessageBox(QMessageBox::Critical,
-                                    "Get Contact failure",
-                                    "Failed to get contact information",
-                                    QMessageBox::Close,
-                                    this);
-        msgBox->setModal (false);
-        QObject::connect (
-            msgBox, SIGNAL (buttonClicked (QAbstractButton *)),
-            this  , SLOT   (msgBox_buttonClicked (QAbstractButton *)));
-        msgBox->show ();
-    }
-}//MainWindow::sendSMSToNameLink
-
-void
-MainWindow::gotSMSContactInfo (const GVContactInfo &info, bool bCallback)
+MainWindow::sendTextToContact (const GVContactInfo &info, bool bSaveIt)
 {
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    if (bCallback)
+    if (bSaveIt)
     {
         dbMain.putContactInfo (info);
     }
@@ -1108,7 +976,7 @@ MainWindow::contactsLinkWorkDoneSMS (bool, const QVariantList &)
     GVAccess &webPage = Singletons::getRef().getGVAccess ();
     QObject::disconnect (
         &webPage, SIGNAL (contactInfo       (const GVContactInfo &)),
-         this   , SLOT   (gotSMSContactInfo (const GVContactInfo &)));
+         this   , SLOT   (sendTextToContact (const GVContactInfo &)));
 
     setStatus ("Retrieved contact info");
 }//MainWindow::contactsLinkWorkDoneSMS

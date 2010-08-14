@@ -59,7 +59,7 @@ GVHistory::GVHistory (QWidget *parent/* = 0*/)
 
     // Initially, all are to be selected
     actSelectAll.setChecked (true);
-    strSelected = "all";
+    strSelectedMessages = "all";
 
     // Double click OR Enter press on an item
     QObject::connect (
@@ -84,9 +84,9 @@ GVHistory::GVHistory (QWidget *parent/* = 0*/)
     // actSendSMS.triggered -> this.sendSMS
     QObject::connect (&actSendSMS, SIGNAL (triggered ()),
                        this      , SLOT   (sendSMS ()));
-    // actPlayVmail.triggered -> this.playVoicemail
-    QObject::connect (&actPlayVmail, SIGNAL (triggered     ()),
-                       this        , SLOT   (playVoicemail ()));
+    // actPlayVmail.triggered -> this.onactPlayVmailTriggered
+    QObject::connect (&actPlayVmail, SIGNAL (triggered             ()),
+                       this        , SLOT   (actPlayVmailTriggered ()));
 
     // Not modifyable
     this->setEditTriggers (QAbstractItemView::NoEditTriggers);
@@ -197,8 +197,7 @@ GVHistory::onCurrentItemChanged (QTreeWidgetItem *current,
     QMutexLocker locker(&mutex);
     if (NULL == current)
     {
-        GVHistoryEvent blank;
-        historyEvent = blank;
+        historyEvent = GVHistoryEvent();
         return;
     }
 
@@ -216,6 +215,67 @@ GVHistory::onCurrentItemChanged (QTreeWidgetItem *current,
 }//GVHistory::onCurrentItemChanged
 
 void
+GVHistory::selectionChanged (const QItemSelection &selected,
+                             const QItemSelection & /*deselected*/)
+{
+    do // Begin cleanup block (not a loop)
+    {
+        QModelIndexList indList = selected.indexes ();
+        if (0 == indList.size ())
+        {
+            emit log ("Empty selection", 5);
+            break;
+        }
+
+        QModelIndex index = indList[0];
+        while (index.parent ().isValid ())
+        {
+            index = index.parent ();
+        }
+
+        QAbstractItemModel *model = this->model();
+
+        // Init to blank
+        historyEvent.init ();
+        strContactId.clear ();
+
+        // Get the extry id
+        historyEvent.id =
+            model->index(index.row(),0).data(Qt::EditRole).toString ();
+        historyEvent.Type = (GVH_Event_Type)
+            model->index(index.row(),1).data(Qt::EditRole).toChar().toAscii ();
+        historyEvent.startTime =
+            model->index(index.row(),2).data(Qt::EditRole).toDateTime ();
+        historyEvent.strDisplayNumber =
+            model->index(index.row(),3).data(Qt::EditRole).toString ();
+        historyEvent.strPhoneNumber =
+            model->index(index.row(),4).data(Qt::EditRole).toString ();
+        quint32 flags =
+            model->index(index.row(),5).data(Qt::EditRole).toInt ();
+
+        historyEvent.bRead  = (flags & (1 << 0)) ? true : false;
+        historyEvent.bSpam  = (flags & (1 << 1)) ? true : false;
+        historyEvent.bTrash = (flags & (1 << 2)) ? true : false;
+        historyEvent.bStar  = (flags & (1 << 3)) ? true : false;
+
+        // Get the Phone number
+        QString strNumber = historyEvent.strPhoneNumber;
+
+        // If it isn't a valid number, we won't be able to pull information
+        if (!GVAccess::isNumberValid (strNumber)) break;
+
+        // Get info about this contact
+        GVAccess::simplify_number (strNumber);
+        CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+        GVContactInfo info;
+        if (!dbMain.getContactFromNumber (strNumber, info)) break;
+
+        // Info found!
+        strContactId = info.strLink;
+    } while (0); // End cleanup block (not a loop)
+}//GVHistory::selectionChanged
+
+void
 GVHistory::onItemActivated (QTreeWidgetItem * /*item*/, int /* column*/)
 {
     placeCall ();
@@ -230,7 +290,7 @@ GVHistory::onInboxSelected (QAction *action)
         return;
     }
 
-    strSelected = action->text().toLower ();
+    strSelectedMessages = action->text().toLower ();
     refreshHistory ();
 }//GVHistory::onInboxSelected
 
@@ -281,14 +341,14 @@ GVHistory::placeCall ()
         return;
     }
 
-    if (0 == historyEvent.id.size ())
+    if (0 == strContactId.size ())
     {
-        // In case it's an unknown number, call by link
-        emit callLink (historyEvent.id);
+        // In case it's an unknown number, call by number
+        emit callNumber (historyEvent.strPhoneNumber);
     }
     else
     {
-        emit callNameLink (historyEvent.id, historyEvent.strPhoneNumber);
+        emit callNumber (historyEvent.strPhoneNumber, strContactId);
     }
 }//GVHistory::placeCall
 
@@ -302,20 +362,19 @@ GVHistory::sendSMS ()
         return;
     }
 
-    if (0 == historyEvent.id.size ())
+    if (0 == strContactId.size ())
     {
-        // In case it's an unknown number, SMS by link
-        emit sendSMSToLink (historyEvent.id);
+        // In case it's an unknown number, SMS by number
+        emit textANumber (historyEvent.strPhoneNumber);
     }
     else
     {
-        emit sendSMSToNameLink (historyEvent.id,
-                                historyEvent.strPhoneNumber);
+        emit textANumber (historyEvent.strPhoneNumber, strContactId);
     }
 }//GVHistory::sendSMS
 
 void
-GVHistory::playVoicemail ()
+GVHistory::actPlayVmailTriggered ()
 {
     QMutexLocker locker(&mutex);
     if (GVHE_Unknown == historyEvent.Type)
@@ -330,4 +389,4 @@ GVHistory::playVoicemail ()
     }
 
     emit playVoicemail (historyEvent.id);
-}//GVHistory::playVoicemail
+}//GVHistory::onactPlayVmailTriggered
