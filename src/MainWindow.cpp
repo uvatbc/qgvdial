@@ -840,6 +840,7 @@ MainWindow::dialComplete (bool bOk, const QVariantList &params)
     }
     else
     {
+        pGVHistory->refreshHistory ();
         setStatus (QString("Dial successful to %1.").arg(params[0].toString()));
     }
 }//MainWindow::dialComplete

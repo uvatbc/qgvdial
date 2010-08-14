@@ -10,6 +10,7 @@ public:
     InboxModel (QObject * parent = 0, QSqlDatabase db = QSqlDatabase());
     QVariant data (const QModelIndex   &index,
                          int            role = Qt::DisplayRole) const;
+    void selectOnly (const QString & filter);
 
 public:
     static QString type_to_string (GVH_Event_Type Type);

@@ -92,6 +92,8 @@ GVHistory::GVHistory (QWidget *parent/* = 0*/)
     this->setEditTriggers (QAbstractItemView::NoEditTriggers);
     // Only one item selectable at a time.
     this->setSelectionMode (QAbstractItemView::SingleSelection);
+    // Select rows at a time
+    this->setSelectionBehavior (QAbstractItemView::SelectRows);
     // Alternating colors = on
     this->setAlternatingRowColors (true);
     // Don't show the (un)collapse sign
@@ -122,8 +124,6 @@ GVHistory::updateMenu (QMenuBar *menuBar)
 void
 GVHistory::refreshHistory ()
 {
-    //clearAllItems ();
-
     QMutexLocker locker(&mutex);
     if (!bLoggedIn)
     {
@@ -175,6 +175,7 @@ GVHistory::getHistoryDone (bool, const QVariantList &)
 
     InboxModel *tModel = (InboxModel *) this->model ();
     tModel->submitAll ();
+    tModel->selectOnly (strSelectedMessages);
 
     this->hideColumn (0);
     this->hideColumn (5);
@@ -192,7 +193,7 @@ GVHistory::getHistoryDone (bool, const QVariantList &)
 
 void
 GVHistory::selectionChanged (const QItemSelection &selected,
-                             const QItemSelection & /*deselected*/)
+                             const QItemSelection &deselected)
 {
     do // Begin cleanup block (not a loop)
     {
@@ -249,6 +250,8 @@ GVHistory::selectionChanged (const QItemSelection &selected,
         // Info found!
         strContactId = info.strLink;
     } while (0); // End cleanup block (not a loop)
+
+    QTreeView::selectionChanged (selected, deselected);
 }//GVHistory::selectionChanged
 
 void

@@ -2,6 +2,8 @@
 #include "Singletons.h"
 #include "GVAccess.h"
 
+#define GV_IN_TYPE          "type"          // voicemail,missed,etc.
+
 InboxModel::InboxModel (QObject * parent, QSqlDatabase db)
 : QSqlTableModel (parent, db)
 {
@@ -123,27 +125,27 @@ InboxModel::string_to_type (const QString &strType)
 
     do // Begin cleanup block (not a loop)
     {
-        if (0 == strType.compare ("Placed"))
+        if (0 == strType.compare ("Placed", Qt::CaseInsensitive))
         {
             Type = GVHE_Placed;
             break;
         }
-        if (0 == strType.compare ("Received"))
+        if (0 == strType.compare ("Received", Qt::CaseInsensitive))
         {
             Type = GVHE_Received;
             break;
         }
-        if (0 == strType.compare ("Missed"))
+        if (0 == strType.compare ("Missed", Qt::CaseInsensitive))
         {
             Type = GVHE_Missed;
             break;
         }
-        if (0 == strType.compare ("Voicemail"))
+        if (0 == strType.compare ("Voicemail", Qt::CaseInsensitive))
         {
             Type = GVHE_Voicemail;
             break;
         }
-        if (0 == strType.compare ("SMS"))
+        if (0 == strType.compare ("SMS", Qt::CaseInsensitive))
         {
             Type = GVHE_TextMessage;
             break;
@@ -153,3 +155,15 @@ InboxModel::string_to_type (const QString &strType)
     return (Type);
 }//InboxModel::string_to_type
 
+void
+InboxModel::selectOnly (const QString & filter)
+{
+    GVH_Event_Type type = string_to_type (filter);
+
+    QString strFilter;
+    if (GVHE_Unknown != type)
+    {
+        strFilter = QString(GV_IN_TYPE "='%1'").arg (type);
+    }
+    this->setFilter (strFilter);
+}//InboxModel::selectOnly
