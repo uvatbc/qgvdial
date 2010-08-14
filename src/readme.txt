@@ -1,6 +1,4 @@
 TODO:
--> Inbox selection of entries: all voicemail, etc.
--> Inbox call, SMS and play voicemail
 -> Call cancel for callout and callback both need to work
 -> Call and SMS buttons from contacts page and history page
 -> SMS needs to be handled in history: Add children of the SMS as representation of the SMS texts
@@ -9,8 +7,11 @@ TODO:
 
 Changelog:
 
-2010-08-13:
--> GV Inbox now uses data API
+2010-08-14:
+-> GV Inbox now uses data API. Inbox is updated when a call is made or SMS is sent.
+-> Inbox selection of entries: all voicemail, etc.
+-> Inbox call, SMS and play voicemail
+-> Streamlined calls and texts from inbox and contacts page.
 
 2010-08-07:
 -> Dial callback works.
