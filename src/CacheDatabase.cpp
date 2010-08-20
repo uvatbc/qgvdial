@@ -733,9 +733,16 @@ CacheDatabase::insertHistory (      InboxModel *modelInbox,
     do { // Begin cleanup block (not a loop)
         QSqlQuery query(dbMain);
         query.setForwardOnly (true);
-        query.exec (QString ("DELETE FROM " GV_INBOX_TABLE " "
+
+        query.exec (QString ("SELECT " GV_IN_ID " FROM " GV_INBOX_TABLE " "
                              "WHERE " GV_IN_ID "='%1'")
                     .arg (hEvent.id));
+        if (query.next ()) {
+            query.exec (QString ("DELETE FROM " GV_INBOX_TABLE " "
+                                 "WHERE " GV_IN_ID "='%1'")
+                        .arg (hEvent.id));
+            nCountInbox--;
+        }
 
         if (!modelInbox->insertRows (nCountInbox, 1)) {
             emit log ("Failed to insert row into history table", 3);
