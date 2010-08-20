@@ -46,6 +46,7 @@ public:
 
     bool setLastInboxUpdate (const QDateTime &dateTime);
     bool getLastInboxUpdate (QDateTime &dateTime);
+    bool getLatestInboxEntry (QDateTime &dateTime);
 
     bool insertHistory (      InboxModel     *modelInbox,
                         const GVHistoryEvent &hEvent    );

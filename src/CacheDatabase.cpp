@@ -661,6 +661,42 @@ CacheDatabase::getLastInboxUpdate (QDateTime &dateTime)
 }//CacheDatabase::getLastInboxUpdate
 
 bool
+CacheDatabase::getLatestInboxEntry (QDateTime &dateTime)
+{
+    QSqlQuery query(dbMain);
+    query.setForwardOnly (true);
+
+    dateTime = QDateTime();
+
+    bool rv = false;
+    query.exec ("SELECT "   GV_IN_ATTIME " FROM " GV_INBOX_TABLE " "
+                "ORDER BY " GV_IN_ATTIME " DESC");
+    do // Begin cleanup block (not a loop)
+    {
+        if (!query.next ())
+        {
+            emit log ("Couldn't get the latest history item");
+            break;
+        }
+
+        // Convert to date time
+        bool bOk = false;
+        quint64 dtVal = query.value(0).toULongLong (&bOk);
+        if (!bOk)
+        {
+            emit log ("Could not convert datetime");
+            break;
+        }
+
+        dateTime = QDateTime::fromTime_t (dtVal);
+
+        rv = true;
+    } while (0); // End cleanup block (not a loop)
+
+    return (rv);
+}//CacheDatabase::getLatestInboxEntry
+
+bool
 CacheDatabase::insertHistory (      InboxModel *modelInbox,
                               const GVHistoryEvent &hEvent    )
 {
@@ -695,6 +731,12 @@ CacheDatabase::insertHistory (      InboxModel *modelInbox,
 
     bool rv = false;
     do { // Begin cleanup block (not a loop)
+        QSqlQuery query(dbMain);
+        query.setForwardOnly (true);
+        query.exec (QString ("DELETE FROM " GV_INBOX_TABLE " "
+                             "WHERE " GV_IN_ID "='%1'")
+                    .arg (hEvent.id));
+
         if (!modelInbox->insertRows (nCountInbox, 1)) {
             emit log ("Failed to insert row into history table", 3);
             break;

@@ -186,9 +186,12 @@ GVHistory::getHistoryDone (bool, const QVariantList &)
         this->resizeColumnToContents (i);
     }
 
-    QDateTime dtUpdate = QDateTime::currentDateTime().toUTC ();
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    dbMain.setLastInboxUpdate (dtUpdate);
+    QDateTime dtUpdate;
+    if (dbMain.getLatestInboxEntry (dtUpdate))
+    {
+        dbMain.setLastInboxUpdate (dtUpdate);
+    }
 }//GVHistory::getHistoryDone
 
 void
