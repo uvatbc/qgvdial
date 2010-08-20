@@ -24,8 +24,6 @@ MainWindow::MainWindow (QWidget *parent/* = 0*/, Qt::WindowFlags f/* = 0*/)
 , dlgSMS (this, ChildWindowBase_flags)
 , vmailPlayer (this, ChildWindowBase_flags)
 , stateMachine(this)
-, modelContacts(NULL)
-, modelInbox(NULL)
 , wakeupTimer (this)
 {
     initLogging ();
@@ -134,9 +132,6 @@ MainWindow::deinit ()
         pContactsView = NULL;
         pGVHistory = NULL;
     }
-
-    deinitContactsModel ();
-    deinitInboxModel ();
 
     qApp->quit ();
 }//MainWindow::deinit
@@ -304,10 +299,6 @@ MainWindow::init ()
          this   , SLOT   (dialAccessNumber (const QString &,
                                             const QVariant &)));
 
-    // pContactsView.oneContact -> this.gotContact
-    QObject::connect (pContactsView,
-                SIGNAL (oneContact (int, const ContactInfo &)),
-          this, SLOT   (gotContact (int, const ContactInfo &)));
     // pContactsView.allContacts -> this.getContactsDone
     QObject::connect (pContactsView, SIGNAL (allContacts (bool)),
                       this         , SLOT   (getContactsDone (bool)));
@@ -482,8 +473,8 @@ void
 MainWindow::enterLoggedIn ()
 {
     // Model init
-    initContactsModel ();
-    initInboxModel ();
+    pContactsView->initModel ();
+    pGVHistory->initModel ();
 
     // Do this the first time (always)
     pGVHistory->refreshHistory ();
@@ -497,29 +488,10 @@ MainWindow::beginGetAccountDetails ()
 }//MainWindow::beginGetAccountDetails
 
 void
-MainWindow::gotContact (int cnt, const ContactInfo &contactInfo)
-{
-    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    dbMain.insertContact (modelContacts, cnt,
-                          contactInfo.strTitle,
-                          contactInfo.strId);
-
-    GVContactInfo gvContactInfo;
-    pContactsView->convert (contactInfo, gvContactInfo);
-
-    dbMain.putContactInfo (gvContactInfo);
-}//MainWindow::gotContact
-
-void
 MainWindow::getContactsDone (bool bOk)
 {
     if (!bOk)
     {
-        if (NULL != modelContacts)
-        {
-            modelContacts->revertAll ();
-        }
-
         QMessageBox *msgBox = new QMessageBox(QMessageBox::Critical,
                            "Error",
                            "Contacts retrieval failed",
@@ -531,14 +503,6 @@ MainWindow::getContactsDone (bool bOk)
         msgBox->show ();
         setStatus ("Contacts retrieval failed");
     }
-    else
-    {
-        setStatus ("Contacts retrieved. Saving. This will take some time...");
-        modelContacts->submitAll ();
-        setStatus ("Contacts committed to local database");
-    }
-
-    //TODO: Retrieve user settings
 }//MainWindow::getContactsDone
 
 void
@@ -554,8 +518,8 @@ void
 MainWindow::logoutCompleted (bool, const QVariantList &)
 {
     // This clears out the table and the view as well
-    deinitContactsModel ();
-    deinitInboxModel ();
+    pContactsView->deinitModel ();
+    pGVHistory->deinitModel ();
 
     emit loggedOut ();
 
@@ -566,62 +530,6 @@ void
 MainWindow::exitLoggedIn ()
 {
 }//MainWindow::exitLoggedIn
-
-void
-MainWindow::deinitContactsModel ()
-{
-    if (NULL != pContactsView)
-    {
-        pContactsView->reset ();
-    }
-
-    if (NULL != modelContacts)
-    {
-        delete modelContacts;
-        modelContacts = NULL;
-    }
-}//MainWindow::deinitContactsModel
-
-void
-MainWindow::initContactsModel ()
-{
-    deinitContactsModel ();
-
-    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    modelContacts = dbMain.newContactsModel ();
-    pContactsView->setModel (modelContacts);
-    modelContacts->submitAll ();
-
-    pContactsView->hideColumn (1);
-    pContactsView->sortByColumn (0, Qt::AscendingOrder);
-}//MainWindow::initContactsModel
-
-void
-MainWindow::deinitInboxModel ()
-{
-    if (NULL != pGVHistory)
-    {
-        pGVHistory->reset ();
-    }
-
-    if (NULL != modelInbox)
-    {
-        delete modelInbox;
-        modelInbox = NULL;
-    }
-}//MainWindow::deinitHistoryModel
-
-void
-MainWindow::initInboxModel ()
-{
-    deinitInboxModel ();
-
-    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    modelInbox = dbMain.newInboxModel ();
-    modelInbox->setSort (4, Qt::AscendingOrder);    // Time when the event happened
-    pGVHistory->setModel (modelInbox);
-    modelInbox->submitAll ();
-}//MainWindow::initHistoryModel
 
 bool
 MainWindow::getInfoFrom (const QString &strNumber,
@@ -723,7 +631,7 @@ MainWindow::callWithContactInfo (const GVContactInfo &info, bool bSaveIt)
 
         dialNow (info.arrPhones[rv].strNumber);
     } while (0); // End cleanup block (not a loop)
-}//MainWindow::gotContactInfo
+}//MainWindow::callWithContactInfo
 
 void
 MainWindow::contactsLinkWorkDone (bool, const QVariantList &)

@@ -48,6 +48,39 @@ GVContactsTable::GVContactsTable (QWidget *parent)
         this, SLOT   (activatedContact (const QModelIndex &)));
 }//GVContactsTable::GVContactsTable
 
+GVContactsTable::~GVContactsTable ()
+{
+    deinitModel ();
+}//GVContactsTable::~GVContactsTable
+
+void
+GVContactsTable::deinitModel ()
+{
+    this->reset ();
+
+    QSqlTableModel *modelContacts = (QSqlTableModel *)this->model ();
+    this->setModel (NULL);
+    if (NULL != modelContacts)
+    {
+        delete modelContacts;
+        modelContacts = NULL;
+    }
+}//GVContactsTable::deinitModel
+
+void
+GVContactsTable::initModel ()
+{
+    deinitModel ();
+
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    QSqlTableModel *modelContacts = dbMain.newContactsModel ();
+    this->setModel (modelContacts);
+    modelContacts->submitAll ();
+
+    this->hideColumn (1);
+    this->sortByColumn (0, Qt::AscendingOrder);
+}//GVContactsTable::initModel
+
 QNetworkReply *
 GVContactsTable::postRequest (QString         strUrl,
                               QStringPairList arrPairs,
@@ -379,6 +412,15 @@ GVContactsTable::onGotContacts (QNetworkReply *reply)
                 .arg (contactsHandler.getUsableContacts ());
     } while (0); // End cleanup block (not a loop)
 
+    QSqlTableModel *modelContacts = (QSqlTableModel *) this->model ();
+    if (rv) {
+        emit status ("Contacts retrieved. Saving. This will take some time...");
+        modelContacts->submitAll ();
+        emit status ("Contacts committed to local database");
+    } else {
+        modelContacts->revertAll ();
+    }
+
     emit status (msg);
     emit allContacts (rv);
 
@@ -424,42 +466,48 @@ GVContactsTable::gotOneContact (const ContactInfo &contactInfo)
         }
 
         whatWork = 'm';
-
     } while (0); // End cleanup block (not a loop)
 
     GVContactInfo gvContactInfo;
     convert (contactInfo, gvContactInfo);
 
-    if ('a' == whatWork)
+    do // Begin cleanup block (not a loop)
     {
-        emit oneContact (nContacts, contactInfo);
-        nContacts++;
-        return;
-    }
+        if ('a' == whatWork)
+        {
+            CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+            QSqlTableModel *modelContacts = (QSqlTableModel *) this->model ();
+            dbMain.insertContact (modelContacts, nContacts,
+                                  contactInfo.strTitle,
+                                  contactInfo.strId);
+            dbMain.putContactInfo (gvContactInfo);
+            break;
+        }
 
-    QModelIndex idxId = listMatches[0];
-    if (!idxId.isValid ())
-    {
-        emit log ("Invalid title ID during delete or modify contact");
-        return;
-    }
+        QModelIndex idxId = listMatches[0];
+        if (!idxId.isValid ())
+        {
+            emit log ("Invalid title ID during delete or modify contact");
+            break;
+        }
 
-    if ('m' == whatWork)
-    {
-        // update the model entry
-        QModelIndex idxName = idxId.sibling (idxId.row (), 0);
-        this->model()->setData (idxName, contactInfo.strTitle);
+        if ('m' == whatWork)
+        {
+            // update the model entry
+            QModelIndex idxName = idxId.sibling (idxId.row (), 0);
+            this->model()->setData (idxName, contactInfo.strTitle);
 
-        // update dbMain.CACHE
+            // update dbMain.CACHE
 
-        CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-        dbMain.putContactInfo (gvContactInfo);
-    }
-    else if ('d' == whatWork)
-    {
-        this->model()->removeRow (idxId.row ());
-        nContacts--;
-    }
+            CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+            dbMain.putContactInfo (gvContactInfo);
+        }
+        else if ('d' == whatWork)
+        {
+            this->model()->removeRow (idxId.row ());
+            nContacts--;
+        }
+    } while (0); // End cleanup block (not a loop)
 
 }//GVContactsTable::gotOneContact
 

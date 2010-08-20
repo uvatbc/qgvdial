@@ -71,8 +71,6 @@ private slots:
     //! Invoked whenever the web component finishes loading the page
     void hideProgress ();
 
-    //! Invoked every time a new contact is parsed from the contacts page
-    void gotContact (int cnt, const ContactInfo &contactInfo);
     //! Invoked after all contacts have been parsed
     void getContactsDone (bool bOk);
 
@@ -141,10 +139,6 @@ private slots:
 
 private:
     void initLogging ();
-    void deinitContactsModel ();
-    void initContactsModel ();
-    void deinitInboxModel ();
-    void initInboxModel ();
 
 private:
     //! The log file
@@ -189,11 +183,6 @@ private:
     QState          sNotLoggedIn;
     QState          sLoggedIn;
     QFinalState     sFinal;
-
-    //! Model for the contacts table
-    QSqlTableModel *modelContacts;
-    //! Model for the inbox table
-    QSqlTableModel *modelInbox;
 
     //! This is the Google Voice number
     QString         strSelfNumber;

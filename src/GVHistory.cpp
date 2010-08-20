@@ -104,8 +104,34 @@ GVHistory::GVHistory (QWidget *parent/* = 0*/)
 
 GVHistory::~GVHistory(void)
 {
-    this->setModel (NULL);
+    deinitModel ();
 }//GVHistory::~GVHistory
+
+void
+GVHistory::deinitModel ()
+{
+    this->reset ();
+
+    InboxModel *modelInbox = (InboxModel *) this->model ();
+    this->setModel (NULL);
+    if (NULL != modelInbox)
+    {
+        delete modelInbox;
+        modelInbox = NULL;
+    }
+}//GVHistory::deinitModel
+
+void
+GVHistory::initModel ()
+{
+    deinitModel ();
+
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    InboxModel *modelInbox = dbMain.newInboxModel ();
+    modelInbox->setSort (4, Qt::AscendingOrder);    // Time when the event happened
+    this->setModel (modelInbox);
+    modelInbox->submitAll ();
+}//GVHistory::initModel
 
 void
 GVHistory::updateMenu (QMenuBar *menuBar)

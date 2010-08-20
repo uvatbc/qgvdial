@@ -10,6 +10,11 @@ class GVContactsTable : public QTreeView
 
 public:
     GVContactsTable (QWidget *parent = 0);
+    ~GVContactsTable ();
+
+    void deinitModel ();
+    void initModel ();
+
     //! Use this to set the username and password for the contacts API login
     void setUserPass (const QString &strU, const QString &strP);
     bool convert (const ContactInfo &cInfo, GVContactInfo &gvcInfo);
@@ -20,8 +25,6 @@ signals:
     //! Status emitter for status bar
     void status(const QString &strText, int timeout = 2000);
 
-    //! Emitted every time a new contact is parsed from the contacts page
-    void oneContact (int count, const ContactInfo &cInfo);
     //! Emitted when all contacts are done
     void allContacts (bool bOk);
 

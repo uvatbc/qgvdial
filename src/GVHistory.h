@@ -11,6 +11,9 @@ public:
     GVHistory (QWidget *parent = 0);
     ~GVHistory(void);
 
+    void deinitModel ();
+    void initModel ();
+
 signals:
     //! Log emitter
     void log(const QString &strText, int level = 10);
