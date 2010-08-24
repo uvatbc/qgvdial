@@ -96,9 +96,6 @@ private:
     //! Mutex protecting the following variable
     QMutex          mutex;
 
-    //! Count of the contacts currently displayed in the contacts view
-    int             nContacts;
-
     //! Is the user logged in?
     bool            bLoggedIn;
 

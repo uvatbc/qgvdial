@@ -73,31 +73,40 @@ ContactsXmlHandler::endElement (const QString & /*namespaceURI*/,
     QString msg;
     do // Begin cleanup block (not a loop)
     {
-        if (localName == "id")
-        {
+        if (localName == "id") {
             currInfo.strId = strCurrentChars;
+            break;
         }
-        if (localName == "title")
-        {
+        if (localName == "title") {
             currInfo.strTitle = strCurrentChars;
+            break;
         }
-        if (localName == "phoneNumber")
-        {
+        if (localName == "phoneNumber") {
             currPhone.strNumber = strCurrentChars;
             currInfo.arrPhones += currPhone;
+            break;
         }
 
-        if (localName == "entry")
+        if (localName != "entry") break;
+        // If execution reaches here then it means it's the end of an entry.
+        bEntryStarted = false;
+
+        if (currInfo.bDeleted)
         {
-            bEntryStarted = false;
-
-            if ((0 != currInfo.arrPhones.size ()) ||
-                (currInfo.bDeleted))
-            {
-                countUsableContacts ++;
-                emit oneContact (currInfo);
-            }
+            emit log (QString("GV reports deleted contact: id = %1, name = %2")
+                .arg (currInfo.strId)
+                .arg (currInfo.strTitle));
         }
+
+        if ((0 == currInfo.arrPhones.size ()) && (!currInfo.bDeleted))
+        {
+            emit log ("Contact does not have any phone numbers");
+            // Just in case, delete it!
+            currInfo.bDeleted = true;
+        }
+
+        countUsableContacts ++;
+        emit oneContact (currInfo);
     } while (0); // End cleanup block (not a loop)
     return (true);
 }//ContactsXmlHandler::endElement

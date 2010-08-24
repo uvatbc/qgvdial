@@ -29,11 +29,12 @@ public:
     bool getRegisteredNumbers (GVRegisteredNumberArray &listNumbers);
     bool putRegisteredNumbers (const GVRegisteredNumberArray &listNumbers);
 
+    bool deleteContact (const QString  &strLink);
     bool insertContact (QSqlTableModel *modelContacts,
-                        int             cnt,
                         const QString  &strName,
                         const QString  &strLink);
 
+    bool deleteContactInfo (const QString  &strLink);
     bool putContactInfo (const GVContactInfo &info);
     bool getContactFromLink (GVContactInfo &info);
     bool getContactFromNumber (const QString &strNumber, GVContactInfo &info);
@@ -60,6 +61,9 @@ private:
 
     //! Count of the entries in the inbox
     quint32         nCountInbox;
+
+    //! Count of contacts
+    quint32         nCountContacts;
 
     friend class Singletons;
 };
