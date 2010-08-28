@@ -149,6 +149,7 @@ symbian {
 exists (../../buildit.pl) {
 PREFIX = ../debian/qgvdial/usr
 message("Build using my scripts")
+}
 
 !exists (../../buildit.pl) {
 PREFIX = ../maemo/debian/qgvdial/usr
