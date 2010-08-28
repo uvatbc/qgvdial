@@ -51,11 +51,7 @@ $cmd = "cd qgvdial-$qver ; $mad qmake && $mad dh_make --createorig --single -e y
 system($cmd);
 
 # Add a post install file to add the executable bit after installation on the device
-open(POSTINST, ">qgvdial-$qver/debian/postinst") or die "Cannot create postinst";
-print(POSTINST "#!/bin/sh\n");
-print(POSTINST "chmod +x /opt/qgvdial/bin/qgvdial\n");
-close(POSTINST);
-system("chmod +x qgvdial-$qver/debian/postinst");
+system("cp postinst.maemo qgvdial-$qver/debian/postinst");
 
 # Change the description and the extended description
 open(CONTROL_OUT, ">qgvdial-$qver/debian/control.new") or die "Cannot open new control";

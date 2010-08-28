@@ -53,10 +53,10 @@ SOURCES  += main.cpp                    \
             SMSEntryDeleteButton.cpp    \
             SMSDlg.cpp                  \
             ChildWindowBase.cpp         \
-            GVHistory.cpp \
-    ContactsTreeView.cpp \
-    InboxTreeView.cpp \
-    VMailDialog.cpp
+            GVHistory.cpp               \
+            ContactsTreeView.cpp        \
+            InboxTreeView.cpp           \
+            VMailDialog.cpp
 
 HEADERS  += global.h                    \
             IObserver.h                 \
@@ -87,16 +87,16 @@ HEADERS  += global.h                    \
             SMSEntryDeleteButton.h      \
             SMSDlg.h                    \
             ChildWindowBase.h           \
-            GVHistory.h \
-    ContactsTreeView.h \
-    InboxTreeView.h \
-    VMailDialog.h
+            GVHistory.h                 \
+            ContactsTreeView.h          \
+            InboxTreeView.h             \
+            VMailDialog.h
 
 FORMS    += MainWindow.ui               \
             LoginDialog.ui              \
             ContactsWidget.ui           \
-            InboxWidget.ui \
-    VMailDialog.ui
+            InboxWidget.ui              \
+            VMailDialog.ui
 
 RESOURCES += qgvdial.qrc
 
@@ -142,3 +142,55 @@ symbian {
     TARGET.EPOCSTACKSIZE = 0x14000
     TARGET.EPOCHEAPSIZE = 0x020000 0x800000
 }
+
+###############################################################
+# Installation related line go here
+###############################################################
+exists (../../buildit.pl) {
+PREFIX = ../debian/qgvdial/usr
+message("Build using my scripts")
+
+!exists (../../buildit.pl) {
+PREFIX = ../maemo/debian/qgvdial/usr
+message("Build using qtcreator")
+}
+
+# Installation for maemo
+maemo5 {
+OPTPREFIX  = $$PREFIX/../opt/qgvdial
+BINDIR     = $$OPTPREFIX/bin
+DATADIR    = $$PREFIX/share
+OPTDATADIR = $$OPTPREFIX/share
+
+DEFINES += DATADIR=\"$$DATADIR\" PKGDATADIR=\"$$PKGDATADIR\"
+
+#MAKE INSTALL
+
+INSTALLS += target desktop icon
+
+  target.path =$$BINDIR
+
+  desktop.path = $$DATADIR/applications/hildon
+  desktop.files += qgvdial.desktop
+
+  icon.path = $$OPTDATADIR
+  icon.files += qgvdial.png
+}
+
+# Installation for Linux
+unix:!symbian:!maemo5 {
+BINDIR  = $$PREFIX/bin
+DATADIR = $$PREFIX/share
+
+DEFINES += DATADIR=\"$$DATADIR\" PKGDATADIR=\"$$PKGDATADIR\"
+
+#MAKE INSTALL
+
+INSTALLS += target desktop icon
+
+  target.path =$$BINDIR
+
+  icon.path = $$DATADIR/qgvdial
+  icon.files += qgvdial.png
+}
+
