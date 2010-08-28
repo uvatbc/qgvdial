@@ -1,0 +1,9 @@
+[Desktop Entry]
+Encoding=UTF-8
+Version=__QGVDIAL_VERSION__
+Type=Application
+Name=QGVDial - A dialer for Google Voice (and someday more)
+Exec=/opt/qgvdial/bin/qgvdial
+Icon=/opt/qgvdial/share/qgvdial.png
+X-HildonDesk-ShowInToolbar=true
+X-Osso-Type=application/x-executable
