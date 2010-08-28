@@ -1,8 +1,0 @@
-<!DOCTYPE RCC><RCC version="1.0">
- <qresource>
-     <file alias="Google.png">../icons/Google.png</file>
-     <file alias="Phone.png">../icons/Phone.png</file>
-     <file alias="Skype.png">../icons/Skype.png</file>
-     <file alias="SMS.png">../icons/SMS.png</file>
- </qresource>
-</RCC>

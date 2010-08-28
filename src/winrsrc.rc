@@ -1,3 +1,0 @@
-#include <windows.h>
-#define	IDR_MAINFRAME   128
-IDR_MAINFRAME           ICON                    "..\icons\Google.ico"
