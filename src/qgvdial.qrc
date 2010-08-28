@@ -1,0 +1,10 @@
+<!DOCTYPE RCC><RCC version="1.0">
+ <qresource>
+     <file alias="Google.png">../icons/Google.png</file>
+     <file alias="Phone.png">../icons/Phone.png</file>
+     <file alias="Skype.png">../icons/Skype.png</file>
+     <file alias="SMS.png">../icons/SMS.png</file>
+     <file alias="dialpad_maemo.qss">../src/stylesheets/dialpad_maemo.qss</file>
+     <file alias="dialpad_desktop.qss">../src/stylesheets/dialpad_desktop.qss</file>
+ </qresource>
+</RCC>
