@@ -177,8 +177,8 @@ INSTALLS += target desktop icon qss
   icon.path = $$OPTDATADIR
   icon.files += qgvdial.png
 
-  qss.path = $BINDIR/stylesheets
-  qss.files += stylesheets/dialpad_maemo.qss
+  qss.path = $$BINDIR/stylesheets
+  qss.files += ./stylesheets/dialpad_maemo.qss
 }
 
 # Installation for Linux
