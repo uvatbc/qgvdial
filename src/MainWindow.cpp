@@ -864,6 +864,18 @@ MainWindow::sendSMSDone (bool bOk, const QVariantList &)
 }//MainWindow::sendSMSDone
 
 void
+MainWindow::on_btnCall_clicked ()
+{
+    QString strNum = ui->edNumber->text();
+    if (0 == strNum.size()) {
+        setStatus ("No number entered");
+        return;
+    }
+
+    dialNow (strNum);
+}//MainWindow::on_btnCall_clicked
+
+void
 MainWindow::on_btnContacts_clicked ()
 {
     initContactsWidget ();

@@ -32,6 +32,7 @@ public slots:
     void setStatus (const QString &strText, int timeout = 3000);
 
 private slots:
+    void on_btnCall_clicked();
     void on_btnHistory_clicked();
     void on_btnContacts_clicked();
 
