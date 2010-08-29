@@ -167,7 +167,7 @@ DEFINES += DATADIR=\"$$DATADIR\" PKGDATADIR=\"$$PKGDATADIR\"
 
 #MAKE INSTALL
 
-INSTALLS += target desktop icon
+INSTALLS += target desktop icon qss
 
   target.path =$$BINDIR
 
@@ -176,6 +176,9 @@ INSTALLS += target desktop icon
 
   icon.path = $$OPTDATADIR
   icon.files += qgvdial.png
+
+  qss.path = $BINDIR/stylesheets
+  qss.files += stylesheets/dialpad_maemo.qss
 }
 
 # Installation for Linux

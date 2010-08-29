@@ -38,12 +38,12 @@ MainWindow::MainWindow (QWidget *parent)
     QObject::connect(QApplication::desktop(), SIGNAL(resized(int)),
                      this                   , SLOT  (orientationChanged()));
 
-    strDialpadFile = "./dialpad_maemo.qss";
+    strDialpadFile = "./stylesheets/dialpad_maemo.qss";
     if (!QFileInfo(strDialpadFile).exists ()) {
         strDialpadFile = ":/dialpad_maemo.qss";
     }
 #else
-    strDialpadFile = "./dialpad_desktop.qss";
+    strDialpadFile = "./stylesheets/dialpad_desktop.qss";
     if (!QFileInfo(strDialpadFile).exists ()) {
         strDialpadFile = ":/dialpad_desktop.qss";
     }

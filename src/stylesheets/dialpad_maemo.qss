@@ -1,3 +1,7 @@
+/*
+ * Style sheet for the dialpad.
+ */
+
 QPushButton {
    border: 2px solid #8f8f91;
    border-radius: 6px;
