@@ -249,37 +249,6 @@ MainWindow::on_action_Login_triggered ()
 }//MainWindow::on_action_Login_triggered
 
 void
-MainWindow::orientationChanged ()
-{
-    QRect screenGeometry = QApplication::desktop()->screenGeometry();
-    if (screenGeometry.width() > screenGeometry.height()) {
-        ui->gridMain->removeWidget (ui->wgtDialpad);
-        ui->gridMain->addWidget (ui->wgtDialpad, 0, 1);
-
-#ifdef Q_WS_MAEMO_5
-    if (NULL != pContactsView) {
-        pContactsView->setAttribute (Qt::WA_Maemo5LandscapeOrientation);
-    }
-    if (NULL != pInboxView) {
-        pInboxView->setAttribute (Qt::WA_Maemo5LandscapeOrientation);
-    }
-#endif
-    } else {
-        ui->gridMain->removeWidget (ui->wgtDialpad);
-        ui->gridMain->addWidget (ui->wgtDialpad, 1, 0);
-
-#ifdef Q_WS_MAEMO_5
-    if (NULL != pContactsView) {
-        pContactsView->setAttribute (Qt::WA_Maemo5PortraitOrientation);
-    }
-    if (NULL != pInboxView) {
-        pInboxView->setAttribute (Qt::WA_Maemo5PortraitOrientation);
-    }
-#endif
-    }
-}//MainWindow::orientationChanged
-
-void
 MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
 {
     strSelfNumber.clear ();
@@ -319,6 +288,7 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
         ui->btnContacts->setEnabled (true);
         ui->btnHistory->setEnabled (true);
         ui->cbDialMethod->setEnabled (true);
+        ui->btnCall->setEnabled (true);
         bLoggedIn = true;
 
         // Fill up the combobox on the main page
@@ -334,6 +304,37 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
         }
     }
 }//MainWindow::loginCompleted
+
+void
+MainWindow::orientationChanged ()
+{
+    QRect screenGeometry = QApplication::desktop()->screenGeometry();
+    if (screenGeometry.width() > screenGeometry.height()) {
+        ui->gridMain->removeWidget (ui->wgtDialpad);
+        ui->gridMain->addWidget (ui->wgtDialpad, 0, 1);
+
+#ifdef Q_WS_MAEMO_5
+    if (NULL != pContactsView) {
+        pContactsView->setAttribute (Qt::WA_Maemo5LandscapeOrientation);
+    }
+    if (NULL != pInboxView) {
+        pInboxView->setAttribute (Qt::WA_Maemo5LandscapeOrientation);
+    }
+#endif
+    } else {
+        ui->gridMain->removeWidget (ui->wgtDialpad);
+        ui->gridMain->addWidget (ui->wgtDialpad, 1, 0);
+
+#ifdef Q_WS_MAEMO_5
+    if (NULL != pContactsView) {
+        pContactsView->setAttribute (Qt::WA_Maemo5PortraitOrientation);
+    }
+    if (NULL != pInboxView) {
+        pInboxView->setAttribute (Qt::WA_Maemo5PortraitOrientation);
+    }
+#endif
+    }
+}//MainWindow::orientationChanged
 
 void
 MainWindow::doLogout ()
@@ -357,6 +358,7 @@ MainWindow::logoutCompleted (bool, const QVariantList &)
     ui->btnContacts->setEnabled (false);
     ui->btnHistory->setEnabled (false);
     ui->cbDialMethod->setEnabled (false);
+    ui->btnCall->setEnabled (false);
 
     bLoggedIn = false;
 
