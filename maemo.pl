@@ -77,5 +77,8 @@ system("mv qgvdial-$qver/debian/control.new qgvdial-$qver/debian/control");
 $cmd = "cd qgvdial-$qver && $asroot $mad dpkg-buildpackage && $mad remote -r org.maemo.qgvdial send ../qgvdial_$qver-1_$machine.deb && $mad remote -r org.maemo.qgvdial install qgvdial_$qver-1_$machine.deb";
 system($cmd);
 
+$cmd = "dput -f fremantle-upload qgvdial*.changes";
+system($cmd);
+
 exit();
 
