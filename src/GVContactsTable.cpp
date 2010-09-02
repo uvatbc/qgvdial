@@ -342,13 +342,13 @@ GVContactsTable::onGotContacts (QNetworkReply *reply)
 
     do // Begin cleanup block (not a loop)
     {
-        QString strData = reply->readAll ();
-        if (strData.contains ("Authorization required"))
+        QByteArray byData = reply->readAll ();
+        if (byData.contains ("Authorization required"))
         {
             msg = "Authorization failed.";
             break;
         }
-        inputSource.setData (strData);
+        inputSource.setData (byData);
 
         QObject::connect (&contactsHandler, SIGNAL (log(const QString &, int)),
             this,            SIGNAL (log(const QString &, int)));

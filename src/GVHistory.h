@@ -35,6 +35,9 @@ signals:
     void retrieveVoicemail (const QString &strVmailLink);
 
 public slots:
+    //! Status sink for this window
+    void setStatus(const QString &strText, int timeout = 2000);
+
     //! Invoked when the user requests a refresh to the history
     void refreshHistory ();
 

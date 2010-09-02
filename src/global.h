@@ -6,10 +6,8 @@
 
 #ifdef QT_NO_DEBUG
 #define NO_DBGINFO      1
-#define POS_BELOW_TAB   1
 #else
 #define NO_DBGINFO      0
-#define POS_BELOW_TAB   2
 #endif
 
 // Uncomment these to disable webview even in debug

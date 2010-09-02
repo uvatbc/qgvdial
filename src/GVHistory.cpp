@@ -42,6 +42,11 @@ GVHistory::GVHistory (QWidget *parent, Qt::WindowFlags flags)
     QObject::connect (
         &actionGroup, SIGNAL (triggered       (QAction *)),
          this       , SLOT   (onInboxSelected (QAction *)));
+
+    // The status must be shown on this window as well
+    QObject::connect (
+        this, SIGNAL (status    (const QString &, int)),
+        this, SLOT   (setStatus (const QString &, int)));
 }//GVHistory::GVHistory
 
 GVHistory::~GVHistory(void)
@@ -74,6 +79,12 @@ GVHistory::initModel ()
     ui->treeView->setModel (modelInbox);
     modelInbox->submitAll ();
 }//GVHistory::initModel
+
+void
+GVHistory::setStatus (const QString &strText, int timeout)
+{
+    ui->statusbar->showMessage (strText, timeout);
+}//GVHistory::setStatus
 
 void
 GVHistory::refreshHistory ()

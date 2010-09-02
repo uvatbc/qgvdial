@@ -105,6 +105,13 @@ ContactsXmlHandler::endElement (const QString & /*namespaceURI*/,
             currInfo.bDeleted = true;
         }
 
+#if !NO_DBGINFO
+        // For debug
+        if (currInfo.strTitle.contains ("Jamie", Qt::CaseInsensitive)) {
+            emit log ("It's Jamie");
+        }
+#endif
+
         countUsableContacts ++;
         emit oneContact (currInfo);
     } while (0); // End cleanup block (not a loop)

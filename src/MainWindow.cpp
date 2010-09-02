@@ -274,6 +274,7 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
     }
     else
     {
+        CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
         setStatus ("User logged in");
 
         // Save the users GV number returned by the login completion
@@ -291,8 +292,10 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
         ui->btnCall->setEnabled (true);
         bLoggedIn = true;
 
+        // Save the user name and password that was used to login
+        dbMain.putUserPass (strUser, strPass);
+
         // Fill up the combobox on the main page
-        CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
         if ((!dbMain.getRegisteredNumbers (arrNumbers)) ||
             (0 == arrNumbers.size ()))
         {
@@ -477,6 +480,10 @@ MainWindow::initContactsWidget ()
         pContactsView->setUserPass (strUser, strPass);
         pContactsView->loginSuccess ();
         pContactsView->initModel ();
+
+#ifndef Q_WS_MAEMO_5
+        pContactsView->refreshContacts ();
+#endif
     } while (0); // End cleanup block (not a loop)
 }//MainWindow::initContactsWidget
 
@@ -533,7 +540,10 @@ MainWindow::initInboxWidget ()
 
         pInboxView->loginSuccess ();
         pInboxView->initModel ();
+
+#ifndef Q_WS_MAEMO_5
         pInboxView->refreshHistory ();
+#endif
     } while (0); // End cleanup block (not a loop)
 }//MainWindow::initInboxWidget
 
