@@ -61,7 +61,7 @@ private slots:
     void garbageTimerTimeout ();
 
     //! Invoked when the SMS main page is loaded
-    void sendSMSPage1 (bool bOk);
+    void sendSMSResponse (QNetworkReply *reply);
 
     //! Invoked when th vmail is downloaded
     void onVmailDownloaded (QNetworkReply *reply);

@@ -1056,68 +1056,88 @@ GVWebPage::sendSMS ()
         return (false);
     }
 
-    QString strGoto = GV_HTTPS_M "/sms";
-    QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
-                       this   , SLOT   (sendSMSPage1 (bool)));
-    this->loadUrlString (strGoto);
+    QVariantList &arrParams = workCurrent.arrParams;
+    QStringPairList arrPairs;
 
+    do // Begin cleanup block (not a loop)
+    {
+        QString strUA = UA_IPHONE;
+        QString strUrl = QString("https://www.google.com/voice/m/x"
+                                 "?m=sms"
+                                 "&n=%1"
+                                 "&v=7")
+                                 .arg(arrParams[0].toString());
+        QUrl url(strUrl);
+        url.addQueryItem ("txt", arrParams[1].toString());
+
+        QNetworkRequest request(url);
+        request.setRawHeader ("User-Agent", strUA.toAscii ());
+
+        QNetworkAccessManager *mgr = webPage.networkAccessManager ();
+        QNetworkCookieJar *jar = mgr->cookieJar();
+        QList<QNetworkCookie> cookies =
+            jar->cookiesForUrl (webPage.mainFrame()->url ());
+        QList<QNetworkCookie> sendCookies;
+        QString gvxVal;
+        foreach (QNetworkCookie cookie, cookies)
+        {
+            if ((cookie.name() == "gv")   ||
+                (cookie.name() == "gvx")  ||
+                (cookie.name() == "PREF") ||
+                (cookie.name() == "S")    ||
+                (cookie.name() == "SID")  ||
+                (cookie.name() == "HSID") ||
+                (cookie.name() == "SSID"))
+            {
+                sendCookies += cookie;
+            }
+
+            if (cookie.name () == "gvx")
+            {
+                gvxVal = cookie.value ();
+            }
+        }
+
+        // Our own number is added separately
+        // The expected format is "number|type" but it seems just "number" also
+        // works. Of course not sending this cookie also works...
+//        QString gvph = QString ("%1|%2")
+//                        .arg (strCurrentCallback)
+//                        .arg (chCurrentCallbackType);
+        QString gvph = QString ("%1")
+                        .arg (strCurrentCallback);
+        sendCookies += QNetworkCookie ("gv-ph", gvph.toAscii ());
+
+        // Set up the cookies in the request
+        request.setHeader (QNetworkRequest::CookieHeader,
+                           QVariant::fromValue(sendCookies));
+
+        // This cookie needs to also be added as contect data
+        QString strContent = QString("{\"gvx\":\"%1\"}").arg(gvxVal);
+
+        QObject::connect (mgr , SIGNAL (finished        (QNetworkReply *)),
+                          this, SLOT   (sendSMSResponse (QNetworkReply *)));
+        mgr->post (request, strContent.toAscii());
+    } while (0); // End cleanup block (not a loop)
     return (true);
 }//GVWebPage::sendSMS
 
 void
-GVWebPage::sendSMSPage1 (bool bOk)
+GVWebPage::sendSMSResponse (QNetworkReply *reply)
 {
-    QObject::disconnect (&webPage, SIGNAL (loadFinished (bool)),
-                          this   , SLOT   (sendSMSPage1 (bool)));
-    do // Begin cleanup block (not a loop)
+    QNetworkAccessManager *mgr = webPage.networkAccessManager ();
+    QObject::disconnect (mgr , SIGNAL (finished        (QNetworkReply *)),
+                         this, SLOT   (sendSMSResponse (QNetworkReply *)));
+    QByteArray ba = reply->readAll ();
+    QString msg = ba;
+
+    bool rv = false;
+    if (ba.contains ("\"send_sms_response\":{\"status\":{\"status\":0}"))
     {
-        if (isLoadFailed (bOk))
-        {
-            bOk = false;
-            emit log ("Failed to load the select phone page");
-            break;
-        }
-        bOk = false;
-
-#define GVSELECTOR "form div input[name=\"number\"]"
-        QWebElement number = doc().findFirst (GVSELECTOR);
-#undef GVSELECTOR
-        if (number.isNull ())
-        {
-            emit log ("Failed to get the number field");
-            break;
-        }
-
-#define GVSELECTOR "form div textarea[name=\"smstext\"]"
-        QWebElement smsText = doc().findFirst (GVSELECTOR);
-#undef GVSELECTOR
-        if (smsText.isNull ())
-        {
-            emit log ("Failed to get the text field");
-            break;
-        }
-
-        number.setAttribute ("value", workCurrent.arrParams[0].toString());
-        QString strScript = QString ("this.value = '%1';")
-                            .arg (workCurrent.arrParams[1].toString());
-        smsText.evaluateJavaScript (strScript);
-
-#define GVSELECTOR "form div input[value=\"Send\"]"
-        QWebElement sendSMSBtn = doc().findFirst (GVSELECTOR);
-#undef GVSELECTOR
-        if (sendSMSBtn.isNull ())
-        {
-            emit log ("Failed to get the SMS button");
-            break;
-        }
-
-        sendSMSBtn.evaluateJavaScript ("this.click();");
-
-        bOk = true;
-    } while (0); // End cleanup block (not a loop)
-
-    completeCurrentWork (GVAW_sendSMS, bOk);
-}//GVWebPage::sendSMSPage1
+        rv = true;
+    }
+    completeCurrentWork (GVAW_sendSMS, rv);
+}//GVWebPage::sendSMSResponse
 
 bool
 GVWebPage::playVmail ()

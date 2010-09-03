@@ -172,6 +172,11 @@ MainWindow::init ()
     QObject::connect (&cif , SIGNAL (status(const QString &, int)),
                        this, SLOT   (setStatus(const QString &, int)));
 
+    // Send an SMS
+    QObject::connect (
+        &dlgSMS, SIGNAL (sendSMS (const QStringList &, const QString &)),
+         this  , SLOT   (sendSMS (const QStringList &, const QString &)));
+
     // If the cache has the username and password, begin login
     if (dbMain.getUserPass (strUser, strPass))
     {
@@ -828,6 +833,7 @@ MainWindow::sendSMS (const QStringList &arrNumbers, const QString &strText)
 {
     GVAccess &webPage = Singletons::getRef().getGVAccess ();
     QStringList arrFailed;
+    QString msg;
 
     for (int i = 0; i < arrNumbers.size (); i++)
     {
@@ -838,8 +844,7 @@ MainWindow::sendSMS (const QStringList &arrNumbers, const QString &strText)
                 SLOT (sendSMSDone (bool, const QVariantList &))))
         {
             arrFailed += arrNumbers[i];
-            QString msg = QString ("Failed to send an SMS to %1")
-                                   .arg (arrNumbers[i]);
+            msg = QString ("Failed to send an SMS to %1").arg (arrNumbers[i]);
             log (msg, 3);
             break;
         }
@@ -857,20 +862,27 @@ MainWindow::sendSMS (const QStringList &arrNumbers, const QString &strText)
             msgBox, SIGNAL (buttonClicked (QAbstractButton *)),
             this  , SLOT   (msgBox_buttonClicked (QAbstractButton *)));
         msgBox->show ();
+
+        msg = QString("Could not send a text to %1")
+                .arg (arrFailed.join (", "));
+        setStatus (msg);
     }
 }//MainWindow::sendSMS
 
 void
-MainWindow::sendSMSDone (bool bOk, const QVariantList &)
+MainWindow::sendSMSDone (bool bOk, const QVariantList &params)
 {
+    QString msg;
     if (!bOk)
     {
-        setStatus ("Failed to send SMS");
+        msg = QString("Failed to send SMS to %1").arg (params[0].toString());
     }
     else
     {
-        setStatus ("SMS sent");
+        msg = QString("SMS sent to %1").arg (params[0].toString());
     }
+
+    setStatus (msg);
 }//MainWindow::sendSMSDone
 
 void
