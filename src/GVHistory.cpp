@@ -75,10 +75,26 @@ GVHistory::initModel ()
 
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     InboxModel *modelInbox = dbMain.newInboxModel ();
-    modelInbox->setSort (4, Qt::AscendingOrder);    // Time when the event happened
     ui->treeView->setModel (modelInbox);
-    modelInbox->submitAll ();
+    prepView ();
 }//GVHistory::initModel
+
+void
+GVHistory::prepView ()
+{
+    InboxModel *tModel = (InboxModel *) ui->treeView->model ();
+    tModel->submitAll ();
+    tModel->selectOnly (strSelectedMessages);
+
+    ui->treeView->hideColumn (0);
+    ui->treeView->hideColumn (5);
+    ui->treeView->sortByColumn (2);
+
+    for (int i = 0; i < 5; i++)
+    {
+        ui->treeView->resizeColumnToContents (i);
+    }
+}//GVHistory::prepView
 
 void
 GVHistory::setStatus (const QString &strText, int timeout)
@@ -140,18 +156,7 @@ GVHistory::getHistoryDone (bool, const QVariantList &)
         &webPage, SIGNAL (oneHistoryEvent (const GVHistoryEvent &)),
          this   , SLOT   (oneHistoryEvent (const GVHistoryEvent &)));
 
-    InboxModel *tModel = (InboxModel *) ui->treeView->model ();
-    tModel->submitAll ();
-    tModel->selectOnly (strSelectedMessages);
-
-    ui->treeView->hideColumn (0);
-    ui->treeView->hideColumn (5);
-    ui->treeView->sortByColumn (2);
-
-    for (int i = 0; i < 5; i++)
-    {
-        ui->treeView->resizeColumnToContents (i);
-    }
+    prepView ();
 
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     QDateTime dtUpdate;

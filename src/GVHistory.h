@@ -54,6 +54,7 @@ private slots:
 
 private:
     void contextMenuEvent (QContextMenuEvent * event);
+    void prepView ();
 
 private:
     Ui::InboxWidget *ui;
