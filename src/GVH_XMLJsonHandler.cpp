@@ -2,7 +2,8 @@
 #include <QtScript>
 
 GVH_XMLJsonHandler::GVH_XMLJsonHandler (QObject *parent)
-: QObject(parent)
+: QObject (parent)
+, nUsableMsgs (0)
 {
 }//GVH_XMLJsonHandler::GVH_XMLJsonHandler
 
@@ -65,7 +66,6 @@ GVH_XMLJsonHandler::parseJSON (const QDateTime &dtUpdate, bool &bGotOld)
         qint32 nMsgCount = scriptEngine.evaluate("msgList.length;").toInt32 ();
         emit log (QString ("message count = %1").arg (nMsgCount));
 
-        qint32 nUsableMsgs = 0;
         for (qint32 i = 0; i < nMsgCount; i++) {
             strTemp = QString(
                     "msgParams = []; "
@@ -178,3 +178,9 @@ GVH_XMLJsonHandler::parseJSON (const QDateTime &dtUpdate, bool &bGotOld)
 
     return (rv);
 }//GVH_XMLJsonHandler::parseJSON
+
+qint32
+GVH_XMLJsonHandler::getUsableMsgsCount ()
+{
+    return (nUsableMsgs);
+}//GVH_XMLJsonHandler::getUsableMsgsCount

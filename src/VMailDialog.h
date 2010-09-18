@@ -23,9 +23,11 @@ signals:
     void status (const QString &strText, int timeout = 3000);
 
 private slots:
+    void on_durationSlider_actionTriggered (int action);
+    //! Play button clicked
+    void on_btnPlay_clicked ();
     //! Stop button clicked
-    void on_btnPlay_clicked();
-    void on_btnStop_clicked();
+    void on_btnStop_clicked ();
 
     //! Player position changed
     void positionChanged (qint64 position);

@@ -11,6 +11,7 @@ class GVH_XMLJsonHandler : public QObject, public QXmlDefaultHandler
 public:
     explicit GVH_XMLJsonHandler(QObject *parent = 0);
     bool parseJSON (const QDateTime &dtUpdate, bool &bGotOld);
+    qint32 getUsableMsgsCount ();
 
 signals:
     void log(const QString &strText, int level = 10);
@@ -31,6 +32,7 @@ protected:
 private:
     QString strChars;
     QString strJson;
+    qint32 nUsableMsgs;
 };
 
 #endif // GVH_XMLJSONHANDLER_H

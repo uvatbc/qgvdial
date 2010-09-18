@@ -901,14 +901,22 @@ void
 MainWindow::on_btnContacts_clicked ()
 {
     initContactsWidget ();
-    pContactsView->show ();
+    if (pContactsView->isVisible ()) {
+        pContactsView->hide ();
+    } else {
+        pContactsView->show ();
+    }
 }//MainWindow::on_btnContacts_clicked
 
 void
 MainWindow::on_btnHistory_clicked ()
 {
     initInboxWidget ();
-    pInboxView->show ();
+    if (pInboxView->isVisible ()) {
+        pInboxView->hide ();
+    } else {
+        pInboxView->show ();
+    }
 }//MainWindow::on_btnHistory_clicked
 
 void

@@ -40,6 +40,8 @@ public slots:
 
     //! Invoked when the user requests a refresh to the history
     void refreshHistory ();
+    //! Invoked when the user requests a full inbox refresh
+    void refreshFullInbox ();
 
     void loginSuccess ();
     void loggedOut ();

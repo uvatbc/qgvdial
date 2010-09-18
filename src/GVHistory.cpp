@@ -83,8 +83,11 @@ void
 GVHistory::prepView ()
 {
     InboxModel *tModel = (InboxModel *) ui->treeView->model ();
+    emit status ("Committing inbox entries. This will take some time", 0);
     tModel->submitAll ();
+    emit status ("Inbox entries committed. Filtering...");
     tModel->selectOnly (strSelectedMessages);
+    emit status ("Inbox entries filtered.");
 
     ui->treeView->hideColumn (0);
     ui->treeView->hideColumn (5);
@@ -119,7 +122,7 @@ GVHistory::refreshHistory ()
     QVariantList l;
     l += "all";
     l += "1";
-    l += "10";
+    l += "500";
     l += dtUpdate;
     QObject::connect (
         &webPage, SIGNAL (oneHistoryEvent (const GVHistoryEvent &)),
@@ -131,6 +134,16 @@ GVHistory::refreshHistory ()
         getHistoryDone (false, l);
     }
 }//GVHistory::refreshHistory
+
+void
+GVHistory::refreshFullInbox ()
+{
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    dbMain.setLastInboxUpdate (QDateTime::fromString ("2000-01-01",
+                                                      "yyyy-MM-dd"));
+    dbMain.clearInbox ();
+    refreshHistory ();
+}//GVHistory::refreshFullInbox
 
 void
 GVHistory::oneHistoryEvent (const GVHistoryEvent &hevent)

@@ -823,6 +823,8 @@ GVWebPage::sendInboxRequest ()
     {
         QString strWhich = workCurrent.arrParams[0].toString();
 
+        emit status (QString("Getting inbox page %1...").arg(nCurrent), 0);
+
         QString strLink = QString (GV_HTTPS "/inbox/recent/%1?page=p%2")
                             .arg(strWhich).arg(nCurrent);
         QNetworkRequest request(strLink);
@@ -927,8 +929,9 @@ GVWebPage::onGotHistoryXML (QNetworkReply *reply)
         bOk = true;
 
         int count = workCurrent.arrParams[2].toString().toInt ();
-        if (((nCurrent-nFirstPage) >= count) || (bGotOld))
-        {
+        if (((nCurrent-nFirstPage) >= count) ||
+            (bGotOld) ||
+            (0 == xmlHandler.getUsableMsgsCount ())) {
             completeCurrentWork (GVAW_getInbox, true);
             break;
         }

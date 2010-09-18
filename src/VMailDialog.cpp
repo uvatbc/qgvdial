@@ -85,3 +85,17 @@ VMailDialog::play (const QString &strVmail)
 
     return (true);
 }//VMailDialog::play
+
+void
+VMailDialog::on_durationSlider_actionTriggered (int /*action*/)
+{
+    qint64 duration = player.duration ();
+    if (0 == duration) {
+        emit log ("Duration is 0");
+        return;
+    }
+
+    int position = ui->durationSlider->value ();
+
+    player.setPosition (position * duration / 100);
+}//VMailDialog::on_durationSlider_actionTriggered

@@ -53,6 +53,7 @@
      <string>Actions</string>
     </property>
     <addaction name="actionRefresh"/>
+    <addaction name="actionFullRefresh"/>
     <addaction name="actionCall"/>
     <addaction name="actionSend_Text"/>
     <addaction name="actionPlay_voicemail"/>
@@ -143,6 +144,11 @@
     <string>SMS</string>
    </property>
   </action>
+  <action name="actionFullRefresh">
+   <property name="text">
+    <string>Full refresh</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -217,11 +223,28 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionFullRefresh</sender>
+   <signal>triggered()</signal>
+   <receiver>InboxWidget</receiver>
+   <slot>refreshFullInbox()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>249</x>
+     <y>127</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>refreshHistory()</slot>
   <slot>placeCall()</slot>
   <slot>sendSMS()</slot>
   <slot>playVoicemail()</slot>
+  <slot>refreshFullInbox()</slot>
  </slots>
 </ui>
