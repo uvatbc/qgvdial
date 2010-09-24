@@ -66,6 +66,8 @@ GVH_XMLJsonHandler::parseJSON (const QDateTime &dtUpdate, bool &bGotOld)
         qint32 nMsgCount = scriptEngine.evaluate("msgList.length;").toInt32 ();
         emit log (QString ("message count = %1").arg (nMsgCount));
 
+        qint32 nOldMsgs = 0;
+
         for (qint32 i = 0; i < nMsgCount; i++) {
             strTemp = QString(
                     "msgParams = []; "
@@ -161,9 +163,13 @@ GVH_XMLJsonHandler::parseJSON (const QDateTime &dtUpdate, bool &bGotOld)
             // Check to see if it is too old to show
             if (dtUpdate.isValid () && (dtUpdate >= oneHistory.startTime))
             {
-                emit log ("Started getting old entries. Quitting loop");
-                bGotOld = true;
-                break;
+                nOldMsgs++;
+                if (1 == nOldMsgs) {
+                    emit log ("Started getting old entries.");
+                    bGotOld = true;
+                } else {
+                    emit log ("Another old entry");
+                }
             }
 
             // emit the history element
@@ -172,6 +178,7 @@ GVH_XMLJsonHandler::parseJSON (const QDateTime &dtUpdate, bool &bGotOld)
         }
 
         emit log (QString ("Valid messages = %1").arg (nUsableMsgs));
+        emit log (QString ("Old messages = %1").arg (nOldMsgs));
 
         rv = true;
     } while (0); // End cleanup block (not a loop)

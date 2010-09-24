@@ -40,8 +40,10 @@ TpCalloutInitiator::onConnectionReady (Tp::PendingOperation *op)
 
         if (account->cmName () == "sofiasip")
         {
-            strSelfNumber =  account->parameters()["auth-user"].toString();
-            break;
+            strSelfNumber = account->parameters()["auth-user"].toString();
+            if (!strSelfNumber.isEmpty ()) break;
+            strSelfNumber = account->parameters()["account"].toString();
+            if (!strSelfNumber.isEmpty ()) break;
         }
 
         msg = QString ("Yet to figure out how to get phone number from %1")

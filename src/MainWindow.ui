@@ -276,33 +276,14 @@
        <widget class="QWidget" name="wgtDisplay" native="true">
         <layout class="QVBoxLayout" name="verticalLayout">
          <item>
-          <widget class="QLineEdit" name="edNumber"/>
+          <widget class="QComboBox" name="cbDialMethod">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+          </widget>
          </item>
          <item>
-          <widget class="QWidget" name="widget_3" native="true">
-           <layout class="QHBoxLayout" name="horizontalLayout">
-            <item>
-             <widget class="QPushButton" name="btnCall">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="text">
-               <string>Call</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="DialDigitButton" name="btnDelete">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="text">
-               <string>Delete</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
+          <widget class="QLineEdit" name="edNumber"/>
          </item>
          <item>
           <widget class="QWidget" name="widget_4" native="true">
@@ -331,10 +312,29 @@
           </widget>
          </item>
          <item>
-          <widget class="QComboBox" name="cbDialMethod">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
+          <widget class="QWidget" name="widget_3" native="true">
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <item>
+             <widget class="QPushButton" name="btnCall">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>Call</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="DialDigitButton" name="btnDelete">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>Delete</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </widget>
          </item>
         </layout>
@@ -398,7 +398,6 @@
   <tabstop>btnDelete</tabstop>
   <tabstop>btnContacts</tabstop>
   <tabstop>btnHistory</tabstop>
-  <tabstop>cbDialMethod</tabstop>
   <tabstop>btn1</tabstop>
   <tabstop>btn2</tabstop>
   <tabstop>btn3</tabstop>

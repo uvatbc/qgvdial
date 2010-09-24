@@ -122,7 +122,7 @@ GVHistory::refreshHistory ()
     QVariantList l;
     l += "all";
     l += "1";
-    l += "500";
+    l += "10";
     l += dtUpdate;
     QObject::connect (
         &webPage, SIGNAL (oneHistoryEvent (const GVHistoryEvent &)),

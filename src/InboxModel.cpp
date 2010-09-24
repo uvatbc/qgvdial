@@ -17,10 +17,10 @@ InboxModel::data (const QModelIndex &index,
 
     do // Begin cleanup block (not a loop)
     {
-    	if (Qt::DisplayRole != role)
-    	{
+        if (Qt::DisplayRole != role)
+        {
             break;
-    	}
+        }
 
         int column = index.column ();
 
@@ -79,6 +79,9 @@ InboxModel::data (const QModelIndex &index,
         {
             QString strNum = var.toString ();
             if (0 == strNum.size ()) break;
+            if (strNum.startsWith ("Unknown")) {
+                var = "Unknown";
+            }
             if (!GVAccess::isNumberValid (strNum)) break;
 
             GVAccess::beautify_number (strNum);
