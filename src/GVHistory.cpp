@@ -86,8 +86,11 @@ GVHistory::prepView ()
     emit status ("Committing inbox entries. This will take some time", 0);
     tModel->submitAll ();
     emit status ("Inbox entries committed. Filtering...");
+    tModel->setSort (2, Qt::DescendingOrder);
     tModel->selectOnly (strSelectedMessages);
     emit status ("Inbox entries filtered.");
+
+    tModel->select ();
 
     ui->treeView->hideColumn (0);
     ui->treeView->hideColumn (5);
@@ -175,6 +178,8 @@ GVHistory::getHistoryDone (bool, const QVariantList &)
     QDateTime dtUpdate;
     if (dbMain.getLatestInboxEntry (dtUpdate))
     {
+        emit log (QString ("Latest inbox entry is : %1")
+                  .arg (dtUpdate.toString ()));
         dbMain.setLastInboxUpdate (dtUpdate);
     }
 
