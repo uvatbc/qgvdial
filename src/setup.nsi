@@ -70,7 +70,7 @@ Section -Main SEC0000
     WriteRegStr HKLM "${REGKEY}\Components" Main 1
 
     SetOutPath $TEMP
-    File "I:\app\Development\IDE\Visual Studio and related\VC Redist\2008 SP1\vcredist_x86.exe"
+    File "I:\app\Development\IDE\Visual Studio and related\VC Redist\2010 redist\vcredist_x86.exe"
     Exec '"$TEMP\vcredist_x86.exe" /q:a /c:$\"VCREDI~1.EXE /q:a /c:$\"$\"msiexec /i vcredist.msi /qn$\"$\" $\"'
     Delete "$TEMP\vcredist_x86.exe"
 SectionEnd
