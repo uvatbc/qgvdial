@@ -70,8 +70,8 @@ Section -Main SEC0000
     WriteRegStr HKLM "${REGKEY}\Components" Main 1
 
     SetOutPath $TEMP
-    File "I:\app\Development\IDE\Visual Studio and related\VC Redist\2010 redist\vcredist_x86.exe"
-    Exec '"$TEMP\vcredist_x86.exe" /q:a /c:$\"VCREDI~1.EXE /q:a /c:$\"$\"msiexec /i vcredist.msi /qn$\"$\" $\"'
+    File "I:\app\Development\IDE\Visual Studio and related\VC Redist\2010\vcredist_x86.exe"
+    Exec '"$TEMP\vcredist_x86.exe" /q'
     Delete "$TEMP\vcredist_x86.exe"
 SectionEnd
 
@@ -83,7 +83,7 @@ Section -post SEC0002
     SetOutPath $SMPROGRAMS\$StartMenuGroup
     CreateShortcut "$SMPROGRAMS\$StartMenuGroup\Uninstall $(^Name).lnk" $INSTDIR\uninstall.exe
 
-    SetOutPath "$INSTDIR\qt\4.6.2"
+    SetOutPath "$INSTDIR\qt\4.7"
     CreateShortcut "$SMPROGRAMS\$StartMenuGroup\QGVDial.lnk" $INSTDIR\bin\qgvdial.exe
 
     !insertmacro MUI_STARTMENU_WRITE_END
