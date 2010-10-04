@@ -44,13 +44,14 @@ public:
 
     InboxModel *newInboxModel();
     void clearInbox ();
+    void refreshInboxModel (InboxModel *modelInbox,
+                            const QString &strType);
 
     bool setLastInboxUpdate (const QDateTime &dateTime);
     bool getLastInboxUpdate (QDateTime &dateTime);
     bool getLatestInboxEntry (QDateTime &dateTime);
 
-    bool insertHistory (      InboxModel     *modelInbox,
-                        const GVHistoryEvent &hEvent    );
+    bool insertHistory (const GVHistoryEvent &hEvent);
 
 signals:
     void log(const QString &strText, int level = 10);

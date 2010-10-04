@@ -4,13 +4,13 @@
 #include "global.h"
 #include <QtSql>
 
-class InboxModel : public QSqlTableModel
+class InboxModel : public QSqlQueryModel
 {
 public:
-    InboxModel (QObject * parent = 0, QSqlDatabase db = QSqlDatabase());
+    InboxModel (QObject * parent = 0);
     QVariant data (const QModelIndex   &index,
                          int            role = Qt::DisplayRole) const;
-    void selectOnly (const QString & filter);
+//    void selectOnly (const QString & filter);
 
 public:
     static QString type_to_string (GVH_Event_Type Type);

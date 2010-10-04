@@ -82,15 +82,12 @@ GVHistory::initModel ()
 void
 GVHistory::prepView ()
 {
-    InboxModel *tModel = (InboxModel *) ui->treeView->model ();
-    emit status ("Committing inbox entries. This will take some time", 0);
-    tModel->submitAll ();
-    emit status ("Inbox entries committed. Filtering...");
-    tModel->setSort (2, Qt::DescendingOrder);
-    tModel->selectOnly (strSelectedMessages);
-    emit status ("Inbox entries filtered.");
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    InboxModel *inboxModel = (InboxModel *) ui->treeView->model ();
 
-    tModel->select ();
+    emit status ("Re-selecting inbox entries. This will take some time", 0);
+    dbMain.refreshInboxModel (inboxModel, strSelectedMessages);
+    emit status ("Inbox entries selected.");
 
     ui->treeView->hideColumn (0);
     ui->treeView->hideColumn (5);
@@ -159,7 +156,7 @@ GVHistory::oneHistoryEvent (const GVHistoryEvent &hevent)
     }
 
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    dbMain.insertHistory (tModel, hevent);
+    dbMain.insertHistory (hevent);
 }//GVHistory::oneHistoryEvent
 
 void

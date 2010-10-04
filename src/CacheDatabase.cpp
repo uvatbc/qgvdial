@@ -201,7 +201,7 @@ CacheDatabase::newContactsModel()
     modelContacts->setEditStrategy (QSqlTableModel::OnManualSubmit);
     modelContacts->setHeaderData (0, Qt::Horizontal, QObject::tr("Name"));
     modelContacts->setHeaderData (1, Qt::Horizontal, QObject::tr("Link"));
-    
+
     QSqlQuery query;
     query.setForwardOnly (true);
     query.exec ("SELECT COUNT (*) FROM " GV_CONTACTS_TABLE);
@@ -616,9 +616,37 @@ CacheDatabase::getLastContactUpdate (QDateTime &dateTime)
 InboxModel *
 CacheDatabase::newInboxModel()
 {
-    InboxModel *modelInbox = new InboxModel(this, dbMain);
-    modelInbox->setTable (GV_INBOX_TABLE);
-    modelInbox->setEditStrategy (QSqlTableModel::OnManualSubmit);
+    InboxModel *modelInbox = new InboxModel(this);
+    this->refreshInboxModel (modelInbox, "all");
+
+    return (modelInbox);
+}//CacheDatabase::newHistoryModel
+
+void
+CacheDatabase::clearInbox ()
+{
+    QSqlQuery query(dbMain);
+    query.setForwardOnly (true);
+    query.exec ("DELETE FROM " GV_INBOX_TABLE);
+}//CacheDatabase::clearInbox
+
+void
+CacheDatabase::refreshInboxModel (InboxModel *modelInbox,
+                                  const QString &strType)
+{
+    GVH_Event_Type Type = modelInbox->string_to_type (strType);
+    QString strQ;
+    if (GVHE_Unknown != Type) {
+        strQ = QString ("SELECT * FROM " GV_INBOX_TABLE " "
+                        "WHERE " GV_IN_TYPE "=%1 "
+                        "ORDER BY " GV_IN_ATTIME " DESC")
+                .arg (Type);
+    } else {
+        strQ = "SELECT * FROM " GV_INBOX_TABLE " "
+               "ORDER BY " GV_IN_ATTIME " DESC";
+    }
+
+    modelInbox->setQuery (strQ, dbMain);
     modelInbox->setHeaderData (0, Qt::Horizontal, QObject::tr("Name"));
     modelInbox->setHeaderData (1, Qt::Horizontal, QObject::tr("Link"));
 
@@ -633,16 +661,7 @@ CacheDatabase::newInboxModel()
             nCountInbox = val;
         }
     }
-    return (modelInbox);
-}//CacheDatabase::newHistoryModel
-
-void
-CacheDatabase::clearInbox ()
-{
-    QSqlQuery query(dbMain);
-    query.setForwardOnly (true);
-    query.exec ("DELETE FROM " GV_INBOX_TABLE);
-}//CacheDatabase::clearInbox
+}//CacheDatabase::refreshInboxModel
 
 bool
 CacheDatabase::setLastInboxUpdate (const QDateTime &dateTime)
@@ -743,37 +762,12 @@ CacheDatabase::getLatestInboxEntry (QDateTime &dateTime)
 }//CacheDatabase::getLatestInboxEntry
 
 bool
-CacheDatabase::insertHistory (      InboxModel *modelInbox,
-                              const GVHistoryEvent &hEvent    )
+CacheDatabase::insertHistory (const GVHistoryEvent &hEvent)
 {
-    // Define fields and the record
-    QSqlField fldId     (GV_IN_ID     , QVariant::String);
-    QSqlField fldPhone  (GV_IN_PHONE  , QVariant::String);
-    QSqlField fldNumber (GV_IN_DISPNUM, QVariant::String);
-    QSqlField fldAtTime (GV_IN_ATTIME , QVariant::ULongLong);
-    QSqlField fldType   (GV_IN_TYPE   , QVariant::Char);
-    QSqlField fldFlags  (GV_IN_FLAGS  , QVariant::UInt);
-
-    // Add columns to the record
-    QSqlRecord sqlRecord;
-    sqlRecord.append (fldId);
-    sqlRecord.append (fldPhone);
-    sqlRecord.append (fldNumber);
-    sqlRecord.append (fldAtTime);
-    sqlRecord.append (fldType);
-    sqlRecord.append (fldFlags);
-
-    // Add values to the columns
-    sqlRecord.setValue (GV_IN_ID     , QVariant (hEvent.id));
-    sqlRecord.setValue (GV_IN_PHONE  , QVariant (hEvent.strPhoneNumber));
-    sqlRecord.setValue (GV_IN_DISPNUM, QVariant (hEvent.strDisplayNumber));
-    sqlRecord.setValue (GV_IN_ATTIME , QVariant (hEvent.startTime.toTime_t()));
-    sqlRecord.setValue (GV_IN_TYPE   , QVariant (hEvent.Type));
     quint32 flags = (hEvent.bRead  ? (1 << 0) : 0)
                   | (hEvent.bSpam  ? (1 << 1) : 0)
                   | (hEvent.bTrash ? (1 << 2) : 0)
                   | (hEvent.bStar  ? (1 << 3) : 0);
-    sqlRecord.setValue (GV_IN_FLAGS  , QVariant (flags));
 
     bool rv = false;
     do { // Begin cleanup block (not a loop)
@@ -790,12 +784,22 @@ CacheDatabase::insertHistory (      InboxModel *modelInbox,
             nCountInbox--;
         }
 
-        if (!modelInbox->insertRows (nCountInbox, 1)) {
+        rv = query.exec (QString ("INSERT INTO " GV_INBOX_TABLE ""
+                                  "(" GV_IN_ID
+                                  "," GV_IN_TYPE
+                                  "," GV_IN_ATTIME
+                                  "," GV_IN_DISPNUM
+                                  "," GV_IN_PHONE
+                                  "," GV_IN_FLAGS ") VALUES "
+                                  "('%1', %2 , %3, '%4', '%5', %6)")
+                            .arg (hEvent.id)
+                            .arg (hEvent.Type)
+                            .arg (hEvent.startTime.toTime_t())
+                            .arg (hEvent.strDisplayNumber)
+                            .arg (hEvent.strPhoneNumber)
+                            .arg (flags));
+        if (!rv) {
             emit log ("Failed to insert row into history table", 3);
-            break;
-        }
-        if (!modelInbox->setRecord (nCountInbox, sqlRecord)) {
-            emit log ("Failed to set row record in history table", 3);
             break;
         }
 

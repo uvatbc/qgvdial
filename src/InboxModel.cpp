@@ -4,8 +4,8 @@
 
 #define GV_IN_TYPE          "type"          // voicemail,missed,etc.
 
-InboxModel::InboxModel (QObject * parent, QSqlDatabase db)
-: QSqlTableModel (parent, db)
+InboxModel::InboxModel (QObject * parent)
+: QSqlQueryModel (parent)
 {
 }//InboxModel::InboxModel
 
@@ -13,7 +13,7 @@ QVariant
 InboxModel::data (const QModelIndex &index,
                         int          role ) const
 {
-    QVariant var = QSqlTableModel::data (index, role);
+    QVariant var = QSqlQueryModel::data (index, role);
 
     do // Begin cleanup block (not a loop)
     {
@@ -158,15 +158,15 @@ InboxModel::string_to_type (const QString &strType)
     return (Type);
 }//InboxModel::string_to_type
 
-void
-InboxModel::selectOnly (const QString & filter)
-{
-    GVH_Event_Type type = string_to_type (filter);
+//void
+//InboxModel::selectOnly (const QString & filter)
+//{
+//    GVH_Event_Type type = string_to_type (filter);
 
-    QString strFilter;
-    if (GVHE_Unknown != type)
-    {
-        strFilter = QString(GV_IN_TYPE "='%1'").arg (type);
-    }
-    this->setFilter (strFilter);
-}//InboxModel::selectOnly
+//    QString strFilter;
+//    if (GVHE_Unknown != type)
+//    {
+//        strFilter = QString(GV_IN_TYPE "='%1'").arg (type);
+//    }
+//    this->setFilter (strFilter);
+//}//InboxModel::selectOnly
