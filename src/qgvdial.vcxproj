@@ -1,0 +1,164 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{02A66EE2-9D9F-488A-A4C7-66FABBA56443}</ProjectGuid>
+    <RootNamespace>qgvdial</RootNamespace>
+    <Keyword>MakeFileProj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
+    <NMakeBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nmake -nologo</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nmake -nologo clean all</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nmake -nologo clean</NMakeCleanCommandLine>
+    <NMakeOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">debug\qgvdial.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">WIN32;_DEBUG;Q_WS_WIN32;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
+    <NMakeForcedIncludes Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(NMakeForcedIncludes)</NMakeForcedIncludes>
+    <NMakeAssemblySearchPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(NMakeAssemblySearchPath)</NMakeAssemblySearchPath>
+    <NMakeForcedUsingAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(NMakeForcedUsingAssemblies)</NMakeForcedUsingAssemblies>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
+    <NMakeBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nmake -nologo</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nmake -nologo clean all</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nmake -nologo clean</NMakeCleanCommandLine>
+    <NMakeOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">release\qgvdial.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">WIN32;NDEBUG;Q_WS_WIN32;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
+    <NMakeForcedIncludes Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(NMakeForcedIncludes)</NMakeForcedIncludes>
+    <NMakeAssemblySearchPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(NMakeAssemblySearchPath)</NMakeAssemblySearchPath>
+    <NMakeForcedUsingAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(NMakeForcedUsingAssemblies)</NMakeForcedUsingAssemblies>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="CacheDatabase.cpp" />
+    <ClCompile Include="CallInitiatorFactory.cpp" />
+    <ClCompile Include="CalloutInitiator.cpp" />
+    <ClCompile Include="CaptchaWidget.cpp" />
+    <ClCompile Include="ChildWindowBase.cpp" />
+    <ClCompile Include="ContactsTreeView.cpp" />
+    <ClCompile Include="ContactsXmlHandler.cpp" />
+    <ClCompile Include="DesktopSkypeCallInitiator.cpp" />
+    <ClCompile Include="DialCancelDlg.cpp" />
+    <ClCompile Include="DialDigitButton.cpp" />
+    <ClCompile Include="DlgSelectContactNumber.cpp" />
+    <ClCompile Include="global.cpp" />
+    <ClCompile Include="GVAccess.cpp" />
+    <ClCompile Include="GVContactsTable.cpp" />
+    <ClCompile Include="GVDataAccess.cpp" />
+    <ClCompile Include="GVH_XMLJsonHandler.cpp" />
+    <ClCompile Include="GVHistory.cpp" />
+    <ClCompile Include="GVWebPage.cpp" />
+    <ClCompile Include="InboxModel.cpp" />
+    <ClCompile Include="InboxTreeView.cpp" />
+    <ClCompile Include="LoginDialog.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="MainApp.cpp" />
+    <ClCompile Include="MainWindow.cpp" />
+    <ClCompile Include="MobileWebPage.cpp" />
+    <ClCompile Include="ObserverFactory.cpp" />
+    <ClCompile Include="OsDependent.cpp" />
+    <ClCompile Include="PhoneNumberValidator.cpp" />
+    <ClCompile Include="QGVDbusServer.cpp" />
+    <ClCompile Include="Singletons.cpp" />
+    <ClCompile Include="SkypeClient.cpp" />
+    <ClCompile Include="SkypeClientFactory.cpp" />
+    <ClCompile Include="SkypeLinuxClient.cpp" />
+    <ClCompile Include="SkypeObserver.cpp" />
+    <ClCompile Include="SkypeWinClient.cpp" />
+    <ClCompile Include="SMSDlg.cpp" />
+    <ClCompile Include="SMSEntryDeleteButton.cpp" />
+    <ClCompile Include="TpCalloutInitiator.cpp" />
+    <ClCompile Include="TpObserver.cpp" />
+    <ClCompile Include="VMailDialog.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CacheDatabase.h" />
+    <ClInclude Include="CallInitiatorFactory.h" />
+    <ClInclude Include="CalloutInitiator.h" />
+    <ClInclude Include="CaptchaWidget.h" />
+    <ClInclude Include="ChildWindowBase.h" />
+    <ClInclude Include="ContactsTreeView.h" />
+    <ClInclude Include="ContactsXmlHandler.h" />
+    <ClInclude Include="DesktopSkypeCallInitiator.h" />
+    <ClInclude Include="DialCancelDlg.h" />
+    <ClInclude Include="DialDigitButton.h" />
+    <ClInclude Include="DlgSelectContactNumber.h" />
+    <ClInclude Include="global.h" />
+    <ClInclude Include="GVAccess.h" />
+    <ClInclude Include="GVContactsTable.h" />
+    <ClInclude Include="GVDataAccess.h" />
+    <ClInclude Include="GVH_XMLJsonHandler.h" />
+    <ClInclude Include="GVHistory.h" />
+    <ClInclude Include="GVWebPage.h" />
+    <ClInclude Include="InboxModel.h" />
+    <ClInclude Include="InboxTreeView.h" />
+    <ClInclude Include="IObserver.h" />
+    <ClInclude Include="LoginDialog.h" />
+    <ClInclude Include="MainApp.h" />
+    <ClInclude Include="MainWindow.h" />
+    <ClInclude Include="MobileWebPage.h" />
+    <ClInclude Include="ObserverFactory.h" />
+    <ClInclude Include="OsDependent.h" />
+    <ClInclude Include="PhoneNumberValidator.h" />
+    <ClInclude Include="QGVDbusServer.h" />
+    <ClInclude Include="Singletons.h" />
+    <ClInclude Include="SkypeClient.h" />
+    <ClInclude Include="SkypeClientFactory.h" />
+    <ClInclude Include="SkypeLinuxClient.h" />
+    <ClInclude Include="SkypeObserver.h" />
+    <ClInclude Include="SkypeWinClient.h" />
+    <ClInclude Include="SMSDlg.h" />
+    <ClInclude Include="SMSEntryDeleteButton.h" />
+    <ClInclude Include="TpCalloutInitiator.h" />
+    <ClInclude Include="TpObserver.h" />
+    <ClInclude Include="ui_ContactsWidget.h" />
+    <ClInclude Include="ui_InboxWidget.h" />
+    <ClInclude Include="ui_LoginDialog.h" />
+    <ClInclude Include="ui_MainWindow.h" />
+    <ClInclude Include="ui_VMailDialog.h" />
+    <ClInclude Include="VMailDialog.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="qgvdial.qrc" />
+    <None Include="stylesheets\dialpad_desktop.qss" />
+    <None Include="stylesheets\dialpad_maemo.qss" />
+    <None Include="readme.txt" />
+    <None Include="src.pro" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="winrsrc.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

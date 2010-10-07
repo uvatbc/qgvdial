@@ -1,10 +1,9 @@
 #include "ChildWindowBase.h"
+#include "Singletons.h"
 
 ChildWindowBase::ChildWindowBase(QWidget *parent, Qt::WindowFlags  f)
 : ChildWindowBaseClass(parent, f)
 {
-#ifdef Q_WS_MAEMO_5
-    this->setAttribute (Qt::WA_Maemo5StackedWindow);
-    this->setAttribute (Qt::WA_Maemo5AutoOrientation);
-#endif
+    OsDependent &osd = Singletons::getRef().getOSD ();
+    osd.setDefaultWindowAttributes (this);
 }//ChildWindowBase::ChildWindowBase

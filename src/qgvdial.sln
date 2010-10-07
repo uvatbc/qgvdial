@@ -1,7 +1,7 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "qgvdial", "qgvdial.vcproj", "{02A66EE2-9D9F-488A-A4C7-66FABBA56443}"
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "qgvdial", "qgvdial.vcxproj", "{02A66EE2-9D9F-488A-A4C7-66FABBA56443}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

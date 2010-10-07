@@ -5,6 +5,9 @@ DialCancelDlg::DialCancelDlg (const QString &strNum, QWidget *parent)
 : QMessageBox (parent)
 , strContact (strNum)
 {
+    OsDependent &osd = Singletons::getRef().getOSD ();
+    osd.setDefaultWindowAttributes (this);
+
     this->setText (QString("Dialing %1. Abort / Cancel ends the call")
                    .arg(strContact));
     this->setStandardButtons (QMessageBox::Ok | QMessageBox::Abort);

@@ -1,5 +1,6 @@
 #include "VMailDialog.h"
 #include "ui_VMailDialog.h"
+#include "Singletons.h"
 
 VMailDialog::VMailDialog (QWidget *parent)
 : QDialog(parent)
@@ -8,9 +9,8 @@ VMailDialog::VMailDialog (QWidget *parent)
 {
     ui->setupUi (this);
 
-#ifdef Q_WS_MAEMO_5
-    this->setAttribute (Qt::WA_Maemo5StackedWindow);
-#endif
+    OsDependent &osd = Singletons::getRef().getOSD ();
+    osd.setDefaultWindowAttributes (this);
 
     bIsBtnPlay = false;
     ui->btnPlay->setIcon (style()->standardIcon(QStyle::SP_MediaPause));

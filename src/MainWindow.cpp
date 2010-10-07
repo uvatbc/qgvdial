@@ -31,10 +31,10 @@ MainWindow::MainWindow (QWidget *parent)
 
     QString strDialpadFile;
     QFile fDialpad_Style;
-#ifdef Q_WS_MAEMO_5
-    this->setAttribute (Qt::WA_Maemo5StackedWindow);
-    this->setAttribute (Qt::WA_Maemo5AutoOrientation);
+    OsDependent &osd = Singletons::getRef().getOSD ();
+    osd.setDefaultWindowAttributes (this);
 
+#ifdef Q_WS_MAEMO_5
     QObject::connect(QApplication::desktop(), SIGNAL(resized(int)),
                      this                   , SLOT  (orientationChanged()));
 
@@ -321,25 +321,25 @@ MainWindow::orientationChanged ()
         ui->gridMain->removeWidget (ui->wgtDialpad);
         ui->gridMain->addWidget (ui->wgtDialpad, 0, 1);
 
-#ifdef Q_WS_MAEMO_5
-    if (NULL != pContactsView) {
-        pContactsView->setAttribute (Qt::WA_Maemo5LandscapeOrientation);
-    }
-    if (NULL != pInboxView) {
-        pInboxView->setAttribute (Qt::WA_Maemo5LandscapeOrientation);
-    }
+#if 0//def Q_WS_MAEMO_5
+        if (NULL != pContactsView) {
+            pContactsView->setAttribute (Qt::WA_Maemo5LandscapeOrientation);
+        }
+        if (NULL != pInboxView) {
+            pInboxView->setAttribute (Qt::WA_Maemo5LandscapeOrientation);
+        }
 #endif
     } else {
         ui->gridMain->removeWidget (ui->wgtDialpad);
         ui->gridMain->addWidget (ui->wgtDialpad, 1, 0);
 
-#ifdef Q_WS_MAEMO_5
-    if (NULL != pContactsView) {
-        pContactsView->setAttribute (Qt::WA_Maemo5PortraitOrientation);
-    }
-    if (NULL != pInboxView) {
-        pInboxView->setAttribute (Qt::WA_Maemo5PortraitOrientation);
-    }
+#if 0 //def Q_WS_MAEMO_5
+        if (NULL != pContactsView) {
+            pContactsView->setAttribute (Qt::WA_Maemo5PortraitOrientation);
+        }
+        if (NULL != pInboxView) {
+            pInboxView->setAttribute (Qt::WA_Maemo5PortraitOrientation);
+        }
 #endif
     }
 }//MainWindow::orientationChanged
@@ -905,6 +905,8 @@ MainWindow::on_btnContacts_clicked ()
         pContactsView->hide ();
     } else {
         pContactsView->show ();
+        OsDependent &osd = Singletons::getRef().getOSD ();
+        osd.setDefaultWindowAttributes (pContactsView);
     }
 }//MainWindow::on_btnContacts_clicked
 
@@ -916,6 +918,8 @@ MainWindow::on_btnHistory_clicked ()
         pInboxView->hide ();
     } else {
         pInboxView->show ();
+        OsDependent &osd = Singletons::getRef().getOSD ();
+        osd.setDefaultWindowAttributes (pInboxView);
     }
 }//MainWindow::on_btnHistory_clicked
 

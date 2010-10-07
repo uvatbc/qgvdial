@@ -49,6 +49,15 @@ OsDependent::initDialServer (QObject *receiver, const char *method)
 #endif
 }//OsDependent::initDialServer
 
+void
+OsDependent::setDefaultWindowAttributes (QWidget *pWidget)
+{
+#ifdef Q_WS_MAEMO_5
+    pWidget->setAttribute (Qt::WA_Maemo5StackedWindow);
+    pWidget->setAttribute (Qt::WA_Maemo5AutoOrientation);
+#endif
+}//OsDependent::setDefaultWindowAttributes
+
 #ifdef QT_NO_SYSTEMTRAYICON
 QSystemTrayIcon::QSystemTrayIcon(QWidget *parent/* = 0*/) : QWidget (parent)
 {
