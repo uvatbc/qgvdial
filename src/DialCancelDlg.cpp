@@ -22,8 +22,6 @@ DialCancelDlg::doModal (const QString &strMyNumber)
 
     int rv = this->exec ();
 
-    obsF.stopObservers ();
-
     return (rv);
 }//DialCancelDlg::doModal
 
@@ -32,3 +30,23 @@ DialCancelDlg::callStarted ()
 {
     this->done (QMessageBox::Ok);
 }//DialCancelDlg::callStarted
+
+void
+DialCancelDlg::doNonModal (const QString &strMyNumber)
+{
+    ObserverFactory &obsF = Singletons::getRef().getObserverFactory ();
+    obsF.startObservers (strMyNumber, this, SLOT (callStarted()));
+
+    this->show ();
+}//DialCancelDlg::doNonModal
+
+void
+DialCancelDlg::done (int r)
+{
+    ObserverFactory &obsF = Singletons::getRef().getObserverFactory ();
+    obsF.stopObservers ();
+
+    emit dialDlgDone (r, strContact);
+
+    QMessageBox::done (r);
+}//DialCancelDlg::done

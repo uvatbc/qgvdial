@@ -67,14 +67,17 @@ private slots:
     //! Invoked after all contacts have been parsed
     void getContactsDone (bool bOk);
 
-    //!Invoked when the dialer widget call button is clicked
+    //! Invoked when the dialer widget call button is clicked
     void dialNow (const QString &strTarget);
 
+    void onDialDlgClose (int retval, const QString &strNumber);
     //! Invoked when dialing has started
     void dialInProgress (const QString &strNumber);
     //! Invoked to perform a dial
     void dialAccessNumber (const QString  &strAccessNumber,
                            const QVariant &context        );
+    //! Invoked when a number dial is completed.
+    void dialComplete (bool bOk, const QVariantList &params);
 
     //! Invoked on user request to call a number
     void callNumber (const QString &strNumber,
@@ -152,8 +155,15 @@ private:
     //! Our own GV phone number
     QString         strSelfNumber;
 
+///////////////////////////////////////////////////////////////////////////////
+// This block of variable is protected by the one mutex in it
+///////////////////////////////////////////////////////////////////////////////
+    QMutex  mtxDial;
+    //! Is there a call in progress?
+    bool    bCallInProgress;
     //! Set this flag if the user cancels the dialed number
-    bool            bDialCancelled;
+    bool    bDialCancelled;
+///////////////////////////////////////////////////////////////////////////////
 
     //! The users registered numbers
     GVRegisteredNumberArray arrNumbers;

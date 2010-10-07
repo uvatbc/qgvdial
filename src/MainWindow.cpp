@@ -14,6 +14,11 @@ using namespace std;
 
 #define CB_TEXT_BUILDER "%1 : %2"
 
+struct DialOutContext {
+    CalloutInitiator *ci;
+    DialCancelDlg *pDialDlg;
+};
+
 MainWindow::MainWindow (QWidget *parent)
 : QMainWindow (parent)
 , ui (new Ui::MainWindow)
@@ -22,6 +27,9 @@ MainWindow::MainWindow (QWidget *parent)
 , pContactsView (NULL)
 , pInboxView (NULL)
 , bLoggedIn (false)
+, mtxDial (QMutex::Recursive)
+, bCallInProgress (false)
+, bDialCancelled (false)
 {
     ui->setupUi(this);
 
@@ -705,6 +713,12 @@ MainWindow::dialNow (const QString &strTarget)
 
     do // Begin cleanup block (not a loop)
     {
+        QMutexLocker locker (&mtxDial);
+        if (bCallInProgress) {
+            setStatus ("Another call is in progress. Please try again later");
+            break;
+        }
+
         GVRegisteredNumber gvRegNumber;
         if (!getDialSettings (bDialout, gvRegNumber, ci))
         {
@@ -716,14 +730,28 @@ MainWindow::dialNow (const QString &strTarget)
         QVariantList l;
         l += strTarget;     // The destination number is common between the two
 
+        DialCancelDlg *pDialDlg = new DialCancelDlg (strTarget, this);
+        QObject::connect (
+            pDialDlg, SIGNAL (dialDlgDone    (int, const QString &)),
+            this    , SLOT   (onDialDlgClose (int, const QString &)));
+
         if (bDialout)
         {
+            DialOutContext *ctx = new DialOutContext;
+            if (NULL == ctx) {
+                setStatus ("Failed to dial out because of allocation problem");
+                break;
+            }
+            ctx->ci = ci;
+            ctx->pDialDlg = pDialDlg;
+
             l += ci->selfNumber ();
-            l += QVariant::fromValue<void*>(ci) ;
+            l += QVariant::fromValue<void*>(ctx) ;
             if (!webPage.enqueueWork (GVAW_dialOut, l, this,
-                            SLOT (dialComplete (bool, const QVariantList &))))
+                    SLOT (dialComplete (bool, const QVariantList &))))
             {
                 setStatus ("Dialing failed instantly");
+                break;
             }
         }
         else
@@ -731,22 +759,28 @@ MainWindow::dialNow (const QString &strTarget)
             l += gvRegNumber.strNumber;
             l += QString (gvRegNumber.chType);
             if (!webPage.enqueueWork (GVAW_dialCallback, l, this,
-                            SLOT (dialComplete (bool, const QVariantList &))))
+                    SLOT (dialComplete (bool, const QVariantList &))))
             {
                 setStatus ("Dialing failed instantly");
+                break;
             }
         }
+
+        bCallInProgress = true;
+        bDialCancelled = false;
+
+        pDialDlg->setAttribute (Qt::WA_DeleteOnClose);
+        pDialDlg->setModal (false);
+        pDialDlg->doNonModal (strSelfNumber);
     } while (0); // End cleanup block (not a loop)
 }//MainWindow::dialNow
 
 void
-MainWindow::dialInProgress (const QString &strNumber)
+MainWindow::onDialDlgClose (int retval, const QString & /*strNumber*/)
 {
-    bDialCancelled = false;
-
-    DialCancelDlg msgBox(strNumber, this);
-    int ret = msgBox.doModal (strSelfNumber);
-    if (QMessageBox::Ok == ret)
+    // Disconnecting this
+    QMutexLocker locker (&mtxDial);
+    if (QMessageBox::Ok == retval)
     {
         emit dialCanFinish ();
     }
@@ -756,24 +790,86 @@ MainWindow::dialInProgress (const QString &strNumber)
         GVAccess &webPage = Singletons::getRef().getGVAccess ();
         webPage.cancelWork (GVAW_dialCallback);
     }
+}//MainWindow::onDialDlgClose
+
+void
+MainWindow::dialInProgress (const QString & /*strNumber*/)
+{
 }//MainWindow::dialInProgress
 
 void
 MainWindow::dialAccessNumber (const QString  &strAccessNumber,
                               const QVariant &context        )
 {
-    CalloutInitiator *ci = (CalloutInitiator *) context.value<void *>();
-    if (NULL != ci)
+    bool bSuccess = false;
+    DialOutContext *ctx = (DialOutContext *) context.value<void *>();
+    do // Begin cleanup block (not a loop)
     {
-        ci->initiateCall (strAccessNumber);
+        if (NULL == ctx)
+        {
+            setStatus ("Invalid call out context", 3);
+            setStatus ("Callout failed");
+            break;
+        }
+
+        if (NULL == ctx->ci)
+        {
+            log ("Invalid call out initiator", 3);
+            setStatus ("Callout failed");
+            break;
+        }
+
+        ctx->ci->initiateCall (strAccessNumber);
         setStatus ("Callout in progress");
+        bSuccess = true;
+    } while (0); // End cleanup block (not a loop)
+
+    if (NULL != ctx) {
+        ctx->ci = NULL;
+        if (NULL != ctx->pDialDlg) {
+            if (bSuccess) {
+                ctx->pDialDlg->accept ();
+            } else {
+                ctx->pDialDlg->reject ();
+            }
+        }
+        free (ctx);
+        ctx = NULL;
+    }
+}//MainWindow::dialAccessNumber
+
+
+void
+MainWindow::dialComplete (bool bOk, const QVariantList &params)
+{
+    QMutexLocker locker (&mtxDial);
+    if (!bOk)
+    {
+        if (bDialCancelled)
+        {
+            setStatus ("Cancelled dial out");
+        }
+        else
+        {
+            setStatus ("Dialing failed", 3);
+            QMessageBox *msgBox = new QMessageBox(QMessageBox::Critical,
+                               "Dial failure",
+                               "Dialing failed",
+                               QMessageBox::Close,
+                               this);
+            msgBox->setModal (false);
+            QObject::connect (
+                msgBox, SIGNAL (buttonClicked (QAbstractButton *)),
+                this  , SLOT   (msgBox_buttonClicked (QAbstractButton *)));
+            msgBox->show ();
+        }
     }
     else
     {
-        log ("Invalid call out initiator", 3);
-        setStatus ("Callout failed");
+        setStatus (QString("Dial successful to %1.").arg(params[0].toString()));
     }
-}//MainWindow::dialAccessNumber
+    bCallInProgress = false;
+}//MainWindow::dialComplete
 
 void
 MainWindow::sendTextToContact (const GVContactInfo &info, bool bSaveIt)
