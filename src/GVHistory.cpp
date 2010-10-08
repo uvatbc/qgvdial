@@ -139,7 +139,6 @@ GVHistory::refreshFullInbox ()
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     dbMain.setLastInboxUpdate (QDateTime::fromString ("2000-01-01",
                                                       "yyyy-MM-dd"));
-    dbMain.clearInbox ();
     refreshHistory ();
 }//GVHistory::refreshFullInbox
 

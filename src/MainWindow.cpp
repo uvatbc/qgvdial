@@ -328,27 +328,9 @@ MainWindow::orientationChanged ()
     if (screenGeometry.width() > screenGeometry.height()) {
         ui->gridMain->removeWidget (ui->wgtDialpad);
         ui->gridMain->addWidget (ui->wgtDialpad, 0, 1);
-
-#if 0//def Q_WS_MAEMO_5
-        if (NULL != pContactsView) {
-            pContactsView->setAttribute (Qt::WA_Maemo5LandscapeOrientation);
-        }
-        if (NULL != pInboxView) {
-            pInboxView->setAttribute (Qt::WA_Maemo5LandscapeOrientation);
-        }
-#endif
     } else {
         ui->gridMain->removeWidget (ui->wgtDialpad);
         ui->gridMain->addWidget (ui->wgtDialpad, 1, 0);
-
-#if 0 //def Q_WS_MAEMO_5
-        if (NULL != pContactsView) {
-            pContactsView->setAttribute (Qt::WA_Maemo5PortraitOrientation);
-        }
-        if (NULL != pInboxView) {
-            pInboxView->setAttribute (Qt::WA_Maemo5PortraitOrientation);
-        }
-#endif
     }
 }//MainWindow::orientationChanged
 
