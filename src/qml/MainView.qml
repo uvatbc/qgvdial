@@ -29,10 +29,12 @@ Rectangle {
 
         DialDisp {
             id: wDisp
+            color: wMainView.color
             layoutName: wMainView.layoutName
         }//DialDisp
 
         Keypad {
+            color: wMainView.color
             layoutName: wMainView.layoutName
             onBtnClick: {
                 wDisp.strNum += strText

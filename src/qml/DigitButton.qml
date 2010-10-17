@@ -40,7 +40,7 @@ Item {
             }
             PropertyChanges {
                 target: rectangle
-                radius: 10.0
+                radius: 15.0
             }
         }
     ]//states

@@ -33,6 +33,7 @@ Rectangle {
 
         TextEdit {
             id: txtNum
+            color: "white"
             width: wDisp.width
             height: (wDisp.layoutName=="desktop"?30:60)
             textFormat: TextEdit.PlainText
