@@ -24,15 +24,15 @@ Item {
             name: "maemo-portrait"; when: (layoutName == "maemo-portrait")
             PropertyChanges {
                 target: digButton
-                width: 150; height: 100
+                width: 140; height: 102
             }
             PropertyChanges {
                 target: mText
-                font { pointSize: 24; bold: true;  }
+                font { pointSize: 36; bold: true;  }
             }
             PropertyChanges {
                 target: sText
-                font { pointSize: 16 }
+                font { pointSize: 18 }
             }
         }
     ]//states

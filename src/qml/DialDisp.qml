@@ -17,7 +17,7 @@ Rectangle {
             name: "maemo-portrait"; when: (layoutName == "maemo-portrait")
             PropertyChanges {
                 target: wDisp
-                width: 350; height: 300
+                width: 365; height: 300
             }
         }
     ]
@@ -33,7 +33,7 @@ Rectangle {
 
         TextEdit {
             id: txtNum
-            width: (wDisp.layoutName=="desktop"?200:350)
+            width: wDisp.width
             height: (wDisp.layoutName=="desktop"?30:60)
             textFormat: TextEdit.PlainText
             text: wDisp.strNum

@@ -20,7 +20,7 @@ Item {
             name: "maemo-portrait"; when: (layoutName == "maemo-portrait")
             PropertyChanges {
                 target: cbNumbers
-                width: 350; height: 60
+                width: 365; height: 60
             }
             PropertyChanges {
                 target: mText

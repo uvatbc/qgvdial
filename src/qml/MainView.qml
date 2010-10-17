@@ -23,6 +23,7 @@ Rectangle {
 
     Flow {
         anchors.fill: parent
+        spacing: (wMainView.layoutName=="desktop"?2:4)
 
         DialDisp {
             id: wDisp

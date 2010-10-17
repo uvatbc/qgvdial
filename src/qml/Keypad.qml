@@ -19,14 +19,15 @@ Rectangle {
             name: "maemo-portrait"; when: (layoutName == "maemo-portrait")
             PropertyChanges {
                 target: wDialer
-                width: 450; height: 400
+                width: 420; height: 400
             }
         }
     ]//states
 
     Grid {
         anchors.fill: parent
-        rows: 4; columns: 3; spacing: 2
+        rows: 4; columns: 3
+        spacing: (wDialer.layoutName == "desktop"?2:4)
 
         DigitButton { mainText: "1"; subText: ""
             layoutName: wDialer.layoutName
