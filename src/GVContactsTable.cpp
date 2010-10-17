@@ -355,7 +355,7 @@ GVContactsTable::onGotContacts (QNetworkReply *reply)
 
         QObject::connect (
             &contactsHandler, SIGNAL (oneContact (const ContactInfo &)),
-            this,            SLOT   (gotOneContact (const ContactInfo &)));
+             this,            SLOT   (gotOneContact (const ContactInfo &)));
 
         simpleReader.setContentHandler (&contactsHandler);
         simpleReader.setErrorHandler (&contactsHandler);
