@@ -1,17 +1,16 @@
 import Qt 4.7
 
 Rectangle {
-    width: 640; height: 250
+    width: 390; height: 170
 
     Flow {
         anchors.fill: parent
 
-        TextEdit {
-            id: txtNum
-            width: 200; height: 30
-            text: "Enter a number"
-            font { pointSize: 14; bold: true;  }
-        }
-        Keypad {}
-    }
-}
+        DialDisp { id: wDisp }
+        Keypad {
+            onBtnClick: {
+                wDisp.text += strText
+            }
+        }// Keypad
+    }// Flow
+}// Rectangle

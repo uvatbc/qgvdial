@@ -1,17 +1,24 @@
 import Qt 4.7
 
 Rectangle {
-    width: 500; height: 200
+    id: wDisp
+    width: 200; height: 30
+    property string text: ""
 
-    Flow {
+    Column {
         anchors.fill: parent
+
+        ComboBoxPhones {
+            lstItems: ["a", "b"]
+            currSelected: 0
+        }
 
         TextEdit {
             id: txtNum
             width: 200; height: 30
-            text: "Enter a number"
+            textFormat: TextEdit.PlainText
+            text: wDisp.text
             font { pointSize: 14; bold: true;  }
-        }
-        Keypad {}
-    }
-}
+        }// TextEdit
+    }// Flow
+}// Rectangle

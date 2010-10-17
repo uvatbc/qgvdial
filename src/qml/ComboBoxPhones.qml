@@ -1,20 +1,15 @@
 import Qt 4.7
 
 Item {
-    id: digButton
-    width: 60; height: 40
+    id: cbNumbers
+    width: 200; height: 30
 
-    // Main text in the button. "0" "1" ...
-    property string mainText: "2"
-    // Subtext
-    property string subText: "abc"
-    // Is this a deletion button?
-    property bool isDel: false
+    // List of items
+//    property list<string> lstItems
+    property variant lstItems
+    // Currently selected item
+    property int currSelected: -1
 
-    // Button emits clicks, but we also mention what is the text to display
-    signal clicked(string strText)
-    // Button can also emit a delete
-    signal delClicked()
 
     Rectangle {
         id: rectangle
@@ -40,28 +35,16 @@ Item {
         // The main text: numbers
         Text {
             id: mText
-            text: mainText
+            text: (currSelected==-1?"...":lstItems[currSelected])
             color: "black"
             font { pointSize: 12; bold: true;  }
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
-            anchors.verticalCenterOffset: -5
-        }// Text
-
-        // The sub text: text
-        Text {
-            id: sText
-            text: subText
-            color: "darkgrey"
-            font { pointSize: 8 }
-            anchors.right: parent.right
-            anchors.bottom: parent.bottom
         }// Text
 
         MouseArea {
             id: mouseArea
             anchors.fill: parent
-            onClicked: (isDel?container.delClicked:digButton.clicked(mainText));
 
             onPressed: rectangle.gradient = grad2
             onReleased: rectangle.gradient = grad1
