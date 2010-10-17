@@ -2,14 +2,16 @@ import Qt 4.7
 
 Rectangle {
     id: wMainView
+    color: "#00000000"
 
+//    property string layoutName: "desktop"
     property string layoutName: "maemo-portrait"
     states: [
         State {
             name: "desktop"; when: (layoutName == "desktop")
             PropertyChanges {
                 target: wMainView
-                width: 390; height: 170
+                width: 392; height: 170
             }
         },
         State {

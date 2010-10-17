@@ -19,6 +19,10 @@ Item {
                 target: sText
                 font { pointSize: 8 }
             }
+            PropertyChanges {
+                target: rectangle
+                radius: 6.0
+            }
         },
         State {
             name: "maemo-portrait"; when: (layoutName == "maemo-portrait")
@@ -33,6 +37,10 @@ Item {
             PropertyChanges {
                 target: sText
                 font { pointSize: 18 }
+            }
+            PropertyChanges {
+                target: rectangle
+                radius: 10.0
             }
         }
     ]//states
