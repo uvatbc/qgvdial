@@ -1,16 +1,39 @@
 import Qt 4.7
 
 Rectangle {
-    width: 390; height: 170
+    id: wMainView
+
+    property string layoutName: "maemo-portrait"
+    states: [
+        State {
+            name: "desktop"; when: (layoutName == "desktop")
+            PropertyChanges {
+                target: wMainView
+                width: 390; height: 170
+            }
+        },
+        State {
+            name: "maemo-portrait"; when: (layoutName == "maemo-portrait")
+            PropertyChanges {
+                target: wMainView
+                width: 800; height: 400
+            }
+        }
+    ]//states
 
     Flow {
         anchors.fill: parent
 
-        DialDisp { id: wDisp }
+        DialDisp {
+            id: wDisp
+            layoutName: wMainView.layoutName
+        }//DialDisp
+
         Keypad {
+            layoutName: wMainView.layoutName
             onBtnClick: {
-                wDisp.text += strText
+                wDisp.strNum += strText
             }
-        }// Keypad
-    }// Flow
-}// Rectangle
+        }//Keypad
+    }//Flow
+}//Rectangle

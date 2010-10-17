@@ -2,7 +2,32 @@ import Qt 4.7
 
 Item {
     id: cbNumbers
-    width: 200; height: 30
+
+    property string layoutName: "desktop"
+    states: [
+        State {
+            name: "desktop"; when: (layoutName == "desktop")
+            PropertyChanges {
+                target: cbNumbers
+                width: 200; height: 30
+            }
+            PropertyChanges {
+                target: mText
+                font { pointSize: 12; bold: true;  }
+            }
+        },
+        State {
+            name: "maemo-portrait"; when: (layoutName == "maemo-portrait")
+            PropertyChanges {
+                target: cbNumbers
+                width: 350; height: 60
+            }
+            PropertyChanges {
+                target: mText
+                font { pointSize: 24; bold: true;  }
+            }
+        }
+    ]
 
     // List of items
 //    property list<string> lstItems
@@ -37,7 +62,6 @@ Item {
             id: mText
             text: (currSelected==-1?"...":lstItems[currSelected])
             color: "black"
-            font { pointSize: 12; bold: true;  }
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
         }// Text

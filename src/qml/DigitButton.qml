@@ -2,7 +2,40 @@ import Qt 4.7
 
 Item {
     id: digButton
-    width: 60; height: 40
+
+    property string layoutName: "desktop"
+    states: [
+        State {
+            name: "desktop"; when: (layoutName == "desktop")
+            PropertyChanges {
+                target: digButton
+                width: 60; height: 40
+            }
+            PropertyChanges {
+                target: mText
+                font { pointSize: 12; bold: true;  }
+            }
+            PropertyChanges {
+                target: sText
+                font { pointSize: 8 }
+            }
+        },
+        State {
+            name: "maemo-portrait"; when: (layoutName == "maemo-portrait")
+            PropertyChanges {
+                target: digButton
+                width: 150; height: 100
+            }
+            PropertyChanges {
+                target: mText
+                font { pointSize: 24; bold: true;  }
+            }
+            PropertyChanges {
+                target: sText
+                font { pointSize: 16 }
+            }
+        }
+    ]//states
 
     // Main text in the button. "0" "1" ...
     property string mainText: "2"
@@ -42,7 +75,6 @@ Item {
             id: mText
             text: mainText
             color: "black"
-            font { pointSize: 12; bold: true;  }
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
             anchors.verticalCenterOffset: -5
@@ -53,7 +85,6 @@ Item {
             id: sText
             text: subText
             color: "darkgrey"
-            font { pointSize: 8 }
             anchors.right: parent.right
             anchors.bottom: parent.bottom
         }// Text
