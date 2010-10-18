@@ -21,7 +21,6 @@ private:
     ~SkypeClientFactory ();
 
 signals:
-    void log (const QString &txt, int level = 10);
     void status (const QString &txt, int timeout = 0);
 
 private:

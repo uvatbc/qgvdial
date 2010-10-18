@@ -38,24 +38,24 @@ TpObserver::observeChannels(
 {
     bool bOk;
     QString msg;
-    emit log ("Observer got something!");
+    qDebug ("Observer got something!");
 
     if (strContact.isEmpty ())
     {
         context->setFinished ();
-        emit log ("But we weren't asked to notify anything, so go away");
+        qDebug ("But we weren't asked to notify anything, so go away");
         return;
     }
 
     msg = QString("There are %1 channels in channels list")
           .arg (channels.size ());
-    log (msg);
+    qDebug () << msg;
 
     foreach (ChannelPtr channel, channels)
     {
         if (!channel->isReady ())
         {
-            emit log ("Channel is not ready");
+            qDebug ("Channel is not ready");
 
             ChannelAccepter *closer = new ChannelAccepter(context,
                                                           account,
@@ -67,10 +67,6 @@ TpObserver::observeChannels(
                                                           channel,
                                                           strContact,
                                                           this);
-            bOk =
-            QObject::connect (
-                closer, SIGNAL (log(const QString &, int)),
-                this  , SIGNAL (log(const QString &, int)));
             bOk =
             QObject::connect (
                 closer, SIGNAL (callStarted ()),
@@ -126,7 +122,7 @@ ChannelAccepter::init ()
         this        , SLOT   (onConnectionReady (Tp::PendingOperation *)));
     if (bOk)
     {
-        emit log ("Waiting for connection to become ready");
+        qDebug ("Waiting for connection to become ready");
     }
 
     nRefCount ++;
@@ -137,7 +133,7 @@ ChannelAccepter::init ()
         this        , SLOT   (onAccountReady (Tp::PendingOperation *)));
     if (bOk)
     {
-        emit log ("Waiting for account to become ready");
+        qDebug ("Waiting for account to become ready");
     }
 
     nRefCount ++;
@@ -148,10 +144,10 @@ ChannelAccepter::init ()
         this        , SLOT   (onChannelReady (Tp::PendingOperation *)));
     if (bOk)
     {
-        emit log ("Waiting for channel to become ready");
+        qDebug ("Waiting for channel to become ready");
     }
 
-    emit log ("All become ready's sent");
+    qDebug ("All become ready's sent");
     decrefCleanup ();
 
     return (bOk);
@@ -167,13 +163,13 @@ ChannelAccepter::decrefCleanup ()
         return;
     }
 
-    emit log ("Everything ready. Cleaning up");
+    qDebug ("Everything ready. Cleaning up");
 
     bool bCleanupLater = false;
     do { // Not a loop
         if (bFailure)
         {
-            emit log ("Failed while waiting for something");
+            qWarning ("Failed while waiting for something");
             break;
         }
 
@@ -181,13 +177,13 @@ ChannelAccepter::decrefCleanup ()
         msg = QString("Channel type = %1. isRequested = %2")
                 .arg (currentChannel->channelType ())
                 .arg (currentChannel->isRequested ());
-        emit log (msg);
+        qDebug () << msg;
 
         ContactPtr contact = currentChannel->initiatorContact ();
         msg = QString("Contact id = %1. alias = %2")
                .arg (contact->id ())
                .arg (contact->alias ());
-        emit log (msg);
+        qDebug () << msg;
 
         int interested = 0;
         if (0 == currentChannel->channelType().compare (
@@ -206,11 +202,11 @@ ChannelAccepter::decrefCleanup ()
 
         if (3 != interested)
         {
-            emit log ("Channel that we're not interested in");
+            qDebug ("Channel that we're not interested in");
             break;
         }
 
-        emit log ("Incoming call from our number!");
+        qDebug ("Incoming call from our number!");
         emit callStarted ();
     } while (0); // Not a loop
 
@@ -226,11 +222,11 @@ ChannelAccepter::onCallAccepted (Tp::PendingOperation *operation)
 {
     if (operation->isError ())
     {
-        emit log ("Failed to accept call");
+        qWarning ("Failed to accept call");
     }
     else
     {
-        emit log ("Call accepted");
+        qDebug ("Call accepted");
     }
     context->setFinished ();
     this->deleteLater ();
@@ -242,17 +238,17 @@ ChannelAccepter::onChannelReady (Tp::PendingOperation *operation)
     do { // Not a loop
         if (operation->isError ())
         {
-            emit log ("Channel could not become ready");
+            qWarning ("Channel could not become ready");
             bFailure = true;
         }
 
         if (!currentChannel->isReady ())
         {
-            emit log ("Dammit the channel is still not ready");
+            qWarning ("Dammit the channel is still not ready");
         }
         else
         {
-            emit log ("Channel is ready");
+            qDebug ("Channel is ready");
         }
 
         decrefCleanup ();
@@ -266,17 +262,17 @@ ChannelAccepter::onConnectionReady (Tp::PendingOperation *operation)
     do { // Not a loop
         if (operation->isError ())
         {
-            emit log ("Connection could not become ready");
+            qWarning ("Connection could not become ready");
             bFailure = true;
         }
 
         if (!connection->isReady ())
         {
-            emit log ("Dammit the connection is still not ready");
+            qWarning ("Dammit the connection is still not ready");
         }
         else
         {
-            emit log ("Connection is ready");
+            qDebug ("Connection is ready");
         }
 
         decrefCleanup ();
@@ -290,17 +286,17 @@ ChannelAccepter::onAccountReady (Tp::PendingOperation *operation)
     do { // Not a loop
         if (operation->isError ())
         {
-            emit log ("Account could not become ready");
+            qWarning ("Account could not become ready");
             bFailure = true;
         }
 
         if (!account->isReady ())
         {
-            emit log ("Dammit the account is still not ready");
+            qWarning ("Dammit the account is still not ready");
         }
         else
         {
-            emit log ("Account is ready");
+            qDebug ("Account is ready");
         }
 
         decrefCleanup ();

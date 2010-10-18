@@ -11,7 +11,6 @@ protected:
     explicit CalloutInitiator(QObject *parent = 0);
 
 signals:
-    void log(const QString &strText, int level = 10);
     void status(const QString &strText, int timeout = 2000);
 
 public:

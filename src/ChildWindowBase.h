@@ -24,8 +24,6 @@ protected slots:
 #endif
 
 signals:
-    //! Log emitter
-    void log(const QString &strText, int level = 10);
     //! Status emitter
     void status(const QString &strText, int timeout = 2000);
 };

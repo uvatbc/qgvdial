@@ -114,7 +114,7 @@ MainWindow::log (const QString &strText, int level /*= 10*/)
 void
 MainWindow::setStatus(const QString &strText, int timeout /* = 0*/)
 {
-//    log (strText);
+    qDebug () << strText;
     ui->statusBar->showMessage (strText, timeout);
 }//MainWindow::setStatus
 
@@ -149,34 +149,25 @@ MainWindow::init ()
          this   , SLOT   (dialAccessNumber (const QString &,
                                             const QVariant &)));
 
-    // Skype client factory log and status
+    // Skype client factory main widget and status
     SkypeClientFactory &skypeFactory = Singletons::getRef().getSkypeFactory ();
     skypeFactory.setMainWidget (this);
-    QObject::connect (
-        &skypeFactory, SIGNAL (log(const QString &, int)),
-         this        , SLOT   (log(const QString &, int)));
     QObject::connect (
         &skypeFactory, SIGNAL (status(const QString &, int)),
          this        , SLOT   (setStatus(const QString &, int)));
 
-    // Observer factory log and status
+    // Observer factory init and status
     ObserverFactory &obF = Singletons::getRef().getObserverFactory ();
     obF.init ();
-    QObject::connect (&obF , SIGNAL (log(const QString &, int)),
-                       this, SLOT   (log(const QString &, int)));
     QObject::connect (&obF , SIGNAL (status(const QString &, int)),
                        this, SLOT   (setStatus(const QString &, int)));
 
-    // webPage log and status
-    QObject::connect (&webPage, SIGNAL (log(const QString &, int)),
-                       this   , SLOT   (log(const QString &, int)));
+    // webPage init and status
     QObject::connect (&webPage, SIGNAL (status(const QString &, int)),
                        this   , SLOT   (setStatus(const QString &, int)));
 
-    // call initiator log status and init
+    // call initiator init and status
     CallInitiatorFactory& cif = Singletons::getRef().getCIFactory ();
-    QObject::connect (&cif , SIGNAL (log(const QString &, int)),
-                       this, SLOT   (log(const QString &, int)));
     QObject::connect (&cif , SIGNAL (status(const QString &, int)),
                        this, SLOT   (setStatus(const QString &, int)));
 
@@ -194,7 +185,7 @@ MainWindow::init ()
     }
     else
     {
-        setStatus ("No user credentials cached. Please log in");
+        setStatus ("No user credentials cached. Please login");
 
         strUser.clear ();
         strPass.clear ();
@@ -220,7 +211,7 @@ MainWindow::doLogin ()
         if (!webPage.enqueueWork (GVAW_login, l, this,
                 SLOT (loginCompleted (bool, const QVariantList &))))
         {
-            log ("Login returned immediately with failure!", 3);
+            qWarning ("Login returned immediately with failure!");
             break;
         }
 
@@ -441,17 +432,14 @@ MainWindow::initContactsWidget ()
 {
     do { // Begin cleanup block (not a loop)
         if (NULL != pContactsView) {
-            log ("Contacts widget is already active");
+            qDebug ("Contacts widget is already active");
             break;
         }
 
         // Create the contact view
         pContactsView = new GVContactsTable (this);
 
-        // Log and status
-        QObject::connect (
-            pContactsView, SIGNAL (log(const QString &, int)),
-            this         , SLOT   (log(const QString &, int)));
+        // Status
         QObject::connect (
             pContactsView, SIGNAL (status   (const QString &, int)),
             this         , SLOT   (setStatus(const QString &, int)));
@@ -487,7 +475,7 @@ MainWindow::deinitContactsWidget ()
 {
     do { // Begin cleanup block (not a loop)
         if (NULL == pContactsView) {
-            log ("Contacts widget was NULL.");
+            qDebug ("Contacts widget was NULL.");
             break;
         }
 
@@ -505,17 +493,14 @@ MainWindow::initInboxWidget ()
 {
     do { // Begin cleanup block (not a loop)
         if (NULL != pInboxView) {
-            log ("Inbox widget is already active");
+            qDebug ("Inbox widget is already active");
             break;
         }
 
         // Create the contact view
         pInboxView = new GVHistory (this);
 
-        // Log and status
-        QObject::connect (
-            pInboxView, SIGNAL (log(const QString &, int)),
-            this      , SLOT   (log(const QString &, int)));
+        // Status
         QObject::connect (
             pInboxView, SIGNAL (status   (const QString &, int)),
             this      , SLOT   (setStatus(const QString &, int)));
@@ -547,7 +532,7 @@ MainWindow::deinitInboxWidget ()
 {
     do { // Begin cleanup block (not a loop)
         if (NULL == pInboxView) {
-            log ("Inbox widget was NULL.");
+            qWarning ("Inbox widget was NULL.");
             break;
         }
 
@@ -653,7 +638,7 @@ MainWindow::callWithContactInfo (const GVContactInfo &info, bool bSaveIt)
     }
     else
     {
-        log ("Got contact info from cached location");
+        qDebug ("Got contact info from cached location");
     }
 
     DlgSelectContactNumber dlg(info, this);
@@ -662,13 +647,13 @@ MainWindow::callWithContactInfo (const GVContactInfo &info, bool bSaveIt)
     {
         if (QDialog::Accepted != rv)
         {
-            log ("User canceled call", 3);
+            qWarning ("User canceled call");
             break;
         }
         rv = dlg.getSelection ();
         if (-1 == rv)
         {
-            log ("Invalid selection", 3);
+            qWarning ("Invalid selection");
             break;
         }
 
@@ -796,7 +781,7 @@ MainWindow::dialAccessNumber (const QString  &strAccessNumber,
 
         if (NULL == ctx->ci)
         {
-            log ("Invalid call out initiator", 3);
+            qWarning ("Invalid call out initiator");
             setStatus ("Callout failed");
             break;
         }
@@ -863,7 +848,7 @@ MainWindow::sendTextToContact (const GVContactInfo &info, bool bSaveIt)
     }
     else
     {
-        log ("Got contact info from cached location");
+        qDebug ("Got contact info from cached location");
     }
 
     DlgSelectContactNumber dlg(info, this);
@@ -872,13 +857,13 @@ MainWindow::sendTextToContact (const GVContactInfo &info, bool bSaveIt)
     {
         if (QDialog::Accepted != rv)
         {
-            log ("User canceled SMS", 3);
+            qWarning ("User canceled SMS");
             break;
         }
         rv = dlg.getSelection ();
         if (-1 == rv)
         {
-            log ("Invalid selection", 3);
+            qWarning ("Invalid selection");
             break;
         }
 
@@ -923,7 +908,7 @@ MainWindow::sendSMS (const QStringList &arrNumbers, const QString &strText)
         {
             arrFailed += arrNumbers[i];
             msg = QString ("Failed to send an SMS to %1").arg (arrNumbers[i]);
-            log (msg, 3);
+            qWarning () << msg;
             break;
         }
     } // loop through all the numbers
@@ -1018,7 +1003,7 @@ MainWindow::refreshRegisteredNumbers ()
     do { // Begin cleanup block (not a loop)
         if (!bLoggedIn)
         {
-            log ("Not logged in. Will not refresh registered numbers.");
+            qWarning ("Not logged in. Will not refresh registered numbers.");
             break;
         }
 
@@ -1038,7 +1023,7 @@ MainWindow::refreshRegisteredNumbers ()
                     SIGNAL (registeredPhone    (const GVRegisteredNumber &)),
                  this   ,
                     SLOT   (gotRegisteredPhone (const GVRegisteredNumber &)));
-            emit log ("Failed to retrieve registered contacts!!", 3);
+            qWarning ("Failed to retrieve registered contacts!!");
             break;
         }
 
@@ -1054,7 +1039,7 @@ MainWindow::gotRegisteredPhone (const GVRegisteredNumber &info)
     QString msg = QString("\"%1\"=\"%2\"")
                     .arg (info.strDisplayName)
                     .arg (info.strNumber);
-    emit log (msg);
+    qDebug () << msg;
 
     arrNumbers += info;
 }//MainWindow::gotRegisteredPhone
@@ -1150,7 +1135,7 @@ MainWindow::getDialSettings (bool                 &bDialout   ,
             QVariant var = ui->cbDialMethod->itemData (index);
             if ((!var.isValid ()) || (var.isNull ()))
             {
-                emit log ("Invalid variant in callout numbers");
+                qWarning ("Invalid variant in callout numbers");
                 break;
             }
             initiator = (CalloutInitiator *) var.value<void *> ();
@@ -1182,7 +1167,7 @@ MainWindow::retrieveVoicemail (const QString &strVmailLink)
         QTemporaryFile tempFile (strTemplate);
         if (!tempFile.open ())
         {
-            log ("Failed to get a temp file name");
+            qWarning ("Failed to get a temp file name");
             break;
         }
         QString strTemp = QFileInfo (tempFile.fileName ()).absoluteFilePath ();
@@ -1194,7 +1179,7 @@ MainWindow::retrieveVoicemail (const QString &strVmailLink)
         if (!webPage.enqueueWork (GVAW_playVmail, l, this,
                 SLOT (onVmailDownloaded (bool, const QVariantList &))))
         {
-            log ("Failed to play Voice mail", 3);
+            qWarning ("Failed to play Voice mail");
             break;
         }
     } while (0); // End cleanup block (not a loop)
@@ -1233,8 +1218,6 @@ MainWindow::playVmail (const QString &strFile)
 {
     VMailDialog *dlgVmail = new VMailDialog (this);
     dlgVmail->setAttribute (Qt::WA_DeleteOnClose);
-    QObject::connect (dlgVmail, SIGNAL (log (const QString &, int)),
-                      this    , SLOT   (log (const QString &, int)));
     QObject::connect (dlgVmail, SIGNAL (status (const QString &, int)),
                       this    , SLOT   (setStatus (const QString &, int)));
     dlgVmail->play (strFile);

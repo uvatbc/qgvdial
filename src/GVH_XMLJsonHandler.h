@@ -14,7 +14,6 @@ public:
     qint32 getUsableMsgsCount ();
 
 signals:
-    void log(const QString &strText, int level = 10);
     void oneElement (const GVHistoryEvent &element);
 
 protected:

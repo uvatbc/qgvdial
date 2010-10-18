@@ -22,11 +22,6 @@ GVContactsTable::GVContactsTable (QWidget *parent, Qt::WindowFlags flags)
     mnuContext.addAction (ui->actionCall);
     mnuContext.addAction (ui->actionSend_Text);
 
-    // Connect the log to this classes log.
-    QObject::connect (
-        ui->treeView, SIGNAL (log(const QString &, int)),
-        this        , SIGNAL (log(const QString &, int)));
-
     // treeView.activated -> this.activatedContact
     QObject::connect (
         ui->treeView, SIGNAL (activated        (const QModelIndex &)),
@@ -269,7 +264,7 @@ GVContactsTable::onLoginResponse (QNetworkReply *reply)
         {
             strCaptchaUrl = "http://www.google.com/accounts/"
                           + strCaptchaUrl;
-            emit log ("Loading captcha");
+            qDebug ("Loading captcha");
             CaptchaWidget *captcha = new CaptchaWidget(strCaptchaUrl, this);
             QObject::connect (
                 captcha, SIGNAL (done (bool, const QString &)),
@@ -279,14 +274,14 @@ GVContactsTable::onLoginResponse (QNetworkReply *reply)
 
         if (0 == strGoogleAuth.size ())
         {
-            emit log ("Failed to login!!");
+            qWarning ("Failed to login!!");
             break;
         }
 
         QMutexLocker locker (&mutex);
         bLoggedIn = true;
 
-        emit log ("Login success");
+        qDebug ("Login success");
 
         if (bRefreshRequested)
         {
@@ -348,8 +343,6 @@ GVContactsTable::onGotContacts (QNetworkReply *reply)
         }
         inputSource.setData (byData);
 
-        QObject::connect (&contactsHandler, SIGNAL (log(const QString &, int)),
-            this,            SIGNAL (log(const QString &, int)));
         QObject::connect (&contactsHandler, SIGNAL (status(const QString &, int)),
             this,            SIGNAL (status(const QString &, int)));
 

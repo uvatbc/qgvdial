@@ -18,11 +18,6 @@ GVHistory::GVHistory (QWidget *parent, Qt::WindowFlags flags)
     OsDependent &osd = Singletons::getRef().getOSD ();
     osd.setDefaultWindowAttributes (this);
 
-    // Connect the log to this classes log.
-    QObject::connect (
-        ui->treeView, SIGNAL (log(const QString &, int)),
-        this        , SIGNAL (log(const QString &, int)));
-
     // Add all these actions to the action group
     actionGroup.addAction (ui->actionAll);
     actionGroup.addAction (ui->actionPlaced);
@@ -172,8 +167,8 @@ GVHistory::getHistoryDone (bool, const QVariantList &)
     QDateTime dtUpdate;
     if (dbMain.getLatestInboxEntry (dtUpdate))
     {
-        emit log (QString ("Latest inbox entry is : %1")
-                  .arg (dtUpdate.toString ()));
+        qDebug () << QString ("Latest inbox entry is : %1")
+                        .arg (dtUpdate.toString ());
         dbMain.setLastInboxUpdate (dtUpdate);
     }
 

@@ -32,7 +32,7 @@ SkypeWinClient::skypeAttachStatus (bool bOk)
         QMutexLocker locker (&mutex);
         if (SW_Connect != workCurrent.whatwork)
         {
-            emit log ("We're not in connection phase.");
+            qWarning ("We're not in connection phase.");
             break;
         }
 
@@ -91,7 +91,7 @@ SkypeWinClient::invoke (const QString &strCommand)
     LRESULT lRet = FALSE;
     do // Begin cleanup block (not a loop)
     {
-        emit log (QString("Sending command %1").arg (strCommand));
+        qDebug () << QString("Sending command %1").arg (strCommand);
 
         QMutexLocker locker (&mutex);
         bInvokeInProgress = true;

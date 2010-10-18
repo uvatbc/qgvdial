@@ -42,12 +42,12 @@ SkypeLinuxClient::ensureConnected ()
                                                  QDBusConnection::sessionBus(),
                                                  this);
                 if (NULL == skypeIface) {
-                    emit log ("malloc fail");
+                    qWarning ("malloc fail");
                     break;
                 }
             }
             if (!skypeIface->isValid()) {
-                emit log ("Skype interface was not valid", 3);
+                qWarning ("Skype interface was not valid");
                 delete skypeIface;
                 skypeIface = NULL;
             }
@@ -55,7 +55,7 @@ SkypeLinuxClient::ensureConnected ()
 
         if ((NULL == skypeIface) || (!skypeIface->isValid ()))
         {
-            emit log ("Failed to initialize skype");
+            qWarning ("Failed to initialize skype");
             break;
         }
 
@@ -74,7 +74,7 @@ SkypeLinuxClient::ensureConnected ()
         rv = invoke(QString("NAME %1").arg(strName));
         if (!rv)
         {
-            emit log ("Failed to tell Skype the client name");
+            qWarning ("Failed to tell Skype the client name");
             break;
         }
 
@@ -101,14 +101,14 @@ SkypeLinuxClient::nameResponse (int status, const QString &strOutput)
     {
         if (0 != status)
         {
-            emit log (QString ("Name response failure. error = %1")
-                      .arg (strOutput), 3);
+            qWarning () << QString ("Name response failure. error = %1")
+                                    .arg (strOutput);
             break;
         }
 
         if (0 != strOutput.compare ("OK"))
         {
-            emit log ("Skype did not like us!", 3);
+            qWarning ("Skype did not like us!");
             break;
         }
 
@@ -120,7 +120,7 @@ SkypeLinuxClient::nameResponse (int status, const QString &strOutput)
         rv = invoke(SKYPE_PROTOCOL);
         if (!rv)
         {
-            emit log ("Failed to tell Skype the client name");
+            qWarning ("Failed to tell Skype the client name");
             break;
         }
 
@@ -145,13 +145,13 @@ SkypeLinuxClient::protocolResponse (int status, const QString &strOutput)
     {
         if (0 != status)
         {
-            emit log ("Name response failure", 3);
+            qWarning ("Name response failure");
             break;
         }
 
         if (0 != strOutput.compare(SKYPE_PROTOCOL))
         {
-            emit log ("Skype did not like protocol 5!", 3);
+            qWarning ("Skype did not like protocol 5!");
             break;
         }
 
@@ -191,7 +191,7 @@ SkypeLinuxClient::invoke (const QString &strCommand)
                      this   , SLOT   (invokeDone (QDBusPendingCallWatcher*)));
 */
 
-    emit log (QString("Sending command %1").arg (strCommand));
+    qDebug () << QString("Sending command %1").arg (strCommand);
 
     QDBusMessage msg = skypeIface->call("Invoke", strCommand);
     if (QDBusMessage::ErrorMessage == msg.type())

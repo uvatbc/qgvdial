@@ -80,12 +80,12 @@ GVWebPage::isLoadFailed (bool bOk)
         QMutexLocker locker(&mutex);
         if (workCurrent.bCancel)
         {
-            emit log ("Work canceled. Fail safely");
+            qDebug ("Work canceled. Fail safely");
             break;
         }
         if (GVAW_Nothing == workCurrent.whatwork)
         {
-            emit log ("Invalid work. Fail safely");
+            qDebug ("Invalid work. Fail safely");
             break;
         }
 
@@ -163,12 +163,12 @@ GVWebPage::loginStage1 (bool bOk)
         if (isLoadFailed (bOk))
         {
             bOk = false;
-            emit log ("Main login page load failed");
+            qWarning ("Main login page load failed");
             break;
         }
         bOk = false;
 
-        emit log ("Login page loaded");
+        qDebug ("Login page loaded");
 
         QWebElement email = doc().findFirst ("#Email");
         QWebElement passwd = doc().findFirst ("#Passwd");
@@ -185,7 +185,7 @@ GVWebPage::loginStage1 (bool bOk)
             }
             else
             {
-                log ("Invalid page!");
+                qWarning ("Invalid page!");
             }
             break;
         }
@@ -216,7 +216,7 @@ GVWebPage::loginStage2 (bool bOk)
         if (isLoadFailed (bOk))
         {
             bOk = false;
-            emit log ("Page load actual login failed", 3);
+            qWarning ("Page load actual login failed");
             break;
         }
         bOk = false;
@@ -242,7 +242,7 @@ GVWebPage::loginStage2 (bool bOk)
         {
             if (!isLoggedIn ())
             {
-                emit log ("Failed to log in!", 3);
+                qWarning ("Failed to login!");
                 break;
             }
 
@@ -252,7 +252,7 @@ GVWebPage::loginStage2 (bool bOk)
 #undef GVSELECTOR
             if (num.isNull ())
             {
-                emit log ("Failed to get a google voice number!!", 3);
+                qWarning ("Failed to get a google voice number!!");
                 break;
             }
 
@@ -265,7 +265,7 @@ GVWebPage::loginStage2 (bool bOk)
 #undef GVSELECTOR
             if (rnr_se.isNull ())
             {
-                emit log ("Could not find rnr_se", 3);
+                qWarning ("Could not find rnr_se");
                 break;
             }
             strRnr_se = rnr_se.attribute ("value");
@@ -292,7 +292,7 @@ GVWebPage::loginStage3 (bool bOk)
         if (isLoadFailed (bOk))
         {
             bOk = false;
-            emit log ("Page load actual login failed", 3);
+            qWarning ("Page load actual login failed");
             break;
         }
         bOk = false;
@@ -303,7 +303,7 @@ GVWebPage::loginStage3 (bool bOk)
 #undef GVSELECTOR
         if (num.isNull ())
         {
-            emit log ("Failed to get a google voice number!!", 3);
+            qWarning ("Failed to get a google voice number!!");
             break;
         }
 
@@ -316,7 +316,7 @@ GVWebPage::loginStage3 (bool bOk)
 #undef GVSELECTOR
         if (rnr_se.isNull ())
         {
-            emit log ("Could not find rnr_se", 3);
+            qWarning ("Could not find rnr_se");
             break;
         }
         strRnr_se = rnr_se.attribute ("value");
@@ -385,7 +385,7 @@ GVWebPage::contactsLoaded (bool bOk)
         if (isLoadFailed (bOk))
         {
             bOk = false;
-            emit log ("Failed to load contacts page", 3);
+            qWarning ("Failed to load contacts page");
             break;
         }
         bOk = false;
@@ -393,7 +393,7 @@ GVWebPage::contactsLoaded (bool bOk)
         QWebFrame *frame = webPage.mainFrame();
         if (NULL == frame)
         {
-            emit log ("No frame!!", 3);
+            qWarning ("No frame!!");
             break;
         }
 
@@ -421,7 +421,7 @@ GVWebPage::contactsLoaded (bool bOk)
             msg = QString ("Found %1 contacts on page %2")
                   .arg(nContactCount)
                   .arg(nCurrent);
-            emit log (msg);
+            qDebug () << msg;
         }
         else
         {
@@ -475,7 +475,7 @@ GVWebPage::dialCallback (bool bCallback)
     {
         if (!bUseIphoneUA)
         {
-            emit log ("Cannot callout if the UA is not the iPhone UA");
+            qWarning ("Cannot callout if the UA is not the iPhone UA");
             completeCurrentWork (GVAW_dialOut, false);
             return (false);
         }
@@ -569,12 +569,12 @@ GVWebPage::onDataCallDone (QNetworkReply * reply)
             QMutexLocker locker(&mutex);
             if (GVAW_dialOut != workCurrent.whatwork)
             {
-                emit log ("What the hell??");
+                qWarning ("What the hell??");
                 break;
             }
 
             QString strAccess = rx.cap(1);
-            emit log (QString ("access number = \"%1\"").arg(strAccess));
+            qWarning () << QString ("access number = \"%1\"").arg(strAccess);
 
             emit dialAccessNumber (strAccess, workCurrent.arrParams[2]);
 
@@ -588,7 +588,7 @@ GVWebPage::onDataCallDone (QNetworkReply * reply)
         msg.remove(QRegExp("[ \t\n]*"));
         if (!msg.contains ("\"ok\":true", Qt::CaseSensitive))
         {
-            emit log ("Failed to dial out");
+            qWarning ("Failed to dial out");
             completeCurrentWork (GVAW_dialCallback, false);
             break;
         }
@@ -664,7 +664,7 @@ GVWebPage::contactInfoLoaded (bool bOk)
         if (isLoadFailed (bOk))
         {
             bOk = false;
-            emit log ("Failed to load call page 2");
+            qWarning ("Failed to load call page 2");
             break;
         }
         bOk = false;
@@ -674,7 +674,7 @@ GVWebPage::contactInfoLoaded (bool bOk)
 #undef GVSELECTOR
         if (user.isNull ())
         {
-            emit log ("Couldn't find user name on page");
+            qWarning ("Couldn't find user name on page");
             break;
         }
         info.strName = user.toPlainText ();
@@ -684,7 +684,7 @@ GVWebPage::contactInfoLoaded (bool bOk)
 #undef GVSELECTOR
         if (0 == numbers.count ())
         {
-            emit log ("No numbers found for this contact");
+            qWarning ("No numbers found for this contact");
             break;
         }
 
@@ -755,7 +755,7 @@ GVWebPage::phonesListLoaded (bool bOk)
         if (isLoadFailed (bOk))
         {
             bOk = false;
-            emit log ("Failed to load phones settings page");
+            qWarning ("Failed to load phones settings page");
             break;
         }
 
@@ -764,7 +764,7 @@ GVWebPage::phonesListLoaded (bool bOk)
 #undef GVSELECTOR
         if (0 == numbers.count ())
         {
-            emit log ("No registered phones found for this account");
+            qWarning ("No registered phones found for this account");
             break;
         }
 
@@ -895,8 +895,6 @@ GVWebPage::onGotHistoryXML (QNetworkReply *reply)
     inputSource.setData (strReply);
     GVH_XMLJsonHandler xmlHandler;
 
-    QObject::connect (&xmlHandler, SIGNAL (log(const QString &, int)),
-                       this      , SIGNAL (log(const QString &, int)));
     QObject::connect (
         &xmlHandler, SIGNAL (oneElement (const GVHistoryEvent &)),
          this      , SIGNAL (oneHistoryEvent (const GVHistoryEvent &)));
@@ -907,19 +905,19 @@ GVWebPage::onGotHistoryXML (QNetworkReply *reply)
         simpleReader.setContentHandler (&xmlHandler);
         simpleReader.setErrorHandler (&xmlHandler);
 
-        emit log ("Begin parsing");
+        qDebug ("Begin parsing");
         if (!simpleReader.parse (&inputSource, false))
         {
-            emit log ("Failed to parse XML");
+            qWarning ("Failed to parse XML");
             break;
         }
-        emit log ("End parsing");
+        qDebug ("End parsing");
 
         QDateTime dtUpdate = workCurrent.arrParams[3].toDateTime ();
         bool bGotOld = false;
         if (!xmlHandler.parseJSON (dtUpdate, bGotOld))
         {
-            emit log ("Failed to parse GV History JSON");
+            qWarning ("Failed to parse GV History JSON");
             break;
         }
 
@@ -953,7 +951,7 @@ GVWebPage::getContactFromHistoryLink ()
     QMutexLocker locker(&mutex);
     if (!bLoggedIn)
     {
-        emit log ("User not logged in when calling history link");
+        qWarning ("User not logged in when calling history link");
         completeCurrentWork (GVAW_getContactFromHistoryLink, false);
         return (false);
     }
@@ -983,7 +981,7 @@ GVWebPage::getContactFromHistoryLinkLoaded (bool bOk)
         if (isLoadFailed (bOk))
         {
             bOk = false;
-            emit log ("Failed to load call history link page");
+            qWarning ("Failed to load call history link page");
             break;
         }
         bOk = false;
@@ -993,7 +991,7 @@ GVWebPage::getContactFromHistoryLinkLoaded (bool bOk)
 #undef GVSELECTOR
         if (user.isNull ())
         {
-            emit log ("Couldn't find user name on page");
+            qWarning ("Couldn't find user name on page");
             break;
         }
         info.strName = user.attribute ("name");
@@ -1007,7 +1005,7 @@ GVWebPage::getContactFromHistoryLinkLoaded (bool bOk)
 #undef GVSELECTOR
         if (0 == numbers.count ())
         {
-            emit log ("No numbers found for this contact");
+            qWarning ("No numbers found for this contact");
             break;
         }
 
@@ -1054,7 +1052,7 @@ GVWebPage::sendSMS ()
     QMutexLocker locker(&mutex);
     if (!bLoggedIn)
     {
-        emit log ("User not logged in when attempting to send an SMS");
+        qWarning ("User not logged in when attempting to send an SMS");
         completeCurrentWork (GVAW_sendSMS, false);
         return (false);
     }
@@ -1212,11 +1210,11 @@ GVWebPage::onVmailDownloaded (QNetworkReply *reply)
         QFile file(workCurrent.arrParams[1].toString());
         if (!file.open(QFile::ReadWrite))
         {
-            emit log ("Failed to open the vmail file. Abort!");
+            qWarning ("Failed to open the vmail file. Abort!");
             break;
         }
 
-        emit log (QString ("Saving vmail in %1").arg(file.fileName ()));
+        qDebug () << QString ("Saving vmail in %1").arg(file.fileName ());
         file.write(reply->readAll());
         emit status ("vmail saved");
 

@@ -19,8 +19,6 @@ public:
     void initModel ();
 
 signals:
-    //! Log emitter
-    void log(const QString &strText, int level = 10);
     //! Status emitter for status bar
     void status(const QString &strText, int timeout = 2000);
 

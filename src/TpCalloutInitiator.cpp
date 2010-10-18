@@ -23,7 +23,7 @@ TpCalloutInitiator::onConnectionReady (Tp::PendingOperation *op)
     QString msg;
     do { // Begin cleanup block (not a loop)
         if (op->isError ()) {
-            emit log ("Connection could not become ready");
+            qWarning ("Connection could not become ready");
             break;
         }
 
@@ -33,10 +33,10 @@ TpCalloutInitiator::onConnectionReady (Tp::PendingOperation *op)
             msg = QString ("Got contact!! id = \"%1\", alias = \"%1\"")
                           .arg(contact->id())
                           .arg(contact->alias());
-            emit log (msg);
+            qWarning () << msg;
             break;
         }
-        emit log ("Self Contact is null");
+        qDebug ("Self Contact is null");
 
         if (account->cmName () == "sofiasip")
         {
@@ -48,7 +48,7 @@ TpCalloutInitiator::onConnectionReady (Tp::PendingOperation *op)
 
         msg = QString ("Yet to figure out how to get phone number from %1")
               .arg (account->cmName ());
-        emit log (msg);
+        qDebug () << msg;
 
         // We can find out some information about this account
         QVariantMap varMap = account->parameters ();
@@ -58,7 +58,7 @@ TpCalloutInitiator::onConnectionReady (Tp::PendingOperation *op)
             msg = QString ("\tkey = \"%1\", value = \"%2\"")
                   .arg(i.key())
                   .arg (i.value().toString ());
-            emit log (msg);
+            qDebug () << msg;
         }
     } while (0); // End cleanup block (not a loop)
 
@@ -87,11 +87,11 @@ TpCalloutInitiator::onChannelReady (Tp::PendingOperation*op)
 {
     do { // Begin cleanup block (not a loop)
         if (op->isError ()) {
-            emit log ("Channel could not become ready");
+            qWarning ("Channel could not become ready");
             break;
         }
 
-        emit log ("Call successful");
+        qDebug ("Call successful");
     } while (0); // End cleanup block (not a loop)
 
      op->deleteLater ();

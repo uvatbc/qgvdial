@@ -31,7 +31,6 @@ private slots:
 #endif // TELEPATHY_CAPABLE
 
 signals:
-    void log(const QString &strText, int level = 10);
     void status(const QString &strText, int timeout = 2000);
 
 private:

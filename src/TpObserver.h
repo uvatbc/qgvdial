@@ -67,7 +67,6 @@ public:
     bool init ();
 
 signals:
-    void log(const QString &strText, int level = 10);
     void callStarted ();
 
 public slots:

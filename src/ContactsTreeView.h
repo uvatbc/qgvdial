@@ -9,10 +9,6 @@ class ContactsTreeView : public QTreeView
 public:
     explicit ContactsTreeView(QWidget *parent = 0);
 
-signals:
-    //! Log emitter
-    void log(const QString &strText, int level = 10);
-
 private:
     void selectionChanged (const QItemSelection &selected,
                            const QItemSelection &deselected);

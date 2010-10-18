@@ -420,12 +420,12 @@ CacheDatabase::insertContact (QSqlTableModel *modelContacts,
 
         if (!modelContacts->insertRows (nCountContacts, 1))
         {
-            emit log ("Failed to insert row", 3);
+            qWarning ("Failed to insert row");
             break;
         }
         if (!modelContacts->setRecord (nCountContacts, sqlRecord))
         {
-            emit log ("Failed to set row record", 3);
+            qWarning ("Failed to set row record");
             break;
         }
 
@@ -592,7 +592,7 @@ CacheDatabase::getLastContactUpdate (QDateTime &dateTime)
     {
         if (!query.next ())
         {
-            emit log ("No last contact update", 5);
+            qWarning ("No last contact update");
             break;
         }
 
@@ -601,7 +601,7 @@ CacheDatabase::getLastContactUpdate (QDateTime &dateTime)
         QRegExp rx(UPDATE_DATE_REGEXP);
         if (!strDateTime.contains (rx) || (6 != rx.captureCount ()))
         {
-            emit log ("Last updated contact update does not match regexp");
+            qDebug ("Last updated contact update does not match regexp");
             break;
         }
 
@@ -703,7 +703,7 @@ CacheDatabase::getLastInboxUpdate (QDateTime &dateTime)
     {
         if (!query.next ())
         {
-            emit log ("No last contact update", 5);
+            qWarning ("No last contact update");
             break;
         }
 
@@ -712,7 +712,7 @@ CacheDatabase::getLastInboxUpdate (QDateTime &dateTime)
         QRegExp rx(UPDATE_DATE_REGEXP);
         if (!strDateTime.contains (rx) || (6 != rx.captureCount ()))
         {
-            emit log ("Last updated contact update does not match regexp");
+            qDebug ("Last updated contact update does not match regexp");
             break;
         }
 
@@ -740,7 +740,7 @@ CacheDatabase::getLatestInboxEntry (QDateTime &dateTime)
     {
         if (!query.next ())
         {
-            emit log ("Couldn't get the latest history item");
+            qWarning ("Couldn't get the latest history item");
             break;
         }
 
@@ -749,7 +749,7 @@ CacheDatabase::getLatestInboxEntry (QDateTime &dateTime)
         quint64 dtVal = query.value(0).toULongLong (&bOk);
         if (!bOk)
         {
-            emit log ("Could not convert datetime");
+            qWarning ("Could not convert datetime");
             break;
         }
 
@@ -799,7 +799,7 @@ CacheDatabase::insertHistory (const GVHistoryEvent &hEvent)
                             .arg (hEvent.strPhoneNumber)
                             .arg (flags));
         if (!rv) {
-            emit log ("Failed to insert row into history table", 3);
+            qWarning ("Failed to insert row into history table");
             break;
         }
 

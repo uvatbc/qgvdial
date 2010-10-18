@@ -19,7 +19,6 @@ public:
     bool play (const QString &strVmail);
 
 signals:
-    void log (const QString &strText, int level = 10);
     void status (const QString &strText, int timeout = 3000);
 
 private slots:

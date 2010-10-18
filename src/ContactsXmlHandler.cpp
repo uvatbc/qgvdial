@@ -93,14 +93,15 @@ ContactsXmlHandler::endElement (const QString & /*namespaceURI*/,
 
         if (currInfo.bDeleted)
         {
-            emit log (QString("GV reports deleted contact: id = %1, name = %2")
-                .arg (currInfo.strId)
-                .arg (currInfo.strTitle));
+            qDebug () << QString("GV reports deleted contact: "
+                                 "id = %1, name = %2")
+                                .arg (currInfo.strId)
+                                .arg (currInfo.strTitle);
         }
 
         if ((0 == currInfo.arrPhones.size ()) && (!currInfo.bDeleted))
         {
-            emit log ("Contact does not have any phone numbers");
+            qDebug ("Contact does not have any phone numbers");
             // Just in case, delete it!
             currInfo.bDeleted = true;
         }
@@ -108,7 +109,7 @@ ContactsXmlHandler::endElement (const QString & /*namespaceURI*/,
 #if !NO_DBGINFO
         // For debug
         if (currInfo.strTitle.contains ("Jamie", Qt::CaseInsensitive)) {
-            emit log ("It's Jamie");
+            qDebug ("It's Jamie");
         }
 #endif
 

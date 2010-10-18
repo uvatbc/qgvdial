@@ -15,7 +15,7 @@ InboxTreeView::selectionChanged (const QItemSelection &selected,
         QModelIndexList indList = selected.indexes ();
         if (0 == indList.size ())
         {
-            emit log ("Empty selection", 5);
+            qWarning ("Empty selection");
             break;
         }
 

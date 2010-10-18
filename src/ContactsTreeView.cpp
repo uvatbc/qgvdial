@@ -20,6 +20,6 @@ ContactsTreeView::selectionChanged (const QItemSelection &selected,
     strSavedLink = linkIndex.data(Qt::EditRole).toString();
     if (strSavedLink.isEmpty ())
     {
-        emit log ("Failed to get contact information", 3);
+        qWarning ("Failed to get contact information");
     }
 }//ContactsTreeView::selectionChanged

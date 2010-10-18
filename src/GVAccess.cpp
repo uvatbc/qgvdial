@@ -71,7 +71,7 @@ GVAccess::enqueueWork (GVAccess_Work whatwork, const QVariantList &params,
 {
     if ((NULL == receiver) || (NULL == method))
     {
-        emit log ("Invalid slot");
+        qWarning ("Invalid slot");
         return (false);
     }
 
@@ -140,7 +140,7 @@ GVAccess::enqueueWork (GVAccess_Work whatwork, const QVariantList &params,
 
     if (!bValid)
     {
-        emit log (msg);
+        qWarning () << msg;
         return (false);
     }
 
@@ -149,7 +149,7 @@ GVAccess::enqueueWork (GVAccess_Work whatwork, const QVariantList &params,
     QMutexLocker locker(&mutex);
     workList.push_back (workItem);
 
-    emit log (QString ("Enqueued %1.").arg (getNameForWork (whatwork)));
+    qDebug () << QString ("Enqueued %1.").arg (getNameForWork (whatwork));
 
     // If there is no current work in progress...
     doNextWork ();// ... this takes care of when some work is in progress
@@ -167,19 +167,19 @@ GVAccess::doNextWork ()
     {
         if (0 == workList.size ())
         {
-            emit log ("No work to be done. Sleep now.");
+            qDebug ("No work to be done. Sleep now.");
             break;
         }
         if (GVAW_Nothing != workCurrent.whatwork)
         {
-            emit log (QString ("Work %1 in progress. Wait for it to finish.")
-                      .arg (getNameForWork (workCurrent.whatwork)));
+            qDebug () << QString ("Work %1 in progress. Wait for it to finish.")
+                            .arg (getNameForWork (workCurrent.whatwork));
             break;
         }
 
         workCurrent = workList.takeFirst ();
-        emit log (QString ("Starting work %1")
-                  .arg(getNameForWork (workCurrent.whatwork)));
+        qDebug () << QString ("Starting work %1")
+                        .arg(getNameForWork (workCurrent.whatwork));
         switch (workCurrent.whatwork)
         {
         case GVAW_aboutBlank:
@@ -217,7 +217,7 @@ GVAccess::doNextWork ()
             playVmail ();
             break;
         default:
-            emit log ("Invalid work specified. Moving on to next work.");
+            qWarning ("Invalid work specified. Moving on to next work.");
             workCurrent.init ();
             continue;
         }
@@ -232,10 +232,10 @@ GVAccess::completeCurrentWork (GVAccess_Work whatwork, bool bOk)
     QMutexLocker locker(&mutex);
     if (whatwork != workCurrent.whatwork)
     {
-        emit log (QString ("Cannot complete the work because it is not "
-                           "current! current = %1. requested = %2")
-                  .arg(getNameForWork (workCurrent.whatwork)
-                  .arg(getNameForWork (whatwork)), 3));
+        qWarning () << QString ("Cannot complete the work because it is not "
+                                "current! current = %1. requested = %2")
+                        .arg(getNameForWork (workCurrent.whatwork)
+                        .arg(getNameForWork (whatwork)), 3);
         return;
     }
 
@@ -243,7 +243,7 @@ GVAccess::completeCurrentWork (GVAccess_Work whatwork, bool bOk)
     {
         if (GVAW_Nothing == workCurrent.whatwork)
         {
-            emit log ("Completing null work!", 3);
+            qWarning ("Completing null work!");
             break;
         }
 
@@ -257,7 +257,8 @@ GVAccess::completeCurrentWork (GVAccess_Work whatwork, bool bOk)
             this, SIGNAL (workCompleted (bool, const QVariantList &)),
             workCurrent.receiver, workCurrent.method);
 
-        emit log (QString("Completed work %1").arg(getNameForWork(whatwork)));
+        qDebug () << QString("Completed work %1")
+                            .arg(getNameForWork(whatwork));
     } while (0); // End cleanup block (not a loop)
 
     // Init MUST be done after the workCompleted emit to prevent races
@@ -412,7 +413,7 @@ GVAccess::dialCanFinish ()
     }
     else
     {
-        emit log ("Cannot complete a call that is not in progress", 3);
+        qWarning ("Cannot complete a call that is not in progress");
     }
 }//GVAccess::dialCanFinish
 

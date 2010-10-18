@@ -16,7 +16,7 @@ DesktopSkypeCallInitiator::initiateCall (const QString &strDestination)
             skypeClient = Singletons::getRef().getSkypeFactory()
                             .ensureSkypeClient (SKYPE_CLIENT_NAME);
             if (NULL == skypeClient) {
-                emit log ("Failed to create skype Client!");
+                qWarning ("Failed to create skype Client!");
                 break;
             }
         }
@@ -30,7 +30,7 @@ DesktopSkypeCallInitiator::initiateCall (const QString &strDestination)
             skypeClient->enqueueWork (SW_Connect, l, this,
                 SLOT (onSkypeConnected (bool, const QVariantList &)));
             if (!bOk) {
-                emit log ("Could not connect skype!!!");
+                qWarning ("Could not connect skype!!!");
             }
             break;
         }
@@ -45,7 +45,7 @@ DesktopSkypeCallInitiator::onSkypeConnected (bool bSuccess, const QVariantList&)
     bool bOk;
     do { // Begin cleanup block (not a loop)
         if (!bSuccess) {
-            emit log ("Failed to connect to skype");
+            qWarning ("Failed to connect to skype");
             break;
         }
 
@@ -55,7 +55,7 @@ DesktopSkypeCallInitiator::onSkypeConnected (bool bSuccess, const QVariantList&)
         skypeClient->enqueueWork (SW_InitiateCall, l, this,
             SLOT (onCallInitiated (bool, const QVariantList &)));
         if (!bOk) {
-            emit log ("Failed to even begin initiating callout");
+            qWarning ("Failed to even begin initiating callout");
             break;
         }
     } while (0); // End cleanup block (not a loop)
@@ -64,7 +64,7 @@ DesktopSkypeCallInitiator::onSkypeConnected (bool bSuccess, const QVariantList&)
 void
 DesktopSkypeCallInitiator::onCallInitiated (bool, const QVariantList &)
 {
-    emit log ("Callout is successful");
+    qDebug ("Callout is successful");
 }//DesktopSkypeCallInitiator::onCallInitiated
 
 QString

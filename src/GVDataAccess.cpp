@@ -119,17 +119,17 @@ GVDataAccess::onLoginResponse (QNetworkReply *reply)
 //                 webView, SIGNAL (loadFinished (bool)),
 //                 this   , SLOT   (onCaptchaLoad (bool)));
 //             webPage.mainFrame()->load (QUrl(strCaptchaUrl));
-//             log ("Loading captcha");
+//             qDebug ("Loading captcha");
             break;
         }
 
         if (0 == strAuth.size ())
         {
-            log ("Failed to login!!");
+            qWarning ("Failed to login!!");
             break;
         }
 
-        log ("Login success");
+        qDebug ("Login success");
         bOk = true;
     } while (0); // End cleanup block (not a loop)
 

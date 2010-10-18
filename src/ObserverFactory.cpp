@@ -52,9 +52,6 @@ ObserverFactory::init ()
     clientRegistrar->registerClient(appr, "QGVStreamObserver");
 
     QObject::connect (
-            myobserver, SIGNAL (log(const QString &, int)),
-            this      , SIGNAL (log(const QString &, int)));
-    QObject::connect (
             myobserver, SIGNAL (status(const QString &, int)),
             this      , SIGNAL (status(const QString &, int)));
 

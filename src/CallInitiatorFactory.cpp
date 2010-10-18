@@ -34,9 +34,6 @@ CallInitiatorFactory::init ()
     listInitiators += initiator;
 
     QObject::connect (
-        initiator, SIGNAL (log(const QString &, int)),
-        this     , SIGNAL (log(const QString &, int)));
-    QObject::connect (
         initiator, SIGNAL (status(const QString &, int)),
         this     , SIGNAL (status(const QString &, int)));
 #endif
@@ -54,33 +51,33 @@ void
 CallInitiatorFactory::onAccountManagerReady (Tp::PendingOperation *op)
 {
     if (op->isError ()) {
-         emit log ("Account manager could not become ready");
-         op->deleteLater ();
-         return;
-     }
+        qWarning ("Account manager could not become ready");
+        op->deleteLater ();
+        return;
+    }
 
-     allAccounts = actMgr->allAccounts ();
-     QMutexLocker locker (&mutex);
-     nCounter = 1;
-     foreach (Tp::AccountPtr acc, allAccounts) {
-         nCounter++;
-         QObject::connect (
-             acc->becomeReady (), SIGNAL (finished(Tp::PendingOperation*)),
-             this, SLOT (onAccountReady(Tp::PendingOperation *)));
-     }
-     nCounter--;
-     if (0 == nCounter) {
-         onAllAccountsReady ();
-     }
+    allAccounts = actMgr->allAccounts ();
+    QMutexLocker locker (&mutex);
+    nCounter = 1;
+    foreach (Tp::AccountPtr acc, allAccounts) {
+        nCounter++;
+        QObject::connect (
+            acc->becomeReady (), SIGNAL (finished(Tp::PendingOperation*)),
+            this, SLOT (onAccountReady(Tp::PendingOperation *)));
+    }
+    nCounter--;
+    if (0 == nCounter) {
+        onAllAccountsReady ();
+    }
 
-     op->deleteLater ();
+    op->deleteLater ();
 }//CallInitiatorFactory::onAccountManagerReady
 
 void
 CallInitiatorFactory::onAccountReady (Tp::PendingOperation *op)
 {
     if (op->isError ()) {
-        emit log ("Account could not become ready");
+        qWarning ("Account could not become ready");
         op->deleteLater ();
         return;
     }
@@ -98,7 +95,7 @@ void
 CallInitiatorFactory::onAllAccountsReady ()
 {
     bAccountsReady = true;
-    emit log (QString("%1 accounts ready").arg (allAccounts.size ()));
+    qDebug () << QString("%1 accounts ready").arg (allAccounts.size ());
 
     QString msg;
     foreach (Tp::AccountPtr act, allAccounts) {
@@ -109,7 +106,7 @@ CallInitiatorFactory::onAllAccountsReady ()
         {
             // Who cares about this one?
             msg += "\tIGNORED!!";
-            emit log (msg);
+            qDebug () << msg;
             continue;
         }
 
@@ -117,14 +114,11 @@ CallInitiatorFactory::onAllAccountsReady ()
         listInitiators += initiator;
 
         QObject::connect (
-            initiator, SIGNAL (log(const QString &, int)),
-            this     , SIGNAL (log(const QString &, int)));
-        QObject::connect (
             initiator, SIGNAL (status(const QString &, int)),
             this     , SIGNAL (status(const QString &, int)));
 
         msg += "\tADDED!";
-        emit log (msg);
+        qDebug () << msg;
     }
 }//CallInitiatorFactory::onAllAccountsReady
 

@@ -87,8 +87,6 @@ public:
     bool isConnected ();
 
 signals:
-    //! Log emitter
-    void log (const QString &txt, int level = 10);
     //! Status emitter
     void status (const QString &txt, int timeout = 0);
     //! Emitted at the end of every work item

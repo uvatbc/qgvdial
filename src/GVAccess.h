@@ -76,9 +76,7 @@ public:
 #endif
 
 signals:
-    //! Log emitter
-    void log(const QString &strText, int level = 10);
-    //! Log emitter
+    //! Status emitter
     void status(const QString &strText, int timeout = 2000);
 
     //! When we start loading a page

@@ -16,7 +16,6 @@ public:
     quint32 getUsableContacts ();
 
 signals:
-    void log(const QString &strText, int level = 10);
     void status (const QString &text, int timeout = 2000);
 
     //! Emitted for every contact parsed from the XML

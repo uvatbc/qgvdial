@@ -13,7 +13,6 @@ GVH_XMLJsonHandler::startElement (const QString        & /*namespaceURI*/,
                                   const QString        & /*qName       */,
                                   const QXmlAttributes & /*atts        */)
 {
-    //emit log (QString ("start name=%1").arg (localName));
     strChars.clear ();
     return (true);
 }//GVH_XMLJsonHandler::startElement
@@ -25,10 +24,8 @@ GVH_XMLJsonHandler::endElement (const QString & /*namespaceURI*/,
 {
     if (localName == "json") {
         strJson += strChars;
-        emit log ("Got json characters");
+        qDebug ("Got json characters");
     }
-
-    //emit log (QString ("stop name=%1").arg (localName));
     return (true);
 }//GVH_XMLJsonHandler::endElement
 
@@ -59,12 +56,12 @@ GVH_XMLJsonHandler::parseJSON (const QDateTime &dtUpdate, bool &bGotOld)
         if (scriptEngine.hasUncaughtException ()) {
             strTemp = QString ("Uncaught exception executing script : %1")
                       .arg (scriptEngine.uncaughtException ().toString ());
-            emit log (strTemp);
+            qWarning () << strTemp;
             break;
         }
 
         qint32 nMsgCount = scriptEngine.evaluate("msgList.length;").toInt32 ();
-        emit log (QString ("message count = %1").arg (nMsgCount));
+        qDebug () << QString ("message count = %1").arg (nMsgCount);
 
         qint32 nOldMsgs = 0;
 
@@ -78,14 +75,12 @@ GVH_XMLJsonHandler::parseJSON (const QDateTime &dtUpdate, bool &bGotOld)
             if (scriptEngine.hasUncaughtException ()) {
                 strTemp = QString ("Uncaught exception in message loop: %1")
                           .arg (scriptEngine.uncaughtException ().toString ());
-                emit log (strTemp);
+                qWarning () << strTemp;
                 break;
             }
 
             qint32 nParams =
             scriptEngine.evaluate ("msgParams.length;").toInt32 ();
-
-//            emit log (QString ("Msg %1 has %2 params").arg (i).arg (nParams));
 
             GVHistoryEvent oneHistory;
             for (qint32 j = 0; j < nParams; j++) {
@@ -129,7 +124,7 @@ GVH_XMLJsonHandler::parseJSON (const QDateTime &dtUpdate, bool &bGotOld)
                     } else if (strVal.contains ("sms")) {
                         oneHistory.Type = GVHE_TextMessage;
                     } else {
-                        emit log (QString ("Unknown labels %1").arg (strVal));
+                        qWarning () << QString("Unknown label %1").arg(strVal);
                     }
                 } else if (strPName == "displayStartDateTime") {
                 } else if (strPName == "displayStartTime") {
@@ -138,25 +133,25 @@ GVH_XMLJsonHandler::parseJSON (const QDateTime &dtUpdate, bool &bGotOld)
                 } else if (strPName == "type") {
                 } else if (strPName == "children") {
                 } else {
-                    emit log (QString ("param = %1. value = %2")
-                                .arg (strPName)
-                                .arg (strVal));
+                    qDebug () << QString ("param = %1. value = %2")
+                                    .arg (strPName)
+                                    .arg (strVal);
                 }
             }
 
             if (0 == oneHistory.id.size()) {
-                emit log ("Invalid ID", 5);
+                qWarning ("Invalid ID");
                 continue;
             }
             if (0 == oneHistory.strPhoneNumber.size()) {
-                emit log ("Invalid Phone number", 5);
+                qWarning ("Invalid Phone number");
                 continue;
             }
             if (0 == oneHistory.strDisplayNumber.size()) {
                 oneHistory.strDisplayNumber = "Unknown";
             }
             if (!oneHistory.startTime.isValid ()) {
-                emit log ("Invalid start time", 5);
+                qWarning ("Invalid start time");
                 continue;
             }
 
@@ -165,10 +160,10 @@ GVH_XMLJsonHandler::parseJSON (const QDateTime &dtUpdate, bool &bGotOld)
             {
                 nOldMsgs++;
                 if (1 == nOldMsgs) {
-                    emit log ("Started getting old entries.");
+                    qDebug ("Started getting old entries.");
                     bGotOld = true;
                 } else {
-                    emit log ("Another old entry");
+                    qDebug ("Another old entry");
                 }
             }
 
@@ -177,8 +172,8 @@ GVH_XMLJsonHandler::parseJSON (const QDateTime &dtUpdate, bool &bGotOld)
             nUsableMsgs++;
         }
 
-        emit log (QString ("Valid messages = %1").arg (nUsableMsgs));
-        emit log (QString ("Old messages = %1").arg (nOldMsgs));
+        qDebug () << QString ("Valid messages = %1").arg (nUsableMsgs);
+        qDebug () << QString ("Old messages = %1").arg (nOldMsgs);
 
         rv = true;
     } while (0); // End cleanup block (not a loop)

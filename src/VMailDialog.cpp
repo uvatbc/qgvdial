@@ -91,7 +91,7 @@ VMailDialog::on_durationSlider_actionTriggered (int /*action*/)
 {
     qint64 duration = player.duration ();
     if (0 == duration) {
-        emit log ("Duration is 0");
+        qDebug ("Vmail Duration is 0");
         return;
     }
 

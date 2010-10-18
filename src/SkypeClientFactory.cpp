@@ -33,7 +33,7 @@ SkypeClient *
 SkypeClientFactory::ensureSkypeClient (const QString &name)
 {
     if (NULL == mainwin) {
-        emit log ("Main window not set");
+        qWarning ("Main window not set");
         return (NULL);
     }
 
@@ -56,9 +56,6 @@ SkypeClientFactory::ensureSkypeClient (const QString &name)
 
     if (NULL != client)
     {
-        QObject::connect (
-            client, SIGNAL (log (const QString &, int)),
-            this  , SIGNAL (log (const QString &, int)));
         QObject::connect (
             client, SIGNAL (status (const QString &, int)),
             this  , SIGNAL (status (const QString &, int)));
