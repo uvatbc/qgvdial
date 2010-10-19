@@ -6,6 +6,7 @@
 #include "GVContactsTable.h"
 #include "GVHistory.h"
 #include "SMSDlg.h"
+#include "WebWidget.h"
 
 // Required for Symbian (QSystemTrayIcon)
 #include "OsDependent.h"
@@ -32,6 +33,8 @@ public slots:
     void setStatus (const QString &strText, int timeout = 3000);
 
 private slots:
+    void on_actionLogs_triggered();
+    void on_actionWeb_view_triggered();
     void on_btnCall_clicked();
     void on_btnHistory_clicked();
     void on_btnContacts_clicked();
@@ -145,6 +148,8 @@ private:
     GVHistory       *pInboxView;
     //! SMS Window
     SMSDlg          dlgSMS;
+    //! Web View
+    WebWidget      *pWebWidget;
 
     //! Are we logged in?
     bool            bLoggedIn;

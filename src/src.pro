@@ -56,7 +56,8 @@ SOURCES  += main.cpp                    \
             GVHistory.cpp               \
             ContactsTreeView.cpp        \
             InboxTreeView.cpp           \
-            VMailDialog.cpp
+            VMailDialog.cpp \
+    WebWidget.cpp
 
 HEADERS  += global.h                    \
             IObserver.h                 \
@@ -90,13 +91,15 @@ HEADERS  += global.h                    \
             GVHistory.h                 \
             ContactsTreeView.h          \
             InboxTreeView.h             \
-            VMailDialog.h
+            VMailDialog.h \
+    WebWidget.h
 
 FORMS    += MainWindow.ui               \
             LoginDialog.ui              \
             ContactsWidget.ui           \
             InboxWidget.ui              \
-            VMailDialog.ui
+            VMailDialog.ui \
+    WebWidget.ui
 
 RESOURCES += qgvdial.qrc
 
@@ -197,4 +200,3 @@ INSTALLS += target desktop icon
   icon.path = $$DATADIR/qgvdial
   icon.files += qgvdial.png
 }
-

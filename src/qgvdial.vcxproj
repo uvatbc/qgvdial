@@ -100,6 +100,7 @@
     <ClCompile Include="TpCalloutInitiator.cpp" />
     <ClCompile Include="TpObserver.cpp" />
     <ClCompile Include="VMailDialog.cpp" />
+    <ClCompile Include="WebWidget.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CacheDatabase.h" />
@@ -147,13 +148,20 @@
     <ClInclude Include="ui_MainWindow.h" />
     <ClInclude Include="ui_VMailDialog.h" />
     <ClInclude Include="VMailDialog.h" />
+    <ClInclude Include="WebWidget.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ContactsWidget.ui" />
+    <None Include="InboxWidget.ui" />
+    <None Include="LoginDialog.ui" />
+    <None Include="MainWindow.ui" />
     <None Include="qgvdial.qrc" />
     <None Include="stylesheets\dialpad_desktop.qss" />
     <None Include="stylesheets\dialpad_maemo.qss" />
     <None Include="readme.txt" />
     <None Include="src.pro" />
+    <None Include="VMailDialog.ui" />
+    <None Include="WebWidget.ui" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="winrsrc.rc" />

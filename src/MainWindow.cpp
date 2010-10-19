@@ -26,6 +26,7 @@ MainWindow::MainWindow (QWidget *parent)
 , pSystray (NULL)
 , pContactsView (NULL)
 , pInboxView (NULL)
+, pWebWidget (new WebWidget (this, Qt::Window))
 , bLoggedIn (false)
 , mtxDial (QMutex::Recursive)
 , bCallInProgress (false)
@@ -56,6 +57,9 @@ MainWindow::MainWindow (QWidget *parent)
         strDialpadFile = ":/dialpad_desktop.qss";
     }
 #endif
+
+    pWebWidget->hide ();
+    osd.setDefaultWindowAttributes (pWebWidget);
 
     fDialpad_Style.setFileName (strDialpadFile);
     if (fDialpad_Style.open (QIODevice::ReadOnly)) {
@@ -1222,3 +1226,19 @@ MainWindow::playVmail (const QString &strFile)
                       this    , SLOT   (setStatus (const QString &, int)));
     dlgVmail->play (strFile);
 }//MainWindow::playVmail
+
+void
+MainWindow::on_actionWeb_view_triggered ()
+{
+    if (pWebWidget->isVisible ()) {
+        pWebWidget->hide ();
+    } else {
+        pWebWidget->show ();
+    }
+}//MainWindow::on_actionWeb_view_triggered
+
+void
+MainWindow::on_actionLogs_triggered ()
+{
+    //
+}//MainWindow::on_actionLogs_triggered
