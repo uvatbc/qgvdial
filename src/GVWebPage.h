@@ -16,10 +16,8 @@ private:
     GVWebPage(QObject *parent = NULL);
     ~GVWebPage(void);
 
-#if !NO_DBGINFO
 public:
     void setView (QWidget *view);
-#endif
 
 public slots:
     //! Invoked when the user presses cancel

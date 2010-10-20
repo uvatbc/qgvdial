@@ -40,14 +40,12 @@ GVWebPage::~GVWebPage(void)
     }
 }//GVWebPage::~GVWebPage
 
-#if !NO_DBGINFO
 void
 GVWebPage::setView (QWidget *view)
 {
     QWebView *wv = (QWebView *)view;
     wv->setPage (&webPage);
 }//GVWebPage::setView
-#endif
 
 void
 GVWebPage::getHostAndQuery (QString &strHost, QString &strQuery)

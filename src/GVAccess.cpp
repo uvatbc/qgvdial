@@ -417,9 +417,7 @@ GVAccess::dialCanFinish ()
     }
 }//GVAccess::dialCanFinish
 
-#if !NO_DBGINFO
 void
 GVAccess::setView (QWidget * /*view*/)
 {
 }//GVWebPage::setView
-#endif

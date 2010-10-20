@@ -70,9 +70,7 @@ public:
     static bool isNumberValid (const QString &strNumber);
     static void beautify_number (QString &strNumber);
 
-#if !NO_DBGINFO
     virtual void setView (QWidget *view);
-#endif
 
 signals:
     //! Status emitter
