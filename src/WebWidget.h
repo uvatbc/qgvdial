@@ -16,6 +16,9 @@ public:
     ~WebWidget();
 
 private:
+    void keyPressEvent (QKeyEvent *event);
+
+private:
     Ui::WebWidget *ui;
 };
 
