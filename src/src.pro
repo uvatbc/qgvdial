@@ -3,7 +3,7 @@ TARGET   = qgvdial
 TEMPLATE = app
 
 CONFIG  += mobility
-MOBILITY = multimedia bearer
+MOBILITY = multimedia
 
 include(qtsingleapplication/qtsingleapplication.pri)
 
@@ -15,6 +15,7 @@ maemo5 {
     message("Maemo5 your world")
     QT *= maemo5
     OTHER_FILES += qgvdial.desktop
+    MOBILITY += bearer
 }
 
 # In Linux and maemo, add the telepathy libraries, sources and headers
