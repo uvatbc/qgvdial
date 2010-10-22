@@ -2,8 +2,8 @@ Source: qgvdial
 Section: user/network
 Priority: extra
 Maintainer: Yuvraaj <yuvraaj@gmail.com>
-Build-Depends: debhelper (>= 7)
-Standards-Version: 3.8.3
+Build-Depends: debhelper (>= 5)
+Standards-Version: 3.7.3
 Homepage: http://code.google.com/p/qgvdial/
 
 Package: qgvdial

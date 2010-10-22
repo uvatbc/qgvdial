@@ -1,5 +1,5 @@
 Source: qgvdial
-Section: unknown
+Section: user/network
 Priority: extra
 Maintainer: Yuvraaj <yuvraaj@gmail.com>
 Build-Depends: debhelper (>= 7)
