@@ -150,18 +150,18 @@ symbian {
 ###############################################################
 # Installation related line go here
 ###############################################################
-exists (../../buildit.pl) {
-PREFIX = ../debian/qgvdial/usr
-message(Built using my scripts)
-}
-
-!exists (../../buildit.pl) {
-PREFIX = ../maemo/debian/qgvdial/usr
-message(Build using qtcreator)
-}
 
 # Installation for maemo
 maemo5 {
+    exists (../../buildit.pl) {
+    PREFIX = ../debian/qgvdial/usr
+    message(Built using my scripts)
+    }
+    !exists (../../buildit.pl) {
+        PREFIX = ../maemo/debian/qgvdial/usr
+        message(Build using qtcreator)
+    }
+    
     message(maemo5 install)
     OPTPREFIX  = $$PREFIX/../opt/qgvdial
     BINDIR     = $$OPTPREFIX/bin
