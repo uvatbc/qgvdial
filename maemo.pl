@@ -51,27 +51,10 @@ $cmd = "cd qgvdial-$qver ; $mad qmake && $mad dh_make --createorig --single -e y
 system($cmd);
 
 # Add a post install file to add the executable bit after installation on the device
-system("cp postinst.maemo qgvdial-$qver/debian/postinst");
+system("mv postinst.maemo qgvdial-$qver/debian/postinst");
 
-# Change the description and the extended description
-open(CONTROL_OUT, ">qgvdial-$qver/debian/control.new") or die "Cannot open new control";
-open(CONTROL, "<qgvdial-$qver/debian/control") or die "Cannot open control";
-while (<CONTROL>) {
-    $line = $_;
-    if ($line =~ m/^Section:/) {
-        $line = "Section: user/network\n";
-    }
-    if ($line =~ m/Description:/) {
-        last;
-    }
-    print(CONTROL_OUT "$line");
-}
-close(CONTROL);
-
-print(CONTROL_OUT "Description: Multi-platform Google Voice Dialer\n");
-print(CONTROL_OUT " Multi-platform Google Voice Dialer written in QT. Works so far in Windows, Linux, Maemo5-fremantle and MacOSX Snow Leopard.\n");
-close(CONTROL_OUT);
-system("mv qgvdial-$qver/debian/control.new qgvdial-$qver/debian/control");
+# Fix the control file
+system("mv qgvdial-$qver/control.linux qgvdial-$qver/debian/control");
 
 # Execute the rest of the build command
 $cmd = "cd qgvdial-$qver && $asroot $mad dpkg-buildpackage && $mad remote -r org.maemo.qgvdial send ../qgvdial_$qver-1_$machine.deb && $mad remote -r org.maemo.qgvdial install qgvdial_$qver-1_$machine.deb";

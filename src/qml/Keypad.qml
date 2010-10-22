@@ -1,30 +1,17 @@
 import Qt 4.7
+import "helper.js" as Code
 
 Rectangle {
     id: wDialer
     color: "white"
+    width: Code.calcFlowChildWidth();
+    height: Code.calcFlowChildHeight();
+    property string layoutName: "maemo-portrait"
 
     signal btnClick(string strText)
 
-    property string layoutName: "desktop"
-    states: [
-        State {
-            name: "desktop"; when: (layoutName == "desktop")
-            PropertyChanges {
-                target: wDialer
-                width: 190; height: 170
-            }
-        },
-        State {
-            name: "maemo-portrait"; when: (layoutName == "maemo-portrait")
-            PropertyChanges {
-                target: wDialer
-                width: 420; height: 400
-            }
-        }
-    ]//states
-
     Grid {
+        id: layoutGrid
         anchors.fill: parent
         rows: 4; columns: 3
         spacing: (wDialer.layoutName == "desktop"?2:4)

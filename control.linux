@@ -1,0 +1,13 @@
+Source: qgvdial
+Section: unknown
+Priority: extra
+Maintainer: Yuvraaj <yuvraaj@gmail.com>
+Build-Depends: debhelper (>= 7)
+Standards-Version: 3.8.3
+Homepage: http://code.google.com/p/qgvdial/
+
+Package: qgvdial
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Multi-platform Google Voice Dialer
+ Multi-platform Google Voice Dialer written in QT. Works so far in Windows, Linux, Maemo5-fremantle and MacOSX Snow Leopard.

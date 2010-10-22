@@ -1,26 +1,14 @@
 import Qt 4.7
+import "helper.js" as Code
 
 Rectangle {
     id: wDisp
+    // The number in the text box
     property string strNum: txtNum.text
+    property string layoutName: "maemo-portrait"
 
-    property string layoutName: "desktop"
-    states: [
-        State {
-            name: "desktop"; when: (layoutName == "desktop")
-            PropertyChanges {
-                target: wDisp
-                width: 200; height: 30
-            }
-        },
-        State {
-            name: "maemo-portrait"; when: (layoutName == "maemo-portrait")
-            PropertyChanges {
-                target: wDisp
-                width: 365; height: 300
-            }
-        }
-    ]
+    width: Code.calcFlowChildWidth();
+    height: Code.calcFlowChildHeight();
 
     Column {
         anchors.fill: parent

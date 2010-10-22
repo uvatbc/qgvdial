@@ -1,16 +1,15 @@
 import Qt 4.7
+import "helper.js" as Code
 
 Item {
     id: digButton
+    width: Code.calcDigitButtonWidth ();
+    height: Code.calcDigitButtonHeight ();
 
     property string layoutName: "desktop"
     states: [
         State {
             name: "desktop"; when: (layoutName == "desktop")
-            PropertyChanges {
-                target: digButton
-                width: 60; height: 40
-            }
             PropertyChanges {
                 target: mText
                 font { pointSize: 12; bold: true;  }
@@ -26,10 +25,6 @@ Item {
         },
         State {
             name: "maemo-portrait"; when: (layoutName == "maemo-portrait")
-            PropertyChanges {
-                target: digButton
-                width: 140; height: 102
-            }
             PropertyChanges {
                 target: mText
                 font { pointSize: 36; bold: true;  }
