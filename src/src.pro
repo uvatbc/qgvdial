@@ -12,7 +12,7 @@ CONFIG *= embed_manifest_exe
 }
 
 maemo5 {
-    message("Maemo5 your world")
+    message(Maemo5 your world)
     QT *= maemo5
     OTHER_FILES += qgvdial.desktop
     MOBILITY += bearer
@@ -150,54 +150,52 @@ symbian {
 ###############################################################
 # Installation related line go here
 ###############################################################
-exists (../../buildit.pl) {
+exists (../../../buildit.pl) {
 PREFIX = ../debian/qgvdial/usr
-message("Build using my scripts")
+message(Built using my scripts)
 }
 
-!exists (../../buildit.pl) {
+!exists (../../../buildit.pl) {
 PREFIX = ../maemo/debian/qgvdial/usr
-message("Build using qtcreator")
+message(Build using qtcreator)
 }
 
 # Installation for maemo
 maemo5 {
-OPTPREFIX  = $$PREFIX/../opt/qgvdial
-BINDIR     = $$OPTPREFIX/bin
-DATADIR    = $$PREFIX/share
-OPTDATADIR = $$OPTPREFIX/share
+    message(maemo5 install)
+    OPTPREFIX  = $$PREFIX/../opt/qgvdial
+    BINDIR     = $$OPTPREFIX/bin
+    DATADIR    = $$PREFIX/share
+    OPTDATADIR = $$OPTPREFIX/share
 
-DEFINES += DATADIR=\"$$DATADIR\" PKGDATADIR=\"$$PKGDATADIR\"
+    DEFINES += DATADIR=\"$$DATADIR\" PKGDATADIR=\"$$PKGDATADIR\"
 
-#MAKE INSTALL
+    INSTALLS += target desktop icon qss
 
-INSTALLS += target desktop icon qss
+    target.path =$$BINDIR
 
-  target.path =$$BINDIR
+    desktop.path = $$DATADIR/applications/hildon
+    desktop.files += qgvdial.desktop
 
-  desktop.path = $$DATADIR/applications/hildon
-  desktop.files += qgvdial.desktop
+    icon.path = $$OPTDATADIR
+    icon.files += qgvdial.png
 
-  icon.path = $$OPTDATADIR
-  icon.files += qgvdial.png
-
-  qss.path = $$BINDIR/stylesheets
-  qss.files += ./stylesheets/dialpad_maemo.qss
+    qss.path = $$BINDIR/stylesheets
+    qss.files += ./stylesheets/dialpad_maemo.qss
 }
 
 # Installation for Linux
 unix:!symbian:!maemo5 {
-BINDIR  = $$PREFIX/bin
-DATADIR = $$PREFIX/share
+    BINDIR  = $$PREFIX/bin
+    DATADIR = $$PREFIX/share
 
-DEFINES += DATADIR=\"$$DATADIR\" PKGDATADIR=\"$$PKGDATADIR\"
+    DEFINES += DATADIR=\"$$DATADIR\" PKGDATADIR=\"$$PKGDATADIR\"
 
-#MAKE INSTALL
+    INSTALLS += target icon
 
-INSTALLS += target desktop icon
+    target.path =$$BINDIR
 
-  target.path =$$BINDIR
-
-  icon.path = $$DATADIR/qgvdial
-  icon.files += qgvdial.png
+    icon.path = $$DATADIR/qgvdial
+    icon.files += qgvdial.png
 }
+

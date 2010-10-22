@@ -54,7 +54,7 @@ system($cmd);
 system("mv postinst.maemo qgvdial-$qver/debian/postinst");
 
 # Fix the control file
-system("mv qgvdial-$qver/control.linux qgvdial-$qver/debian/control");
+system("mv qgvdial-$qver/control.maemo qgvdial-$qver/debian/control");
 
 # Execute the rest of the build command
 $cmd = "cd qgvdial-$qver && $asroot $mad dpkg-buildpackage && $mad remote -r org.maemo.qgvdial send ../qgvdial_$qver-1_$machine.deb && $mad remote -r org.maemo.qgvdial install qgvdial_$qver-1_$machine.deb";
