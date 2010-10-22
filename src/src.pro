@@ -150,12 +150,12 @@ symbian {
 ###############################################################
 # Installation related line go here
 ###############################################################
-exists (../../../buildit.pl) {
+exists (../../buildit.pl) {
 PREFIX = ../debian/qgvdial/usr
 message(Built using my scripts)
 }
 
-!exists (../../../buildit.pl) {
+!exists (../../buildit.pl) {
 PREFIX = ../maemo/debian/qgvdial/usr
 message(Build using qtcreator)
 }
@@ -188,6 +188,7 @@ maemo5 {
 unix:!symbian:!maemo5 {
     BINDIR  = $$PREFIX/bin
     DATADIR = $$PREFIX/share
+    message($$BINDIR)
 
     DEFINES += DATADIR=\"$$DATADIR\" PKGDATADIR=\"$$PKGDATADIR\"
 
