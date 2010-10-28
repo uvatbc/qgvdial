@@ -6,20 +6,16 @@
 // These functions calculates the height/width of the current component
 function calcFlowChildHeight () {
     if (parent.height > parent.width) {
-        console.debug("reduced height = " + (parent.height / 2));
-        return (parent.height / 2);
+        return ((parent.height - parent.spacing) / 2);
     } else {
-        console.debug("normal height = " + parent.height);
-        return (parent.height);
+        return (parent.height - parent.spacing);
     }
 }
 function calcFlowChildWidth () {
     if (parent.width > parent.height) {
-        console.debug("reduced width = " + (parent.width / 2));
-        return (parent.width / 2);
+        return ((parent.width - parent.spacing) / 2);
     } else {
-        console.debug("normal width = " + parent.width);
-        return (parent.width);
+        return (parent.width - parent.spacing);
     }
 }
 
