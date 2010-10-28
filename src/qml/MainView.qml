@@ -4,14 +4,14 @@ Rectangle {
     id: wMainView
     color: "#00000000"
 
-//    property string layoutName: "desktop"
-    property string layoutName: "maemo-portrait"
+    property string layoutName: "desktop"
+//    property string layoutName: "maemo-portrait"
     states: [
         State {
             name: "desktop"; when: (layoutName == "desktop")
             PropertyChanges {
                 target: wMainView
-                width: 392; height: 170
+                width: 250; height: 400
             }
         },
         State {
@@ -30,12 +30,10 @@ Rectangle {
         DialDisp {
             id: wDisp
             color: wMainView.color
-            layoutName: wMainView.layoutName
         }//DialDisp
 
         Keypad {
             color: wMainView.color
-            layoutName: wMainView.layoutName
             onBtnClick: {
                 wDisp.strNum += strText
             }

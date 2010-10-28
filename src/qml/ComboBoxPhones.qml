@@ -1,40 +1,17 @@
 import Qt 4.7
+import "helper.js" as Code
 
 Item {
     id: cbNumbers
+    height: (parent.height / 5)
 
-    property string layoutName: "desktop"
-    states: [
-        State {
-            name: "desktop"; when: (layoutName == "desktop")
-            PropertyChanges {
-                target: cbNumbers
-                width: 200; height: 30
-            }
-            PropertyChanges {
-                target: mText
-                font { pointSize: 12; bold: true;  }
-            }
-        },
-        State {
-            name: "maemo-portrait"; when: (layoutName == "maemo-portrait")
-            PropertyChanges {
-                target: cbNumbers
-                width: 365; height: 60
-            }
-            PropertyChanges {
-                target: mText
-                font { pointSize: 24; bold: true;  }
-            }
-        }
-    ]
+    width: parent.width
 
     // List of items
 //    property list<string> lstItems
     property variant lstItems
     // Currently selected item
     property int currSelected: -1
-
 
     Rectangle {
         id: rectangle
@@ -64,6 +41,7 @@ Item {
             color: "black"
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
+            font.pointSize: Code.btnFontPoint();
         }// Text
 
         MouseArea {

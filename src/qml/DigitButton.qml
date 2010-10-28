@@ -3,42 +3,8 @@ import "helper.js" as Code
 
 Item {
     id: digButton
-    width: Code.calcDigitButtonWidth ();
-    height: Code.calcDigitButtonHeight ();
-
-    property string layoutName: "desktop"
-    states: [
-        State {
-            name: "desktop"; when: (layoutName == "desktop")
-            PropertyChanges {
-                target: mText
-                font { pointSize: 12; bold: true;  }
-            }
-            PropertyChanges {
-                target: sText
-                font { pointSize: 8 }
-            }
-            PropertyChanges {
-                target: rectangle
-                radius: 6.0
-            }
-        },
-        State {
-            name: "maemo-portrait"; when: (layoutName == "maemo-portrait")
-            PropertyChanges {
-                target: mText
-                font { pointSize: 36; bold: true;  }
-            }
-            PropertyChanges {
-                target: sText
-                font { pointSize: 18 }
-            }
-            PropertyChanges {
-                target: rectangle
-                radius: 15.0
-            }
-        }
-    ]//states
+    width: ((parent.width / layoutGrid.columns) - parent.spacing);
+    height: ((parent.height / layoutGrid.rows) - parent.spacing);
 
     // Main text in the button. "0" "1" ...
     property string mainText: "2"
@@ -57,7 +23,7 @@ Item {
         anchors.fill: parent
         border.color: "black"
         smooth: true
-        radius: 6.0
+        radius: ((height + width) / 20);
 
         // Two gradients: grad1 for pressed and grad2 for released
         Gradient {
@@ -81,6 +47,8 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
             anchors.verticalCenterOffset: -5
+            font.pointSize: Code.btnFontPoint ();
+            font.bold: true
         }// Text
 
         // The sub text: text
@@ -90,6 +58,7 @@ Item {
             color: "darkgrey"
             anchors.right: parent.right
             anchors.bottom: parent.bottom
+            font.pointSize: Code.btnSubTextFontPoint ();
         }// Text
 
         MouseArea {

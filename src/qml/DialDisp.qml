@@ -5,7 +5,6 @@ Rectangle {
     id: wDisp
     // The number in the text box
     property string strNum: txtNum.text
-    property string layoutName: "maemo-portrait"
 
     width: Code.calcFlowChildWidth();
     height: Code.calcFlowChildHeight();
@@ -16,7 +15,6 @@ Rectangle {
         ComboBoxPhones {
             lstItems: ["a", "b"]
             currSelected: 0
-            layoutName: wDisp.layoutName
         }
 
         TextEdit {
@@ -27,7 +25,7 @@ Rectangle {
             textFormat: TextEdit.PlainText
             text: wDisp.strNum
             font {
-                pointSize: (wDisp.layoutName=="desktop"?14:28)
+                pointSize: Code.btnFontPoint();
                 bold: true
             }
         }// TextEdit

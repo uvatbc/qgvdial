@@ -3,27 +3,35 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
-// These functions calculates the height/width of the current component
+// Calculate the height/width of the current component
 function calcFlowChildHeight () {
     if (parent.height > parent.width) {
-        return ((parent.height - parent.spacing) / 2);
+        return (parent.height / 2);
     } else {
-        return (parent.height - parent.spacing);
+        return (parent.height);
     }
 }
 function calcFlowChildWidth () {
     if (parent.width > parent.height) {
         return ((parent.width - parent.spacing) / 2);
     } else {
-        return (parent.width - parent.spacing);
+        return (parent.width);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// These functions calculate the height and width of the buttons on the keypad
-function calcDigitButtonWidth () {
-    return (parent.width / layoutGrid.columns);
+// Calculate the font point from the minimum of the height and width of the button
+function btnFontPoint () {
+    var m = (parent.height < parent.width? parent.height : parent.width);
+    m = (m + 7) / 8;
+    m = (m == 0 ? 1 : m);
+    return (m);
 }
-function calcDigitButtonHeight () {
-    return (parent.height / layoutGrid.rows);
+
+////////////////////////////////////////////////////////////////////////////////
+// Calculate the subtext font point from the main font point
+function btnSubTextFontPoint () {
+    var m = (btnFontPoint() + 2) / 3;
+    m = (m == 0 ? 1 : m);
+    return (m);
 }
