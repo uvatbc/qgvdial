@@ -17,7 +17,12 @@ Rectangle {
         Keypad {
             color: wMainView.color
             onBtnClick: {
-                wDisp.strNum += strText
+                var origStart = wDisp.tEd.selectionStart;
+                var result = wDisp.tEd.text.substr(0,origStart);
+                result += strText;
+                result += wDisp.tEd.text.substr(wDisp.tEd.selectionEnd);
+                wDisp.tEd.text = result;
+                wDisp.tEd.cursorPosition = origStart + strText.length;
             }
         }//Keypad
     }//Flow

@@ -66,8 +66,8 @@ Item {
             anchors.fill: parent
             onClicked: (isDel?container.delClicked:digButton.clicked(mainText));
 
-            onPressed: rectangle.gradient = grad2
-            onReleased: rectangle.gradient = grad1
+            onPressed: rectangle.gradient = grad2;
+            onReleased: rectangle.gradient = grad1;
         }// MouseArea
     }// Rectangle
 }// Item

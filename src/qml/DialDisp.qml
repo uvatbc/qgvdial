@@ -3,8 +3,9 @@ import "helper.js" as Code
 
 Rectangle {
     id: wDisp
-    // The number in the text box
-    property string strNum: txtNum.text
+
+    // Expose the text edit as a property
+    property TextEdit tEd: txtNum
 
     width: Code.calcFlowChildWidth();
     height: Code.calcFlowChildHeight();
@@ -19,11 +20,16 @@ Rectangle {
 
         TextEdit {
             id: txtNum
+
+//            text: wDisp.strNum
+
             color: "white"
             width: wDisp.width
             height: (wDisp.height * 60 / 400)
             textFormat: TextEdit.PlainText
-            text: wDisp.strNum
+            cursorVisible: true
+            wrapMode: TextEdit.WrapAnywhere
+            selectByMouse: true
             font {
                 pointSize: Code.btnFontPoint();
                 bold: true
