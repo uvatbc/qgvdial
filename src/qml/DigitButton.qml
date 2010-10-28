@@ -18,38 +18,11 @@ Item {
     // Button can also emit a delete
     signal delClicked()
 
-    Rectangle {
-        id: rectangle
-        anchors.fill: parent
-        border.color: "black"
-        smooth: true
-        radius: ((height + width) / 20);
+    MyButton {
+        id: btn
+        mainText: digButton.mainText
 
-        // Two gradients: grad1 for pressed and grad2 for released
-        Gradient {
-            id: grad1
-            GradientStop { position: 0.0; color: "#f6f7fa" }
-            GradientStop { position: 1.0; color: "#0a0b0e" }
-        }// Gradient
-        Gradient {
-            id: grad2
-            GradientStop { position: 0.0; color: "#0a0b0e" }
-            GradientStop { position: 1.0; color: "#f6f7fa" }
-        }// Gradient
-
-        gradient: grad1
-
-        // The main text: numbers
-        Text {
-            id: mText
-            text: mainText
-            color: "black"
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.verticalCenterOffset: -5
-            font.pointSize: Code.btnFontPoint ();
-            font.bold: true
-        }// Text
+        onClicked: (digButton.isDel?digButton.delClicked():digButton.clicked(mainText));
 
         // The sub text: text
         Text {
@@ -60,14 +33,5 @@ Item {
             anchors.bottom: parent.bottom
             font.pointSize: Code.btnSubTextFontPoint ();
         }// Text
-
-        MouseArea {
-            id: mouseArea
-            anchors.fill: parent
-            onClicked: (isDel?container.delClicked:digButton.clicked(mainText));
-
-            onPressed: rectangle.gradient = grad2;
-            onReleased: rectangle.gradient = grad1;
-        }// MouseArea
-    }// Rectangle
+    }
 }// Item

@@ -21,8 +21,6 @@ Rectangle {
         TextEdit {
             id: txtNum
 
-//            text: wDisp.strNum
-
             color: "white"
             width: wDisp.width
             height: (wDisp.height * 60 / 400)
@@ -31,7 +29,7 @@ Rectangle {
             wrapMode: TextEdit.WrapAnywhere
             selectByMouse: true
             font {
-                pointSize: Code.btnFontPoint();
+                pointSize: (Code.btnFontPoint()/3);
                 bold: true
             }
         }// TextEdit
