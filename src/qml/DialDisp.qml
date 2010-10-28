@@ -23,7 +23,7 @@ Rectangle {
             id: txtNum
             color: "white"
             width: wDisp.width
-            height: (wDisp.layoutName=="desktop"?30:60)
+            height: (wDisp.height * 60 / 400)
             textFormat: TextEdit.PlainText
             text: wDisp.strNum
             font {
