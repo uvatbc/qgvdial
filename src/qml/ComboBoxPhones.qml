@@ -17,5 +17,9 @@ Item {
         id: btn
         mainText: (currSelected==-1?"...":lstItems[currSelected])
         radius: ((cbNumbers.height / 10.0) + (cbNumbers.width / 60.0))
+
+        onClicked: {
+            var v = new ListView;
+        }
     }
 }// Item

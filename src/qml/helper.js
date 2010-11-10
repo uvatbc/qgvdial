@@ -22,7 +22,7 @@ function calcFlowChildWidth () {
 ////////////////////////////////////////////////////////////////////////////////
 // Calculate the font point from the minimum of the height and width of the button
 function btnFontPoint () {
-    var m = (height < width? height : width);
+    var m = Math.min(height, width);
     m = (m + 1) / 2;
     m = (m < 1 ? 1 : m);
     return (m);

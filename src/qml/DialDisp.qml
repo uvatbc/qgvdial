@@ -14,7 +14,7 @@ Rectangle {
         anchors.fill: parent
 
         ComboBoxPhones {
-            lstItems: ["a", "b"]
+//            lstItems: ["a", "b"]
             currSelected: 0
         }
 
