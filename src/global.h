@@ -46,8 +46,8 @@ struct GVContactInfo
 
 struct GVRegisteredNumber
 {
-    QString     strDisplayName;
-    QString     strNumber;
+    QString     strName;
+    QString     strDescription;
     char        chType;
 
     GVRegisteredNumber () {chType = 0;}

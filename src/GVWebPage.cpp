@@ -774,11 +774,11 @@ GVWebPage::phonesListLoaded (bool bOk)
             GVRegisteredNumber regNumber;
             strText = strText.simplified ();
             QStringList arrSplit = strText.split (":");
-            regNumber.strDisplayName = arrSplit[0].trimmed ();
-            regNumber.strNumber = arrSplit[1].trimmed();
+            regNumber.strName = arrSplit[0].trimmed ();
+            regNumber.strDescription = arrSplit[1].trimmed();
             // Make the actual number follow the form: +1aaabbbcccc
-            regNumber.strNumber.remove (QRegExp("[ \t\n()-]"));
-            regNumber.strNumber = "+1" + regNumber.strNumber;
+            regNumber.strDescription.remove (QRegExp("[ \t\n()-]"));
+            regNumber.strDescription = "+1" + regNumber.strDescription;
 
             QString strFromInput = numbers[index].attribute("value");
             QRegExp rx1("(\\+{0,1}\\d*)\\|(.)");
@@ -786,7 +786,7 @@ GVWebPage::phonesListLoaded (bool bOk)
             {
                 QString strTemp = rx1.cap (1);
                 simplify_number (strTemp);
-                if (strTemp == regNumber.strNumber) {
+                if (strTemp == regNumber.strDescription) {
                     regNumber.chType = rx1.cap (2)[0].toAscii ();
                 }
             }

@@ -1,4 +1,4 @@
-QT      *= core gui webkit sql xml script
+QT      *= core gui webkit sql xml script declarative
 TARGET   = qgvdial
 TEMPLATE = app
 
@@ -57,8 +57,9 @@ SOURCES  += main.cpp                    \
             GVHistory.cpp               \
             ContactsTreeView.cpp        \
             InboxTreeView.cpp           \
-            VMailDialog.cpp \
-    WebWidget.cpp
+            VMailDialog.cpp             \
+            WebWidget.cpp               \
+            RegNumberModel.cpp
 
 HEADERS  += global.h                    \
             IObserver.h                 \
@@ -92,20 +93,29 @@ HEADERS  += global.h                    \
             GVHistory.h                 \
             ContactsTreeView.h          \
             InboxTreeView.h             \
-            VMailDialog.h \
-    WebWidget.h
+            VMailDialog.h               \
+            WebWidget.h                 \
+            RegNumberModel.h
 
-FORMS    += MainWindow.ui               \
-            LoginDialog.ui              \
+FORMS    += LoginDialog.ui              \
             ContactsWidget.ui           \
             InboxWidget.ui              \
-            VMailDialog.ui \
-    WebWidget.ui
+            VMailDialog.ui              \
+            WebWidget.ui
 
 RESOURCES += qgvdial.qrc
 
 # This is so that QtCreator can show these files in the files list.
-OTHER_FILES  += winrsrc.rc
+OTHER_FILES  += winrsrc.rc                  \
+                ../qml/MyButton.qml         \
+                ../qml/MainView_p.qml       \
+                ../qml/MainView_l.qml       \
+                ../qml/Keypad.qml           \
+                ../qml/helper.js            \
+                ../qml/DigitButton.qml      \
+                ../qml/DialDisp.qml         \
+                ../qml/ComboBoxPhones.qml   \
+                ../qml/ActionButtons.qml
 
 # In Linux and maemo, add the telepathy related sources and headers
 unix:!symbian {
@@ -161,7 +171,7 @@ maemo5 {
         PREFIX = ../maemo/debian/qgvdial/usr
         message(Build using qtcreator)
     }
-    
+
     message(maemo5 install)
     OPTPREFIX  = $$PREFIX/../opt/qgvdial
     BINDIR     = $$OPTPREFIX/bin
@@ -192,11 +202,13 @@ unix:!symbian:!maemo5 {
 
     DEFINES += DATADIR=\"$$DATADIR\" PKGDATADIR=\"$$PKGDATADIR\"
 
-    INSTALLS += target icon
+    INSTALLS += target icon qss
 
     target.path =$$BINDIR
 
     icon.path = $$DATADIR/qgvdial
     icon.files += qgvdial.png
-}
 
+    qss.path = $$BINDIR/stylesheets
+    qss.files += ./stylesheets/dialpad_maemo.qss
+}

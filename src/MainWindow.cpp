@@ -1,6 +1,5 @@
 #include "global.h"
 #include "MainWindow.h"
-#include "ui_MainWindow.h"
 
 #include "LoginDialog.h"
 #include "DialCancelDlg.h"
@@ -20,51 +19,34 @@ struct DialOutContext {
 };
 
 MainWindow::MainWindow (QWidget *parent)
-: QMainWindow (parent)
-, ui (new Ui::MainWindow)
+: QDeclarativeView (parent)
 , icoGoogle (":/Google.png")
 , pSystray (NULL)
 , pContactsView (NULL)
 , pInboxView (NULL)
 , pWebWidget (new WebWidget (this, Qt::Window))
 , bLoggedIn (false)
+, modelRegNumber (this)
+, indRegPhone (0)
 , mtxDial (QMutex::Recursive)
 , bCallInProgress (false)
 , bDialCancelled (false)
 {
-    ui->setupUi(this);
-
-    // Additional UI initializations:
-    ui->btnDelete->setDelete (true);
-    ui->edNumber->setValidator (new PhoneNumberValidator (ui->edNumber));
-
-    QString strDialpadFile;
-    QFile fDialpad_Style;
-    OsDependent &osd = Singletons::getRef().getOSD ();
-    osd.setDefaultWindowAttributes (this);
-
 #ifdef Q_WS_MAEMO_5
     QObject::connect(QApplication::desktop(), SIGNAL(resized(int)),
                      this                   , SLOT  (orientationChanged()));
-
-    strDialpadFile = "./stylesheets/dialpad_maemo.qss";
-    if (!QFileInfo(strDialpadFile).exists ()) {
-        strDialpadFile = ":/dialpad_maemo.qss";
-    }
-#else
-    strDialpadFile = "./stylesheets/dialpad_desktop.qss";
-    if (!QFileInfo(strDialpadFile).exists ()) {
-        strDialpadFile = ":/dialpad_desktop.qss";
-    }
 #endif
+
+    // This must be done at least once so that the initial qml is loaded.
+    // Even if it is desktop, this must be done: The function takes care of
+    // making it portrait for non-maemo.
+    orientationChanged ();
+
+    OsDependent &osd = Singletons::getRef().getOSD ();
+    osd.setDefaultWindowAttributes (this);
 
     pWebWidget->hide ();
     osd.setDefaultWindowAttributes (pWebWidget);
-
-    fDialpad_Style.setFileName (strDialpadFile);
-    if (fDialpad_Style.open (QIODevice::ReadOnly)) {
-        ui->wgtDialpad->setStyleSheet (fDialpad_Style.readAll ());
-    }
 
     // A systray icon if the OS supports it
     if (QSystemTrayIcon::isSystemTrayAvailable ())
@@ -88,7 +70,8 @@ MainWindow::MainWindow (QWidget *parent)
 
 MainWindow::~MainWindow ()
 {
-    delete ui;
+    //@@UV: Fix this
+//    delete ui;
 }//MainWindow::~MainWindow
 
 void
@@ -118,8 +101,8 @@ MainWindow::log (const QString &strText, int level /*= 10*/)
 void
 MainWindow::setStatus(const QString &strText, int timeout /* = 0*/)
 {
+    //@@UV: Fix
     qDebug () << strText;
-    ui->statusBar->showMessage (strText, timeout);
 }//MainWindow::setStatus
 
 void
@@ -179,6 +162,10 @@ MainWindow::init ()
     QObject::connect (
         &dlgSMS, SIGNAL (sendSMS (const QStringList &, const QString &)),
          this  , SLOT   (sendSMS (const QStringList &, const QString &)));
+
+    // Additional UI initializations:
+    //@@UV: Need this for later
+//    ui->edNumber->setValidator (new PhoneNumberValidator (ui->edNumber));
 
     // If the cache has the username and password, begin login
     if (dbMain.getUserPass (strUser, strPass))
@@ -293,11 +280,12 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
         initInboxWidget ();
 
         // Allow access to buttons and widgets
-        ui->action_Login->setText ("Logout");
-        ui->btnContacts->setEnabled (true);
-        ui->btnHistory->setEnabled (true);
-        ui->cbDialMethod->setEnabled (true);
-        ui->btnCall->setEnabled (true);
+        //@@UV: Fix this later
+//        ui->action_Login->setText ("Logout");
+//        ui->btnContacts->setEnabled (true);
+//        ui->btnHistory->setEnabled (true);
+//        ui->cbDialMethod->setEnabled (true);
+//        ui->btnCall->setEnabled (true);
         bLoggedIn = true;
 
         // Save the user name and password that was used to login
@@ -319,14 +307,40 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
 void
 MainWindow::orientationChanged ()
 {
-    QRect screenGeometry = QApplication::desktop()->screenGeometry();
-    if (screenGeometry.width() > screenGeometry.height()) {
-        ui->gridMain->removeWidget (ui->wgtDialpad);
-        ui->gridMain->addWidget (ui->wgtDialpad, 0, 1);
-    } else {
-        ui->gridMain->removeWidget (ui->wgtDialpad);
-        ui->gridMain->addWidget (ui->wgtDialpad, 1, 0);
+    QDesktopWidget *dWgt = QApplication::desktop();
+    bool bLandscape = false;
+
+    if (NULL != dWgt) {
+        QRect screenGeometry = dWgt->screenGeometry();
+        bLandscape = (screenGeometry.width() > screenGeometry.height());
     }
+#ifndef Q_WS_MAEMO_5
+    bLandscape = false;
+#endif
+
+    QDeclarativeContext *ctx = this->rootContext();
+    ctx->setContextProperty ("myModel", &modelRegNumber);
+    onRegPhoneSelectionChange (indRegPhone);
+
+    if (bLandscape) {
+        this->setSource (QUrl ("qrc:/MainView_l.qml"));
+    } else {
+        this->setSource (QUrl ("qrc:/MainView_p.qml"));
+    }
+    this->setResizeMode (QDeclarativeView::SizeRootObjectToView);
+
+    // Call or text a number
+    QGraphicsObject *gObj = this->rootObject();
+    QObject::connect (gObj, SIGNAL (sigCall (QString)),
+                      this, SLOT   (dialNow (QString)));
+    QObject::connect (gObj, SIGNAL (sigText (QString)),
+                      this, SLOT   (textANumber (QString)));
+    QObject::connect (gObj, SIGNAL (sigContacts ()),
+                      this, SLOT   (on_btnContacts_clicked ()));
+    QObject::connect (gObj, SIGNAL (sigInbox ()),
+                      this, SLOT   (on_btnHistory_clicked ()));
+    QObject::connect (gObj, SIGNAL (sigSelChanged (int)),
+                      this, SLOT   (onRegPhoneSelectionChange (int)));
 }//MainWindow::orientationChanged
 
 void
@@ -347,11 +361,12 @@ MainWindow::logoutCompleted (bool, const QVariantList &)
 
     arrNumbers.clear ();
 
-    ui->action_Login->setText ("Login...");
-    ui->btnContacts->setEnabled (false);
-    ui->btnHistory->setEnabled (false);
-    ui->cbDialMethod->setEnabled (false);
-    ui->btnCall->setEnabled (false);
+    //@UV: Fix this later
+//    ui->action_Login->setText ("Login...");
+//    ui->btnContacts->setEnabled (false);
+//    ui->btnHistory->setEnabled (false);
+//    ui->cbDialMethod->setEnabled (false);
+//    ui->btnCall->setEnabled (false);
 
     bLoggedIn = false;
 
@@ -384,18 +399,6 @@ MainWindow::msgBox_buttonClicked (QAbstractButton *button)
         button->parent()->deleteLater ();
     }
 }//MainWindow::msgBox_buttonClicked
-
-void
-MainWindow::charClicked (QChar ch)
-{
-    ui->edNumber->insert (ch);
-}//MainWindow::charClicked
-
-void
-MainWindow::charDeleted ()
-{
-    ui->edNumber->backspace ();
-}//MainWindow::charDeleted
 
 void
 MainWindow::on_actionE_xit_triggered ()
@@ -727,7 +730,7 @@ MainWindow::dialNow (const QString &strTarget)
         }
         else
         {
-            l += gvRegNumber.strNumber;
+            l += gvRegNumber.strDescription;
             l += QString (gvRegNumber.chType);
             if (!webPage.enqueueWork (GVAW_dialCallback, l, this,
                     SLOT (dialComplete (bool, const QVariantList &))))
@@ -955,7 +958,8 @@ MainWindow::sendSMSDone (bool bOk, const QVariantList &params)
 void
 MainWindow::on_btnCall_clicked ()
 {
-    QString strNum = ui->edNumber->text();
+    //@@UV: Fix this later
+    QString strNum; // = ui->edNumber->text();
     if (0 == strNum.size()) {
         setStatus ("No number entered");
         return;
@@ -991,11 +995,22 @@ MainWindow::on_btnHistory_clicked ()
 }//MainWindow::on_btnHistory_clicked
 
 void
+MainWindow::keyPressEvent (QKeyEvent *event)
+{
+    if ((Qt::Key_Q == event->key ()) &&
+        (Qt::ControlModifier == event->modifiers ())) {
+        on_actionE_xit_triggered ();
+    } else {
+        QDeclarativeView::keyPressEvent (event);
+    }
+}//MainWindow::keyPressEvent
+
+void
 MainWindow::closeEvent (QCloseEvent *event)
 {
     deinitContactsWidget ();
     deinitInboxWidget ();
-    QMainWindow::closeEvent (event);
+    QDeclarativeView::closeEvent (event);
 }//MainWindow::closeEvent
 
 bool
@@ -1011,8 +1026,9 @@ MainWindow::refreshRegisteredNumbers ()
             break;
         }
 
-        ui->cbDialMethod->clear ();
-        ui->cbDialMethod->setEnabled (false);
+        //@@UV: Fix this
+//        ui->cbDialMethod->clear ();
+//        ui->cbDialMethod->setEnabled (false);
         arrNumbers.clear ();
 
         QVariantList l;
@@ -1041,8 +1057,8 @@ void
 MainWindow::gotRegisteredPhone (const GVRegisteredNumber &info)
 {
     QString msg = QString("\"%1\"=\"%2\"")
-                    .arg (info.strDisplayName)
-                    .arg (info.strNumber);
+                    .arg (info.strName)
+                    .arg (info.strDescription);
     qDebug () << msg;
 
     arrNumbers += info;
@@ -1086,30 +1102,24 @@ MainWindow::fillCallbackNumbers (bool bSave)
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     QString strCallback;
     bool bGotCallback = dbMain.getCallback (strCallback);
-    ui->cbDialMethod->clear ();
-    ui->cbDialMethod->setEnabled (true);
+
+    modelRegNumber.clear ();
     for (int i = 0; i < arrNumbers.size (); i++)
     {
-        QString strText = QString (CB_TEXT_BUILDER)
-                            .arg (arrNumbers[i].strDisplayName)
-                            .arg (arrNumbers[i].strNumber);
-        ui->cbDialMethod->addItem (strText);
-
-        if ((bGotCallback) && (strCallback == arrNumbers[i].strNumber))
-        {
-            ui->cbDialMethod->setCurrentIndex (i);
-        }
+        modelRegNumber.insertRow (arrNumbers[i].strName,
+                                  arrNumbers[i].strDescription,
+                                  arrNumbers[i].chType);
     }
 
     // Store the callouts in the same widget as the callbacks
     CallInitiatorFactory& cif = Singletons::getRef().getCIFactory ();
     CalloutInitiatorList listCi = cif.getInitiators ();
     foreach (CalloutInitiator *ci, listCi) {
-        void * store = ci;
-        QString strText = QString (CB_TEXT_BUILDER)
-                            .arg (ci->name ())
-                            .arg (ci->selfNumber ());
-        ui->cbDialMethod->addItem (strText, QVariant::fromValue (store));
+        modelRegNumber.insertRow (ci->name (), ci->selfNumber (), ci);
+    }
+
+    if (bGotCallback) {
+        indRegPhone = strCallback.toInt ();
     }
 
     if (bSave)
@@ -1117,6 +1127,8 @@ MainWindow::fillCallbackNumbers (bool bSave)
         // Save all callbacks into the cache
         dbMain.putRegisteredNumbers (arrNumbers);
     }
+
+    onRegPhoneSelectionChange (indRegPhone);
 }//MainWindow::fillCallbackNumbers
 
 bool
@@ -1128,23 +1140,20 @@ MainWindow::getDialSettings (bool                 &bDialout   ,
 
     bool rv = false;
     do { // Begin cleanup block (not a loop)
-        int index = ui->cbDialMethod->currentIndex ();
-        if (index < arrNumbers.size ())
-        {
-            gvRegNumber = arrNumbers[index];
-            bDialout = false;
+        RegNumData data;
+        if (modelRegNumber.getAt (indRegPhone, data)) {
+            qDebug ("Invalid registered phone index");
+            break;
         }
-        else
-        {
-            QVariant var = ui->cbDialMethod->itemData (index);
-            if ((!var.isValid ()) || (var.isNull ()))
-            {
-                qWarning ("Invalid variant in callout numbers");
-                break;
-            }
-            initiator = (CalloutInitiator *) var.value<void *> ();
-            bDialout = true;
+
+        gvRegNumber.chType = data.chType;
+        gvRegNumber.strName = data.strName;
+        gvRegNumber.strDescription = data.strDesc;
+        bDialout = (data.type == RNT_Callout);
+        if (bDialout) {
+            initiator = (CalloutInitiator *) data.pCtx;
         }
+
         rv = true;
     } while (0); // End cleanup block (not a loop)
 
@@ -1242,3 +1251,19 @@ MainWindow::on_actionLogs_triggered ()
 {
     //
 }//MainWindow::on_actionLogs_triggered
+
+void
+MainWindow::onRegPhoneSelectionChange (int index)
+{
+    indRegPhone = index;
+
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    dbMain.putCallback (QString("%1").arg (indRegPhone));
+
+    QDeclarativeContext *ctx = this->rootContext();
+    RegNumData data;
+    if (!modelRegNumber.getAt (indRegPhone, data)) {
+        data.strName = "<Unknown>";
+    }
+    ctx->setContextProperty ("currentPhoneName", data.strName);
+}//MainWindow::onRegPhoneSelectionChange

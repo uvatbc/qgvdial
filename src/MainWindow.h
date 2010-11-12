@@ -2,21 +2,19 @@
 #define MAINWINDOW_H
 
 #include <QtGui>
+#include <QtDeclarative>
 
 #include "GVContactsTable.h"
 #include "GVHistory.h"
 #include "SMSDlg.h"
 #include "WebWidget.h"
+#include "RegNumberModel.h"
 
 // Required for Symbian (QSystemTrayIcon)
 #include "OsDependent.h"
 #include "Singletons.h"
 
-namespace Ui {
-    class MainWindow;
-}
-
-class MainWindow : public QMainWindow
+class MainWindow : public QDeclarativeView
 {
     Q_OBJECT
 
@@ -42,6 +40,7 @@ private slots:
     // All initializations happen here
     void init ();
 
+    // Invoked when the application is supposed to exit
     void on_actionE_xit_triggered();
     //! The Singleton Application class invokes this function
     void messageReceived (const QString &message);
@@ -61,11 +60,6 @@ private slots:
     void systray_activated (QSystemTrayIcon::ActivationReason reason);
     //! Invoked when a message box is closed. Purely a cleanup function.
     void msgBox_buttonClicked (QAbstractButton *button);
-
-    //! Character clicked from the dialpad
-    void charClicked (QChar ch);
-    //! Delete clicked from dialpad
-    void charDeleted ();
 
     //! Invoked after all contacts have been parsed
     void getContactsDone (bool bOk);
@@ -114,6 +108,8 @@ private slots:
     //! Invoked by GVAccess when the voice mail download has completed
     void onVmailDownloaded (bool bOk, const QVariantList &arrParams);
 
+    void onRegPhoneSelectionChange (int index);
+
 private:
     void doLogin ();
 
@@ -126,6 +122,8 @@ private:
     bool getInfoFrom (const QString &strNumber,
                       const QString &strNameLink,
                       GVContactInfo &info);
+
+    void keyPressEvent (QKeyEvent *event);
     void closeEvent (QCloseEvent *event);
 
     bool refreshRegisteredNumbers ();
@@ -137,8 +135,6 @@ private:
     void playVmail (const QString &strFile);
 
 private:
-    Ui::MainWindow *ui;
-
     // Tray, icons, widgets
     QIcon           icoGoogle;
     QSystemTrayIcon *pSystray;
@@ -159,6 +155,11 @@ private:
     QString         strPass;
     //! Our own GV phone number
     QString         strSelfNumber;
+
+    //! Model for registered phone numbers
+    RegNumberModel  modelRegNumber;
+    //! Index of the registered phone currently in use
+    int             indRegPhone;
 
 ///////////////////////////////////////////////////////////////////////////////
 // This block of variable is protected by the one mutex in it

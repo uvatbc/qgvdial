@@ -21,8 +21,27 @@ Item {
     MyButton {
         id: btn
         mainText: digButton.mainText
+        anchors.fill: parent
 
-        onClicked: (digButton.isDel?digButton.delClicked():digButton.clicked(mainText));
+        onClicked: {
+            if (digButton.isDel) {
+                digButton.delClicked();
+            } else {
+                digButton.clicked(mainText.substring(0,1));
+            }
+        }
+
+        onPressHold: {
+            if ((mainText.length > 1) && (!digButton.isDel)) {
+                digButton.clicked(mainText.substring(1,2));
+            } else {
+                if (digButton.isDel) {
+                    digButton.delClicked();
+                } else {
+                    digButton.clicked(mainText.substring(0,1));
+                }
+            }
+        }
 
         // The sub text: text
         Text {

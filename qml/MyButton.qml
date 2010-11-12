@@ -3,17 +3,17 @@ import "helper.js" as Code
 
 Rectangle {
     id: button
-    anchors.fill: parent
     border.color: "black"
     smooth: true
     radius: ((height + width) / 20);
 
     // Main text in the button
     property string mainText: "2"
-    property Text someText: mText
+    property alias textFont: mText.font
 
     // Button emits clicks, but we also mention what is the text to display
     signal clicked(string strText)
+    signal pressHold(string strText)
 
     // Two gradients: grad1 for pressed and grad2 for released
     Gradient {
@@ -37,7 +37,6 @@ Rectangle {
 
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
-        anchors.verticalCenterOffset: -5
 
         font.pointSize: Code.btnFontPoint ();
         font.bold: true
@@ -50,6 +49,7 @@ Rectangle {
         onPressed: button.gradient = grad2;
         onReleased: button.gradient = grad1;
 
-        onClicked: (button.clicked(mainText));
+        onClicked: button.clicked(mainText);
+        onPressAndHold: button.pressHold(mainText);
     }// MouseArea
 }// Rectangle

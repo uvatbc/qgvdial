@@ -55,6 +55,7 @@ OsDependent::setDefaultWindowAttributes (QWidget *pWidget)
 #ifdef Q_WS_MAEMO_5
     pWidget->setAttribute (Qt::WA_Maemo5StackedWindow);
     pWidget->setAttribute (Qt::WA_Maemo5AutoOrientation);
+//    pWidget->setAttribute (Qt::WA_Maemo5PortraitOrientation);
 #else
     Q_UNUSED (pWidget);
 #endif
