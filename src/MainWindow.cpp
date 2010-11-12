@@ -282,10 +282,6 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
         // Allow access to buttons and widgets
         //@@UV: Fix this later
 //        ui->action_Login->setText ("Logout");
-//        ui->btnContacts->setEnabled (true);
-//        ui->btnHistory->setEnabled (true);
-//        ui->cbDialMethod->setEnabled (true);
-//        ui->btnCall->setEnabled (true);
         bLoggedIn = true;
 
         // Save the user name and password that was used to login
@@ -363,10 +359,6 @@ MainWindow::logoutCompleted (bool, const QVariantList &)
 
     //@UV: Fix this later
 //    ui->action_Login->setText ("Login...");
-//    ui->btnContacts->setEnabled (false);
-//    ui->btnHistory->setEnabled (false);
-//    ui->cbDialMethod->setEnabled (false);
-//    ui->btnCall->setEnabled (false);
 
     bLoggedIn = false;
 
@@ -954,19 +946,6 @@ MainWindow::sendSMSDone (bool bOk, const QVariantList &params)
 
     setStatus (msg);
 }//MainWindow::sendSMSDone
-
-void
-MainWindow::on_btnCall_clicked ()
-{
-    //@@UV: Fix this later
-    QString strNum; // = ui->edNumber->text();
-    if (0 == strNum.size()) {
-        setStatus ("No number entered");
-        return;
-    }
-
-    dialNow (strNum);
-}//MainWindow::on_btnCall_clicked
 
 void
 MainWindow::on_btnContacts_clicked ()

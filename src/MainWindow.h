@@ -33,7 +33,6 @@ public slots:
 private slots:
     void on_actionLogs_triggered();
     void on_actionWeb_view_triggered();
-    void on_btnCall_clicked();
     void on_btnHistory_clicked();
     void on_btnContacts_clicked();
 
