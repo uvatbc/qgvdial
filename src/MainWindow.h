@@ -111,9 +111,6 @@ private slots:
 
     void onRegPhoneSelectionChange (int index);
 
-    void onLongWorkStart ();
-    void onLongWorkStop ();
-
 private:
     void doLogin ();
 
@@ -138,6 +135,9 @@ private:
     void playVmail (const QString &strFile);
 
 private:
+    //! Logfile
+    QFile           fLogfile;
+
     // Tray, icons, widgets
     QIcon           icoGoogle;
     QSystemTrayIcon *pSystray;
@@ -149,6 +149,10 @@ private:
     SMSDlg          dlgSMS;
     //! Web View
     WebWidget      *pWebWidget;
+
+#ifdef Q_WS_MAEMO_5
+    QMaemo5InformationBox   infoBox;
+#endif
 
     // Menus and actions
     QMenu           menuFile;

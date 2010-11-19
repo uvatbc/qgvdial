@@ -20,11 +20,15 @@ struct DialOutContext {
 
 MainWindow::MainWindow (QWidget *parent)
 : QDeclarativeView (parent)
+, fLogfile (this)
 , icoGoogle (":/Google.png")
 , pSystray (NULL)
 , pContactsView (NULL)
 , pInboxView (NULL)
 , pWebWidget (new WebWidget (this, Qt::Window))
+#ifdef Q_WS_MAEMO_5
+, infoBox (this)
+#endif
 , menuFile ("&File", this)
 , actLogin ("Login...", this)
 , actExit ("Exit", this)
@@ -39,6 +43,16 @@ MainWindow::MainWindow (QWidget *parent)
     QObject::connect(QApplication::desktop(), SIGNAL(resized(int)),
                      this                   , SLOT  (orientationChanged()));
 #endif
+
+    // Initialize logging
+    QString strLogfile = QDir::homePath ();
+    if (!strLogfile.endsWith (QDir::separator ()))
+    {
+        strLogfile += QDir::separator ();
+    }
+    strLogfile += "qgvdial.log";
+    fLogfile.setFileName (strLogfile);
+    fLogfile.open (QIODevice::WriteOnly | QIODevice::Append);
 
     // This must be done at least once so that the initial qml is loaded.
     // Even if it is desktop, this must be done: The function takes care of
@@ -93,10 +107,10 @@ MainWindow::log (const QString &strText, int level /*= 10*/)
     cout << strLog.toStdString () << endl;
 
     // Send to log file
-//    if (fLogfile.isOpen ()) {
-//        QTextStream streamLog(&fLogfile);
-//        streamLog << strLog << endl;
-//    }
+    if (fLogfile.isOpen ()) {
+        QTextStream streamLog(&fLogfile);
+        streamLog << strLog << endl;
+    }
 }//MainWindow::log
 
 void
@@ -106,8 +120,17 @@ MainWindow::setStatus(const QString &strText, int timeout /* = 0*/)
     qDebug () << strText;
 
 #ifdef Q_WS_MAEMO_5
-    QMaemo5InformationBox::information (this, strText,
-                                        (0 == timeout?3000:timeout));
+    infoBox.hide ();
+    QLabel *theLabel = (QLabel *) infoBox.widget ();
+    if (NULL == theLabel) {
+        theLabel = new QLabel (strText, &infoBox);
+        theLabel->setAlignment (Qt::AlignHCenter);
+        infoBox.setWidget (theLabel);
+    } else {
+        theLabel->setText (strText);
+    }
+    infoBox.setTimeout (0 == timeout?3000:timeout);
+    infoBox.show ();
 #else
     if (NULL != pSystray) {
         pSystray->showMessage ("Status", strText,
@@ -228,7 +251,8 @@ MainWindow::doLogin ()
             break;
         }
 
-        onLongWorkStart ();
+        OsDependent &osd = Singletons::getRef().getOSD ();
+        osd.setLongWork (this, true);
 
         bOk = true;
     } while (0); // End cleanup block (not a loop)
@@ -291,7 +315,8 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
         QVariantList l;
         logoutCompleted (true, l);
 
-        onLongWorkStop ();
+        OsDependent &osd = Singletons::getRef().getOSD ();
+        osd.setLongWork (this, false);
     }
     else
     {
@@ -372,7 +397,8 @@ MainWindow::doLogout ()
     webPage.enqueueWork (GVAW_logout, l, this,
                          SLOT (logoutCompleted (bool, const QVariantList &)));
 
-    onLongWorkStart ();
+    OsDependent &osd = Singletons::getRef().getOSD ();
+    osd.setLongWork (this, true);
 }//MainWindow::doLogout
 
 void
@@ -389,7 +415,8 @@ MainWindow::logoutCompleted (bool, const QVariantList &)
     bLoggedIn = false;
 
     setStatus ("Logout complete");
-    onLongWorkStop ();
+    OsDependent &osd = Singletons::getRef().getOSD ();
+    osd.setLongWork (this, false);
 }//MainWindow::logoutCompleted
 
 void
@@ -1259,25 +1286,6 @@ MainWindow::onRegPhoneSelectionChange (int index)
     }
     ctx->setContextProperty ("currentPhoneName", data.strName);
 
-    onLongWorkStop ();
+    OsDependent &osd = Singletons::getRef().getOSD ();
+    osd.setLongWork (this, false);
 }//MainWindow::onRegPhoneSelectionChange
-
-void
-MainWindow::onLongWorkStart ()
-{
-#ifdef Q_WS_MAEMO_5
-    this->setAttribute(Qt::WA_Maemo5ShowProgressIndicator, true);
-#else
-    this->setCursor (Qt::WaitCursor);
-#endif
-}//MainWindow::onLongWorkStart
-
-void
-MainWindow::onLongWorkStop ()
-{
-#ifdef Q_WS_MAEMO_5
-    this->setAttribute(Qt::WA_Maemo5ShowProgressIndicator, false);
-#else
-    this->unsetCursor ();
-#endif
-}//MainWindow::onLongWorkStop

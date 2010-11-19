@@ -24,6 +24,7 @@ public:
     bool isN900 ();
     void initDialServer (QObject *receiver, const char *method);
     void setDefaultWindowAttributes (QWidget *pWidget);
+    void setLongWork (QWidget *window, bool bSet = false);
 
 private:
     OsDependent(QObject *parent = 0);

@@ -61,6 +61,20 @@ OsDependent::setDefaultWindowAttributes (QWidget *pWidget)
 #endif
 }//OsDependent::setDefaultWindowAttributes
 
+void
+OsDependent::setLongWork (QWidget *window, bool bSet /*= false*/)
+{
+#ifdef Q_WS_MAEMO_5
+    window->setAttribute(Qt::WA_Maemo5ShowProgressIndicator, bSet);
+#else
+    if (bSet) {
+        window->setCursor (Qt::WaitCursor);
+    } else {
+        window->unsetCursor ();
+    }
+#endif
+}//OsDependent::setLongWork
+
 #ifdef QT_NO_SYSTEMTRAYICON
 QSystemTrayIcon::QSystemTrayIcon(QWidget *parent/* = 0*/) : QWidget (parent)
 {
