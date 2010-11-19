@@ -3,12 +3,16 @@
 
 #include "global.h"
 
-#if defined (Q_OS_UNIX) && !defined (Q_OS_SYMBIAN)
+#if TELEPATHY_CAPABLE
 #include <TelepathyQt4/Constants>
 #include <TelepathyQt4/Types>
 #if !NO_DBGINFO
 #include <TelepathyQt4/Debug>
 #endif
+#endif
+
+#ifdef Q_WS_MAEMO_5
+#include <QtMaemo5>
 #endif
 
 class OsDependent : public QObject

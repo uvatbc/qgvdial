@@ -104,6 +104,17 @@ MainWindow::setStatus(const QString &strText, int timeout /* = 0*/)
 {
     //@@UV: Fix
     qDebug () << strText;
+
+#ifdef Q_WS_MAEMO_5
+    QMaemo5InformationBox::information (this, strText,
+                                        (0 == timeout?3000:timeout));
+#else
+    if (NULL != pSystray) {
+        pSystray->showMessage ("Status", strText,
+                               QSystemTrayIcon::Information,
+                               timeout);
+    }
+#endif
 }//MainWindow::setStatus
 
 void
@@ -295,8 +306,7 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
         initInboxWidget ();
 
         // Allow access to buttons and widgets
-        //@@UV: Fix this later
-//        ui->action_Login->setText ("Logout");
+        actLogin.setText ("Logout");
         bLoggedIn = true;
 
         // Save the user name and password that was used to login
@@ -361,6 +371,8 @@ MainWindow::doLogout ()
     QVariantList l;
     webPage.enqueueWork (GVAW_logout, l, this,
                          SLOT (logoutCompleted (bool, const QVariantList &)));
+
+    onLongWorkStart ();
 }//MainWindow::doLogout
 
 void
@@ -372,12 +384,12 @@ MainWindow::logoutCompleted (bool, const QVariantList &)
 
     arrNumbers.clear ();
 
-    //@UV: Fix this later
-//    ui->action_Login->setText ("Login...");
+    actLogin.setText ("Login...");
 
     bLoggedIn = false;
 
     setStatus ("Logout complete");
+    onLongWorkStop ();
 }//MainWindow::logoutCompleted
 
 void
@@ -1253,11 +1265,19 @@ MainWindow::onRegPhoneSelectionChange (int index)
 void
 MainWindow::onLongWorkStart ()
 {
+#ifdef Q_WS_MAEMO_5
+    this->setAttribute(Qt::WA_Maemo5ShowProgressIndicator, true);
+#else
     this->setCursor (Qt::WaitCursor);
+#endif
 }//MainWindow::onLongWorkStart
 
 void
 MainWindow::onLongWorkStop ()
 {
+#ifdef Q_WS_MAEMO_5
+    this->setAttribute(Qt::WA_Maemo5ShowProgressIndicator, false);
+#else
     this->unsetCursor ();
+#endif
 }//MainWindow::onLongWorkStop

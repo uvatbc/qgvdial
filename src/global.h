@@ -164,5 +164,4 @@ struct ContactInfo
 #define TELEPATHY_CAPABLE 0
 #endif
 
-
 #endif //__GLOBAL_H__

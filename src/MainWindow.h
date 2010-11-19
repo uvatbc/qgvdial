@@ -33,18 +33,20 @@ public slots:
 private slots:
     void on_actionLogs_triggered();
     void on_actionWeb_view_triggered();
-    void on_btnHistory_clicked();
-    void on_btnContacts_clicked();
 
     // All initializations happen here
     void init ();
 
-    // Invoked when the application is supposed to exit
+    //! Invoked when the application is supposed to exit
     void on_actionE_xit_triggered();
     //! The Singleton Application class invokes this function
     void messageReceived (const QString &message);
     //! Invoked when the user clicks Login
     void on_action_Login_triggered();
+    //! Invoked when the user clicks the Inbox button
+    void on_btnHistory_clicked();
+    //! invoked when the user clicks the Contacts button
+    void on_btnContacts_clicked();
 
     //! Invoked on rotation
     void orientationChanged ();
