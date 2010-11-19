@@ -109,6 +109,9 @@ private slots:
 
     void onRegPhoneSelectionChange (int index);
 
+    void onLongWorkStart ();
+    void onLongWorkStop ();
+
 private:
     void doLogin ();
 
@@ -122,7 +125,6 @@ private:
                       const QString &strNameLink,
                       GVContactInfo &info);
 
-    void keyPressEvent (QKeyEvent *event);
     void closeEvent (QCloseEvent *event);
 
     bool refreshRegisteredNumbers ();
@@ -145,6 +147,11 @@ private:
     SMSDlg          dlgSMS;
     //! Web View
     WebWidget      *pWebWidget;
+
+    // Menus and actions
+    QMenu           menuFile;
+    QAction         actLogin;
+    QAction         actExit;
 
     //! Are we logged in?
     bool            bLoggedIn;

@@ -25,6 +25,9 @@ MainWindow::MainWindow (QWidget *parent)
 , pContactsView (NULL)
 , pInboxView (NULL)
 , pWebWidget (new WebWidget (this, Qt::Window))
+, menuFile ("&File", this)
+, actLogin ("Login...", this)
+, actExit ("Exit", this)
 , bLoggedIn (false)
 , modelRegNumber (this)
 , indRegPhone (0)
@@ -70,8 +73,6 @@ MainWindow::MainWindow (QWidget *parent)
 
 MainWindow::~MainWindow ()
 {
-    //@@UV: Fix this
-//    delete ui;
 }//MainWindow::~MainWindow
 
 void
@@ -166,6 +167,16 @@ MainWindow::init ()
     // Additional UI initializations:
     //@@UV: Need this for later
 //    ui->edNumber->setValidator (new PhoneNumberValidator (ui->edNumber));
+    actLogin.setShortcut (QKeySequence(Qt::CTRL + Qt::Key_L));
+    actExit.setShortcut (QKeySequence(Qt::CTRL + Qt::Key_Q));
+    menuFile.addAction (&actLogin);
+    menuFile.addAction (&actExit);
+    this->addAction (&actLogin);
+    this->addAction (&actExit);
+    QObject::connect (&actLogin, SIGNAL (triggered()),
+                       this    , SLOT   (on_action_Login_triggered()));
+    QObject::connect (&actExit, SIGNAL (triggered()),
+                       this   , SLOT   (on_actionE_xit_triggered()));
 
     // If the cache has the username and password, begin login
     if (dbMain.getUserPass (strUser, strPass))
@@ -205,6 +216,8 @@ MainWindow::doLogin ()
             qWarning ("Login returned immediately with failure!");
             break;
         }
+
+        onLongWorkStart ();
 
         bOk = true;
     } while (0); // End cleanup block (not a loop)
@@ -266,6 +279,8 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
 
         QVariantList l;
         logoutCompleted (true, l);
+
+        onLongWorkStop ();
     }
     else
     {
@@ -974,17 +989,6 @@ MainWindow::on_btnHistory_clicked ()
 }//MainWindow::on_btnHistory_clicked
 
 void
-MainWindow::keyPressEvent (QKeyEvent *event)
-{
-    if ((Qt::Key_Q == event->key ()) &&
-        (Qt::ControlModifier == event->modifiers ())) {
-        on_actionE_xit_triggered ();
-    } else {
-        QDeclarativeView::keyPressEvent (event);
-    }
-}//MainWindow::keyPressEvent
-
-void
 MainWindow::closeEvent (QCloseEvent *event)
 {
     deinitContactsWidget ();
@@ -1005,9 +1009,6 @@ MainWindow::refreshRegisteredNumbers ()
             break;
         }
 
-        //@@UV: Fix this
-//        ui->cbDialMethod->clear ();
-//        ui->cbDialMethod->setEnabled (false);
         arrNumbers.clear ();
 
         QVariantList l;
@@ -1245,4 +1246,18 @@ MainWindow::onRegPhoneSelectionChange (int index)
         data.strName = "<Unknown>";
     }
     ctx->setContextProperty ("currentPhoneName", data.strName);
+
+    onLongWorkStop ();
 }//MainWindow::onRegPhoneSelectionChange
+
+void
+MainWindow::onLongWorkStart ()
+{
+    this->setCursor (Qt::WaitCursor);
+}//MainWindow::onLongWorkStart
+
+void
+MainWindow::onLongWorkStop ()
+{
+    this->unsetCursor ();
+}//MainWindow::onLongWorkStop
