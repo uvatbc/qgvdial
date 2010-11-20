@@ -42,7 +42,7 @@ system($cmd);
 system("cp qgvdial-$qver/icons/Google.png qgvdial-$qver/src/qgvdial.png");
 
 # Version replacement
-$cmd = "cd qgvdial-$qver ; perl ../version.pl __QGVDIAL_VERSION__ $qver";
+$cmd = "cd qgvdial-$qver ; perl ../build-files/version.pl __QGVDIAL_VERSION__ $qver";
 print "$cmd\n";
 system($cmd);
 
