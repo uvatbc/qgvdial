@@ -11,8 +11,6 @@
 #include <iostream>
 using namespace std;
 
-#define CB_TEXT_BUILDER "%1 : %2"
-
 struct DialOutContext {
     CalloutInitiator *ci;
     DialCancelDlg *pDialDlg;
@@ -786,6 +784,9 @@ MainWindow::dialNow (const QString &strTarget)
             }
         }
 
+        OsDependent &osd = Singletons::getRef().getOSD ();
+        osd.setLongWork (this, true);
+
         bCallInProgress = true;
         bDialCancelled = false;
 
@@ -889,6 +890,9 @@ MainWindow::dialComplete (bool bOk, const QVariantList &params)
         setStatus (QString("Dial successful to %1.").arg(params[0].toString()));
     }
     bCallInProgress = false;
+
+    OsDependent &osd = Singletons::getRef().getOSD ();
+    osd.setLongWork (this, false);
 }//MainWindow::dialComplete
 
 void
@@ -1279,12 +1283,19 @@ MainWindow::onRegPhoneSelectionChange (int index)
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     dbMain.putCallback (QString("%1").arg (indRegPhone));
 
-    QDeclarativeContext *ctx = this->rootContext();
     RegNumData data;
     if (!modelRegNumber.getAt (indRegPhone, data)) {
         data.strName = "<Unknown>";
     }
-    ctx->setContextProperty ("currentPhoneName", data.strName);
+    QString disp = data.strName;
+    if (RNT_Callback == data.type) {
+        disp = "In : " + disp;
+    } else if (RNT_Callout == data.type) {
+        disp = "Out : " + disp;
+    }
+
+    QDeclarativeContext *ctx = this->rootContext();
+    ctx->setContextProperty ("currentPhoneName", disp);
 
     OsDependent &osd = Singletons::getRef().getOSD ();
     osd.setLongWork (this, false);

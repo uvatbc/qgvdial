@@ -10,7 +10,6 @@ Rectangle {
     property alias txtEd: txtNum
 
     function slotSelectionChanged(index, name) {
-        btnPhones.mainText = name;
         wDisp.sigSelChanged(index);
     }
     function slotCbBoxDestroy () {
