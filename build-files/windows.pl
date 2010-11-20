@@ -9,7 +9,7 @@ if (-f ver.cfg)
     unlink(ver.cfg);
 }
 # Get the latest version file from the repository
-$cmd = "svn export $repo/ver.cfg";
+$cmd = "svn export $repo/build-files/ver.cfg";
 system($cmd);
 
 # Pull out the version from the file
