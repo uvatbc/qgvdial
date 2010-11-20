@@ -731,6 +731,11 @@ MainWindow::dialNow (const QString &strTarget)
 
     do // Begin cleanup block (not a loop)
     {
+        if (!bLoggedIn) {
+            setStatus ("User is not logged in yet. Cannot make any calls.");
+            break;
+        }
+
         QMutexLocker locker (&mtxDial);
         if (bCallInProgress) {
             setStatus ("Another call is in progress. Please try again later");
@@ -740,7 +745,7 @@ MainWindow::dialNow (const QString &strTarget)
         GVRegisteredNumber gvRegNumber;
         if (!getDialSettings (bDialout, gvRegNumber, ci))
         {
-            setStatus ("Unable to dial out because settings are not valid");
+            setStatus ("Unable to dial because settings are not valid.");
             break;
         }
 
@@ -858,7 +863,6 @@ MainWindow::dialAccessNumber (const QString  &strAccessNumber,
         ctx = NULL;
     }
 }//MainWindow::dialAccessNumber
-
 
 void
 MainWindow::dialComplete (bool bOk, const QVariantList &params)
