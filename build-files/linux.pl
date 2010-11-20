@@ -43,9 +43,10 @@ system($cmd);
 
 # Add a post install file to add the executable bit after installation on the device
 system("mv qgvdial-$qver/build-files/postinst.linux qgvdial-$qver/debian/postinst");
-
 # Fix the control file
 system("mv qgvdial-$qver/build-files/control.linux qgvdial-$qver/debian/control");
+# Fix the dbu service file name
+system("mv qgvdial-$qver/build-files/qgvdial.service.linux qgvdial-$qver/build-files/qgvdial.service");
 
 # Execute the rest of the build command
 $cmd = "cd qgvdial-$qver && $mad dpkg-buildpackage && $mad remote -r org.maemo.qgvdial send ../qgvdial_$qver-1_$machine.deb && $mad remote -r org.maemo.qgvdial install qgvdial_$qver-1_$machine.deb";

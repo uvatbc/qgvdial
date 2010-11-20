@@ -193,8 +193,8 @@ maemo5 {
     qss.path = $$BINDIR/stylesheets
     qss.files += ./stylesheets/dialpad_maemo.qss
 
-    dbus_service.path = /usr/share/dbus-1/service/qgvdial.service
-    dbus_service.files += ../build-files/qgvdial.service.maemo
+    dbus_service.path = /usr/share/dbus-1/service
+    dbus_service.files += ../build-files/qgvdial.service
 }
 
 # Installation for Linux
@@ -215,6 +215,6 @@ unix:!symbian:!maemo5 {
     qss.path = $$BINDIR/stylesheets
     qss.files += ./stylesheets/dialpad_maemo.qss
 
-    dbus_service.path = /usr/share/dbus-1/service/qgvdial.service
-    dbus_service.files += ../build-files/qgvdial.service.linux
+    dbus_service.path = /usr/share/dbus-1/service
+    dbus_service.files += ../build-files/qgvdial.service
 }
