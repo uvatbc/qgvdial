@@ -1,0 +1,3 @@
+[D-BUS Service]
+Name=org.QGVDial.CallServer
+Exec=/usr/bin/qgvdial
