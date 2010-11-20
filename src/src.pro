@@ -193,7 +193,7 @@ maemo5 {
     qss.path = $$BINDIR/stylesheets
     qss.files += ./stylesheets/dialpad_maemo.qss
 
-    dbusservice.path = $$DATADIR/dbus-1/service
+    dbusservice.path = $$DATADIR/dbus-1/services
     dbusservice.files += ../build-files/qgvdial.Call.service
 }
 
@@ -215,7 +215,7 @@ unix:!symbian:!maemo5 {
     qss.path = $$BINDIR/stylesheets
     qss.files += ./stylesheets/dialpad_maemo.qss
 
-    dbusservice.path = $$DATADIR/dbus-1/service
+    dbusservice.path = $$DATADIR/dbus-1/services
     dbusservice.files += ../build-files/qgvdial.Call.service
 }
 
