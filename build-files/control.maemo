@@ -5,6 +5,7 @@ Maintainer: Yuvraaj <yuvraaj@gmail.com>
 Build-Depends: debhelper (>= 5)
 Standards-Version: 3.7.3
 Homepage: http://code.google.com/p/qgvdial/
+XSBC-Bugtracker: http://code.google.com/p/qgvdial/issues/list
 
 Package: qgvdial
 Architecture: any
