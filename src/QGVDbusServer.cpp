@@ -11,29 +11,87 @@ QGVDbusServerHelper::emitDialNow (const QString &strNumber)
     emit dialNow (strNumber);
 }//QGVDbusServerHelper::emitDialNow
 
-QGVDbusServer::QGVDbusServer (QObject *parent)
+void
+QGVDbusServerHelper::emitText (const QStringList &arrNumbers,
+                               const QString     &strData)
+{
+    emit sendText (arrNumbers, strData);
+}//QGVDbusServerHelper::emitText
+
+void
+QGVDbusServerHelper::emitTextWithoutData (const QStringList &arrNumbers)
+{
+    emit sendTextWithoutData (arrNumbers);
+}//QGVDbusServerHelper::emitTextWithoutData
+
+QGVDbusCallServer::QGVDbusCallServer (QObject *parent)
 : QDBusAbstractAdaptor(parent)
 , helper (this)
 {
-}//QGVDbusServer::QGVDbusServer
+}//QGVDbusCallServer::QGVDbusServer
 
 void
-QGVDbusServer::Call (const QString &strNumber)
+QGVDbusCallServer::Call (const QString &strNumber)
 {
     // Make a call
     helper.emitDialNow (strNumber);
-}//QGVDbusServer::Call
+}//QGVDbusCallServer::Call
 
 void
-QGVDbusServer::addCallReceiver (QObject *receiver, const char *method)
+QGVDbusCallServer::addCallReceiver (QObject *receiver, const char *method)
 {
     QObject::connect (&helper, SIGNAL (dialNow (const QString &)),
                       receiver, method);
-}//QGVDbusServer::addCallReceiver
+}//QGVDbusCallServer::addCallReceiver
 
 void
-QGVDbusServer::delCallReceiver (QObject *receiver, const char *method)
+QGVDbusCallServer::delCallReceiver (QObject *receiver, const char *method)
 {
     QObject::disconnect (&helper, SIGNAL (dialNow (const QString &)),
                           receiver, method);
-}//QGVDbusServer::delCallReceiver
+}//QGVDbusCallServer::delCallReceiver
+
+QGVDbusTextServer::QGVDbusTextServer (QObject *parent)
+: QDBusAbstractAdaptor(parent)
+, helper (this)
+{
+}//QGVDbusTextServer::QGVDbusServer
+
+void
+QGVDbusTextServer::Text (const QStringList &arrNumbers,
+                         const QString     &strData)
+{
+    // Send a text
+    helper.emitText (arrNumbers, strData);
+}//QGVDbusTextServer::Text
+
+void
+QGVDbusTextServer::TextWithoutData (const QStringList &arrNumbers)
+{
+    // Signal that a text is to be sent to this list of numbers
+    helper.emitTextWithoutData (arrNumbers);
+}//QGVDbusTextServer::TextWithoutData
+
+void
+QGVDbusTextServer::addTextReceivers (QObject *r1, const char *m1,
+                                     QObject *r2, const char *m2)
+{
+    QObject::connect (
+        &helper, SIGNAL (sendText (const QStringList &, const QString &)),
+        r1, m1);
+    QObject::connect (
+        &helper, SIGNAL (sendTextWithoutData (const QStringList &)),
+        r2, m2);
+}//QGVDbusTextServer::addTextReceiver
+
+void
+QGVDbusTextServer::delTextReceivers (QObject *r1, const char *m1,
+                                     QObject *r2, const char *m2)
+{
+    QObject::disconnect (
+        &helper, SIGNAL (sendText (const QStringList &, const QString &)),
+        r1, m1);
+    QObject::disconnect (
+        &helper, SIGNAL (sendTextWithoutData (const QStringList &)),
+        r2, m2);
+}//QGVDbusTextServer::delTextReceiver

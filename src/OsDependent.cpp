@@ -34,9 +34,9 @@ void
 OsDependent::initDialServer (QObject *receiver, const char *method)
 {
 #if TELEPATHY_CAPABLE
-    static QGVDbusServer *pDialServer = NULL;
+    static QGVDbusCallServer *pDialServer = NULL;
     if (NULL == pDialServer) {
-        pDialServer = new QGVDbusServer (this);
+        pDialServer = new QGVDbusCallServer (this);
         pDialServer->addCallReceiver (receiver, method);
 
         QDBusConnection sessionBus = QDBusConnection::sessionBus();
@@ -50,12 +50,33 @@ OsDependent::initDialServer (QObject *receiver, const char *method)
 }//OsDependent::initDialServer
 
 void
+OsDependent::initTextServer (QObject *r1, const char *m1,
+                             QObject *r2, const char *m2)
+{
+#if TELEPATHY_CAPABLE
+    static QGVDbusTextServer *pTextServer = NULL;
+    if (NULL == pTextServer) {
+        pTextServer = new QGVDbusTextServer (this);
+        pTextServer->addTextReceivers (r1, m1, r2, m2);
+
+        QDBusConnection sessionBus = QDBusConnection::sessionBus();
+        sessionBus.registerObject ("/org/QGVDial/TextServer", this);
+        sessionBus.registerService("org.QGVDial.TextServer");
+    }
+#else
+    Q_UNUSED (r1);
+    Q_UNUSED (m1);
+    Q_UNUSED (r2);
+    Q_UNUSED (m2);
+#endif
+}//OsDependent::initDialServer
+
+void
 OsDependent::setDefaultWindowAttributes (QWidget *pWidget)
 {
 #ifdef Q_WS_MAEMO_5
     pWidget->setAttribute (Qt::WA_Maemo5StackedWindow);
     pWidget->setAttribute (Qt::WA_Maemo5AutoOrientation);
-//    pWidget->setAttribute (Qt::WA_Maemo5PortraitOrientation);
 #else
     Q_UNUSED (pWidget);
 #endif

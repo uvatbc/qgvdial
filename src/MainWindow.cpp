@@ -128,7 +128,6 @@ MainWindow::log (const QString &strText, int level /*= 10*/)
 void
 MainWindow::setStatus(const QString &strText, int timeout /* = 0*/)
 {
-    //@@UV: Fix
     qDebug () << strText;
 
 #ifdef Q_WS_MAEMO_5
@@ -191,6 +190,9 @@ MainWindow::init ()
 
     dbMain.init ();
     osd.initDialServer (this, SLOT (dialNow (const QString &)));
+    osd.initTextServer (
+        this, SLOT (sendSMS (const QStringList &, const QString &)),
+        this, SLOT (onSendTextWithoutData (const QStringList &)));
 
     // Dialing handshake
     QObject::connect (&webPage    , SIGNAL (dialInProgress (const QString &)),
@@ -698,6 +700,31 @@ MainWindow::getInfoFrom (const QString &strNumber,
     return (true);
 }//MainWindow::getInfoFrom
 
+bool
+MainWindow::findInfo (const QString &strNumber, GVContactInfo &info)
+{
+    info = GVContactInfo();
+
+    QString strTrunc = strNumber;
+    GVAccess::simplify_number (strTrunc, false);
+    strTrunc.remove (' ');
+
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    if (!dbMain.getContactFromNumber (strNumber, info)) {
+        qDebug ("Could not find info about this number. Using dummy info");
+        info.strName = strNumber;
+        GVContactNumber num;
+        num.chType = 'O';
+        num.strNumber = strNumber;
+        info.arrPhones += num;
+        info.selected = 0;
+    } else {
+        //
+    }
+
+    return (true);
+}//MainWindow::findInfo
+
 void
 MainWindow::callNumber (const QString &strNumber,
                         const QString &strNameLink)
@@ -847,6 +874,34 @@ MainWindow::dialNow (const QString &strTarget)
         pDialDlg->doNonModal (strSelfNumber);
     } while (0); // End cleanup block (not a loop)
 }//MainWindow::dialNow
+
+//! Invoked by the DBus Text server
+/**
+ * When the DBus Text server's text method is called, it finally reaches this
+ * function. Here, we:
+ * 1. Find out information (if there is any) about each number
+ * 2. Add that info into the widget that collects numbers to send a text to
+ * 3. Show the text widget
+ */
+void
+MainWindow::onSendTextWithoutData (const QStringList &arrNumbers)
+{
+    foreach (QString strNumber, arrNumbers) {
+        GVContactInfo info;
+
+        // Get info about this number
+        if (!findInfo (strNumber, info)) {
+            qWarning () << "Unable to find information for " << strNumber;
+            continue;
+        }
+
+        SMSEntry entry;
+        entry.strName = info.strName;
+        entry.sNumber = info.arrPhones[info.selected];
+
+        dlgSMS.addSMSEntry (entry);
+    }
+}//MainWindow::onSendTextWithoutData
 
 void
 MainWindow::onDialDlgClose (int retval, const QString & /*strNumber*/)

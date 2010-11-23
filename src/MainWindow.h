@@ -68,6 +68,9 @@ private slots:
     //! Invoked when the dialer widget call button is clicked
     void dialNow (const QString &strTarget);
 
+    //! Invoked by the DBus Text server without any text data
+    void onSendTextWithoutData (const QStringList &arrNumbers);
+
     void onDialDlgClose (int retval, const QString &strNumber);
     //! Invoked when dialing has started
     void dialInProgress (const QString &strNumber);
@@ -124,6 +127,8 @@ private:
     bool getInfoFrom (const QString &strNumber,
                       const QString &strNameLink,
                       GVContactInfo &info);
+
+    bool findInfo (const QString &strNumber, GVContactInfo &info);
 
     void closeEvent (QCloseEvent *event);
 
