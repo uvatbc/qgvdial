@@ -115,7 +115,8 @@ OTHER_FILES  += winrsrc.rc                  \
                 ../qml/DigitButton.qml      \
                 ../qml/DialDisp.qml         \
                 ../qml/ComboBoxPhones.qml   \
-                ../qml/ActionButtons.qml
+                ../qml/ActionButtons.qml    \
+                readme.txt
 
 # In Linux and maemo, add the telepathy related sources and headers
 unix:!symbian {
@@ -218,4 +219,3 @@ unix:!symbian:!maemo5 {
     dbusservice.path = $$DATADIR/dbus-1/services
     dbusservice.files += ../build-files/qgvdial.Call.service
 }
-
