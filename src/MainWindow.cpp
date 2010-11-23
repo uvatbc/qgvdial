@@ -87,6 +87,11 @@ MainWindow::~MainWindow ()
 {
 }//MainWindow::~MainWindow
 
+/** Log information to console and to log file
+ * This function is invoked from the qDebug handler that is installed in main.
+ * @param strText Text to be logged
+ * @param level Log level
+ */
 void
 MainWindow::log (const QString &strText, int level /*= 10*/)
 {
@@ -111,6 +116,15 @@ MainWindow::log (const QString &strText, int level /*= 10*/)
     }
 }//MainWindow::log
 
+/** Status update function
+ * Use this function to update the status. The status is shown dependent on the
+ * platform. On Windows and Linux, this status is shown on the system tray as a
+ * notification message from our systray icon. On Maemo, it is shown as the
+ * notification banner.
+ * @param strText Text to show as the status
+ * @param timeout Timeout in milliseconds. 0 indicates a status that remains
+ *          until the next status is to be displayed.
+ */
 void
 MainWindow::setStatus(const QString &strText, int timeout /* = 0*/)
 {
@@ -138,6 +152,15 @@ MainWindow::setStatus(const QString &strText, int timeout /* = 0*/)
 #endif
 }//MainWindow::setStatus
 
+/** Invoked when the QtSingleApplication sends a message
+ * We have used a QtSignleApplication to ensure that there is only one instance
+ * of our program running in a specific user context. When the user attempts to
+ * fire up another instance of our application, the second instance communicates
+ * with the first and tells it to show the main window. the 2nd instance then
+ * self-terminates. The first instance gets the "show" command as a parameter to
+ * this SLOT.
+ * @param message The message passed by the other application.
+ */
 void
 MainWindow::messageReceived (const QString &message)
 {
@@ -146,6 +169,17 @@ MainWindow::messageReceived (const QString &message)
     }
 }//MainWindow::messageReceived
 
+/** Deferred initialization function
+ * This function does all of the initialization that was originally in the
+ * constructor. It was moved out of the constructor because it takes a long time
+ * to complete and because it was in the constructor, the GUI would not be shown
+ * until the init was done. Since the GUI does not need full init, I shifted it
+ * to this function and invoke this function function in a delay timer (100ms).
+ * That way the constructor returns quickly, the app begins processing events,
+ * the GUI is displayed and all is ready to show before init begins. Then as the
+ * init progresses, the init functions can output status messages documenting
+ * what the app is currently doing. User and programmer both happy!
+ */
 void
 MainWindow::init ()
 {
@@ -228,6 +262,10 @@ MainWindow::init ()
     }
 }//MainWindow::init
 
+/** Invoked to begin the login process.
+ * This function begins the process to login to the GV website. Its async
+ * completion routine is loginCompleted
+ */
 void
 MainWindow::doLogin ()
 {
@@ -266,6 +304,9 @@ MainWindow::doLogin ()
     }
 }//MainWindow::doLogin
 
+/** SLOT: Invoked when user triggers the login/logout action
+ * If it is a login action, the Login dialog box is shown.
+ */
 void
 MainWindow::on_action_Login_triggered ()
 {
@@ -596,6 +637,12 @@ MainWindow::deinitInboxWidget ()
     } while (0); // End cleanup block (not a loop)
 }//MainWindow::deinitInboxWidget
 
+/** Convert a number and a key to more info into a structure with all the info.
+ * @param strNumber The phone number
+ * @param strNameLink The key to the associated information. This parameter is
+ *          optional. If it is not present, then a dummy structure is created
+ *          that has only the number as valid information.
+ */
 bool
 MainWindow::getInfoFrom (const QString &strNumber,
                          const QString &strNameLink,

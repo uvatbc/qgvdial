@@ -109,6 +109,7 @@ private slots:
     //! Invoked by GVAccess when the voice mail download has completed
     void onVmailDownloaded (bool bOk, const QVariantList &arrParams);
 
+    //! Invoked by QML when the user selects a new phone method
     void onRegPhoneSelectionChange (int index);
 
 private:

@@ -5,6 +5,7 @@ Rectangle {
     id: wDisp
 
     signal sigSelChanged (int index)
+    signal sigNumChanged (string strNumber)
 
     // Expose the text edit as a property
     property alias txtEd: txtNum
@@ -68,6 +69,8 @@ Rectangle {
             }
 
             height: (parent * 4 / 5)
+
+            onTextChanged: wDisp.sigNumChanged(txtNum.text);
         }// TextEdit
     }// Flow
 }// Rectangle
