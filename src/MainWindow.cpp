@@ -707,7 +707,7 @@ MainWindow::findInfo (const QString &strNumber, GVContactInfo &info)
 
     QString strTrunc = strNumber;
     GVAccess::simplify_number (strTrunc, false);
-    strTrunc.remove (' ');
+    strTrunc.remove(' ').remove('+');
 
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     if (!dbMain.getContactFromNumber (strNumber, info)) {
@@ -900,6 +900,11 @@ MainWindow::onSendTextWithoutData (const QStringList &arrNumbers)
         entry.sNumber = info.arrPhones[info.selected];
 
         dlgSMS.addSMSEntry (entry);
+    }
+
+    if (dlgSMS.isHidden ())
+    {
+        dlgSMS.show ();
     }
 }//MainWindow::onSendTextWithoutData
 

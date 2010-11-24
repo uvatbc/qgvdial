@@ -15,12 +15,19 @@ void
 QGVDbusServerHelper::emitText (const QStringList &arrNumbers,
                                const QString     &strData)
 {
+    QString msg = QString("Send text \"%1\" to (%2)")
+                  .arg (strData)
+                  .arg (arrNumbers.join (", "));
+    qDebug () << msg;
     emit sendText (arrNumbers, strData);
 }//QGVDbusServerHelper::emitText
 
 void
 QGVDbusServerHelper::emitTextWithoutData (const QStringList &arrNumbers)
 {
+    QString msg = QString("Send text without data to (%1)")
+                  .arg (arrNumbers.join (", "));
+    qDebug () << msg;
     emit sendTextWithoutData (arrNumbers);
 }//QGVDbusServerHelper::emitTextWithoutData
 
