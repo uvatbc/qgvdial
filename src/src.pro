@@ -196,6 +196,7 @@ maemo5 {
 
     dbusservice.path = $$DATADIR/dbus-1/services
     dbusservice.files += ../build-files/qgvdial.Call.service
+    dbusservice.files += ../build-files/qgvdial.Text.service
 }
 
 # Installation for Linux
@@ -218,4 +219,5 @@ unix:!symbian:!maemo5 {
 
     dbusservice.path = $$DATADIR/dbus-1/services
     dbusservice.files += ../build-files/qgvdial.Call.service
+    dbusservice.files += ../build-files/qgvdial.Text.service
 }
