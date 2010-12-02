@@ -1,9 +1,12 @@
 <!DOCTYPE RCC><RCC version="1.0">
  <qresource>
      <file alias="Google.png">../icons/Google.png</file>
-     <file alias="Phone.png">../icons/Phone.png</file>
+     <file alias="Phone.png">../icons/telephone.png</file>
      <file alias="Skype.png">../icons/Skype.png</file>
-     <file alias="SMS.png">../icons/SMS.png</file>
+     <file alias="SMS.png">../icons/email_send.png</file>
+     <file alias="users.png">../icons/users.png</file>
+     <file alias="note.png">../icons/note.png</file>
+     <file alias="left_arrow.png">../icons/left_arrow.png</file>
      <file alias="dialpad_maemo.qss">../src/stylesheets/dialpad_maemo.qss</file>
      <file alias="dialpad_desktop.qss">../src/stylesheets/dialpad_desktop.qss</file>
      <file alias="MainView_p.qml">../qml/MainView_p.qml</file>
