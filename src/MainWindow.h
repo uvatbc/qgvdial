@@ -164,6 +164,7 @@ private:
     QMenu           menuFile;
     QAction         actLogin;
     QAction         actExit;
+    QAction         actViewWeb;
 
     //! Are we logged in?
     bool            bLoggedIn;

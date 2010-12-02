@@ -30,6 +30,7 @@ MainWindow::MainWindow (QWidget *parent)
 , menuFile ("&File", this)
 , actLogin ("Login...", this)
 , actExit ("Exit", this)
+, actViewWeb ("Show web view", this)
 , bLoggedIn (false)
 , modelRegNumber (this)
 , indRegPhone (0)
@@ -237,14 +238,19 @@ MainWindow::init ()
 //    ui->edNumber->setValidator (new PhoneNumberValidator (ui->edNumber));
     actLogin.setShortcut (QKeySequence(Qt::CTRL + Qt::Key_L));
     actExit.setShortcut (QKeySequence(Qt::CTRL + Qt::Key_Q));
+    actViewWeb.setShortcut (QKeySequence (Qt::CTRL + Qt::SHIFT + Qt::Key_W));
     menuFile.addAction (&actLogin);
     menuFile.addAction (&actExit);
+    menuFile.addAction (&actViewWeb);
     this->addAction (&actLogin);
     this->addAction (&actExit);
+    this->addAction (&actViewWeb);
     QObject::connect (&actLogin, SIGNAL (triggered()),
                        this    , SLOT   (on_action_Login_triggered()));
     QObject::connect (&actExit, SIGNAL (triggered()),
                        this   , SLOT   (on_actionE_xit_triggered()));
+    QObject::connect (&actViewWeb, SIGNAL (triggered ()),
+                       this      , SLOT (on_actionWeb_view_triggered ()));
 
     // If the cache has the username and password, begin login
     if (dbMain.getUserPass (strUser, strPass))
