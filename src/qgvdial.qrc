@@ -9,6 +9,7 @@
      <file alias="left_arrow.png">../icons/left_arrow.png</file>
      <file alias="dialpad_maemo.qss">../src/stylesheets/dialpad_maemo.qss</file>
      <file alias="dialpad_desktop.qss">../src/stylesheets/dialpad_desktop.qss</file>
+     <file alias="MainView.qml">../qml/MainView.qml</file>
      <file alias="MainView_p.qml">../qml/MainView_p.qml</file>
      <file alias="MainView_l.qml">../qml/MainView_l.qml</file>
      <file alias="MyButton.qml">../qml/MyButton.qml</file>

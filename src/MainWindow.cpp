@@ -406,28 +406,26 @@ MainWindow::orientationChanged ()
 #endif
 
     QDeclarativeContext *ctx = this->rootContext();
-    ctx->setContextProperty ("myModel", &modelRegNumber);
-    onRegPhoneSelectionChange (indRegPhone);
 
-    if (bLandscape) {
-        this->setSource (QUrl ("qrc:/MainView_l.qml"));
-    } else {
-        this->setSource (QUrl ("qrc:/MainView_p.qml"));
+    if (this->source().toString().isEmpty ()) {
+        ctx->setContextProperty ("myModel", &modelRegNumber);
+        onRegPhoneSelectionChange (indRegPhone);
+        this->setSource (QUrl ("qrc:/MainView.qml"));
+        this->setResizeMode (QDeclarativeView::SizeRootObjectToView);
+
+        // Call or text a number
+        QGraphicsObject *gObj = this->rootObject();
+        QObject::connect (gObj, SIGNAL (sigCall (QString)),
+                          this, SLOT   (dialNow (QString)));
+        QObject::connect (gObj, SIGNAL (sigText (QString)),
+                          this, SLOT   (textANumber (QString)));
+        QObject::connect (gObj, SIGNAL (sigContacts ()),
+                          this, SLOT   (on_btnContacts_clicked ()));
+        QObject::connect (gObj, SIGNAL (sigInbox ()),
+                          this, SLOT   (on_btnHistory_clicked ()));
+        QObject::connect (gObj, SIGNAL (sigSelChanged (int)),
+                          this, SLOT   (onRegPhoneSelectionChange (int)));
     }
-    this->setResizeMode (QDeclarativeView::SizeRootObjectToView);
-
-    // Call or text a number
-    QGraphicsObject *gObj = this->rootObject();
-    QObject::connect (gObj, SIGNAL (sigCall (QString)),
-                      this, SLOT   (dialNow (QString)));
-    QObject::connect (gObj, SIGNAL (sigText (QString)),
-                      this, SLOT   (textANumber (QString)));
-    QObject::connect (gObj, SIGNAL (sigContacts ()),
-                      this, SLOT   (on_btnContacts_clicked ()));
-    QObject::connect (gObj, SIGNAL (sigInbox ()),
-                      this, SLOT   (on_btnHistory_clicked ()));
-    QObject::connect (gObj, SIGNAL (sigSelChanged (int)),
-                      this, SLOT   (onRegPhoneSelectionChange (int)));
 }//MainWindow::orientationChanged
 
 void

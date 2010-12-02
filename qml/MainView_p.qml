@@ -14,6 +14,7 @@ Rectangle {
     signal sigNumChanged (string strNumber)
 
     property bool landscape: window.width > window.height
+    property variant rotationDelta: landscape? -90 : 0
 
     // initial state is portrait
     property real baseWidth: landscape ? window.height : window.width
@@ -27,7 +28,7 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         anchors.horizontalCenter: parent.horizontalCenter
 
-        rotation: (landscape?-90:0)
+        rotation: rotationDelta
 
         Column {
             anchors.fill: parent

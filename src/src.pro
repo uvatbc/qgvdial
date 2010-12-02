@@ -116,7 +116,8 @@ OTHER_FILES  += winrsrc.rc                  \
                 ../qml/DialDisp.qml         \
                 ../qml/ComboBoxPhones.qml   \
                 ../qml/ActionButtons.qml    \
-                readme.txt
+                readme.txt \
+    ../qml/MainView.qml
 
 # In Linux and maemo, add the telepathy related sources and headers
 unix:!symbian {
