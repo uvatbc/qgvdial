@@ -89,6 +89,7 @@
     <ClCompile Include="OsDependent.cpp" />
     <ClCompile Include="PhoneNumberValidator.cpp" />
     <ClCompile Include="QGVDbusServer.cpp" />
+    <ClCompile Include="RegNumberModel.cpp" />
     <ClCompile Include="Singletons.cpp" />
     <ClCompile Include="SkypeClient.cpp" />
     <ClCompile Include="SkypeClientFactory.cpp" />
@@ -132,6 +133,7 @@
     <ClInclude Include="OsDependent.h" />
     <ClInclude Include="PhoneNumberValidator.h" />
     <ClInclude Include="QGVDbusServer.h" />
+    <ClInclude Include="RegNumberModel.h" />
     <ClInclude Include="Singletons.h" />
     <ClInclude Include="SkypeClient.h" />
     <ClInclude Include="SkypeClientFactory.h" />
@@ -147,10 +149,21 @@
     <ClInclude Include="ui_LoginDialog.h" />
     <ClInclude Include="ui_MainWindow.h" />
     <ClInclude Include="ui_VMailDialog.h" />
+    <ClInclude Include="ui_WebWidget.h" />
     <ClInclude Include="VMailDialog.h" />
     <ClInclude Include="WebWidget.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\qml\ActionButtons.qml" />
+    <None Include="..\qml\ComboBoxPhones.qml" />
+    <None Include="..\qml\DialDisp.qml" />
+    <None Include="..\qml\DigitButton.qml" />
+    <None Include="..\qml\helper.js" />
+    <None Include="..\qml\Keypad.qml" />
+    <None Include="..\qml\MainView.qml" />
+    <None Include="..\qml\MainView_l.qml" />
+    <None Include="..\qml\MainView_p.qml" />
+    <None Include="..\qml\MyButton.qml" />
     <None Include="ContactsWidget.ui" />
     <None Include="InboxWidget.ui" />
     <None Include="LoginDialog.ui" />

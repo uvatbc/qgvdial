@@ -1238,6 +1238,8 @@ GVWebPage::getSystemProxies (QNetworkProxy &http, QNetworkProxy &https)
         QNetworkProxyQuery(QUrl("http://www.google.com")));
         http = netProxies[0];
         if (QNetworkProxy::NoProxy != http.type ()) {
+            qDebug () << "Got proxy: host = " << http.hostName ()
+                      << ", port = " << http.port ();
             break;
         }
 
@@ -1272,6 +1274,8 @@ GVWebPage::getSystemProxies (QNetworkProxy &http, QNetworkProxy &https)
         QNetworkProxyQuery(QUrl("https://www.google.com")));
         https = netProxies[0];
         if (QNetworkProxy::NoProxy != https.type ()) {
+            qDebug () << "Got proxy: host = " << https.hostName ()
+                      << ", port = " << https.port ();
             break;
         }
 
