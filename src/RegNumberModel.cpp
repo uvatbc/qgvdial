@@ -85,7 +85,7 @@ RegNumberModel::getAt (int index, RegNumData &data) const
 {
     bool rv = false;
     do { // Begin cleanup block (not a loop)
-        if ((index < 0) || (index > rowCount ())) {
+        if ((index < 0) || (index >= rowCount ())) {
             qWarning ("Requested an index out of range");
             break;
         }

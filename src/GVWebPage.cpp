@@ -18,7 +18,6 @@ GVWebPage::GVWebPage(QObject *parent/* = NULL*/)
     QNetworkProxy http, https;
     getSystemProxies (http, https);
     QNetworkProxy::setApplicationProxy (http);
-    QNetworkProxy::setApplicationProxy (https);
 
     garbageTimer.setSingleShot (true);
     garbageTimer.setInterval (1000 * 60 * 2);   // 2 minutes
@@ -1253,6 +1252,9 @@ GVWebPage::getSystemProxies (QNetworkProxy &http, QNetworkProxy &https)
         if (-1 != colon) {
             QString strHost = strHttpProxy.mid (0, colon);
             QString strPort = strHttpProxy.mid (colon);
+
+            strHost.remove ("http://").remove ("https://");
+
             strPort.remove (':').remove ('/');
             int port = strPort.toInt ();
 
@@ -1284,6 +1286,9 @@ GVWebPage::getSystemProxies (QNetworkProxy &http, QNetworkProxy &https)
         if (-1 != colon) {
             QString strHost = strHttpProxy.mid (0, colon);
             QString strPort = strHttpProxy.mid (colon);
+
+            strHost.remove ("http://").remove ("https://");
+
             strPort.remove (':').remove ('/');
             int port = strPort.toInt ();
 
