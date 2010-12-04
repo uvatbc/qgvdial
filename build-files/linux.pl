@@ -43,6 +43,7 @@ system($cmd);
 
 # Add a post install file to add the executable bit after installation on the device
 system("mv qgvdial-$qver/build-files/postinst.linux qgvdial-$qver/debian/postinst");
+system("mv qgvdial-$qver/build-files/prerm.linux qgvdial-$qver/debian/prerm");
 # Fix the control file
 system("mv qgvdial-$qver/build-files/control.linux qgvdial-$qver/debian/control");
 # Fix the dbus service file name
