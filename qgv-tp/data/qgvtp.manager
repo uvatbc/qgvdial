@@ -1,0 +1,8 @@
+[ConnectionManager]
+Name=qgvtp
+BusName=org.freedesktop.Telepathy.ConnectionManager.qgvtp
+ObjectPath=/org/freedesktop/Telepathy/ConnectionManager/qgvtp
+
+[Protocol qgv]
+param-account=s
+param-password=s

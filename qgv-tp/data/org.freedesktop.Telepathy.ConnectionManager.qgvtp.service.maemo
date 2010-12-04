@@ -1,0 +1,3 @@
+[D-BUS Service]
+Name=org.freedesktop.Telepathy.ConnectionManager.qgvtp
+Exec=/opt/qgvdial/bin/qgv-tp
