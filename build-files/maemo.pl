@@ -58,6 +58,7 @@ system("mv qgvdial-$qver/build-files/control.maemo qgvdial-$qver/debian/control"
 # Fix the dbus service file name
 system("mv qgvdial-$qver/build-files/qgvdial.Call.service.maemo qgvdial-$qver/build-files/qgvdial.Call.service");
 system("mv qgvdial-$qver/build-files/qgvdial.Text.service.maemo qgvdial-$qver/build-files/qgvdial.Text.service");
+system("mv qgvdial-$qver/build-files/org.freedesktop.Telepathy.ConnectionManager.qgvtp.service.maemo qgvdial-$qver/build-files/org.freedesktop.Telepathy.ConnectionManager.qgvtp.service");
 
 # Execute the rest of the build command
 $cmd = "cd qgvdial-$qver && $asroot $mad dpkg-buildpackage && $mad remote -r org.maemo.qgvdial send ../qgvdial_$qver-1_$machine.deb && $mad remote -r org.maemo.qgvdial install qgvdial_$qver-1_$machine.deb";
