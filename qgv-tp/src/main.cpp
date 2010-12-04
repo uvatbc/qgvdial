@@ -29,13 +29,8 @@ Based on Telepathy-SNOM with copyright notice below.
 #include <iostream>
 #include <fstream>
 
-#include <QtCore/QCoreApplication>
-#include <QtCore/QDebug>
-
-#include <QtDBus/QDBusConnection>
-#include <QtDBus/QDBusMetaType>
-#include <QtDBus/QDBusInterface>
-#include <QDateTime>
+#include <QtCore>
+#include <QtDBus>
 
 #include "names.h"
 #include "connectionmanager.h"
@@ -50,31 +45,42 @@ using namespace std;
 
 ofstream logfile;
 
-void MyOutputHandler(QtMsgType type, const char *msg) {
+void dbgHandler(QtMsgType type, const char *msg)
+{
+    QDateTime dt = QDateTime::currentDateTime ();
+    int level = 0;
+
     switch (type) {
         case QtDebugMsg:
-            logfile << QTime::currentTime().toString().toAscii().data() << " Debug: " << msg << "\n";
-            break;
-        case QtCriticalMsg:
-            logfile << QTime::currentTime().toString().toAscii().data() << " Critical: " << msg << "\n";
+            level = 3;
             break;
         case QtWarningMsg:
-            logfile << QTime::currentTime().toString().toAscii().data() << " Warning: " << msg << "\n";
+            level = 2;
+            break;
+        case QtCriticalMsg:
+            level = 1;
             break;
         case QtFatalMsg:
-            logfile << QTime::currentTime().toString().toAscii().data() <<  " Fatal: " << msg << "\n";
-            abort();
+            level = 0;
+            break;
+    }
+
+    QString strLog = QString("%1 : %2 : %3")
+                     .arg(dt.toString ("yyyy-MM-dd hh:mm:ss.zzz"))
+                     .arg(level)
+                     .arg(msg);
+    logfile << strLog.toAscii().data() << endl;
+    cout << strLog.toAscii().data() << endl;
+
+    if (QtFatalMsg == type) {
+        abort ();
     }
 }
 
 int main(int argc, char ** argv)
 {
-
-//    logfile.open("/var/log/logfile.txt", ios::app);
-//    #ifndef QT_NO_DEBUG_OUTPUT
-//    qInstallMsgHandler(MyOutputHandler);
-//    #endif
-
+    logfile.open("/var/log/qgv-tp.log", ios::app);
+    qInstallMsgHandler(dbgHandler);
 
     QCoreApplication app(argc, argv);
 
@@ -101,23 +107,24 @@ int main(int argc, char ** argv)
 
         // register CM on D-BUS:
         if (connection.registerService(cm_service_name)){
-            qDebug(qPrintable(QObject::tr("Service %1 registered with session bus.").
-                       arg(cm_service_name)));
+            qDebug(qPrintable(QObject::tr("Service %1 registered with session bus.")
+                        .arg(cm_service_name)));
         }
         else{
-            qDebug(qPrintable(QObject::tr("Unable to register service %1 with session bus.").
-                       arg(cm_service_name)));
+            qDebug(qPrintable(QObject::tr("Unable to register service %1 with session bus.")
+                        .arg(cm_service_name)));
         }
 
     }
 
     ConnectionManager connection_mgr(&app);
     if (!connection.registerObject(cm_object_path,&connection_mgr)){
-        qDebug(qPrintable(QObject::tr("Unable to register VICaR connection manager at path %1 with session bus.").
-                   arg(cm_object_path)));
+        qDebug(qPrintable(QObject::tr("Unable to register VICaR connection manager at path %1 with session bus.")
+                    .arg(cm_object_path)));
     }
 
     qDebug(qPrintable(QObject::tr("Entering main loop.")));    
-//    logfile.close();
-    return app.exec();
-}
+    int rv = app.exec();
+    logfile.close();
+    return rv;
+}//main
