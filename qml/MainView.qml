@@ -17,8 +17,8 @@ Rectangle {
         opacity: (landscape?1:0)
         anchors.fill: parent
 
-        onSigCall: main.sigCall()
-        onSigText: main.sigText()
+        onSigCall: main.sigCall(strNumber)
+        onSigText: main.sigText(strNumber)
         onSigContacts: main.sigContacts()
         onSigInbox: main.sigInbox()
         onSigSelChanged: main.sigSelChanged(index)
@@ -29,8 +29,8 @@ Rectangle {
         opacity: (landscape?0:1)
         anchors.fill: parent
 
-        onSigCall: main.sigCall()
-        onSigText: main.sigText()
+        onSigCall: main.sigCall(strNumber)
+        onSigText: main.sigText(strNumber)
         onSigContacts: main.sigContacts()
         onSigInbox: main.sigInbox()
         onSigSelChanged: main.sigSelChanged(index)
