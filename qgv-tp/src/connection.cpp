@@ -418,9 +418,9 @@ QDBusObjectPath Connection::processChannel(const QVariantMap &request){
 
     QDBusObjectPath channel_path;
 
-    if (!request.contains(TP_PATH_DOT ".Channel.TargetID")){
+    if (!request.contains(TP_PATH_DOT ".Channel.TargetID")) {
         sendErrorReply(TP_PATH_DOT ".Error.InvalidArgument",
-                       "qgvtp - Invalid request. TargetID (Phone Number) not included.");
+            "qgvtp - Invalid request. TargetID (Phone Number) not included.");
         return channel_path;
     }
 
@@ -440,12 +440,10 @@ QDBusObjectPath Connection::processChannel(const QVariantMap &request){
     /*
         Send an error reply to Tp Client (Mission Control) to force it to close the active channel.
         Once it recieves the reply, the client does not bother what we return.
-
      */
 
     sendErrorReply(TP_PATH_DOT ".Error.NotAvailable",
-                   "qgvtp - Creating a new channel to "+strNumber+" via qgvdial.");
-
+        "qgvtp - Creating a new channel to " + strNumber + " via qgvdial.");
 
     // This is where we call QGVDIAL.
     QDBusInterface iface("org.QGVDial.CallServer",
@@ -458,15 +456,6 @@ QDBusObjectPath Connection::processChannel(const QVariantMap &request){
     }
 
     iface.call("Call", strNumber);
-
-/*
-    //Initiate a new call to CC/Google Out/Skype-out number by requesting a new channel with Ring CM.
-    VicarCallRouterProxy *callRouter = new VicarCallRouterProxy(APPLICATION_DBUS_SERVICE,APPLICATION_DBUS_PATH,QDBusConnection::sessionBus(),this);
-
-    callRouter->callInternationalNumber(strNumber);
-
-    qDebug() << "qgvtp: Call is processed.";
-*/
 
     return channel_path;
 }

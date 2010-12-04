@@ -108,10 +108,6 @@ QString ConnectionManager::RequestConnection(const QString & proto,
     }
 
 
-    QString imsi;
-    QString privacy;
-    QString smsServiceCenter;
-    uint smsValidityPeriod(0);
     QString account;
     QString password;
 

@@ -827,6 +827,11 @@ MainWindow::dialNow (const QString &strTarget)
             break;
         }
 
+        if (strTarget.isEmpty ()) {
+            setStatus ("Cannot dial empty number");
+            break;
+        }
+
         GVAccess &webPage = Singletons::getRef().getGVAccess ();
         QVariantList l;
         l += strTarget;     // The destination number is common between the two
@@ -891,6 +896,11 @@ void
 MainWindow::onSendTextWithoutData (const QStringList &arrNumbers)
 {
     foreach (QString strNumber, arrNumbers) {
+        if (strNumber.isEmpty ()) {
+            qWarning ("Cannot text empty number");
+            continue;
+        }
+
         GVContactInfo info;
 
         // Get info about this number
@@ -1072,6 +1082,11 @@ MainWindow::sendSMS (const QStringList &arrNumbers, const QString &strText)
 
     for (int i = 0; i < arrNumbers.size (); i++)
     {
+        if (arrNumbers[i].isEmpty ()) {
+            qWarning ("Cannot text empty number");
+            continue;
+        }
+
         QVariantList l;
         l += arrNumbers[i];
         l += strText;

@@ -33,8 +33,7 @@ Based on Telepathy-SNOM with copyright notice below.
 #include "connectioninterfacerequeststypes.h"
 #include "connectioninterfacecapabilitiestypes.h"
 
-#include <QtDBus/QDBusContext>
-#include <QtDBus/QtDBus>
+#include <QtDBus>
 
 class ConnectionPrivate;
 

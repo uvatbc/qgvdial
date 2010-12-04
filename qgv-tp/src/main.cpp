@@ -79,10 +79,11 @@ void dbgHandler(QtMsgType type, const char *msg)
 
 int main(int argc, char ** argv)
 {
-    logfile.open("/var/log/qgv-tp.log", ios::app);
-    qInstallMsgHandler(dbgHandler);
-
     QCoreApplication app(argc, argv);
+    QString msg;
+
+    logfile.open("/var/log/qgvtp.log", ios::app);
+    qInstallMsgHandler(dbgHandler);
 
     // register types:
     qDBusRegisterMetaType<org::freedesktop::Telepathy::ParameterDefinition>();
@@ -102,28 +103,27 @@ int main(int argc, char ** argv)
 
     QDBusConnection connection = QDBusConnection::sessionBus();
 
-    if (!connection.interface()->isServiceRegistered(cm_service_name))
-    {
-
+    if (!connection.interface()->isServiceRegistered(cm_service_name)) {
         // register CM on D-BUS:
-        if (connection.registerService(cm_service_name)){
-            qDebug(qPrintable(QObject::tr("Service %1 registered with session bus.")
-                        .arg(cm_service_name)));
+        if (connection.registerService(cm_service_name)) {
+            msg = QString ("Service %1 registered with session bus.")
+                    .arg(cm_service_name);
+            qDebug() << msg;
+        } else {
+            msg = QString ("Unable to register service %1 with session bus.")
+                    .arg(cm_service_name);
+            qDebug() << msg;
         }
-        else{
-            qDebug(qPrintable(QObject::tr("Unable to register service %1 with session bus.")
-                        .arg(cm_service_name)));
-        }
-
     }
 
     ConnectionManager connection_mgr(&app);
-    if (!connection.registerObject(cm_object_path,&connection_mgr)){
-        qDebug(qPrintable(QObject::tr("Unable to register VICaR connection manager at path %1 with session bus.")
-                    .arg(cm_object_path)));
+    if (!connection.registerObject(cm_object_path,&connection_mgr)) {
+        msg = QString ("Unable to register VICaR connection manager at path %1 with session bus.")
+                .arg(cm_object_path);
+        qDebug() << msg;
     }
 
-    qDebug(qPrintable(QObject::tr("Entering main loop.")));    
+    qDebug("Entering main loop.");    
     int rv = app.exec();
     logfile.close();
     return rv;
