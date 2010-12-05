@@ -439,15 +439,10 @@ Connection::processChannel(const QVariantMap &request)
         return channel_path;
     }
 
-    qDebug ("***** Begin key enumeration *****");
-    QStringList keyList = request.keys ();
-    foreach (QString strKey, keyList) {
-        qDebug () << strKey;
-    }
-    qDebug ("***** End key enumeration *****");
-
-    if (request.find (TP_CHANNEL_TYPE) == request.end ()) {
-        strType = request[TP_CHANNEL_TYPE].toString();
+    qDebug (TP_CHANNEL_TYPE);
+    if (request.contains (TP_CHANNEL_TYPE)) {
+        strType = request.value (TP_CHANNEL_TYPE).toString();
+        qDebug() << "Found channel type" << strType;
     }
 
     /*
@@ -473,9 +468,8 @@ Connection::processChannel(const QVariantMap &request)
     } else if (strType == TP_TEXTMEDIA) {
         iface.call("Text", strNumber);
     } else {
-        sendErrorReply(TP_PATH_DOT ".Error.NotAvailable",
-            "qgvtp - Invalid channel type requested:" + strType);
-        qDebug ("Invalid channel type requested");
+        qDebug () << "Requested channel type = " << strType
+                  << "does not require me to call qgvdial";
     }
 
     return channel_path;
