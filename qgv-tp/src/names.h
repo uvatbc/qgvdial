@@ -53,4 +53,9 @@ Based on Telepathy-SNOM with copyright notice below.
 #define APPLICATION_DBUS_INTERFACE      "org.maemo." TP_NAME
 #define APPLICATION_DBUS_SERVICE        "org.maemo." TP_NAME
 
+#define TP_CHANNEL          TP_PATH_DOT ".Channel"
+#define TP_CHANNEL_PATH     TP_PATH_SLASH "/Channel"
+
+#define TP_STREAMEDMEDIA    TP_CHANNEL ".Type.StreamedMedia"
+
 #endif //_QGVTP_NAMES_H_

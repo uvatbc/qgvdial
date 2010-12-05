@@ -82,7 +82,7 @@ int main(int argc, char ** argv)
     QCoreApplication app(argc, argv);
     QString msg;
 
-    logfile.open("/var/log/qgvtp.log", ios::app);
+    logfile.open ("/var/log/qgv-tp.log", ios::app);
     qInstallMsgHandler(dbgHandler);
 
     // register types:

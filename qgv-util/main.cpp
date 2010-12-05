@@ -12,32 +12,71 @@
 #include <QtCore>
 #include <QtDBus>
 
-int main(int argc, char *argv[])
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+ofstream logfile;
+
+void dbgHandler(QtMsgType type, const char *msg)
 {
+    QDateTime dt = QDateTime::currentDateTime ();
+    int level = 0;
+
+    switch (type) {
+        case QtDebugMsg:
+            level = 3;
+            break;
+        case QtWarningMsg:
+            level = 2;
+            break;
+        case QtCriticalMsg:
+            level = 1;
+            break;
+        case QtFatalMsg:
+            level = 0;
+            break;
+    }
+
+    QString strLog = QString("%1 : %2 : %3")
+                     .arg(dt.toString ("yyyy-MM-dd hh:mm:ss.zzz"))
+                     .arg(level)
+                     .arg(msg);
+    logfile << strLog.toAscii().data() << endl;
+    cout << strLog.toAscii().data() << endl;
+
+    if (QtFatalMsg == type) {
+        abort ();
+    }
+}
+
+int
+main(int argc, char *argv[])
+{
+    logfile.open("~/qgv-util.log", ios::app);
+    qInstallMsgHandler(dbgHandler);
+
     qDBusRegisterMetaType<org::freedesktop::Telepathy::SimplePresence>();
     //qDBusRegisterMetaType<org::maemo::vicar::Profile>();
     //qDBusRegisterMetaType<org::maemo::vicar::ProfileList>();
 
     TelepathyUtility *tpUtility = new TelepathyUtility();
 
-    if (argc > 1 && argv[1]){
+    if (argc > 1 && argv[1]) {
         QString instruction = QString(argv[1]);
-        if (instruction == "INSTALL"){
+        if (instruction == "INSTALL") {
             //Check if Account already exists
-            if (!tpUtility->accountExists()){
+            if (!tpUtility->accountExists()) {
                 qDebug() << "qgv-tp account not found. Creating ..";
                 bool result = tpUtility->createAccount();
                 if (!result) exit(1);
+            } else {
+                qDebug() << "qgv-tp account found.";
             }
-            else{
-                qDebug() << "qgv-qgv account found.";
-            }
-        }
-        else if (instruction == "REMOVE"){
+        } else if (instruction == "REMOVE") {
             bool result = tpUtility->deleteAccount();
             if (!result) exit(2);
-        }
-        else if (instruction == "ACCOUNTSTATUS"){
+        } else if (instruction == "ACCOUNTSTATUS") {
             QString status = tpUtility->getAccountStatus();
             qDebug() << "Account Status is "<< status;
         }
@@ -45,5 +84,7 @@ int main(int argc, char *argv[])
 
     delete (tpUtility);
     tpUtility = 0;
-}
 
+    logfile.close();
+    return 0;
+}

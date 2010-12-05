@@ -437,6 +437,13 @@ QDBusObjectPath Connection::processChannel(const QVariantMap &request){
         return channel_path;
     }
 
+    qDebug ("***** Begin key enumeration *****");
+    QStringList keyList = request.keys ();
+    foreach (QString strKey, keyList) {
+        qDebug () << strKey;
+    }
+    qDebug ("***** End key enumeration *****");
+
     /*
         Send an error reply to Tp Client (Mission Control) to force it to close the active channel.
         Once it recieves the reply, the client does not bother what we return.

@@ -57,20 +57,20 @@ QList<QDBusObjectPath> TelepathyUtility::getAllAccounts()
     return (objPathList);
 }
 
-//Check if Vicar telepathy account exists
+//Check if qgvtp telepathy account exists
 bool TelepathyUtility::accountExists()
 {
-    bool vicarAccountExists = false;
+    bool qgvtpAccountExists = false;
     QList<QDBusObjectPath> accountsList = this->getAllAccounts();
     QDBusObjectPath account;
     foreach (account,accountsList){
         if (account.path().contains("qgvtp/qgv/qgvtp")){
-            vicarAccountExists = true;
+            qgvtpAccountExists = true;
             break;
         }
     }
 
-    return vicarAccountExists;
+    return qgvtpAccountExists;
 }
 
 //Get telepathy account status
@@ -105,7 +105,7 @@ QString TelepathyUtility::getAccountStatus()
     return status;
 }
 
-//Create Vicar telepathy account (used installation)
+// Create qgvtp telepathy account (used installation)
 bool TelepathyUtility::createAccount()
 {
     AccountManagerProxy *amProxy = new AccountManagerProxy(AM_SERVICE,AM_OBJ_PATH,QDBusConnection::sessionBus(),this);
@@ -125,10 +125,10 @@ bool TelepathyUtility::createAccount()
     presence.statusMessage = "Available";
 
     QMap<QString,QVariant> accountPropertiesMap;
-    accountPropertiesMap.insert("org.freedesktop.Telepathy.Account.AutomaticPresence",QVariant::fromValue(presence));
+//    accountPropertiesMap.insert("org.freedesktop.Telepathy.Account.AutomaticPresence",QVariant::fromValue(presence));
     accountPropertiesMap.insert("org.freedesktop.Telepathy.Account.Enabled",true);
     accountPropertiesMap.insert("org.freedesktop.Telepathy.Account.ConnectAutomatically",true);
-    accountPropertiesMap.insert("org.freedesktop.Telepathy.Account.RequestedPresence",QVariant::fromValue(presence));
+//    accountPropertiesMap.insert("org.freedesktop.Telepathy.Account.RequestedPresence",QVariant::fromValue(presence));
     accountPropertiesMap.insert("com.nokia.Account.Interface.Compat.Profile","qgvtp");
 
     QStringList valuesList;
@@ -153,14 +153,14 @@ bool TelepathyUtility::createAccount()
         }
     }
     else{
-        qDebug() << "Error creating VICaR telepathy account " << reply.error();
+        qDebug() << "Error creating qgvtp telepathy account " << reply.error();
         return false;
     }
 
     return true;
 }
 
-//Delete Vicar telepathy account (used during uninstallation)
+//Delete qgvtp telepathy account (used during uninstallation)
 bool TelepathyUtility::deleteAccount()
 {
     QList<QDBusObjectPath> accountsList = this->getAllAccounts();
