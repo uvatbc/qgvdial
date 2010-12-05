@@ -414,9 +414,11 @@ bool Connection::EnsureChannel(const QVariantMap &request,
     return true;
 }
 
-QDBusObjectPath Connection::processChannel(const QVariantMap &request){
-
+QDBusObjectPath
+Connection::processChannel(const QVariantMap &request)
+{
     QDBusObjectPath channel_path;
+    QString strType;
 
     if (!request.contains(TP_PATH_DOT ".Channel.TargetID")) {
         sendErrorReply(TP_PATH_DOT ".Error.InvalidArgument",
@@ -444,6 +446,10 @@ QDBusObjectPath Connection::processChannel(const QVariantMap &request){
     }
     qDebug ("***** End key enumeration *****");
 
+    if (request.find (TP_CHANNEL_TYPE) == request.end ()) {
+        strType = request[TP_CHANNEL_TYPE].toString();
+    }
+
     /*
         Send an error reply to Tp Client (Mission Control) to force it to close the active channel.
         Once it recieves the reply, the client does not bother what we return.
@@ -462,7 +468,15 @@ QDBusObjectPath Connection::processChannel(const QVariantMap &request){
         return channel_path;
     }
 
-    iface.call("Call", strNumber);
+    if (strType == TP_STREAMEDMEDIA) {
+        iface.call("Call", strNumber);
+    } else if (strType == TP_TEXTMEDIA) {
+        iface.call("Text", strNumber);
+    } else {
+        sendErrorReply(TP_PATH_DOT ".Error.NotAvailable",
+            "qgvtp - Invalid channel type requested:" + strType);
+        qDebug ("Invalid channel type requested");
+    }
 
     return channel_path;
 }
@@ -477,7 +491,7 @@ org::freedesktop::Telepathy::ContactCapabilitiesList Connection::GetCapabilities
 }
 
 
-org::freedesktop::Telepathy::CapabilityPairList Connection::AdvertiseCapabilities(org::freedesktop::Telepathy::CapabilityPairList Add, const QStringList &Remove){
+org::freedesktop::Telepathy::CapabilityPairList Connection::AdvertiseCapabilities(org::freedesktop::Telepathy::CapabilityPairList Add, const QStringList &Remove) {
     Q_UNUSED(Add);
     Q_UNUSED(Remove);
     org::freedesktop::Telepathy::CapabilityPairList capabilities;
