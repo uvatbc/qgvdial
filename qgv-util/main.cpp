@@ -18,6 +18,14 @@ using namespace std;
 
 ofstream logfile;
 
+void
+open_logfile ()
+{
+    if (!logfile.is_open ()) {
+        logfile.open("/home/user/.qgvdial/qgv-util.log", ios::app);
+    }
+}
+
 void dbgHandler(QtMsgType type, const char *msg)
 {
     QDateTime dt = QDateTime::currentDateTime ();
@@ -42,6 +50,7 @@ void dbgHandler(QtMsgType type, const char *msg)
                      .arg(dt.toString ("yyyy-MM-dd hh:mm:ss.zzz"))
                      .arg(level)
                      .arg(msg);
+    open_logfile ();
     logfile << strLog.toAscii().data() << endl;
     cout << strLog.toAscii().data() << endl;
 
@@ -53,7 +62,7 @@ void dbgHandler(QtMsgType type, const char *msg)
 int
 main(int argc, char *argv[])
 {
-    logfile.open("~/qgv-util.log", ios::app);
+    open_logfile ();
     qInstallMsgHandler(dbgHandler);
 
     qDBusRegisterMetaType<org::freedesktop::Telepathy::SimplePresence>();

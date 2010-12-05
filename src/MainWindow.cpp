@@ -43,15 +43,7 @@ MainWindow::MainWindow (QWidget *parent)
                      this                   , SLOT  (orientationChanged()));
 #endif
 
-    // Initialize logging
-    QString strLogfile = QDir::homePath ();
-    if (!strLogfile.endsWith (QDir::separator ()))
-    {
-        strLogfile += QDir::separator ();
-    }
-    strLogfile += "qgvdial.log";
-    fLogfile.setFileName (strLogfile);
-    fLogfile.open (QIODevice::WriteOnly | QIODevice::Append);
+    initLogging ();
 
     // This must be done at least once so that the initial qml is loaded.
     // Even if it is desktop, this must be done: The function takes care of
@@ -87,6 +79,26 @@ MainWindow::MainWindow (QWidget *parent)
 MainWindow::~MainWindow ()
 {
 }//MainWindow::~MainWindow
+
+void
+MainWindow::initLogging ()
+{
+    // Initialize logging
+    QString strLogfile = QDir::homePath ();
+    QDir dirHome(strLogfile);
+    if (!strLogfile.endsWith (QDir::separator ()))
+    {
+        strLogfile += QDir::separator ();
+    }
+    strLogfile += ".qgvdial";
+    if (!QFileInfo(strLogfile).exists ()) {
+        dirHome.mkdir (".qgvdial");
+    }
+    strLogfile += QDir::separator ();
+    strLogfile += "qgvdial.log";
+    fLogfile.setFileName (strLogfile);
+    fLogfile.open (QIODevice::WriteOnly | QIODevice::Append);
+}//MainWindow::initLogging
 
 /** Log information to console and to log file
  * This function is invoked from the qDebug handler that is installed in main.

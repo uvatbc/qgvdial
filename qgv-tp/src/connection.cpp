@@ -439,7 +439,6 @@ Connection::processChannel(const QVariantMap &request)
         return channel_path;
     }
 
-    qDebug (TP_CHANNEL_TYPE);
     if (request.contains (TP_CHANNEL_TYPE)) {
         strType = request.value (TP_CHANNEL_TYPE).toString();
         qDebug() << "Found channel type" << strType;

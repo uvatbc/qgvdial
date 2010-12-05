@@ -116,6 +116,7 @@ private slots:
     void onRegPhoneSelectionChange (int index);
 
 private:
+    void initLogging ();
     void doLogin ();
 
     void initContactsWidget ();
