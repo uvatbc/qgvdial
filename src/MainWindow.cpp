@@ -735,12 +735,32 @@ MainWindow::callNumber (const QString &strNumber,
 {
     GVContactInfo info;
 
-    if (!getInfoFrom (strNumber, strNameLink, info))
-    {
-        return;
-    }
+    do { // Begin cleanup block (not a loop)
+        if (!getInfoFrom (strNumber, strNameLink, info))
+        {
+            qWarning () << "Failed to get any info for num = " << strNumber
+                        << ", link = " << strNameLink;
+            break;
+        }
 
-    callWithContactInfo (info, false);
+        if (info.arrPhones.isEmpty ()) {
+            qWarning ("No phones found!!");
+            break;
+        }
+
+        // Check at least the first number
+        QString strTest = info.arrPhones[0].strNumber;
+        strTest.remove(QRegExp ("\\d*"))
+               .remove(QRegExp ("\\s"))
+               .remove('+')
+               .remove('-');
+        if (!strTest.isEmpty ()) {
+            qWarning ("Cannot use numbers with special symbols or characters");
+            break;
+        }
+
+        callWithContactInfo (info, false);
+    } while (0); // End cleanup block (not a loop)
 }//MainWindow::callNumber
 
 void
@@ -749,12 +769,32 @@ MainWindow::textANumber (const QString &strNumber,
 {
     GVContactInfo info;
 
-    if (!getInfoFrom (strNumber, strNameLink, info))
-    {
-        return;
-    }
+    do { // Begin cleanup block (not a loop)
+        if (!getInfoFrom (strNumber, strNameLink, info))
+        {
+            qWarning () << "Failed to get any info for num = " << strNumber
+                        << ", link = " << strNameLink;
+            return;
+        }
 
-    sendTextToContact (info, false);
+        if (info.arrPhones.isEmpty ()) {
+            qWarning ("No phones found!!");
+            break;
+        }
+
+        // Check at least the first number
+        QString strTest = info.arrPhones[0].strNumber;
+        strTest.remove(QRegExp ("\\d*"))
+               .remove(QRegExp ("\\s"))
+               .remove('+')
+               .remove('-');
+        if (!strTest.isEmpty ()) {
+            qWarning ("Cannot use numbers with special symbols or characters");
+            break;
+        }
+
+        sendTextToContact (info, false);
+    } while (0); // End cleanup block (not a loop)
 }//MainWindow::textANumber
 
 void
@@ -829,6 +869,15 @@ MainWindow::dialNow (const QString &strTarget)
 
         if (strTarget.isEmpty ()) {
             setStatus ("Cannot dial empty number");
+            break;
+        }
+        QString strTest = strTarget;
+        strTest.remove(QRegExp ("\\d*"))
+               .remove(QRegExp ("\\s"))
+               .remove('+')
+               .remove('-');
+        if (!strTest.isEmpty ()) {
+            setStatus ("Cannot use numbers with special symbols or characters");
             break;
         }
 
