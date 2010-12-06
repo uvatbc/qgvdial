@@ -6,6 +6,7 @@ TpCalloutInitiator::TpCalloutInitiator (Tp::AccountPtr act, QObject *parent)
 : CalloutInitiator(parent)
 , account (act)
 , strSelfNumber("undefined")
+, bIsSpirit (false)
 {
     Tp::ConnectionPtr connection = account->connection();
     if (!connection.isNull ())
@@ -37,6 +38,10 @@ TpCalloutInitiator::onConnectionReady (Tp::PendingOperation *op)
             break;
         }
         qDebug ("Self Contact is null");
+
+        if (account->cmName () == "spirit") {
+            bIsSpirit = true;
+        }
 
         if (account->cmName () == "sofiasip")
         {
@@ -75,6 +80,12 @@ TpCalloutInitiator::initiateCall (const QString &strDestination)
                    (uint) Tp::HandleTypeContact);
     request.insert(TELEPATHY_INTERFACE_CHANNEL ".TargetID",
                    strDestination);
+    if (!bIsSpirit) {
+        request.insert(TELEPATHY_INTERFACE_CHANNEL
+                       ".Type.StreamedMedia.InitialAudio",
+                       true);
+    }
+
     Tp::PendingChannelRequest *pReq = account->ensureChannel(request);
 
     QObject::connect (

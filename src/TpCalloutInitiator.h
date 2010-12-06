@@ -29,6 +29,9 @@ private:
     Tp::AccountPtr      account;
     QString             strSelfNumber;
 
+    //! Is this the buggy spirit (skype) TP-CM?
+    bool                bIsSpirit;
+
     friend class CallInitiatorFactory;
 };
 
