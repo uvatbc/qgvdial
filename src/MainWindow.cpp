@@ -264,6 +264,8 @@ MainWindow::init ()
     QObject::connect (&actViewWeb, SIGNAL (triggered ()),
                        this      , SLOT (on_actionWeb_view_triggered ()));
 
+    this->setWindowIcon (icoGoogle);
+
     // If the cache has the username and password, begin login
     if (dbMain.getUserPass (strUser, strPass))
     {
