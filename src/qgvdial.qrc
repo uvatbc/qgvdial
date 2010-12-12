@@ -19,5 +19,7 @@
      <file alias="DialDisp.qml">../qml/DialDisp.qml</file>
      <file alias="ComboBoxPhones.qml">../qml/ComboBoxPhones.qml</file>
      <file alias="ActionButtons.qml">../qml/ActionButtons.qml</file>
+     <file alias="ContactsList.qml">../qml/ContactsList.qml</file>
+     <file alias="TextButton.qml">../qml/TextButton.qml</file>
  </qresource>
 </RCC>

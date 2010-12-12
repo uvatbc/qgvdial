@@ -116,6 +116,8 @@ OTHER_FILES  += winrsrc.rc                  \
                 ../qml/DialDisp.qml         \
                 ../qml/ComboBoxPhones.qml   \
                 ../qml/ActionButtons.qml    \
+                ../qml/ContactsList.qml     \
+                ../qml/TextButton.qml       \
                 readme.txt \
     ../qml/MainView.qml
 
