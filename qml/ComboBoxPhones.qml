@@ -41,6 +41,7 @@ Rectangle {
     ListView {
         id: listView
         anchors.fill: parent
+        clip: true
 
         // Display smoothly
         Behavior on opacity {
