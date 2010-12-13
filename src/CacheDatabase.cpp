@@ -1,6 +1,5 @@
 #include "CacheDatabase.h"
 #include "GVAccess.h"
-#include "ContactsModel.h"
 
 //////////////////////////////// Settings table ////////////////////////////////
 #define GV_SETTINGS_TABLE   "gvsettings"
@@ -226,6 +225,27 @@ CacheDatabase::clearContacts ()
     query.exec ("DELETE FROM " GV_CONTACTS_TABLE);
     query.exec ("DELETE FROM " GV_LINKS_TABLE);
 }//CacheDatabase::clearContacts
+
+void
+CacheDatabase::refreshContactsModel (ContactsModel *modelContacts)
+{
+    modelContacts->setQuery ("SELECT " GV_C_ID "," GV_C_NAME " "
+                             "FROM " GV_CONTACTS_TABLE , dbMain);
+    modelContacts->setHeaderData (0, Qt::Horizontal, QObject::tr("Id"));
+    modelContacts->setHeaderData (1, Qt::Horizontal, QObject::tr("Name"));
+
+    QSqlQuery query;
+    query.setForwardOnly (true);
+    query.exec ("SELECT COUNT (*) FROM " GV_CONTACTS_TABLE);
+    if (query.next ()) {
+        bool bOk = false;
+        int val = query.value (0).toInt (&bOk);
+        nCountContacts = 0;
+        if (bOk) {
+            nCountContacts = val;
+        }
+    }
+}//CacheDatabase::refreshContactsModel
 
 bool
 CacheDatabase::getUserPass (QString &strUser, QString &strPass)
