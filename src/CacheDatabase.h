@@ -18,7 +18,7 @@ public:
     void init ();
     void deinit ();
 
-    QSqlTableModel *newContactsModel();
+    ContactsModel *newContactsModel();
     void clearContacts ();
     void refreshContactsModel (ContactsModel *modelContacts);
 

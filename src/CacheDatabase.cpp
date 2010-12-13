@@ -193,26 +193,11 @@ CacheDatabase::init ()
     }
 }//CacheDatabase::init
 
-QSqlTableModel *
+ContactsModel *
 CacheDatabase::newContactsModel()
 {
-    ContactsModel *modelContacts = new ContactsModel(this, dbMain);
-    modelContacts->setTable (GV_CONTACTS_TABLE);
-    modelContacts->setEditStrategy (QSqlTableModel::OnManualSubmit);
-    modelContacts->setHeaderData (0, Qt::Horizontal, QObject::tr("Name"));
-    modelContacts->setHeaderData (1, Qt::Horizontal, QObject::tr("Link"));
-
-    QSqlQuery query;
-    query.setForwardOnly (true);
-    query.exec ("SELECT COUNT (*) FROM " GV_CONTACTS_TABLE);
-    if (query.next ()) {
-        bool bOk = false;
-        int val = query.value (0).toInt (&bOk);
-        nCountContacts = 0;
-        if (bOk) {
-            nCountContacts = val;
-        }
-    }
+    ContactsModel *modelContacts = new ContactsModel(this);
+    this->refreshContactsModel (modelContacts);
 
     return (modelContacts);
 }//CacheDatabase::newContactsModel

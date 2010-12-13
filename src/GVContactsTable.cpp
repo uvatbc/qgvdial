@@ -6,6 +6,8 @@
 #include "Singletons.h"
 #include "ContactsXmlHandler.h"
 
+#include <QtDeclarative>
+
 GVContactsTable::GVContactsTable (QWidget *parent, Qt::WindowFlags flags)
 : QMainWindow (parent, flags)
 , ui (new Ui::ContactsWindow)
@@ -16,16 +18,14 @@ GVContactsTable::GVContactsTable (QWidget *parent, Qt::WindowFlags flags)
 {
     ui->setupUi (this);
 
+    delete ui->graphicsView;
+    ui->graphicsView = (QDeclarativeView *) new QDeclarativeView (this);
+
     OsDependent &osd = Singletons::getRef().getOSD ();
     osd.setDefaultWindowAttributes (this);
 
     mnuContext.addAction (ui->actionCall);
     mnuContext.addAction (ui->actionSend_Text);
-
-    // treeView.activated -> this.activatedContact
-    QObject::connect (
-        ui->treeView, SIGNAL (activated        (const QModelIndex &)),
-        this        , SLOT   (activatedContact (const QModelIndex &)));
 
     // The status must be shown on this window as well
     QObject::connect (
@@ -41,15 +41,10 @@ GVContactsTable::~GVContactsTable ()
 void
 GVContactsTable::deinitModel ()
 {
-    ui->treeView->reset ();
-
-    QSqlTableModel *modelContacts = (QSqlTableModel *)ui->treeView->model ();
-    ui->treeView->setModel (NULL);
-    if (NULL != modelContacts)
-    {
-        delete modelContacts;
-        modelContacts = NULL;
+    if (NULL != ui->graphicsView) {
+        delete ui->graphicsView;
     }
+    ui->graphicsView = NULL;
 }//GVContactsTable::deinitModel
 
 void
@@ -57,13 +52,15 @@ GVContactsTable::initModel ()
 {
     deinitModel ();
 
-    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    QSqlTableModel *modelContacts = dbMain.newContactsModel ();
-    ui->treeView->setModel (modelContacts);
-    modelContacts->submitAll ();
+    QDeclarativeView *pView = new QDeclarativeView (this);
+    ui->graphicsView = (QDeclarativeView *) pView;
 
-    ui->treeView->hideColumn (1);
-    ui->treeView->sortByColumn (0, Qt::AscendingOrder);
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    ContactsModel *modelContacts = dbMain.newContactsModel ();
+    QDeclarativeContext *ctx = pView->rootContext();
+    ctx->setContextProperty ("contactsModel", modelContacts);
+
+    pView->setSource (QUrl ("qrc:/ContactsList.qml"));
 }//GVContactsTable::initModel
 
 QNetworkReply *
@@ -135,7 +132,6 @@ GVContactsTable::refreshContacts ()
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     QString strUrl;
 
-    ui->treeView->strSavedLink.clear ();
     strUrl = QString ("http://www.google.com/m8/feeds/contacts/%1/full"
                       "?max-results=10000")
                         .arg (strUser);
@@ -150,6 +146,7 @@ GVContactsTable::refreshContacts ()
     }
     else
     {
+        //TODO: Tell model to clear, not the DB
         dbMain.clearContacts ();
     }
 
@@ -180,18 +177,6 @@ GVContactsTable::loggedOut ()
 
     strGoogleAuth.clear ();
 }//GVContactsTable::loggedOut
-
-void
-GVContactsTable::activatedContact (const QModelIndex &)
-{
-    placeCall ();
-}//GVContactsTable::activatedContact
-
-void
-GVContactsTable::contextMenuEvent (QContextMenuEvent * event)
-{
-    mnuContext.popup (event->globalPos ());
-}//GVContactsTable::contextMenuEvent
 
 void
 GVContactsTable::placeCall ()

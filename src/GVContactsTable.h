@@ -48,8 +48,6 @@ public slots:
     void refreshContacts ();
 
 private slots:
-    void activatedContact (const QModelIndex &);
-
     //! Invoked when the place call action is triggered
     void placeCall ();
     //! Invoked when the send SMS action is triggered
@@ -69,8 +67,6 @@ private slots:
     void setStatus(const QString &strText, int timeout = 2000);
 
 private:
-    void contextMenuEvent (QContextMenuEvent * event);
-
     QNetworkReply *
     postRequest (QString         strUrl,
                  QStringPairList arrPairs,

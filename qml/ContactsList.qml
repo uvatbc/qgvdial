@@ -9,6 +9,7 @@ Rectangle {
     signal sigCall(string strNumber)
     signal sigText(string strNumber)
 
+/*
     ListModel {
         id: contactsModel
 
@@ -43,6 +44,7 @@ Rectangle {
             ]
         }
     }
+*/
 
     ListView {
         id: listView
