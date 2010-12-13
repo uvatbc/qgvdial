@@ -1,5 +1,6 @@
 #include "CacheDatabase.h"
 #include "GVAccess.h"
+#include "ContactsModel.h"
 
 //////////////////////////////// Settings table ////////////////////////////////
 #define GV_SETTINGS_TABLE   "gvsettings"
@@ -196,7 +197,7 @@ CacheDatabase::init ()
 QSqlTableModel *
 CacheDatabase::newContactsModel()
 {
-    QSqlTableModel *modelContacts = new QSqlTableModel(this, dbMain);
+    ContactsModel *modelContacts = new ContactsModel(this, dbMain);
     modelContacts->setTable (GV_CONTACTS_TABLE);
     modelContacts->setEditStrategy (QSqlTableModel::OnManualSubmit);
     modelContacts->setHeaderData (0, Qt::Horizontal, QObject::tr("Name"));

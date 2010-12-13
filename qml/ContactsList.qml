@@ -1,5 +1,5 @@
 import Qt 4.7
-import "../../trunk/qml/helper.js" as Code
+import "helper.js" as Code
 
 Rectangle {
     id: container
