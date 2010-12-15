@@ -428,7 +428,11 @@ CacheDatabase::insertContact (const QString  &strName,
                             .arg (strLink)
                             .arg (strName));
         if (!rv) {
-            qWarning ("Failed to insert row into contacts table");
+            qWarning () << "Failed to insert row into contacts table. ID:["
+                        << strLink
+                        << "] name=["
+                        << strName
+                        << "]";
             break;
         }
 
