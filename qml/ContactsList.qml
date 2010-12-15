@@ -143,6 +143,9 @@ Rectangle {
                     anchors.fill: parent
                     spacing: 2
                     clip: true
+
+                    onSigCall: container.sigCall (number)
+                    onSigText: container.sigText (number)
                 }
             }
 

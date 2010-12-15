@@ -1,13 +1,14 @@
 #include "ContactsModel.h"
 #include "Singletons.h"
+#include "ContactDetailsModel.h"
 
 ContactsModel::ContactsModel (QObject *parent)
 : QSqlQueryModel (parent)
 , modelContacts (NULL)
 {
     QHash<int, QByteArray> roles;
-    roles[CT_NameRoles]     = "name";
-    roles[CT_ContactsRoles] = "contacts";
+    roles[CT_NameRole]     = "name";
+    roles[CT_ContactsRole] = "contacts";
     setRoleNames(roles);
 }//ContactsModel::ContactsModel
 
@@ -17,14 +18,24 @@ ContactsModel::data (const QModelIndex &index, int role) const
     QVariant retVar;
 
     do { // Begin cleanup block (not a loop)
-        if (CT_NameRoles == role) {
+        if (CT_NameRole == role) {
             retVar =
             QSqlQueryModel::data (index.sibling(index.row(), 1), Qt::EditRole);
             break;
         }
 
-        if (CT_ContactsRoles == role) {
-            //@@UV: Need to create another SQL model here
+        if (CT_ContactsRole == role) {
+            GVContactInfo info;
+            info.strLink = QSqlQueryModel::data (index.sibling(index.row(), 0),
+                                                 Qt::EditRole)
+                            .toString ();
+            CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+            dbMain.getContactFromLink (info);
+
+            QObject *pNonConst = (QObject *) this;
+            ContactDetailsModel *pCdm = new ContactDetailsModel (info,
+                                                                 pNonConst);
+            retVar = qVariantFromValue<QObject *> (pCdm);
             break;
         }
 

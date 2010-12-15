@@ -10,8 +10,8 @@ class ContactsModel : public QSqlQueryModel
 
 public:
     enum ContactsFieldRoles {
-        CT_NameRoles = Qt::UserRole + 1,
-        CT_ContactsRoles,
+        CT_NameRole = Qt::UserRole + 1,
+        CT_ContactsRole,
     };
 
     explicit ContactsModel(QObject *parent = 0);

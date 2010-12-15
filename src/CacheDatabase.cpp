@@ -511,6 +511,8 @@ CacheDatabase::getContactFromLink (GVContactInfo &info)
                     GV_L_LINK "='%1'").arg (info.strLink);
     query.exec (strQ);
 
+    info.arrPhones.clear ();
+
     QString strType, strData;
     while (query.next ())
     {

@@ -60,7 +60,8 @@ SOURCES  += main.cpp                    \
             VMailDialog.cpp             \
             WebWidget.cpp               \
             RegNumberModel.cpp          \
-            ContactsModel.cpp
+            ContactsModel.cpp           \
+            ContactDetailsModel.cpp
 
 HEADERS  += global.h                    \
             IObserver.h                 \
@@ -97,7 +98,8 @@ HEADERS  += global.h                    \
             VMailDialog.h               \
             WebWidget.h                 \
             RegNumberModel.h            \
-            ContactsModel.h
+            ContactsModel.h             \
+            ContactDetailsModel.h
 
 FORMS    += LoginDialog.ui              \
             InboxWidget.ui              \

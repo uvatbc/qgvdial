@@ -1,6 +1,5 @@
 #include "global.h"
 #include "GVContactsTable.h"
-#include "ui_ContactsWidget.h"
 #include "CaptchaWidget.h"
 
 #include "Singletons.h"
@@ -28,7 +27,10 @@ GVContactsTable::~GVContactsTable ()
 void
 GVContactsTable::deinitModel ()
 {
-    // Nothing here!
+    if (NULL != modelContacts) {
+        delete modelContacts;
+        modelContacts = NULL;
+    }
 }//GVContactsTable::deinitModel
 
 void

@@ -17,7 +17,7 @@ RegNumberModel::rowCount (const QModelIndex & /*parent*/) const
 }//RegNumberModel::rowCount
 
 QVariant
-RegNumberModel::data(const QModelIndex &index, int role) const
+RegNumberModel::data (const QModelIndex &index, int role) const
 {
     QVariant var;
     do { // Begin cleanup block (not a loop)
