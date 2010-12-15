@@ -8,30 +8,16 @@
 
 #include <QtDeclarative>
 
-GVContactsTable::GVContactsTable (QWidget *parent, Qt::WindowFlags flags)
-: QMainWindow (parent, flags)
-, ui (new Ui::ContactsWindow)
+GVContactsTable::GVContactsTable (QWidget *parent)
+: QDeclarativeView (parent)
 , modelContacts (NULL)
 , nwMgr (this)
 , mutex(QMutex::Recursive)
 , bLoggedIn(false)
 , bRefreshRequested (false)
 {
-    ui->setupUi (this);
-
-    delete ui->graphicsView;
-    ui->graphicsView = (QDeclarativeView *) new QDeclarativeView (this);
-
     OsDependent &osd = Singletons::getRef().getOSD ();
     osd.setDefaultWindowAttributes (this);
-
-    mnuContext.addAction (ui->actionCall);
-    mnuContext.addAction (ui->actionSend_Text);
-
-    // The status must be shown on this window as well
-    QObject::connect (
-        this, SIGNAL (status    (const QString &, int)),
-        this, SLOT   (setStatus (const QString &, int)));
 }//GVContactsTable::GVContactsTable
 
 GVContactsTable::~GVContactsTable ()
@@ -42,10 +28,7 @@ GVContactsTable::~GVContactsTable ()
 void
 GVContactsTable::deinitModel ()
 {
-    if (NULL != ui->graphicsView) {
-        delete ui->graphicsView;
-    }
-    ui->graphicsView = NULL;
+    // Nothing here!
 }//GVContactsTable::deinitModel
 
 void
@@ -53,24 +36,23 @@ GVContactsTable::initModel ()
 {
     deinitModel ();
 
-    QDeclarativeView *pView = new QDeclarativeView (this);
-    ui->graphicsView = (QDeclarativeView *) pView;
-
     if (NULL == modelContacts) {
         CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
         modelContacts = dbMain.newContactsModel ();
     }
 
-    QDeclarativeContext *ctx = pView->rootContext();
-    ctx->setContextProperty ("contactsModel", modelContacts);
+    if (this->source ().isEmpty ()) {
+        QDeclarativeContext *ctx = this->rootContext();
+        ctx->setContextProperty ("contactsModel", modelContacts);
 
-    pView->setSource (QUrl ("qrc:/ContactsList.qml"));
-    pView->setResizeMode (QDeclarativeView::SizeRootObjectToView);
+        this->setSource (QUrl ("qrc:/ContactsList.qml"));
+        this->setResizeMode (QDeclarativeView::SizeRootObjectToView);
 
-    QObject::connect (pView, SIGNAL (sigCall   (const QString &)),
-                      this,  SLOT   (placeCall (const QString &)));
-    QObject::connect (pView, SIGNAL (sigText   (const QString &)),
-                      this,  SLOT   (sendSMS   (const QString &)));
+        QObject::connect (this, SIGNAL (sigCall   (const QString &)),
+                          this, SLOT   (placeCall (const QString &)));
+        QObject::connect (this, SIGNAL (sigText   (const QString &)),
+                          this, SLOT   (sendSMS   (const QString &)));
+    }
 }//GVContactsTable::initModel
 
 QNetworkReply *
@@ -370,9 +352,3 @@ GVContactsTable::gotOneContact (const ContactInfo &contactInfo)
     }
 
 }//GVContactsTable::gotOneContact
-
-void
-GVContactsTable::setStatus (const QString &strText, int timeout)
-{
-    ui->statusbar->showMessage (strText, timeout);
-}//GVContactsTable::setStatus

@@ -3,19 +3,16 @@
 
 #include "global.h"
 #include <QtNetwork>
+#include <QtDeclarative>
 
 #include "ContactsModel.h"
 
-namespace Ui {
-    class ContactsWindow;
-}
-
-class GVContactsTable : public QMainWindow
+class GVContactsTable : public QDeclarativeView
 {
     Q_OBJECT
 
 public:
-    GVContactsTable (QWidget *parent = 0, Qt::WindowFlags flags = 0);
+    GVContactsTable (QWidget *parent = 0);
     ~GVContactsTable ();
 
     void deinitModel ();
@@ -62,9 +59,6 @@ private slots:
     // Invoked when one contact is parsed out of the XML
     void gotOneContact (const ContactInfo &contactInfo);
 
-    //! Status sink for this window for status bar
-    void setStatus(const QString &strText, int timeout = 2000);
-
 private:
     QNetworkReply *
     postRequest (QString         strUrl,
@@ -78,8 +72,6 @@ private:
 
 
 private:
-    Ui::ContactsWindow *ui;
-
     ContactsModel  *modelContacts;
 
     //! Username and password for google authentication
@@ -89,9 +81,6 @@ private:
 
     //! The network manager for contacts API
     QNetworkAccessManager nwMgr;
-
-    //! Context menu for clicking on an item
-    QMenu           mnuContext;
 
     //! Mutex protecting the following variable
     QMutex          mutex;
