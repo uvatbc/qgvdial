@@ -215,7 +215,8 @@ void
 CacheDatabase::refreshContactsModel (ContactsModel *modelContacts)
 {
     modelContacts->setQuery ("SELECT " GV_C_ID "," GV_C_NAME " "
-                             "FROM " GV_CONTACTS_TABLE , dbMain);
+                             "FROM " GV_CONTACTS_TABLE " "
+                             "ORDER BY " GV_C_NAME, dbMain);
     modelContacts->setHeaderData (0, Qt::Horizontal, QObject::tr("Id"));
     modelContacts->setHeaderData (1, Qt::Horizontal, QObject::tr("Name"));
 

@@ -94,7 +94,7 @@ Rectangle {
                         id: textName
                         width: parent.width - btnClose.width
 
-                        text: listView.model.name
+                        text: model.name
                         color: "white"
 
                         anchors {
