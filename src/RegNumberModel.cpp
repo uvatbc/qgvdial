@@ -11,7 +11,7 @@ RegNumberModel::RegNumberModel (QObject *parent)
 }//RegNumberModel::RegNumberModel
 
 int
-RegNumberModel::rowCount(const QModelIndex & /*parent*/) const
+RegNumberModel::rowCount (const QModelIndex & /*parent*/) const
 {
     return (listRegNums.count ());
 }//RegNumberModel::rowCount
@@ -47,7 +47,7 @@ RegNumberModel::insertRow (const QString &strName,
                            const QString &strDesc,
                            void *pContext)
 {
-    int oldcount = listRegNums.count ();
+    int oldcount = this->rowCount ();
     beginInsertRows (QModelIndex (), oldcount, oldcount);
 
     RegNumData data;

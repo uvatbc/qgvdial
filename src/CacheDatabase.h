@@ -32,9 +32,9 @@ public:
     bool putRegisteredNumbers (const GVRegisteredNumberArray &listNumbers);
 
     bool deleteContact (const QString  &strLink);
-    bool insertContact (QSqlTableModel *modelContacts,
-                        const QString  &strName,
+    bool insertContact (const QString  &strName,
                         const QString  &strLink);
+    quint32 getContactsCount ();
 
     bool deleteContactInfo (const QString  &strLink);
     bool putContactInfo (const GVContactInfo &info);

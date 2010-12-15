@@ -11,6 +11,7 @@
 GVContactsTable::GVContactsTable (QWidget *parent, Qt::WindowFlags flags)
 : QMainWindow (parent, flags)
 , ui (new Ui::ContactsWindow)
+, modelContacts (NULL)
 , nwMgr (this)
 , mutex(QMutex::Recursive)
 , bLoggedIn(false)
@@ -55,12 +56,20 @@ GVContactsTable::initModel ()
     QDeclarativeView *pView = new QDeclarativeView (this);
     ui->graphicsView = (QDeclarativeView *) pView;
 
-    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    ContactsModel *modelContacts = dbMain.newContactsModel ();
+    if (NULL != modelContacts) {
+        CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+        modelContacts = dbMain.newContactsModel ();
+    }
+
     QDeclarativeContext *ctx = pView->rootContext();
     ctx->setContextProperty ("contactsModel", modelContacts);
 
     pView->setSource (QUrl ("qrc:/ContactsList.qml"));
+
+    QObject::connect (pView, SIGNAL (sigCall   (const QString &)),
+                      this,  SLOT   (placeCall (const QString &)));
+    QObject::connect (pView, SIGNAL (sigText   (const QString &)),
+                      this,  SLOT   (sendSMS   (const QString &)));
 }//GVContactsTable::initModel
 
 QNetworkReply *
@@ -179,31 +188,15 @@ GVContactsTable::loggedOut ()
 }//GVContactsTable::loggedOut
 
 void
-GVContactsTable::placeCall ()
+GVContactsTable::placeCall (const QString &strNumber)
 {
-    QMutexLocker locker(&mutex);
-    if (0 != ui->treeView->strSavedLink.size ())
-    {
-        emit callNumber (QString (), ui->treeView->strSavedLink);
-    }
-    else
-    {
-        emit status ("Nothing selected");
-    }
+    emit callNumber (strNumber, QString ());
 }//GVContactsTable::placeCall
 
 void
-GVContactsTable::sendSMS ()
+GVContactsTable::sendSMS (const QString &strNumber)
 {
-    QMutexLocker locker(&mutex);
-    if (0 != ui->treeView->strSavedLink.size ())
-    {
-        emit textANumber (QString(), ui->treeView->strSavedLink);
-    }
-    else
-    {
-        emit status ("Nothing selected");
-    }
+    emit textANumber (strNumber, QString());
 }//GVContactsTable::sendSMS
 
 void
@@ -345,16 +338,16 @@ GVContactsTable::onGotContacts (QNetworkReply *reply)
                 .arg (contactsHandler.getUsableContacts ());
     } while (0); // End cleanup block (not a loop)
 
-    QSqlTableModel *modelContacts = (QSqlTableModel *) ui->treeView->model ();
-    if (rv) {
-        emit status ("Contacts retrieved. Saving. This will take some time...");
-        modelContacts->submitAll ();
-        emit status ("Contacts committed to local database");
-    } else {
-        modelContacts->revertAll ();
-    }
+//    QSqlTableModel *modelContacts = (QSqlTableModel *) ui->treeView->model ();
+//    if (rv) {
+//        emit status ("Contacts retrieved. Saving. This will take some time...");
+//        modelContacts->submitAll ();
+//        emit status ("Contacts committed to local database");
+//    } else {
+//        modelContacts->revertAll ();
+//    }
 
-    modelContacts->select ();
+//    modelContacts->select ();
 
     emit status (msg);
     emit allContacts (rv);
@@ -365,61 +358,17 @@ GVContactsTable::onGotContacts (QNetworkReply *reply)
 void
 GVContactsTable::gotOneContact (const ContactInfo &contactInfo)
 {
-    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-
-    GVContactInfo gvContactInfo;
-    convert (contactInfo, gvContactInfo);
-
     QMutexLocker locker(&mutex);
-    QSqlTableModel *modelContacts = (QSqlTableModel *) ui->treeView->model ();
-
     if (contactInfo.bDeleted)
     {
-        dbMain.deleteContact (contactInfo.strId);
-        dbMain.deleteContactInfo (contactInfo.strId);
+        modelContacts->deleteContact (contactInfo);
     }
     else    // add or modify
     {
-        dbMain.insertContact (modelContacts,
-                              contactInfo.strTitle,
-                              contactInfo.strId);
-        dbMain.putContactInfo (gvContactInfo);
+        modelContacts->insertContact (contactInfo);
     }
 
 }//GVContactsTable::gotOneContact
-
-bool
-GVContactsTable::convert (const ContactInfo &cInfo, GVContactInfo &gvcInfo)
-{
-    gvcInfo.strLink = cInfo.strId;
-    gvcInfo.strName = cInfo.strTitle;
-
-    foreach (PhoneInfo pInfo, cInfo.arrPhones)
-    {
-        GVContactNumber gvcn;
-        switch (pInfo.Type)
-        {
-        case PType_Mobile:
-            gvcn.chType = 'M';
-            break;
-        case PType_Home:
-            gvcn.chType = 'H';
-            break;
-        case PType_Other:
-            gvcn.chType = 'O';
-            break;
-        default:
-            gvcn.chType = '?';
-            break;
-        }
-
-        gvcn.strNumber = pInfo.strNumber;
-
-        gvcInfo.arrPhones += gvcn;
-    }
-
-    return (true);
-}//GVContactsTable::convert
 
 void
 GVContactsTable::setStatus (const QString &strText, int timeout)

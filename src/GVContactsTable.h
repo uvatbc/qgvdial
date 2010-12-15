@@ -4,6 +4,8 @@
 #include "global.h"
 #include <QtNetwork>
 
+#include "ContactsModel.h"
+
 namespace Ui {
     class ContactsWindow;
 }
@@ -27,9 +29,6 @@ public:
     //! Use this to logout
     void loggedOut ();
 
-    bool convert (const ContactInfo &cInfo, GVContactInfo &gvcInfo);
-
-
 signals:
     //! Log emitter
     void log(const QString &strText, int level = 10);
@@ -49,9 +48,9 @@ public slots:
 
 private slots:
     //! Invoked when the place call action is triggered
-    void placeCall ();
+    void placeCall (const QString &strNumber);
     //! Invoked when the send SMS action is triggered
-    void sendSMS ();
+    void sendSMS (const QString &strNumber);
 
     //! Invoked on response to login to contacts API
     void onLoginResponse (QNetworkReply *reply);
@@ -80,6 +79,8 @@ private:
 
 private:
     Ui::ContactsWindow *ui;
+
+    ContactsModel  *modelContacts;
 
     //! Username and password for google authentication
     QString strUser, strPass;
