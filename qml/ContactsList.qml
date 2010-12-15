@@ -94,7 +94,7 @@ Rectangle {
                         id: textName
                         width: parent.width - btnClose.width
 
-                        text: name
+                        text: listView.model.name
                         color: "white"
 
                         anchors {
@@ -137,40 +137,12 @@ Rectangle {
                 width: parent.width
                 height: (parent.height - topRow.height)
 
-                ListView {
+                ContactDetails {
                     id: listPhones
                     model: contacts
                     anchors.fill: parent
                     spacing: 2
                     clip: true
-
-                    delegate: Flow {
-                        width: parent.width
-                        height: Math.max(textNumber.height, btnCall.height)
-
-                        Text {
-                            id: textNumber
-                            width: parent.width - btnCall.width - btnText.width
-                            text: type + "\t: " + number
-                            color: "white"
-                            font.pointSize: (Code.btnFontPoint () / 12)
-                        }
-
-                        TextButton {
-                            id: btnCall
-                            text: "Call"
-                            fontPoint: (Code.btnFontPoint () / 12)
-
-                            onClicked: container.sigCall(number)
-                        }
-                        TextButton {
-                            id: btnText
-                            text: "Text"
-                            fontPoint: (Code.btnFontPoint () / 12)
-
-                            onClicked: container.sigText(number)
-                        }
-                    }
                 }
             }
 
