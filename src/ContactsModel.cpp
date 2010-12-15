@@ -46,7 +46,8 @@ bool
 ContactsModel::insertContact (const ContactInfo &contactInfo)
 {
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    int oldcount = dbMain.getContactsCount ();
+
+    int oldcount = this->rowCount ();
     beginInsertRows (QModelIndex (), oldcount, oldcount);
 
     GVContactInfo gvContactInfo;
@@ -63,7 +64,8 @@ bool
 ContactsModel::deleteContact (const ContactInfo &contactInfo)
 {
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    int oldcount = dbMain.getContactsCount ();
+
+    int oldcount = this->rowCount ();
     beginInsertRows (QModelIndex (), oldcount, oldcount);
 
     dbMain.deleteContact (contactInfo.strId);

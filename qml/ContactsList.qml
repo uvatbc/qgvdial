@@ -94,7 +94,7 @@ Rectangle {
                         id: textName
                         width: parent.width - btnClose.width
 
-                        text: model.name
+                        text: name
                         color: "white"
 
                         anchors {

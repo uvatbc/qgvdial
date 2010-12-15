@@ -56,7 +56,7 @@ GVContactsTable::initModel ()
     QDeclarativeView *pView = new QDeclarativeView (this);
     ui->graphicsView = (QDeclarativeView *) pView;
 
-    if (NULL != modelContacts) {
+    if (NULL == modelContacts) {
         CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
         modelContacts = dbMain.newContactsModel ();
     }
@@ -65,6 +65,7 @@ GVContactsTable::initModel ()
     ctx->setContextProperty ("contactsModel", modelContacts);
 
     pView->setSource (QUrl ("qrc:/ContactsList.qml"));
+    pView->setResizeMode (QDeclarativeView::SizeRootObjectToView);
 
     QObject::connect (pView, SIGNAL (sigCall   (const QString &)),
                       this,  SLOT   (placeCall (const QString &)));
