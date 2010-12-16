@@ -9,13 +9,14 @@ void
 ContactsTreeView::selectionChanged (const QItemSelection &selected,
                                     const QItemSelection & /*deselected*/)
 {
-    QModelIndexList lstModels = selected.indexes ();
-    if (0 == lstModels.size ())
+    QModelIndexList listModels = selected.indexes ();
+    if (0 == listModels.size ())
     {
         strSavedLink.clear ();
         return;
     }
-    QModelIndex linkIndex = lstModels[0].model()->index(lstModels[0].row(),1);
+    QModelIndex linkIndex = listModels[0].model()->index (listModels[0].row(),
+                                                          1);
     strSavedLink = linkIndex.data(Qt::EditRole).toString();
     if (strSavedLink.isEmpty ())
     {

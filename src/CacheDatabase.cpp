@@ -193,32 +193,14 @@ CacheDatabase::init ()
     }
 }//CacheDatabase::init
 
-ContactsModel *
+QSqlTableModel *
 CacheDatabase::newContactsModel()
 {
-    ContactsModel *modelContacts = new ContactsModel(this);
-    this->refreshContactsModel (modelContacts);
-
-    return (modelContacts);
-}//CacheDatabase::newContactsModel
-
-void
-CacheDatabase::clearContacts ()
-{
-    QSqlQuery query(dbMain);
-    query.setForwardOnly (true);
-    query.exec ("DELETE FROM " GV_CONTACTS_TABLE);
-    query.exec ("DELETE FROM " GV_LINKS_TABLE);
-}//CacheDatabase::clearContacts
-
-void
-CacheDatabase::refreshContactsModel (ContactsModel *modelContacts)
-{
-    modelContacts->setQuery ("SELECT " GV_C_ID "," GV_C_NAME " "
-                             "FROM " GV_CONTACTS_TABLE " "
-                             "ORDER BY " GV_C_NAME, dbMain);
-    modelContacts->setHeaderData (0, Qt::Horizontal, QObject::tr("Id"));
-    modelContacts->setHeaderData (1, Qt::Horizontal, QObject::tr("Name"));
+    QSqlTableModel *modelContacts = new QSqlTableModel(this, dbMain);
+    modelContacts->setTable (GV_CONTACTS_TABLE);
+    modelContacts->setEditStrategy (QSqlTableModel::OnManualSubmit);
+    modelContacts->setHeaderData (0, Qt::Horizontal, QObject::tr("Name"));
+    modelContacts->setHeaderData (1, Qt::Horizontal, QObject::tr("Link"));
 
     QSqlQuery query;
     query.setForwardOnly (true);
@@ -231,7 +213,18 @@ CacheDatabase::refreshContactsModel (ContactsModel *modelContacts)
             nCountContacts = val;
         }
     }
-}//CacheDatabase::refreshContactsModel
+
+    return (modelContacts);
+}//CacheDatabase::newContactsModel
+
+void
+CacheDatabase::clearContacts ()
+{
+    QSqlQuery query(dbMain);
+    query.setForwardOnly (true);
+    query.exec ("DELETE FROM " GV_CONTACTS_TABLE);
+    query.exec ("DELETE FROM " GV_LINKS_TABLE);
+}//CacheDatabase::clearContacts
 
 bool
 CacheDatabase::getUserPass (QString &strUser, QString &strPass)
@@ -405,35 +398,34 @@ CacheDatabase::deleteContact (const QString  &strLink)
 }//CacheDatabase::deleteContact
 
 bool
-CacheDatabase::insertContact (const QString  &strName,
+CacheDatabase::insertContact (QSqlTableModel *modelContacts,
+                              const QString  &strName,
                               const QString  &strLink)
 {
+    // Define fields and the record
+    QSqlField fldName(GV_C_NAME, QVariant::String);
+    QSqlField fldLink(GV_C_ID, QVariant::String);
+    QSqlRecord sqlRecord;
+    sqlRecord.append (fldName);
+    sqlRecord.append (fldLink);
+
+    // Add values to the record
+    sqlRecord.setValue (GV_C_NAME, QVariant (strName));
+    sqlRecord.setValue (GV_C_ID, QVariant (strLink));
+
     bool rv = false;
-    do { // Begin cleanup block (not a loop)
-        QSqlQuery query(dbMain);
-        query.setForwardOnly (true);
+    do // Begin cleanup block (not a loop)
+    {
+        this->deleteContact (strLink);
 
-        query.exec (QString ("SELECT " GV_C_ID " FROM " GV_CONTACTS_TABLE " "
-                             "WHERE " GV_C_ID "='%1'")
-                    .arg (strLink));
-        if (query.next ()) {
-            query.exec (QString ("DELETE FROM " GV_CONTACTS_TABLE " "
-                                 "WHERE " GV_C_ID "='%1'")
-                        .arg (strLink));
-            nCountContacts--;
+        if (!modelContacts->insertRows (nCountContacts, 1))
+        {
+            qWarning ("Failed to insert row");
+            break;
         }
-
-        rv = query.exec (QString ("INSERT INTO " GV_CONTACTS_TABLE ""
-                                  "(" GV_C_ID
-                                  "," GV_C_NAME ") VALUES ('%1', '%2')")
-                            .arg (strLink)
-                            .arg (strName));
-        if (!rv) {
-            qWarning () << "Failed to insert row into contacts table. ID:["
-                        << strLink
-                        << "] name=["
-                        << strName
-                        << "]";
+        if (!modelContacts->setRecord (nCountContacts, sqlRecord))
+        {
+            qWarning ("Failed to set row record");
             break;
         }
 
@@ -443,12 +435,6 @@ CacheDatabase::insertContact (const QString  &strName,
 
     return (rv);
 }//CacheDatabase::insertContact
-
-quint32
-CacheDatabase::getContactsCount ()
-{
-    return (nCountContacts);
-}//CacheDatabase::getContactsCount
 
 bool
 CacheDatabase::deleteContactInfo (const QString  &strLink)
@@ -510,8 +496,6 @@ CacheDatabase::getContactFromLink (GVContactInfo &info)
                     " FROM " GV_LINKS_TABLE " WHERE "
                     GV_L_LINK "='%1'").arg (info.strLink);
     query.exec (strQ);
-
-    info.arrPhones.clear ();
 
     QString strType, strData;
     while (query.next ())

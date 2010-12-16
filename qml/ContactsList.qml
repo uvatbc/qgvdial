@@ -1,19 +1,14 @@
 import Qt 4.7
-import "helper.js" as Code
+import "../../trunk/qml/helper.js" as Code
 
 Rectangle {
     id: container
-    width: 250; height: 320
+    width: 400; height: 250
     color: "black"
 
     signal sigCall(string strNumber)
     signal sigText(string strNumber)
 
-    property bool landscape: container.width > container.height
-    property variant rotationDelta: landscape? -90 : 0
-    rotation: rotationDelta
-
-/*
     ListModel {
         id: contactsModel
 
@@ -22,15 +17,15 @@ Rectangle {
             contacts: [
                 ListElement {
                     type: "Mobile"
-                    number: "+1 408 111 2222"
+                    number: "+1 408 905 9884"
                 },
                 ListElement {
                     type: "Work"
-                    number: "+1 408 333 4444"
+                    number: "+1 408 497 1234"
                 },
                 ListElement {
                     type: "Home"
-                    number: "+1 408 555 6666"
+                    number: "+1 408 916 5616"
                 }
             ]
         }
@@ -39,16 +34,15 @@ Rectangle {
             contacts: [
                 ListElement {
                     type: "Mobile"
-                    number: "+1 408 777 8888"
+                    number: "+1 408 905 9883"
                 },
                 ListElement {
                     type: "Work"
-                    number: "+1 408 999 0000"
+                    number: "+1 408 567 5885"
                 }
             ]
         }
     }
-*/
 
     ListView {
         id: listView
@@ -141,15 +135,40 @@ Rectangle {
                 width: parent.width
                 height: (parent.height - topRow.height)
 
-                ContactDetails {
+                ListView {
                     id: listPhones
                     model: contacts
                     anchors.fill: parent
                     spacing: 2
                     clip: true
 
-                    onSigCall: container.sigCall (number)
-                    onSigText: container.sigText (number)
+                    delegate: Flow {
+                        width: parent.width
+                        height: Math.max(textNumber.height, btnCall.height)
+
+                        Text {
+                            id: textNumber
+                            width: parent.width - btnCall.width - btnText.width
+                            text: type + "\t: " + number
+                            color: "white"
+                            font.pointSize: (Code.btnFontPoint () / 12)
+                        }
+
+                        TextButton {
+                            id: btnCall
+                            text: "Call"
+                            fontPoint: (Code.btnFontPoint () / 12)
+
+                            onClicked: container.sigCall(number)
+                        }
+                        TextButton {
+                            id: btnText
+                            text: "Text"
+                            fontPoint: (Code.btnFontPoint () / 12)
+
+                            onClicked: container.sigText(number)
+                        }
+                    }
                 }
             }
 

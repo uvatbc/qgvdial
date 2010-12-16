@@ -65,7 +65,6 @@
     <ClCompile Include="CalloutInitiator.cpp" />
     <ClCompile Include="CaptchaWidget.cpp" />
     <ClCompile Include="ChildWindowBase.cpp" />
-    <ClCompile Include="ContactsModel.cpp" />
     <ClCompile Include="ContactsTreeView.cpp" />
     <ClCompile Include="ContactsXmlHandler.cpp" />
     <ClCompile Include="DesktopSkypeCallInitiator.cpp" />
@@ -157,7 +156,6 @@
   <ItemGroup>
     <None Include="..\qml\ActionButtons.qml" />
     <None Include="..\qml\ComboBoxPhones.qml" />
-    <None Include="..\qml\ContactsList.qml" />
     <None Include="..\qml\DialDisp.qml" />
     <None Include="..\qml\DigitButton.qml" />
     <None Include="..\qml\helper.js" />
@@ -166,7 +164,6 @@
     <None Include="..\qml\MainView_l.qml" />
     <None Include="..\qml\MainView_p.qml" />
     <None Include="..\qml\MyButton.qml" />
-    <None Include="..\qml\TextButton.qml" />
     <None Include="ContactsWidget.ui" />
     <None Include="InboxWidget.ui" />
     <None Include="LoginDialog.ui" />

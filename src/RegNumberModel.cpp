@@ -11,13 +11,13 @@ RegNumberModel::RegNumberModel (QObject *parent)
 }//RegNumberModel::RegNumberModel
 
 int
-RegNumberModel::rowCount (const QModelIndex & /*parent*/) const
+RegNumberModel::rowCount(const QModelIndex & /*parent*/) const
 {
     return (listRegNums.count ());
 }//RegNumberModel::rowCount
 
 QVariant
-RegNumberModel::data (const QModelIndex &index, int role) const
+RegNumberModel::data(const QModelIndex &index, int role) const
 {
     QVariant var;
     do { // Begin cleanup block (not a loop)
@@ -47,7 +47,7 @@ RegNumberModel::insertRow (const QString &strName,
                            const QString &strDesc,
                            void *pContext)
 {
-    int oldcount = this->rowCount ();
+    int oldcount = listRegNums.count ();
     beginInsertRows (QModelIndex (), oldcount, oldcount);
 
     RegNumData data;

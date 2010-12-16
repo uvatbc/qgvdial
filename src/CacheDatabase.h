@@ -4,7 +4,6 @@
 #include "global.h"
 #include <QtSql>
 #include "InboxModel.h"
-#include "ContactsModel.h"
 
 class CacheDatabase : public QObject
 {
@@ -18,9 +17,8 @@ public:
     void init ();
     void deinit ();
 
-    ContactsModel *newContactsModel();
+    QSqlTableModel *newContactsModel();
     void clearContacts ();
-    void refreshContactsModel (ContactsModel *modelContacts);
 
     bool getUserPass (QString &strUser, QString &strPass);
     bool putUserPass (const QString &strUser, const QString &strPass);
@@ -32,9 +30,9 @@ public:
     bool putRegisteredNumbers (const GVRegisteredNumberArray &listNumbers);
 
     bool deleteContact (const QString  &strLink);
-    bool insertContact (const QString  &strName,
+    bool insertContact (QSqlTableModel *modelContacts,
+                        const QString  &strName,
                         const QString  &strLink);
-    quint32 getContactsCount ();
 
     bool deleteContactInfo (const QString  &strLink);
     bool putContactInfo (const GVContactInfo &info);

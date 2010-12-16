@@ -21,6 +21,5 @@
      <file alias="ActionButtons.qml">../qml/ActionButtons.qml</file>
      <file alias="ContactsList.qml">../qml/ContactsList.qml</file>
      <file alias="TextButton.qml">../qml/TextButton.qml</file>
-     <file alias="ContactDetails.qml">../qml/ContactDetails.qml</file>
  </qresource>
 </RCC>

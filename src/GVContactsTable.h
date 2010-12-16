@@ -3,16 +3,17 @@
 
 #include "global.h"
 #include <QtNetwork>
-#include <QtDeclarative>
 
-#include "ContactsModel.h"
+namespace Ui {
+    class ContactsWindow;
+}
 
-class GVContactsTable : public QDeclarativeView
+class GVContactsTable : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    GVContactsTable (QWidget *parent = 0);
+    GVContactsTable (QWidget *parent = 0, Qt::WindowFlags flags = 0);
     ~GVContactsTable ();
 
     void deinitModel ();
@@ -25,6 +26,9 @@ public:
     void loginSuccess ();
     //! Use this to logout
     void loggedOut ();
+
+    bool convert (const ContactInfo &cInfo, GVContactInfo &gvcInfo);
+
 
 signals:
     //! Log emitter
@@ -44,10 +48,12 @@ public slots:
     void refreshContacts ();
 
 private slots:
+    void activatedContact (const QModelIndex &);
+
     //! Invoked when the place call action is triggered
-    void placeCall (const QString &strNumber);
+    void placeCall ();
     //! Invoked when the send SMS action is triggered
-    void sendSMS (const QString &strNumber);
+    void sendSMS ();
 
     //! Invoked on response to login to contacts API
     void onLoginResponse (QNetworkReply *reply);
@@ -59,7 +65,12 @@ private slots:
     // Invoked when one contact is parsed out of the XML
     void gotOneContact (const ContactInfo &contactInfo);
 
+    //! Status sink for this window for status bar
+    void setStatus(const QString &strText, int timeout = 2000);
+
 private:
+    void contextMenuEvent (QContextMenuEvent * event);
+
     QNetworkReply *
     postRequest (QString         strUrl,
                  QStringPairList arrPairs,
@@ -72,7 +83,7 @@ private:
 
 
 private:
-    ContactsModel  *modelContacts;
+    Ui::ContactsWindow *ui;
 
     //! Username and password for google authentication
     QString strUser, strPass;
@@ -81,6 +92,9 @@ private:
 
     //! The network manager for contacts API
     QNetworkAccessManager nwMgr;
+
+    //! Context menu for clicking on an item
+    QMenu           mnuContext;
 
     //! Mutex protecting the following variable
     QMutex          mutex;

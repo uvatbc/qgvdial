@@ -59,9 +59,7 @@ SOURCES  += main.cpp                    \
             InboxTreeView.cpp           \
             VMailDialog.cpp             \
             WebWidget.cpp               \
-            RegNumberModel.cpp          \
-            ContactsModel.cpp           \
-            ContactDetailsModel.cpp
+            RegNumberModel.cpp
 
 HEADERS  += global.h                    \
             IObserver.h                 \
@@ -97,11 +95,10 @@ HEADERS  += global.h                    \
             InboxTreeView.h             \
             VMailDialog.h               \
             WebWidget.h                 \
-            RegNumberModel.h            \
-            ContactsModel.h             \
-            ContactDetailsModel.h
+            RegNumberModel.h
 
 FORMS    += LoginDialog.ui              \
+            ContactsWidget.ui           \
             InboxWidget.ui              \
             VMailDialog.ui              \
             WebWidget.ui
@@ -121,9 +118,8 @@ OTHER_FILES  += winrsrc.rc                  \
                 ../qml/ActionButtons.qml    \
                 ../qml/ContactsList.qml     \
                 ../qml/TextButton.qml       \
-                ../qml/ContactDetails.qml   \
-                ../qml/MainView.qml         \
-                readme.txt
+                readme.txt \
+    ../qml/MainView.qml
 
 # In Linux and maemo, add the telepathy related sources and headers
 unix:!symbian {

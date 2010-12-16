@@ -1227,6 +1227,7 @@ MainWindow::on_btnHistory_clicked ()
 void
 MainWindow::closeEvent (QCloseEvent *event)
 {
+    deinitContactsWidget ();
     deinitInboxWidget ();
     QDeclarativeView::closeEvent (event);
 }//MainWindow::closeEvent
