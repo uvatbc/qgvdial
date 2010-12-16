@@ -35,7 +35,11 @@ ContactsModel::data (const QModelIndex &index, int role) const
             QObject *pNonConst = (QObject *) this;
             ContactDetailsModel *pCdm = new ContactDetailsModel (info,
                                                                  pNonConst);
-            retVar = qVariantFromValue<QObject *> (pCdm);
+            if (NULL != pCdm) {
+                retVar = qVariantFromValue<QObject *> (pCdm);
+            } else {
+                qWarning ("Failed to allocate contact detail");
+            }
             break;
         }
 

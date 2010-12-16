@@ -5,11 +5,18 @@ ContactDetailsModel::ContactDetailsModel (const GVContactInfo &i,
 : QAbstractListModel (parent)
 , info (i)
 {
+    qDebug () << "ContactDetailsModel constructor" << (void *)this;
+
     QHash<int, QByteArray> roles;
     roles[CD_TypeRole]   = "type";
     roles[CD_NumberRole] = "number";
     setRoleNames(roles);
 }//ContactDetailsModel::ContactDetailsModel
+
+ContactDetailsModel::~ContactDetailsModel ()
+{
+    qDebug () << "ContactDetailsModel destructor" << (void *)this;
+}
 
 int
 ContactDetailsModel::rowCount (const QModelIndex & /*parent*/) const
