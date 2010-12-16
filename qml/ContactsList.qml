@@ -3,11 +3,15 @@ import "helper.js" as Code
 
 Rectangle {
     id: container
-    width: 400; height: 250
+    width: 250; height: 320
     color: "black"
 
     signal sigCall(string strNumber)
     signal sigText(string strNumber)
+
+    property bool landscape: container.width > container.height
+    property variant rotationDelta: landscape? -90 : 0
+    rotation: rotationDelta
 
 /*
     ListModel {
@@ -18,15 +22,15 @@ Rectangle {
             contacts: [
                 ListElement {
                     type: "Mobile"
-                    number: "+1 408 905 9884"
+                    number: "+1 408 111 2222"
                 },
                 ListElement {
                     type: "Work"
-                    number: "+1 408 497 1234"
+                    number: "+1 408 333 4444"
                 },
                 ListElement {
                     type: "Home"
-                    number: "+1 408 916 5616"
+                    number: "+1 408 555 6666"
                 }
             ]
         }
@@ -35,11 +39,11 @@ Rectangle {
             contacts: [
                 ListElement {
                     type: "Mobile"
-                    number: "+1 408 905 9883"
+                    number: "+1 408 777 8888"
                 },
                 ListElement {
                     type: "Work"
-                    number: "+1 408 567 5885"
+                    number: "+1 408 999 0000"
                 }
             ]
         }
