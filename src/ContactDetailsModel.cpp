@@ -1,11 +1,18 @@
 #include "ContactDetailsModel.h"
 
+static quint32 nChildren = 0;
+
 ContactDetailsModel::ContactDetailsModel (const GVContactInfo &i,
                                           QObject *parent)
 : QAbstractListModel (parent)
 , info (i)
 {
-    qDebug () << "ContactDetailsModel constructor" << (void *)this;
+    nChildren++;
+    qDebug () << nChildren << ": ContactDetailsModel constructor" << (void *)this;
+
+    if (nChildren == 256) {
+        qDebug ("Wait");
+    }
 
     QHash<int, QByteArray> roles;
     roles[CD_TypeRole]   = "type";
@@ -15,7 +22,8 @@ ContactDetailsModel::ContactDetailsModel (const GVContactInfo &i,
 
 ContactDetailsModel::~ContactDetailsModel ()
 {
-    qDebug () << "ContactDetailsModel destructor" << (void *)this;
+    qDebug () << nChildren << ": ContactDetailsModel destructor" << (void *)this;
+    nChildren--;
 }
 
 int
