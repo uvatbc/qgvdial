@@ -6,10 +6,8 @@ Rectangle {
     color: "black"
     width: 250; height: 400
 
-    signal sigCall(string strNumber)
-    signal sigText(string strNumber)
-    signal sigContacts
-    signal sigInbox
+    signal sigCall(string number)
+    signal sigText(string number)
     signal sigSelChanged (int index)
     signal sigNumChanged (string strNumber)
 
@@ -19,6 +17,7 @@ Rectangle {
     // initial state is portrait
     property real baseWidth: landscape ? window.height : window.width
     property real baseHeight: landscape ? window.width : window.height
+    property alias theNumber: wDisp.theNumber
 
     Rectangle {
         color: "black"
@@ -40,7 +39,7 @@ Rectangle {
                 color: window.color
 
                 width: parent.width
-                height: parent.height * (4 / 9)
+                height: parent.height * (7.5 / 18)
 
                 onSigSelChanged: window.sigSelChanged (index)
                 onSigNumChanged: window.sigNumChanged (strNumber)
@@ -50,7 +49,7 @@ Rectangle {
                 color: window.color
 
                 width: parent.width
-                height: parent.height * (4 / 9)
+                height: parent.height * (8 / 18)
 
                 onBtnClick: Code.doIns(strText)
                 onBtnDelClick: Code.doDel()
@@ -60,12 +59,10 @@ Rectangle {
                 color: window.color
 
                 width: parent.width
-                height: parent.height * (1 / 9)
+                height: parent.height * (2.5 / 18)
 
                 onSigCall: window.sigCall(wDisp.txtEd.text)
                 onSigText: window.sigText(wDisp.txtEd.text)
-                onSigContacts: window.sigContacts()
-                onSigInbox: window.sigInbox()
 
                 onSigDel: Code.doDel()
             }

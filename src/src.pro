@@ -3,7 +3,7 @@ TARGET   = qgvdial
 TEMPLATE = app
 
 CONFIG  += mobility
-MOBILITY = multimedia
+MOBILITY *= multimedia
 
 include(qtsingleapplication/qtsingleapplication.pri)
 
@@ -59,7 +59,9 @@ SOURCES  += main.cpp                    \
             InboxTreeView.cpp           \
             VMailDialog.cpp             \
             WebWidget.cpp               \
-            RegNumberModel.cpp
+            RegNumberModel.cpp          \
+            ContactsModel.cpp           \
+            ContactDetailsModel.cpp
 
 HEADERS  += global.h                    \
             IObserver.h                 \
@@ -95,11 +97,11 @@ HEADERS  += global.h                    \
             InboxTreeView.h             \
             VMailDialog.h               \
             WebWidget.h                 \
-            RegNumberModel.h
+            RegNumberModel.h            \
+            ContactsModel.h             \
+            ContactDetailsModel.h
 
 FORMS    += LoginDialog.ui              \
-            ContactsWidget.ui           \
-            InboxWidget.ui              \
             VMailDialog.ui              \
             WebWidget.ui
 
@@ -107,19 +109,23 @@ RESOURCES += qgvdial.qrc
 
 # This is so that QtCreator can show these files in the files list.
 OTHER_FILES  += winrsrc.rc                  \
-                ../qml/MyButton.qml         \
-                ../qml/MainView_p.qml       \
-                ../qml/MainView_l.qml       \
-                ../qml/Keypad.qml           \
-                ../qml/helper.js            \
-                ../qml/DigitButton.qml      \
-                ../qml/DialDisp.qml         \
-                ../qml/ComboBoxPhones.qml   \
                 ../qml/ActionButtons.qml    \
+                ../qml/ComboBoxPhones.qml   \
+                ../qml/ContactDetails.qml   \
                 ../qml/ContactsList.qml     \
+                ../qml/DialDisp.qml         \
+                ../qml/DigitButton.qml      \
+                ../qml/helper.js            \
+                ../qml/InboxList.qml        \
+                ../qml/Keypad.qml           \
+                ../qml/MainButtons.qml      \
+                ../qml/Main.qml             \
+                ../qml/MainView_l.qml       \
+                ../qml/MainView_p.qml       \
+                ../qml/MainView.qml         \
+                ../qml/MyButton.qml         \
                 ../qml/TextButton.qml       \
-                readme.txt \
-    ../qml/MainView.qml
+                readme.txt
 
 # In Linux and maemo, add the telepathy related sources and headers
 unix:!symbian {
@@ -168,8 +174,8 @@ symbian {
 # Installation for maemo
 maemo5 {
     exists (../../buildit.pl) {
-    PREFIX = ../debian/qgvdial/usr
-    message(Built using my scripts)
+        PREFIX = ../debian/qgvdial/usr
+        message(Built using my scripts)
     }
     !exists (../../buildit.pl) {
         PREFIX = ../maemo/debian/qgvdial/usr

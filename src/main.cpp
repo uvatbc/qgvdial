@@ -63,6 +63,8 @@ main (int argc, char *argv[])
 
 #if defined(Q_WS_S60)
     w.showMaximized();
+#elif defined(Q_WS_MAEMO_5)
+    w.showFullScreen ();
 #else
     w.show();
 #endif

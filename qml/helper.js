@@ -33,7 +33,7 @@ function btnFontPoint () {
 // Calculate the subtext font point from the main font point
 function btnSubTextFontPoint () {
     var m = (btnFontPoint() + 2) / 3;
-    m = (m == 0 ? 1 : m);
+    m = (m < 1 ? 1 : m);
     return (m);
 }
 

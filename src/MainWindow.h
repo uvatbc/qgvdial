@@ -36,6 +36,8 @@ private slots:
 
     // All initializations happen here
     void init ();
+    //! Initialize the QML view
+    void initQML ();
 
     //! Invoked when the application is supposed to exit
     void on_actionE_xit_triggered();
@@ -43,10 +45,6 @@ private slots:
     void messageReceived (const QString &message);
     //! Invoked when the user clicks Login
     void on_action_Login_triggered();
-    //! Invoked when the user clicks the Inbox button
-    void on_btnHistory_clicked();
-    //! invoked when the user clicks the Contacts button
-    void on_btnContacts_clicked();
 
     //! Invoked on rotation
     void orientationChanged ();
@@ -119,19 +117,17 @@ private:
     void initLogging ();
     void doLogin ();
 
-    void initContactsWidget ();
-    void deinitContactsWidget ();
+    void initContacts ();
+    void deinitContacts ();
 
-    void initInboxWidget ();
-    void deinitInboxWidget ();
+    void initInbox ();
+    void deinitInbox ();
 
     bool getInfoFrom (const QString &strNumber,
                       const QString &strNameLink,
                       GVContactInfo &info);
 
     bool findInfo (const QString &strNumber, GVContactInfo &info);
-
-    void closeEvent (QCloseEvent *event);
 
     bool refreshRegisteredNumbers ();
     void fillCallbackNumbers (bool bSave = true);
@@ -149,9 +145,9 @@ private:
     QIcon           icoGoogle;
     QSystemTrayIcon *pSystray;
     //! Contacts table widget
-    GVContactsTable *pContactsView;
+    GVContactsTable oContacts;
     //! Contacts table widget
-    GVHistory       *pInboxView;
+    GVHistory       oInbox;
     //! SMS Window
     SMSDlg          dlgSMS;
     //! Web View
@@ -164,6 +160,7 @@ private:
     // Menus and actions
     QMenu           menuFile;
     QAction         actLogin;
+    QAction         actDismiss;
     QAction         actExit;
     QAction         actViewWeb;
 

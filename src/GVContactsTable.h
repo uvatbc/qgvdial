@@ -2,22 +2,21 @@
 #define __GVCONTACTSTABLE_H__
 
 #include "global.h"
+#include "ContactsModel.h"
+
 #include <QtNetwork>
+#include <QtDeclarative>
 
-namespace Ui {
-    class ContactsWindow;
-}
-
-class GVContactsTable : public QMainWindow
+class GVContactsTable : public QObject
 {
     Q_OBJECT
 
 public:
-    GVContactsTable (QWidget *parent = 0, Qt::WindowFlags flags = 0);
+    GVContactsTable (QObject *parent = 0);
     ~GVContactsTable ();
 
     void deinitModel ();
-    void initModel ();
+    void initModel (QDeclarativeView *pMainWindow);
 
     //! Use this to set the username and password for the contacts API login
     void setUserPass (const QString &strU, const QString &strP);
@@ -26,9 +25,6 @@ public:
     void loginSuccess ();
     //! Use this to logout
     void loggedOut ();
-
-    bool convert (const ContactInfo &cInfo, GVContactInfo &gvcInfo);
-
 
 signals:
     //! Log emitter
@@ -39,22 +35,10 @@ signals:
     //! Emitted when all contacts are done
     void allContacts (bool bOk);
 
-    //! Emitted on user request to call a known contact
-    void callNumber (const QString &strNumber, const QString &strNameLink);
-    //! Emitted on user request to send an SMS to a known contact
-    void textANumber (const QString &strNumber, const QString &strNameLink);
-
 public slots:
     void refreshContacts ();
 
 private slots:
-    void activatedContact (const QModelIndex &);
-
-    //! Invoked when the place call action is triggered
-    void placeCall ();
-    //! Invoked when the send SMS action is triggered
-    void sendSMS ();
-
     //! Invoked on response to login to contacts API
     void onLoginResponse (QNetworkReply *reply);
     //! Invoked when the captcha is done
@@ -65,12 +49,7 @@ private slots:
     // Invoked when one contact is parsed out of the XML
     void gotOneContact (const ContactInfo &contactInfo);
 
-    //! Status sink for this window for status bar
-    void setStatus(const QString &strText, int timeout = 2000);
-
 private:
-    void contextMenuEvent (QContextMenuEvent * event);
-
     QNetworkReply *
     postRequest (QString         strUrl,
                  QStringPairList arrPairs,
@@ -83,18 +62,15 @@ private:
 
 
 private:
-    Ui::ContactsWindow *ui;
+    ContactsModel  *modelContacts;
 
     //! Username and password for google authentication
-    QString strUser, strPass;
+    QString         strUser, strPass;
     //! The authentication string returned by the contacts API
     QString         strGoogleAuth;
 
     //! The network manager for contacts API
     QNetworkAccessManager nwMgr;
-
-    //! Context menu for clicking on an item
-    QMenu           mnuContext;
 
     //! Mutex protecting the following variable
     QMutex          mutex;

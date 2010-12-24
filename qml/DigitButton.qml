@@ -47,7 +47,7 @@ Item {
         Text {
             id: sText
             text: subText
-            color: "darkgrey"
+            color: "grey"
             anchors.right: parent.right
             anchors.bottom: parent.bottom
             font.pointSize: Code.btnSubTextFontPoint ();

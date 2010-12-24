@@ -590,7 +590,8 @@ GVWebPage::onDataCallDone (QNetworkReply * reply)
         msg.remove(QRegExp("[ \t\n]*"));
         if (!msg.contains ("\"ok\":true", Qt::CaseSensitive))
         {
-            qWarning ("Failed to dial out");
+            qWarning() << "Failed to dial out. Response to dial out request ="
+                       << msg;
             completeCurrentWork (GVAW_dialCallback, false);
             break;
         }

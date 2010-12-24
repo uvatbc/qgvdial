@@ -1,36 +1,18 @@
 #include "global.h"
 #include "GVContactsTable.h"
-#include "ui_ContactsWidget.h"
 #include "CaptchaWidget.h"
 
 #include "Singletons.h"
 #include "ContactsXmlHandler.h"
 
-GVContactsTable::GVContactsTable (QWidget *parent, Qt::WindowFlags flags)
-: QMainWindow (parent, flags)
-, ui (new Ui::ContactsWindow)
+GVContactsTable::GVContactsTable (QObject *parent)
+: QObject (parent)
+, modelContacts (NULL)
 , nwMgr (this)
 , mutex(QMutex::Recursive)
 , bLoggedIn(false)
 , bRefreshRequested (false)
 {
-    ui->setupUi (this);
-
-    OsDependent &osd = Singletons::getRef().getOSD ();
-    osd.setDefaultWindowAttributes (this);
-
-    mnuContext.addAction (ui->actionCall);
-    mnuContext.addAction (ui->actionSend_Text);
-
-    // treeView.activated -> this.activatedContact
-    QObject::connect (
-        ui->treeView, SIGNAL (activated        (const QModelIndex &)),
-        this        , SLOT   (activatedContact (const QModelIndex &)));
-
-    // The status must be shown on this window as well
-    QObject::connect (
-        this, SIGNAL (status    (const QString &, int)),
-        this, SLOT   (setStatus (const QString &, int)));
 }//GVContactsTable::GVContactsTable
 
 GVContactsTable::~GVContactsTable ()
@@ -41,29 +23,26 @@ GVContactsTable::~GVContactsTable ()
 void
 GVContactsTable::deinitModel ()
 {
-    ui->treeView->reset ();
-
-    QSqlTableModel *modelContacts = (QSqlTableModel *)ui->treeView->model ();
-    ui->treeView->setModel (NULL);
-    if (NULL != modelContacts)
-    {
+    if (NULL != modelContacts) {
         delete modelContacts;
         modelContacts = NULL;
     }
 }//GVContactsTable::deinitModel
 
 void
-GVContactsTable::initModel ()
+GVContactsTable::initModel (QDeclarativeView *pMainWindow)
 {
     deinitModel ();
 
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    QSqlTableModel *modelContacts = dbMain.newContactsModel ();
-    ui->treeView->setModel (modelContacts);
-    modelContacts->submitAll ();
+    modelContacts = dbMain.newContactsModel ();
 
-    ui->treeView->hideColumn (1);
-    ui->treeView->sortByColumn (0, Qt::AscendingOrder);
+    QDeclarativeContext *ctx = pMainWindow->rootContext();
+    ctx->setContextProperty ("contactsModel", modelContacts);
+
+    while (modelContacts->canFetchMore ()) {
+        modelContacts->fetchMore ();
+    }
 }//GVContactsTable::initModel
 
 QNetworkReply *
@@ -135,7 +114,6 @@ GVContactsTable::refreshContacts ()
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     QString strUrl;
 
-    ui->treeView->strSavedLink.clear ();
     strUrl = QString ("http://www.google.com/m8/feeds/contacts/%1/full"
                       "?max-results=10000")
                         .arg (strUser);
@@ -150,12 +128,21 @@ GVContactsTable::refreshContacts ()
     }
     else
     {
+        //TODO: Tell model to clear, not the DB
         dbMain.clearContacts ();
     }
 
     emit status ("Retrieving contacts", 0);
     getRequest (strUrl, this , SLOT (onGotContacts (QNetworkReply *)));
-}//GVContactsTable::refreshContactsFromContactsAPI
+}//GVContactsTable::refreshContacts
+
+void
+GVContactsTable::setUserPass (const QString &strU, const QString &strP)
+{
+    QMutexLocker locker(&mutex);
+    strUser = strU;
+    strPass = strP;
+}//GVContactsTable::setUserPass
 
 void
 GVContactsTable::loginSuccess ()
@@ -180,54 +167,6 @@ GVContactsTable::loggedOut ()
 
     strGoogleAuth.clear ();
 }//GVContactsTable::loggedOut
-
-void
-GVContactsTable::activatedContact (const QModelIndex &)
-{
-    placeCall ();
-}//GVContactsTable::activatedContact
-
-void
-GVContactsTable::contextMenuEvent (QContextMenuEvent * event)
-{
-    mnuContext.popup (event->globalPos ());
-}//GVContactsTable::contextMenuEvent
-
-void
-GVContactsTable::placeCall ()
-{
-    QMutexLocker locker(&mutex);
-    if (0 != ui->treeView->strSavedLink.size ())
-    {
-        emit callNumber (QString (), ui->treeView->strSavedLink);
-    }
-    else
-    {
-        emit status ("Nothing selected");
-    }
-}//GVContactsTable::placeCall
-
-void
-GVContactsTable::sendSMS ()
-{
-    QMutexLocker locker(&mutex);
-    if (0 != ui->treeView->strSavedLink.size ())
-    {
-        emit textANumber (QString(), ui->treeView->strSavedLink);
-    }
-    else
-    {
-        emit status ("Nothing selected");
-    }
-}//GVContactsTable::sendSMS
-
-void
-GVContactsTable::setUserPass (const QString &strU, const QString &strP)
-{
-    QMutexLocker locker(&mutex);
-    strUser = strU;
-    strPass = strP;
-}//GVContactsTable::setUserPass
 
 void
 GVContactsTable::onLoginResponse (QNetworkReply *reply)
@@ -265,7 +204,7 @@ GVContactsTable::onLoginResponse (QNetworkReply *reply)
             strCaptchaUrl = "http://www.google.com/accounts/"
                           + strCaptchaUrl;
             qDebug ("Loading captcha");
-            CaptchaWidget *captcha = new CaptchaWidget(strCaptchaUrl, this);
+            CaptchaWidget *captcha = new CaptchaWidget(strCaptchaUrl);
             QObject::connect (
                 captcha, SIGNAL (done (bool, const QString &)),
                 this   , SLOT   (onCaptchaDone (bool, const QString &)));
@@ -360,17 +299,6 @@ GVContactsTable::onGotContacts (QNetworkReply *reply)
                 .arg (contactsHandler.getUsableContacts ());
     } while (0); // End cleanup block (not a loop)
 
-    QSqlTableModel *modelContacts = (QSqlTableModel *) ui->treeView->model ();
-    if (rv) {
-        emit status ("Contacts retrieved. Saving. This will take some time...");
-        modelContacts->submitAll ();
-        emit status ("Contacts committed to local database");
-    } else {
-        modelContacts->revertAll ();
-    }
-
-    modelContacts->select ();
-
     emit status (msg);
     emit allContacts (rv);
 
@@ -380,64 +308,14 @@ GVContactsTable::onGotContacts (QNetworkReply *reply)
 void
 GVContactsTable::gotOneContact (const ContactInfo &contactInfo)
 {
-    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-
-    GVContactInfo gvContactInfo;
-    convert (contactInfo, gvContactInfo);
-
     QMutexLocker locker(&mutex);
-    QSqlTableModel *modelContacts = (QSqlTableModel *) ui->treeView->model ();
-
     if (contactInfo.bDeleted)
     {
-        dbMain.deleteContact (contactInfo.strId);
-        dbMain.deleteContactInfo (contactInfo.strId);
+        modelContacts->deleteContact (contactInfo);
     }
     else    // add or modify
     {
-        dbMain.insertContact (modelContacts,
-                              contactInfo.strTitle,
-                              contactInfo.strId);
-        dbMain.putContactInfo (gvContactInfo);
+        modelContacts->insertContact (contactInfo);
     }
 
 }//GVContactsTable::gotOneContact
-
-bool
-GVContactsTable::convert (const ContactInfo &cInfo, GVContactInfo &gvcInfo)
-{
-    gvcInfo.strLink = cInfo.strId;
-    gvcInfo.strName = cInfo.strTitle;
-
-    foreach (PhoneInfo pInfo, cInfo.arrPhones)
-    {
-        GVContactNumber gvcn;
-        switch (pInfo.Type)
-        {
-        case PType_Mobile:
-            gvcn.chType = 'M';
-            break;
-        case PType_Home:
-            gvcn.chType = 'H';
-            break;
-        case PType_Other:
-            gvcn.chType = 'O';
-            break;
-        default:
-            gvcn.chType = '?';
-            break;
-        }
-
-        gvcn.strNumber = pInfo.strNumber;
-
-        gvcInfo.arrPhones += gvcn;
-    }
-
-    return (true);
-}//GVContactsTable::convert
-
-void
-GVContactsTable::setStatus (const QString &strText, int timeout)
-{
-    ui->statusbar->showMessage (strText, timeout);
-}//GVContactsTable::setStatus

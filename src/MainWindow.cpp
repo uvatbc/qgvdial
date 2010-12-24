@@ -21,14 +21,15 @@ MainWindow::MainWindow (QWidget *parent)
 , fLogfile (this)
 , icoGoogle (":/Google.png")
 , pSystray (NULL)
-, pContactsView (NULL)
-, pInboxView (NULL)
+, oContacts (this)
+, oInbox (this)
 , pWebWidget (new WebWidget (this, Qt::Window))
 #ifdef Q_WS_MAEMO_5
 , infoBox (this)
 #endif
 , menuFile ("&File", this)
 , actLogin ("Login...", this)
+, actDismiss ("Dismiss", this)
 , actExit ("Exit", this)
 , actViewWeb ("Show web view", this)
 , bLoggedIn (false)
@@ -45,16 +46,20 @@ MainWindow::MainWindow (QWidget *parent)
 
     initLogging ();
 
-    // This must be done at least once so that the initial qml is loaded.
-    // Even if it is desktop, this must be done: The function takes care of
-    // making it portrait for non-maemo.
-    orientationChanged ();
-
     OsDependent &osd = Singletons::getRef().getOSD ();
     osd.setDefaultWindowAttributes (this);
 
     pWebWidget->hide ();
     osd.setDefaultWindowAttributes (pWebWidget);
+
+    // We first show the window without any context variables set.
+    // At this point we anyway do not have an dea about the user, so it doesn't
+    // make sense to actually set up any variables. However, the view needs to
+    // be shown, otherwise the user will be confused about whether the app is
+    // running or hung. We can safely reload this QML later, whenuser is logged
+    // in and we have all the models set up.
+    this->setSource (QUrl ("qrc:/Main.qml"));
+    this->setResizeMode (QDeclarativeView::SizeRootObjectToView);
 
     // A systray icon if the OS supports it
     if (QSystemTrayIcon::isSystemTrayAvailable ())
@@ -62,6 +67,7 @@ MainWindow::MainWindow (QWidget *parent)
         pSystray = new QSystemTrayIcon (this);
         pSystray->setIcon (icoGoogle);
         pSystray->setToolTip ("Google Voice dialer");
+        pSystray->setContextMenu (&menuFile);
         QObject::connect (
             pSystray,
             SIGNAL (activated (QSystemTrayIcon::ActivationReason)),
@@ -201,13 +207,18 @@ MainWindow::init ()
 
     setStatus ("Initializing...");
 
+    // Initialize the database: This may create OR blowup and then re-create
+    // the database.
     dbMain.init ();
+
+    // Initialize the DBUS interface to allow other applications (and qgv-tp) to
+    // initiate calls and send texts through us.
     osd.initDialServer (this, SLOT (dialNow (const QString &)));
     osd.initTextServer (
         this, SLOT (sendSMS (const QStringList &, const QString &)),
         this, SLOT (onSendTextWithoutData (const QStringList &)));
 
-    // Dialing handshake
+    // The GV access class signals these during the dialling protocol
     QObject::connect (&webPage    , SIGNAL (dialInProgress (const QString &)),
                        this       , SLOT   (dialInProgress (const QString &)));
     QObject::connect ( this       , SIGNAL (dialCanFinish ()),
@@ -218,29 +229,30 @@ MainWindow::init ()
          this   , SLOT   (dialAccessNumber (const QString &,
                                             const QVariant &)));
 
-    // Skype client factory main widget and status
+    // Skype client factory needs a main widget. Also, it needs a status sink.
     SkypeClientFactory &skypeFactory = Singletons::getRef().getSkypeFactory ();
     skypeFactory.setMainWidget (this);
     QObject::connect (
         &skypeFactory, SIGNAL (status(const QString &, int)),
          this        , SLOT   (setStatus(const QString &, int)));
 
-    // Observer factory init and status
+    // Telepathy Observer factory init and status
     ObserverFactory &obF = Singletons::getRef().getObserverFactory ();
     obF.init ();
     QObject::connect (&obF , SIGNAL (status(const QString &, int)),
                        this, SLOT   (setStatus(const QString &, int)));
 
-    // webPage init and status
+    // webPage init and status. This webpage is for debug purposes only
     QObject::connect (&webPage, SIGNAL (status(const QString &, int)),
                        this   , SLOT   (setStatus(const QString &, int)));
 
-    // call initiator init and status
+    // Call initiator init and status
     CallInitiatorFactory& cif = Singletons::getRef().getCIFactory ();
     QObject::connect (&cif , SIGNAL (status(const QString &, int)),
                        this, SLOT   (setStatus(const QString &, int)));
 
-    // Send an SMS
+    // The dialog box that we use to input text signals us to send an SMS.
+    // Connect it to the slot that does the job.
     QObject::connect (
         &dlgSMS, SIGNAL (sendSMS (const QStringList &, const QString &)),
          this  , SLOT   (sendSMS (const QStringList &, const QString &)));
@@ -248,17 +260,29 @@ MainWindow::init ()
     // Additional UI initializations:
     //@@UV: Need this for later
 //    ui->edNumber->setValidator (new PhoneNumberValidator (ui->edNumber));
+
+    // Login/logout = Ctrl+L
     actLogin.setShortcut (QKeySequence(Qt::CTRL + Qt::Key_L));
+    // Dismiss = Esc
+    actDismiss.setShortcut (QKeySequence(Qt::Key_Escape));
+    // Quit = Ctrl+Q
     actExit.setShortcut (QKeySequence(Qt::CTRL + Qt::Key_Q));
+    // Show debug webpage = Ctrl+Shift+W
     actViewWeb.setShortcut (QKeySequence (Qt::CTRL + Qt::SHIFT + Qt::Key_W));
-    menuFile.addAction (&actLogin);
-    menuFile.addAction (&actExit);
+    // Add these actions to the window
     menuFile.addAction (&actViewWeb);
+    menuFile.addAction (&actLogin);
+    menuFile.addAction (&actDismiss);
+    menuFile.addAction (&actExit);
     this->addAction (&actLogin);
+    this->addAction (&actDismiss);
     this->addAction (&actExit);
     this->addAction (&actViewWeb);
+    // When the actions are triggered, do the corresponding work.
     QObject::connect (&actLogin, SIGNAL (triggered()),
                        this    , SLOT   (on_action_Login_triggered()));
+    QObject::connect (&actDismiss, SIGNAL (triggered()),
+                       this      , SLOT   (close()));
     QObject::connect (&actExit, SIGNAL (triggered()),
                        this   , SLOT   (on_actionE_xit_triggered()));
     QObject::connect (&actViewWeb, SIGNAL (triggered ()),
@@ -271,6 +295,7 @@ MainWindow::init ()
     {
         QVariantList l;
         logoutCompleted (true, l);
+        // Login without popping up the "enter user/pass" dialog
         doLogin ();
     }
     else
@@ -284,9 +309,32 @@ MainWindow::init ()
     }
 }//MainWindow::init
 
+void
+MainWindow::initQML ()
+{
+    // Initialize the QML view
+    QDeclarativeContext *ctx = this->rootContext();
+    ctx->setContextProperty ("registeredPhonesModel", &modelRegNumber);
+    this->setSource (QUrl ("qrc:/Main.qml"));
+    this->setResizeMode (QDeclarativeView::SizeRootObjectToView);
+
+    // Pick up signals from QML to call or text a number
+    QGraphicsObject *gObj = this->rootObject();
+    QObject::connect (gObj, SIGNAL (sigCall (QString)),
+                      this, SLOT   (dialNow (QString)));
+    QObject::connect (gObj, SIGNAL (sigText (QString)),
+                      this, SLOT   (textANumber (QString)));
+    QObject::connect (gObj, SIGNAL (sigVoicemail (QString)),
+                      this, SLOT   (retrieveVoicemail (const QString &)));
+    QObject::connect (gObj, SIGNAL (sigSelChanged (int)),
+                      this, SLOT   (onRegPhoneSelectionChange (int)));
+    QObject::connect (gObj   , SIGNAL (sigInboxSelect (QString)),
+                      &oInbox, SLOT   (onInboxSelected (const QString &)));
+}//MainWindow::initQML
+
 /** Invoked to begin the login process.
- * This function begins the process to login to the GV website. Its async
- * completion routine is loginCompleted
+ * We already have the username and password, so just start the login to the GV
+ * website. The async completion routine is loginCompleted.
  */
 void
 MainWindow::doLogin ()
@@ -386,10 +434,13 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
 
         // Save the users GV number returned by the login completion
         strSelfNumber = varList[varList.size()-1].toString ();
-        // Prepare then contacts widget for usage
-        initContactsWidget ();
+
+        // Prepare then contacts
+        initContacts ();
         // Prepare the inbox widget for usage
-        initInboxWidget ();
+        initInbox ();
+        // Finally prepare the mail QML
+        initQML ();
 
         // Allow access to buttons and widgets
         actLogin.setText ("Logout");
@@ -424,28 +475,6 @@ MainWindow::orientationChanged ()
 #ifndef Q_WS_MAEMO_5
     bLandscape = false;
 #endif
-
-    QDeclarativeContext *ctx = this->rootContext();
-
-    if (this->source().toString().isEmpty ()) {
-        ctx->setContextProperty ("myModel", &modelRegNumber);
-        onRegPhoneSelectionChange (indRegPhone);
-        this->setSource (QUrl ("qrc:/MainView.qml"));
-        this->setResizeMode (QDeclarativeView::SizeRootObjectToView);
-
-        // Call or text a number
-        QGraphicsObject *gObj = this->rootObject();
-        QObject::connect (gObj, SIGNAL (sigCall (QString)),
-                          this, SLOT   (dialNow (QString)));
-        QObject::connect (gObj, SIGNAL (sigText (QString)),
-                          this, SLOT   (textANumber (QString)));
-        QObject::connect (gObj, SIGNAL (sigContacts ()),
-                          this, SLOT   (on_btnContacts_clicked ()));
-        QObject::connect (gObj, SIGNAL (sigInbox ()),
-                          this, SLOT   (on_btnHistory_clicked ()));
-        QObject::connect (gObj, SIGNAL (sigSelChanged (int)),
-                          this, SLOT   (onRegPhoneSelectionChange (int)));
-    }
 }//MainWindow::orientationChanged
 
 void
@@ -464,8 +493,8 @@ void
 MainWindow::logoutCompleted (bool, const QVariantList &)
 {
     // This clears out the table and the view as well
-    deinitContactsWidget ();
-    deinitInboxWidget ();
+    deinitContacts ();
+    deinitInbox ();
 
     arrNumbers.clear ();
 
@@ -540,122 +569,54 @@ MainWindow::getContactsDone (bool bOk)
 }//MainWindow::getContactsDone
 
 void
-MainWindow::initContactsWidget ()
+MainWindow::initContacts ()
 {
-    do { // Begin cleanup block (not a loop)
-        if (NULL != pContactsView) {
-            qDebug ("Contacts widget is already active");
-            break;
-        }
+    // Status
+    QObject::connect (&oContacts, SIGNAL (status   (const QString &, int)),
+                       this     , SLOT   (setStatus(const QString &, int)));
 
-        // Create the contact view
-        pContactsView = new GVContactsTable (this);
+    // oContacts.allContacts -> this.getContactsDone
+    QObject::connect (&oContacts, SIGNAL (allContacts (bool)),
+                      this      , SLOT   (getContactsDone (bool)));
 
-        // Status
-        QObject::connect (
-            pContactsView, SIGNAL (status   (const QString &, int)),
-            this         , SLOT   (setStatus(const QString &, int)));
-
-        // pContactsView.allContacts -> this.getContactsDone
-        QObject::connect (pContactsView, SIGNAL (allContacts (bool)),
-                          this         , SLOT   (getContactsDone (bool)));
-        // pContactsView.call -> this.call
-        QObject::connect (
-            pContactsView,
-                SIGNAL(callNumber(const QString &, const QString &)),
-            this         ,
-                SLOT  (callNumber(const QString &, const QString &)));
-        // pContactsView.SMS -> this.SMS
-        QObject::connect (
-            pContactsView,
-                SIGNAL (textANumber (const QString &, const QString &)),
-            this         ,
-                SLOT   (textANumber (const QString &, const QString &)));
-
-        pContactsView->setUserPass (strUser, strPass);
-        pContactsView->loginSuccess ();
-        pContactsView->initModel ();
+    oContacts.setUserPass (strUser, strPass);
+    oContacts.loginSuccess ();
+    oContacts.initModel (this);
 
 #ifndef Q_WS_MAEMO_5
-        pContactsView->refreshContacts ();
+    oContacts.refreshContacts ();
 #endif
-    } while (0); // End cleanup block (not a loop)
-}//MainWindow::initContactsWidget
+}//MainWindow::initContacts
 
 void
-MainWindow::deinitContactsWidget ()
+MainWindow::deinitContacts ()
 {
-    do { // Begin cleanup block (not a loop)
-        if (NULL == pContactsView) {
-            qDebug ("Contacts widget was NULL.");
-            break;
-        }
-
-        pContactsView->deinitModel ();
-
-        pContactsView->loggedOut ();
-
-        pContactsView->deleteLater ();
-        pContactsView = NULL;
-    } while (0); // End cleanup block (not a loop)
-}//MainWindow::deinitContactsWidget
+    oContacts.deinitModel ();
+    oContacts.loggedOut ();
+}//MainWindow::deinitContacts
 
 void
-MainWindow::initInboxWidget ()
+MainWindow::initInbox ()
 {
-    do { // Begin cleanup block (not a loop)
-        if (NULL != pInboxView) {
-            qDebug ("Inbox widget is already active");
-            break;
-        }
+    // Status
+    QObject::connect (
+            &oInbox, SIGNAL (status   (const QString &, int)),
+            this   , SLOT   (setStatus(const QString &, int)));
 
-        // Create the contact view
-        pInboxView = new GVHistory (this);
-
-        // Status
-        QObject::connect (
-            pInboxView, SIGNAL (status   (const QString &, int)),
-            this      , SLOT   (setStatus(const QString &, int)));
-
-        // pInboxView.call -> this.call
-        QObject::connect (
-            pInboxView, SIGNAL(callNumber(const QString &, const QString &)),
-            this      , SLOT  (callNumber(const QString &, const QString &)));
-        // pInboxView.SMS -> this.SMS
-        QObject::connect (
-            pInboxView, SIGNAL(textANumber (const QString &, const QString &)),
-            this      , SLOT  (textANumber (const QString &, const QString &)));
-        // pInboxView.retrieveVoicemail -> this.retrieveVoicemail
-        QObject::connect (
-            pInboxView, SIGNAL(retrieveVoicemail (const QString &)),
-            this      , SLOT  (retrieveVoicemail (const QString &)));
-
-        pInboxView->loginSuccess ();
-        pInboxView->initModel ();
+    oInbox.loginSuccess ();
+    oInbox.initModel (this);
 
 #ifndef Q_WS_MAEMO_5
-        pInboxView->refreshHistory ();
+    oInbox.refreshHistory ();
 #endif
-    } while (0); // End cleanup block (not a loop)
-}//MainWindow::initInboxWidget
+}//MainWindow::initInbox
 
 void
-MainWindow::deinitInboxWidget ()
+MainWindow::deinitInbox ()
 {
-    do { // Begin cleanup block (not a loop)
-        if (NULL == pInboxView) {
-            qWarning ("Inbox widget was NULL.");
-            break;
-        }
-
-        pInboxView->deinitModel ();
-
-        pInboxView->loggedOut ();
-
-        pInboxView->deleteLater ();
-        pInboxView = NULL;
-    } while (0); // End cleanup block (not a loop)
-}//MainWindow::deinitInboxWidget
+    oInbox.deinitModel ();
+    oInbox.loggedOut ();
+}//MainWindow::deinitInbox
 
 /** Convert a number and a key to more info into a structure with all the info.
  * @param strNumber The phone number
@@ -1197,40 +1158,6 @@ MainWindow::sendSMSDone (bool bOk, const QVariantList &params)
 
     setStatus (msg);
 }//MainWindow::sendSMSDone
-
-void
-MainWindow::on_btnContacts_clicked ()
-{
-    initContactsWidget ();
-    if (pContactsView->isVisible ()) {
-        pContactsView->hide ();
-    } else {
-        pContactsView->show ();
-        OsDependent &osd = Singletons::getRef().getOSD ();
-        osd.setDefaultWindowAttributes (pContactsView);
-    }
-}//MainWindow::on_btnContacts_clicked
-
-void
-MainWindow::on_btnHistory_clicked ()
-{
-    initInboxWidget ();
-    if (pInboxView->isVisible ()) {
-        pInboxView->hide ();
-    } else {
-        pInboxView->show ();
-        OsDependent &osd = Singletons::getRef().getOSD ();
-        osd.setDefaultWindowAttributes (pInboxView);
-    }
-}//MainWindow::on_btnHistory_clicked
-
-void
-MainWindow::closeEvent (QCloseEvent *event)
-{
-    deinitContactsWidget ();
-    deinitInboxWidget ();
-    QDeclarativeView::closeEvent (event);
-}//MainWindow::closeEvent
 
 bool
 MainWindow::refreshRegisteredNumbers ()

@@ -1,195 +1,141 @@
 import Qt 4.7
-import "../../trunk/qml/helper.js" as Code
+import "helper.js" as Code
 
 Rectangle {
     id: container
-    width: 400; height: 250
+    width: 250; height: 320
     color: "black"
 
-    signal sigCall(string strNumber)
-    signal sigText(string strNumber)
+    signal sigCall(string number)
+    signal sigText(string number)
+    signal sigContactlink(string link)
 
-    ListModel {
-        id: contactsModel
+////////////////////////////////////////////////////////////////////////////////
+//                                Data models                                 //
+////////////////////////////////////////////////////////////////////////////////
+//    ContactsModelData1 {
+//        id: testContactsModelData1
+//    }
 
-        ListElement {
-            name: "Uv"
-            contacts: [
-                ListElement {
-                    type: "Mobile"
-                    number: "+1 408 905 9884"
-                },
-                ListElement {
-                    type: "Work"
-                    number: "+1 408 497 1234"
-                },
-                ListElement {
-                    type: "Home"
-                    number: "+1 408 916 5616"
-                }
-            ]
+//    XmlListModel {
+//        id: testContactsModelData2
+//        source: "./ContactsModelData2.xml"
+//        query: "/all_contacts/one_contact"
+
+//        XmlRole { name: "name"; query: "@name/string()" }
+//        XmlRole { name: "contacts"; query: "contact/*" }
+//    }
+////////////////////////////////////////////////////////////////////////////////
+
+    Rectangle {
+        id: detailsView
+
+        anchors.fill: parent
+        color: "darkslategray"
+        border.color: "orange"
+        radius: 10
+
+        opacity: 0
+
+        Item {
+            id: detailTopRow
+
+            anchors {
+                top: parent.top
+                left: parent.left
+                right: parent.right
+            }
+            height: btnDetailsClose.height
+
+            Text {
+                text: "Contact name"    // contactDetailName
+                anchors.verticalCenter: parent.verticalCenter
+                color: "white"
+                font.pointSize: Code.btnFontPoint () / 8
+                anchors.left: parent.left
+            }
+
+            TextButton {
+                id: btnDetailsClose
+                text: "Close"
+                onClicked: container.state= ''
+                anchors.right: parent.right
+
+                fontPoint: Code.btnFontPoint() / 8
+            }
         }
-        ListElement {
-            name: "Yasho"
-            contacts: [
-                ListElement {
-                    type: "Mobile"
-                    number: "+1 408 905 9883"
-                },
-                ListElement {
-                    type: "Work"
-                    number: "+1 408 567 5885"
-                }
-            ]
+
+        ContactDetails {
+            anchors {
+                top: detailTopRow.bottom
+                left: parent.left
+                right: parent.right
+                bottom: parent.bottom
+            }
+
+            onSigCall: container.sigCall(number)
+            onSigText: container.sigText(number)
         }
     }
 
     ListView {
-        id: listView
-        model: contactsModel
+        id: contactsView
+
         anchors.fill: parent
+        clip: true
+        opacity: 1
 
-        delegate: Item {
+        model: contactsModel
+//        model: testContactsModelData1
+
+        delegate: Rectangle {
             id: listDelegate
-            property real detailsOpacity: 0
 
-            width: listView.width
-            height: {
-                if (detailsOpacity == 0) {
-                    return (listView.height / 5);
-                } else {
-                    return listView.height / 3;
+            color: "darkslategray"
+            border.color: "orange"
+            radius: 5
+
+            width: contactsView.width
+            height: textName.height + 8
+
+            Text {
+                id: textName
+
+                anchors {
+                    verticalCenter: parent.verticalCenter
+                    left: parent.left
+                    leftMargin: 5
                 }
+
+                text: name
+                color: "white"
+
+                font.pointSize: (Code.btnFontPoint () / 8)
             }
 
             MouseArea {
                 anchors.fill: parent
 
-                onClicked: listDelegate.state = 'Details'
-            }
-
-            // Bounding rectangle
-            Rectangle {
-                anchors.fill: parent
-                color: "darkslategray"
-                border.color: "orange"
-                radius: 10
-                opacity: 1
-            }
-
-            // Topmost information in each delegate entry
-            Item {
-                id: topRow
-
-                anchors.left: parent.left
-                width: parent.width
-                height: Math.max(textName.height, btnClose.height) + 10
-
-                Row {
-                    anchors.fill: parent
-
-                    Text {
-                        id: textName
-                        width: parent.width - btnClose.width
-
-                        text: model.name
-                        color: "white"
-
-                        anchors {
-                            top: parent.top
-                            topMargin: 10
-                            leftMargin: 3
-                        }
-
-                        font.pointSize: (Code.btnFontPoint () / 8)
-                    }
-
-                    TextButton {
-                        id: btnClose
-
-                        text: "Close"
-                        fontPoint: (Code.btnFontPoint () / 12)
-
-                        opacity: listDelegate.detailsOpacity
-                        anchors {
-                            top: parent.top
-                            topMargin: 10
-                        }
-
-                        onClicked: listDelegate.state = ''
-                    }
-                }
-            }
-
-            // Details in the delegate
-            Item {
-                id: bigForm
-                opacity: listDelegate.detailsOpacity
-                anchors {
-                    top: topRow.bottom
-                    left: parent.left
-                    right: parent.right
-                    bottom: parent.bottom
-                }
-
-                width: parent.width
-                height: (parent.height - topRow.height)
-
-                ListView {
-                    id: listPhones
-                    model: contacts
-                    anchors.fill: parent
-                    spacing: 2
-                    clip: true
-
-                    delegate: Flow {
-                        width: parent.width
-                        height: Math.max(textNumber.height, btnCall.height)
-
-                        Text {
-                            id: textNumber
-                            width: parent.width - btnCall.width - btnText.width
-                            text: type + "\t: " + number
-                            color: "white"
-                            font.pointSize: (Code.btnFontPoint () / 12)
-                        }
-
-                        TextButton {
-                            id: btnCall
-                            text: "Call"
-                            fontPoint: (Code.btnFontPoint () / 12)
-
-                            onClicked: container.sigCall(number)
-                        }
-                        TextButton {
-                            id: btnText
-                            text: "Text"
-                            fontPoint: (Code.btnFontPoint () / 12)
-
-                            onClicked: container.sigText(number)
-                        }
-                    }
-                }
-            }
-
-            states: State {
-                name: "Details"
-                PropertyChanges { target: listDelegate; detailsOpacity: 1 }
-
-                // Move the list so that this item is at the top.
-                PropertyChanges { target: listDelegate.ListView.view; explicit: true; contentY: listDelegate.y }
-
-                // Disallow flicking while we're in detailed view
-                PropertyChanges { target: listDelegate.ListView.view; interactive: false }
-            }
-
-            transitions: Transition {
-                // Make the state changes smooth
-                ParallelAnimation {
-//                    ColorAnimation { property: "color"; duration: 500 }
-                    NumberAnimation { duration: 300; properties: "detailsOpacity,x,height,width" }
+                onClicked: {
+                    container.sigContactlink (contacts);
+                    container.state = "Details"
                 }
             }
         }// delegate Rectangle
     }// ListView
+
+    states: [
+        State {
+            name: "Details"
+            PropertyChanges { target: contactsView; opacity: 0 }
+            PropertyChanges { target: detailsView; opacity: 1 }
+        }
+    ]
+
+    transitions: [
+        Transition {
+            PropertyAnimation { property: "opacity"; easing.type: Easing.InOutQuad}
+        }
+    ]
+
 }// Rectangle

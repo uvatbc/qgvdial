@@ -6,10 +6,8 @@ Rectangle {
     color: "black"
     width: 400; height: 250
 
-    signal sigCall(string strNumber)
-    signal sigText(string strNumber)
-    signal sigContacts
-    signal sigInbox
+    signal sigCall(string number)
+    signal sigText(string number)
     signal sigSelChanged (int index)
     signal sigNumChanged (string strNumber)
 
@@ -19,6 +17,8 @@ Rectangle {
     // initial state is portrait
     property real baseWidth: landscape ? window.height : window.width
     property real baseHeight: landscape ? window.width : window.height
+    property alias theNumber: wDisp.theNumber
+
 
     Row {
         id: main
@@ -46,8 +46,6 @@ Rectangle {
 
                 onSigCall: window.sigCall(wDisp.txtEd.text)
                 onSigText: window.sigText(wDisp.txtEd.text)
-                onSigContacts: window.sigContacts()
-                onSigInbox: window.sigInbox()
 
                 onSigDel: Code.doDel()
             }

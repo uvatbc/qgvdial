@@ -9,6 +9,7 @@ Rectangle {
 
     // Expose the text edit as a property
     property alias txtEd: txtNum
+    property alias theNumber: txtNum.text
 
     function slotSelectionChanged(index, name) {
         wDisp.sigSelChanged(index);
@@ -18,16 +19,22 @@ Rectangle {
         Code.cbBox = null;
     }
 
-    Column {
+    Item {
         anchors.fill: parent
 
         Rectangle {
+            id: btnPhones
+
             color: wDisp.color
             width: parent.width
             height: (parent.height / 5)
+            anchors {
+                top: parent.top
+                left: parent.left
+                right: parent.right
+            }
 
             MyButton {
-                id: btnPhones
                 mainText: currentPhoneName;
                 anchors.fill: parent
                 radius: ((height / 10.0) + (width / 60.0))
@@ -50,13 +57,19 @@ Rectangle {
                     } else {
                         Code.cbBox.killSelf ();
                     }
-                }
-            }
-        }
+                }// onClicked
+            }// MyButton (btnPhones)
+        }// Rectangle (wDisp)
 
         TextEdit {
             id: txtNum
             width: parent.width
+            height: (parent.height * 4 / 5)
+            anchors {
+                top: btnPhones.bottom
+                left: parent.left
+                right: parent.right
+            }
 
             color: "white"
             textFormat: TextEdit.PlainText
@@ -68,9 +81,7 @@ Rectangle {
                 bold: true
             }
 
-            height: (parent * 4 / 5)
-
             onTextChanged: wDisp.sigNumChanged(txtNum.text);
         }// TextEdit
-    }// Flow
+    }// Item
 }// Rectangle

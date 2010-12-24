@@ -2,21 +2,19 @@
 #define __GVHISTORY_H__
 
 #include "global.h"
+#include "InboxModel.h"
+#include <QtDeclarative>
 
-namespace Ui {
-    class InboxWidget;
-}
-
-class GVHistory : public QMainWindow
+class GVHistory : public QObject
 {
     Q_OBJECT
 
 public:
-    GVHistory (QWidget *parent = 0, Qt::WindowFlags flags = 0);
+    GVHistory (QObject *parent = 0);
     ~GVHistory(void);
 
     void deinitModel ();
-    void initModel ();
+    void initModel (QDeclarativeView *pMainWindow);
 
 signals:
     //! Status emitter for status bar
@@ -33,13 +31,12 @@ signals:
     void retrieveVoicemail (const QString &strVmailLink);
 
 public slots:
-    //! Status sink for this window
-    void setStatus(const QString &strText, int timeout = 2000);
-
     //! Invoked when the user requests a refresh to the history
     void refreshHistory ();
     //! Invoked when the user requests a full inbox refresh
     void refreshFullInbox ();
+
+    void onInboxSelected (const QString &strSelection);
 
     void loginSuccess ();
     void loggedOut ();
@@ -47,24 +44,11 @@ public slots:
 private slots:
     void oneHistoryEvent (const GVHistoryEvent &hevent);
     void getHistoryDone (bool bOk, const QVariantList &arrParams);
-    void onInboxSelected (QAction *action);
-    void placeCall ();
-    void sendSMS ();
-    void playVoicemail ();
 
 private:
-    void contextMenuEvent (QContextMenuEvent * event);
     void prepView ();
 
 private:
-    Ui::InboxWidget *ui;
-
-    //! Action group to make these options exclusive
-    QActionGroup    actionGroup;
-
-    //! Menu to hold the context menu for voicemail
-    QMenu           mnuContext;
-
     //! Mutex for the following variables
     QMutex          mutex;
 
@@ -73,6 +57,9 @@ private:
 
     //! Are we logged in?
     bool            bLoggedIn;
+
+    //! The inbox model
+    InboxModel     *modelInbox;
 };
 
 #endif //__GVHISTORY_H__

@@ -2,64 +2,143 @@
 #include "Singletons.h"
 #include "GVAccess.h"
 
-#define GV_IN_TYPE          "type"          // voicemail,missed,etc.
-
 InboxModel::InboxModel (QObject * parent)
 : QSqlQueryModel (parent)
 {
+    QHash<int, QByteArray> roles;
+    roles[IN_TypeRole]  = "type";
+    roles[IN_TimeRole]  = "time";
+    roles[IN_NameRole]  = "name";
+    roles[IN_NumberRole]= "number";
+    roles[IN_Link]      = "link";
+    roles[IN_TimeDetail]= "time_detail";
+    setRoleNames(roles);
 }//InboxModel::InboxModel
+
+int
+InboxModel::rowCount (const QModelIndex & /*parent = QModelIndex()*/) const
+{
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    return (dbMain.getInboxCount ());
+}//InboxModel::rowCount
 
 QVariant
 InboxModel::data (const QModelIndex &index,
                         int          role ) const
 {
-    QVariant var = QSqlQueryModel::data (index, role);
+    QVariant var;
 
     do // Begin cleanup block (not a loop)
     {
-        if (Qt::DisplayRole != role)
+        int column = -1;
+        switch (role)
         {
+        case Qt::DisplayRole:
+        case Qt::EditRole:
+            column = index.column ();
+            break;
+        case IN_Link:
+            column = 0;
+            break;
+        case IN_TypeRole:
+            column = 1;
+            break;
+        case IN_TimeRole:
+        case IN_TimeDetail:
+            column = 2;
+            break;
+        case IN_NameRole:
+            column = 3;
+            break;
+        case IN_NumberRole:
+            column = 4;
             break;
         }
 
-        int column = index.column ();
+        // Pick up the data from the base class
+        var = QSqlQueryModel::data (index.sibling(index.row (), column),
+                                    Qt::EditRole);
 
-        if (1 == column)    // GV_IN_TYPE
+        if (0 == column)        // GV_IN_ID
+        {
+            QString strLink = var.toString ();
+            if (0 == strLink.size ()) {
+                qWarning ("Inbox: Invalid link: Blank!");
+                var.clear ();
+                break;
+            }
+        }
+        else if (1 == column)   // GV_IN_TYPE
         {
             char chType = var.toChar().toAscii ();
             QString strDisp = type_to_string ((GVH_Event_Type) chType);
-            if (0 == strDisp.size ()) break;
+            var.clear ();
+            if (0 == strDisp.size ()) {
+                qWarning () << "Inbox: Entry type could not be deciphered: "
+                            << chType;
+                break;
+            }
 
             var = strDisp;
-            break;
         }
-
-        if (2 == column)    // GV_IN_ATTIME
+        else if (2 == column)   // GV_IN_ATTIME
         {
             bool bOk = false;
             quint64 num = var.toULongLong (&bOk);
+            var.clear ();
             if (!bOk) break;
 
             QDateTime dt = QDateTime::fromTime_t (num);
             QString strDisp;
-            if (0 == dt.daysTo (QDateTime::currentDateTime ()))
-            {
-                strDisp = dt.toString ("hh:mm:ss");
-            }
-            else
-            {
-                strDisp = dt.toString ("hh:mm:ss on dd-MMM");
+            QDate currentDate = QDate::currentDate ();
+            int daysTo = dt.daysTo (QDateTime::currentDateTime ());
+            if (IN_TimeDetail == role) {
+                if (0 == daysTo) {
+                    strDisp = "today at " + dt.toString ("hh:mm:ss");
+                } else if (1 == daysTo) {
+                    strDisp = "yesterday at " + dt.toString ("hh:mm:ss");
+                } else {
+                    strDisp = "on "
+                              + dt.toString ("dddd, dd-MMM")
+                              + " at "
+                              + dt.toString ("hh:mm:ss");
+                }
+            } else {
+                if (0 == daysTo) {
+                    strDisp = "at " + dt.toString ("hh:mm");
+                } else if (1 == daysTo) {
+                    strDisp = "yesterday";
+                } else if (daysTo < currentDate.dayOfWeek ()) {
+                    strDisp = "on " + dt.toString ("dddd");
+                } else if (daysTo < (currentDate.dayOfWeek () + 7)) {
+                    strDisp = "last week";
+                } else {
+                    strDisp = "on " + dt.toString ("dd-MMM");
+                }
             }
 
             var = strDisp;
-            break;
         }
-
-        if (3 == column)    // GV_IN_DISPNUM
+        else if (3 == column)   // GV_IN_DISPNUM
         {
             QString strNum = var.toString ();
-            if (0 == strNum.size ()) break;
-            if (!GVAccess::isNumberValid (strNum)) break;
+            var.clear ();
+            if (0 == strNum.size ()) {
+                qWarning ("Inbox: Friendly number is blank in entry");
+                break;
+            }
+
+            if (strNum.startsWith ("Unknown")) {
+                qDebug ("Inbox: Unknown number is unknown");
+                var = "Unknown";
+                break;
+            }
+
+            if (!GVAccess::isNumberValid (strNum)) {
+                qWarning () << "Inbox: Display phone number is invalid : "
+                            << strNum;
+                break;
+            }
 
             GVAccess::simplify_number (strNum);
 
@@ -71,23 +150,35 @@ InboxModel::data (const QModelIndex &index,
                 break;
             }
 
+            qDebug () << "Inbox: Number could not be identified: " << strNum
+                      << "Labeling it as unknown.";
             var = "Unknown";
-            break;
         }
-
-        if (4 == column)    // GV_IN_PHONE
+        else if (4 == column)   // GV_IN_PHONE
         {
             QString strNum = var.toString ();
-            if (0 == strNum.size ()) break;
+            var.clear ();
+            if (0 == strNum.size ()) {
+                qWarning ("Inbox: Number is blank in entry");
+                break;
+            }
             if (strNum.startsWith ("Unknown")) {
                 var = "Unknown";
             }
-            if (!GVAccess::isNumberValid (strNum)) break;
+            if (!GVAccess::isNumberValid (strNum)) {
+                qWarning () << "Inbox: Actual phone number is invalid : "
+                            << strNum;
+                break;
+            }
 
             GVAccess::beautify_number (strNum);
             var = strNum;
-
-            break;
+        }
+        else
+        {
+            var.clear ();
+            qWarning () << "Invalid data column requested in Inbox view: "
+                        << column;
         }
     } while (0); // End cleanup block (not a loop)
 
@@ -157,16 +248,3 @@ InboxModel::string_to_type (const QString &strType)
 
     return (Type);
 }//InboxModel::string_to_type
-
-//void
-//InboxModel::selectOnly (const QString & filter)
-//{
-//    GVH_Event_Type type = string_to_type (filter);
-
-//    QString strFilter;
-//    if (GVHE_Unknown != type)
-//    {
-//        strFilter = QString(GV_IN_TYPE "='%1'").arg (type);
-//    }
-//    this->setFilter (strFilter);
-//}//InboxModel::selectOnly
