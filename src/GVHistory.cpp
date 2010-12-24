@@ -2,8 +2,6 @@
 #include "GVHistory.h"
 #include "Singletons.h"
 
-#include "ui_InboxWidget.h"
-
 GVHistory::GVHistory (QObject *parent)
 : QObject (parent)
 , mutex (QMutex::Recursive)
