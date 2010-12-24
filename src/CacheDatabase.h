@@ -48,12 +48,13 @@ public:
     void clearInbox ();
     void refreshInboxModel (InboxModel *modelInbox,
                             const QString &strType);
-    quint32 getInboxCount ();
+    quint32 getInboxCount (GVH_Event_Type Type);
 
     bool setLastInboxUpdate (const QDateTime &dateTime);
     bool getLastInboxUpdate (QDateTime &dateTime);
     bool getLatestInboxEntry (QDateTime &dateTime);
 
+    bool existsHistoryEvent (const GVHistoryEvent &hEvent);
     bool insertHistory (const GVHistoryEvent &hEvent);
 
 signals:

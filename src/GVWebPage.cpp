@@ -150,7 +150,7 @@ GVWebPage::login ()
     // GV page load complete will begin the login process.
     QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
                        this   , SLOT   (loginStage1 (bool)));
-    this->loadUrlString (GV_URL);
+    this->loadUrlString (GV_HTTPS);
 
     return (true);
 }//GVWebPage::login

@@ -6,7 +6,7 @@ Item {
 
     anchors.fill: parent
 
-    signal sigDialer
+    signal sigDialpad
     signal sigContacts
     signal sigInbox
     signal sigSettings
@@ -24,7 +24,7 @@ Item {
 
         model: ListModel {
             ListElement {
-                name: "Dialer"
+                name: "Dialpad"
                 imagePath: "Phone.png"
             }
             ListElement {
@@ -51,8 +51,8 @@ Item {
             mainFontPoint: Code.btnFontPoint()/3.7
 
             onClicked: {
-                if (name == "Dialer") {
-                    container.sigDialer();
+                if (name == "Dialpad") {
+                    container.sigDialpad();
                 } else if (name == "Contacts") {
                     container.sigContacts();
                 } else if (name == "Inbox") {

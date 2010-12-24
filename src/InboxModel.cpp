@@ -4,6 +4,8 @@
 
 InboxModel::InboxModel (QObject * parent)
 : QSqlQueryModel (parent)
+, strSelectType ("all")
+, eSelectType (GVHE_Unknown)
 {
     QHash<int, QByteArray> roles;
     roles[IN_TypeRole]  = "type";
@@ -19,7 +21,7 @@ int
 InboxModel::rowCount (const QModelIndex & /*parent = QModelIndex()*/) const
 {
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    return (dbMain.getInboxCount ());
+    return (dbMain.getInboxCount (eSelectType));
 }//InboxModel::rowCount
 
 QVariant
@@ -248,3 +250,66 @@ InboxModel::string_to_type (const QString &strType)
 
     return (Type);
 }//InboxModel::string_to_type
+
+bool
+InboxModel::refresh (const QString &strSelected)
+{
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+
+    if (strSelected == strSelectType)
+    {
+        beginResetModel ();
+
+        dbMain.refreshInboxModel (this, strSelected);
+
+        endResetModel ();
+    } else {
+        beginRemoveRows (QModelIndex(), 0, this->rowCount ());
+
+        strSelectType = strSelected;
+        eSelectType = string_to_type (strSelected);
+
+        beginInsertRows (QModelIndex(), 0, this->rowCount ());
+
+        dbMain.refreshInboxModel (this, strSelected);
+
+        endInsertRows ();
+
+        endRemoveRows ();
+    }
+
+    while (this->canFetchMore ()) {
+        this->fetchMore ();
+    }
+
+    return (true);
+}//InboxModel::refresh
+
+bool
+InboxModel::refresh ()
+{
+    return this->refresh (strSelectType);
+}//InboxModel::refresh
+
+bool
+InboxModel::insertHistory (const GVHistoryEvent &hEvent)
+{
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    quint32 rowCount = this->rowCount ();
+
+    bool bExists = dbMain.existsHistoryEvent (hEvent);
+
+    if (bExists) {
+        beginInsertRows (QModelIndex(), rowCount, rowCount);
+    }
+
+    dbMain.insertHistory (hEvent);
+
+    if (bExists) {
+        endInsertRows ();
+    } else {
+        //emit dataChanged ();
+    }
+
+    return (true);
+}//InboxModel::insertHistory

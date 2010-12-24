@@ -56,7 +56,6 @@ SOURCES  += main.cpp                    \
             ChildWindowBase.cpp         \
             GVHistory.cpp               \
             ContactsTreeView.cpp        \
-            InboxTreeView.cpp           \
             VMailDialog.cpp             \
             WebWidget.cpp               \
             RegNumberModel.cpp          \
@@ -94,7 +93,6 @@ HEADERS  += global.h                    \
             ChildWindowBase.h           \
             GVHistory.h                 \
             ContactsTreeView.h          \
-            InboxTreeView.h             \
             VMailDialog.h               \
             WebWidget.h                 \
             RegNumberModel.h            \

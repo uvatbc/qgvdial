@@ -42,14 +42,8 @@ GVHistory::initModel (QDeclarativeView *pMainWindow)
 void
 GVHistory::prepView ()
 {
-    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-
     emit status ("Re-selecting inbox entries. This will take some time", 0);
-    dbMain.refreshInboxModel (modelInbox, strSelectedMessages);
-
-    while (modelInbox->canFetchMore ()) {
-        modelInbox->fetchMore ();
-    }
+    modelInbox->refresh (strSelectedMessages);
     emit status ("Inbox entries selected.");
 }//GVHistory::prepView
 
@@ -101,8 +95,7 @@ GVHistory::oneHistoryEvent (const GVHistoryEvent &hevent)
         return;
     }
 
-    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    dbMain.insertHistory (hevent);
+    modelInbox->insertHistory (hevent);
 }//GVHistory::oneHistoryEvent
 
 void

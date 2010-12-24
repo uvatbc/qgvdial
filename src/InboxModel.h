@@ -24,8 +24,16 @@ public:
     static QString type_to_string (GVH_Event_Type Type);
     static GVH_Event_Type string_to_type (const QString &strType);
 
+    bool refresh (const QString &strSelected);
+    bool refresh ();
+
+    bool insertHistory (const GVHistoryEvent &hEvent);
+
 private:
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
+
+    QString strSelectType;
+    GVH_Event_Type eSelectType;
 };
 
 #endif //__INBOXMODEL_H__

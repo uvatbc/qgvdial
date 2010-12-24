@@ -663,12 +663,20 @@ CacheDatabase::refreshInboxModel (InboxModel *modelInbox,
 }//CacheDatabase::refreshInboxModel
 
 quint32
-CacheDatabase::getInboxCount ()
+CacheDatabase::getInboxCount (GVH_Event_Type Type)
 {
     quint32 nCountInbox = 0;
     QSqlQuery query;
     query.setForwardOnly (true);
-    query.exec ("SELECT COUNT (*) FROM " GV_INBOX_TABLE);
+    QString strQ;
+    if (GVHE_Unknown == Type) {
+        strQ = "SELECT COUNT (*) FROM " GV_INBOX_TABLE " ";
+    } else {
+        strQ = QString ("SELECT COUNT (*) FROM " GV_INBOX_TABLE " "
+                        "WHERE " GV_IN_TYPE "= %1")
+                        .arg (Type);
+    }
+    query.exec (strQ);
     if (query.next ()) {
         bool bOk = false;
         int val = query.value (0).toInt (&bOk);
@@ -779,6 +787,22 @@ CacheDatabase::getLatestInboxEntry (QDateTime &dateTime)
 }//CacheDatabase::getLatestInboxEntry
 
 bool
+CacheDatabase::existsHistoryEvent (const GVHistoryEvent &hEvent)
+{
+    QSqlQuery query(dbMain);
+    query.setForwardOnly (true);
+
+    query.exec (QString ("SELECT " GV_IN_ID " FROM " GV_INBOX_TABLE " "
+                         "WHERE " GV_IN_ID "='%1'")
+                .arg (hEvent.id));
+    if (query.next ()) {
+        return true;
+    }
+
+    return false;
+}//CacheDatabase::existsHistoryEvent
+
+bool
 CacheDatabase::insertHistory (const GVHistoryEvent &hEvent)
 {
     quint32 flags = (hEvent.bRead  ? (1 << 0) : 0)
@@ -791,10 +815,7 @@ CacheDatabase::insertHistory (const GVHistoryEvent &hEvent)
         QSqlQuery query(dbMain);
         query.setForwardOnly (true);
 
-        query.exec (QString ("SELECT " GV_IN_ID " FROM " GV_INBOX_TABLE " "
-                             "WHERE " GV_IN_ID "='%1'")
-                    .arg (hEvent.id));
-        if (query.next ()) {
+        if (existsHistoryEvent (hEvent)) {
             query.exec (QString ("DELETE FROM " GV_INBOX_TABLE " "
                                  "WHERE " GV_IN_ID "='%1'")
                         .arg (hEvent.id));

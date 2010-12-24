@@ -66,6 +66,12 @@ Rectangle {
                 bottom: parent.bottom
             }
 
+            // This mouse area is only so that you don't click through to the
+            // view underneath
+            MouseArea {
+                anchors.fill: parent
+            }
+
             Text {
                 id: theTime
                 text: strDetailsTime
@@ -93,6 +99,7 @@ Rectangle {
             }
 
             Row {
+                id: btnRow
                 anchors {
                     top: theNumber.bottom
                     left: parent.left

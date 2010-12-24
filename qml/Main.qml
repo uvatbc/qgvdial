@@ -13,9 +13,9 @@ Rectangle {
     signal sigVoicemail(string link)
     signal sigInboxSelect(string selection)
 
-    onSigCall: console.debug("Call " + number)
-    onSigText: console.debug("Text " + number)
-    onSigContactlink: console.debug("Link :" + link)
+    onSigCall: console.debug("QML: Call " + number)
+    onSigText: console.debug("QML: Text " + number)
+    onSigContactlink: console.debug("QML: Contact Link :" + link)
 
     property bool landscape: (main.width > main.height)
     property string strStatus: "Ready"
@@ -87,7 +87,7 @@ Rectangle {
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.verticalCenter: parent.verticalCenter
 
-                onSigDialer:    { main.state = "Dialer" }
+                onSigDialpad:   { main.state = "Dialpad" }
                 onSigContacts:  { main.state = "Contacts" }
                 onSigInbox:     { main.state = "Inbox" }
                 onSigSettings:  { main.state = "Settings" }
@@ -95,7 +95,7 @@ Rectangle {
         }
 
         MainView {
-            id: dialer
+            id: dialPad
 
             width: mainColumn.centralWidth
             height: mainColumn.centralHeight
@@ -128,7 +128,7 @@ Rectangle {
             opacity: 0
 
             onSigCall: main.sigCall (number)
-            onSigText: main.sigCall (number)
+            onSigText: main.sigText (number)
             onSigContactlink: main.sigContactlink(link)
         }
 
@@ -147,7 +147,7 @@ Rectangle {
             opacity: 0
 
             onSigCall: main.sigCall (number)
-            onSigText: main.sigCall (number)
+            onSigText: main.sigText (number)
             onSigInboxSelect: main.sigInboxSelect(selection)
             onSigVoicemail: main.sigVoicemail(link)
         }
@@ -176,8 +176,8 @@ Rectangle {
 
     states: [
         State {
-            name: "Dialer"
-            PropertyChanges { target: dialer; opacity: 1}
+            name: "Dialpad"
+            PropertyChanges { target: dialPad; opacity: 1}
         },
         State {
             name: "Contacts"
@@ -195,7 +195,7 @@ Rectangle {
     transitions: [
         Transition {
             PropertyAnimation { property: "opacity"; easing.type: Easing.InOutQuad}
-            PropertyAnimation { target: dialer; property: "opacity"; easing.type: Easing.InOutQuad}
+            PropertyAnimation { target: dialPad; property: "opacity"; easing.type: Easing.InOutQuad}
         }
     ]
 }
