@@ -53,7 +53,7 @@ Rectangle {
                 onClicked: container.state= ''
                 anchors.right: parent.right
 
-                fontPoint: Code.btnFontPoint()/12
+                fontPoint: Code.btnFontPoint()/10
             }
         }
 
@@ -111,18 +111,18 @@ Rectangle {
                     id: btnCall
                     text: "Call"
                     onClicked: container.sigCall(strNumber)
-                    fontPoint: Code.btnFontPoint()/15
+                    fontPoint: Code.btnFontPoint()/10
                 }
                 TextButton {
                     text: "Text"
                     onClicked: container.sigText(strNumber)
-                    fontPoint: Code.btnFontPoint()/15
+                    fontPoint: Code.btnFontPoint()/10
                 }
                 TextButton {
                     text: "Play"
                     opacity: (detailsView.opacity & isVoicemail)
                     onClicked: container.sigVoicemail(strLink)
-                    fontPoint: Code.btnFontPoint()/15
+                    fontPoint: Code.btnFontPoint()/10
                 }
             }
         }
@@ -157,7 +157,11 @@ Rectangle {
 
                 onClicked: {
                     barTop.clickedTopBar();
-                    inboxView.state = 'Selectors';
+                    if (inboxView.state != "Selectors") {
+                        inboxView.state = "Selectors";
+                    } else {
+                        inboxView.state = ''
+                    }
                 }
             }// MouseArea
 
@@ -195,7 +199,7 @@ Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: modelData
-                    font.pointSize: Code.btnFontPoint()/12
+                    font.pointSize: Code.btnFontPoint()/10
                     color: "white"
                 }
 

@@ -8,10 +8,9 @@ Rectangle {
 
     signal sigCall(string number)
     signal sigText(string number)
-    signal sigContactlink(string link)
 
 ////////////////////////////////////////////////////////////////////////////////
-//                                Data models                                 //
+//                              Test Data models                              //
 ////////////////////////////////////////////////////////////////////////////////
 //    ContactsModelData1 {
 //        id: testContactsModelData1
@@ -66,6 +65,7 @@ Rectangle {
         }
 
         ContactDetails {
+            id: detailsList
             anchors {
                 top: detailTopRow.bottom
                 left: parent.left
@@ -117,7 +117,7 @@ Rectangle {
                 anchors.fill: parent
 
                 onClicked: {
-                    container.sigContactlink (contacts);
+                    detailsList.model = contacts;
                     container.state = "Details"
                 }
             }

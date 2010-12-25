@@ -8,14 +8,12 @@ Rectangle {
 
     signal sigCall(string number)
     signal sigText(string number)
-    signal sigContactlink(string link)
     signal sigSelChanged(int index)
     signal sigVoicemail(string link)
     signal sigInboxSelect(string selection)
 
     onSigCall: console.debug("QML: Call " + number)
     onSigText: console.debug("QML: Text " + number)
-    onSigContactlink: console.debug("QML: Contact Link :" + link)
 
     property bool landscape: (main.width > main.height)
     property string strStatus: "Ready"
@@ -129,7 +127,6 @@ Rectangle {
 
             onSigCall: main.sigCall (number)
             onSigText: main.sigText (number)
-            onSigContactlink: main.sigContactlink(link)
         }
 
         InboxList {
