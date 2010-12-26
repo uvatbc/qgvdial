@@ -28,10 +28,11 @@ MainWindow::MainWindow (QWidget *parent)
 , infoBox (this)
 #endif
 , menuFile ("&File", this)
+, actViewWeb ("Show web view", this)
 , actLogin ("Login...", this)
 , actDismiss ("Dismiss", this)
+, actRefresh ("Refresh", this)
 , actExit ("Exit", this)
-, actViewWeb ("Show web view", this)
 , bLoggedIn (false)
 , modelRegNumber (this)
 , indRegPhone (0)
@@ -265,6 +266,8 @@ MainWindow::init ()
     actLogin.setShortcut (QKeySequence(Qt::CTRL + Qt::Key_L));
     // Dismiss = Esc
     actDismiss.setShortcut (QKeySequence(Qt::Key_Escape));
+    // Refresh = Ctrl+R
+    actRefresh.setShortcut (QKeySequence(Qt::CTRL + Qt::Key_R));
     // Quit = Ctrl+Q
     actExit.setShortcut (QKeySequence(Qt::CTRL + Qt::Key_Q));
     // Show debug webpage = Ctrl+Shift+W
@@ -273,9 +276,11 @@ MainWindow::init ()
     menuFile.addAction (&actViewWeb);
     menuFile.addAction (&actLogin);
     menuFile.addAction (&actDismiss);
+    menuFile.addAction (&actRefresh);
     menuFile.addAction (&actExit);
     this->addAction (&actLogin);
     this->addAction (&actDismiss);
+    this->addAction (&actRefresh);
     this->addAction (&actExit);
     this->addAction (&actViewWeb);
     // When the actions are triggered, do the corresponding work.
@@ -283,6 +288,8 @@ MainWindow::init ()
                        this    , SLOT   (on_action_Login_triggered()));
     QObject::connect (&actDismiss, SIGNAL (triggered()),
                        this      , SLOT   (close()));
+    QObject::connect (&actRefresh, SIGNAL (triggered()),
+                       this      , SLOT   (onRefreshAll()));
     QObject::connect (&actExit, SIGNAL (triggered()),
                        this   , SLOT   (on_actionE_xit_triggered()));
     QObject::connect (&actViewWeb, SIGNAL (triggered ()),
@@ -1455,3 +1462,13 @@ MainWindow::onRegPhoneSelectionChange (int index)
     OsDependent &osd = Singletons::getRef().getOSD ();
     osd.setLongWork (this, false);
 }//MainWindow::onRegPhoneSelectionChange
+
+void
+MainWindow::onRefreshAll ()
+{
+    qDebug ("Refresh all requested.");
+
+    refreshRegisteredNumbers ();
+    oInbox.refreshHistory ();
+    oContacts.refreshContacts ();
+}//MainWindow::onRefreshAll

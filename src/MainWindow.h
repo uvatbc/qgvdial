@@ -116,6 +116,9 @@ private slots:
     //! Invoked by QML when the user selects a new phone method
     void onRegPhoneSelectionChange (int index);
 
+    //! Invoked when user invokes refresh
+    void onRefreshAll ();
+
 private:
     void initLogging ();
     void doLogin ();
@@ -162,10 +165,11 @@ private:
 
     // Menus and actions
     QMenu           menuFile;
+    QAction         actViewWeb;
     QAction         actLogin;
     QAction         actDismiss;
+    QAction         actRefresh;
     QAction         actExit;
-    QAction         actViewWeb;
 
     //! Are we logged in?
     bool            bLoggedIn;
