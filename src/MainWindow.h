@@ -66,6 +66,9 @@ private slots:
     //! Invoked when the dialer widget call button is clicked
     void dialNow (const QString &strTarget);
 
+    //! Invoked from the QML to send a text message
+    void onSigText (const QString &strNumber);
+
     //! Invoked by the DBus Text server without any text data
     void onSendTextWithoutData (const QStringList &arrNumbers);
 

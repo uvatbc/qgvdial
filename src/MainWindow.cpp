@@ -323,7 +323,7 @@ MainWindow::initQML ()
     QObject::connect (gObj, SIGNAL (sigCall (QString)),
                       this, SLOT   (dialNow (QString)));
     QObject::connect (gObj, SIGNAL (sigText (QString)),
-                      this, SLOT   (textANumber (QString)));
+                      this, SLOT   (onSigText (const QString &)));
     QObject::connect (gObj, SIGNAL (sigVoicemail (QString)),
                       this, SLOT   (retrieveVoicemail (const QString &)));
     QObject::connect (gObj, SIGNAL (sigSelChanged (int)),
@@ -698,7 +698,18 @@ MainWindow::findInfo (const QString &strNumber, GVContactInfo &info)
         info.arrPhones += num;
         info.selected = 0;
     } else {
-        //
+        // Found it, now set the "selected" field correctly
+        info.selected = 0;
+        foreach (GVContactNumber num, info.arrPhones) {
+            QString strNum = num.strNumber;
+            GVAccess::simplify_number (strNum, false);
+            strNum.remove(' ').remove('+');
+
+            if (strNum == strTrunc) {
+                break;
+            }
+            info.selected++;
+        }
     }
 
     return (true);
@@ -907,6 +918,30 @@ MainWindow::dialNow (const QString &strTarget)
         pDialDlg->doNonModal (strSelfNumber);
     } while (0); // End cleanup block (not a loop)
 }//MainWindow::dialNow
+
+void
+MainWindow::onSigText (const QString &strNumber)
+{
+    GVContactInfo info;
+
+    do { // Begin cleanup block (not a loop)
+        // Get info about this number
+        if (!findInfo (strNumber, info)) {
+            qWarning () << "Unable to find information for " << strNumber;
+            setStatus ("Unable to identify phone number");
+            break;
+        }
+
+        SMSEntry entry;
+        entry.strName = info.strName;
+        entry.sNumber = info.arrPhones[info.selected];
+
+        dlgSMS.addSMSEntry (entry);
+        if (dlgSMS.isHidden ()) {
+            dlgSMS.show ();
+        }
+    } while (0); // End cleanup block (not a loop)
+}//MainWindow::onSigText
 
 //! Invoked by the DBus Text server
 /**

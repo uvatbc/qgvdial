@@ -47,7 +47,9 @@ Rectangle {
             height: btnDetailsClose.height
 
             Text {
-                text: "Contact name"    // contactDetailName
+                id: txtContactName
+
+                text: "Contact name"
                 anchors.verticalCenter: parent.verticalCenter
                 color: "white"
                 font.pointSize: Code.btnFontPoint () / 8
@@ -118,6 +120,7 @@ Rectangle {
 
                 onClicked: {
                     detailsList.model = contacts;
+                    txtContactName.text = name
                     container.state = "Details"
                 }
             }
