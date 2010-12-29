@@ -66,11 +66,9 @@
     <ClCompile Include="CaptchaWidget.cpp" />
     <ClCompile Include="ChildWindowBase.cpp" />
     <ClCompile Include="ContactsModel.cpp" />
-    <ClCompile Include="ContactsTreeView.cpp" />
     <ClCompile Include="ContactsXmlHandler.cpp" />
     <ClCompile Include="DesktopSkypeCallInitiator.cpp" />
     <ClCompile Include="DialCancelDlg.cpp" />
-    <ClCompile Include="DialDigitButton.cpp" />
     <ClCompile Include="DlgSelectContactNumber.cpp" />
     <ClCompile Include="global.cpp" />
     <ClCompile Include="GVAccess.cpp" />
@@ -80,7 +78,6 @@
     <ClCompile Include="GVHistory.cpp" />
     <ClCompile Include="GVWebPage.cpp" />
     <ClCompile Include="InboxModel.cpp" />
-    <ClCompile Include="InboxTreeView.cpp" />
     <ClCompile Include="LoginDialog.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainApp.cpp" />
@@ -110,11 +107,9 @@
     <ClInclude Include="CalloutInitiator.h" />
     <ClInclude Include="CaptchaWidget.h" />
     <ClInclude Include="ChildWindowBase.h" />
-    <ClInclude Include="ContactsTreeView.h" />
     <ClInclude Include="ContactsXmlHandler.h" />
     <ClInclude Include="DesktopSkypeCallInitiator.h" />
     <ClInclude Include="DialCancelDlg.h" />
-    <ClInclude Include="DialDigitButton.h" />
     <ClInclude Include="DlgSelectContactNumber.h" />
     <ClInclude Include="global.h" />
     <ClInclude Include="GVAccess.h" />
@@ -124,7 +119,6 @@
     <ClInclude Include="GVHistory.h" />
     <ClInclude Include="GVWebPage.h" />
     <ClInclude Include="InboxModel.h" />
-    <ClInclude Include="InboxTreeView.h" />
     <ClInclude Include="IObserver.h" />
     <ClInclude Include="LoginDialog.h" />
     <ClInclude Include="MainApp.h" />
@@ -145,10 +139,7 @@
     <ClInclude Include="SMSEntryDeleteButton.h" />
     <ClInclude Include="TpCalloutInitiator.h" />
     <ClInclude Include="TpObserver.h" />
-    <ClInclude Include="ui_ContactsWidget.h" />
-    <ClInclude Include="ui_InboxWidget.h" />
     <ClInclude Include="ui_LoginDialog.h" />
-    <ClInclude Include="ui_MainWindow.h" />
     <ClInclude Include="ui_VMailDialog.h" />
     <ClInclude Include="ui_WebWidget.h" />
     <ClInclude Include="VMailDialog.h" />
@@ -157,20 +148,23 @@
   <ItemGroup>
     <None Include="..\qml\ActionButtons.qml" />
     <None Include="..\qml\ComboBoxPhones.qml" />
+    <None Include="..\qml\ContactDetails.qml" />
     <None Include="..\qml\ContactsList.qml" />
+    <None Include="..\qml\ContactsModelData1.qml" />
+    <None Include="..\qml\ContactsModelData2.xml" />
     <None Include="..\qml\DialDisp.qml" />
     <None Include="..\qml\DigitButton.qml" />
     <None Include="..\qml\helper.js" />
+    <None Include="..\qml\InboxList.qml" />
     <None Include="..\qml\Keypad.qml" />
+    <None Include="..\qml\Main.qml" />
+    <None Include="..\qml\MainButtons.qml" />
     <None Include="..\qml\MainView.qml" />
     <None Include="..\qml\MainView_l.qml" />
     <None Include="..\qml\MainView_p.qml" />
     <None Include="..\qml\MyButton.qml" />
     <None Include="..\qml\TextButton.qml" />
-    <None Include="ContactsWidget.ui" />
-    <None Include="InboxWidget.ui" />
     <None Include="LoginDialog.ui" />
-    <None Include="MainWindow.ui" />
     <None Include="qgvdial.qrc" />
     <None Include="stylesheets\dialpad_desktop.qss" />
     <None Include="stylesheets\dialpad_maemo.qss" />

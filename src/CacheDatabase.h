@@ -3,8 +3,9 @@
 
 #include "global.h"
 #include <QtSql>
-#include "InboxModel.h"
-#include "ContactsModel.h"
+
+class ContactsModel;
+class InboxModel;
 
 class CacheDatabase : public QObject
 {

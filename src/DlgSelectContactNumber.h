@@ -3,9 +3,6 @@
 
 #include "global.h"
 
-#include <QtCore>
-#include <QtGui>
-
 class DlgSelectContactNumber : public QDialog
 {
 public:

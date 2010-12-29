@@ -1,7 +1,7 @@
 #ifndef DIALCANCELDLG_H
 #define DIALCANCELDLG_H
 
-#include <QtGui>
+#include "global.h"
 
 class DialCancelDlg : public QMessageBox
 {

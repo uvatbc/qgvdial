@@ -44,7 +44,6 @@ SOURCES  += main.cpp                    \
             MobileWebPage.cpp           \
             InboxModel.cpp              \
             GVH_XMLJsonHandler.cpp      \
-            DialDigitButton.cpp         \
             PhoneNumberValidator.cpp    \
             GVContactsTable.cpp         \
             CaptchaWidget.cpp           \
@@ -55,7 +54,6 @@ SOURCES  += main.cpp                    \
             SMSDlg.cpp                  \
             ChildWindowBase.cpp         \
             GVHistory.cpp               \
-            ContactsTreeView.cpp        \
             VMailDialog.cpp             \
             WebWidget.cpp               \
             RegNumberModel.cpp          \
@@ -81,7 +79,6 @@ HEADERS  += global.h                    \
             MobileWebPage.h             \
             InboxModel.h                \
             GVH_XMLJsonHandler.h        \
-            DialDigitButton.h           \
             PhoneNumberValidator.h      \
             GVContactsTable.h           \
             CaptchaWidget.h             \
@@ -92,7 +89,6 @@ HEADERS  += global.h                    \
             SMSDlg.h                    \
             ChildWindowBase.h           \
             GVHistory.h                 \
-            ContactsTreeView.h          \
             VMailDialog.h               \
             WebWidget.h                 \
             RegNumberModel.h            \

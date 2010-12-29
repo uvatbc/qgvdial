@@ -2,8 +2,9 @@
 #define __GVHISTORY_H__
 
 #include "global.h"
-#include "InboxModel.h"
 #include <QtDeclarative>
+
+class InboxModel;
 
 class GVHistory : public QObject
 {

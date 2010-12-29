@@ -21,8 +21,7 @@ public:
     bool insertContact (const ContactInfo &contactInfo);
     bool deleteContact (const ContactInfo &contactInfo);
 
-    bool hasChildren (const QModelIndex &parent = QModelIndex());
-
+    void clearAll ();
 private:
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
 

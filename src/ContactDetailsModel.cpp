@@ -1,4 +1,5 @@
 #include "ContactDetailsModel.h"
+#include "GVAccess.h"
 
 static quint32 nChildren = 0;
 
@@ -49,14 +50,15 @@ ContactDetailsModel::data (const QModelIndex &index, int role) const
             case 'M':
                 var = "Mobile";
                 break;
+            case 'H':
+                var = "Home";
+                break;
             case 'W':
                 var = "Work";
                 break;
+            default:
             case 'O':
                 var = "Other";
-                break;
-            default:
-                var = "Unknown";
                 break;
             }
 
@@ -64,6 +66,7 @@ ContactDetailsModel::data (const QModelIndex &index, int role) const
         }
 
         if (CD_NumberRole == role) {
+            GVAccess::beautify_number (data.strNumber);
             var = data.strNumber;
             break;
         }

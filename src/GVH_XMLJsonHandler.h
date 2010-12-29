@@ -31,6 +31,7 @@ protected:
 private:
     QString strChars;
     QString strJson;
+    QString strHtml;
     qint32 nUsableMsgs;
 };
 

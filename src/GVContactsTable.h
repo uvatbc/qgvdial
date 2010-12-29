@@ -2,10 +2,11 @@
 #define __GVCONTACTSTABLE_H__
 
 #include "global.h"
-#include "ContactsModel.h"
 
 #include <QtNetwork>
 #include <QtDeclarative>
+
+class ContactsModel;
 
 class GVContactsTable : public QObject
 {

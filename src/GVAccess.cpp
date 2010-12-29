@@ -317,13 +317,28 @@ GVAccess::simplify_number (QString &strNumber, bool bAddIntPrefix /*= true*/)
     strNumber.remove(QChar (' ')).remove(QChar ('(')).remove(QChar (')'));
     strNumber.remove(QChar ('-'));
 
-    if (!strNumber.startsWith ("+"))
+    do // Begin cleanup block (not a loop)
     {
-        if (bAddIntPrefix)
-        {
-            strNumber = "+1" + strNumber;
+        if (!bAddIntPrefix) {
+            break;
         }
-    }
+
+        if (strNumber.startsWith ("+")) {
+            break;
+        }
+
+        if (strNumber.length () < 10) {
+            break;
+        }
+
+        if ((strNumber.length () == 11) && (strNumber.startsWith ('1')))
+        {
+            strNumber = "+" + strNumber;
+            break;
+        }
+
+        strNumber = "+1" + strNumber;
+    } while (0); // End cleanup block (not a loop)
 }//GVAccess::simplify_number
 
 bool

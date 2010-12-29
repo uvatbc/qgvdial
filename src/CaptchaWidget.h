@@ -1,7 +1,7 @@
 #ifndef __CAPTCHAWIDGET_H__
 #define __CAPTCHAWIDGET_H__
 
-#include <QtGui>
+#include "global.h"
 #include <QtWebKit>
 
 class CaptchaWidget : public QWidget

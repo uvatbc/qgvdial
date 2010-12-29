@@ -26,6 +26,10 @@ GVH_XMLJsonHandler::endElement (const QString & /*namespaceURI*/,
         strJson += strChars;
         qDebug ("Got json characters");
     }
+    if (localName == "html") {
+        strHtml += strChars;
+        qDebug ("Got html characters");
+    }
     return (true);
 }//GVH_XMLJsonHandler::endElement
 
@@ -166,6 +170,8 @@ GVH_XMLJsonHandler::parseJSON (const QDateTime &dtUpdate, bool &bGotOld)
                     qDebug ("Another old entry");
                 }
             }
+
+            //@@UV: This is where we get additional information from the HTML and merge it.
 
             // emit the history element
             emit oneElement (oneHistory);

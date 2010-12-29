@@ -2,7 +2,8 @@
 #define DESKTOPSKYPECALLINITIATOR_H
 
 #include "CalloutInitiator.h"
-#include "SkypeClient.h"
+
+class SkypeClient;
 
 class DesktopSkypeCallInitiator : public CalloutInitiator
 {

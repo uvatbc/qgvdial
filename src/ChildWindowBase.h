@@ -1,7 +1,7 @@
 #ifndef CHILDWINDOWBASE_H
 #define CHILDWINDOWBASE_H
 
-#include <QtGui>
+#include "global.h"
 
 #ifdef Q_WS_MAEMO_5
 typedef QWidget ChildWindowBaseClass;

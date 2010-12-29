@@ -1,6 +1,7 @@
 #include "global.h"
 #include "GVHistory.h"
 #include "Singletons.h"
+#include "InboxModel.h"
 
 GVHistory::GVHistory (QObject *parent)
 : QObject (parent)

@@ -1,7 +1,7 @@
 #ifndef WEBWIDGET_H
 #define WEBWIDGET_H
 
-#include <QWidget>
+#include "global.h"
 
 namespace Ui {
     class WebWidget;

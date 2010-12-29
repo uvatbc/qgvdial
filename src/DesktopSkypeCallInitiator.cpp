@@ -1,5 +1,6 @@
 #include "DesktopSkypeCallInitiator.h"
 #include "Singletons.h"
+#include "SkypeClient.h"
 
 DesktopSkypeCallInitiator::DesktopSkypeCallInitiator (QObject *parent)
 : CalloutInitiator(parent)

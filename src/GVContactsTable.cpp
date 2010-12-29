@@ -4,6 +4,7 @@
 
 #include "Singletons.h"
 #include "ContactsXmlHandler.h"
+#include "ContactsModel.h"
 
 GVContactsTable::GVContactsTable (QObject *parent)
 : QObject (parent)
@@ -120,16 +121,12 @@ GVContactsTable::refreshContacts ()
 
     bRefreshIsUpdate = false;
     QDateTime dtUpdate;
-    if ((dbMain.getLastContactUpdate (dtUpdate)) && (dtUpdate.isValid ()))
-    {
+    if ((dbMain.getLastContactUpdate (dtUpdate)) && (dtUpdate.isValid ())) {
         QString strUpdate = dtUpdate.toString ("yyyy-MM-ddThh:mm:ss");
         strUrl += QString ("&updated-min=%1&showdeleted=true").arg (strUpdate);
         bRefreshIsUpdate = true;
-    }
-    else
-    {
-        //TODO: Tell model to clear, not the DB
-        dbMain.clearContacts ();
+    } else {
+        modelContacts->clearAll ();
     }
 
     emit status ("Retrieving contacts", 0);

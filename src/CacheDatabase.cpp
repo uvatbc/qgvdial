@@ -1,5 +1,7 @@
 #include "CacheDatabase.h"
 #include "GVAccess.h"
+#include "ContactsModel.h"
+#include "InboxModel.h"
 
 //////////////////////////////// Settings table ////////////////////////////////
 #define GV_SETTINGS_TABLE   "gvsettings"

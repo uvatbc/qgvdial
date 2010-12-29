@@ -101,7 +101,8 @@ ContactsXmlHandler::endElement (const QString & /*namespaceURI*/,
 
         if ((0 == currInfo.arrPhones.size ()) && (!currInfo.bDeleted))
         {
-            qDebug ("Contact does not have any phone numbers");
+            qDebug () << "Contact does not have any phone numbers : "
+                      << currInfo.strTitle;
             // Just in case, delete it!
             currInfo.bDeleted = true;
         }

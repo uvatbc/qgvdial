@@ -2,11 +2,9 @@
 #define __GVWEBPAGE_H__
 
 #include "global.h"
+#include <QtWebKit>
 #include "MobileWebPage.h"
 #include "GVAccess.h"
-
-#include <QtCore>
-#include <QtWebKit>
 
 class GVWebPage : public GVAccess
 {
