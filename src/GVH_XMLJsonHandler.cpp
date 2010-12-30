@@ -1,5 +1,6 @@
 #include "GVH_XMLJsonHandler.h"
 #include <QtScript>
+#include <QtXmlPatterns>
 
 GVH_XMLJsonHandler::GVH_XMLJsonHandler (QObject *parent)
 : QObject (parent)
@@ -23,12 +24,22 @@ GVH_XMLJsonHandler::endElement (const QString & /*namespaceURI*/,
                                const QString & /*qName       */)
 {
     if (localName == "json") {
-        strJson += strChars;
+        strJson = strChars;
         qDebug ("Got json characters");
     }
     if (localName == "html") {
-        strHtml += strChars;
+        strHtml = "<html>"
+                + strChars
+                + "</html>";
         qDebug ("Got html characters");
+
+        QXmlInputSource inputSource;
+        inputSource.setData (strHtml);
+        QXmlSimpleReader simpleReader;
+
+        simpleReader.setContentHandler (&smsHandler);
+        simpleReader.setErrorHandler (&smsHandler);
+        simpleReader.parse (&inputSource, false);
     }
     return (true);
 }//GVH_XMLJsonHandler::endElement
@@ -171,7 +182,12 @@ GVH_XMLJsonHandler::parseJSON (const QDateTime &dtUpdate, bool &bGotOld)
                 }
             }
 
-            //@@UV: This is where we get additional information from the HTML and merge it.
+            // Pick up the text from the parsed HTML
+            if ((GVHE_TextMessage == oneHistory.Type) &&
+                (smsHandler.mapTexts.contains (oneHistory.id)))
+            {
+                oneHistory.strText = smsHandler.mapTexts[oneHistory.id];
+            }
 
             // emit the history element
             emit oneElement (oneHistory);

@@ -18,7 +18,7 @@
 // Registered numbers now include the phone type.
 // #define GV_S_VALUE_DB_VER   "2010-08-07 13:48:26"
 // Contact updates moved out of main table into updates table
-#define GV_S_VALUE_DB_VER   "2010-08-13 15:24:15"
+#define GV_S_VALUE_DB_VER   "2010-12-30 10:30:03"
 ////////////////////////////// GV Contacts table ///////////////////////////////
 #define GV_CONTACTS_TABLE   "gvcontacts"
 #define GV_C_ID             "id"
@@ -47,6 +47,7 @@
 #define GV_IN_DISPNUM       "display_number"
 #define GV_IN_PHONE         "number"
 #define GV_IN_FLAGS         "flags"         // read, starred, etc.
+#define GV_IN_SMSTEXT       "smstext"       // Full text of the SMS
 ////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////// GV updates table ///////////////////////////////
 #define GV_UPDATES_TABLE    "gvupdates"
@@ -179,7 +180,8 @@ CacheDatabase::init ()
                         GV_IN_ATTIME    " bigint, "
                         GV_IN_DISPNUM   " varchar, "
                         GV_IN_PHONE     " varchar, "
-                        GV_IN_FLAGS     " integer)");
+                        GV_IN_FLAGS     " integer, "
+                        GV_IN_SMSTEXT   " varchar)");
     }
     // Ensure that the inbox table is present. If not, create it.
     query.exec ("SELECT * FROM sqlite_master "
@@ -648,20 +650,21 @@ CacheDatabase::refreshInboxModel (InboxModel *modelInbox,
                                   const QString &strType)
 {
     GVH_Event_Type Type = modelInbox->string_to_type (strType);
-    QString strQ;
+    QString strQ = "SELECT "
+                   GV_IN_ID ","
+                   GV_IN_TYPE ","
+                   GV_IN_ATTIME ","
+                   GV_IN_DISPNUM ","
+                   GV_IN_PHONE ","
+                   GV_IN_FLAGS ","
+                   GV_IN_SMSTEXT " "
+                   "FROM " GV_INBOX_TABLE;
     if (GVHE_Unknown != Type) {
-        strQ = QString ("SELECT * FROM " GV_INBOX_TABLE " "
-                        "WHERE " GV_IN_TYPE "=%1 "
-                        "ORDER BY " GV_IN_ATTIME " DESC")
-                .arg (Type);
-    } else {
-        strQ = "SELECT * FROM " GV_INBOX_TABLE " "
-               "ORDER BY " GV_IN_ATTIME " DESC";
+        strQ += QString (" WHERE " GV_IN_TYPE "=%1 ").arg (Type);
     }
+    strQ += " ORDER BY " GV_IN_ATTIME " DESC";
 
     modelInbox->setQuery (strQ, dbMain);
-    modelInbox->setHeaderData (0, Qt::Horizontal, QObject::tr("Name"));
-    modelInbox->setHeaderData (1, Qt::Horizontal, QObject::tr("Link"));
 }//CacheDatabase::refreshInboxModel
 
 quint32
@@ -794,9 +797,11 @@ CacheDatabase::existsHistoryEvent (const GVHistoryEvent &hEvent)
     QSqlQuery query(dbMain);
     query.setForwardOnly (true);
 
+    QString scrubId = hEvent.id;
+    scrubId.replace ("'", "''");
     query.exec (QString ("SELECT " GV_IN_ID " FROM " GV_INBOX_TABLE " "
                          "WHERE " GV_IN_ID "='%1'")
-                .arg (hEvent.id));
+                .arg (scrubId));
     if (query.next ()) {
         return true;
     }
@@ -811,16 +816,22 @@ CacheDatabase::insertHistory (const GVHistoryEvent &hEvent)
                   | (hEvent.bSpam  ? (1 << 1) : 0)
                   | (hEvent.bTrash ? (1 << 2) : 0)
                   | (hEvent.bStar  ? (1 << 3) : 0);
+    GVHistoryEvent scrubEvent = hEvent;
+    scrubEvent.id.replace ("'", "''");
+    scrubEvent.strDisplayNumber.replace ("'", "''");
+    scrubEvent.strPhoneNumber.replace ("'", "''");
+    scrubEvent.strText.replace ("'", "''");
 
     bool rv = false;
     do { // Begin cleanup block (not a loop)
         QSqlQuery query(dbMain);
         query.setForwardOnly (true);
 
+        // Must send this function the unscrubbed history.
         if (existsHistoryEvent (hEvent)) {
             query.exec (QString ("DELETE FROM " GV_INBOX_TABLE " "
                                  "WHERE " GV_IN_ID "='%1'")
-                        .arg (hEvent.id));
+                        .arg (scrubEvent.id));
         }
 
         rv = query.exec (QString ("INSERT INTO " GV_INBOX_TABLE ""
@@ -829,14 +840,16 @@ CacheDatabase::insertHistory (const GVHistoryEvent &hEvent)
                                   "," GV_IN_ATTIME
                                   "," GV_IN_DISPNUM
                                   "," GV_IN_PHONE
-                                  "," GV_IN_FLAGS ") VALUES "
-                                  "('%1', %2 , %3, '%4', '%5', %6)")
-                            .arg (hEvent.id)
-                            .arg (hEvent.Type)
-                            .arg (hEvent.startTime.toTime_t())
-                            .arg (hEvent.strDisplayNumber)
-                            .arg (hEvent.strPhoneNumber)
-                            .arg (flags));
+                                  "," GV_IN_FLAGS
+                                  "," GV_IN_SMSTEXT ") VALUES "
+                                  "('%1', %2 , %3, '%4', '%5', %6, '%7')")
+                            .arg (scrubEvent.id)
+                            .arg (scrubEvent.Type)
+                            .arg (scrubEvent.startTime.toTime_t())
+                            .arg (scrubEvent.strDisplayNumber)
+                            .arg (scrubEvent.strPhoneNumber)
+                            .arg (flags)
+                            .arg (scrubEvent.strText));
         if (!rv) {
             qWarning ("Failed to insert row into history table");
             break;

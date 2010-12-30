@@ -18,6 +18,7 @@ Rectangle {
     property string strNumber: "The number"
     property string strLink: "BAD LINK!"
     property string strSelected: "All"
+    property string strSmsText: "Some text!"
 
     Rectangle { // Details
         id: detailsView
@@ -102,7 +103,6 @@ Rectangle {
                 id: btnRow
                 anchors {
                     top: theNumber.bottom
-                    left: parent.left
                     right: parent.right
                 }
                 height: btnCall.height
@@ -124,6 +124,21 @@ Rectangle {
                     onClicked: container.sigVoicemail(strLink)
                     fontPoint: Code.btnFontPoint()/10
                 }
+            }
+
+            Text {
+                id: theSmsText
+                anchors {
+                    top: btnRow.bottom
+                    left: parent.left
+                }
+                width: parent.width
+                wrapMode: Text.Wrap
+
+                text: strSmsText
+
+                color: "white"
+                font.pointSize: Code.btnFontPoint()/12
             }
         }
     }
@@ -263,6 +278,7 @@ Rectangle {
                         strDetailsName = name;
                         strNumber = number;
                         strLink = link;
+                        strSmsText = smstext;
 
                         if (type == "Voicemail") {
                             isVoicemail = true;

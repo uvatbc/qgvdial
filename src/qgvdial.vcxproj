@@ -74,6 +74,7 @@
     <ClCompile Include="GVAccess.cpp" />
     <ClCompile Include="GVContactsTable.cpp" />
     <ClCompile Include="GVDataAccess.cpp" />
+    <ClCompile Include="GVH_SMS_Handler.cpp" />
     <ClCompile Include="GVH_XMLJsonHandler.cpp" />
     <ClCompile Include="GVHistory.cpp" />
     <ClCompile Include="GVWebPage.cpp" />
@@ -115,6 +116,7 @@
     <ClInclude Include="GVAccess.h" />
     <ClInclude Include="GVContactsTable.h" />
     <ClInclude Include="GVDataAccess.h" />
+    <ClInclude Include="GVH_SMS_Handler.h" />
     <ClInclude Include="GVH_XMLJsonHandler.h" />
     <ClInclude Include="GVHistory.h" />
     <ClInclude Include="GVWebPage.h" />

@@ -14,6 +14,7 @@ InboxModel::InboxModel (QObject * parent)
     roles[IN_NumberRole]= "number";
     roles[IN_Link]      = "link";
     roles[IN_TimeDetail]= "time_detail";
+    roles[IN_SmsText]   = "smstext";
     setRoleNames(roles);
 }//InboxModel::InboxModel
 
@@ -54,6 +55,9 @@ InboxModel::data (const QModelIndex &index,
             break;
         case IN_NumberRole:
             column = 4;
+            break;
+        case IN_SmsText:
+            column = 6;
             break;
         }
 
@@ -175,6 +179,10 @@ InboxModel::data (const QModelIndex &index,
 
             GVAccess::beautify_number (strNum);
             var = strNum;
+        }
+        else if (6 == column)   // GV_IN_SMSTEXT
+        {
+            // Just return the data as is.
         }
         else
         {

@@ -67,8 +67,11 @@ struct GVHistoryEvent
     QString         id;
     GVH_Event_Type  Type;
     QDateTime       startTime;
+
     QString         strDisplayNumber;
     QString         strPhoneNumber;
+    QString         strText;
+
     bool            bRead;
     bool            bSpam;
     bool            bTrash;
@@ -82,6 +85,7 @@ struct GVHistoryEvent
         id.clear ();
         strPhoneNumber.clear ();
         strDisplayNumber.clear ();
+        strText.clear ();
 
         startTime = QDateTime();
         Type = GVHE_Unknown;

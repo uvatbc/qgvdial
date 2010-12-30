@@ -19,7 +19,7 @@ ListView {
                 left: parent.left
             }
 
-            text: type + "\t: " + number
+            text: type + " : " + number
             color: "white"
             font.pointSize: (Code.btnFontPoint () / 12)
         }

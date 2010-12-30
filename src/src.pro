@@ -1,4 +1,4 @@
-QT      *= core gui webkit sql xml script declarative
+QT      *= core gui webkit sql xml xmlpatterns script declarative
 TARGET   = qgvdial
 TEMPLATE = app
 
@@ -58,7 +58,8 @@ SOURCES  += main.cpp                    \
             WebWidget.cpp               \
             RegNumberModel.cpp          \
             ContactsModel.cpp           \
-            ContactDetailsModel.cpp
+            ContactDetailsModel.cpp     \
+            GVH_SMS_Handler.cpp
 
 HEADERS  += global.h                    \
             IObserver.h                 \
@@ -93,7 +94,8 @@ HEADERS  += global.h                    \
             WebWidget.h                 \
             RegNumberModel.h            \
             ContactsModel.h             \
-            ContactDetailsModel.h
+            ContactDetailsModel.h       \
+            GVH_SMS_Handler.h
 
 FORMS    += LoginDialog.ui              \
             VMailDialog.ui              \

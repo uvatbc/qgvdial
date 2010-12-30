@@ -14,6 +14,7 @@ public:
         IN_NumberRole,
         IN_Link,
         IN_TimeDetail,
+        IN_SmsText,
     };
 
     InboxModel (QObject * parent = 0);
