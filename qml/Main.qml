@@ -16,8 +16,6 @@ Rectangle {
     onSigText: console.debug("QML: Text " + number)
 
     property bool landscape: (main.width > main.height)
-    property string strStatus: "Ready"
-
     property int nMargins: 1
 
     Item {
@@ -162,7 +160,7 @@ Rectangle {
             color: "black"
 
             Text {
-                text: main.strStatus
+                text: strStatus
                 font.pointSize: Code.btnFontPoint()/12
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter

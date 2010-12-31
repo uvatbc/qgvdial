@@ -119,6 +119,8 @@ private slots:
     //! Invoked when user invokes refresh
     void onRefreshAll ();
 
+    void onStatusTimerTick ();
+
 private:
     void initLogging ();
     void doLogin ();
@@ -158,6 +160,9 @@ private:
     SMSDlg          dlgSMS;
     //! Web View
     WebWidget      *pWebWidget;
+
+    //! Timer for status messages
+    QTimer          statusTimer;
 
 #ifdef Q_WS_MAEMO_5
     QMaemo5InformationBox   infoBox;

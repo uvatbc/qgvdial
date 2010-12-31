@@ -24,6 +24,7 @@ MainWindow::MainWindow (QWidget *parent)
 , oContacts (this)
 , oInbox (this)
 , pWebWidget (new WebWidget (this, Qt::Window))
+, statusTimer (this)
 #ifdef Q_WS_MAEMO_5
 , infoBox (this)
 #endif
@@ -80,7 +81,11 @@ MainWindow::MainWindow (QWidget *parent)
     QObject::connect (qApp, SIGNAL (messageReceived (const QString &)),
                       this, SLOT   (messageReceived (const QString &)));
 
-    QTimer::singleShot (1000, this, SLOT (init()));
+    QObject::connect (&statusTimer, SIGNAL (timeout()),
+                       this       , SLOT   (onStatusTimerTick ()));
+
+    // Schedule the init a bit later so that the app.exec() can begin executing
+    QTimer::singleShot (100, this, SLOT (init()));
 }//MainWindow::MainWindow
 
 MainWindow::~MainWindow ()
@@ -160,7 +165,7 @@ MainWindow::setStatus(const QString &strText, int timeout /* = 0*/)
     } else {
         theLabel->setText (strText);
     }
-    infoBox.setTimeout (0 == timeout?3000:timeout);
+    infoBox.setTimeout (0 == timeout ? 3000 : timeout);
     infoBox.show ();
 #else
     if (NULL != pSystray) {
@@ -169,7 +174,24 @@ MainWindow::setStatus(const QString &strText, int timeout /* = 0*/)
                                timeout);
     }
 #endif
+
+    statusTimer.stop ();
+    QDeclarativeContext *ctx = this->rootContext();
+    ctx->setContextProperty ("strStatus", strText);
+
+    if (0 != timeout) {
+        statusTimer.setSingleShot (true);
+        statusTimer.setInterval (timeout);
+        statusTimer.start ();
+    }
 }//MainWindow::setStatus
+
+void
+MainWindow::onStatusTimerTick ()
+{
+    QDeclarativeContext *ctx = this->rootContext();
+    ctx->setContextProperty ("strStatus", "Ready");
+}//MainWindow::onStatusTimerTick
 
 /** Invoked when the QtSingleApplication sends a message
  * We have used a QtSignleApplication to ensure that there is only one instance
