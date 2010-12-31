@@ -589,10 +589,7 @@ MainWindow::initContacts ()
     oContacts.setUserPass (strUser, strPass);
     oContacts.loginSuccess ();
     oContacts.initModel (this);
-
-#ifndef Q_WS_MAEMO_5
     oContacts.refreshContacts ();
-#endif
 }//MainWindow::initContacts
 
 void
@@ -612,10 +609,7 @@ MainWindow::initInbox ()
 
     oInbox.loginSuccess ();
     oInbox.initModel (this);
-
-#ifndef Q_WS_MAEMO_5
     oInbox.refreshHistory ();
-#endif
 }//MainWindow::initInbox
 
 void

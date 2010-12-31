@@ -294,6 +294,9 @@ GVContactsTable::onGotContacts (QNetworkReply *reply)
         msg = QString("Contact parsing done. total = %1. usable = %2")
                 .arg (contactsHandler.getTotalContacts ())
                 .arg (contactsHandler.getUsableContacts ());
+
+        // Tell the contacts model to refresh all.
+        modelContacts->refresh ();
     } while (0); // End cleanup block (not a loop)
 
     emit status (msg);

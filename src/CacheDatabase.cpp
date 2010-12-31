@@ -376,7 +376,7 @@ CacheDatabase::putRegisteredNumbers (const GVRegisteredNumberArray &listNumbers)
 }//CacheDatabase::putRegisteredNumbers
 
 bool
-CacheDatabase::deleteContact (const QString  &strLink)
+CacheDatabase::existsContact (const QString  &strLink)
 {
     QSqlQuery query(dbMain);
     query.setForwardOnly (true);
@@ -385,10 +385,20 @@ CacheDatabase::deleteContact (const QString  &strLink)
                          "WHERE " GV_C_ID "='%1'")
                 .arg (strLink));
     if (query.next ()) {
-        query.exec (QString ("DELETE FROM " GV_CONTACTS_TABLE " "
-                             "WHERE " GV_C_ID "='%1'")
-                    .arg (strLink));
+        return (true);
     }
+    return (false);
+}//CacheDatabase::existsContact
+
+bool
+CacheDatabase::deleteContact (const QString  &strLink)
+{
+    QSqlQuery query(dbMain);
+    query.setForwardOnly (true);
+
+    query.exec (QString ("DELETE FROM " GV_CONTACTS_TABLE " "
+                         "WHERE " GV_C_ID "='%1'")
+                .arg (strLink));
 
     return (true);
 }//CacheDatabase::deleteContact
@@ -402,13 +412,8 @@ CacheDatabase::insertContact (const QString  &strName,
         QSqlQuery query(dbMain);
         query.setForwardOnly (true);
 
-        query.exec (QString ("SELECT " GV_C_ID " FROM " GV_CONTACTS_TABLE " "
-                             "WHERE " GV_C_ID "='%1'")
-                    .arg (strLink));
-        if (query.next ()) {
-            query.exec (QString ("DELETE FROM " GV_CONTACTS_TABLE " "
-                                 "WHERE " GV_C_ID "='%1'")
-                        .arg (strLink));
+        if (existsContact (strLink)) {
+            deleteContact (strLink);
         }
 
         rv = query.exec (QString ("INSERT INTO " GV_CONTACTS_TABLE ""

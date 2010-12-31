@@ -32,6 +32,7 @@ public:
     bool getRegisteredNumbers (GVRegisteredNumberArray &listNumbers);
     bool putRegisteredNumbers (const GVRegisteredNumberArray &listNumbers);
 
+    bool existsContact (const QString  &strLink);
     bool deleteContact (const QString  &strLink);
     bool insertContact (const QString  &strName,
                         const QString  &strLink);

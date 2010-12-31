@@ -22,6 +22,7 @@ public:
     bool deleteContact (const ContactInfo &contactInfo);
 
     void clearAll ();
+    void refresh ();
 private:
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
 

@@ -68,16 +68,23 @@ ContactsModel::insertContact (const ContactInfo &contactInfo)
 {
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
 
-    int oldcount = this->rowCount ();
-    beginInsertRows (QModelIndex (), oldcount, oldcount);
-
     GVContactInfo gvContactInfo;
     convert (contactInfo, gvContactInfo);
+
+    bool bExists = dbMain.existsContact (gvContactInfo.strLink);
+    int oldcount = this->rowCount ();
+
+    if (!bExists) {
+        beginInsertRows (QModelIndex (), oldcount, oldcount);
+    }
 
     dbMain.insertContact (contactInfo.strTitle, contactInfo.strId);
     dbMain.putContactInfo (gvContactInfo);
 
-    endInsertRows ();
+    if (!bExists) {
+        endInsertRows ();
+    }
+    
     return (true);
 }//ContactsModel::insertContact
 
@@ -87,12 +94,15 @@ ContactsModel::deleteContact (const ContactInfo &contactInfo)
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
 
     int oldcount = this->rowCount ();
-    beginInsertRows (QModelIndex (), oldcount, oldcount);
+    bool bExists = dbMain.existsContact (contactInfo.strId);
 
-    dbMain.deleteContact (contactInfo.strId);
+    if (bExists) {
+        beginRemoveRows (QModelIndex (), oldcount, oldcount);
+        dbMain.deleteContact (contactInfo.strId);
+        endRemoveRows ();
+    }
+    
     dbMain.deleteContactInfo (contactInfo.strId);
-
-    endInsertRows ();
     return (true);
 }//ContactsModel::deleteContact
 
@@ -138,3 +148,17 @@ ContactsModel::clearAll ()
     dbMain.clearContacts ();
     endRemoveRows ();
 }//ContactsModel::clearAll
+
+void
+ContactsModel::refresh ()
+{
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+
+    beginResetModel ();
+    dbMain.refreshContactsModel (this);
+    endResetModel ();
+
+    while (this->canFetchMore ()) {
+        this->fetchMore ();
+    }
+}//ContactsModel::refresh
