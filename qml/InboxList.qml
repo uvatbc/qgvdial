@@ -204,7 +204,7 @@ Rectangle {
             model: ["All", "Placed", "Missed", "Received", "Voicemail", "SMS"]
             delegate:  Rectangle {
                 height: lblSelector.height
-                width: listSelector.width
+                width: listSelector.width - border.width
 
                 color: "black"
                 border.color: "orange"
@@ -251,7 +251,7 @@ Rectangle {
                 border.color: "orange"
                 radius: 2
 
-                width: inboxView.width
+                width: inboxView.width - border.width
                 height: textName.height + 6
 
                 Text {

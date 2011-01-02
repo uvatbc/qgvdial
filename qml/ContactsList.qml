@@ -64,7 +64,7 @@ Rectangle {
 
                 fontPoint: Code.btnFontPoint() / 8
             }
-        }
+        }// Item (details top row)
 
         ContactDetails {
             id: detailsList
@@ -97,7 +97,7 @@ Rectangle {
             border.color: "orange"
             radius: 5
 
-            width: contactsView.width
+            width: contactsView.width - border.width
             height: textName.height + 8
 
             Text {

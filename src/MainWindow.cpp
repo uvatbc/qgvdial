@@ -359,6 +359,12 @@ MainWindow::initQML ()
                       this, SLOT   (onRegPhoneSelectionChange (int)));
     QObject::connect (gObj   , SIGNAL (sigInboxSelect (QString)),
                       &oInbox, SLOT   (onInboxSelected (const QString &)));
+    QObject::connect (gObj, SIGNAL (sigRefreshAll ()),
+                      this, SLOT   (onRefreshAll  ()));
+    QObject::connect (gObj, SIGNAL (sigDismiss ()),
+                      this, SLOT   (close ()));
+    QObject::connect (gObj, SIGNAL (sigQuit ()),
+                      this, SLOT   (on_actionE_xit_triggered ()));
 }//MainWindow::initQML
 
 /** Invoked to begin the login process.

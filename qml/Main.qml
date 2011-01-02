@@ -6,11 +6,20 @@ Rectangle {
     width: 250; height: 400
     color: "black"
 
+    // Signals from dialpad, contacts and inbox
     signal sigCall(string number)
     signal sigText(string number)
+    // Signal from dialpad indicating change of callback / callout
     signal sigSelChanged(int index)
+    // Signal from inbox to play a vmail
     signal sigVoicemail(string link)
+    // Signal from inbox to chose the type of inbox entries to show
     signal sigInboxSelect(string selection)
+    // Signals from the Settings page
+    signal sigLogin (bool bLogin)
+    signal sigRefreshAll
+    signal sigDismiss
+    signal sigQuit
 
     onSigCall: console.debug("QML: Call " + number)
     onSigText: console.debug("QML: Text " + number)
@@ -21,8 +30,8 @@ Rectangle {
     Item {
         id: mainColumn
         anchors.fill: parent
-        property int centralHeight: parent.height - barTop.height - barStatus.height
-        property int centralWidth: parent.width
+        property int centralHeight: height - barTop.height - barStatus.height
+        property int centralWidth: width
 
         Rectangle {
             id: barTop
@@ -147,6 +156,26 @@ Rectangle {
             onSigVoicemail: main.sigVoicemail(link)
         }
 
+        Settings {
+            id: settingsView
+
+            width: mainColumn.centralWidth
+            height: mainColumn.centralHeight
+            anchors {
+                top: barTop.bottom
+                bottom: barStatus.top
+                topMargin: nMargins
+                bottomMargin: nMargins
+            }
+
+            opacity: 0
+
+            onSigLogin: main.sigLogin(bLogin)
+            onSigRefreshAll: main.sigRefreshAll()
+            onSigDismiss: main.sigDismiss()
+            onSigQuit: main.sigQuit()
+        }
+
 ////////////////////////////////////////////////////////////////////////////////
 //                           Co-existent Items End                            //
 ////////////////////////////////////////////////////////////////////////////////
@@ -173,17 +202,22 @@ Rectangle {
         State {
             name: "Dialpad"
             PropertyChanges { target: dialPad; opacity: 1}
+            PropertyChanges { target: mainRect; opacity: 0}
         },
         State {
             name: "Contacts"
             PropertyChanges { target: contactsList; opacity: 1}
+            PropertyChanges { target: mainRect; opacity: 0}
         },
         State {
             name: "Inbox"
             PropertyChanges { target: inboxList; opacity: 1}
+            PropertyChanges { target: mainRect; opacity: 0}
         },
         State {
             name: "Settings"
+            PropertyChanges { target: settingsView; opacity: 1}
+            PropertyChanges { target: mainRect; opacity: 0}
         }
     ]//states
 

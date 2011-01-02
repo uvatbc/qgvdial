@@ -47,6 +47,7 @@ Rectangle {
     property real fontPoint: 40 // Outrageously large so that you are forced to change it.
 
     signal clicked
+    signal pressAndHold
 
     width: label.width + 20; height: label.height + 6
     smooth: true
@@ -62,7 +63,8 @@ Rectangle {
     MouseArea {
         id: mouseArea
         anchors.fill: parent
-        onClicked: { container.clicked() }
+        onClicked: container.clicked()
+        onPressAndHold: container.pressAndHold()
     }
 
     Text {
