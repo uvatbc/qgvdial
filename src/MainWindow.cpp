@@ -58,10 +58,23 @@ MainWindow::MainWindow (QWidget *parent)
     // At this point we anyway do not have an dea about the user, so it doesn't
     // make sense to actually set up any variables. However, the view needs to
     // be shown, otherwise the user will be confused about whether the app is
-    // running or hung. We can safely reload this QML later, whenuser is logged
-    // in and we have all the models set up.
+    // running or hung. We can safely reload this QML later, when the user is
+    // logged in and we have all the models set up.
+    QDeclarativeContext *ctx = this->rootContext();
+    ctx->setContextProperty ("g_strUsername", "user@gmail.com");
+    ctx->setContextProperty ("g_strPassword", "hunter2 :p");
+    ctx->setContextProperty ("g_bShowSettings", true);
     this->setSource (QUrl ("qrc:/Main.qml"));
     this->setResizeMode (QDeclarativeView::SizeRootObjectToView);
+    QGraphicsObject *gObj = this->rootObject();
+    QObject::connect (gObj, SIGNAL (sigLogin ()),  this, SLOT (doLogin ()));
+    QObject::connect (gObj, SIGNAL (sigLogout ()), this, SLOT (doLogout ()));
+    QObject::connect (gObj, SIGNAL (sigUserChanged (const QString &)),
+                      this, SLOT   (onUserTextChanged (const QString &)));
+    QObject::connect (gObj, SIGNAL (sigPassChanged (const QString &)),
+                      this, SLOT   (onPassTextChanged (const QString &)));
+    QObject::connect (gObj, SIGNAL (sigQuit ()),
+                      this, SLOT   (on_actionE_xit_triggered ()));
 
     // A systray icon if the OS supports it
     if (QSystemTrayIcon::isSystemTrayAvailable ())
@@ -311,7 +324,7 @@ MainWindow::init ()
     QObject::connect (&actDismiss, SIGNAL (triggered()),
                        this      , SLOT   (close()));
     QObject::connect (&actRefresh, SIGNAL (triggered()),
-                       this      , SLOT   (onRefreshAll()));
+                       this      , SLOT   (onRefresh()));
     QObject::connect (&actExit, SIGNAL (triggered()),
                        this   , SLOT   (on_actionE_xit_triggered()));
     QObject::connect (&actViewWeb, SIGNAL (triggered ()),
@@ -343,12 +356,25 @@ MainWindow::initQML ()
 {
     // Initialize the QML view
     QDeclarativeContext *ctx = this->rootContext();
-    ctx->setContextProperty ("registeredPhonesModel", &modelRegNumber);
+
+    ctx->setContextProperty ("g_registeredPhonesModel", &modelRegNumber);
+    ctx->setContextProperty ("g_bShowSettings", false);
+
+    QGraphicsObject *gObj = this->rootObject();
+    QObject::disconnect (gObj, SIGNAL (sigLogin ()),
+                         this, SLOT   (doLogin ()));
+    QObject::disconnect (gObj, SIGNAL (sigLogout ()),
+                         this, SLOT   (doLogout ()));
+    QObject::connect (gObj, SIGNAL (sigUserChanged (const QString &)),
+                      this, SLOT   (onUserTextChanged (const QString &)));
+    QObject::connect (gObj, SIGNAL (sigPassChanged (const QString &)),
+                      this, SLOT   (onPassTextChanged (const QString &)));
+    QObject::disconnect (gObj, SIGNAL (sigQuit ()),
+                         this, SLOT   (on_actionE_xit_triggered ()));
     this->setSource (QUrl ("qrc:/Main.qml"));
     this->setResizeMode (QDeclarativeView::SizeRootObjectToView);
 
     // Pick up signals from QML to call or text a number
-    QGraphicsObject *gObj = this->rootObject();
     QObject::connect (gObj, SIGNAL (sigCall (QString)),
                       this, SLOT   (dialNow (QString)));
     QObject::connect (gObj, SIGNAL (sigText (QString)),
@@ -359,8 +385,18 @@ MainWindow::initQML ()
                       this, SLOT   (onRegPhoneSelectionChange (int)));
     QObject::connect (gObj   , SIGNAL (sigInboxSelect (QString)),
                       &oInbox, SLOT   (onInboxSelected (const QString &)));
+    QObject::connect (gObj, SIGNAL (sigUserChanged (const QString &)),
+                      this, SLOT   (onUserTextChanged (const QString &)));
+    QObject::connect (gObj, SIGNAL (sigPassChanged (const QString &)),
+                      this, SLOT   (onPassTextChanged (const QString &)));
+    QObject::connect (gObj, SIGNAL (sigLogin ()),
+                      this, SLOT   (doLogin ()));
+    QObject::connect (gObj, SIGNAL (sigLogout ()),
+                      this, SLOT   (doLogout ()));
+    QObject::connect (gObj, SIGNAL (sigRefresh ()),
+                      this, SLOT   (onRefresh ()));
     QObject::connect (gObj, SIGNAL (sigRefreshAll ()),
-                      this, SLOT   (onRefreshAll  ()));
+                      this, SLOT   (onRefreshAll ()));
     QObject::connect (gObj, SIGNAL (sigDismiss ()),
                       this, SLOT   (close ()));
     QObject::connect (gObj, SIGNAL (sigQuit ()),
@@ -378,8 +414,7 @@ MainWindow::doLogin ()
     QVariantList l;
 
     bool bOk = false;
-    do // Begin cleanup block (not a loop)
-    {
+    do { // Begin cleanup block (not a loop)
         l += strUser;
         l += strPass;
 
@@ -409,30 +444,40 @@ MainWindow::doLogin ()
     }
 }//MainWindow::doLogin
 
+void
+MainWindow::onUserTextChanged (const QString &strUsername)
+{
+    if (strUser != strUsername) {
+        strUser = strUsername;
+
+        QDeclarativeContext *ctx = this->rootContext();
+        ctx->setContextProperty ("g_strUsername", strUser);
+    }
+}//MainWindow::onUserPassTextChanged
+
+void
+MainWindow::onPassTextChanged (const QString &strPassword)
+{
+    if (strPass != strPassword) {
+        strPass = strPassword;
+
+        QDeclarativeContext *ctx = this->rootContext();
+        ctx->setContextProperty ("g_strPassword", strPass);
+    }
+}//MainWindow::onUserPassTextChanged
+
 /** SLOT: Invoked when user triggers the login/logout action
  * If it is a login action, the Login dialog box is shown.
  */
 void
 MainWindow::on_action_Login_triggered ()
 {
-    do // Begin cleanup block (not a loop)
-    {
-        if (!bLoggedIn) {
-            LoginDialog dlg (strUser, strPass, this);
-            if (QDialog::Rejected == dlg.exec ()) {
-                setStatus ("User cancelled login");
-                break;
-            }
-            if (!dlg.getUserPass (strUser, strPass)) {
-                setStatus ("Invalid username or password");
-                break;
-            }
-
-            doLogin ();
-        } else {
-            doLogout ();
-        }
-    } while (0); // End cleanup block (not a loop)
+    if (!bLoggedIn) {
+        QDeclarativeContext *ctx = this->rootContext();
+        ctx->setContextProperty ("g_bShowSettings", true);
+    } else {
+        doLogout ();
+    }
 }//MainWindow::on_action_Login_triggered
 
 void
@@ -483,6 +528,11 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
 
         // Save the user name and password that was used to login
         dbMain.putUserPass (strUser, strPass);
+
+        QDeclarativeContext *ctx = this->rootContext();
+        ctx->setContextProperty ("g_strUsername", strUser);
+        ctx->setContextProperty ("g_strPassword", strPass);
+        ctx->setContextProperty ("g_bIsLoggedIn", bLoggedIn);
 
         // Fill up the combobox on the main page
         if ((!dbMain.getRegisteredNumbers (arrNumbers)) ||
@@ -536,6 +586,9 @@ MainWindow::logoutCompleted (bool, const QVariantList &)
     actLogin.setText ("Login...");
 
     bLoggedIn = false;
+
+    QDeclarativeContext *ctx = this->rootContext();
+    ctx->setContextProperty ("g_bIsLoggedIn", bLoggedIn);
 
     setStatus ("Logout complete");
     OsDependent &osd = Singletons::getRef().getOSD ();
@@ -1486,11 +1539,21 @@ MainWindow::onRegPhoneSelectionChange (int index)
 }//MainWindow::onRegPhoneSelectionChange
 
 void
-MainWindow::onRefreshAll ()
+MainWindow::onRefresh ()
 {
     qDebug ("Refresh all requested.");
 
     refreshRegisteredNumbers ();
     oInbox.refreshHistory ();
     oContacts.refreshContacts ();
+}//MainWindow::onRefresh
+
+void
+MainWindow::onRefreshAll ()
+{
+    qDebug ("Refresh all requested.");
+
+    refreshRegisteredNumbers ();
+    oInbox.refreshFullInbox ();
+    oContacts.refreshAllContacts ();
 }//MainWindow::onRefreshAll

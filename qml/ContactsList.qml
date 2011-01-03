@@ -87,7 +87,7 @@ Rectangle {
         clip: true
         opacity: 1
 
-        model: contactsModel
+        model: g_contactsModel
 //        model: testContactsModelData1
 
         delegate: Rectangle {

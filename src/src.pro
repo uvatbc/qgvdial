@@ -29,7 +29,6 @@ SOURCES  += main.cpp                    \
             global.cpp                  \
             MainApp.cpp                 \
             MainWindow.cpp              \
-            LoginDialog.cpp             \
             Singletons.cpp              \
             CacheDatabase.cpp           \
             OsDependent.cpp             \
@@ -65,7 +64,6 @@ HEADERS  += global.h                    \
             IObserver.h                 \
             MainApp.h                   \
             MainWindow.h                \
-            LoginDialog.h               \
             Singletons.h                \
             CacheDatabase.h             \
             OsDependent.h               \
@@ -97,8 +95,7 @@ HEADERS  += global.h                    \
             ContactDetailsModel.h       \
             GVH_SMS_Handler.h
 
-FORMS    += LoginDialog.ui              \
-            VMailDialog.ui              \
+FORMS    += VMailDialog.ui              \
             WebWidget.ui
 
 RESOURCES += qgvdial.qrc

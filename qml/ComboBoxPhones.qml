@@ -48,7 +48,7 @@ Rectangle {
             NumberAnimation { properties:"opacity"; duration: 400 }
         }
 
-        model: registeredPhonesModel
+        model: g_registeredPhonesModel
         delegate: Rectangle {
             id: rectDelegate
             color: "black"

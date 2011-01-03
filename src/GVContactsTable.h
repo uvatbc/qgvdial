@@ -37,6 +37,7 @@ signals:
     void allContacts (bool bOk);
 
 public slots:
+    void refreshAllContacts ();
     void refreshContacts ();
 
 private slots:

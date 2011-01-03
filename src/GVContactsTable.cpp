@@ -39,7 +39,7 @@ GVContactsTable::initModel (QDeclarativeView *pMainWindow)
     modelContacts = dbMain.newContactsModel ();
 
     QDeclarativeContext *ctx = pMainWindow->rootContext();
-    ctx->setContextProperty ("contactsModel", modelContacts);
+    ctx->setContextProperty ("g_contactsModel", modelContacts);
 
     while (modelContacts->canFetchMore ()) {
         modelContacts->fetchMore ();
@@ -102,6 +102,15 @@ GVContactsTable::getRequest (QString         strUrl,
 }//GVContactsTable::getRequest
 
 void
+GVContactsTable::refreshAllContacts ()
+{
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    dbMain.clearLastContactUpdate ();
+
+    refreshContacts ();
+}//GVContactsTable::refreshAllContacts
+
+void
 GVContactsTable::refreshContacts ()
 {
     QMutexLocker locker(&mutex);
@@ -122,7 +131,9 @@ GVContactsTable::refreshContacts ()
     bRefreshIsUpdate = false;
     QDateTime dtUpdate;
     if ((dbMain.getLastContactUpdate (dtUpdate)) && (dtUpdate.isValid ())) {
-        QString strUpdate = dtUpdate.toString ("yyyy-MM-ddThh:mm:ss");
+        QString strUpdate = dtUpdate.toString ("yyyy-MM-dd")
+                          + "T"
+                          + dtUpdate.toString ("hh:mm:ss");
         strUrl += QString ("&updated-min=%1&showdeleted=true").arg (strUpdate);
         bRefreshIsUpdate = true;
     } else {

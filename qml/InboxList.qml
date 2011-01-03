@@ -242,7 +242,7 @@ Rectangle {
 
             clip: true
 
-            model: inboxModel
+            model: g_inboxModel
 
             delegate: Rectangle {
                 id: listDelegate

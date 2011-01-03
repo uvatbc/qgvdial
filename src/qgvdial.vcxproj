@@ -79,7 +79,6 @@
     <ClCompile Include="GVHistory.cpp" />
     <ClCompile Include="GVWebPage.cpp" />
     <ClCompile Include="InboxModel.cpp" />
-    <ClCompile Include="LoginDialog.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainApp.cpp" />
     <ClCompile Include="MainWindow.cpp" />
@@ -122,7 +121,6 @@
     <ClInclude Include="GVWebPage.h" />
     <ClInclude Include="InboxModel.h" />
     <ClInclude Include="IObserver.h" />
-    <ClInclude Include="LoginDialog.h" />
     <ClInclude Include="MainApp.h" />
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="MobileWebPage.h" />
@@ -141,7 +139,6 @@
     <ClInclude Include="SMSEntryDeleteButton.h" />
     <ClInclude Include="TpCalloutInitiator.h" />
     <ClInclude Include="TpObserver.h" />
-    <ClInclude Include="ui_LoginDialog.h" />
     <ClInclude Include="ui_VMailDialog.h" />
     <ClInclude Include="ui_WebWidget.h" />
     <ClInclude Include="VMailDialog.h" />
@@ -165,8 +162,9 @@
     <None Include="..\qml\MainView_l.qml" />
     <None Include="..\qml\MainView_p.qml" />
     <None Include="..\qml\MyButton.qml" />
+    <None Include="..\qml\RadioButton.qml" />
+    <None Include="..\qml\Settings.qml" />
     <None Include="..\qml\TextButton.qml" />
-    <None Include="LoginDialog.ui" />
     <None Include="qgvdial.qrc" />
     <None Include="stylesheets\dialpad_desktop.qss" />
     <None Include="stylesheets\dialpad_maemo.qss" />

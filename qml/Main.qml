@@ -16,7 +16,11 @@ Rectangle {
     // Signal from inbox to chose the type of inbox entries to show
     signal sigInboxSelect(string selection)
     // Signals from the Settings page
-    signal sigLogin (bool bLogin)
+    signal sigUserChanged(string username)
+    signal sigPassChanged(string password)
+    signal sigLogin
+    signal sigLogout
+    signal sigRefresh
     signal sigRefreshAll
     signal sigDismiss
     signal sigQuit
@@ -26,6 +30,15 @@ Rectangle {
 
     property bool landscape: (main.width > main.height)
     property int nMargins: 1
+
+    property bool bShowSettings: g_bShowSettings
+    onBShowSettingsChanged: {
+        if (bShowSettings) {
+            main.state = "Settings";
+        } else {
+            main.state = '';
+        }
+    }
 
     Item {
         id: mainColumn
@@ -170,7 +183,11 @@ Rectangle {
 
             opacity: 0
 
-            onSigLogin: main.sigLogin(bLogin)
+            onSigUserChanged: main.sigUserChanged(username)
+            onSigPassChanged: main.sigPassChanged(password)
+            onSigLogin: main.sigLogin()
+            onSigLogout: main.sigLogout()
+            onSigRefresh: main.sigRefresh()
             onSigRefreshAll: main.sigRefreshAll()
             onSigDismiss: main.sigDismiss()
             onSigQuit: main.sigQuit()

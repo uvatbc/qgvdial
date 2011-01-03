@@ -36,7 +36,7 @@ GVHistory::initModel (QDeclarativeView *pMainWindow)
     modelInbox = dbMain.newInboxModel ();
 
     QDeclarativeContext *ctx = pMainWindow->rootContext();
-    ctx->setContextProperty ("inboxModel", modelInbox);
+    ctx->setContextProperty ("g_inboxModel", modelInbox);
     prepView ();
 }//GVHistory::initModel
 

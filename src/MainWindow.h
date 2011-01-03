@@ -39,18 +39,24 @@ private slots:
     //! Initialize the QML view
     void initQML ();
 
+    //! Invoked on rotation
+    void orientationChanged ();
+
     //! Invoked when the application is supposed to exit
     void on_actionE_xit_triggered();
     //! The Singleton Application class invokes this function
     void messageReceived (const QString &message);
-    //! Invoked when the user clicks Login
+
+    //! Invoked when the QML says that the username and/or password has changed.
+    void onUserTextChanged (const QString &strUsername);
+    void onPassTextChanged (const QString &strPassword);
+    //! Invoked when the user uses Ctrl_L to initiate login.
     void on_action_Login_triggered();
-
-    //! Invoked on rotation
-    void orientationChanged ();
-
+    //! Invoked when the user clicks the login button on QML.
+    void doLogin ();
     //! Called when the web component completes login - with success or failure
     void loginCompleted (bool bOk, const QVariantList &arrParams);
+
     //! Called when the logout button is clicked
     void doLogout ();
     //! Called when the web component completes logoff - with success or failure
@@ -117,13 +123,13 @@ private slots:
     void onRegPhoneSelectionChange (int index);
 
     //! Invoked when user invokes refresh
+    void onRefresh ();
     void onRefreshAll ();
 
     void onStatusTimerTick ();
 
 private:
     void initLogging ();
-    void doLogin ();
 
     void initContacts ();
     void deinitContacts ();

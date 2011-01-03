@@ -7,6 +7,7 @@
      <file alias="users.png">../icons/users.png</file>
      <file alias="note.png">../icons/note.png</file>
      <file alias="left_arrow.png">../icons/left_arrow.png</file>
+     <file alias="tick.png">../icons/tick.png</file>
      <file alias="ActionButtons.qml">../qml/ActionButtons.qml</file>
      <file alias="ComboBoxPhones.qml">../qml/ComboBoxPhones.qml</file>
      <file alias="ContactDetails.qml">../qml/ContactDetails.qml</file>

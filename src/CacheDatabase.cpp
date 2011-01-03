@@ -572,26 +572,27 @@ CacheDatabase::getContactFromNumber (const QString &strNumber,
     return (rv);
 }//CacheDatabase::getContactFromNumber
 
-bool
-CacheDatabase::setLastContactUpdate (const QDateTime &dateTime)
+void
+CacheDatabase::clearLastContactUpdate ()
 {
     QSqlQuery query(dbMain);
     query.setForwardOnly (true);
+    query.exec ("DELETE FROM " GV_UPDATES_TABLE
+                " WHERE " GV_UP_WHAT "='" GV_UP_CONTACTS "'");
+}//CacheDatabase::clearLastContactUpdate
 
-    QString strQ;
-    QDateTime dtUpdate;
-    if (getLastContactUpdate (dtUpdate))
-    {
-        query.exec ("DELETE FROM " GV_UPDATES_TABLE
-                    " WHERE " GV_UP_WHAT "='" GV_UP_CONTACTS "'");
-    }
+bool
+CacheDatabase::setLastContactUpdate (const QDateTime &dateTime)
+{
+    clearLastContactUpdate ();
 
-    QString strDateTime = dateTime.toString (UPDATE_DATE_FORMAT);
+    QSqlQuery query(dbMain);
+    query.setForwardOnly (true);
 
-    strQ = QString ("INSERT INTO " GV_UPDATES_TABLE
-                    " (" GV_UP_WHAT "," GV_UP_WHEN ")"
-                    " VALUES ('" GV_UP_CONTACTS "', '%1')")
-           .arg(strDateTime);
+    QString strQ = QString ("INSERT INTO " GV_UPDATES_TABLE
+                            " (" GV_UP_WHAT "," GV_UP_WHEN ")"
+                            " VALUES ('" GV_UP_CONTACTS "', '%1')")
+                    .arg(dateTime.toString (UPDATE_DATE_FORMAT));
     query.exec (strQ);
 
     return (true);

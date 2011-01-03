@@ -4,10 +4,13 @@ import "helper.js" as Code
 Item {
     id: container
 
-    //@@UV: 3 at the beginning yet tobe done
     signal sigProxySupport(bool enable)
     signal sigUseSystemProxy(bool enable)
-    signal sigLogin (bool bLogin)
+    signal sigUserChanged(string username)
+    signal sigPassChanged(string password)
+    signal sigLogin
+    signal sigLogout
+    signal sigRefresh
     signal sigRefreshAll
     signal sigDismiss
     signal sigQuit
@@ -19,6 +22,11 @@ Item {
         spacing: 2
 
         property bool bUserProxy: ((proxySupport.check == true) && (proxySystem.check  != true))
+
+        // Test properties; comment out when adding qml to c++ code.
+        property string strUsername: g_strUsername      // "user@gmail.com"
+        property string strPassword: g_strPassword      // "hunter2 :p"
+        property bool bIsLoggedIn: g_bIsLoggedIn        // false
 
         Row {
             width: parent.width
@@ -34,9 +42,21 @@ Item {
             TextInput {
                 id: textUsername
                 anchors.verticalCenter: parent.verticalCenter
-                text: "use@gmail.com"
+                text: mainColumn.strUsername
                 color: "white"
                 font.pointSize: Code.btnFontPoint()/10
+
+                opacity: (mainColumn.bIsLoggedIn == true ? 0 : 1)
+
+                onTextChanged: container.sigUserChanged(textUsername.text);
+            }
+
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                text: mainColumn.strUsername
+                color: "white"
+                font.pointSize: Code.btnFontPoint()/10
+                opacity: (mainColumn.bIsLoggedIn == true ? 1 : 0)
             }
         }//Row (username)
 
@@ -52,25 +72,41 @@ Item {
             }
 
             TextInput {
-                id: textpassword
+                id: textPassword
                 anchors.verticalCenter: parent.verticalCenter
-                text: "hunter2 :p"
+                text: mainColumn.strPassword
                 color: "white"
                 echoMode: TextInput.Password
                 font.pointSize: Code.btnFontPoint()/10
+
+                opacity: (mainColumn.bIsLoggedIn == true ? 0 : 1)
+
+                onTextChanged: container.sigPassChanged(textPassword.text);
+            }
+
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                text: Array(mainColumn.strPassword.length+1).join("*")
+                color: "white"
+                font.pointSize: Code.btnFontPoint()/10
+                opacity: (mainColumn.bIsLoggedIn == true ? 1 : 0)
             }
         }// Row (password)
 
         TextButton {
-            property bool bIsLoggedIn: false
-
-            text: (bIsLoggedIn == true ? "Logout" : "Login")
+            text: (mainColumn.bIsLoggedIn == true ? "Logout" : "Login")
             width: parent.width
             fontPoint: Code.btnFontPoint()/10
 
             onClicked: {
-                container.sigLogin(!bIsLoggedIn);
-                bIsLoggedIn = !bIsLoggedIn;
+                if (mainColumn.bIsLoggedIn) {
+                    container.sigLogout();
+                } else {
+                    container.sigLogin();
+                }
+
+                // Comment out when using qml in c++ code.
+                mainColumn.bIsLoggedIn = !mainColumn.bIsLoggedIn;
             }
         }// TextButton (login/logout)
 
@@ -138,11 +174,12 @@ Item {
         }// Row (user proxy port)
 
         TextButton {
-            text: "Refresh all"
+            text: "Refresh"
             width: parent.width
             fontPoint: Code.btnFontPoint()/10
 
-            onClicked: container.sigRefreshAll();
+            onClicked: container.sigRefresh();
+            onPressAndHold: container.sigRefreshAll();
         }//TextButton (Refresh all)
 
         TextButton {

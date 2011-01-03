@@ -43,6 +43,7 @@ public:
     bool getContactFromLink (GVContactInfo &info);
     bool getContactFromNumber (const QString &strNumber, GVContactInfo &info);
 
+    void clearLastContactUpdate ();
     bool setLastContactUpdate (const QDateTime &dateTime);
     bool getLastContactUpdate (QDateTime &dateTime);
 
