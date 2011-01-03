@@ -54,27 +54,11 @@ MainWindow::MainWindow (QWidget *parent)
     pWebWidget->hide ();
     osd.setDefaultWindowAttributes (pWebWidget);
 
-    // We first show the window without any context variables set.
-    // At this point we anyway do not have an dea about the user, so it doesn't
-    // make sense to actually set up any variables. However, the view needs to
-    // be shown, otherwise the user will be confused about whether the app is
-    // running or hung. We can safely reload this QML later, when the user is
-    // logged in and we have all the models set up.
+    initQML ();
     QDeclarativeContext *ctx = this->rootContext();
-    ctx->setContextProperty ("g_strUsername", "user@gmail.com");
+    ctx->setContextProperty ("g_strUsername", "example@gmail.com");
     ctx->setContextProperty ("g_strPassword", "hunter2 :p");
     ctx->setContextProperty ("g_bShowSettings", true);
-    this->setSource (QUrl ("qrc:/Main.qml"));
-    this->setResizeMode (QDeclarativeView::SizeRootObjectToView);
-    QGraphicsObject *gObj = this->rootObject();
-    QObject::connect (gObj, SIGNAL (sigLogin ()),  this, SLOT (doLogin ()));
-    QObject::connect (gObj, SIGNAL (sigLogout ()), this, SLOT (doLogout ()));
-    QObject::connect (gObj, SIGNAL (sigUserChanged (const QString &)),
-                      this, SLOT   (onUserTextChanged (const QString &)));
-    QObject::connect (gObj, SIGNAL (sigPassChanged (const QString &)),
-                      this, SLOT   (onPassTextChanged (const QString &)));
-    QObject::connect (gObj, SIGNAL (sigQuit ()),
-                      this, SLOT   (on_actionE_xit_triggered ()));
 
     // A systray icon if the OS supports it
     if (QSystemTrayIcon::isSystemTrayAvailable ())
@@ -335,6 +319,10 @@ MainWindow::init ()
     // If the cache has the username and password, begin login
     if (dbMain.getUserPass (strUser, strPass))
     {
+        QDeclarativeContext *ctx = this->rootContext();
+        ctx->setContextProperty ("g_strUsername", strUser);
+        ctx->setContextProperty ("g_strPassword", strPass);
+
         QVariantList l;
         logoutCompleted (true, l);
         // Login without popping up the "enter user/pass" dialog
@@ -355,27 +343,11 @@ void
 MainWindow::initQML ()
 {
     // Initialize the QML view
-    QDeclarativeContext *ctx = this->rootContext();
-
-    ctx->setContextProperty ("g_registeredPhonesModel", &modelRegNumber);
-    ctx->setContextProperty ("g_bShowSettings", false);
-
-    QGraphicsObject *gObj = this->rootObject();
-    QObject::disconnect (gObj, SIGNAL (sigLogin ()),
-                         this, SLOT   (doLogin ()));
-    QObject::disconnect (gObj, SIGNAL (sigLogout ()),
-                         this, SLOT   (doLogout ()));
-    QObject::disconnect (gObj, SIGNAL (sigUserChanged (const QString &)),
-                         this, SLOT   (onUserTextChanged (const QString &)));
-    QObject::disconnect (gObj, SIGNAL (sigPassChanged (const QString &)),
-                         this, SLOT   (onPassTextChanged (const QString &)));
-    QObject::disconnect (gObj, SIGNAL (sigQuit ()),
-                         this, SLOT   (on_actionE_xit_triggered ()));
     this->setSource (QUrl ("qrc:/Main.qml"));
     this->setResizeMode (QDeclarativeView::SizeRootObjectToView);
 
     // The root object changes when we reload the source. Pick it up again.
-    gObj = this->rootObject();
+    QGraphicsObject *gObj = this->rootObject();
 
     // Connect all signals to slots in this class.
     QObject::connect (gObj, SIGNAL (sigCall (QString)),
@@ -405,6 +377,15 @@ MainWindow::initQML ()
     QObject::connect (gObj, SIGNAL (sigQuit ()),
                       this, SLOT   (on_actionE_xit_triggered ()));
 }//MainWindow::initQML
+
+void
+MainWindow::initQMLGlobals ()
+{
+    QDeclarativeContext *ctx = this->rootContext();
+
+    ctx->setContextProperty ("g_registeredPhonesModel", &modelRegNumber);
+    ctx->setContextProperty ("g_bShowSettings", false);
+}//MainWindow::initQMLGlobals
 
 /** Invoked to begin the login process.
  * We already have the username and password, so just start the login to the GV
@@ -523,7 +504,7 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
         // Prepare the inbox widget for usage
         initInbox ();
         // Finally prepare the mail QML
-        initQML ();
+        initQMLGlobals ();
 
         // Allow access to buttons and widgets
         actLogin.setText ("Logout");
@@ -536,6 +517,8 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
         ctx->setContextProperty ("g_strUsername", strUser);
         ctx->setContextProperty ("g_strPassword", strPass);
         ctx->setContextProperty ("g_bIsLoggedIn", bLoggedIn);
+        ctx->setContextProperty ("g_bShowSettings", true);
+        ctx->setContextProperty ("g_bShowSettings", false);
 
         // Fill up the combobox on the main page
         if ((!dbMain.getRegisteredNumbers (arrNumbers)) ||

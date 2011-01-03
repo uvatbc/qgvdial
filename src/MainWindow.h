@@ -38,6 +38,7 @@ private slots:
     void init ();
     //! Initialize the QML view
     void initQML ();
+    void initQMLGlobals ();
 
     //! Invoked on rotation
     void orientationChanged ();

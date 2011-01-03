@@ -37,8 +37,10 @@ Rectangle {
     property bool bShowSettings: g_bShowSettings
     onBShowSettingsChanged: {
         if (bShowSettings) {
+            console.debug("Settings on");
             main.state = "Settings";
         } else {
+            console.debug("Settings off");
             main.state = '';
         }
     }
