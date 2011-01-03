@@ -58,7 +58,7 @@ MainWindow::MainWindow (QWidget *parent)
     QDeclarativeContext *ctx = this->rootContext();
     ctx->setContextProperty ("g_strUsername", "example@gmail.com");
     ctx->setContextProperty ("g_strPassword", "hunter2 :p");
-    ctx->setContextProperty ("g_bShowSettings", true);
+    ctx->setContextProperty ("g_bShowSettings", false);
 
     // A systray icon if the OS supports it
     if (QSystemTrayIcon::isSystemTrayAvailable ())
@@ -384,7 +384,6 @@ MainWindow::initQMLGlobals ()
     QDeclarativeContext *ctx = this->rootContext();
 
     ctx->setContextProperty ("g_registeredPhonesModel", &modelRegNumber);
-    ctx->setContextProperty ("g_bShowSettings", false);
 }//MainWindow::initQMLGlobals
 
 /** Invoked to begin the login process.
@@ -517,7 +516,6 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
         ctx->setContextProperty ("g_strUsername", strUser);
         ctx->setContextProperty ("g_strPassword", strPass);
         ctx->setContextProperty ("g_bIsLoggedIn", bLoggedIn);
-        ctx->setContextProperty ("g_bShowSettings", true);
         ctx->setContextProperty ("g_bShowSettings", false);
 
         // Fill up the combobox on the main page

@@ -144,9 +144,13 @@ ContactsModel::clearAll ()
 {
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
 
-    beginRemoveRows (QModelIndex (), 0, this->rowCount ());
-    dbMain.clearContacts ();
-    endRemoveRows ();
+    int rc = this->rowCount ();
+
+    if (0 != rc) {
+        beginRemoveRows (QModelIndex (), 0, rc);
+        dbMain.clearContacts ();
+        endRemoveRows ();
+    }
 }//ContactsModel::clearAll
 
 void

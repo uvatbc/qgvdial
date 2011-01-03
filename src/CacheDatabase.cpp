@@ -264,24 +264,26 @@ CacheDatabase::putUserPass (const QString &strUser, const QString &strPass)
     QSqlQuery query(dbMain);
     query.setForwardOnly (true);
 
-    if (getUserPass (strQ, strP))
-    {
-        query.exec ("DELETE FROM " GV_SETTINGS_TABLE
-                    " WHERE " GV_S_NAME "='" GV_S_VAR_USER "'");
-        query.exec ("DELETE FROM " GV_SETTINGS_TABLE
-                    " WHERE " GV_S_NAME "='" GV_S_VAR_PASS "'");
-    }
+    // Delete the old user pass always
+    query.exec ("DELETE FROM " GV_SETTINGS_TABLE
+                " WHERE " GV_S_NAME "='" GV_S_VAR_USER "'");
+    query.exec ("DELETE FROM " GV_SETTINGS_TABLE
+                " WHERE " GV_S_NAME "='" GV_S_VAR_PASS "'");
 
+    QString strScrub = strUser;
+    strScrub.replace ("'", "''");
     strQ = QString ("INSERT INTO " GV_SETTINGS_TABLE
                     " (" GV_S_NAME "," GV_S_VALUE ")"
                     " VALUES ('" GV_S_VAR_USER "', '%1')")
-           .arg(strUser);
+           .arg(strScrub);
     query.exec (strQ);
 
+    strScrub = strPass;
+    strScrub.replace ("'", "''");
     strQ = QString ("INSERT INTO " GV_SETTINGS_TABLE
                     " (" GV_S_NAME "," GV_S_VALUE ")"
                     " VALUES ('" GV_S_VAR_PASS "', '%1')")
-           .arg(strPass);
+           .arg(strScrub);
     query.exec (strQ);
 
     return (true);
@@ -316,10 +318,12 @@ CacheDatabase::putCallback (const QString &strCallback)
                     " WHERE " GV_S_NAME "='" GV_S_VAR_CALLBACK "'");
     }
 
+    QString strScrub = strCallback;
+    strScrub.replace ("'", "''");
     strQ = QString ("INSERT INTO " GV_SETTINGS_TABLE
                     " (" GV_S_NAME "," GV_S_VALUE ")"
                     " VALUES ('" GV_S_VAR_CALLBACK "', '%1')")
-           .arg(strCallback);
+           .arg(strScrub);
     query.exec (strQ);
 
     return (true);
@@ -362,6 +366,10 @@ CacheDatabase::putRegisteredNumbers (const GVRegisteredNumberArray &listNumbers)
 
         foreach (GVRegisteredNumber num, listNumbers)
         {
+            // Must scrub single quotes
+            num.strName.replace ("'", "''");
+            num.strDescription.replace ("'", "''");
+
             strQ = QString ("INSERT INTO " GV_REG_NUMS_TABLE
                             " (" GV_RN_NAME ", " GV_RN_NUM ", " GV_RN_TYPE ") "
                             "VALUES ('%1', '%2', %3)")
@@ -381,9 +389,13 @@ CacheDatabase::existsContact (const QString  &strLink)
     QSqlQuery query(dbMain);
     query.setForwardOnly (true);
 
+    // Must scrub for single quotes.
+    QString scrubLink = strLink;
+    scrubLink.replace ("'", "''");
+
     query.exec (QString ("SELECT " GV_C_ID " FROM " GV_CONTACTS_TABLE " "
                          "WHERE " GV_C_ID "='%1'")
-                .arg (strLink));
+                .arg (scrubLink));
     if (query.next ()) {
         return (true);
     }
@@ -396,9 +408,13 @@ CacheDatabase::deleteContact (const QString  &strLink)
     QSqlQuery query(dbMain);
     query.setForwardOnly (true);
 
+    // Must scrub for single quotes.
+    QString scrubLink = strLink;
+    scrubLink.replace ("'", "''");
+
     query.exec (QString ("DELETE FROM " GV_CONTACTS_TABLE " "
                          "WHERE " GV_C_ID "='%1'")
-                .arg (strLink));
+                .arg (scrubLink));
 
     return (true);
 }//CacheDatabase::deleteContact
@@ -412,15 +428,20 @@ CacheDatabase::insertContact (const QString  &strName,
         QSqlQuery query(dbMain);
         query.setForwardOnly (true);
 
-        if (existsContact (strLink)) {
-            deleteContact (strLink);
-        }
+        // Delete always succeeds (whether the row exists or not)
+        deleteContact (strLink);
+
+        // Must scrub for single quotes.
+        QString scrubName = strName;
+        scrubName.replace ("'", "''");
+        QString scrubLink = strLink;
+        scrubLink.replace ("'", "''");
 
         rv = query.exec (QString ("INSERT INTO " GV_CONTACTS_TABLE ""
                                   "(" GV_C_ID
                                   "," GV_C_NAME ") VALUES ('%1', '%2')")
-                            .arg (strLink)
-                            .arg (strName));
+                            .arg (scrubLink)
+                            .arg (scrubName));
         if (!rv) {
             qWarning () << "Failed to insert row into contacts table. ID:["
                         << strLink
@@ -458,10 +479,15 @@ bool
 CacheDatabase::deleteContactInfo (const QString  &strLink)
 {
     QSqlQuery query(dbMain);
-    QString strQ, strTemplate;
+    QString strQ;
     query.setForwardOnly (true);
+
+    // Must scrub for single quotes.
+    QString scrubLink = strLink;
+    scrubLink.replace ("'", "''");
+
     strQ = QString ("DELETE FROM " GV_LINKS_TABLE " WHERE "
-                    GV_L_LINK "='%1'").arg (strLink);
+                    GV_L_LINK "='%1'").arg (scrubLink);
     query.exec (strQ);
 
     return (true);
@@ -476,12 +502,18 @@ CacheDatabase::putContactInfo (const GVContactInfo &info)
 
     deleteContactInfo (info.strLink);
 
+    // Must scrub for single quotes.
+    GVContactInfo scrubInfo = info;
+    scrubInfo.strName.replace ("'", "''");
+    scrubInfo.strLink.replace ("'", "''");
+
     strTemplate = QString ("INSERT INTO " GV_LINKS_TABLE
                            " (" GV_L_LINK "," GV_L_TYPE "," GV_L_DATA ")"
-                           " VALUES ('%1', '%2', '%3')").arg (info.strLink);
+                           " VALUES ('%1', '%2', '%3')")
+                    .arg (scrubInfo.strLink);
 
     // Insert name
-    strQ = strTemplate.arg (GV_L_TYPE_NAME, info.strName);
+    strQ = strTemplate.arg (GV_L_TYPE_NAME, scrubInfo.strName);
     query.exec (strQ);
 
     // Then insert numbers
@@ -493,8 +525,9 @@ CacheDatabase::putContactInfo (const GVContactInfo &info)
             GVAccess::simplify_number (strNum);
         }
 
-        strQ = strTemplate.arg (GV_L_TYPE_NUMBER,
-                                QString (entry.chType + strNum));
+        strQ =
+        strTemplate.arg (GV_L_TYPE_NUMBER, QString (entry.chType + strNum)
+                                                    .replace ("'", "''"));
         query.exec (strQ);
     }
     return (true);
@@ -509,10 +542,13 @@ CacheDatabase::getContactFromLink (GVContactInfo &info)
     quint16 count = 0;
     bool rv = false;
 
+    QString scrubLink = info.strLink;
+    scrubLink.replace ("'", "''");
+
     QString strQ;
     strQ = QString ("SELECT " GV_L_TYPE ", " GV_L_DATA
                     " FROM " GV_LINKS_TABLE " WHERE "
-                    GV_L_LINK "='%1'").arg (info.strLink);
+                    GV_L_LINK "='%1'").arg (scrubLink);
     query.exec (strQ);
 
     info.arrPhones.clear ();
@@ -555,11 +591,12 @@ CacheDatabase::getContactFromNumber (const QString &strNumber,
 
     bool rv = false;
     do {// Begin cleanup block (not a loop)
-        QString strQ;
+        QString strQ, scrubNumber = strNumber;
+        scrubNumber.replace ("'", "''");
         strQ = QString ("SELECT " GV_L_LINK " FROM " GV_LINKS_TABLE " "
                         "WHERE " GV_L_TYPE "='" GV_L_TYPE_NUMBER "' "
                         "AND " GV_L_DATA " LIKE '%%%1'")
-                        .arg (strNumber);
+                        .arg (scrubNumber);
         query.exec (strQ);
 
         if (query.next ())
