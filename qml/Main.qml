@@ -28,6 +28,9 @@ Rectangle {
     onSigCall: console.debug("QML: Call " + number)
     onSigText: console.debug("QML: Text " + number)
 
+    onSigDismiss: console.debug("QML: Dismiss requested");
+    onSigQuit: console.debug("QML: Quit requested");
+
     property bool landscape: (main.width > main.height)
     property int nMargins: 1
 

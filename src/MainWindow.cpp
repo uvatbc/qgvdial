@@ -365,16 +365,19 @@ MainWindow::initQML ()
                          this, SLOT   (doLogin ()));
     QObject::disconnect (gObj, SIGNAL (sigLogout ()),
                          this, SLOT   (doLogout ()));
-    QObject::connect (gObj, SIGNAL (sigUserChanged (const QString &)),
-                      this, SLOT   (onUserTextChanged (const QString &)));
-    QObject::connect (gObj, SIGNAL (sigPassChanged (const QString &)),
-                      this, SLOT   (onPassTextChanged (const QString &)));
+    QObject::disconnect (gObj, SIGNAL (sigUserChanged (const QString &)),
+                         this, SLOT   (onUserTextChanged (const QString &)));
+    QObject::disconnect (gObj, SIGNAL (sigPassChanged (const QString &)),
+                         this, SLOT   (onPassTextChanged (const QString &)));
     QObject::disconnect (gObj, SIGNAL (sigQuit ()),
                          this, SLOT   (on_actionE_xit_triggered ()));
     this->setSource (QUrl ("qrc:/Main.qml"));
     this->setResizeMode (QDeclarativeView::SizeRootObjectToView);
 
-    // Pick up signals from QML to call or text a number
+    // The root object changes when we reload the source. Pick it up again.
+    gObj = this->rootObject();
+
+    // Connect all signals to slots in this class.
     QObject::connect (gObj, SIGNAL (sigCall (QString)),
                       this, SLOT   (dialNow (QString)));
     QObject::connect (gObj, SIGNAL (sigText (QString)),
