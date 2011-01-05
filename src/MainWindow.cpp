@@ -755,7 +755,7 @@ MainWindow::findInfo (const QString &strNumber, GVContactInfo &info)
     strTrunc.remove(' ').remove('+');
 
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    if (!dbMain.getContactFromNumber (strNumber, info)) {
+    if (!dbMain.getContactFromNumber (strTrunc, info)) {
         qDebug ("Could not find info about this number. Using dummy info");
         info.strName = strNumber;
         GVContactNumber num;
