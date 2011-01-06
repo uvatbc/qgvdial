@@ -81,7 +81,7 @@ InboxModel::data (const QModelIndex &index,
             var.clear ();
             if (0 == strDisp.size ()) {
                 qWarning () << "Inbox: Entry type could not be deciphered: "
-                            << chType;
+                            << int(chType);
                 break;
             }
 
@@ -264,27 +264,13 @@ InboxModel::refresh (const QString &strSelected)
 {
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
 
-    if (strSelected == strSelectType)
+    if (strSelected != strSelectType)
     {
-        beginResetModel ();
-
-        dbMain.refreshInboxModel (this, strSelected);
-
-        endResetModel ();
-    } else {
-        beginRemoveRows (QModelIndex(), 0, this->rowCount ());
-
         strSelectType = strSelected;
         eSelectType = string_to_type (strSelected);
-
-        beginInsertRows (QModelIndex(), 0, this->rowCount ());
-
-        dbMain.refreshInboxModel (this, strSelected);
-
-        endInsertRows ();
-
-        endRemoveRows ();
     }
+
+    dbMain.refreshInboxModel (this, strSelected);
 
     while (this->canFetchMore ()) {
         this->fetchMore ();

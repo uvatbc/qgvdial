@@ -63,7 +63,7 @@ GVHistory::refreshHistory ()
 
     GVAccess &webPage = Singletons::getRef().getGVAccess ();
     QVariantList l;
-    l += "all";
+    l += strSelectedMessages; // "all";
     l += "1";
     l += "10";
     l += dtUpdate;

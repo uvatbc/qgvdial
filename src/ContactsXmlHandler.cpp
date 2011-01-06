@@ -101,10 +101,13 @@ ContactsXmlHandler::endElement (const QString & /*namespaceURI*/,
 
         if ((0 == currInfo.arrPhones.size ()) && (!currInfo.bDeleted))
         {
-            qDebug () << "Contact does not have any phone numbers : "
-                      << currInfo.strTitle;
+            qDebug() << "Contact does not have any phone numbers : "
+                     << currInfo.strTitle;
             // Just in case, delete it!
             currInfo.bDeleted = true;
+        } else {
+            qDebug() << "Pulled one contact from Google with valid numbers: "
+                     << currInfo.strTitle;
         }
 
 #if !NO_DBGINFO
