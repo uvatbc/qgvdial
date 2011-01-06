@@ -93,10 +93,10 @@ Item {
             }
         }// Row (password)
 
-        TextButton {
-            text: (mainColumn.bIsLoggedIn == true ? "Logout" : "Login")
+        MyButton {
+            mainText: (mainColumn.bIsLoggedIn == true ? "Logout" : "Login")
             width: parent.width
-            fontPoint: Code.btnFontPoint()/10
+            mainFontPoint: Code.btnFontPoint()/10
 
             onClicked: {
                 if (mainColumn.bIsLoggedIn) {
@@ -108,7 +108,7 @@ Item {
                 // Comment out when using qml in c++ code.
                 mainColumn.bIsLoggedIn = !mainColumn.bIsLoggedIn;
             }
-        }// TextButton (login/logout)
+        }// MyButton (login/logout)
 
         RadioButton {
             id: proxySupport
@@ -173,22 +173,22 @@ Item {
             }
         }// Row (user proxy port)
 
-        TextButton {
-            text: "Refresh"
+        MyButton {
+            mainText: "Refresh"
             width: parent.width
-            fontPoint: Code.btnFontPoint()/10
+            mainFontPoint: Code.btnFontPoint()/10
 
             onClicked: container.sigRefresh();
-            onPressAndHold: container.sigRefreshAll();
-        }//TextButton (Refresh all)
+            onPressHold: container.sigRefreshAll();
+        }//MyButton (Refresh all)
 
-        TextButton {
-            text: "Dismiss window"
+        MyButton {
+            mainText: "Dismiss window"
             width: parent.width
-            fontPoint: Code.btnFontPoint()/10
+            mainFontPoint: Code.btnFontPoint()/10
 
             onClicked: container.sigDismiss();
-            onPressAndHold: container.sigQuit();
-        }//TextButton (quit)
+            onPressHold: container.sigQuit();
+        }//MyButton (quit)
     }// Column
 }// Item (top level)

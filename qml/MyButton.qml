@@ -7,6 +7,7 @@ Rectangle {
     smooth: true
 
     radius: ((height + width) / 20);
+    height: mText.height + 4
 
     // Main text in the button
     property string mainText: "2"
