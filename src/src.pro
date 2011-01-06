@@ -14,7 +14,7 @@ CONFIG *= embed_manifest_exe
 maemo5 {
     message(Maemo5 your world)
     QT *= maemo5
-    OTHER_FILES += qgvdial.desktop
+    OTHER_FILES += ../build-files/qgvdial.desktop
     MOBILITY += bearer
 }
 
@@ -190,7 +190,7 @@ maemo5 {
     target.path =$$BINDIR
 
     desktop.path = $$DATADIR/applications/hildon
-    desktop.files += qgvdial.desktop
+    desktop.files += ../build-files/qgvdial.desktop
 
     icon.path = $$OPTDATADIR
     icon.files += qgvdial.png

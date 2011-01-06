@@ -59,6 +59,8 @@ system("mv qgvdial-$qver/build-files/control.maemo qgvdial-$qver/debian/control"
 system("mv qgvdial-$qver/build-files/qgvdial.Call.service.maemo qgvdial-$qver/build-files/qgvdial.Call.service");
 system("mv qgvdial-$qver/build-files/qgvdial.Text.service.maemo qgvdial-$qver/build-files/qgvdial.Text.service");
 system("mv qgvdial-$qver/qgv-tp/data/org.freedesktop.Telepathy.ConnectionManager.qgvtp.service.maemo qgvdial-$qver/qgv-tp/data/org.freedesktop.Telepathy.ConnectionManager.qgvtp.service");
+# Change the name of the desktop file so that it can be directly used in the compilation
+system("mv qgvdial-$qver/build-files/qgvdial.desktop.maemo qgvdial-$qver/build-files/qgvdial.desktop");
 
 # Execute the rest of the build command
 $cmd = "cd qgvdial-$qver && $asroot $mad dpkg-buildpackage && $mad remote -r org.maemo.qgvdial send ../qgvdial_$qver-1_$machine.deb && $mad remote -r org.maemo.qgvdial install qgvdial_$qver-1_$machine.deb";
