@@ -40,13 +40,6 @@ SkypeWinClient::skypeAttachStatus (bool bOk)
 
         bOk = SkypeClient::ensureConnected ();
     } while (0); // End cleanup block (not a loop)
-
-/*@@UV Not sure why this is there.
-    if ((!bOk) && (bInWork))
-    {
-        completeCurrentWork (false);
-    }
-*/
 }//SkypeWinClient::skypeAttachStatus
 
 bool

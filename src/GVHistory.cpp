@@ -133,7 +133,7 @@ GVHistory::onInboxSelected (const QString &strSelection)
     }
 
     strSelectedMessages = strSelection.toLower ();
-    refreshHistory ();
+    prepView ();
 }//GVHistory::onInboxSelected
 
 void

@@ -123,11 +123,6 @@ MainWindow::log (const QString &strText, int level /*= 10*/)
                      .arg(level)
                      .arg(strText);
 
-    // Send to plain text widget
-//    if (NULL != txtLogs) {
-//        txtLogs->appendPlainText (strLog);
-//    }
-
     // Send to standard output
     cout << strLog.toStdString () << endl;
 
