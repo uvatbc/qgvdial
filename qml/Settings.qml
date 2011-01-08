@@ -22,6 +22,7 @@ Item {
         spacing: 2
 
         property bool bUserProxy: ((proxySupport.check == true) && (proxySystem.check  != true))
+        property bool bProxyUserPass: (bUserProxy ? (proxyUserPassRequired.check ? 1 : 0) : 0)
 
         // Test properties; comment out when adding qml to c++ code.
         property string strUsername: g_strUsername      // "user@gmail.com"
@@ -172,6 +173,58 @@ Item {
                 font.pointSize: Code.btnFontPoint()/10
             }
         }// Row (user proxy port)
+
+        RadioButton {
+            id: proxyUserPassRequired
+            width: parent.width
+            opacity: (mainColumn.bUserProxy == true ? 1 : 0)
+            fontPoint: Code.btnFontPoint()/10
+
+            text: "Requires username and password"
+            onCheckChanged: container.sigUseSystemProxy(check)
+        }// RadioButton (proxySystem)
+
+        Row {
+            width: parent.width
+            spacing: 2
+            opacity: (mainColumn.bProxyUserPass == true ? 1 : 0)
+
+            Text {
+                text: "Proxy user:"
+                color: "white"
+                anchors.verticalCenter: parent.verticalCenter
+                font.pointSize: Code.btnFontPoint()/10
+            }
+
+            TextInput {
+                id: textUserProxyUser
+                anchors.verticalCenter: parent.verticalCenter
+                text: ""
+                color: "white"
+                font.pointSize: Code.btnFontPoint()/10
+            }
+        }// Row (user proxy user name)
+
+        Row {
+            width: parent.width
+            spacing: 2
+            opacity: (mainColumn.bProxyUserPass == true ? 1 : 0)
+
+            Text {
+                text: "Proxy password:"
+                color: "white"
+                anchors.verticalCenter: parent.verticalCenter
+                font.pointSize: Code.btnFontPoint()/10
+            }
+
+            TextInput {
+                id: textUserProxyPass
+                anchors.verticalCenter: parent.verticalCenter
+                text: ""
+                color: "white"
+                font.pointSize: Code.btnFontPoint()/10
+            }
+        }// Row (user proxy password)
 
         MyButton {
             mainText: "Refresh"

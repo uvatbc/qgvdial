@@ -12,7 +12,7 @@ ContactDetailsModel::ContactDetailsModel (const GVContactInfo &i,
     qDebug () << nChildren << ": ContactDetailsModel constructor" << (void *)this;
 
     if (nChildren == 256) {
-        qDebug ("Wait");
+        qDebug ("This is the point after which it usually crashes");
     }
 
     QHash<int, QByteArray> roles;
