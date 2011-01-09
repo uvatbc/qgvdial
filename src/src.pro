@@ -117,6 +117,7 @@ OTHER_FILES  += winrsrc.rc                  \
                 ../qml/MainView_p.qml       \
                 ../qml/MainView.qml         \
                 ../qml/MyButton.qml         \
+                ../qml/Proxy.qml            \
                 ../qml/RadioButton.qml      \
                 ../qml/Settings.qml         \
                 ../qml/TextButton.qml       \

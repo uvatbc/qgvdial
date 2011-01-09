@@ -4,8 +4,6 @@ import "helper.js" as Code
 Item {
     id: container
 
-    signal sigProxySupport(bool enable)
-    signal sigUseSystemProxy(bool enable)
     signal sigUserChanged(string username)
     signal sigPassChanged(string password)
     signal sigLogin
@@ -15,14 +13,18 @@ Item {
     signal sigDismiss
     signal sigQuit
 
+    signal sigProxyChanges(bool bEnable,
+                           bool bUserSystemSettings,
+                           string host, int port,
+                           bool bRequiresAuth,
+                           string user, string pass)
+
     Column {
         id: mainColumn
         anchors.fill: parent
         anchors.topMargin: 2
         spacing: 2
-
-        property bool bUserProxy: ((proxySupport.check == true) && (proxySystem.check  != true))
-        property bool bProxyUserPass: (bUserProxy ? (proxyUserPassRequired.check ? 1 : 0) : 0)
+        opacity: 1
 
         // Test properties; comment out when adding qml to c++ code.
         property string strUsername: g_strUsername      // "user@gmail.com"
@@ -111,120 +113,14 @@ Item {
             }
         }// MyButton (login/logout)
 
-        RadioButton {
-            id: proxySupport
+
+        MyButton {
+            mainText: "Proxy settings"
             width: parent.width
-            fontPoint: Code.btnFontPoint()/10
+            mainFontPoint: Code.btnFontPoint()/10
 
-            text: "Enable proxy support"
-            onCheckChanged: container.sigProxySupport(check)
-        }// RadioButton (proxySupport)
-
-        RadioButton {
-            id: proxySystem
-            width: parent.width
-            opacity: (proxySupport.check == true ? 1 : 0)
-            fontPoint: Code.btnFontPoint()/10
-
-            text: "Use system proxy settings"
-            onCheckChanged: container.sigUseSystemProxy(check)
-        }// RadioButton (proxySystem)
-
-        Row {
-            width: parent.width
-            spacing: 2
-            opacity: (mainColumn.bUserProxy == true ? 1 : 0)
-
-            Text {
-                text: "Host:"
-                color: "white"
-                anchors.verticalCenter: parent.verticalCenter
-                font.pointSize: Code.btnFontPoint()/10
-            }
-
-            TextInput {
-                id: textUserProxyHost
-                anchors.verticalCenter: parent.verticalCenter
-                text: "Enter proxy host"
-                color: "white"
-                font.pointSize: Code.btnFontPoint()/10
-            }
-        }// Row (user proxy host)
-
-        Row {
-            width: parent.width
-            spacing: 2
-
-            opacity: (mainColumn.bUserProxy == true ? 1 : 0)
-
-            Text {
-                text: "Port:"
-                color: "white"
-                anchors.verticalCenter: parent.verticalCenter
-                font.pointSize: Code.btnFontPoint()/10
-            }
-
-            TextInput {
-                id: textUserProxyPort
-                anchors.verticalCenter: parent.verticalCenter
-                text: "Enter proxy port"
-                color: "white"
-                validator: IntValidator { bottom: 0; top: 65535 }
-                font.pointSize: Code.btnFontPoint()/10
-            }
-        }// Row (user proxy port)
-
-        RadioButton {
-            id: proxyUserPassRequired
-            width: parent.width
-            opacity: (mainColumn.bUserProxy == true ? 1 : 0)
-            fontPoint: Code.btnFontPoint()/10
-
-            text: "Requires username and password"
-            onCheckChanged: container.sigUseSystemProxy(check)
-        }// RadioButton (proxySystem)
-
-        Row {
-            width: parent.width
-            spacing: 2
-            opacity: (mainColumn.bProxyUserPass == true ? 1 : 0)
-
-            Text {
-                text: "Proxy user:"
-                color: "white"
-                anchors.verticalCenter: parent.verticalCenter
-                font.pointSize: Code.btnFontPoint()/10
-            }
-
-            TextInput {
-                id: textUserProxyUser
-                anchors.verticalCenter: parent.verticalCenter
-                text: ""
-                color: "white"
-                font.pointSize: Code.btnFontPoint()/10
-            }
-        }// Row (user proxy user name)
-
-        Row {
-            width: parent.width
-            spacing: 2
-            opacity: (mainColumn.bProxyUserPass == true ? 1 : 0)
-
-            Text {
-                text: "Proxy password:"
-                color: "white"
-                anchors.verticalCenter: parent.verticalCenter
-                font.pointSize: Code.btnFontPoint()/10
-            }
-
-            TextInput {
-                id: textUserProxyPass
-                anchors.verticalCenter: parent.verticalCenter
-                text: ""
-                color: "white"
-                font.pointSize: Code.btnFontPoint()/10
-            }
-        }// Row (user proxy password)
+            onClicked: container.state = "Proxy"
+        }// MyButton (login/logout)
 
         MyButton {
             mainText: "Refresh"
@@ -244,4 +140,26 @@ Item {
             onPressHold: container.sigQuit();
         }//MyButton (quit)
     }// Column
+
+    Proxy {
+        id: proxySettings
+        anchors.fill: parent
+        anchors.topMargin: 2
+        opacity: 0
+
+        onSigDone: container.state = ''
+        onSigProxyChanges: container.sigProxyChanges(bEnable,
+                                                     bUserSystemSettings,
+                                                     host, port,
+                                                     bRequiresAuth,
+                                                     user, pass)
+    }
+
+    states: [
+        State {
+            name: "Proxy"
+            PropertyChanges { target: proxySettings; opacity: 1 }
+            PropertyChanges { target: mainColumn; opacity: 0 }
+        }
+    ]
 }// Item (top level)

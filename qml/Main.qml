@@ -25,6 +25,12 @@ Rectangle {
     signal sigDismiss
     signal sigQuit
 
+    signal sigProxyChanges(bool bEnable,
+                           bool bUserSystemSettings,
+                           string host, int port,
+                           bool bRequiresAuth,
+                           string user, string pass)
+
     onSigCall: console.debug("QML: Call " + number)
     onSigText: console.debug("QML: Text " + number)
 
@@ -196,6 +202,12 @@ Rectangle {
             onSigRefreshAll: main.sigRefreshAll()
             onSigDismiss: main.sigDismiss()
             onSigQuit: main.sigQuit()
+
+            onSigProxyChanges: main.sigProxyChanges(bEnable,
+                                                    bUserSystemSettings,
+                                                    host, port,
+                                                    bRequiresAuth,
+                                                    user, pass)
         }
 
 ////////////////////////////////////////////////////////////////////////////////
