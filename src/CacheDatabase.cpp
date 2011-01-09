@@ -852,7 +852,7 @@ CacheDatabase::getLatestInboxEntry (QDateTime &dateTime)
         quint64 dtVal = query.value(0).toULongLong (&bOk);
         if (!bOk)
         {
-            qWarning ("Could not convert datetime");
+            qWarning ("Could not convert datetime for latest inbox update");
             break;
         }
 
@@ -933,3 +933,95 @@ CacheDatabase::insertInboxEntry (const GVInboxEntry &hEvent)
 
     return (rv);
 }//CacheDatabase::insertInboxEntry
+
+bool
+CacheDatabase::setProxySettings (bool bEnable,
+                                 bool bUseSystemProxy,
+                                 const QString &host, int port,
+                                 bool bRequiresAuth,
+                                 const QString &user, const QString &pass)
+{
+    int flags = (bEnable ? GV_P_F_ENABLE : 0)
+              | (bUseSystemProxy ? GV_P_F_USE_SYSTEM : 0)
+              | (bRequiresAuth ? GV_P_F_NEEDS_AUTH : 0);
+
+    QString scrubHost = host, scrubUser = user, scrubPass = pass;
+    scrubHost.replace ("'", "''");
+    scrubUser.replace ("'", "''");
+    scrubPass.replace ("'", "''");
+
+    QSqlQuery query(dbMain);
+    query.setForwardOnly (true);
+
+    // Clear the table of all settings
+    query.exec ("DELETE FROM " GV_PROXY_TABLE);
+    // Insert the new settings (not that there can ever be more than one)
+    bool rv =
+    query.exec (QString ("INSERT INTO " GV_PROXY_TABLE " "
+                         "(" GV_P_FLAGS
+                         "," GV_P_HOST "," GV_P_PORT
+                         "," GV_P_USER "," GV_P_PASS ") VALUES "
+                         "(%1, '%2', %3, '%4', '%5')")
+                         .arg (flags)
+                         .arg (scrubHost).arg (port)
+                         .arg (scrubUser).arg (scrubPass));
+    return (rv);
+}//CacheDatabase::setProxySettings
+
+bool
+CacheDatabase::getProxySettings (bool &bEnable,
+                                 bool &bUseSystemProxy,
+                                 QString &host, int &port,
+                                 bool &bRequiresAuth,
+                                 QString &user, QString &pass)
+{
+    QSqlQuery query(dbMain);
+    query.setForwardOnly (true);
+    bool rv = false;
+
+    do // Begin cleanup block (not a loop)
+    {
+        rv = query.exec ("SELECT " GV_P_FLAGS "," GV_P_HOST "," GV_P_PORT
+                         "," GV_P_USER "," GV_P_PASS " FROM " GV_PROXY_TABLE);
+        if (!rv) {
+            qWarning ("Failed to query DB for proxy settings");
+            break;
+        }
+
+        rv = query.next ();
+        if (!rv) {
+            qWarning ("No entries in the proxy settings table!");
+            break;
+        }
+
+        int flags = query.value(0).toInt (&rv);
+        if (!rv) {
+            qWarning ("Failed to pull the flags from the DB");
+            break;
+        }
+        bEnable = (flags & GV_P_F_ENABLE ? true : false);
+        if (!bEnable) {
+            qDebug ("Proxy not enabled.");
+            break;
+        }
+        bUseSystemProxy = (flags & GV_P_F_USE_SYSTEM ? true : false);
+        if (bUseSystemProxy) {
+            qDebug ("Use system settings");
+            break;
+        }
+        host = query.value (1).toString ();
+        port = query.value (2).toInt (&rv);
+        if (!rv) {
+            qWarning ("Failed to query DB for proxy port");
+            break;
+        }
+        bRequiresAuth = (flags & GV_P_F_NEEDS_AUTH ? true : false);
+        if (!bRequiresAuth) {
+            qDebug ("Proxy does not require authentication");
+            break;
+        }
+        user = query.value (3).toString ();
+        pass = query.value (4).toString ();
+    } while (0); // End cleanup block (not a loop)
+    return (rv);
+}//CacheDatabase::getProxySettings

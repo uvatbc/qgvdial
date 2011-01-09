@@ -435,4 +435,122 @@ GVAccess::dialCanFinish ()
 void
 GVAccess::setView (QWidget * /*view*/)
 {
-}//GVWebPage::setView
+}//GVAccess::setView
+
+bool
+GVAccess::setProxySettings (bool bEnable,
+                            bool bUseSystemProxy,
+                            const QString &host, int port,
+                            bool bRequiresAuth,
+                            const QString &user, const QString &pass)
+{
+    QNetworkProxy proxySettings;
+    do // Begin cleanup block (not a loop)
+    {
+    	if (!bEnable) {
+            qDebug ("Clearing all proxy information");
+            break;
+    	}
+
+        if (bUseSystemProxy) {
+            QNetworkProxy https;
+            getSystemProxies (proxySettings, https);
+            qDebug ("Using system proxy settings");
+            break;
+        }
+
+        proxySettings.setHostName (host);
+        proxySettings.setPort (port);
+        proxySettings.setType (QNetworkProxy::HttpProxy);
+
+        if (bRequiresAuth) {
+            proxySettings.setUser (user);
+            proxySettings.setPassword (pass);
+        }
+
+        qDebug ("Using user defined proxy settings.");
+    } while (0); // End cleanup block (not a loop)
+    QNetworkProxy::setApplicationProxy (proxySettings);
+
+    return (true);
+}//GVAccess::setProxySettings
+
+bool
+GVAccess::getSystemProxies (QNetworkProxy &http, QNetworkProxy &https)
+{
+    QNetworkProxyFactory::setUseSystemConfiguration (true);
+
+    do { // Begin cleanup block (not a loop)
+        QList<QNetworkProxy> netProxies =
+        QNetworkProxyFactory::systemProxyForQuery (
+        QNetworkProxyQuery(QUrl("http://www.google.com")));
+        http = netProxies[0];
+        if (QNetworkProxy::NoProxy != http.type ()) {
+            qDebug () << "Got proxy: host = " << http.hostName ()
+                      << ", port = " << http.port ();
+            break;
+        }
+
+        // Otherwise Confirm it
+#if defined(Q_WS_X11)
+        QString strHttpProxy = getenv ("http_proxy");
+        if (strHttpProxy.isEmpty ()) {
+            break;
+        }
+
+        int colon = strHttpProxy.lastIndexOf (':');
+        if (-1 != colon) {
+            QString strHost = strHttpProxy.mid (0, colon);
+            QString strPort = strHttpProxy.mid (colon);
+
+            strHost.remove ("http://").remove ("https://");
+
+            strPort.remove (':').remove ('/');
+            int port = strPort.toInt ();
+
+            qDebug () << "Found http proxy: " << strHost << ":" << port;
+            http.setHostName (strHost);
+            http.setPort (port);
+            http.setType (QNetworkProxy::HttpProxy);
+        }
+#endif
+    } while (0); // End cleanup block (not a loop)
+
+    do { // Begin cleanup block (not a loop)
+        QList<QNetworkProxy> netProxies =
+        QNetworkProxyFactory::systemProxyForQuery (
+        QNetworkProxyQuery(QUrl("https://www.google.com")));
+        https = netProxies[0];
+        if (QNetworkProxy::NoProxy != https.type ()) {
+            qDebug () << "Got proxy: host = " << https.hostName ()
+                      << ", port = " << https.port ();
+            break;
+        }
+
+        // Otherwise Confirm it
+#if defined(Q_WS_X11)
+        QString strHttpProxy = getenv ("https_proxy");
+        if (strHttpProxy.isEmpty ()) {
+            break;
+        }
+
+        int colon = strHttpProxy.lastIndexOf (':');
+        if (-1 != colon) {
+            QString strHost = strHttpProxy.mid (0, colon);
+            QString strPort = strHttpProxy.mid (colon);
+
+            strHost.remove ("http://").remove ("https://");
+
+            strPort.remove (':').remove ('/');
+            int port = strPort.toInt ();
+
+            qDebug () << "Found http proxy: " << strHost << ":" << port;
+            https.setHostName (strHost);
+            https.setPort (port);
+            https.setType (QNetworkProxy::HttpProxy);
+        }
+#endif
+    } while (0); // End cleanup block (not a loop)
+
+    return (true);
+}//GVWebPage::getSystemProxies

@@ -162,6 +162,7 @@
     <None Include="..\qml\MainView_l.qml" />
     <None Include="..\qml\MainView_p.qml" />
     <None Include="..\qml\MyButton.qml" />
+    <None Include="..\qml\Proxy.qml" />
     <None Include="..\qml\RadioButton.qml" />
     <None Include="..\qml\Settings.qml" />
     <None Include="..\qml\TextButton.qml" />

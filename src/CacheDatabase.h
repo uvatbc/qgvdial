@@ -70,6 +70,18 @@ public:
     bool existsInboxEntry (const GVInboxEntry &hEvent);
     bool insertInboxEntry (const GVInboxEntry &hEvent);
 
+    // proxy settings get and set
+    bool setProxySettings (bool bEnable,
+                           bool bUseSystemProxy,
+                           const QString &host, int port,
+                           bool bRequiresAuth,
+                           const QString &user, const QString &pass);
+    bool getProxySettings (bool &bEnable,
+                           bool &bUseSystemProxy,
+                           QString &host, int &port,
+                           bool &bRequiresAuth,
+                           QString &user, QString &pass);
+
 signals:
     void status(const QString &strText, int timeout = 2000);
 

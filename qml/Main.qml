@@ -26,7 +26,7 @@ Rectangle {
     signal sigQuit
 
     signal sigProxyChanges(bool bEnable,
-                           bool bUserSystemSettings,
+                           bool bUseSystemProxy,
                            string host, int port,
                            bool bRequiresAuth,
                            string user, string pass)
@@ -204,7 +204,7 @@ Rectangle {
             onSigQuit: main.sigQuit()
 
             onSigProxyChanges: main.sigProxyChanges(bEnable,
-                                                    bUserSystemSettings,
+                                                    bUseSystemProxy,
                                                     host, port,
                                                     bRequiresAuth,
                                                     user, pass)

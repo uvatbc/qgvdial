@@ -4,9 +4,23 @@ import "helper.js" as Code
 Item {
     id: container
 
+    objectName: "ProxySettingsPage"
+
+    function setValues(bEnable, bUseSystemProxy, host, port,
+                       bRequiresAuth, user, pass) {
+        console.debug ("QML: Setting proxy settings")
+        proxySupport.check = bEnable;
+        proxySystem.check = bUseSystemProxy;
+        textUserProxyHost.text = host;
+        textUserProxyPort.text = port;
+        proxyUserPassRequired.check = bRequiresAuth;
+        textUserProxyUser.text = user;
+        textUserProxyPass.text = pass;
+    }
+
     signal sigDone(bool bSave)
     signal sigProxyChanges(bool bEnable,
-                           bool bUserSystemSettings,
+                           bool bUseSystemProxy,
                            string host, int port,
                            bool bRequiresAuth,
                            string user, string pass)
@@ -26,7 +40,6 @@ Item {
             fontPoint: Code.btnFontPoint()/10
 
             text: "Enable proxy support"
-            onCheckChanged: container.sigProxySupport(check)
         }// RadioButton (proxySupport)
 
         RadioButton {
@@ -36,7 +49,6 @@ Item {
             fontPoint: Code.btnFontPoint()/10
 
             text: "Use system proxy settings"
-            onCheckChanged: container.sigUseSystemProxy(check)
         }// RadioButton (proxySystem)
 
         Row {
@@ -90,7 +102,6 @@ Item {
             fontPoint: Code.btnFontPoint()/10
 
             text: "Requires username and password"
-            onCheckChanged: container.sigUseSystemProxy(check)
         }// RadioButton (proxyUserPassRequired)
 
         Row {
@@ -99,6 +110,7 @@ Item {
             opacity: (bEnableProxy && !bSystemProxy && bProxyUserPass ? 1 : 0)
 
             Text {
+                id: lblProxyUser
                 text: "Proxy user:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
@@ -108,6 +120,7 @@ Item {
             TextInput {
                 id: textUserProxyUser
                 anchors.verticalCenter: parent.verticalCenter
+                width: parent.width - lblProxyUser.width
                 text: ""
                 color: "white"
                 font.pointSize: Code.btnFontPoint()/10
@@ -120,6 +133,7 @@ Item {
             opacity: (bEnableProxy && !bSystemProxy && bProxyUserPass ? 1 : 0)
 
             Text {
+                id: lblProxyPass
                 text: "Proxy password:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
@@ -129,6 +143,7 @@ Item {
             TextInput {
                 id: textUserProxyPass
                 anchors.verticalCenter: parent.verticalCenter
+                width: parent.width - lblProxyPass.width
                 text: ""
                 color: "white"
                 font.pointSize: Code.btnFontPoint()/10
@@ -147,11 +162,11 @@ Item {
                 onClicked: {
                     container.sigProxyChanges (bEnableProxy,
                                                bSystemProxy,
-                                               textUserProxyHost,
-                                               textUserProxyPort,
+                                               textUserProxyHost.text,
+                                               textUserProxyPort.text,
                                                bProxyUserPass,
-                                               textUserProxyUser,
-                                               textUserProxyPass);
+                                               textUserProxyUser.text,
+                                               textUserProxyPass.text);
                     container.sigDone(true);
                 }
 

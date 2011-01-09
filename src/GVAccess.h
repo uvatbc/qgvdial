@@ -59,6 +59,9 @@ protected:
     GVAccess (QObject *parent = NULL);
     virtual ~GVAccess ();
 
+    //! This function will find out the proxy information for the system
+    bool getSystemProxies (QNetworkProxy &http, QNetworkProxy &https);
+
 public:
     bool enqueueWork (GVAccess_Work whatwork, const QVariantList &params,
                       QObject      *receiver, const char         *method);
@@ -71,6 +74,12 @@ public:
     static void beautify_number (QString &strNumber);
 
     virtual void setView (QWidget *view);
+
+    bool setProxySettings (bool bEnable,
+                           bool bUseSystemProxy,
+                           const QString &host, int port,
+                           bool bRequiresAuth,
+                           const QString &user, const QString &pass);
 
 signals:
     //! Status emitter

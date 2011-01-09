@@ -126,7 +126,7 @@ private slots:
 
     //! Proxy changes come into this slot
     void onSigProxyChanges(bool bEnable,
-                           bool bUserSystemSettings,
+                           bool bUseSystemProxy,
                            const QString &host, int port,
                            bool bRequiresAuth,
                            const QString &user, const QString &pass);

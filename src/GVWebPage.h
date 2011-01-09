@@ -104,9 +104,6 @@ private:
 
     void cancelDataDial2 ();
 
-    //! This function will find out the proxy information for the system
-    bool getSystemProxies (QNetworkProxy &http, QNetworkProxy &https);
-
 private:
     bool                    bUseIphoneUA;
 

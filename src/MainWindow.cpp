@@ -221,6 +221,17 @@ MainWindow::init ()
     // the database.
     dbMain.init ();
 
+    // Pick up proxy settings from the DB and apply to webpage.
+    bool bProxyEnable = false, bUseSystemProxy = false;
+    bool bProxyAuthRequired = false;
+    QString strProxyHost, strProxyUser, strProxyPass;
+    int proxy_port = 0;
+    dbMain.getProxySettings (bProxyEnable, bUseSystemProxy,
+                             strProxyHost, proxy_port,
+                             bProxyAuthRequired, strProxyUser, strProxyPass);
+    onSigProxyChanges (bProxyEnable, bUseSystemProxy, strProxyHost, proxy_port,
+                       bProxyAuthRequired, strProxyUser, strProxyPass);
+
     // Initialize the DBUS interface to allow other applications (and qgv-tp) to
     // initiate calls and send texts through us.
     osd.initDialServer (this, SLOT (dialNow (const QString &)));
@@ -1524,12 +1535,44 @@ MainWindow::onRefreshAll ()
 
 void
 MainWindow::onSigProxyChanges(bool bEnable,
-                              bool bUserSystemSettings,
+                              bool bUseSystemProxy,
                               const QString &host, int port,
                               bool bRequiresAuth,
                               const QString &user, const QString &pass)
 {
-    qDebug ("onSigProxyChanges");
-    //TODO: Save to dbMain
-    //TODO: Send to WebPage.
+    qDebug (__FUNCTION__);
+
+    // Send to WebPage.
+    GVAccess &webPage = Singletons::getRef().getGVAccess ();
+    webPage.setProxySettings (bEnable, bUseSystemProxy, host, port,
+                              bRequiresAuth, user, pass);
+
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    dbMain.setProxySettings (bEnable, bUseSystemProxy, host, port,
+                             bRequiresAuth, user, pass);
+
+    do // Begin cleanup block (not a loop)
+    {
+    	QObject *pRoot = this->rootObject ();
+        if (NULL == pRoot) {
+            qWarning ("Could not get to root object in QML!!!");
+            break;
+        }
+
+        QObject *pProxySettings = pRoot->findChild <QObject*>
+                                                  ("ProxySettingsPage");
+        if (NULL == pProxySettings) {
+            qWarning ("Could not get to ProxySettingsPage");
+            break;
+        }
+        
+        QMetaObject::invokeMethod (pProxySettings, "setValues",
+                                   Q_ARG (QVariant, QVariant(bEnable)),
+                                   Q_ARG (QVariant, QVariant(bUseSystemProxy)),
+                                   Q_ARG (QVariant, QVariant(host)),
+                                   Q_ARG (QVariant, QVariant(port)),
+                                   Q_ARG (QVariant, QVariant(bRequiresAuth)),
+                                   Q_ARG (QVariant, QVariant(user)),
+                                   Q_ARG (QVariant, QVariant(pass)));
+    } while (0); // End cleanup block (not a loop)
 }//MainWindow::onSigProxyChanges
