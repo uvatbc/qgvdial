@@ -4,12 +4,16 @@ Credits:
 
 TODO:
 -> Call cancel for callout and callback both need to work
--> Call and SMS buttons from contacts page and history page
--> SMS needs to be handled in history: Add children of the SMS as representation of the SMS texts
+-> Call and SMS buttons from contacts page and inbox page
+-> SMS needs to be handled in inbox: Add children of the SMS as representation of the SMS texts
 -> Dialer page buttons need to be mapped to some work
 -> Default button on GVSettings page should map to Login button
 
 Changelog:
+
+2011-01-09: (Since the last log entry - in chronological order)
+-> Fixed vmail issue
+-> History now updated based on
 
 2010-08-14:
 -> GV Inbox now uses data API. Inbox is updated when a call is made or SMS is sent.

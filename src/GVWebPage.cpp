@@ -899,8 +899,8 @@ GVWebPage::onGotHistoryXML (QNetworkReply *reply)
     GVH_XMLJsonHandler xmlHandler;
 
     QObject::connect (
-        &xmlHandler, SIGNAL (oneElement (const GVHistoryEvent &)),
-         this      , SIGNAL (oneHistoryEvent (const GVHistoryEvent &)));
+        &xmlHandler, SIGNAL (oneElement (const GVInboxEntry &)),
+         this      , SIGNAL (oneHistoryEvent (const GVInboxEntry &)));
 
     bool bOk = false;
     do // Begin cleanup block (not a loop)

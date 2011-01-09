@@ -15,7 +15,7 @@ public:
     qint32 getUsableMsgsCount ();
 
 signals:
-    void oneElement (const GVHistoryEvent &element);
+    void oneElement (const GVInboxEntry &element);
 
 protected:
     bool startElement (const QString        &namespaceURI,

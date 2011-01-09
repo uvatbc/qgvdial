@@ -3,7 +3,7 @@
 #include "Singletons.h"
 #include "InboxModel.h"
 
-GVHistory::GVHistory (QObject *parent)
+GVInbox::GVInbox (QObject *parent)
 : QObject (parent)
 , mutex (QMutex::Recursive)
 , bLoggedIn (false)
@@ -11,24 +11,24 @@ GVHistory::GVHistory (QObject *parent)
 {
     // Initially, all are to be selected
     strSelectedMessages = "all";
-}//GVHistory::GVHistory
+}//GVInbox::GVInbox
 
-GVHistory::~GVHistory(void)
+GVInbox::~GVInbox(void)
 {
     deinitModel ();
-}//GVHistory::~GVHistory
+}//GVInbox::~GVInbox
 
 void
-GVHistory::deinitModel ()
+GVInbox::deinitModel ()
 {
     if (NULL != modelInbox) {
         delete modelInbox;
         modelInbox = NULL;
     }
-}//GVHistory::deinitModel
+}//GVInbox::deinitModel
 
 void
-GVHistory::initModel (QDeclarativeView *pMainWindow)
+GVInbox::initModel (QDeclarativeView *pMainWindow)
 {
     deinitModel ();
 
@@ -38,18 +38,18 @@ GVHistory::initModel (QDeclarativeView *pMainWindow)
     QDeclarativeContext *ctx = pMainWindow->rootContext();
     ctx->setContextProperty ("g_inboxModel", modelInbox);
     prepView ();
-}//GVHistory::initModel
+}//GVInbox::initModel
 
 void
-GVHistory::prepView ()
+GVInbox::prepView ()
 {
     emit status ("Re-selecting inbox entries. This will take some time", 0);
     modelInbox->refresh (strSelectedMessages);
     emit status ("Inbox entries selected.");
-}//GVHistory::prepView
+}//GVInbox::prepView
 
 void
-GVHistory::refreshHistory ()
+GVInbox::refreshHistory ()
 {
     QMutexLocker locker(&mutex);
     if (!bLoggedIn)
@@ -68,27 +68,27 @@ GVHistory::refreshHistory ()
     l += "10";
     l += dtUpdate;
     QObject::connect (
-        &webPage, SIGNAL (oneHistoryEvent (const GVHistoryEvent &)),
-         this   , SLOT   (oneHistoryEvent (const GVHistoryEvent &)));
+        &webPage, SIGNAL (oneHistoryEvent (const GVInboxEntry &)),
+         this   , SLOT   (oneHistoryEvent (const GVInboxEntry &)));
     emit status ("Retrieving Inbox...", 0);
     if (!webPage.enqueueWork (GVAW_getInbox, l, this,
             SLOT (getHistoryDone (bool, const QVariantList &))))
     {
         getHistoryDone (false, l);
     }
-}//GVHistory::refreshHistory
+}//GVInbox::refreshHistory
 
 void
-GVHistory::refreshFullInbox ()
+GVInbox::refreshFullInbox ()
 {
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     dbMain.setLastInboxUpdate (QDateTime::fromString ("2000-01-01",
                                                       "yyyy-MM-dd"));
     refreshHistory ();
-}//GVHistory::refreshFullInbox
+}//GVInbox::refreshFullInbox
 
 void
-GVHistory::oneHistoryEvent (const GVHistoryEvent &hevent)
+GVInbox::oneHistoryEvent (const GVInboxEntry &hevent)
 {
     QString strType = modelInbox->type_to_string (hevent.Type);
     if (0 == strType.size ())
@@ -97,17 +97,17 @@ GVHistory::oneHistoryEvent (const GVHistoryEvent &hevent)
     }
 
     modelInbox->insertHistory (hevent);
-}//GVHistory::oneHistoryEvent
+}//GVInbox::oneHistoryEvent
 
 void
-GVHistory::getHistoryDone (bool, const QVariantList &)
+GVInbox::getHistoryDone (bool, const QVariantList &)
 {
     emit status ("Inbox retrieved. Sorting...", 0);
 
     GVAccess &webPage = Singletons::getRef().getGVAccess ();
     QObject::disconnect (
-        &webPage, SIGNAL (oneHistoryEvent (const GVHistoryEvent &)),
-         this   , SLOT   (oneHistoryEvent (const GVHistoryEvent &)));
+        &webPage, SIGNAL (oneHistoryEvent (const GVInboxEntry &)),
+         this   , SLOT   (oneHistoryEvent (const GVInboxEntry &)));
 
     prepView ();
 
@@ -121,10 +121,10 @@ GVHistory::getHistoryDone (bool, const QVariantList &)
     }
 
     emit status ("Inbox ready");
-}//GVHistory::getHistoryDone
+}//GVInbox::getHistoryDone
 
 void
-GVHistory::onInboxSelected (const QString &strSelection)
+GVInbox::onInboxSelected (const QString &strSelection)
 {
     QMutexLocker locker(&mutex);
     if (!bLoggedIn)
@@ -134,18 +134,18 @@ GVHistory::onInboxSelected (const QString &strSelection)
 
     strSelectedMessages = strSelection.toLower ();
     prepView ();
-}//GVHistory::onInboxSelected
+}//GVInbox::onInboxSelected
 
 void
-GVHistory::loginSuccess ()
+GVInbox::loginSuccess ()
 {
     QMutexLocker locker(&mutex);
     bLoggedIn = true;
-}//GVHistory::loginSuccess
+}//GVInbox::loginSuccess
 
 void
-GVHistory::loggedOut ()
+GVInbox::loggedOut ()
 {
     QMutexLocker locker(&mutex);
     bLoggedIn = false;
-}//GVHistory::loggedOut
+}//GVInbox::loggedOut

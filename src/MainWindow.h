@@ -36,12 +36,6 @@ private slots:
 
     // All initializations happen here
     void init ();
-    //! Initialize the QML view
-    void initQML ();
-    void initQMLGlobals ();
-
-    //! Invoked on rotation
-    void orientationChanged ();
 
     //! Invoked when the application is supposed to exit
     void on_actionE_xit_triggered();
@@ -127,10 +121,22 @@ private slots:
     void onRefresh ();
     void onRefreshAll ();
 
+    //! Status messages timeout
     void onStatusTimerTick ();
+
+    //! Proxy changes come into this slot
+    void onSigProxyChanges(bool bEnable,
+                           bool bUserSystemSettings,
+                           const QString &host, int port,
+                           bool bRequiresAuth,
+                           const QString &user, const QString &pass);
 
 private:
     void initLogging ();
+
+    //! Initialize the QML view
+    void initQML ();
+    void initQMLGlobals ();
 
     void initContacts ();
     void deinitContacts ();
@@ -162,7 +168,7 @@ private:
     //! Contacts table widget
     GVContactsTable oContacts;
     //! Contacts table widget
-    GVHistory       oInbox;
+    GVInbox         oInbox;
     //! SMS Window
     SMSDlg          dlgSMS;
     //! Web View

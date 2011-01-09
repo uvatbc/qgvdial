@@ -53,19 +53,19 @@ struct GVRegisteredNumber
 };
 typedef QVector<GVRegisteredNumber> GVRegisteredNumberArray;
 
-enum GVH_Event_Type {
-    GVHE_Unknown = 0,
-    GVHE_Placed,
-    GVHE_Received,
-    GVHE_Missed,
-    GVHE_Voicemail,
-    GVHE_TextMessage,
+enum GVI_Entry_Type {
+    GVIE_Unknown = 0,
+    GVIE_Placed,
+    GVIE_Received,
+    GVIE_Missed,
+    GVIE_Voicemail,
+    GVIE_TextMessage,
 };
 
-struct GVHistoryEvent
+struct GVInboxEntry
 {
     QString         id;
-    GVH_Event_Type  Type;
+    GVI_Entry_Type  Type;
     QDateTime       startTime;
 
     QString         strDisplayNumber;
@@ -77,7 +77,7 @@ struct GVHistoryEvent
     bool            bTrash;
     bool            bStar;
 
-    GVHistoryEvent () {
+    GVInboxEntry () {
         init ();
     }
 
@@ -88,12 +88,12 @@ struct GVHistoryEvent
         strText.clear ();
 
         startTime = QDateTime();
-        Type = GVHE_Unknown;
+        Type = GVIE_Unknown;
 
         bRead = bSpam = bTrash = bStar = false;
     }
 };
-Q_DECLARE_METATYPE (GVHistoryEvent)
+Q_DECLARE_METATYPE (GVInboxEntry)
 
 QString get_db_name ();
 

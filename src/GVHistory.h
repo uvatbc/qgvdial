@@ -1,18 +1,18 @@
-#ifndef __GVHISTORY_H__
-#define __GVHISTORY_H__
+#ifndef __GVINBOX_H__
+#define __GVINBOX_H__
 
 #include "global.h"
 #include <QtDeclarative>
 
 class InboxModel;
 
-class GVHistory : public QObject
+class GVInbox : public QObject
 {
     Q_OBJECT
 
 public:
-    GVHistory (QObject *parent = 0);
-    ~GVHistory(void);
+    GVInbox (QObject *parent = 0);
+    ~GVInbox(void);
 
     void deinitModel ();
     void initModel (QDeclarativeView *pMainWindow);
@@ -43,7 +43,7 @@ public slots:
     void loggedOut ();
 
 private slots:
-    void oneHistoryEvent (const GVHistoryEvent &hevent);
+    void oneHistoryEvent (const GVInboxEntry &hevent);
     void getHistoryDone (bool bOk, const QVariantList &arrParams);
 
 private:
@@ -63,4 +63,4 @@ private:
     InboxModel     *modelInbox;
 };
 
-#endif //__GVHISTORY_H__
+#endif //__GVINBOX_H__

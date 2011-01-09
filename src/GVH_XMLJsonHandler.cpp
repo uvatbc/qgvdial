@@ -97,7 +97,7 @@ GVH_XMLJsonHandler::parseJSON (const QDateTime &dtUpdate, bool &bGotOld)
             qint32 nParams =
             scriptEngine.evaluate ("msgParams.length;").toInt32 ();
 
-            GVHistoryEvent oneHistory;
+            GVInboxEntry inboxEntry;
             for (qint32 j = 0; j < nParams; j++) {
                 strTemp = QString("msgParams[%1];").arg (j);
                 QString strPName = scriptEngine.evaluate (strTemp).toString ();
@@ -108,36 +108,36 @@ GVH_XMLJsonHandler::parseJSON (const QDateTime &dtUpdate, bool &bGotOld)
                 QString strVal = scriptEngine.evaluate (strTemp).toString ();
 
                 if (strPName == "id") {
-                    oneHistory.id = strVal;
+                    inboxEntry.id = strVal;
                 } else if (strPName == "phoneNumber") {
-                    oneHistory.strPhoneNumber = strVal;
+                    inboxEntry.strPhoneNumber = strVal;
                 } else if (strPName == "displayNumber") {
-                    oneHistory.strDisplayNumber = strVal;
+                    inboxEntry.strDisplayNumber = strVal;
                 } else if (strPName == "startTime") {
                     bool bOk = false;
                     quint64 iVal = strVal.toULongLong (&bOk) / 1000;
                     if (bOk) {
-                        oneHistory.startTime = QDateTime::fromTime_t (iVal);
+                        inboxEntry.startTime = QDateTime::fromTime_t (iVal);
                     }
                 } else if (strPName == "isRead") {
-                    oneHistory.bRead = (strVal == "true");
+                    inboxEntry.bRead = (strVal == "true");
                 } else if (strPName == "isSpam") {
-                    oneHistory.bSpam = (strVal == "true");
+                    inboxEntry.bSpam = (strVal == "true");
                 } else if (strPName == "isTrash") {
-                    oneHistory.bTrash = (strVal == "true");
+                    inboxEntry.bTrash = (strVal == "true");
                 } else if (strPName == "star") {
-                    oneHistory.bStar = (strVal == "true");
+                    inboxEntry.bStar = (strVal == "true");
                 } else if (strPName == "labels") {
                     if (strVal.contains ("placed")) {
-                        oneHistory.Type = GVHE_Placed;
+                        inboxEntry.Type = GVIE_Placed;
                     } else if (strVal.contains ("received")) {
-                        oneHistory.Type = GVHE_Received;
+                        inboxEntry.Type = GVIE_Received;
                     } else if (strVal.contains ("missed")) {
-                        oneHistory.Type = GVHE_Missed;
+                        inboxEntry.Type = GVIE_Missed;
                     } else if (strVal.contains ("voicemail")) {
-                        oneHistory.Type = GVHE_Voicemail;
+                        inboxEntry.Type = GVIE_Voicemail;
                     } else if (strVal.contains ("sms")) {
-                        oneHistory.Type = GVHE_TextMessage;
+                        inboxEntry.Type = GVIE_TextMessage;
                     } else {
                         qWarning () << QString("Unknown label %1").arg(strVal);
                     }
@@ -154,24 +154,24 @@ GVH_XMLJsonHandler::parseJSON (const QDateTime &dtUpdate, bool &bGotOld)
                 }
             }
 
-            if (0 == oneHistory.id.size()) {
+            if (0 == inboxEntry.id.size()) {
                 qWarning ("Invalid ID");
                 continue;
             }
-            if (0 == oneHistory.strPhoneNumber.size()) {
+            if (0 == inboxEntry.strPhoneNumber.size()) {
                 qWarning ("Invalid Phone number");
                 continue;
             }
-            if (0 == oneHistory.strDisplayNumber.size()) {
-                oneHistory.strDisplayNumber = "Unknown";
+            if (0 == inboxEntry.strDisplayNumber.size()) {
+                inboxEntry.strDisplayNumber = "Unknown";
             }
-            if (!oneHistory.startTime.isValid ()) {
+            if (!inboxEntry.startTime.isValid ()) {
                 qWarning ("Invalid start time");
                 continue;
             }
 
             // Check to see if it is too old to show
-            if (dtUpdate.isValid () && (dtUpdate >= oneHistory.startTime))
+            if (dtUpdate.isValid () && (dtUpdate >= inboxEntry.startTime))
             {
                 nOldMsgs++;
                 if (1 == nOldMsgs) {
@@ -183,14 +183,14 @@ GVH_XMLJsonHandler::parseJSON (const QDateTime &dtUpdate, bool &bGotOld)
             }
 
             // Pick up the text from the parsed HTML
-            if ((GVHE_TextMessage == oneHistory.Type) &&
-                (smsHandler.mapTexts.contains (oneHistory.id)))
+            if ((GVIE_TextMessage == inboxEntry.Type) &&
+                (smsHandler.mapTexts.contains (inboxEntry.id)))
             {
-                oneHistory.strText = smsHandler.mapTexts[oneHistory.id];
+                inboxEntry.strText = smsHandler.mapTexts[inboxEntry.id];
             }
 
             // emit the history element
-            emit oneElement (oneHistory);
+            emit oneElement (inboxEntry);
             nUsableMsgs++;
         }
 

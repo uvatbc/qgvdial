@@ -5,7 +5,7 @@
 InboxModel::InboxModel (QObject * parent)
 : QSqlQueryModel (parent)
 , strSelectType ("all")
-, eSelectType (GVHE_Unknown)
+, eSelectType (GVIE_Unknown)
 {
     QHash<int, QByteArray> roles;
     roles[IN_TypeRole]  = "type";
@@ -77,7 +77,7 @@ InboxModel::data (const QModelIndex &index,
         else if (1 == column)   // GV_IN_TYPE
         {
             char chType = var.toChar().toAscii ();
-            QString strDisp = type_to_string ((GVH_Event_Type) chType);
+            QString strDisp = type_to_string ((GVI_Entry_Type) chType);
             var.clear ();
             if (0 == strDisp.size ()) {
                 qWarning () << "Inbox: Entry type could not be deciphered: "
@@ -196,24 +196,24 @@ InboxModel::data (const QModelIndex &index,
 }//InboxModel::data
 
 QString
-InboxModel::type_to_string (GVH_Event_Type Type)
+InboxModel::type_to_string (GVI_Entry_Type Type)
 {
     QString strReturn;
     switch (Type)
     {
-    case GVHE_Placed:
+    case GVIE_Placed:
         strReturn = "Placed";
         break;
-    case GVHE_Received:
+    case GVIE_Received:
         strReturn = "Received";
         break;
-    case GVHE_Missed:
+    case GVIE_Missed:
         strReturn = "Missed";
         break;
-    case GVHE_Voicemail:
+    case GVIE_Voicemail:
         strReturn = "Voicemail";
         break;
-    case GVHE_TextMessage:
+    case GVIE_TextMessage:
         strReturn = "SMS";
         break;
     default:
@@ -222,36 +222,36 @@ InboxModel::type_to_string (GVH_Event_Type Type)
     return (strReturn);
 }//InboxModel::type_to_string
 
-GVH_Event_Type
+GVI_Entry_Type
 InboxModel::string_to_type (const QString &strType)
 {
-    GVH_Event_Type Type = GVHE_Unknown;
+    GVI_Entry_Type Type = GVIE_Unknown;
 
     do // Begin cleanup block (not a loop)
     {
         if (0 == strType.compare ("Placed", Qt::CaseInsensitive))
         {
-            Type = GVHE_Placed;
+            Type = GVIE_Placed;
             break;
         }
         if (0 == strType.compare ("Received", Qt::CaseInsensitive))
         {
-            Type = GVHE_Received;
+            Type = GVIE_Received;
             break;
         }
         if (0 == strType.compare ("Missed", Qt::CaseInsensitive))
         {
-            Type = GVHE_Missed;
+            Type = GVIE_Missed;
             break;
         }
         if (0 == strType.compare ("Voicemail", Qt::CaseInsensitive))
         {
-            Type = GVHE_Voicemail;
+            Type = GVIE_Voicemail;
             break;
         }
         if (0 == strType.compare ("SMS", Qt::CaseInsensitive))
         {
-            Type = GVHE_TextMessage;
+            Type = GVIE_TextMessage;
             break;
         }
     } while (0); // End cleanup block (not a loop)
@@ -286,18 +286,18 @@ InboxModel::refresh ()
 }//InboxModel::refresh
 
 bool
-InboxModel::insertHistory (const GVHistoryEvent &hEvent)
+InboxModel::insertHistory (const GVInboxEntry &hEvent)
 {
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     quint32 rowCount = this->rowCount ();
 
-    bool bExists = dbMain.existsHistoryEvent (hEvent);
+    bool bExists = dbMain.existsInboxEntry (hEvent);
 
     if (bExists) {
         beginInsertRows (QModelIndex(), rowCount, rowCount);
     }
 
-    dbMain.insertHistory (hEvent);
+    dbMain.insertInboxEntry (hEvent);
 
     if (bExists) {
         endInsertRows ();

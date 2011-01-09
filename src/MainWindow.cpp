@@ -41,11 +41,6 @@ MainWindow::MainWindow (QWidget *parent)
 , bCallInProgress (false)
 , bDialCancelled (false)
 {
-#ifdef Q_WS_MAEMO_5
-    QObject::connect(QApplication::desktop(), SIGNAL(resized(int)),
-                     this                   , SLOT  (orientationChanged()));
-#endif
-
     initLogging ();
 
     OsDependent &osd = Singletons::getRef().getOSD ();
@@ -371,6 +366,11 @@ MainWindow::initQML ()
                       this, SLOT   (close ()));
     QObject::connect (gObj, SIGNAL (sigQuit ()),
                       this, SLOT   (on_actionE_xit_triggered ()));
+    QObject::connect (
+        gObj, SIGNAL (sigProxyChanges(bool, bool, const QString &, int,
+                                      bool, const QString &, const QString &)),
+        this, SLOT (onSigProxyChanges(bool, bool, const QString &, int,
+                                      bool, const QString &, const QString &)));
 }//MainWindow::initQML
 
 void
@@ -525,21 +525,6 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
         }
     }
 }//MainWindow::loginCompleted
-
-void
-MainWindow::orientationChanged ()
-{
-    QDesktopWidget *dWgt = QApplication::desktop();
-    bool bLandscape = false;
-
-    if (NULL != dWgt) {
-        QRect screenGeometry = dWgt->screenGeometry();
-        bLandscape = (screenGeometry.width() > screenGeometry.height());
-    }
-#ifndef Q_WS_MAEMO_5
-    bLandscape = false;
-#endif
-}//MainWindow::orientationChanged
 
 void
 MainWindow::doLogout ()
@@ -1536,3 +1521,15 @@ MainWindow::onRefreshAll ()
     oInbox.refreshFullInbox ();
     oContacts.refreshAllContacts ();
 }//MainWindow::onRefreshAll
+
+void
+MainWindow::onSigProxyChanges(bool bEnable,
+                              bool bUserSystemSettings,
+                              const QString &host, int port,
+                              bool bRequiresAuth,
+                              const QString &user, const QString &pass)
+{
+    qDebug ("onSigProxyChanges");
+    //TODO: Save to dbMain
+    //TODO: Send to WebPage.
+}//MainWindow::onSigProxyChanges
