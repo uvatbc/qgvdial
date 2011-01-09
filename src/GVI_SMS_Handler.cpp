@@ -1,14 +1,14 @@
-#include "GVH_SMS_Handler.h"
+#include "GVI_SMS_Handler.h"
 
-GVH_SMS_Handler::GVH_SMS_Handler (QObject *parent)
+GVI_SMS_Handler::GVI_SMS_Handler (QObject *parent)
 : QObject(parent)
 , uDepth (0)
 , bTextStarted (false)
 {
-}//GVH_SMS_Handler::GVH_SMS_Handler
+}//GVI_SMS_Handler::GVI_SMS_Handler
 
 bool
-GVH_SMS_Handler::startElement (const QString        & /*namespaceURI*/,
+GVI_SMS_Handler::startElement (const QString        & /*namespaceURI*/,
                                const QString        &localName   ,
                                const QString        & /*qName       */,
                                const QXmlAttributes &atts        )
@@ -36,10 +36,10 @@ GVH_SMS_Handler::startElement (const QString        & /*namespaceURI*/,
     } while (0);
 
     return (true);
-}//GVH_SMS_Handler::startElement
+}//GVI_SMS_Handler::startElement
 
 bool
-GVH_SMS_Handler::endElement (const QString & /*namespaceURI*/,
+GVI_SMS_Handler::endElement (const QString & /*namespaceURI*/,
                              const QString &localName   ,
                              const QString & /*qName       */)
 {
@@ -51,11 +51,11 @@ GVH_SMS_Handler::endElement (const QString & /*namespaceURI*/,
         uDepth--;
     }
     return (true);
-}//GVH_SMS_Handler::endElement
+}//GVI_SMS_Handler::endElement
 
 bool
-GVH_SMS_Handler::characters (const QString &ch)
+GVI_SMS_Handler::characters (const QString &ch)
 {
     strChars += ch;
     return (true);
-}//GVH_SMS_Handler::characters
+}//GVI_SMS_Handler::characters

@@ -1,25 +1,25 @@
-#include "GVH_XMLJsonHandler.h"
+#include "GVI_XMLJsonHandler.h"
 #include <QtScript>
 #include <QtXmlPatterns>
 
-GVH_XMLJsonHandler::GVH_XMLJsonHandler (QObject *parent)
+GVI_XMLJsonHandler::GVI_XMLJsonHandler (QObject *parent)
 : QObject (parent)
 , nUsableMsgs (0)
 {
-}//GVH_XMLJsonHandler::GVH_XMLJsonHandler
+}//GVI_XMLJsonHandler::GVI_XMLJsonHandler
 
 bool
-GVH_XMLJsonHandler::startElement (const QString        & /*namespaceURI*/,
+GVI_XMLJsonHandler::startElement (const QString        & /*namespaceURI*/,
                                   const QString        & /*localName   */,
                                   const QString        & /*qName       */,
                                   const QXmlAttributes & /*atts        */)
 {
     strChars.clear ();
     return (true);
-}//GVH_XMLJsonHandler::startElement
+}//GVI_XMLJsonHandler::startElement
 
 bool
-GVH_XMLJsonHandler::endElement (const QString & /*namespaceURI*/,
+GVI_XMLJsonHandler::endElement (const QString & /*namespaceURI*/,
                                const QString &localName   ,
                                const QString & /*qName       */)
 {
@@ -42,17 +42,17 @@ GVH_XMLJsonHandler::endElement (const QString & /*namespaceURI*/,
         simpleReader.parse (&inputSource, false);
     }
     return (true);
-}//GVH_XMLJsonHandler::endElement
+}//GVI_XMLJsonHandler::endElement
 
 bool
-GVH_XMLJsonHandler::characters (const QString &ch)
+GVI_XMLJsonHandler::characters (const QString &ch)
 {
     strChars += ch;
     return (true);
-}//GVH_XMLJsonHandler::characters
+}//GVI_XMLJsonHandler::characters
 
 bool
-GVH_XMLJsonHandler::parseJSON (const QDateTime &dtUpdate, bool &bGotOld)
+GVI_XMLJsonHandler::parseJSON (const QDateTime &dtUpdate, bool &bGotOld)
 {
     bool rv = false;
     do // Begin cleanup block (not a loop)
@@ -189,7 +189,7 @@ GVH_XMLJsonHandler::parseJSON (const QDateTime &dtUpdate, bool &bGotOld)
                 inboxEntry.strText = smsHandler.mapTexts[inboxEntry.id];
             }
 
-            // emit the history element
+            // emit the inbox element
             emit oneElement (inboxEntry);
             nUsableMsgs++;
         }
@@ -201,10 +201,10 @@ GVH_XMLJsonHandler::parseJSON (const QDateTime &dtUpdate, bool &bGotOld)
     } while (0); // End cleanup block (not a loop)
 
     return (rv);
-}//GVH_XMLJsonHandler::parseJSON
+}//GVI_XMLJsonHandler::parseJSON
 
 qint32
-GVH_XMLJsonHandler::getUsableMsgsCount ()
+GVI_XMLJsonHandler::getUsableMsgsCount ()
 {
     return (nUsableMsgs);
-}//GVH_XMLJsonHandler::getUsableMsgsCount
+}//GVI_XMLJsonHandler::getUsableMsgsCount

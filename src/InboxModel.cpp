@@ -286,7 +286,7 @@ InboxModel::refresh ()
 }//InboxModel::refresh
 
 bool
-InboxModel::insertHistory (const GVInboxEntry &hEvent)
+InboxModel::insertEntry (const GVInboxEntry &hEvent)
 {
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     quint32 rowCount = this->rowCount ();
@@ -306,4 +306,4 @@ InboxModel::insertHistory (const GVInboxEntry &hEvent)
     }
 
     return (true);
-}//InboxModel::insertHistory
+}//InboxModel::insertEntry

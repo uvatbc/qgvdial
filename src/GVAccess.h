@@ -18,7 +18,7 @@ enum GVAccess_Work {
     GVAW_dialOut,                   // Destination number, callout number
     GVAW_getRegisteredPhones,
     GVAW_getInbox,                  // type, start page, page count, last update
-    GVAW_getContactFromHistoryLink, // History link
+    GVAW_getContactFromInboxLink,   // Inbox link
     GVAW_sendSMS,                   // Number, text
     GVAW_playVmail,                 // Voicemail link
 };
@@ -93,8 +93,8 @@ signals:
     void registeredPhone (const GVRegisteredNumber &info);
     //! Emitted when dialing has started (for callback method)
     void dialInProgress (const QString &strNumber);
-    //! Emitted for every history event
-    void oneHistoryEvent (const GVInboxEntry &hevent);
+    //! Emitted for every inbox entry
+    void oneInboxEntry (const GVInboxEntry &hevent);
     //! Emitted when GV returns an access number to dial out
     void dialAccessNumber (const QString  &strAccessNumber,
                            const QVariant &context        );
@@ -142,10 +142,10 @@ protected:
     virtual bool dialCallback (bool bCallback) = 0;
     //! Get registered phones from the settings page
     virtual bool getRegisteredPhones () = 0;
-    //! Begin the process to get history
-    virtual bool getHistory () = 0;
-    //! Call a number given the history entry's link
-    virtual bool getContactFromHistoryLink () = 0;
+    //! Begin the process to get inbox
+    virtual bool getInbox () = 0;
+    //! Call a number given the inbox entry link
+    virtual bool getContactFromInboxLink () = 0;
     //! This sends SMSes
     virtual bool sendSMS () = 0;
     //! Play a voicemail

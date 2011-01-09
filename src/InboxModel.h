@@ -28,7 +28,7 @@ public:
     bool refresh (const QString &strSelected);
     bool refresh ();
 
-    bool insertHistory (const GVInboxEntry &hEvent);
+    bool insertEntry (const GVInboxEntry &hEvent);
 
 private:
     int rowCount(const QModelIndex &parent = QModelIndex()) const;

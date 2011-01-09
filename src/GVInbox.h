@@ -32,8 +32,8 @@ signals:
     void retrieveVoicemail (const QString &strVmailLink);
 
 public slots:
-    //! Invoked when the user requests a refresh to the history
-    void refreshHistory ();
+    //! Invoked when the user requests a refresh
+    void refresh ();
     //! Invoked when the user requests a full inbox refresh
     void refreshFullInbox ();
 
@@ -43,8 +43,8 @@ public slots:
     void loggedOut ();
 
 private slots:
-    void oneHistoryEvent (const GVInboxEntry &hevent);
-    void getHistoryDone (bool bOk, const QVariantList &arrParams);
+    void oneInboxEntry (const GVInboxEntry &hevent);
+    void getInboxDone (bool bOk, const QVariantList &arrParams);
 
 private:
     void prepView ();

@@ -47,11 +47,11 @@ private slots:
     //! Invoked when the registered phone list page is loaded
     void phonesListLoaded (bool bOk);
 
-    //! Invoked when GV responds with a history page.
-    void onGotHistoryXML (QNetworkReply *reply);
+    //! Invoked when GV responds with a inbox page.
+    void onGotInboxXML (QNetworkReply *reply);
 
-    //! Invoked when the history entry link  for an unknown number is loaded
-    void getContactFromHistoryLinkLoaded (bool bOk);
+    //! Invoked when the inbox entry link for an unknown number is loaded
+    void getContactFromInboxLinkLoaded (bool bOk);
 
     //! Invoked when the garbage timer times out.
     void garbageTimerTimeout ();
@@ -91,12 +91,12 @@ private:
     bool dialCallback (bool bCallback);
     //! Get registered phones from the settings page
     bool getRegisteredPhones ();
-    //! Begin the process to get history
-    bool getHistory ();
+    //! Begin the process to get inbox
+    bool getInbox ();
     //! Create and send an inbox request
     bool sendInboxRequest ();
-    //! Call a number given the history entry's link
-    bool getContactFromHistoryLink ();
+    //! Call a number given the inbox entry link
+    bool getContactFromInboxLink ();
     //! This sends SMSes
     bool sendSMS ();
     //! Play a voicemail
@@ -116,10 +116,10 @@ private:
     //! The timer object that optimizes our memory usage
     QTimer                  garbageTimer;
 
-    //! The starting history page
+    //! The starting inbox page
     int                     nFirstPage;
 
-    //! The current page (contacts or history)
+    //! The current page (contacts or inbox)
     int                     nCurrent;
 
     friend class Singletons;

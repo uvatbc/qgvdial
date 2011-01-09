@@ -39,10 +39,10 @@ private:
     bool dialCallback (bool bCallback);
     //! Get registered phones from the settings page
     bool getRegisteredPhones ();
-    //! Begin the process to get history
-    bool getHistory ();
-    //! Call a number given the history entry's link
-    bool getContactFromHistoryLink ();
+    //! Begin the process to get inbox
+    bool getInbox ();
+    //! Call a number given the inbox entry link
+    bool getContactFromInboxLink ();
     //! This sends SMSes
     bool sendSMS ();
     //! Play a voicemail

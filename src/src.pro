@@ -42,7 +42,7 @@ SOURCES  += main.cpp                    \
             CallInitiatorFactory.cpp    \
             MobileWebPage.cpp           \
             InboxModel.cpp              \
-            GVH_XMLJsonHandler.cpp      \
+            GVI_XMLJsonHandler.cpp      \
             PhoneNumberValidator.cpp    \
             GVContactsTable.cpp         \
             CaptchaWidget.cpp           \
@@ -52,13 +52,13 @@ SOURCES  += main.cpp                    \
             SMSEntryDeleteButton.cpp    \
             SMSDlg.cpp                  \
             ChildWindowBase.cpp         \
-            GVHistory.cpp               \
+            GVInbox.cpp                 \
             VMailDialog.cpp             \
             WebWidget.cpp               \
             RegNumberModel.cpp          \
             ContactsModel.cpp           \
             ContactDetailsModel.cpp     \
-            GVH_SMS_Handler.cpp
+            GVI_SMS_Handler.cpp
 
 HEADERS  += global.h                    \
             IObserver.h                 \
@@ -77,7 +77,7 @@ HEADERS  += global.h                    \
             CallInitiatorFactory.h      \
             MobileWebPage.h             \
             InboxModel.h                \
-            GVH_XMLJsonHandler.h        \
+            GVI_XMLJsonHandler.h        \
             PhoneNumberValidator.h      \
             GVContactsTable.h           \
             CaptchaWidget.h             \
@@ -87,13 +87,13 @@ HEADERS  += global.h                    \
             SMSEntryDeleteButton.h      \
             SMSDlg.h                    \
             ChildWindowBase.h           \
-            GVHistory.h                 \
+            GVInbox.h                   \
             VMailDialog.h               \
             WebWidget.h                 \
             RegNumberModel.h            \
             ContactsModel.h             \
             ContactDetailsModel.h       \
-            GVH_SMS_Handler.h
+            GVI_SMS_Handler.h
 
 FORMS    += VMailDialog.ui              \
             WebWidget.ui

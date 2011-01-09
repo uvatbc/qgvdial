@@ -74,9 +74,9 @@
     <ClCompile Include="GVAccess.cpp" />
     <ClCompile Include="GVContactsTable.cpp" />
     <ClCompile Include="GVDataAccess.cpp" />
-    <ClCompile Include="GVH_SMS_Handler.cpp" />
-    <ClCompile Include="GVH_XMLJsonHandler.cpp" />
-    <ClCompile Include="GVHistory.cpp" />
+    <ClCompile Include="GVI_SMS_Handler.cpp" />
+    <ClCompile Include="GVI_XMLJsonHandler.cpp" />
+    <ClCompile Include="GVInbox.cpp" />
     <ClCompile Include="GVWebPage.cpp" />
     <ClCompile Include="InboxModel.cpp" />
     <ClCompile Include="main.cpp" />
@@ -115,9 +115,9 @@
     <ClInclude Include="GVAccess.h" />
     <ClInclude Include="GVContactsTable.h" />
     <ClInclude Include="GVDataAccess.h" />
-    <ClInclude Include="GVH_SMS_Handler.h" />
-    <ClInclude Include="GVH_XMLJsonHandler.h" />
-    <ClInclude Include="GVHistory.h" />
+    <ClInclude Include="GVI_SMS_Handler.h" />
+    <ClInclude Include="GVI_XMLJsonHandler.h" />
+    <ClInclude Include="GVInbox.h" />
     <ClInclude Include="GVWebPage.h" />
     <ClInclude Include="InboxModel.h" />
     <ClInclude Include="IObserver.h" />

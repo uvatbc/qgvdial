@@ -37,8 +37,8 @@ GVAccess::getNameForWork (GVAccess_Work whatwork)
     case GVAW_dialOut:
         func = "dialOut";
         break;
-    case GVAW_getContactFromHistoryLink:
-        func = "getContactFromHistoryLink";
+    case GVAW_getContactFromInboxLink:
+        func = "getContactFromInboxLink";
         break;
     case GVAW_getContactFromLink:
         func = "getContactFromLink";
@@ -47,7 +47,7 @@ GVAccess::getNameForWork (GVAccess_Work whatwork)
         func = "login";
         break;
     case GVAW_getInbox:
-        func = "getHistory";
+        func = "getInbox";
         break;
     case GVAW_sendSMS:
         func = "sendSMS";
@@ -96,7 +96,7 @@ GVAccess::enqueueWork (GVAccess_Work whatwork, const QVariantList &params,
         }
         break;
 
-    case GVAW_getContactFromHistoryLink:// History link
+    case GVAW_getContactFromInboxLink:  // Inbox link
         if (1 != params.size ())
         {
             msg = "Invalid parameter count";
@@ -205,10 +205,10 @@ GVAccess::doNextWork ()
             getRegisteredPhones ();
             break;
         case GVAW_getInbox:
-            getHistory ();
+            getInbox ();
             break;
-        case GVAW_getContactFromHistoryLink:
-            getContactFromHistoryLink ();
+        case GVAW_getContactFromInboxLink:
+            getContactFromInboxLink ();
             break;
         case GVAW_sendSMS:
             sendSMS ();

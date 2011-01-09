@@ -654,7 +654,7 @@ MainWindow::initInbox ()
 
     oInbox.loginSuccess ();
     oInbox.initModel (this);
-    oInbox.refreshHistory ();
+    oInbox.refresh ();
 }//MainWindow::initInbox
 
 void
@@ -1508,7 +1508,7 @@ MainWindow::onRefresh ()
     qDebug ("Refresh all requested.");
 
     refreshRegisteredNumbers ();
-    oInbox.refreshHistory ();
+    oInbox.refresh ();
     oContacts.refreshContacts ();
 }//MainWindow::onRefresh
 

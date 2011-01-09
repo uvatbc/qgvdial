@@ -1,14 +1,21 @@
-#ifndef GVH_SMS_HANDLER_H
-#define GVH_SMS_HANDLER_H
+#ifndef GVI_XMLJSONHANDLER_H
+#define GVI_XMLJSONHANDLER_H
 
 #include "global.h"
 #include <QtXml>
+#include "GVI_SMS_Handler.h"
 
-class GVH_SMS_Handler : public QObject, public QXmlDefaultHandler
+class GVI_XMLJsonHandler : public QObject, public QXmlDefaultHandler
 {
     Q_OBJECT
+
 public:
-    explicit GVH_SMS_Handler(QObject *parent = 0);
+    explicit GVI_XMLJsonHandler(QObject *parent = 0);
+    bool parseJSON (const QDateTime &dtUpdate, bool &bGotOld);
+    qint32 getUsableMsgsCount ();
+
+signals:
+    void oneElement (const GVInboxEntry &element);
 
 protected:
     bool startElement (const QString        &namespaceURI,
@@ -24,13 +31,11 @@ protected:
 
 private:
     QString strChars;
-    QString id;
+    QString strJson;
+    QString strHtml;
+    qint32 nUsableMsgs;
 
-    quint32 uDepth;
-    bool bTextStarted;
-
-public:
-    QMap<QString, QString> mapTexts;
+    GVI_SMS_Handler smsHandler;
 };
 
-#endif // GVH_SMS_HANDLER_H
+#endif // GVI_XMLJSONHANDLER_H

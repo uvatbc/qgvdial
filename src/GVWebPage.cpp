@@ -1,6 +1,6 @@
 #include "GVWebPage.h"
 #include "Singletons.h"
-#include "GVH_XMLJsonHandler.h"
+#include "GVI_XMLJsonHandler.h"
 
 #define GV_DATA_BASE "https://www.google.com/voice"
 
@@ -863,7 +863,7 @@ GVWebPage::sendInboxRequest ()
                            QVariant::fromValue(sendCookies));
 
         QObject::connect (mgr , SIGNAL (finished (QNetworkReply *)),
-                          this, SLOT   (onGotHistoryXML (QNetworkReply *)));
+                          this, SLOT   (onGotInboxXML (QNetworkReply *)));
         mgr->get (request);
     } while (0); // End cleanup block (not a loop)
 
@@ -871,7 +871,7 @@ GVWebPage::sendInboxRequest ()
 }//GVWebPage::sendInboxRequest
 
 bool
-GVWebPage::getHistory ()
+GVWebPage::getInbox ()
 {
     QMutexLocker locker(&mutex);
     if (!bLoggedIn)
@@ -883,24 +883,24 @@ GVWebPage::getHistory ()
     nFirstPage = nCurrent = workCurrent.arrParams[1].toString().toInt ();
 
     return sendInboxRequest ();
-}//GVWebPage::getHistory
+}//GVWebPage::getInbox
 
 void
-GVWebPage::onGotHistoryXML (QNetworkReply *reply)
+GVWebPage::onGotInboxXML (QNetworkReply *reply)
 {
     QNetworkAccessManager *mgr = webPage.networkAccessManager ();
     QObject::disconnect (mgr , SIGNAL (finished (QNetworkReply *)),
-                         this, SLOT   (onGotHistoryXML (QNetworkReply *)));
+                         this, SLOT   (onGotInboxXML (QNetworkReply *)));
 
     QString strReply = reply->readAll ();
     QXmlInputSource inputSource;
     QXmlSimpleReader simpleReader;
     inputSource.setData (strReply);
-    GVH_XMLJsonHandler xmlHandler;
+    GVI_XMLJsonHandler xmlHandler;
 
     QObject::connect (
         &xmlHandler, SIGNAL (oneElement (const GVInboxEntry &)),
-         this      , SIGNAL (oneHistoryEvent (const GVInboxEntry &)));
+         this      , SIGNAL (oneInboxEntry (const GVInboxEntry &)));
 
     bool bOk = false;
     do // Begin cleanup block (not a loop)
@@ -920,7 +920,7 @@ GVWebPage::onGotHistoryXML (QNetworkReply *reply)
         bool bGotOld = false;
         if (!xmlHandler.parseJSON (dtUpdate, bGotOld))
         {
-            qWarning ("Failed to parse GV History JSON");
+            qWarning ("Failed to parse GV Inbox JSON");
             break;
         }
 
@@ -946,16 +946,16 @@ GVWebPage::onGotHistoryXML (QNetworkReply *reply)
     }
 
     reply->deleteLater ();
-}//GVWebPage::onGotHistoryXML
+}//GVWebPage::onGotInboxXML
 
 bool
-GVWebPage::getContactFromHistoryLink ()
+GVWebPage::getContactFromInboxLink ()
 {
     QMutexLocker locker(&mutex);
     if (!bLoggedIn)
     {
-        qWarning ("User not logged in when calling history link");
-        completeCurrentWork (GVAW_getContactFromHistoryLink, false);
+        qWarning ("User not logged in when calling Inbox link");
+        completeCurrentWork (GVAW_getContactFromInboxLink, false);
         return (false);
     }
 
@@ -965,18 +965,18 @@ GVWebPage::getContactFromHistoryLink ()
                     + workCurrent.arrParams[0].toString();
     QObject::connect (
         &webPage, SIGNAL (loadFinished (bool)),
-         this   , SLOT   (getContactFromHistoryLinkLoaded (bool)));
+         this   , SLOT   (getContactFromInboxLinkLoaded (bool)));
     this->loadUrlString (strGoto);
 
     return (true);
-}//GVWebPage::getContactFromHistoryLink
+}//GVWebPage::getContactFromInboxLink
 
 void
-GVWebPage::getContactFromHistoryLinkLoaded (bool bOk)
+GVWebPage::getContactFromInboxLinkLoaded (bool bOk)
 {
     QObject::disconnect (
         &webPage, SIGNAL (loadFinished (bool)),
-         this   , SLOT   (getContactFromHistoryLinkLoaded (bool)));
+         this   , SLOT   (getContactFromInboxLinkLoaded (bool)));
 
     GVContactInfo info;
     do // Begin cleanup block (not a loop)
@@ -984,7 +984,7 @@ GVWebPage::getContactFromHistoryLinkLoaded (bool bOk)
         if (isLoadFailed (bOk))
         {
             bOk = false;
-            qWarning ("Failed to load call history link page");
+            qWarning ("Failed to load Inbox link page");
             break;
         }
         bOk = false;
@@ -1037,8 +1037,8 @@ GVWebPage::getContactFromHistoryLinkLoaded (bool bOk)
         emit contactInfo (info);
     }
 
-    completeCurrentWork (GVAW_getContactFromHistoryLink, bOk);
-}//GVWebPage::getContactFromHistoryLinkLoaded
+    completeCurrentWork (GVAW_getContactFromInboxLink, bOk);
+}//GVWebPage::getContactFromInboxLinkLoaded
 
 void
 GVWebPage::garbageTimerTimeout ()

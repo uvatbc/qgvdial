@@ -1,5 +1,5 @@
 #include "global.h"
-#include "GVHistory.h"
+#include "GVInbox.h"
 #include "Singletons.h"
 #include "InboxModel.h"
 
@@ -49,7 +49,7 @@ GVInbox::prepView ()
 }//GVInbox::prepView
 
 void
-GVInbox::refreshHistory ()
+GVInbox::refresh ()
 {
     QMutexLocker locker(&mutex);
     if (!bLoggedIn)
@@ -68,15 +68,15 @@ GVInbox::refreshHistory ()
     l += "10";
     l += dtUpdate;
     QObject::connect (
-        &webPage, SIGNAL (oneHistoryEvent (const GVInboxEntry &)),
-         this   , SLOT   (oneHistoryEvent (const GVInboxEntry &)));
+        &webPage, SIGNAL (oneInboxEntry (const GVInboxEntry &)),
+         this   , SLOT   (oneInboxEntry (const GVInboxEntry &)));
     emit status ("Retrieving Inbox...", 0);
     if (!webPage.enqueueWork (GVAW_getInbox, l, this,
-            SLOT (getHistoryDone (bool, const QVariantList &))))
+            SLOT (getInboxDone (bool, const QVariantList &))))
     {
-        getHistoryDone (false, l);
+        getInboxDone (false, l);
     }
-}//GVInbox::refreshHistory
+}//GVInbox::refresh
 
 void
 GVInbox::refreshFullInbox ()
@@ -84,11 +84,11 @@ GVInbox::refreshFullInbox ()
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     dbMain.setLastInboxUpdate (QDateTime::fromString ("2000-01-01",
                                                       "yyyy-MM-dd"));
-    refreshHistory ();
+    refresh ();
 }//GVInbox::refreshFullInbox
 
 void
-GVInbox::oneHistoryEvent (const GVInboxEntry &hevent)
+GVInbox::oneInboxEntry (const GVInboxEntry &hevent)
 {
     QString strType = modelInbox->type_to_string (hevent.Type);
     if (0 == strType.size ())
@@ -96,18 +96,18 @@ GVInbox::oneHistoryEvent (const GVInboxEntry &hevent)
         return;
     }
 
-    modelInbox->insertHistory (hevent);
-}//GVInbox::oneHistoryEvent
+    modelInbox->insertEntry (hevent);
+}//GVInbox::oneInboxEntry
 
 void
-GVInbox::getHistoryDone (bool, const QVariantList &)
+GVInbox::getInboxDone (bool, const QVariantList &)
 {
     emit status ("Inbox retrieved. Sorting...", 0);
 
     GVAccess &webPage = Singletons::getRef().getGVAccess ();
     QObject::disconnect (
-        &webPage, SIGNAL (oneHistoryEvent (const GVInboxEntry &)),
-         this   , SLOT   (oneHistoryEvent (const GVInboxEntry &)));
+        &webPage, SIGNAL (oneInboxEntry (const GVInboxEntry &)),
+         this   , SLOT   (oneInboxEntry (const GVInboxEntry &)));
 
     prepView ();
 
@@ -121,7 +121,7 @@ GVInbox::getHistoryDone (bool, const QVariantList &)
     }
 
     emit status ("Inbox ready");
-}//GVInbox::getHistoryDone
+}//GVInbox::getInboxDone
 
 void
 GVInbox::onInboxSelected (const QString &strSelection)

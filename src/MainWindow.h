@@ -5,7 +5,7 @@
 #include <QtDeclarative>
 
 #include "GVContactsTable.h"
-#include "GVHistory.h"
+#include "GVInbox.h"
 #include "SMSDlg.h"
 #include "WebWidget.h"
 #include "RegNumberModel.h"

@@ -207,18 +207,18 @@ GVDataAccess::getRegisteredPhones ()
 }//GVDataAccess::getRegisteredPhones
 
 bool
-GVDataAccess::getHistory ()
+GVDataAccess::getInbox ()
 {
     completeCurrentWork (GVAW_getInbox, false);
     return (false);
-}//GVDataAccess::getHistory
+}//GVDataAccess::getInbox
 
 bool
-GVDataAccess::getContactFromHistoryLink ()
+GVDataAccess::getContactFromInboxLink ()
 {
-    completeCurrentWork (GVAW_getContactFromHistoryLink, false);
+    completeCurrentWork (GVAW_getContactFromInboxLink, false);
     return (false);
-}//GVDataAccess::getContactFromHistoryLink
+}//GVDataAccess::getContactFromInboxLink
 
 bool
 GVDataAccess::sendSMS ()

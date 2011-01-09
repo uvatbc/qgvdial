@@ -4,16 +4,25 @@ Credits:
 
 TODO:
 -> Call cancel for callout and callback both need to work
--> Call and SMS buttons from contacts page and inbox page
--> SMS needs to be handled in inbox: Add children of the SMS as representation of the SMS texts
--> Dialer page buttons need to be mapped to some work
--> Default button on GVSettings page should map to Login button
+-> Proxy settings in QML need to go to webpage. Please.
 
 Changelog:
 
-2011-01-09: (Since the last log entry - in chronological order)
--> Fixed vmail issue
--> History now updated based on
+2011-01-09: (Since the last log entry)
+-> Voicemail now works!
+   This way, there is reduced network traffic for getting to vmail and listening to it again.
+-> Inbox now updated based on latest inbox entry.
+-> UI is almost entirely in QML. Only some components remain in QtCreator form format. Went through stylesheets and eventually discarded them.
+-> Rotation is really truly complete
+-> Call ui, contacts UI and inbox UI all work.
+-> SMS and call buttons on contacts and inbox pages.
+-> SMSes are shown in the inbox and sending SMS actually works!
+-> Windows installer now installs vcredist 2010 silently. Windows version now uses VS 2010 and qtmobility 1.1
+-> log goes into logfile at ~/.qgvdial/qgvdial.log
+-> use a model view design for using QML
+-> Added a telepathy connection manager "qgv-tp" to integrate into the n900 phone book. Calls are now possible directly from the phone book.
+-> DBus activation for Call and Text service. Used by MyContacts and my own qgv-tp on Maemo5.
+-> Added network proxy support.
 
 2010-08-14:
 -> GV Inbox now uses data API. Inbox is updated when a call is made or SMS is sent.
