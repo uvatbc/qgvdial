@@ -2,7 +2,7 @@ QT      *= core gui webkit sql xml xmlpatterns script declarative
 TARGET   = qgvdial
 TEMPLATE = app
 
-CONFIG  += mobility
+CONFIG  *= mobility precompile_header
 MOBILITY *= multimedia
 
 include(qtsingleapplication/qtsingleapplication.pri)
