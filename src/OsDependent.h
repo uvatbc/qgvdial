@@ -39,6 +39,18 @@ class QSystemTrayIcon : public QWidget
 {
     Q_OBJECT
 public:
+    enum ActivationReason {
+        Unknown,
+        Context,
+        DoubleClick,
+        Trigger,
+        MiddleClick
+    };
+
+    enum MessageIcon {
+        Information
+    };
+
     QSystemTrayIcon(QWidget *parent = 0);
     QSystemTrayIcon(const QIcon &icon, QWidget *parent = 0);
     ~QSystemTrayIcon();
@@ -52,13 +64,12 @@ public:
     QString toolTip() const;
     void setToolTip(const QString &tip);
 
-    enum ActivationReason {
-        Unknown,
-        Context,
-        DoubleClick,
-        Trigger,
-        MiddleClick
-    };
+    void setContextMenu (QMenu *menu);
+
+    void showMessage (const QString &title,
+                      const QString &message,
+                      MessageIcon icon = Information,
+                      int millisecondsTimeoutHint = 10000);
 
 Q_SIGNALS:
     void activated(QSystemTrayIcon::ActivationReason reason);

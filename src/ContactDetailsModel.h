@@ -2,7 +2,6 @@
 #define CONTACTDETAILSMODEL_H
 
 #include "global.h"
-#include <QtSql>
 
 class ContactDetailsModel : public QAbstractListModel
 {

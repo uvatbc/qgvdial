@@ -25,8 +25,9 @@ unix:!symbian {
     LIBS += -ltelepathy-qt4
 }
 
+PRECOMPILED_HEADER = global.h
+
 SOURCES  += main.cpp                    \
-            global.cpp                  \
             MainApp.cpp                 \
             MainWindow.cpp              \
             Singletons.cpp              \

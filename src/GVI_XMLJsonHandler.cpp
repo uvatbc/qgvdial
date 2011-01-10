@@ -1,5 +1,4 @@
 #include "GVI_XMLJsonHandler.h"
-#include <QtScript>
 #include <QtXmlPatterns>
 
 GVI_XMLJsonHandler::GVI_XMLJsonHandler (QObject *parent)

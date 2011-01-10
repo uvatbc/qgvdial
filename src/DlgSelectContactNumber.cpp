@@ -1,5 +1,4 @@
 #include "DlgSelectContactNumber.h"
-#include <QLabel>
 
 DlgSelectContactNumber::DlgSelectContactNumber(
     const GVContactInfo  &info          ,

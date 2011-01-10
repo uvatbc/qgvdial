@@ -1,10 +1,13 @@
 #ifndef __MOBILEWEBPAGE_H__
 #define __MOBILEWEBPAGE_H__
 
+#include "global.h"
 #include <QWebPage>
 
 class MobileWebPage : public QWebPage
 {
+    Q_OBJECT
+
 public:
     MobileWebPage (QObject *parent = NULL);
 

@@ -1,7 +1,7 @@
 #ifndef IOBSERVER_H
 #define IOBSERVER_H
 
-#include <QtCore>
+#include "global.h"
 
 class IObserver : public QObject
 {

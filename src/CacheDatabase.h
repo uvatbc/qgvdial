@@ -2,7 +2,6 @@
 #define __CACHEDATABASE_H__
 
 #include "global.h"
-#include <QtSql>
 
 class ContactsModel;
 class InboxModel;
@@ -14,6 +13,8 @@ class CacheDatabase : public QObject
 private:
     CacheDatabase(const QSqlDatabase &other, QObject *parent = 0);
     ~CacheDatabase(void);
+
+    QString get_db_name ();
 
 public:
     void init ();

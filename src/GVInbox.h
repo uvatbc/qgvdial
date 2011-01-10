@@ -2,7 +2,6 @@
 #define __GVINBOX_H__
 
 #include "global.h"
-#include <QtDeclarative>
 
 class InboxModel;
 

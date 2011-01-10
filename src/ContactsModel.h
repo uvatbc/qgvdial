@@ -2,7 +2,6 @@
 #define CONTACTSMODEL_H
 
 #include "global.h"
-#include <QtSql>
 
 class ContactsModel : public QSqlQueryModel
 {

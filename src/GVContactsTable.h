@@ -3,9 +3,6 @@
 
 #include "global.h"
 
-#include <QtNetwork>
-#include <QtDeclarative>
-
 class ContactsModel;
 
 class GVContactsTable : public QObject

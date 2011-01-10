@@ -97,12 +97,14 @@ OsDependent::setLongWork (QWidget *window, bool bSet /*= false*/)
 }//OsDependent::setLongWork
 
 #ifdef QT_NO_SYSTEMTRAYICON
-QSystemTrayIcon::QSystemTrayIcon(QWidget *parent/* = 0*/) : QWidget (parent)
+QSystemTrayIcon::QSystemTrayIcon(QWidget *parent /*= 0*/)
+: QWidget (parent)
 {
 }//QSystemTrayIcon::QSystemTrayIcon
 
-QSystemTrayIcon::QSystemTrayIcon(const QIcon &icon, QWidget *parent/* = 0*/) :
-QWidget (parent)
+QSystemTrayIcon::QSystemTrayIcon(const QIcon & /*icon*/,
+                                 QWidget *parent /*= 0*/)
+: QWidget (parent)
 {
 }//QSystemTrayIcon::QSystemTrayIcon
 
@@ -129,7 +131,7 @@ QSystemTrayIcon::icon () const
 }//QSystemTrayIcon::icon
 
 void
-QSystemTrayIcon::setIcon (const QIcon &icon)
+QSystemTrayIcon::setIcon (const QIcon & /*icon*/)
 {
 }//QSystemTrayIcon::setIcon
 
@@ -140,8 +142,21 @@ QSystemTrayIcon::toolTip () const
 }
 
 void
-QSystemTrayIcon::setToolTip (const QString &tip)
+QSystemTrayIcon::setToolTip (const QString & /*tip*/)
 {
 }//QSystemTrayIcon::setToolTip
+
+void
+QSystemTrayIcon::setContextMenu (QMenu * /*menu*/)
+{
+}//QSystemTrayIcon::setContextMenu
+
+void
+QSystemTrayIcon::showMessage (const QString & /*title*/,
+                              const QString & /*message*/,
+                              MessageIcon /*icon = Information*/,
+                              int /*millisecondsTimeoutHint = 10000*/)
+{
+}//QSystemTrayIcon::showMessage
 
 #endif // QT_NO_SYSTEMTRAYICON

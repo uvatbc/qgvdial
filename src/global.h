@@ -1,8 +1,15 @@
 #ifndef __GLOBAL_H__
 #define __GLOBAL_H__
 
+#ifdef __cplusplus
+
 #include <QtCore>
 #include <QtGui>
+#include <QtNetwork>
+#include <QtSql>
+#include <QtXml>
+#include <QtDeclarative>
+#include <QtScript>
 
 #ifdef QT_NO_DEBUG
 #define NO_DBGINFO      1
@@ -95,8 +102,6 @@ struct GVInboxEntry
 };
 Q_DECLARE_METATYPE (GVInboxEntry)
 
-QString get_db_name ();
-
 template <class T> class VConv
 {
 public:
@@ -167,4 +172,5 @@ struct ContactInfo
 #define TELEPATHY_CAPABLE 0
 #endif
 
+#endif //__cplusplus
 #endif //__GLOBAL_H__

@@ -1,8 +1,7 @@
 #ifndef REGNUMBERMODEL_H
 #define REGNUMBERMODEL_H
 
-#include <QtCore>
-#include <QAbstractListModel>
+#include "global.h"
 
 enum RegNumType {
     RNT_Callback,

@@ -1,7 +1,7 @@
 #ifndef TPOBSERVER_H
 #define TPOBSERVER_H
 
-#include <QtCore>
+#include "global.h"
 #include <QtDBus>
 #include <TelepathyQt4/Types>
 #include <TelepathyQt4/AbstractClientObserver>

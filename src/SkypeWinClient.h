@@ -1,7 +1,7 @@
 #ifndef SKYPEWINCLIENT_H
 #define SKYPEWINCLIENT_H
 
-#include <QtGui>
+#include "global.h"
 #include "SkypeClientFactory.h"
 #include "SkypeClient.h"
 

@@ -1,7 +1,7 @@
 #ifndef OBSERVERFACTORY_H
 #define OBSERVERFACTORY_H
 
-#include <QtCore>
+#include "global.h"
 #include "IObserver.h"
 
 class ObserverFactory : public QObject

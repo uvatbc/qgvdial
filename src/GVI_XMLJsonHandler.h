@@ -2,7 +2,6 @@
 #define GVI_XMLJSONHANDLER_H
 
 #include "global.h"
-#include <QtXml>
 #include "GVI_SMS_Handler.h"
 
 class GVI_XMLJsonHandler : public QObject, public QXmlDefaultHandler

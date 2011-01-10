@@ -1,6 +1,7 @@
 #ifndef QGVDBUSSERVER_H
 #define QGVDBUSSERVER_H
 
+#include "global.h"
 #include <QtDBus>
 
 class QGVDbusServerHelper : public QObject

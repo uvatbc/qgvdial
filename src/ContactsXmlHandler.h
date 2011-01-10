@@ -2,7 +2,6 @@
 #define __CONTACTSXMLHANDLER_H__
 
 #include "global.h"
-#include <QtXml>
 
 class ContactsXmlHandler : public QObject, public QXmlDefaultHandler
 {

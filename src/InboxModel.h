@@ -2,7 +2,6 @@
 #define __INBOXMODEL_H__
 
 #include "global.h"
-#include <QtSql>
 
 class InboxModel : public QSqlQueryModel
 {

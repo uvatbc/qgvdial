@@ -2,7 +2,6 @@
 #define __GVACCESS_H__
 
 #include "global.h"
-#include <QtNetwork>
 
 class GVAccess;
 typedef void (GVAccess::*WebPageCancel)();

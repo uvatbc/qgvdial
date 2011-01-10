@@ -3,6 +3,8 @@
 #include "ContactsModel.h"
 #include "InboxModel.h"
 
+#define DB_NAME ".gvdial.sqlite.db"
+
 //////////////////////////////// Settings table ////////////////////////////////
 #define GV_SETTINGS_TABLE   "gvsettings"
 #define GV_S_NAME           "name"
@@ -95,6 +97,19 @@ CacheDatabase::deinit ()
         dbMain = QSqlDatabase ();
     }
 }//CacheDatabase::deinit
+
+QString
+CacheDatabase::get_db_name ()
+{
+    QString rv = QDir::homePath ();
+    if (!rv.endsWith (QDir::separator ()))
+    {
+        rv += QDir::separator ();
+    }
+    rv += DB_NAME;
+
+    return (rv);
+}//CacheDatabase::get_db_name
 
 void
 CacheDatabase::init ()

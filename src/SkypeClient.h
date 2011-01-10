@@ -1,7 +1,7 @@
 #ifndef __SKYPECLIENT_H__
 #define __SKYPECLIENT_H__
 
-#include <QtCore>
+#include "global.h"
 #include "SkypeClientFactory.h"
 
 enum Skype_Work {

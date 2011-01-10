@@ -1,7 +1,7 @@
 #ifndef __SMSENTRYDELETEBUTTON_H__
 #define __SMSENTRYDELETEBUTTON_H__
 
-#include <QtGui>
+#include "global.h"
 
 class SMSEntryDeleteButton : public QPushButton
 {

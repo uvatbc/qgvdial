@@ -3,8 +3,8 @@
 
 #include "global.h"
 #include <QtWebKit>
-#include "MobileWebPage.h"
 #include "GVAccess.h"
+#include "MobileWebPage.h"
 
 class GVWebPage : public GVAccess
 {

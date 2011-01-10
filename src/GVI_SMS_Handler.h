@@ -2,7 +2,6 @@
 #define GVI_SMS_HANDLER_H
 
 #include "global.h"
-#include <QtXml>
 
 class GVI_SMS_Handler : public QObject, public QXmlDefaultHandler
 {

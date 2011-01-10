@@ -1,9 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QtGui>
-#include <QtDeclarative>
-
+#include "global.h"
 #include "GVContactsTable.h"
 #include "GVInbox.h"
 #include "SMSDlg.h"

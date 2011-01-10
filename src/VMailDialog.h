@@ -1,7 +1,7 @@
 #ifndef VMAILDIALOG_H
 #define VMAILDIALOG_H
 
-#include <QtGui>
+#include "global.h"
 #include <QMediaPlayer>
 
 namespace Ui {

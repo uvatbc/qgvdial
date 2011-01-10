@@ -1,7 +1,7 @@
 #ifndef SKYPECLIENTFACTORY_H
 #define SKYPECLIENTFACTORY_H
 
-#include <QtCore>
+#include "global.h"
 
 class SkypeClient;
 typedef QMap<QString, SkypeClient *> SkypeClientMap;

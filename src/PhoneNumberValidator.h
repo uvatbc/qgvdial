@@ -1,7 +1,7 @@
 #ifndef PHONENUMBERVALIDATOR_H
 #define PHONENUMBERVALIDATOR_H
 
-#include <QValidator>
+#include "global.h"
 
 class PhoneNumberValidator : public QValidator
 {
