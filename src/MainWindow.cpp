@@ -1540,8 +1540,6 @@ MainWindow::onSigProxyChanges(bool bEnable,
                               bool bRequiresAuth,
                               const QString &user, const QString &pass)
 {
-    qDebug (__FUNCTION__);
-
     // Send to WebPage.
     GVAccess &webPage = Singletons::getRef().getGVAccess ();
     webPage.setProxySettings (bEnable, bUseSystemProxy, host, port,
