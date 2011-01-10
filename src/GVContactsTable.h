@@ -3,6 +3,10 @@
 
 #include "global.h"
 
+// For some reason the symbian MOC doesn't like it if I don't include QObject
+// even though it is present in QtCore which is included in global.h
+#include <QObject>
+
 class ContactsModel;
 
 class GVContactsTable : public QObject

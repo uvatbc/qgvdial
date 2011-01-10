@@ -4,6 +4,10 @@
 #include "IObserver.h"
 #include "SkypeClient.h"
 
+// For some reason the symbian MOC doesn't like it if I don't include QObject
+// even though it is present in QtCore which is included in global.h
+#include <QObject>
+
 class SkypeObserver : public IObserver
 {
     Q_OBJECT

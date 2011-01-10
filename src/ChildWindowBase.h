@@ -3,6 +3,10 @@
 
 #include "global.h"
 
+// For some reason the symbian MOC doesn't like it if I don't include QObject
+// even though it is present in QtCore which is included in global.h
+#include <QObject>
+
 #ifdef Q_WS_MAEMO_5
 typedef QWidget ChildWindowBaseClass;
 #define ChildWindowBase_flags (Qt::Window)

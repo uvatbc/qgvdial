@@ -4,6 +4,10 @@
 #include "global.h"
 #include "SkypeClientFactory.h"
 
+// For some reason the symbian MOC doesn't like it if I don't include QObject
+// even though it is present in QtCore which is included in global.h
+#include <QObject>
+
 enum Skype_Work {
     SW_Nothing = 0,
     SW_Connect,         // No params

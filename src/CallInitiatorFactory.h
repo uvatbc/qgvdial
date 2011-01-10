@@ -4,6 +4,10 @@
 #include "global.h"
 #include "CalloutInitiator.h"
 
+// For some reason the symbian MOC doesn't like it if I don't include QObject
+// even though it is present in QtCore which is included in global.h
+#include <QObject>
+
 #if TELEPATHY_CAPABLE
 #include <TelepathyQt4/AccountManager>
 #include <TelepathyQt4/SharedPtr>

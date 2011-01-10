@@ -4,6 +4,10 @@
 #include "global.h"
 #include "GVI_SMS_Handler.h"
 
+// For some reason the symbian MOC doesn't like it if I don't include QObject
+// even though it is present in QtCore which is included in global.h
+#include <QObject>
+
 class GVI_XMLJsonHandler : public QObject, public QXmlDefaultHandler
 {
     Q_OBJECT
