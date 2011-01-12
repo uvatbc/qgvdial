@@ -83,16 +83,23 @@ Rectangle {
                     barTop.clickedTopBar();
                     main.state = '';
                 }
+
+                onPressAndHold: {
+                    main.sigDismiss();
+                    barTop.state = '';
+                }
+
+                onPressed: barTop.state = "pressed"
+                onReleased: barTop.state = ''
             }// MouseArea
 
             states: [
                 State {
                     name: "pressed"
-                    when: mouseAreaTopBar.pressed
                     PropertyChanges { target: barTop; color: "orange" }
                 }
             ]
-        }
+        }//Rectangle (barTop)
 
 ////////////////////////////////////////////////////////////////////////////////
 //                          Co-existent Items Begin                           //

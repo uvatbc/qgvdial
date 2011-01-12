@@ -284,8 +284,13 @@ MainWindow::init ()
 
     // Login/logout = Ctrl+L
     actLogin.setShortcut (QKeySequence(Qt::CTRL + Qt::Key_L));
+#ifdef Q_WS_MAEMO_5
+    // Dismiss = Esc
+    actDismiss.setShortcut (QKeySequence(Qt::CTRL + Qt::Key_W));
+#else
     // Dismiss = Esc
     actDismiss.setShortcut (QKeySequence(Qt::Key_Escape));
+#endif
     // Refresh = Ctrl+R
     actRefresh.setShortcut (QKeySequence(Qt::CTRL + Qt::Key_R));
     // Quit = Ctrl+Q
@@ -1551,7 +1556,7 @@ MainWindow::onSigProxyChanges(bool bEnable,
 
     do // Begin cleanup block (not a loop)
     {
-    	QObject *pRoot = this->rootObject ();
+        QObject *pRoot = this->rootObject ();
         if (NULL == pRoot) {
             qWarning ("Could not get to root object in QML!!!");
             break;
@@ -1563,7 +1568,7 @@ MainWindow::onSigProxyChanges(bool bEnable,
             qWarning ("Could not get to ProxySettingsPage");
             break;
         }
-        
+
         QMetaObject::invokeMethod (pProxySettings, "setValues",
                                    Q_ARG (QVariant, QVariant(bEnable)),
                                    Q_ARG (QVariant, QVariant(bUseSystemProxy)),
