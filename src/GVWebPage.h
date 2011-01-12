@@ -123,6 +123,9 @@ private:
     //! The current page (contacts or inbox)
     int                     nCurrent;
 
+    //! We use this to check if we're online
+    QNetworkConfigurationManager nwCfg;
+
     friend class Singletons;
 };
 

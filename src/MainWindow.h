@@ -213,6 +213,8 @@ private:
     bool    bCallInProgress;
     //! Set this flag if the user cancels the dialed number
     bool    bDialCancelled;
+    //! Set this flag if we're doing a callout, clear it if it is a callback
+    bool    bDialout;
 ///////////////////////////////////////////////////////////////////////////////
 
     //! The users registered numbers

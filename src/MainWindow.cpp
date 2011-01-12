@@ -892,7 +892,6 @@ MainWindow::contactsLinkWorkDone (bool, const QVariantList &)
 void
 MainWindow::dialNow (const QString &strTarget)
 {
-    bool bDialout;
     CalloutInitiator *ci;
 
     do // Begin cleanup block (not a loop)
@@ -1054,9 +1053,13 @@ MainWindow::onDialDlgClose (int retval, const QString & /*strNumber*/)
     }
     else
     {
-        bDialCancelled = true;
         GVAccess &webPage = Singletons::getRef().getGVAccess ();
-        webPage.cancelWork (GVAW_dialCallback);
+        bDialCancelled = true;
+        if (bDialout) {
+            webPage.cancelWork (GVAW_dialOut);
+        } else {
+            webPage.cancelWork (GVAW_dialCallback);
+        }
     }
 }//MainWindow::onDialDlgClose
 

@@ -15,7 +15,6 @@ maemo5 {
     message(Maemo5 your world)
     QT *= maemo5
     OTHER_FILES += ../build-files/qgvdial.desktop
-    MOBILITY += bearer
 }
 
 # In Linux and maemo, add the telepathy libraries, sources and headers

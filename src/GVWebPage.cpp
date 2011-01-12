@@ -9,6 +9,7 @@ GVWebPage::GVWebPage(QObject *parent/* = NULL*/)
 , bUseIphoneUA (true)
 , webPage (this)
 , garbageTimer (this)
+, nwCfg (this)
 {
     webPage.settings()->setAttribute (QWebSettings::JavaEnabled   , false);
 //     webPage.settings()->setAttribute (QWebSettings::PluginsEnabled, false);
@@ -141,6 +142,11 @@ GVWebPage::aboutBlankDone (bool bOk)
 bool
 GVWebPage::login ()
 {
+    if (!nwCfg.isOnline ()) {
+        qDebug ("Cannot login when offline");
+        return false;
+    }
+
     webPage.setUA (bUseIphoneUA);
 
     // GV page load complete will begin the login process.
@@ -329,11 +335,14 @@ GVWebPage::loginStage3 (bool bOk)
 bool
 GVWebPage::logout ()
 {
-    QString strLink = GV_HTTPS "/account/signout";
+    if (!nwCfg.isOnline ()) {
+        qDebug ("Cannot logout when offline");
+        return false;
+    }
 
     QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
                        this   , SLOT   (logoutDone (bool)));
-    this->loadUrlString (strLink);
+    this->loadUrlString (GV_HTTPS "/account/signout");
 
     return (true);
 }//GVWebPage::logout
@@ -356,6 +365,11 @@ GVWebPage::logoutDone (bool bOk)
 bool
 GVWebPage::retrieveContacts ()
 {
+    if (!nwCfg.isOnline ()) {
+        qDebug ("Cannot retrieve contacts when offline");
+        return false;
+    }
+
     QMutexLocker locker(&mutex);
     if (!bLoggedIn)
     {
@@ -458,6 +472,11 @@ GVWebPage::isNextContactsPageAvailable ()
 bool
 GVWebPage::dialCallback (bool bCallback)
 {
+    if (!nwCfg.isOnline ()) {
+        qDebug ("Cannot dial back when offline");
+        return false;
+    }
+
     QMutexLocker locker(&mutex);
     if (!bLoggedIn)
     {
@@ -634,6 +653,11 @@ GVWebPage::onDataCallCanceled (QNetworkReply * reply)
 bool
 GVWebPage::getContactInfoFromLink ()
 {
+    if (!nwCfg.isOnline ()) {
+        qDebug ("Cannot retrieve contact info when offline");
+        return false;
+    }
+
     QMutexLocker locker(&mutex);
     if (!bLoggedIn)
     {
@@ -729,6 +753,11 @@ GVWebPage::contactInfoLoaded (bool bOk)
 bool
 GVWebPage::getRegisteredPhones ()
 {
+    if (!nwCfg.isOnline ()) {
+        qDebug ("Cannot get registered phones when offline");
+        return false;
+    }
+
     QMutexLocker locker(&mutex);
     if (!bLoggedIn)
     {
@@ -811,6 +840,11 @@ GVWebPage::userCancel ()
 bool
 GVWebPage::sendInboxRequest ()
 {
+    if (!nwCfg.isOnline ()) {
+        qDebug ("Cannot send request for inbox when offline");
+        return false;
+    }
+
     QMutexLocker locker(&mutex);
     if (!bLoggedIn)
     {
@@ -869,6 +903,11 @@ GVWebPage::sendInboxRequest ()
 bool
 GVWebPage::getInbox ()
 {
+    if (!nwCfg.isOnline ()) {
+        qDebug ("Cannot get inbox when offline");
+        return false;
+    }
+
     QMutexLocker locker(&mutex);
     if (!bLoggedIn)
     {
@@ -947,6 +986,11 @@ GVWebPage::onGotInboxXML (QNetworkReply *reply)
 bool
 GVWebPage::getContactFromInboxLink ()
 {
+    if (!nwCfg.isOnline ()) {
+        qDebug ("Cannot get contact from inbox link when offline");
+        return false;
+    }
+
     QMutexLocker locker(&mutex);
     if (!bLoggedIn)
     {
@@ -1048,6 +1092,11 @@ GVWebPage::garbageTimerTimeout ()
 bool
 GVWebPage::sendSMS ()
 {
+    if (!nwCfg.isOnline ()) {
+        qDebug ("Cannot send SMS when offline");
+        return false;
+    }
+
     QMutexLocker locker(&mutex);
     if (!bLoggedIn)
     {
@@ -1142,6 +1191,11 @@ GVWebPage::sendSMSResponse (QNetworkReply *reply)
 bool
 GVWebPage::playVmail ()
 {
+    if (!nwCfg.isOnline ()) {
+        qDebug ("Cannot download vmail when offline");
+        return false;
+    }
+
     QMutexLocker locker(&mutex);
     if (!bLoggedIn)
     {
