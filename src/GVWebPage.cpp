@@ -580,6 +580,7 @@ GVWebPage::onDataCallDone (QNetworkReply * reply)
 
     bool bOk = false;
     do { // Begin cleanup block (not a loop)
+        qDebug () << msg;
         QRegExp rx("\"access_number\":\"([+\\d]*)\"");
         if (msg.contains (rx) && (1 == rx.captureCount ()))
         {
