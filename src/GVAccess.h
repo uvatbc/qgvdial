@@ -65,6 +65,9 @@ protected:
     //! This function will find out the proxy information for the system
     bool getSystemProxies (QNetworkProxy &http, QNetworkProxy &https);
 
+    //! Cancel whatever work is current
+    bool cancelWork ();
+
 public:
     bool enqueueWork (GVAccess_Work whatwork, const QVariantList &params,
                       QObject      *receiver, const char         *method);
@@ -123,7 +126,7 @@ protected:
     //! Begin the next work
     void doNextWork ();
     //! Complete the work so that the next one can begin
-    void completeCurrentWork (GVAccess_Work whatwork, bool bOk);
+    virtual void completeCurrentWork (GVAccess_Work whatwork, bool bOk);
 
     //! To be used for Data Access API ONLY
     QNetworkRequest
@@ -182,8 +185,6 @@ protected:
 
     //! The currently selected registered callback number
     QString                     strCurrentCallback;
-    //! The currently selected registered callback number's type
-    //char                        chCurrentCallbackType;
 
     friend class Singletons;
 };

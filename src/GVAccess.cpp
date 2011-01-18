@@ -268,6 +268,13 @@ GVAccess::completeCurrentWork (GVAccess_Work whatwork, bool bOk)
 }//GVAccess::completeCurrentWork
 
 bool
+GVAccess::cancelWork()
+{
+    QMutexLocker locker(&mutex);
+    return cancelWork (workCurrent.whatwork);
+}//GVAccess::cancelWork
+
+bool
 GVAccess::cancelWork (GVAccess_Work whatwork)
 {
     bool rv = false;
@@ -447,10 +454,10 @@ GVAccess::setProxySettings (bool bEnable,
     QNetworkProxy proxySettings;
     do // Begin cleanup block (not a loop)
     {
-    	if (!bEnable) {
+        if (!bEnable) {
             qDebug ("Clearing all proxy information");
             break;
-    	}
+        }
 
         if (bUseSystemProxy) {
             QNetworkProxy https;

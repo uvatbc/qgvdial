@@ -10,10 +10,10 @@ GVWebPage::GVWebPage(QObject *parent/* = NULL*/)
 , webPage (this)
 , garbageTimer (this)
 , nwCfg (this)
+, pageTimeoutTimer (this)
+, pCurrentReply (NULL)
 {
     webPage.settings()->setAttribute (QWebSettings::JavaEnabled   , false);
-//     webPage.settings()->setAttribute (QWebSettings::PluginsEnabled, false);
-//     webPage.settings()->setAttribute (QWebSettings::AutoLoadImages, false);
     webPage.setForwardUnsupportedContent (true);
 
     garbageTimer.setSingleShot (true);
@@ -31,6 +31,10 @@ GVWebPage::GVWebPage(QObject *parent/* = NULL*/)
     QObject::connect (&garbageTimer, SIGNAL (timeout ()),
                        this        , SLOT   (garbageTimerTimeout ()));
     garbageTimer.start ();
+
+    // Page timeout timer
+    QObject::connect (&pageTimeoutTimer, SIGNAL (timeout()),
+                       this            , SLOT   (onPageTimeout()));
 }//GVWebPage::GVWebPage
 
 GVWebPage::~GVWebPage(void)
@@ -62,6 +66,7 @@ void
 GVWebPage::loadUrlString (const QString &strUrl)
 {
     webPage.mainFrame()->load (QUrl (strUrl));
+    onPageProgress (0);
     if (NULL != webPage.view ())
     {
         webPage.view()->show ();
@@ -1278,3 +1283,53 @@ GVWebPage::onVmailDownloaded (QNetworkReply *reply)
     completeCurrentWork (GVAW_playVmail, rv);
     reply->deleteLater ();
 }//GVWebPage::onVmailDownloaded
+
+void
+GVWebPage::onPageTimeout ()
+{
+    if (NULL != pCurrentReply) {
+        qWarning ("Request has timed out. Aborting!!!");
+        pCurrentReply->abort ();
+        pCurrentReply = NULL;
+    } else {
+        qWarning ("Web page load has timed out. Aborting!!!");
+    }
+
+    cancelWork ();
+}//GVWebPage::onPageTimeout
+
+void
+GVWebPage::onPageProgress(int /*progress*/)
+{
+    pageTimeoutTimer.stop ();
+    pageTimeoutTimer.setInterval (15 * 1000);
+    pageTimeoutTimer.setSingleShot (true);
+    pageTimeoutTimer.start ();
+}//GVWebPage::onPageProgress
+
+void
+GVWebPage::onSocketXfer (qint64 /*bytesXfer*/, qint64 /*bytesTotal*/)
+{
+    pageTimeoutTimer.stop ();
+    pageTimeoutTimer.setInterval (15 * 1000);
+    pageTimeoutTimer.setSingleShot (true);
+    pageTimeoutTimer.start ();
+}//GVWebPage::onSocketXfer
+
+void
+GVWebPage::completeCurrentWork (GVAccess_Work whatwork, bool bOk)
+{
+    pageTimeoutTimer.stop ();
+    if (NULL != pCurrentReply) {
+        pCurrentReply = NULL;
+    }
+
+    GVAccess::completeCurrentWork (whatwork, bOk);
+}//GVWebPage::completeCurrentWork
+
+void
+GVWebPage::startTimerForReply (QNetworkReply *reply)
+{
+    pCurrentReply = reply;
+    onSocketXfer (0,0);
+}//GVWebPage::startTimerForReply

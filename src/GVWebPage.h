@@ -66,6 +66,13 @@ private slots:
     //! Invoked when th vmail is downloaded
     void onVmailDownloaded (QNetworkReply *reply);
 
+    //! Invoked when the page timeout timer times out.
+    void onPageTimeout ();
+    //! Invoked when the page makes any progress.
+    void onPageProgress (int progress);
+    //! Invoked when the socket makes any transfers
+    void onSocketXfer (qint64 bytesXfer, qint64 bytesTotal);
+
 private:
     QWebElement doc ();
     bool isLoggedIn ();
@@ -108,6 +115,11 @@ private:
 
     void cancelDataDial2 ();
 
+    //! This aborts the timeout timer and calls the base completeWork
+    virtual void completeCurrentWork (GVAccess_Work whatwork, bool bOk);
+    //! Starts the timeout timer for NW requests
+    void startTimerForReply(QNetworkReply *reply);
+
 private:
     bool                    bUseIphoneUA;
 
@@ -125,6 +137,10 @@ private:
 
     //! We use this to check if we're online
     QNetworkConfigurationManager nwCfg;
+
+    //! Timeout timer for web page loading
+    QTimer                      pageTimeoutTimer;
+    QNetworkReply              *pCurrentReply;
 
     friend class Singletons;
 };
