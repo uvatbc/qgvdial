@@ -22,6 +22,7 @@ Item {
         id: btn
         mainText: digButton.mainText
         anchors.fill: parent
+        mainFontPoint: Code.btnFontPoint()
 
         onClicked: {
             if (digButton.isDel) {

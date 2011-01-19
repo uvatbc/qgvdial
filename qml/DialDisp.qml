@@ -38,6 +38,7 @@ Rectangle {
                 mainText: currentPhoneName;
                 anchors.fill: parent
                 radius: ((height / 10.0) + (width / 60.0))
+                mainFontPoint: Code.btnFontPoint() / 4
 
                 onClicked: {
                     if (Code.compCbBox == null) {

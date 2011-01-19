@@ -492,6 +492,7 @@ GVWebPage::dialCallback (bool bCallback)
     QVariantList &arrParams = workCurrent.arrParams;
     QStringPairList arrPairs;
     workCurrent.cancel = (WebPageCancel) &GVWebPage::cancelDataDial2;
+    QNetworkReply *reply = NULL;
 
     if (!bCallback)
     {
@@ -557,7 +558,7 @@ GVWebPage::dialCallback (bool bCallback)
 
         QObject::connect (mgr , SIGNAL (finished (QNetworkReply *)),
                           this, SLOT   (onDataCallDone (QNetworkReply *)));
-        mgr->post (request, strContent.toAscii());
+        reply = mgr->post (request, strContent.toAscii());
     }
     else
     {
@@ -567,9 +568,12 @@ GVWebPage::dialCallback (bool bCallback)
         arrPairs += QStringPair("phoneType"       , arrParams[2].toString());
         arrPairs += QStringPair("remember"        , "1");
         arrPairs += QStringPair("_rnr_se"         , strRnr_se);
+        reply =
         postRequest (GV_DATA_BASE "/call/connect/", arrPairs, UA_IPHONE,
                      this, SLOT (onDataCallDone (QNetworkReply *)));
     }
+
+    startTimerForReply (reply);
 
     return (true);
 }//GVWebPage::dialCallback
@@ -1290,19 +1294,29 @@ GVWebPage::onPageTimeout ()
     if (NULL != pCurrentReply) {
         qWarning ("Request has timed out. Aborting!!!");
         pCurrentReply->abort ();
+
+        QObject::disconnect (
+            pCurrentReply, SIGNAL(downloadProgress(qint64,qint64)),
+            this         , SLOT(onSocketXfer(qint64,qint64)));
+        QObject::disconnect (
+            pCurrentReply, SIGNAL(uploadProgress(qint64,qint64)),
+            this         , SLOT(onSocketXfer(qint64,qint64)));
         pCurrentReply = NULL;
+
+        //@@UV: Test if this is required
+        cancelWork ();
     } else {
         qWarning ("Web page load has timed out. Aborting!!!");
+        userCancel ();
     }
-
-    cancelWork ();
 }//GVWebPage::onPageTimeout
 
 void
 GVWebPage::onPageProgress(int /*progress*/)
 {
     pageTimeoutTimer.stop ();
-    pageTimeoutTimer.setInterval (15 * 1000);
+    qDebug("Page progressed. Not timing out!");
+    pageTimeoutTimer.setInterval (45 * 1000);
     pageTimeoutTimer.setSingleShot (true);
     pageTimeoutTimer.start ();
 }//GVWebPage::onPageProgress
@@ -1311,6 +1325,7 @@ void
 GVWebPage::onSocketXfer (qint64 /*bytesXfer*/, qint64 /*bytesTotal*/)
 {
     pageTimeoutTimer.stop ();
+    qDebug("Socket transferred data. Not timing out!");
     pageTimeoutTimer.setInterval (15 * 1000);
     pageTimeoutTimer.setSingleShot (true);
     pageTimeoutTimer.start ();
@@ -1321,6 +1336,12 @@ GVWebPage::completeCurrentWork (GVAccess_Work whatwork, bool bOk)
 {
     pageTimeoutTimer.stop ();
     if (NULL != pCurrentReply) {
+        QObject::disconnect (
+            pCurrentReply, SIGNAL(downloadProgress(qint64,qint64)),
+            this         , SLOT(onSocketXfer(qint64,qint64)));
+        QObject::disconnect (
+            pCurrentReply, SIGNAL(uploadProgress(qint64,qint64)),
+            this         , SLOT(onSocketXfer(qint64,qint64)));
         pCurrentReply = NULL;
     }
 
@@ -1331,5 +1352,9 @@ void
 GVWebPage::startTimerForReply (QNetworkReply *reply)
 {
     pCurrentReply = reply;
+    QObject::connect (reply, SIGNAL(downloadProgress(qint64,qint64)),
+                      this , SLOT(onSocketXfer(qint64,qint64)));
+    QObject::connect (reply, SIGNAL(uploadProgress(qint64,qint64)),
+                      this , SLOT(onSocketXfer(qint64,qint64)));
     onSocketXfer (0,0);
 }//GVWebPage::startTimerForReply
