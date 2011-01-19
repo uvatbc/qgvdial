@@ -20,6 +20,7 @@ Rectangle {
     signal sigPassChanged(string password)
     signal sigLogin
     signal sigLogout
+    signal sigWebPage
     signal sigRefresh
     signal sigRefreshAll
     signal sigDismiss
@@ -205,6 +206,7 @@ Rectangle {
             onSigPassChanged: main.sigPassChanged(password)
             onSigLogin: main.sigLogin()
             onSigLogout: main.sigLogout()
+            onSigWebPage: main.sigWebPage()
             onSigRefresh: main.sigRefresh()
             onSigRefreshAll: main.sigRefreshAll()
             onSigDismiss: main.sigDismiss()

@@ -8,6 +8,7 @@ Item {
     signal sigPassChanged(string password)
     signal sigLogin
     signal sigLogout
+    signal sigWebPage
     signal sigRefresh
     signal sigRefreshAll
     signal sigDismiss
@@ -99,7 +100,7 @@ Item {
         MyButton {
             mainText: (mainColumn.bIsLoggedIn == true ? "Logout" : "Login")
             width: parent.width
-            mainFontPoint: Code.btnFontPoint()/10
+            mainFontPoint: Code.btnFontPoint()/8
 
             onClicked: {
                 if (mainColumn.bIsLoggedIn) {
@@ -113,19 +114,26 @@ Item {
             }
         }// MyButton (login/logout)
 
-
         MyButton {
             mainText: "Proxy settings"
             width: parent.width
-            mainFontPoint: Code.btnFontPoint()/10
+            mainFontPoint: Code.btnFontPoint()/8
 
             onClicked: container.state = "Proxy"
         }// MyButton (login/logout)
 
         MyButton {
+            mainText: "Web Page (debug)"
+            width: parent.width
+            mainFontPoint: Code.btnFontPoint()/8
+
+            onClicked: container.sigWebPage();
+        }//MyButton (Refresh all)
+
+        MyButton {
             mainText: "Refresh"
             width: parent.width
-            mainFontPoint: Code.btnFontPoint()/10
+            mainFontPoint: Code.btnFontPoint()/8
 
             onClicked: container.sigRefresh();
             onPressHold: container.sigRefreshAll();
@@ -134,7 +142,7 @@ Item {
         MyButton {
             mainText: "Dismiss window"
             width: parent.width
-            mainFontPoint: Code.btnFontPoint()/10
+            mainFontPoint: Code.btnFontPoint()/8
 
             onClicked: container.sigDismiss();
             onPressHold: container.sigQuit();

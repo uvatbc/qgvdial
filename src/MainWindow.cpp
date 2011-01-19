@@ -374,6 +374,8 @@ MainWindow::initQML ()
                       this, SLOT   (doLogin ()));
     QObject::connect (gObj, SIGNAL (sigLogout ()),
                       this, SLOT   (doLogout ()));
+    QObject::connect (gObj, SIGNAL (sigWebPage ()),
+                      this, SLOT   (on_actionWeb_view_triggered ()));
     QObject::connect (gObj, SIGNAL (sigRefresh ()),
                       this, SLOT   (onRefresh ()));
     QObject::connect (gObj, SIGNAL (sigRefreshAll ()),
