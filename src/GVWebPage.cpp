@@ -149,6 +149,7 @@ GVWebPage::login ()
 {
     if (!nwCfg.isOnline ()) {
         qDebug ("Cannot login when offline");
+        completeCurrentWork (GVAW_login, false);
         return false;
     }
 
@@ -342,6 +343,7 @@ GVWebPage::logout ()
 {
     if (!nwCfg.isOnline ()) {
         qDebug ("Cannot logout when offline");
+        completeCurrentWork (GVAW_logout, false);
         return false;
     }
 
@@ -372,6 +374,7 @@ GVWebPage::retrieveContacts ()
 {
     if (!nwCfg.isOnline ()) {
         qDebug ("Cannot retrieve contacts when offline");
+        completeCurrentWork (GVAW_getAllContacts, false);
         return false;
     }
 
@@ -479,6 +482,7 @@ GVWebPage::dialCallback (bool bCallback)
 {
     if (!nwCfg.isOnline ()) {
         qDebug ("Cannot dial back when offline");
+        completeCurrentWork (bCallback?GVAW_dialCallback:GVAW_dialOut, false);
         return false;
     }
 
@@ -665,6 +669,7 @@ GVWebPage::getContactInfoFromLink ()
 {
     if (!nwCfg.isOnline ()) {
         qDebug ("Cannot retrieve contact info when offline");
+        completeCurrentWork (GVAW_getContactFromLink, false);
         return false;
     }
 
@@ -765,6 +770,7 @@ GVWebPage::getRegisteredPhones ()
 {
     if (!nwCfg.isOnline ()) {
         qDebug ("Cannot get registered phones when offline");
+        completeCurrentWork (GVAW_getRegisteredPhones, false);
         return false;
     }
 
@@ -852,6 +858,7 @@ GVWebPage::sendInboxRequest ()
 {
     if (!nwCfg.isOnline ()) {
         qDebug ("Cannot send request for inbox when offline");
+        completeCurrentWork (GVAW_getInbox, false);
         return false;
     }
 
@@ -915,6 +922,7 @@ GVWebPage::getInbox ()
 {
     if (!nwCfg.isOnline ()) {
         qDebug ("Cannot get inbox when offline");
+        completeCurrentWork (GVAW_getInbox, false);
         return false;
     }
 
@@ -998,6 +1006,7 @@ GVWebPage::getContactFromInboxLink ()
 {
     if (!nwCfg.isOnline ()) {
         qDebug ("Cannot get contact from inbox link when offline");
+        completeCurrentWork (GVAW_getContactFromInboxLink, false);
         return false;
     }
 
@@ -1104,6 +1113,7 @@ GVWebPage::sendSMS ()
 {
     if (!nwCfg.isOnline ()) {
         qDebug ("Cannot send SMS when offline");
+        completeCurrentWork (GVAW_sendSMS, false);
         return false;
     }
 
@@ -1203,6 +1213,7 @@ GVWebPage::playVmail ()
 {
     if (!nwCfg.isOnline ()) {
         qDebug ("Cannot download vmail when offline");
+        completeCurrentWork (GVAW_playVmail, false);
         return false;
     }
 
