@@ -115,8 +115,7 @@ GVAccess::enqueueWork (GVAccess_Work whatwork, const QVariantList &params,
         }
         break;
 
-    case GVAW_dialCallback:         // Destination number, callback and type
-    case GVAW_dialOut:              // Destination, callout, and context var
+    case GVAW_dialOut:              // Destination, context, callout
         if (3 != params.size ())
         {
             msg = "Invalid parameter count";
@@ -124,6 +123,7 @@ GVAccess::enqueueWork (GVAccess_Work whatwork, const QVariantList &params,
         }
         break;
 
+    case GVAW_dialCallback:         // Destination, context, callback and type
     case GVAW_getInbox:             // type, start page, page count, last update
         if (4 != params.size ())
         {

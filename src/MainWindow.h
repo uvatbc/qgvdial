@@ -75,7 +75,7 @@ private slots:
     //! Invoked by the DBus Text server without any text data
     void onSendTextWithoutData (const QStringList &arrNumbers);
 
-    void onDialDlgClose (int retval, const QString &strNumber);
+    void onDialDlgClose (int retval, const QString &strNumber, void *pvctx);
     //! Invoked when dialing has started
     void dialInProgress (const QString &strNumber);
     //! Invoked to perform a dial

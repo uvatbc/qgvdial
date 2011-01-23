@@ -69,6 +69,7 @@
     <ClCompile Include="ContactsXmlHandler.cpp" />
     <ClCompile Include="DesktopSkypeCallInitiator.cpp" />
     <ClCompile Include="DialCancelDlg.cpp" />
+    <ClCompile Include="DialContext.cpp" />
     <ClCompile Include="DlgSelectContactNumber.cpp" />
     <ClCompile Include="global.cpp" />
     <ClCompile Include="GVAccess.cpp" />
@@ -110,6 +111,7 @@
     <ClInclude Include="ContactsXmlHandler.h" />
     <ClInclude Include="DesktopSkypeCallInitiator.h" />
     <ClInclude Include="DialCancelDlg.h" />
+    <ClInclude Include="DialContext.h" />
     <ClInclude Include="DlgSelectContactNumber.h" />
     <ClInclude Include="global.h" />
     <ClInclude Include="GVAccess.h" />

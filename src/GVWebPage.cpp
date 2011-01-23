@@ -489,7 +489,7 @@ GVWebPage::dialCallback (bool bCallback)
     QMutexLocker locker(&mutex);
     if (!bLoggedIn)
     {
-        completeCurrentWork (GVAW_dialCallback, false);
+        completeCurrentWork (bCallback?GVAW_dialCallback:GVAW_dialOut, false);
         return (false);
     }
 
@@ -567,9 +567,9 @@ GVWebPage::dialCallback (bool bCallback)
     else
     {
         arrPairs += QStringPair("outgoingNumber"  , arrParams[0].toString());
-        arrPairs += QStringPair("forwardingNumber", arrParams[1].toString());
+        arrPairs += QStringPair("forwardingNumber", arrParams[2].toString());
         arrPairs += QStringPair("subscriberNumber", strSelfNumber);
-        arrPairs += QStringPair("phoneType"       , arrParams[2].toString());
+        arrPairs += QStringPair("phoneType"       , arrParams[3].toString());
         arrPairs += QStringPair("remember"        , "1");
         arrPairs += QStringPair("_rnr_se"         , strRnr_se);
         reply =
@@ -607,7 +607,7 @@ GVWebPage::onDataCallDone (QNetworkReply * reply)
             QString strAccess = rx.cap(1);
             qWarning () << QString ("access number = \"%1\"").arg(strAccess);
 
-            emit dialAccessNumber (strAccess, workCurrent.arrParams[2]);
+            emit dialAccessNumber (strAccess, workCurrent.arrParams[1]);
 
             completeCurrentWork (GVAW_dialOut, true);
             bOk = true;
@@ -621,7 +621,7 @@ GVWebPage::onDataCallDone (QNetworkReply * reply)
         {
             qWarning() << "Failed to dial out. Response to dial out request ="
                        << msg;
-            completeCurrentWork (GVAW_dialCallback, false);
+            completeCurrentWork(GVAW_dialOut, false);
             break;
         }
 

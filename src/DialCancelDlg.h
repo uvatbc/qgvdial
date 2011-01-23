@@ -12,12 +12,12 @@ class DialCancelDlg : public QMessageBox
     Q_OBJECT
 
 public:
-    DialCancelDlg (const QString &strNum, QWidget *parent = 0);
+    DialCancelDlg (const QString &strNum, void *ctx, QWidget *parent = 0);
     int doModal (const QString &strMyNumber);
     void doNonModal (const QString &strMyNumber);
 
 signals:
-    void dialDlgDone (int retval, const QString &strNumber);
+    void dialDlgDone (int retval, const QString &strNumber, void *ctx);
 
 public slots:
     void done (int r);
@@ -26,7 +26,8 @@ private slots:
     void callStarted ();
 
 private:
-    QString         strContact;
+    QString strContact;
+    void   *m_Ctx;
 };
 
 #endif // DIALCANCELDLG_H

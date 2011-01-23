@@ -1,9 +1,10 @@
 #include "DialCancelDlg.h"
 #include "Singletons.h"
 
-DialCancelDlg::DialCancelDlg (const QString &strNum, QWidget *parent)
+DialCancelDlg::DialCancelDlg(const QString &strNum, void *ctx, QWidget *parent)
 : QMessageBox (parent)
 , strContact (strNum)
+, m_Ctx (ctx)
 {
     OsDependent &osd = Singletons::getRef().getOSD ();
     osd.setDefaultWindowAttributes (this);
@@ -46,7 +47,7 @@ DialCancelDlg::done (int r)
     ObserverFactory &obsF = Singletons::getRef().getObserverFactory ();
     obsF.stopObservers ();
 
-    emit dialDlgDone (r, strContact);
+    emit dialDlgDone (r, strContact, m_Ctx);
 
     QMessageBox::done (r);
 }//DialCancelDlg::done

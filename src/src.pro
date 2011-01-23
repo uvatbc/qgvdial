@@ -58,7 +58,8 @@ SOURCES  += main.cpp                    \
             RegNumberModel.cpp          \
             ContactsModel.cpp           \
             ContactDetailsModel.cpp     \
-            GVI_SMS_Handler.cpp
+            GVI_SMS_Handler.cpp         \
+            DialContext.cpp
 
 HEADERS  += global.h                    \
             IObserver.h                 \
@@ -93,7 +94,8 @@ HEADERS  += global.h                    \
             RegNumberModel.h            \
             ContactsModel.h             \
             ContactDetailsModel.h       \
-            GVI_SMS_Handler.h
+            GVI_SMS_Handler.h           \
+            DialContext.h
 
 FORMS    += VMailDialog.ui              \
             WebWidget.ui

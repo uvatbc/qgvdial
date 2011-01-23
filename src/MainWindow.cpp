@@ -1,4 +1,3 @@
-#include "global.h"
 #include "MainWindow.h"
 
 #include "LoginDialog.h"
@@ -7,14 +6,10 @@
 #include "VMailDialog.h"
 
 #include "PhoneNumberValidator.h"
+#include "DialContext.h"
 
 #include <iostream>
 using namespace std;
-
-struct DialOutContext {
-    CalloutInitiator *ci;
-    DialCancelDlg *pDialDlg;
-};
 
 MainWindow::MainWindow (QWidget *parent)
 : QDeclarativeView (parent)
@@ -920,6 +915,7 @@ MainWindow::dialNow (const QString &strTarget)
             setStatus ("Cannot dial empty number");
             break;
         }
+
         QString strTest = strTarget;
         strTest.remove(QRegExp ("\\d*"))
                .remove(QRegExp ("\\s"))
@@ -930,31 +926,45 @@ MainWindow::dialNow (const QString &strTarget)
             break;
         }
 
+        DialContext *ctx = new DialContext(this);
+        if (NULL == ctx) {
+            setStatus ("Failed to dial out because of allocation problem");
+            break;
+        }
+
         GVAccess &webPage = Singletons::getRef().getGVAccess ();
         QVariantList l;
         l += strTarget;     // The destination number is common between the two
+        l += QVariant::fromValue<void*>(ctx);
 
-        DialCancelDlg *pDialDlg = new DialCancelDlg (strTarget, this);
+        DialCancelDlg *pDialDlg = new DialCancelDlg (strTarget, ctx, this);
         QObject::connect (
-            pDialDlg, SIGNAL (dialDlgDone    (int, const QString &)),
-            this    , SLOT   (onDialDlgClose (int, const QString &)));
+            pDialDlg, SIGNAL (dialDlgDone    (int, const QString &, void *)),
+            this    , SLOT   (onDialDlgClose (int, const QString &, void *)));
+
+        OsDependent &osd = Singletons::getRef().getOSD ();
+        osd.setLongWork (this, true);
+
+        bCallInProgress = true;
+        bDialCancelled = false;
+
+        pDialDlg->setAttribute (Qt::WA_DeleteOnClose);
+        pDialDlg->setModal (false);
+        pDialDlg->doNonModal (strSelfNumber);
+
+        ctx->pDialDlg = pDialDlg;
 
         if (bDialout)
         {
-            DialOutContext *ctx = new DialOutContext;
-            if (NULL == ctx) {
-                setStatus ("Failed to dial out because of allocation problem");
-                break;
-            }
             ctx->ci = ci;
-            ctx->pDialDlg = pDialDlg;
 
             l += ci->selfNumber ();
-            l += QVariant::fromValue<void*>(ctx) ;
             if (!webPage.enqueueWork (GVAW_dialOut, l, this,
                     SLOT (dialComplete (bool, const QVariantList &))))
             {
                 setStatus ("Dialing failed instantly");
+                bCallInProgress = bDialCancelled = false;
+                ctx->deleteLater ();
                 break;
             }
         }
@@ -966,19 +976,11 @@ MainWindow::dialNow (const QString &strTarget)
                     SLOT (dialComplete (bool, const QVariantList &))))
             {
                 setStatus ("Dialing failed instantly");
+                bCallInProgress = bDialCancelled = false;
+                pDialDlg->deleteLater ();
                 break;
             }
         }
-
-        OsDependent &osd = Singletons::getRef().getOSD ();
-        osd.setLongWork (this, true);
-
-        bCallInProgress = true;
-        bDialCancelled = false;
-
-        pDialDlg->setAttribute (Qt::WA_DeleteOnClose);
-        pDialDlg->setModal (false);
-        pDialDlg->doNonModal (strSelfNumber);
     } while (0); // End cleanup block (not a loop)
 }//MainWindow::dialNow
 
@@ -1045,8 +1047,11 @@ MainWindow::onSendTextWithoutData (const QStringList &arrNumbers)
 }//MainWindow::onSendTextWithoutData
 
 void
-MainWindow::onDialDlgClose (int retval, const QString & /*strNumber*/)
+MainWindow::onDialDlgClose (int retval,
+                            const QString & /*strNumber*/,
+                            void *pvctx)
 {
+    DialContext *ctx = (DialContext *) pvctx;
     // Disconnecting this
     QMutexLocker locker (&mtxDial);
     if (QMessageBox::Ok == retval)
@@ -1057,11 +1062,7 @@ MainWindow::onDialDlgClose (int retval, const QString & /*strNumber*/)
     {
         GVAccess &webPage = Singletons::getRef().getGVAccess ();
         bDialCancelled = true;
-        if (bDialout) {
-            webPage.cancelWork (GVAW_dialOut);
-        } else {
-            webPage.cancelWork (GVAW_dialCallback);
-        }
+        webPage.cancelWork (ctx->bDialOut ? GVAW_dialOut : GVAW_dialCallback);
     }
 }//MainWindow::onDialDlgClose
 
@@ -1075,7 +1076,7 @@ MainWindow::dialAccessNumber (const QString  &strAccessNumber,
                               const QVariant &context        )
 {
     bool bSuccess = false;
-    DialOutContext *ctx = (DialOutContext *) context.value<void *>();
+    DialContext *ctx = (DialContext *) context.value<void *>();
     do // Begin cleanup block (not a loop)
     {
         if (NULL == ctx)
@@ -1097,6 +1098,7 @@ MainWindow::dialAccessNumber (const QString  &strAccessNumber,
         bSuccess = true;
     } while (0); // End cleanup block (not a loop)
 
+/*
     if (NULL != ctx) {
         ctx->ci = NULL;
         if (NULL != ctx->pDialDlg) {
@@ -1106,15 +1108,17 @@ MainWindow::dialAccessNumber (const QString  &strAccessNumber,
                 ctx->pDialDlg->reject ();
             }
         }
-        free (ctx);
+        ctx->deleteLater ();
         ctx = NULL;
     }
+*/
 }//MainWindow::dialAccessNumber
 
 void
 MainWindow::dialComplete (bool bOk, const QVariantList &params)
 {
     QMutexLocker locker (&mtxDial);
+    DialContext *ctx = (DialContext *) params[1].value <void*> ();
     if (!bOk)
     {
         if (bDialCancelled)
@@ -1144,6 +1148,8 @@ MainWindow::dialComplete (bool bOk, const QVariantList &params)
 
     OsDependent &osd = Singletons::getRef().getOSD ();
     osd.setLongWork (this, false);
+
+    ctx->deleteLater ();
 }//MainWindow::dialComplete
 
 void
