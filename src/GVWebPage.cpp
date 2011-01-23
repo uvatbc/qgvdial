@@ -621,7 +621,7 @@ GVWebPage::onDataCallDone (QNetworkReply * reply)
         {
             qWarning() << "Failed to dial out. Response to dial out request ="
                        << msg;
-            completeCurrentWork(GVAW_dialOut, false);
+            completeCurrentWork(GVAW_dialCallback, false);
             break;
         }
 
@@ -630,6 +630,9 @@ GVWebPage::onDataCallDone (QNetworkReply * reply)
     } while (0); // End cleanup block (not a loop)
 
     reply->deleteLater ();
+    if (pCurrentReply == reply) {
+        pCurrentReply = NULL;
+    }
 }//GVWebPage::onDataCallDone
 
 void

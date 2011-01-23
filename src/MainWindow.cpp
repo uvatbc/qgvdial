@@ -948,7 +948,6 @@ MainWindow::dialNow (const QString &strTarget)
         bCallInProgress = true;
         bDialCancelled = false;
 
-        pDialDlg->setAttribute (Qt::WA_DeleteOnClose);
         pDialDlg->setModal (false);
         pDialDlg->doNonModal (strSelfNumber);
 
@@ -1097,21 +1096,6 @@ MainWindow::dialAccessNumber (const QString  &strAccessNumber,
         setStatus ("Callout in progress");
         bSuccess = true;
     } while (0); // End cleanup block (not a loop)
-
-/*
-    if (NULL != ctx) {
-        ctx->ci = NULL;
-        if (NULL != ctx->pDialDlg) {
-            if (bSuccess) {
-                ctx->pDialDlg->accept ();
-            } else {
-                ctx->pDialDlg->reject ();
-            }
-        }
-        ctx->deleteLater ();
-        ctx = NULL;
-    }
-*/
 }//MainWindow::dialAccessNumber
 
 void
