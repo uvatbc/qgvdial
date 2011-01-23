@@ -188,7 +188,7 @@ maemo5 {
 
     DEFINES += DATADIR=\"$$DATADIR\" PKGDATADIR=\"$$PKGDATADIR\"
 
-    INSTALLS += target desktop icon qss dbusservice
+    INSTALLS += target desktop icon dbusservice
 
     target.path =$$BINDIR
 
@@ -198,9 +198,6 @@ maemo5 {
     icon.path = $$OPTDATADIR
     icon.files += qgvdial.png
 
-    qss.path = $$BINDIR/stylesheets
-    qss.files += ./stylesheets/dialpad_maemo.qss
-
     dbusservice.path = $$DATADIR/dbus-1/services
     dbusservice.files += ../build-files/qgvdial.Call.service
     dbusservice.files += ../build-files/qgvdial.Text.service
@@ -208,21 +205,18 @@ maemo5 {
 
 # Installation for Linux
 unix:!symbian:!maemo5 {
-    BINDIR  = $$PREFIX/bin
+    BINDIR  = $$PREFIX/bin/qgvdial
     DATADIR = $$PREFIX/share
     message($$BINDIR)
 
     DEFINES += DATADIR=\"$$DATADIR\" PKGDATADIR=\"$$PKGDATADIR\"
 
-    INSTALLS += target icon qss dbusservice
+    INSTALLS += target icon dbusservice
 
     target.path =$$BINDIR
 
     icon.path = $$DATADIR/qgvdial
     icon.files += qgvdial.png
-
-    qss.path = $$BINDIR/stylesheets
-    qss.files += ./stylesheets/dialpad_maemo.qss
 
     dbusservice.path = $$DATADIR/dbus-1/services
     dbusservice.files += ../build-files/qgvdial.Call.service

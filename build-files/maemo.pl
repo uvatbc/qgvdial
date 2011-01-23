@@ -34,36 +34,37 @@ $svnver =~ m/^r(\d+)*/;
 $svnver = $1;
 # Create the version suffix
 $qver = "$qver.$svnver";
+my $basedir = "./$basedir"
 
 # Delete any previous checkout directories
 system("rm -rf qgvdial*");
-$cmd = "svn export $repo qgvdial-$qver";
+$cmd = "svn export $repo $basedir";
 system($cmd);
-system("cp qgvdial-$qver/icons/Google.png qgvdial-$qver/src/qgvdial.png");
+system("cp $basedir/icons/Google.png $basedir/src/qgvdial.png");
 
 # Version replacement
-$cmd = "cd qgvdial-$qver ; perl ./build-files/version.pl __QGVDIAL_VERSION__ $qver";
+$cmd = "cd $basedir ; perl ./build-files/version.pl __QGVDIAL_VERSION__ $qver";
 print "$cmd\n";
 system($cmd);
 
 # Do everything upto the preparation of the debian directory. Code is still not compiled.
-$cmd = "cd qgvdial-$qver ; $mad qmake && $mad dh_make --createorig --single -e yuvraaj\@gmail.com -c lgpl && $mad qmake";
+$cmd = "cd $basedir ; $mad qmake && $mad dh_make --createorig --single -e yuvraaj\@gmail.com -c lgpl && $mad qmake";
 system($cmd);
 
 # Add a post install file to add the executable bit after installation on the device
-system("mv qgvdial-$qver/build-files/postinst.maemo qgvdial-$qver/debian/postinst");
-system("mv qgvdial-$qver/build-files/prerm.maemo qgvdial-$qver/debian/prerm");
+system("mv $basedir/build-files/postinst.maemo $basedir/debian/postinst");
+system("mv $basedir/build-files/prerm.maemo $basedir/debian/prerm");
 # Fix the control file
-system("mv qgvdial-$qver/build-files/control.maemo qgvdial-$qver/debian/control");
+system("mv $basedir/build-files/control.maemo $basedir/debian/control");
 # Fix the dbus service file name
-system("mv qgvdial-$qver/build-files/qgvdial.Call.service.maemo qgvdial-$qver/build-files/qgvdial.Call.service");
-system("mv qgvdial-$qver/build-files/qgvdial.Text.service.maemo qgvdial-$qver/build-files/qgvdial.Text.service");
-system("mv qgvdial-$qver/qgv-tp/data/org.freedesktop.Telepathy.ConnectionManager.qgvtp.service.maemo qgvdial-$qver/qgv-tp/data/org.freedesktop.Telepathy.ConnectionManager.qgvtp.service");
+system("mv $basedir/build-files/qgvdial.Call.service.maemo $basedir/build-files/qgvdial.Call.service");
+system("mv $basedir/build-files/qgvdial.Text.service.maemo $basedir/build-files/qgvdial.Text.service");
+system("mv $basedir/qgv-tp/data/org.freedesktop.Telepathy.ConnectionManager.qgvtp.service.maemo $basedir/qgv-tp/data/org.freedesktop.Telepathy.ConnectionManager.qgvtp.service");
 # Change the name of the desktop file so that it can be directly used in the compilation
-system("mv qgvdial-$qver/build-files/qgvdial.desktop.maemo qgvdial-$qver/build-files/qgvdial.desktop");
+system("mv $basedir/build-files/qgvdial.desktop.maemo $basedir/build-files/qgvdial.desktop");
 
 # Execute the rest of the build command
-$cmd = "cd qgvdial-$qver && $asroot $mad dpkg-buildpackage && $mad remote -r org.maemo.qgvdial send ../qgvdial_$qver-1_$machine.deb && $mad remote -r org.maemo.qgvdial install qgvdial_$qver-1_$machine.deb";
+$cmd = "cd $basedir && $asroot $mad dpkg-buildpackage && $mad remote -r org.maemo.qgvdial send ../qgvdial_$qver-1_$machine.deb && $mad remote -r org.maemo.qgvdial install qgvdial_$qver-1_$machine.deb";
 system($cmd);
 
 $cmd = "dput -f fremantle-upload qgvdial*.changes";

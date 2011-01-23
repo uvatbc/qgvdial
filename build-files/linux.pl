@@ -3,6 +3,7 @@ my $mad = '';
 my $repo = "https://qgvdial.googlecode.com/svn/trunk";
 my $cmd;
 my $line;
+my $qtdir = $ENV{'QTDIR'};
 
 # Delete any existing version file
 if (-f ver.cfg)
@@ -25,34 +26,53 @@ $svnver =~ m/^r(\d+)*/;
 $svnver = $1;
 # Create the version suffix
 $qver = "$qver.$svnver";
+my $basedir = "./$basedir";
 
 # Delete any previous checkout directories
 system("rm -rf qgvdial*");
-$cmd = "svn export $repo qgvdial-$qver";
+$cmd = "svn export $repo $basedir";
 system($cmd);
-system("cp qgvdial-$qver/icons/Google.png qgvdial-$qver/src/qgvdial.png");
+system("cp $basedir/icons/Google.png $basedir/src/qgvdial.png");
 
 # Version replacement
-$cmd = "cd qgvdial-$qver ; perl ./build-files/version.pl __QGVDIAL_VERSION__ $qver";
+$cmd = "cd $basedir ; perl ./build-files/version.pl __QGVDIAL_VERSION__ $qver";
 print "$cmd\n";
 system($cmd);
 
 # Do everything upto the preparation of the debian directory. Code is still not compiled.
-$cmd = "cd qgvdial-$qver ; $mad qmake && $mad dh_make --createorig --single -e yuvraaj\@gmail.com -c lgpl && $mad qmake";
+$cmd = "cd $basedir ; $mad qmake && $mad dh_make --createorig --single -e yuvraaj\@gmail.com -c lgpl && $mad qmake";
 system($cmd);
 
 # Add a post install file to add the executable bit after installation on the device
-system("mv qgvdial-$qver/build-files/postinst.linux qgvdial-$qver/debian/postinst");
-system("mv qgvdial-$qver/build-files/prerm.linux qgvdial-$qver/debian/prerm");
+system("mv $basedir/build-files/postinst.linux $basedir/debian/postinst");
+system("mv $basedir/build-files/prerm.linux $basedir/debian/prerm");
 # Fix the control file
-system("mv qgvdial-$qver/build-files/control.linux qgvdial-$qver/debian/control");
+system("mv $basedir/build-files/control.linux $basedir/debian/control");
 # Fix the dbus service file name
-system("mv qgvdial-$qver/build-files/qgvdial.Call.service.linux qgvdial-$qver/build-files/qgvdial.Call.service");
-system("mv qgvdial-$qver/build-files/qgvdial.Text.service.linux qgvdial-$qver/build-files/qgvdial.Text.service");
-system("mv qgvdial-$qver/qgv-tp/data/org.freedesktop.Telepathy.ConnectionManager.qgvtp.service.linux qgvdial-$qver/qgv-tp/data/org.freedesktop.Telepathy.ConnectionManager.qgvtp.service");
+system("mv $basedir/build-files/qgvdial.Call.service.linux $basedir/build-files/qgvdial.Call.service");
+system("mv $basedir/build-files/qgvdial.Text.service.linux $basedir/build-files/qgvdial.Text.service");
+system("mv $basedir/qgv-tp/data/org.freedesktop.Telepathy.ConnectionManager.qgvtp.service.linux $basedir/qgv-tp/data/org.freedesktop.Telepathy.ConnectionManager.qgvtp.service");
+
+my $qt_target = "$basedir/debian/qgvdial/usr/share/qgvdial/qt-4.7.1";
+# Copy the relevent Qt shared libraries
+system("mkdir -p $qt_target");
+system("cp $qtdir/lib/libQtMultimediaKit.so.1 $qt_target");
+system("cp $qtdir/lib/libQtDeclarative.so.4 $qt_target");
+system("cp $qtdir/lib/libQtSvg.so.4 $qt_target");
+system("cp $qtdir/lib/libQtWebKit.so.4 $qt_target");
+system("cp $qtdir/lib/libQtDBus.so.4 $qt_target");
+system("cp $qtdir/lib/libQtScript.so.4 $qt_target");
+system("cp $qtdir/lib/libQtSql.so.4 $qt_target");
+system("cp $qtdir/lib/libQtXmlPatterns.so.4 $qt_target");
+system("cp $qtdir/lib/libQtXml.so.4 $qt_target");
+system("cp $qtdir/lib/libQtOpenGL.so.4 $qt_target");
+system("cp $qtdir/lib/libQtGui.so.4 $qt_target");
+system("cp $qtdir/lib/libQtNetwork.so.4 $qt_target");
+system("cp $qtdir/lib/libQtCore.so.4 $qt_target");
+system("cp $qtdir/lib/libphonon.so.4 $qt_target");
 
 # Execute the rest of the build command
-$cmd = "cd qgvdial-$qver && $mad dpkg-buildpackage && $mad remote -r org.maemo.qgvdial send ../qgvdial_$qver-1_$machine.deb && $mad remote -r org.maemo.qgvdial install qgvdial_$qver-1_$machine.deb";
+$cmd = "cd $basedir && $mad dpkg-buildpackage && $mad remote -r org.maemo.qgvdial send ../qgvdial_$qver-1_$machine.deb && $mad remote -r org.maemo.qgvdial install qgvdial_$qver-1_$machine.deb";
 system($cmd);
 
 exit();
