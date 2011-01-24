@@ -215,7 +215,7 @@ unix:!symbian:!maemo5 {
 
     target.path =$$BINDIR
 
-    icon.path = $$DATADIR/qgvdial
+    icon.path = $$DATADIR/qgvdial/icons
     icon.files += qgvdial.png
 
     dbusservice.path = $$DATADIR/dbus-1/services

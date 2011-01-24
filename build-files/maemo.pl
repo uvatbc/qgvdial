@@ -34,7 +34,7 @@ $svnver =~ m/^r(\d+)*/;
 $svnver = $1;
 # Create the version suffix
 $qver = "$qver.$svnver";
-my $basedir = "./$basedir"
+my $basedir = "./qgvdial-$qver"
 
 # Delete any previous checkout directories
 system("rm -rf qgvdial*");
