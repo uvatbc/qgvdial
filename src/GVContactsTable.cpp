@@ -301,7 +301,6 @@ GVContactsTable::onGotContacts (QNetworkReply *reply)
                           this, SIGNAL (status(const QString &, int)));
         QObject::connect (pObj, SIGNAL (gotOneContact (const ContactInfo &)),
                           this, SLOT   (gotOneContact (const ContactInfo &)));
-        dbMain.setQuickAndDirty();
         workerThread->start ();
     } while (0); // End cleanup block (not a loop)
 
@@ -311,6 +310,9 @@ GVContactsTable::onGotContacts (QNetworkReply *reply)
 void
 GVContactsTable::gotOneContact (const ContactInfo &contactInfo)
 {
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    dbMain.setQuickAndDirty();
+
     QMutexLocker locker(&mutex);
     if (contactInfo.bDeleted)
     {

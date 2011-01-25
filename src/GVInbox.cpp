@@ -96,6 +96,9 @@ GVInbox::oneInboxEntry (const GVInboxEntry &hevent)
         return;
     }
 
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    dbMain.setQuickAndDirty ();
+
     modelInbox->insertEntry (hevent);
 }//GVInbox::oneInboxEntry
 
@@ -104,6 +107,9 @@ GVInbox::getInboxDone (bool, const QVariantList &)
 {
     emit status ("Inbox retrieved. Sorting...", 0);
 
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    dbMain.setQuickAndDirty (false);
+
     GVAccess &webPage = Singletons::getRef().getGVAccess ();
     QObject::disconnect (
         &webPage, SIGNAL (oneInboxEntry (const GVInboxEntry &)),
@@ -111,7 +117,6 @@ GVInbox::getInboxDone (bool, const QVariantList &)
 
     prepView ();
 
-    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     QDateTime dtUpdate;
     if (dbMain.getLatestInboxEntry (dtUpdate))
     {
