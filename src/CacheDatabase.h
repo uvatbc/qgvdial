@@ -24,6 +24,9 @@ public:
     void init ();
     void deinit ();
 
+    // Toggle quick and dirty!
+    void setQuickAndDirty(bool bBeDirty = true);
+
     // Contacts model
     ContactsModel *newContactsModel();
     void clearContacts ();

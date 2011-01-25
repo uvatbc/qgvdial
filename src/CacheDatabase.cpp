@@ -240,6 +240,18 @@ CacheDatabase::init ()
     }
 }//CacheDatabase::init
 
+void
+CacheDatabase::setQuickAndDirty (bool bBeDirty)
+{
+    // Be quick and fucking dirty!
+    QSqlQuery query(dbMain);
+    if (bBeDirty) {
+        query.exec ("PRAGMA synchronous=off");
+    } else {
+        query.exec ("PRAGMA synchronous=on");
+    }
+}//CacheDatabase::setQuickAndDirty
+
 ContactsModel *
 CacheDatabase::newContactsModel()
 {

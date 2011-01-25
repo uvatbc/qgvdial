@@ -29,8 +29,6 @@ public:
     void loggedOut ();
 
 signals:
-    //! Log emitter
-    void log(const QString &strText, int level = 10);
     //! Status emitter for status bar
     void status(const QString &strText, int timeout = 2000);
 
@@ -51,6 +49,8 @@ private slots:
     void onGotContacts (QNetworkReply *reply);
     // Invoked when one contact is parsed out of the XML
     void gotOneContact (const ContactInfo &contactInfo);
+    //! Invoked when all the contacts are parsed
+    void onContactsParsed(bool rv);
 
 private:
     QNetworkReply *

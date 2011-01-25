@@ -158,6 +158,7 @@ struct ContactInfo
         bDeleted = false;
     }
 };
+Q_DECLARE_METATYPE(ContactInfo)
 ////////////////////////////////////////////////////////////////////////////////
 
 #if defined(Q_WS_X11) && !defined(Q_WS_MAEMO_5)

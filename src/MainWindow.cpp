@@ -38,6 +38,8 @@ MainWindow::MainWindow (QWidget *parent)
 {
     initLogging ();
 
+    qRegisterMetaType<ContactInfo>("ContactInfo");
+
     OsDependent &osd = Singletons::getRef().getOSD ();
     osd.setDefaultWindowAttributes (this);
 

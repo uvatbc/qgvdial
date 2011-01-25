@@ -5,6 +5,7 @@
 #include "Singletons.h"
 #include "ContactsXmlHandler.h"
 #include "ContactsModel.h"
+#include "ContactsParserObject.h"
 
 GVContactsTable::GVContactsTable (QObject *parent)
 : QObject (parent)
@@ -247,7 +248,7 @@ GVContactsTable::onCaptchaDone (bool bOk, const QString & /*strCaptcha*/)
     do { // Begin cleanup block (not a loop)
         if (!bOk)
         {
-            log ("Captcha failed");
+            qWarning ("Captcha failed");
             break;
         }
 
@@ -270,48 +271,39 @@ GVContactsTable::onGotContacts (QNetworkReply *reply)
                           this , SLOT   (onGotContacts (QNetworkReply *)));
     emit status ("Contacts retrieved, parsing", 0);
 
-    bool rv = false;
-    QString msg;
-    QDateTime currDT = QDateTime::currentDateTime().toUTC ();
-    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    dbMain.setLastContactUpdate (currDT);
-
-    QXmlInputSource inputSource;
-    QXmlSimpleReader simpleReader;
-    ContactsXmlHandler contactsHandler;
-
     do // Begin cleanup block (not a loop)
     {
         QByteArray byData = reply->readAll ();
         if (byData.contains ("Authorization required"))
         {
-            msg = "Authorization failed.";
+            emit status("Authorization failed.");
             break;
         }
-        inputSource.setData (byData);
 
-        QObject::connect (&contactsHandler, SIGNAL (status(const QString &, int)),
-            this,            SIGNAL (status(const QString &, int)));
+        QDateTime currDT = QDateTime::currentDateTime().toUTC ();
+        CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+        dbMain.setLastContactUpdate (currDT);
 
-        QObject::connect (
-            &contactsHandler, SIGNAL (oneContact (const ContactInfo &)),
-             this,            SLOT   (gotOneContact (const ContactInfo &)));
-
-        simpleReader.setContentHandler (&contactsHandler);
-        simpleReader.setErrorHandler (&contactsHandler);
-
-        rv = simpleReader.parse (&inputSource, false);
-
-        msg = QString("Contact parsing done. total = %1. usable = %2")
-                .arg (contactsHandler.getTotalContacts ())
-                .arg (contactsHandler.getUsableContacts ());
-
-        // Tell the contacts model to refresh all.
-        modelContacts->refresh ();
+        QThread *workerThread = new QThread(this);
+        ContactsParserObject *pObj = new ContactsParserObject(byData);
+        pObj->moveToThread (workerThread);
+        QObject::connect (workerThread, SIGNAL(started()),
+                          pObj        , SLOT  (doWork()));
+        QObject::connect (pObj, SIGNAL(done(bool)),
+                          this, SLOT  (onContactsParsed(bool)));
+        QObject::connect (pObj        , SIGNAL(done(bool)),
+                          workerThread, SLOT  (quit()));
+        QObject::connect (workerThread, SIGNAL(terminated()),
+                          pObj        , SLOT  (deleteLater()));
+        QObject::connect (workerThread, SIGNAL(terminated()),
+                          workerThread, SLOT  (deleteLater()));
+        QObject::connect (pObj, SIGNAL (status(const QString &, int)),
+                          this, SIGNAL (status(const QString &, int)));
+        QObject::connect (pObj, SIGNAL (gotOneContact (const ContactInfo &)),
+                          this, SLOT   (gotOneContact (const ContactInfo &)));
+        dbMain.setQuickAndDirty();
+        workerThread->start ();
     } while (0); // End cleanup block (not a loop)
-
-    emit status (msg);
-    emit allContacts (rv);
 
     reply->deleteLater ();
 }//GVContactsTable::onGotContacts
@@ -322,11 +314,23 @@ GVContactsTable::gotOneContact (const ContactInfo &contactInfo)
     QMutexLocker locker(&mutex);
     if (contactInfo.bDeleted)
     {
+        qDebug() << "Delete contact " << contactInfo.strTitle;
         modelContacts->deleteContact (contactInfo);
     }
     else    // add or modify
     {
+        qDebug() << "Insert contact " << contactInfo.strTitle;
         modelContacts->insertContact (contactInfo);
     }
 
 }//GVContactsTable::gotOneContact
+
+void
+GVContactsTable::onContactsParsed (bool rv)
+{
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    dbMain.setQuickAndDirty(false);
+    // Tell the contacts model to refresh all.
+    modelContacts->refresh ();
+    emit allContacts (rv);
+}//GVContactsTable::onContactsParsed
