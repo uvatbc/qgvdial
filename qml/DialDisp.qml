@@ -11,15 +11,8 @@ Rectangle {
     property alias txtEd: txtNum
     property alias theNumber: txtNum.text
 
-    function slotSelectionChanged(index, name) {
-        wDisp.sigSelChanged(index);
-    }
-    function slotCbBoxDestroy () {
-        Code.cbBox.destroy ();
-        Code.cbBox = null;
-    }
-
     Item {
+        id: mainItem
         anchors.fill: parent
 
         Rectangle {
@@ -40,36 +33,21 @@ Rectangle {
                 radius: ((height / 10.0) + (width / 60.0))
                 mainFontPoint: Code.btnFontPoint() / 4
 
-                onClicked: {
-                    if (Code.compCbBox == null) {
-                        Code.compCbBox = Qt.createComponent("ComboBoxPhones.qml");
-                    }
-
-                    if (Code.cbBox == null) {
-                        Code.cbBox = Code.compCbBox.createObject(wDisp);
-                        Code.cbBox.width  = btnPhones.width;
-                        Code.cbBox.height = wDisp.height - btnPhones.height;
-
-                        Code.cbBox.y = btnPhones.height;
-
-                        Code.cbBox.selectionChanged.connect(slotSelectionChanged);
-                        Code.cbBox.sigDestructor.connect(slotCbBoxDestroy);
-                        Code.cbBox.alive = true;
-                    } else {
-                        Code.cbBox.killSelf ();
-                    }
-                }// onClicked
+                onClicked: mainItem.state == "PhonesShown" ?
+                           mainItem.state = "" : mainItem.state = "PhonesShown"
             }// MyButton (btnPhones)
         }// Rectangle (wDisp)
 
         TextEdit {
             id: txtNum
+            opacity: 1
+
             width: parent.width
-            height: (parent.height * 4 / 5)
             anchors {
                 top: btnPhones.bottom
                 left: parent.left
                 right: parent.right
+                bottom: parent.bottom
             }
 
             color: "white"
@@ -84,5 +62,37 @@ Rectangle {
 
             onTextChanged: wDisp.sigNumChanged(txtNum.text);
         }// TextEdit
+
+        ComboBoxPhones {
+            id: cbPhones
+            opacity: 0
+
+            width: parent.width
+            anchors {
+                top: btnPhones.bottom
+                left: parent.left
+                right: parent.right
+                bottom: parent.bottom
+            }
+
+            onSelectionChanged: {
+                wDisp.sigSelChanged(iIndex)
+                mainItem.state =  ""
+            }
+        }
+
+        states: [
+            State {
+                name: "PhonesShown"
+                PropertyChanges { target: cbPhones; opacity: 1 }
+                PropertyChanges { target: txtNum; opacity: 0 }
+            }
+        ]
+
+        transitions: [
+            Transition {
+                PropertyAnimation { property: "opacity"; easing.type: Easing.InOutQuad}
+            }
+        ]
     }// Item
 }// Rectangle
