@@ -65,6 +65,7 @@ Rectangle {
                 onSigText: window.sigText(wDisp.txtEd.text)
 
                 onSigDel: Code.doDel()
+                onSigClear: wDisp.txtEd.text = ""
             }
         }//Column
     }//Rectangle

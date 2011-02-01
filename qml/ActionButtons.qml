@@ -4,6 +4,7 @@ Rectangle {
     signal sigCall
     signal sigText
     signal sigDel
+    signal sigClear
 
     Row {
         anchors.fill: parent
@@ -29,7 +30,7 @@ Rectangle {
                 onPressed: btnCall.border.color = "grey"
                 onReleased: btnCall.border.color = "black"
             }
-        }
+        }//Rectangle (call)
 
         Rectangle {
             id: btnText
@@ -52,7 +53,7 @@ Rectangle {
                 onPressed: btnText.border.color = "grey"
                 onReleased: btnText.border.color = "black"
             }
-        }
+        }//Rectangle (SMS)
 
         Rectangle {
             id: btnDel
@@ -71,10 +72,11 @@ Rectangle {
             MouseArea {
                 anchors.fill: parent
                 onClicked: sigDel()
+                onPressAndHold: sigClear()
 
                 onPressed: btnDel.border.color = "grey"
                 onReleased: btnDel.border.color = "black"
             }
-        }
+        }//Rectangle (del)
     }
 }
