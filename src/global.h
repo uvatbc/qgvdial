@@ -167,6 +167,12 @@ Q_DECLARE_METATYPE(ContactInfo)
 #define LINUX_DESKTOP 0
 #endif
 
+#if LINUX_DESKTOP || defined(Q_WS_WIN)
+#define DESKTOP_OS 1
+#else
+#define DESKTOP_OS 0
+#endif
+
 #if defined(Q_WS_X11)
 #define TELEPATHY_CAPABLE 1
 #else

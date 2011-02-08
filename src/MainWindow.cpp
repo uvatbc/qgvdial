@@ -386,6 +386,10 @@ MainWindow::initQML ()
                                       bool, const QString &, const QString &)),
         this, SLOT (onSigProxyChanges(bool, bool, const QString &, int,
                                       bool, const QString &, const QString &)));
+
+#if DESKTOP_OS
+    this->setFixedSize (this->size ());
+#endif
 }//MainWindow::initQML
 
 void

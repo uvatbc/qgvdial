@@ -40,8 +40,11 @@ OsDependent::initDialServer (QObject *receiver, const char *method)
         pDialServer->addCallReceiver (receiver, method);
 
         QDBusConnection sessionBus = QDBusConnection::sessionBus();
-        sessionBus.registerObject ("/org/QGVDial/CallServer", this);
-        sessionBus.registerService("org.QGVDial.CallServer");
+        if (!sessionBus.registerObject ("/org/QGVDial/CallServer", this) ||
+            !sessionBus.registerService("org.QGVDial.CallServer")) {
+            qWarning ("Failed to register Dbus Call server. Aborting!");
+            qApp->quit ();
+        }
     }
 #else
     Q_UNUSED (receiver);
@@ -60,8 +63,11 @@ OsDependent::initTextServer (QObject *r1, const char *m1,
         pTextServer->addTextReceivers (r1, m1, r2, m2);
 
         QDBusConnection sessionBus = QDBusConnection::sessionBus();
-        sessionBus.registerObject ("/org/QGVDial/TextServer", this);
-        sessionBus.registerService("org.QGVDial.TextServer");
+        if (!sessionBus.registerObject ("/org/QGVDial/TextServer", this) ||
+            !sessionBus.registerService("org.QGVDial.TextServer")) {
+            qWarning ("Failed to register Dbus Text server. Aborting!");
+            qApp->quit ();
+        }
     }
 #else
     Q_UNUSED (r1);
