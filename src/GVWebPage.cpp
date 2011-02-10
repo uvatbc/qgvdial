@@ -1326,10 +1326,14 @@ GVWebPage::onPageTimeout ()
 }//GVWebPage::onPageTimeout
 
 void
-GVWebPage::onPageProgress(int /*progress*/)
+GVWebPage::onPageProgress(int progress)
 {
     pageTimeoutTimer.stop ();
-    qDebug("Page progressed. Not timing out!");
+    if (0 == progress) {
+        qDebug ("Page timeout timer started");
+    } else {
+        qDebug("Page progressed. Not timing out!");
+    }
     pageTimeoutTimer.setInterval (45 * 1000);
     pageTimeoutTimer.setSingleShot (true);
     pageTimeoutTimer.start ();
