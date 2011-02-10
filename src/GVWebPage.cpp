@@ -1336,11 +1336,15 @@ GVWebPage::onPageProgress(int /*progress*/)
 }//GVWebPage::onPageProgress
 
 void
-GVWebPage::onSocketXfer (qint64 /*bytesXfer*/, qint64 /*bytesTotal*/)
+GVWebPage::onSocketXfer (qint64 bytesXfer, qint64 bytesTotal)
 {
     pageTimeoutTimer.stop ();
-    qDebug("Socket transferred data. Not timing out!");
-    pageTimeoutTimer.setInterval (15 * 1000);
+    if ((0 == bytesXfer) && (0 == bytesTotal)) {
+        qDebug("Started the timeout timer");
+    } else {
+        qDebug("Socket transferred data. Not timing out!");
+    }
+    pageTimeoutTimer.setInterval (20 * 1000);
     pageTimeoutTimer.setSingleShot (true);
     pageTimeoutTimer.start ();
 }//GVWebPage::onSocketXfer
