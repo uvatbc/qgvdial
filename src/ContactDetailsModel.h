@@ -11,6 +11,12 @@ class ContactDetailsModel : public QAbstractListModel
 {
     Q_OBJECT
 
+    Q_PROPERTY(int count READ rowCount NOTIFY sigRowcount)
+
+signals:
+    //! Never going to be used!
+    void sigRowcount();
+
 public:
     enum ContactDetailRoles {
         CD_TypeRole = Qt::UserRole + 1,
@@ -26,7 +32,7 @@ public:
     bool getAt (int index, GVContactNumber &data) const;
 
 private:
-    GVContactInfo   info;
+    GVContactInfo info;
 };
 
 #endif // CONTACTDETAILSMODEL_H
