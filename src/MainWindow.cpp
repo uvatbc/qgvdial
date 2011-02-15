@@ -8,6 +8,8 @@
 #include "PhoneNumberValidator.h"
 #include "DialContext.h"
 
+#include <QDesktopServices>
+
 #include <iostream>
 using namespace std;
 
@@ -381,6 +383,8 @@ MainWindow::initQML ()
                       this, SLOT   (close ()));
     QObject::connect (gObj, SIGNAL (sigQuit ()),
                       this, SLOT   (on_actionE_xit_triggered ()));
+    QObject::connect (gObj, SIGNAL (sigLinkActivated (const QString &)),
+                      this, SLOT   (onLinkActivated (const QString &)));
     QObject::connect (
         gObj, SIGNAL (sigProxyChanges(bool, bool, const QString &, int,
                                       bool, const QString &, const QString &)),
@@ -1580,3 +1584,9 @@ MainWindow::onSigProxyChanges(bool bEnable,
                                    Q_ARG (QVariant, QVariant(pass)));
     } while (0); // End cleanup block (not a loop)
 }//MainWindow::onSigProxyChanges
+
+void
+MainWindow::onLinkActivated (const QString &strLink)
+{
+    QDesktopServices::openUrl (QUrl::fromUserInput (strLink));
+}//MainWindow::onLinkActivated

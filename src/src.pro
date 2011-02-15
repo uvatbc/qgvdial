@@ -106,6 +106,7 @@ RESOURCES += qgvdial.qrc
 
 # This is so that QtCreator can show these files in the files list.
 OTHER_FILES  += winrsrc.rc                  \
+                ../qml/About.qml            \
                 ../qml/ActionButtons.qml    \
                 ../qml/ComboBoxPhones.qml   \
                 ../qml/ContactDetails.qml   \

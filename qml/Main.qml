@@ -26,6 +26,9 @@ Rectangle {
     signal sigDismiss
     signal sigQuit
 
+    // If there is any link that is activated from anywhere
+    signal sigLinkActivated(string strLink)
+
     signal sigProxyChanges(bool bEnable,
                            bool bUseSystemProxy,
                            string host, int port,
@@ -51,6 +54,8 @@ Rectangle {
             main.state = '';
         }
     }
+
+    onSigLinkActivated: console.debug("QML: Link activated: " + strLink);
 
     Item {
         id: mainColumn
@@ -212,11 +217,10 @@ Rectangle {
             onSigDismiss: main.sigDismiss()
             onSigQuit: main.sigQuit()
 
-            onSigProxyChanges: main.sigProxyChanges(bEnable,
-                                                    bUseSystemProxy,
-                                                    host, port,
-                                                    bRequiresAuth,
+            onSigProxyChanges: main.sigProxyChanges(bEnable, bUseSystemProxy,
+                                                    host, port, bRequiresAuth,
                                                     user, pass)
+            onSigLinkActivated: main.sigLinkActivated(strLink)
         }
 
 ////////////////////////////////////////////////////////////////////////////////

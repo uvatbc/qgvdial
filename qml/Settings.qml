@@ -13,6 +13,7 @@ Item {
     signal sigRefreshAll
     signal sigDismiss
     signal sigQuit
+    signal sigLinkActivated(string strLink)
 
     signal sigProxyChanges(bool bEnable,
                            bool bUseSystemProxy,
@@ -120,7 +121,7 @@ Item {
             mainFontPoint: Code.btnFontPoint()/8
 
             onClicked: container.state = "Proxy"
-        }// MyButton (login/logout)
+        }// MyButton (proxy settings)
 
         MyButton {
             mainText: "Web Page (debug)"
@@ -128,7 +129,7 @@ Item {
             mainFontPoint: Code.btnFontPoint()/8
 
             onClicked: container.sigWebPage();
-        }//MyButton (Refresh all)
+        }//MyButton (Web Page (debug))
 
         MyButton {
             mainText: "Refresh"
@@ -146,7 +147,15 @@ Item {
 
             onClicked: container.sigDismiss();
             onPressHold: container.sigQuit();
-        }//MyButton (quit)
+        }//MyButton (Dismiss window/quit)
+
+        MyButton {
+            mainText: "About"
+            width: parent.width
+            mainFontPoint: Code.btnFontPoint()/8
+
+            onClicked: container.state = "About"
+        }//MyButton (Dismiss window/quit)
     }// Column
 
     Proxy {
@@ -156,17 +165,31 @@ Item {
         opacity: 0
 
         onSigDone: container.state = ''
-        onSigProxyChanges: container.sigProxyChanges(bEnable,
-                                                     bUseSystemProxy,
-                                                     host, port,
-                                                     bRequiresAuth,
+        onSigProxyChanges: container.sigProxyChanges(bEnable, bUseSystemProxy,
+                                                     host, port, bRequiresAuth,
                                                      user, pass)
-    }
+    }//Proxy
+
+    About {
+        id: aboutWin
+        anchors.fill: parent
+        anchors.topMargin: 2
+        opacity: 0
+        onSigBack: container.state = ''
+        onSigLinkActivated: container.sigLinkActivated(strLink)
+    }//About
 
     states: [
         State {
             name: "Proxy"
             PropertyChanges { target: proxySettings; opacity: 1 }
+            PropertyChanges { target: aboutWin; opacity: 0 }
+            PropertyChanges { target: mainColumn; opacity: 0 }
+        },
+        State {
+            name: "About"
+            PropertyChanges { target: aboutWin; opacity: 1 }
+            PropertyChanges { target: proxySettings; opacity: 0 }
             PropertyChanges { target: mainColumn; opacity: 0 }
         }
     ]

@@ -132,6 +132,8 @@ private slots:
                            const QString &host, int port,
                            bool bRequiresAuth,
                            const QString &user, const QString &pass);
+    //! Activated when a link is clicked in the QML
+    void onLinkActivated (const QString &strLink);
 
 private:
     void initLogging ();
