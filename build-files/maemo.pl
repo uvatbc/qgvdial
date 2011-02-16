@@ -7,7 +7,6 @@ if ($machine ne "arm") {
 } else {
     $asroot = "fakeroot";
 }
-$machine = "armel";
 
 my $repo = "https://qgvdial.googlecode.com/svn/trunk";
 my $cmd;
