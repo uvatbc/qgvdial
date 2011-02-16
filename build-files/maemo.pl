@@ -64,10 +64,14 @@ system("mv $basedir/qgv-tp/data/org.freedesktop.Telepathy.ConnectionManager.qgvt
 system("mv $basedir/build-files/qgvdial.desktop.maemo $basedir/build-files/qgvdial.desktop");
 
 # Execute the rest of the build command
-$cmd = "cd $basedir && $asroot $mad dpkg-buildpackage && $mad remote -r org.maemo.qgvdial send ../qgvdial_$qver-1_$machine.deb && $mad remote -r org.maemo.qgvdial install qgvdial_$qver-1_$machine.deb";
+$cmd = "cd $basedir && $asroot $mad dpkg-buildpackage -rfakeroot -sa -S";
 system($cmd);
 
-$cmd = "dput -f fremantle-upload qgvdial*.changes";
+if ($machine ne "arm") {
+    $cmd = "dput -f fremantle-upload qgvdial*.changes";
+} else {
+    $cmd = "dput -f fremantle-extras-builder qgvdial*.changes";
+}
 system($cmd);
 
 exit();
