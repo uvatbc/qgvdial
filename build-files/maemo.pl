@@ -65,10 +65,12 @@ system("mv $basedir/build-files/qgvdial.desktop.maemo $basedir/build-files/qgvdi
 if ($machine eq "arm") {
     $cmd="sed 's/\\/targets\\/FREMANTLE_ARMEL//g' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/\\/targets\\/FREMANTLE_ARMEL//g' $basedir/qgv-tp/Makefile >$basedir/qgv-tp/Makefile1 ; mv $basedir/qgv-tp/Makefile1 $basedir/qgv-tp/Makefile ; sed 's/\\/targets\\/FREMANTLE_ARMEL//g' $basedir/qgv-util/Makefile >$basedir/qgv-util/Makefile1 ; mv $basedir/qgv-util/Makefile1 $basedir/qgv-util/Makefile";
     system($cmd);
-}
 
+    $cmd = "cd $basedir && $asroot $mad dpkg-buildpackage -rfakeroot -sa -S";
+} else {
+    $cmd = "cd $basedir && $asroot $mad dpkg-buildpackage -rfakeroot";
+}
 # Execute the rest of the build command
-$cmd = "cd $basedir && $asroot $mad dpkg-buildpackage -rfakeroot -sa -S";
 system($cmd);
 
 if ($machine ne "arm") {
