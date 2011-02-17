@@ -2,7 +2,7 @@ Source: qgvdial
 Section: user/network
 Priority: extra
 Maintainer: Yuvraaj <yuvraaj@gmail.com>
-Build-Depends: debhelper (>= 7)
+Build-Depends: debhelper (>= 7), libqt4-dev
 Standards-Version: 3.8.3
 Homepage: http://code.google.com/p/qgvdial/
 
