@@ -41,11 +41,15 @@ HEADERS  += src/names.h \
 
 # Installation for maemo
 maemo5 {
-    exists (../../buildit.pl) {
-    PREFIX = ../debian/qgvdial/usr
-    message(Built using my scripts)
+    exists(../../buildit.sh) {
+        PREFIX = ../debian/qgvdial/usr
+        message(Built using my scripts... probably inside scratchbox)
     }
-    !exists (../../buildit.pl) {
+    exists(../../buildit.pl) {
+        PREFIX = ../debian/qgvdial/usr
+        message(Built using my scripts)
+    }
+    !exists(../../buildit.pl):!exists(../../buildit.sh) {
         PREFIX = ../maemo/debian/qgvdial/usr
         message(Build using qtcreator)
     }

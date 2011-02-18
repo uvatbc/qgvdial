@@ -28,7 +28,11 @@ maemo5 {
     PREFIX = ../debian/qgvdial/usr
     message(Built using my scripts)
     }
-    !exists (../../buildit.pl) {
+    exists(../../buildit.pl) {
+        PREFIX = ../debian/qgvdial/usr
+        message(Built using my scripts)
+    }
+    !exists(../../buildit.pl):!exists(../../buildit.sh) {
         PREFIX = ../maemo/debian/qgvdial/usr
         message(Build using qtcreator)
     }
