@@ -2,7 +2,7 @@ Source: qgvdial
 Section: user/network
 Priority: extra
 Maintainer: Yuvraaj <yuvraaj@gmail.com>
-Build-Depends: debhelper (>= 5), libqt4-dev, libtelepathy-qt4-dev, libqtm-dev
+Build-Depends: debhelper (>= 5), libqt4-dev, libtelepathy-qt4-dev, libqtm-dev, libgles2-dev
 Standards-Version: 3.7.3
 Homepage: http://code.google.com/p/qgvdial/
 XSBC-Bugtracker: http://code.google.com/p/qgvdial/issues/list
