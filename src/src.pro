@@ -174,9 +174,9 @@ symbian {
 
 # Installation for maemo
 maemo5 {
-    exists (../../buildit.pl) {
+    exists(../../buildit.sh) {
         PREFIX = ../debian/qgvdial/usr
-        message(Built using my scripts)
+        message(Built using my scripts... probably inside scratchbox)
     }
     exists(../../buildit.pl) {
         PREFIX = ../debian/qgvdial/usr
