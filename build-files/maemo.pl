@@ -80,6 +80,11 @@ if ($machine eq "arm") {
     print "$cmd\n";
     system($cmd);
 
+    # Remove the GLESv2 dependency
+    $cmd="sed 's/ -lGLESv2//g' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/ -lGLESv2//g' $basedir/qgv-tp/Makefile >$basedir/qgv-tp/Makefile1 ; mv $basedir/qgv-tp/Makefile1 $basedir/qgv-tp/Makefile ; sed 's/ -lGLESv2//g' $basedir/qgv-util/Makefile >$basedir/qgv-util/Makefile1 ; mv $basedir/qgv-util/Makefile1 $basedir/qgv-util/Makefile ; sed 's/ -lGLESv2//g' $basedir/src/Makefile >$basedir/src/Makefile1 ; mv $basedir/src/Makefile1 $basedir/src/Makefile";
+    print "$cmd\n";
+    system($cmd);
+
     # Reverse the order of these two lines for a complete build 
     $cmd = "cd $basedir && dpkg-buildpackage -rfakeroot";
     $cmd = "cd $basedir && dpkg-buildpackage -rfakeroot -sa -S";
