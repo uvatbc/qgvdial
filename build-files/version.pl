@@ -87,7 +87,7 @@ sub action_on_entry
     if (-f $file)
     {
         $_ = $file;
-        if ( (m/.cpp$/i) || (m/.c$/i) || (m/.h$/i) || (m/.rc$/i) || (m/.iss$/i) || (m/.txt$/i) || (m/.desktop$/i)  || (m/.qml$/i) )
+        if ( (m/.cpp$/i) || (m/.c$/i) || (m/.h$/i) || (m/.rc$/i) || (m/.iss$/i) || (m/.txt$/i) || (m/.desktop$/i) || (m/.qml$/i) || (m/.wxs$/i))
         {
             print "Working on $file\n";
             my $subst = "s/$srcsubst/$qver/g";

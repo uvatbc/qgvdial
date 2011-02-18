@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Product Id="cdee8386-b061-4cbb-b79c-40b5e1da0325" Name="QGVDial" Language="1033" Version="__QGVDIAL_VERSION__" Manufacturer="QGVDial" UpgradeCode="4b428abe-1451-4de6-aae2-e13e96aebde5">
+		<Package InstallerVersion="200" Compressed="yes" />
+
+		<Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
+
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFilesFolder">
+				<Directory Id="INSTALLLOCATION" Name="QGVDial">
+                    <Directory Id="appbins" Name="bin" />
+                    <Directory Id="qtbins" Name="qt">
+                        <Directory Id="pluginsdir" Name="plugins">
+                            <Directory Id="plugins_bearer" Name="bearer" />
+                            <Directory Id="plugins_imageformats" Name="imageformats" />
+                            <Directory Id="plugins_mediaservice" Name="mediaservice" />
+                            <Directory Id="plugins_playlistformats" Name="playlistformats" />
+                            <Directory Id="plugins_sqldrivers" Name="sqldrivers" />
+                        </Directory>
+                    </Directory>
+				</Directory>
+			</Directory>
+		</Directory>
+        
+        <!-- Specify the files that need to go to the install location -->
+        <DirectoryRef Id="appbins">
+            <Component Id="qgvdial.exe" Guid="003F7582-3B03-4FED-8B3B-A21E6AB07D34">
+                <File Id="qgvdial.exe" Source="..\src\release\qgvdial.exe" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="libeay32.dll" Guid="85006557-DB29-43E1-B60D-D42457E2293F">
+                <File Id="libeay32.dll" Source="C:\Users\Uv\work\cc\qt-everywhere-opensource-src-4.7.1-dll-x86\bin\libeay32.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="ssleay32.dll" Guid="5A660879-F547-49C0-A7D8-F93BFBF92E5C">
+                <File Id="ssleay32.dll" Source="C:\Users\Uv\work\cc\qt-everywhere-opensource-src-4.7.1-dll-x86\bin\ssleay32.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="qt.conf" Guid="F5AA101C-FD8B-4525-9E72-4E32641C11A7">
+                <File Id="qt.conf" Source="build-files\qt.conf" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="run.bat" Guid="E1642775-4701-48CA-B12F-292EA621DF24">
+                <File Id="run.bat" Source="build-files\run.bat" KeyPath="yes" Checksum="yes"/>
+            </Component>
+        </DirectoryRef>
+
+        <DirectoryRef Id="qtbins">
+            <Component Id="phonon4.dll" Guid="CDD1458E-9824-4ECC-960F-E81078317EFB">
+                <File Id="phonon4.dll" Source="C:\Users\Uv\work\cc\qt-everywhere-opensource-src-4.7.1-dll-x86\bin\phonon4.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="QtCore4.dll" Guid="E35D7C13-FE4E-4BFD-A112-8E040D03469D">
+                <File Id="QtCore4.dll" Source="C:\Users\Uv\work\cc\qt-everywhere-opensource-src-4.7.1-dll-x86\bin\QtCore4.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="QtDeclarative4.dll" Guid="45799C6D-8E1A-45A0-9A88-918399DC624C">
+                <File Id="QtDeclarative4.dll" Source="C:\Users\Uv\work\cc\qt-everywhere-opensource-src-4.7.1-dll-x86\bin\QtDeclarative4.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="QtGui4.dll" Guid="774C1356-53CF-4F65-94BF-A6B4C4755E41">
+                <File Id="QtGui4.dll" Source="C:\Users\Uv\work\cc\qt-everywhere-opensource-src-4.7.1-dll-x86\bin\QtGui4.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="QtMultimedia4.dll" Guid="6AA1354C-7BD7-4DED-B6A6-0143BB2429B8">
+                <File Id="QtMultimedia4.dll" Source="C:\Users\Uv\work\cc\qt-everywhere-opensource-src-4.7.1-dll-x86\bin\QtMultimedia4.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="QtMultimediaKit1.dll" Guid="B7BB7BF7-D490-48D7-B967-D61B896FBD69">
+                <File Id="QtMultimediaKit1.dll" Source="C:\Users\Uv\work\cc\qt-everywhere-opensource-src-4.7.1-dll-x86\bin\QtMultimediaKit1.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="QtNetwork4.dll" Guid="5986CCCC-B1DD-462C-8866-0EF57136928B">
+                <File Id="QtNetwork4.dll" Source="C:\Users\Uv\work\cc\qt-everywhere-opensource-src-4.7.1-dll-x86\bin\QtNetwork4.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="QtOpenGL4.dll" Guid="5E2E7628-ECB7-41DC-8A9C-CFEEDF9826DD">
+                <File Id="QtOpenGL4.dll" Source="C:\Users\Uv\work\cc\qt-everywhere-opensource-src-4.7.1-dll-x86\bin\QtOpenGL4.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="QtScript4.dll" Guid="321104F1-FE22-4176-9D8C-5B842394E17E">
+                <File Id="QtScript4.dll" Source="C:\Users\Uv\work\cc\qt-everywhere-opensource-src-4.7.1-dll-x86\bin\QtScript4.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="QtSql4.dll" Guid="BEACF7C2-1BFD-44FC-AB2D-6B0A71BF99B5">
+                <File Id="QtSql4.dll" Source="C:\Users\Uv\work\cc\qt-everywhere-opensource-src-4.7.1-dll-x86\bin\QtSql4.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="QtSvg4.dll" Guid="AC5A10A7-A92F-4C4B-B058-B89EA0AE086E">
+                <File Id="QtSvg4.dll" Source="C:\Users\Uv\work\cc\qt-everywhere-opensource-src-4.7.1-dll-x86\bin\QtSvg4.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="QtWebKit4.dll" Guid="12B851E1-165D-4C25-8D6F-CEB6C446DC37">
+                <File Id="QtWebKit4.dll" Source="C:\Users\Uv\work\cc\qt-everywhere-opensource-src-4.7.1-dll-x86\bin\QtWebKit4.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="QtXml4.dll" Guid="9D13C144-B2DD-4073-8FCA-48A46928ED8C">
+                <File Id="QtXml4.dll" Source="C:\Users\Uv\work\cc\qt-everywhere-opensource-src-4.7.1-dll-x86\bin\QtXml4.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="QtXmlPatterns4.dll" Guid="27574D0D-D570-40AB-A248-CEE276C6F05F">
+                <File Id="QtXmlPatterns4.dll" Source="C:\Users\Uv\work\cc\qt-everywhere-opensource-src-4.7.1-dll-x86\bin\QtXmlPatterns4.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+        </DirectoryRef>
+
+        <DirectoryRef Id="plugins_bearer">
+            <Component Id="qgenericbearer4.dll" Guid="AABF8088-5E99-48EA-9BAE-D53A949D20EB">
+                <File Id="qgenericbearer4.dll" Source="C:\Users\Uv\work\cc\qt-everywhere-opensource-src-4.7.1-dll-x86\plugins\bearer\qgenericbearer4.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="qnativewifibearer4.dll" Guid="B10D3DBB-2E41-412E-B23C-C0270C132996">
+                <File Id="qnativewifibearer4.dll" Source="C:\Users\Uv\work\cc\qt-everywhere-opensource-src-4.7.1-dll-x86\plugins\bearer\qnativewifibearer4.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+        </DirectoryRef>
+
+        <DirectoryRef Id="plugins_imageformats">
+            <Component Id="qgif4.dll" Guid="70A2D65E-7A40-43F3-B72A-07E6E9D4711F">
+                <File Id="qgif4.dll" Source="C:\Users\Uv\work\cc\qt-everywhere-opensource-src-4.7.1-dll-x86\plugins\imageformats\qgif4.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="qico4.dll" Guid="ADF74286-E2C7-409E-B984-50C08F966C1D">
+                <File Id="qico4.dll" Source="C:\Users\Uv\work\cc\qt-everywhere-opensource-src-4.7.1-dll-x86\plugins\imageformats\qico4.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="qjpeg4.dll" Guid="A11AA286-EB9C-4309-838F-080AAEF110EF">
+                <File Id="qjpeg4.dll" Source="C:\Users\Uv\work\cc\qt-everywhere-opensource-src-4.7.1-dll-x86\plugins\imageformats\qjpeg4.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="qmng4.dll" Guid="040FB712-2FC1-4309-9BEE-95479407836E">
+                <File Id="qmng4.dll" Source="C:\Users\Uv\work\cc\qt-everywhere-opensource-src-4.7.1-dll-x86\plugins\imageformats\qmng4.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="qsvg4.dll" Guid="9243B8C9-3FC5-433B-AA15-B9F5677D8DC9">
+                <File Id="qsvg4.dll" Source="C:\Users\Uv\work\cc\qt-everywhere-opensource-src-4.7.1-dll-x86\plugins\imageformats\qsvg4.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="qtiff4.dll" Guid="0D0F16F0-111C-44A3-BEB4-ABF96C201914">
+                <File Id="qtiff4.dll" Source="C:\Users\Uv\work\cc\qt-everywhere-opensource-src-4.7.1-dll-x86\plugins\imageformats\qtiff4.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+        </DirectoryRef>
+
+        <DirectoryRef Id="plugins_mediaservice">
+            <Component Id="dsengine.dll" Guid="7A25690B-7466-48A2-B11A-7FAA73CFB1E0">
+                <File Id="dsengine.dll" Source="C:\Users\Uv\work\cc\qt-everywhere-opensource-src-4.7.1-dll-x86\plugins\mediaservice\dsengine.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="qtmedia_audioengine.dll" Guid="1DD7E0A9-026B-464C-9C06-016A856B04C7">
+                <File Id="qtmedia_audioengine.dll" Source="C:\Users\Uv\work\cc\qt-everywhere-opensource-src-4.7.1-dll-x86\plugins\mediaservice\qtmedia_audioengine.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="qtmedia_wmp.dll" Guid="FADEE92E-ED2F-40C7-AE2A-CF9C59D31ECB">
+                <File Id="qtmedia_wmp.dll" Source="C:\Users\Uv\work\cc\qt-everywhere-opensource-src-4.7.1-dll-x86\plugins\mediaservice\qtmedia_wmp.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+        </DirectoryRef>
+
+        <DirectoryRef Id="plugins_playlistformats">
+            <Component Id="qtmultimediakit_m3u.dll" Guid="BF946856-E76F-4331-9F1B-6213170D52FD">
+                <File Id="qtmultimediakit_m3u.dll" Source="C:\Users\Uv\work\cc\qt-everywhere-opensource-src-4.7.1-dll-x86\plugins\playlistformats\qtmultimediakit_m3u.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+        </DirectoryRef>
+
+        <DirectoryRef Id="plugins_sqldrivers">
+            <Component Id="qsqlite4.dll" Guid="7AE6234B-0BA7-4381-9F85-1A47D269D644">
+                <File Id="qsqlite4.dll" Source="C:\Users\Uv\work\cc\qt-everywhere-opensource-src-4.7.1-dll-x86\plugins\sqldrivers\qsqlite4.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+        </DirectoryRef>
+        
+		<Feature Id="ProductFeature" Title="QGVDial" Level="1">
+			<!-- TODO: Remove the comments around this ComponentRef element and the Component above in order to add resources to this installer. -->
+			<!-- <ComponentRef Id="ProductComponent" /> -->
+		</Feature>
+	</Product>
+</Wix>

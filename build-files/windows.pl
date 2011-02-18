@@ -38,6 +38,8 @@ system("copy qgvdial-$qver\\icons\\Google.png qgvdial-$qver\\src\\qgvdial.png");
 $cmd = "cd qgvdial-$qver/src & perl ../build-files/version.pl __QGVDIAL_VERSION__ $qver";
 system($cmd);
 
+system("move qgvdial-$qver/build-files/qt.conf.win qgvdial-$qver/build-files/qt.conf");
+
 # Do everything upto the preparation of the debian directory. Code is still not compiled.
 $cmd = "cd qgvdial-$qver & qmake & make all";
 system($cmd);
