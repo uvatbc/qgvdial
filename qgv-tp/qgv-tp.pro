@@ -7,8 +7,8 @@ CONFIG   -= app_bundle
 
 TEMPLATE = app
 VPATH += src
-MOC_DIR = mocs
-OBJECTS_DIR = objs
+#MOC_DIR = mocs
+#OBJECTS_DIR = objs
 
 SOURCES  += src/main.cpp \
             src/connectiontypes.cpp \
