@@ -45,8 +45,9 @@ system($cmd);
 $cmd = "copy qgvdial-$qver\\src\\release\\qgvdial.exe I:\\Uv\\releases\\qgvdial\\win-install\\qgvdial\\bin";
 system($cmd);
 
-$cmd = "$nsis qgvdial-$qver\\src\\setup.nsi";
-system($cmd);
+# Old setup
+#system("$nsis qgvdial-$qver\\src\\setup.nsi");
 
+# New setup: Create MSI.
 system("cd qgvdial-$qver/build-files & \"$wixbase/candle.exe\" qgvdial.wxs");
-system("cd qgvdial-$qver/build-files & \"$wixbase/light.exe\" qgvdial.wixobj -o ..\qgvdial-$qver.msi");
+system("cd qgvdial-$qver/build-files & \"$wixbase/light.exe\" qgvdial.wixobj -o ..\\qgvdial-$qver.msi");
