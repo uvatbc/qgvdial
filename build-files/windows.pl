@@ -1,5 +1,6 @@
 my $repo = "https://qgvdial.googlecode.com/svn/trunk";
 my $nsis = "\"C:\\Program Files (x86)\\NSIS\\makensis.exe\"";
+my $wixbase='C:/Program Files (x86)/Windows Installer XML v3/bin';
 my $cmd;
 my $line;
 
@@ -49,3 +50,6 @@ system($cmd);
 
 $cmd = "$nsis qgvdial-$qver\\src\\setup.nsi";
 system($cmd);
+
+system("cd qgvdial-$qver/build-files & \"$wixbase/candle.exe\" qgvdial.wxs");
+system("cd qgvdial-$qver/build-files & \"$wixbase/light.exe\" qgvdial.wixobj -o setup.msi");
