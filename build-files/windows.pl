@@ -35,7 +35,7 @@ system("move qgvdial-$qver\\build-files\\qt.conf.win qgvdial-$qver\\build-files\
 system("cd qgvdial-$qver & perl build-files/version.pl __QGVDIAL_VERSION__ $qver");
 $cmd = `echo %QTDIR%`;
 $cmd =~ s/\\/\\\\/g;
-$cmd = "cd qgvdial-$qver/src & perl ../build-files/version.pl __QTDIR__ $cmd";
+$cmd = "cd qgvdial-$qver & perl build-files/version.pl __QTDIR__ $cmd";
 system($cmd);
 
 # Compile it!
