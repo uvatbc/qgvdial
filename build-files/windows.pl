@@ -5,13 +5,9 @@ my $cmd;
 my $line;
 
 # Delete any existing version file
-if (-f ver.cfg)
-{
-    unlink(ver.cfg);
-}
+if (-f ver.cfg) { unlink(ver.cfg); }
 # Get the latest version file from the repository
-$cmd = "svn export $repo/build-files/ver.cfg";
-system($cmd);
+system("svn export $repo/build-files/ver.cfg");
 
 # Pull out the version from the file
 open(QVARFILE, "ver.cfg") or die;
@@ -32,14 +28,16 @@ $svnver = $1;
 $qver = "$qver.$svnver";
 
 system("powershell Remove-Item -Recurse -Force qgvdial*");
-$cmd = "svn export $repo qgvdial-$qver";
-system($cmd);
-system("copy qgvdial-$qver\\icons\\Google.png qgvdial-$qver\\src\\qgvdial.png");
-
-$cmd = "cd qgvdial-$qver/src & perl ../build-files/version.pl __QGVDIAL_VERSION__ $qver";
-system($cmd);
-
+system("svn export $repo qgvdial-$qver");
+system("copy qgvdial-$qver/icons/Google.png qgvdial-$qver/src/qgvdial.png");
+system("copy qgvdial-$qver/build-files/qgvdial.wxs qgvdial-$qver/src");
 system("move qgvdial-$qver/build-files/qt.conf.win qgvdial-$qver/build-files/qt.conf");
+
+system("cd qgvdial-$qver/src & perl ../build-files/version.pl __QGVDIAL_VERSION__ $qver");
+$cmd = `echo %QTDIR%`;
+$cmd =~ s/\\/\\\\/g;
+$cmd = "cd qgvdial-$qver/src & perl ../build-files/version.pl __QTDIR__ $cmd"
+system($cmd);
 
 # Do everything upto the preparation of the debian directory. Code is still not compiled.
 $cmd = "cd qgvdial-$qver & qmake & make all";
