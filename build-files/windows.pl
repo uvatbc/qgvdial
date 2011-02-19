@@ -29,18 +29,17 @@ $qver = "$qver.$svnver";
 
 system("powershell Remove-Item -Recurse -Force qgvdial*");
 system("svn export $repo qgvdial-$qver");
-system("copy qgvdial-$qver/icons/Google.png qgvdial-$qver/src/qgvdial.png");
-system("copy qgvdial-$qver/build-files/qgvdial.wxs qgvdial-$qver/src");
-system("move qgvdial-$qver/build-files/qt.conf.win qgvdial-$qver/build-files/qt.conf");
+system("copy qgvdial-$qver\\icons\\Google.png qgvdial-$qver\\src\\qgvdial.png");
+system("move qgvdial-$qver\\build-files\\qt.conf.win qgvdial-$qver\\build-files\\qt.conf");
 
-system("cd qgvdial-$qver/src & perl ../build-files/version.pl __QGVDIAL_VERSION__ $qver");
+system("cd qgvdial-$qver & perl build-files/version.pl __QGVDIAL_VERSION__ $qver");
 $cmd = `echo %QTDIR%`;
 $cmd =~ s/\\/\\\\/g;
-$cmd = "cd qgvdial-$qver/src & perl ../build-files/version.pl __QTDIR__ $cmd"
+$cmd = "cd qgvdial-$qver/src & perl ../build-files/version.pl __QTDIR__ $cmd";
 system($cmd);
 
-# Do everything upto the preparation of the debian directory. Code is still not compiled.
-$cmd = "cd qgvdial-$qver & qmake & make all";
+# Compile it!
+$cmd = "cd qgvdial-$qver & qmake & make release";
 system($cmd);
 
 $cmd = "copy qgvdial-$qver\\src\\release\\qgvdial.exe I:\\Uv\\releases\\qgvdial\\win-install\\qgvdial\\bin";
@@ -50,4 +49,4 @@ $cmd = "$nsis qgvdial-$qver\\src\\setup.nsi";
 system($cmd);
 
 system("cd qgvdial-$qver/build-files & \"$wixbase/candle.exe\" qgvdial.wxs");
-system("cd qgvdial-$qver/build-files & \"$wixbase/light.exe\" qgvdial.wixobj -o setup.msi");
+system("cd qgvdial-$qver/build-files & \"$wixbase/light.exe\" qgvdial.wixobj -o ..\qgvdial-$qver.msi");
