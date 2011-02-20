@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <Product Id="cdee8386-b061-4cbb-b79c-40b5e1da0325" Name="QGVDial" Language="1033" Version="__QGVDIAL_VERSION__" Manufacturer="QGVDial" UpgradeCode="4b428abe-1451-4de6-aae2-e13e96aebde5">
-        <Package InstallerVersion="200" Compressed="yes" />
+        <Package InstallerVersion="300" Compressed="yes" />
 
         <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
 
         <Directory Id="TARGETDIR" Name="SourceDir">
+            <!-- Directory structure under program files -->
             <Directory Id="ProgramFilesFolder">
                 <Directory Id="INSTALLLOCATION" Name="QGVDial">
                     <Directory Id="appbins" Name="bin" />
@@ -19,6 +20,11 @@
                         </Directory>
                     </Directory>
                 </Directory>
+            </Directory>
+            
+            <!-- Directory structure for the shortcut -->
+            <Directory Id="ProgramMenuFolder">
+                <Directory Id="ApplicationProgramsFolder" Name="QGVDial" />
             </Directory>
         </Directory>
         
@@ -170,6 +176,29 @@
             <ComponentRef Id="qtmedia_audioengine.dll" />
             <ComponentRef Id="qtmultimediakit_m3u.dll" />
             <ComponentRef Id="qsqlite4.dll" />
+            
+            <!-- Tell WiX to install the shortcut -->
+            <ComponentRef Id="ApplicationShortcut" />   
         </Feature>
+
+        <DirectoryRef Id="TARGETDIR">
+            <Merge Id="VCRedist" SourceFile="C:\Program Files (x86)\Common Files\Merge Modules\Microsoft_VC100_CRT_x86.msm" DiskId="1" Language="0"/>
+        </DirectoryRef>
+        <Feature Id="VCRedist" Title="Visual C++ 8.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
+            <MergeRef Id="VCRedist"/>
+        </Feature>
+
+        <DirectoryRef Id="ApplicationProgramsFolder">
+            <Component Id="ApplicationShortcut" Guid="5C62B2E3-F7BF-4392-A7B8-F372A9939C59">
+                <Shortcut Id="ApplicationStartMenuShortcut" 
+                          Name="QGVDial"
+                          Description="Qt Google Voice Dialer"
+                          Target="[appbins]qgvdial.exe"
+                          WorkingDirectory="qtbins"/>
+                <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
+                <RegistryValue Root="HKCU" Key="Software\Microsoft\QGVDial" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+            </Component>
+        </DirectoryRef>
+
     </Product>
 </Wix>

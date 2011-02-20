@@ -50,4 +50,4 @@ system($cmd);
 
 # New setup: Create MSI.
 system("cd qgvdial-$qver/build-files & \"$wixbase/candle.exe\" qgvdial.wxs");
-system("cd qgvdial-$qver/build-files & \"$wixbase/light.exe\" qgvdial.wixobj -o ..\\qgvdial-$qver.msi");
+system("cd qgvdial-$qver/build-files & \"$wixbase/light.exe\" -cultures:en-US -ext WixUIExtension qgvdial.wixobj -o ..\\qgvdial-$qver.msi");

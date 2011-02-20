@@ -2,4 +2,4 @@
 setlocal
 set path=%path%;%CD%\..\qt
 cd ..\qt
-start ..\..\bin\qgvdial.exe
+start ..\bin\qgvdial.exe
