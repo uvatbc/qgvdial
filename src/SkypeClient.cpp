@@ -39,7 +39,7 @@ SkypeClient::enqueueWork (Skype_Work whatwork, const QVariantList &params,
 {
     if ((NULL == receiver) || (NULL == method))
     {
-        qWarning ("Invalid slot");
+        qWarning ("SkypeClient: Invalid slot");
         return (false);
     }
 
@@ -56,7 +56,7 @@ SkypeClient::enqueueWork (Skype_Work whatwork, const QVariantList &params,
         // Count of params must be = 0
         if (0 != params.size ())
         {
-            msg = QString("Invalid parameter count for %1")
+            msg = QString("SkypeClient: Invalid parameter count for %1")
                     .arg (getNameForWork (whatwork));
             bValid = false;
         }
@@ -66,7 +66,7 @@ SkypeClient::enqueueWork (Skype_Work whatwork, const QVariantList &params,
         // Count of params must be != 0
         if (0 == params.size ())
         {
-            msg = "Invalid parameter count";
+            msg = "SkypeClient: Invalid parameter count";
             bValid = false;
         }
         break;
@@ -75,13 +75,13 @@ SkypeClient::enqueueWork (Skype_Work whatwork, const QVariantList &params,
         // Count of params must be = 1
         if (1 != params.size ())
         {
-            msg = "Invalid parameter count";
+            msg = "SkypeClient: Invalid parameter count";
             bValid = false;
         }
         break;
 
     default:
-        msg = "Invalid work code";
+        msg = "SkypeClient: Invalid work code";
         bValid = false;
         break;
     }
@@ -113,12 +113,13 @@ SkypeClient::doNextWork ()
     {
         if (0 == workList.size ())
         {
-            qDebug ("No work to be done. Sleep now.");
+            qDebug ("SkypeClient: No work to be done. Sleep now.");
             break;
         }
         if (SW_Nothing != workCurrent.whatwork)
         {
-            qDebug () << QString ("Work %1 in progress. Wait for it to finish.")
+            qDebug () << QString ("SkypeClient: Work %1 in progress. Wait for "
+                                  "it to finish.")
                             .arg (getNameForWork (workCurrent.whatwork));
             break;
         }
@@ -139,7 +140,7 @@ SkypeClient::doNextWork ()
             getCallInfo ();
             break;
         default:
-            qDebug ("Invalid work specified. Moving on to next work.");
+            qDebug ("SkypeClient: Invalid work specified. Moving on to next work.");
             workCurrent.init ();
             continue;
         }
@@ -154,17 +155,17 @@ SkypeClient::completeCurrentWork (Skype_Work whatwork, bool bOk)
     QMutexLocker locker(&mutex);
     if (whatwork != workCurrent.whatwork)
     {
-        qDebug () << QString ("Cannot complete the work because it is not "
-                              "current! current = %1. requested = %2")
-                                .arg(getNameForWork (workCurrent.whatwork)
-                                .arg(getNameForWork (whatwork)), 3);
+        qDebug() << "SkypeClient: Cannot complete the work because it is not "
+                    "current!  current = "
+                 << getNameForWork (workCurrent.whatwork)
+                 << ". requested = " << getNameForWork (whatwork);
         return;
     }
 
     do { // Begin cleanup block (not a loop)
         if (SW_Nothing == workCurrent.whatwork)
         {
-            qWarning ("Completing null work!");
+            qWarning ("SkypeClient: Completing null work!");
             break;
         }
 
@@ -178,7 +179,7 @@ SkypeClient::completeCurrentWork (Skype_Work whatwork, bool bOk)
             this, SIGNAL (workCompleted (bool, const QVariantList &)),
             workCurrent.receiver, workCurrent.method);
 
-        qDebug () << QString("Completed work %1").arg(getNameForWork(whatwork));
+        qDebug () << "SkypeClient: Completed work " << getNameForWork(whatwork);
     } while (0); // End cleanup block (not a loop)
 
     // Init MUST be done after the workCompleted emit to prevent races
@@ -225,7 +226,7 @@ SkypeClient::initiateCall (const QString &strTarget)
     do {
         if (!bConnected)
         {
-            qWarning ("Skype not connected");
+            qWarning ("SkypeClient: Skype not connected");
             break;
         }
 
@@ -240,8 +241,8 @@ SkypeClient::initiateCall (const QString &strTarget)
             QObject::disconnect (
                 this, SIGNAL (internalCompleted (int, const QString &)),
                 this, SLOT   (callInitiated      (int, const QString &)));
-            qWarning () << QString ("Failed to invoke a call to PSTN %1")
-                               .arg(strTarget);
+            qWarning () << "SkypeClient: Failed to invoke a call to PSTN "
+                        << strTarget;
             rv = false;
             break;
         }
@@ -268,16 +269,16 @@ SkypeClient::callInitiated (int status, const QString &strOutput)
     do { // Begin cleanup block (not a loop)
         if (0 != status)
         {
-            qWarning () << QString ("Failed to place call. string = %1")
-                                .arg(strOutput);
+            qWarning () << "SkypeClient: Failed to place call. string = "
+                        << strOutput;
             break;
         }
 
         rv = strOutput.startsWith ("CALL ");
         if (!rv)
         {
-            qWarning () << QString ("Failed to make a call to PSTN %1")
-                                .arg(workCurrent.arrParams[0].toString ());
+            qWarning () << "Failed to make a call to PSTN "
+                        << workCurrent.arrParams[0].toString ();
             break;
         }
 
@@ -288,7 +289,7 @@ SkypeClient::callInitiated (int status, const QString &strOutput)
         QRegExp rx ("([\\d]{1,}) (.*)");
         if ((!strStatus.contains (rx)) || (2 != rx.captureCount ()))
         {
-            qWarning ("Invalid call status pattern");
+            qWarning ("SkypeClient: Invalid call status pattern");
             break;
         }
 
@@ -339,7 +340,7 @@ SkypeClient::getContacts ()
     do {
         if (!bConnected)
         {
-            qWarning ("Skype not connected");
+            qWarning ("SkypeClient: Skype not connected");
             break;
         }
 
@@ -352,7 +353,7 @@ SkypeClient::getContacts ()
             QObject::disconnect (
                 this, SIGNAL (internalCompleted (int, const QString &)),
                 this, SLOT   (onGotContacts     (int, const QString &)));
-            qWarning ("Failed to get contacts");
+            qWarning ("SkypeClient: Failed to get contacts");
             rv = false;
             break;
         }
@@ -377,12 +378,13 @@ SkypeClient::onGotContacts (int status, const QString &strOutput)
     do { // Begin cleanup block (not a loop)
         if (0 != status)
         {
-            qWarning ("Error getting contacts");
+            qWarning ("SkypeClient: Error getting contacts");
             break;
         }
         if (!strOutput.startsWith ("USERS "))
         {
-            qWarning () << QString("Unknown response %1. Expected: USERS")
+            qWarning () << QString("SkypeClient: Unknown response %1. "
+                                   "Expected: USERS")
                              .arg (strOutput);
             break;
         }
@@ -405,7 +407,7 @@ SkypeClient::onGotContacts (int status, const QString &strOutput)
 bool
 SkypeClient::skypeNotifyPre (const QString &strData)
 {
-    qDebug () << QString("Skype notify :\"%1\"").arg(strData);
+    qDebug () << "SkypeClient: Skype notify : " << strData;
 
     bool rv = true;
     do // Begin cleanup block (not a loop)
@@ -443,7 +445,7 @@ SkypeClient::skypeNotifyPre (const QString &strData)
             QRegExp rx ("([\\d]{1,}) (.*)");
             if ((!strStatus.contains (rx)) || (2 != rx.captureCount ()))
             {
-                qWarning ("Invalid call status pattern");
+                qWarning ("SkypeClient: Invalid call status pattern");
                 break;
             }
 
@@ -459,7 +461,7 @@ SkypeClient::skypeNotifyPre (const QString &strData)
                 if ((strText.contains ("MISSED")) ||
                     (strText.contains ("FINISHED")))
                 {
-                    qDebug () << QString("Remove call id=%1").arg(callId);
+                    qDebug () << "SkypeClient: Remove call id=" << callId;
                     mapCallInfo.remove (callId);
                 }
             }
@@ -480,14 +482,14 @@ SkypeClient::getCallInfo ()
     do {
         if (!bConnected)
         {
-            qWarning ("Skype not connected");
+            qWarning ("SkypeClient: Skype not connected");
             break;
         }
 
         ulong callId = workCurrent.arrParams[0].toULongLong (&rv);
         if (!rv)
         {
-            qWarning ("Failed to pull call ID from arguments list");
+            qWarning ("SkypeClient: Failed to pull call ID from arguments list");
             break;
         }
 
@@ -513,7 +515,7 @@ SkypeClient::getCallInfo ()
             QObject::disconnect (
                 this, SIGNAL (callStatusChanged (uint, const QString &)),
                 this, SLOT   (onCI_GetType      (uint, const QString &)));
-            qWarning ("Failed to get contacts");
+            qWarning ("SkypeClient: Failed to get contacts");
             rv = false;
             break;
         }
@@ -617,7 +619,7 @@ SkypeClient::onCI_GetType (uint incomingCallId, const QString &strOutput,
             QObject::disconnect (
                 this, SIGNAL (callStatusChanged (uint, const QString &)),
                 this, SLOT   (onCI_GetPH        (uint, const QString &)));
-            qWarning ("Failed to get contacts");
+            qWarning ("SkypeClient: Failed to get contacts");
             rv = false;
             break;
         }
@@ -692,7 +694,7 @@ SkypeClient::onCI_GetPH (uint incomingCallId, const QString &strOutput,
             QObject::disconnect (
                 this, SIGNAL (callStatusChanged (uint, const QString &)),
                 this, SLOT   (onCI_GetPName     (uint, const QString &)));
-            qWarning ("Failed to get contacts");
+            qWarning ("SkypeClient: Failed to get contacts");
             rv = false;
             break;
         }
@@ -768,7 +770,7 @@ SkypeClient::onCI_GetPName (uint incomingCallId, const QString &strOutput,
             QObject::disconnect (
                 this, SIGNAL (callStatusChanged (uint, const QString &)),
                 this, SLOT   (onCI_GetTarget    (uint, const QString &)));
-            qWarning ("Failed to get contacts");
+            qWarning ("SkypeClient: Failed to get contacts");
             rv = false;
             break;
         }

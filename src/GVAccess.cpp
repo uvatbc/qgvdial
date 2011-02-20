@@ -71,7 +71,7 @@ GVAccess::enqueueWork (GVAccess_Work whatwork, const QVariantList &params,
 {
     if ((NULL == receiver) || (NULL == method))
     {
-        qWarning ("Invalid slot");
+        qWarning ("GVAccess: Invalid slot");
         return (false);
     }
 
@@ -91,7 +91,7 @@ GVAccess::enqueueWork (GVAccess_Work whatwork, const QVariantList &params,
         // No params needed here
         if (0 != params.size ())
         {
-            msg = "Invalid parameter count";
+            msg = "GVAccess: Invalid parameter count";
             bValid = false;
         }
         break;
@@ -99,7 +99,7 @@ GVAccess::enqueueWork (GVAccess_Work whatwork, const QVariantList &params,
     case GVAW_getContactFromInboxLink:  // Inbox link
         if (1 != params.size ())
         {
-            msg = "Invalid parameter count";
+            msg = "GVAccess: Invalid parameter count";
             bValid = false;
         }
         break;
@@ -110,7 +110,7 @@ GVAccess::enqueueWork (GVAccess_Work whatwork, const QVariantList &params,
     case GVAW_playVmail:            // Voicemail link, destination filename
         if (2 != params.size ())
         {
-            msg = "Invalid parameter count";
+            msg = "GVAccess: Invalid parameter count";
             bValid = false;
         }
         break;
@@ -118,7 +118,7 @@ GVAccess::enqueueWork (GVAccess_Work whatwork, const QVariantList &params,
     case GVAW_dialOut:              // Destination, context, callout
         if (3 != params.size ())
         {
-            msg = "Invalid parameter count";
+            msg = "GVAccess: Invalid parameter count";
             bValid = false;
         }
         break;
@@ -127,13 +127,13 @@ GVAccess::enqueueWork (GVAccess_Work whatwork, const QVariantList &params,
     case GVAW_getInbox:             // type, start page, page count, last update
         if (4 != params.size ())
         {
-            msg = "Invalid parameter count";
+            msg = "GVAccess: Invalid parameter count";
             bValid = false;
         }
         break;
 
     default:
-        msg = "Invalid work code";
+        msg = "GVAccess: Invalid work code";
         bValid = false;
         break;
     }
@@ -149,7 +149,7 @@ GVAccess::enqueueWork (GVAccess_Work whatwork, const QVariantList &params,
     QMutexLocker locker(&mutex);
     workList.push_back (workItem);
 
-    qDebug () << QString ("Enqueued %1.").arg (getNameForWork (whatwork));
+    qDebug () << "GVAccess: Enqueued " << getNameForWork (whatwork);
 
     // If there is no current work in progress...
     doNextWork ();// ... this takes care of when some work is in progress
@@ -167,19 +167,20 @@ GVAccess::doNextWork ()
     {
         if (0 == workList.size ())
         {
-            qDebug ("No work to be done. Sleep now.");
+            qDebug ("GVAccess: No work to be done. Sleep now.");
             break;
         }
         if (GVAW_Nothing != workCurrent.whatwork)
         {
-            qDebug () << QString ("Work %1 in progress. Wait for it to finish.")
+            qDebug () << QString ("GVAccess: Work %1 in progress. Wait for it "
+                                  "to finish.")
                             .arg (getNameForWork (workCurrent.whatwork));
             break;
         }
 
         workCurrent = workList.takeFirst ();
-        qDebug () << QString ("Starting work %1")
-                        .arg(getNameForWork (workCurrent.whatwork));
+        qDebug () << "GVAccess: Starting work "
+                  << getNameForWork (workCurrent.whatwork);
         switch (workCurrent.whatwork)
         {
         case GVAW_aboutBlank:
@@ -232,10 +233,10 @@ GVAccess::completeCurrentWork (GVAccess_Work whatwork, bool bOk)
     QMutexLocker locker(&mutex);
     if (whatwork != workCurrent.whatwork)
     {
-        qWarning () << QString ("Cannot complete the work because it is not "
-                                "current! current = %1. requested = %2")
-                        .arg(getNameForWork (workCurrent.whatwork)
-                        .arg(getNameForWork (whatwork)), 3);
+        qWarning () << "GVAccess: Cannot complete the work because it is not "
+                       "current! current = "
+                    << getNameForWork (workCurrent.whatwork)
+                    << ". requested = " << getNameForWork (whatwork);
         return;
     }
 
@@ -243,7 +244,7 @@ GVAccess::completeCurrentWork (GVAccess_Work whatwork, bool bOk)
     {
         if (GVAW_Nothing == workCurrent.whatwork)
         {
-            qWarning ("Completing null work!");
+            qWarning ("GVAccess: Completing null work!");
             break;
         }
 
@@ -257,8 +258,7 @@ GVAccess::completeCurrentWork (GVAccess_Work whatwork, bool bOk)
             this, SIGNAL (workCompleted (bool, const QVariantList &)),
             workCurrent.receiver, workCurrent.method);
 
-        qDebug () << QString("Completed work %1")
-                            .arg(getNameForWork(whatwork));
+        qDebug () << "GVAccess: Completed work " << getNameForWork(whatwork);
     } while (0); // End cleanup block (not a loop)
 
     // Init MUST be done after the workCompleted emit to prevent races
@@ -435,7 +435,7 @@ GVAccess::dialCanFinish ()
     }
     else
     {
-        qWarning ("Cannot complete a call that is not in progress");
+        qWarning ("GVAccess: Cannot complete a call that is not in progress");
     }
 }//GVAccess::dialCanFinish
 
@@ -455,14 +455,14 @@ GVAccess::setProxySettings (bool bEnable,
     do // Begin cleanup block (not a loop)
     {
         if (!bEnable) {
-            qDebug ("Clearing all proxy information");
+            qDebug ("GVAccess: Clearing all proxy information");
             break;
         }
 
         if (bUseSystemProxy) {
             QNetworkProxy https;
             getSystemProxies (proxySettings, https);
-            qDebug ("Using system proxy settings");
+            qDebug ("GVAccess: Using system proxy settings");
             break;
         }
 
@@ -475,7 +475,7 @@ GVAccess::setProxySettings (bool bEnable,
             proxySettings.setPassword (pass);
         }
 
-        qDebug ("Using user defined proxy settings.");
+        qDebug ("GVAccess: Using user defined proxy settings.");
     } while (0); // End cleanup block (not a loop)
     QNetworkProxy::setApplicationProxy (proxySettings);
 
@@ -493,7 +493,7 @@ GVAccess::getSystemProxies (QNetworkProxy &http, QNetworkProxy &https)
         QNetworkProxyQuery(QUrl("http://www.google.com")));
         http = netProxies[0];
         if (QNetworkProxy::NoProxy != http.type ()) {
-            qDebug () << "Got proxy: host = " << http.hostName ()
+            qDebug () << "GVAccess: Got proxy: host = " << http.hostName ()
                       << ", port = " << http.port ();
             break;
         }
@@ -515,7 +515,8 @@ GVAccess::getSystemProxies (QNetworkProxy &http, QNetworkProxy &https)
             strPort.remove (':').remove ('/');
             int port = strPort.toInt ();
 
-            qDebug () << "Found http proxy: " << strHost << ":" << port;
+            qDebug () << "GVAccess: Found http proxy: "
+                      << strHost << ":" << port;
             http.setHostName (strHost);
             http.setPort (port);
             http.setType (QNetworkProxy::HttpProxy);
@@ -529,7 +530,7 @@ GVAccess::getSystemProxies (QNetworkProxy &http, QNetworkProxy &https)
         QNetworkProxyQuery(QUrl("https://www.google.com")));
         https = netProxies[0];
         if (QNetworkProxy::NoProxy != https.type ()) {
-            qDebug () << "Got proxy: host = " << https.hostName ()
+            qDebug () << "GVAccess: Got proxy: host = " << https.hostName ()
                       << ", port = " << https.port ();
             break;
         }
@@ -551,7 +552,8 @@ GVAccess::getSystemProxies (QNetworkProxy &http, QNetworkProxy &https)
             strPort.remove (':').remove ('/');
             int port = strPort.toInt ();
 
-            qDebug () << "Found http proxy: " << strHost << ":" << port;
+            qDebug () << "GVAccess: Found http proxy: "
+                      << strHost << ":" << port;
             https.setHostName (strHost);
             https.setPort (port);
             https.setType (QNetworkProxy::HttpProxy);

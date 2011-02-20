@@ -142,6 +142,9 @@ private:
     QTimer                      pageTimeoutTimer;
     QNetworkReply              *pCurrentReply;
 
+    //! This flag is to be set to distinguish between call out and call back.
+    bool                    bIsCallback;
+
     friend class Singletons;
 };
 

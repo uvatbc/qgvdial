@@ -751,6 +751,7 @@ MainWindow::getInfoFrom (const QString &strNumber,
 bool
 MainWindow::findInfo (const QString &strNumber, GVContactInfo &info)
 {
+    bool rv = true;
     info = GVContactInfo();
 
     QString strTrunc = strNumber;
@@ -774,14 +775,19 @@ MainWindow::findInfo (const QString &strNumber, GVContactInfo &info)
             GVAccess::simplify_number (strNum, false);
             strNum.remove(' ').remove('+');
 
-            if (strNum == strTrunc) {
+            if (-1 != strNum.indexOf (strTrunc)) {
                 break;
             }
             info.selected++;
         }
+
+        if (info.selected >= info.arrPhones.size ()) {
+            info.selected = 0;
+            rv = false;
+        }
     }
 
-    return (true);
+    return (rv);
 }//MainWindow::findInfo
 
 void
@@ -1071,7 +1077,7 @@ MainWindow::onDialDlgClose (int retval,
     {
         GVAccess &webPage = Singletons::getRef().getGVAccess ();
         bDialCancelled = true;
-        webPage.cancelWork (ctx->bDialOut ? GVAW_dialOut : GVAW_dialCallback);
+        webPage.cancelWork (ctx->bDialOut ? GVAW_dialCallback : GVAW_dialOut);
     }
 }//MainWindow::onDialDlgClose
 

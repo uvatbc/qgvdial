@@ -562,6 +562,7 @@ GVWebPage::dialCallback (bool bCallback)
 
         QObject::connect (mgr , SIGNAL (finished (QNetworkReply *)),
                           this, SLOT   (onDataCallDone (QNetworkReply *)));
+        this->bIsCallback = false;
         reply = mgr->post (request, strContent.toAscii());
     }
     else
@@ -572,6 +573,7 @@ GVWebPage::dialCallback (bool bCallback)
         arrPairs += QStringPair("phoneType"       , arrParams[3].toString());
         arrPairs += QStringPair("remember"        , "1");
         arrPairs += QStringPair("_rnr_se"         , strRnr_se);
+        this->bIsCallback = true;
         reply =
         postRequest (GV_DATA_BASE "/call/connect/", arrPairs, UA_IPHONE,
                      this, SLOT (onDataCallDone (QNetworkReply *)));
@@ -609,6 +611,9 @@ GVWebPage::onDataCallDone (QNetworkReply * reply)
 
             emit dialAccessNumber (strAccess, workCurrent.arrParams[1]);
 
+            // Don't need to check if this is a callback - if we got an access
+            // number it most definitely means that this is supposed to be a
+            // call out.
             completeCurrentWork (GVAW_dialOut, true);
             bOk = true;
             break;
@@ -621,7 +626,9 @@ GVWebPage::onDataCallDone (QNetworkReply * reply)
         {
             qWarning() << "Failed to dial out. Response to dial out request ="
                        << msg;
-            completeCurrentWork(GVAW_dialCallback, false);
+            completeCurrentWork(this->bIsCallback ? GVAW_dialCallback
+                                                  : GVAW_dialOut,
+                                false);
             break;
         }
 
@@ -1189,7 +1196,9 @@ GVWebPage::sendSMS ()
 
         QObject::connect (mgr , SIGNAL (finished        (QNetworkReply *)),
                           this, SLOT   (sendSMSResponse (QNetworkReply *)));
-        mgr->post (request, strContent.toAscii());
+        QNetworkReply *reply = mgr->post (request, strContent.toAscii());
+
+        startTimerForReply (reply);
     } while (0); // End cleanup block (not a loop)
     return (true);
 }//GVWebPage::sendSMS
@@ -1268,7 +1277,9 @@ GVWebPage::playVmail ()
         emit status ("Starting vmail download");
         QObject::connect (mgr , SIGNAL (finished          (QNetworkReply *)),
                           this, SLOT   (onVmailDownloaded (QNetworkReply *)));
-        mgr->get (request);
+        QNetworkReply *reply = mgr->get (request);
+
+        startTimerForReply (reply);
     } while (0); // End cleanup block (not a loop)
 
     return (true);
