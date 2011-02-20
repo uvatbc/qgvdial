@@ -33,77 +33,95 @@ Item {
         property string strPassword: g_strPassword      // "hunter2 :p"
         property bool bIsLoggedIn: g_bIsLoggedIn        // false
 
-        Row {
+        Rectangle {
             width: parent.width
-            spacing: 2
+            height: textUsername.height
+            color: "black"
+            border.color: textUsername.activeFocus?"orange":"black"
+            Row {
+                width: parent.width
+                spacing: 2
 
-            Text {
-                text: "Username:"
-                color: "white"
-                anchors.verticalCenter: parent.verticalCenter
-                font.pointSize: Code.btnFontPoint()/10
-            }
+                Text {
+                    text: "Username:"
+                    color: "white"
+                    anchors.verticalCenter: parent.verticalCenter
+                    font.pointSize: Code.btnFontPoint()/10
+                }
 
-            TextInput {
-                id: textUsername
-                anchors.verticalCenter: parent.verticalCenter
-                text: mainColumn.strUsername
-                color: "white"
-                font.pointSize: Code.btnFontPoint()/10
+                TextInput {
+                    id: textUsername
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: mainColumn.strUsername
+                    color: "white"
+                    font.pointSize: Code.btnFontPoint()/10
 
-                opacity: (mainColumn.bIsLoggedIn == true ? 0 : 1)
+                    opacity: (mainColumn.bIsLoggedIn == true ? 0 : 1)
 
-                onTextChanged: container.sigUserChanged(textUsername.text);
-            }
+                    onTextChanged: container.sigUserChanged(textUsername.text);
+                    KeyNavigation.tab: textPassword
+                    Keys.onReturnPressed: btnLogin.btnActivated();
+                }
 
-            Text {
-                anchors.verticalCenter: parent.verticalCenter
-                text: mainColumn.strUsername
-                color: "white"
-                font.pointSize: Code.btnFontPoint()/10
-                opacity: (mainColumn.bIsLoggedIn == true ? 1 : 0)
-            }
-        }//Row (username)
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: mainColumn.strUsername
+                    color: "white"
+                    font.pointSize: Code.btnFontPoint()/10
+                    opacity: (mainColumn.bIsLoggedIn == true ? 1 : 0)
+                }
+            }//Row
+        }//Rectangle (username)
 
-        Row {
+        Rectangle {
             width: parent.width
-            spacing: 2
+            height: textPassword.height
+            color: "black"
+            border.color: textPassword.activeFocus?"orange":"black"
 
-            Text {
-                text: "Password:"
-                color: "white"
-                anchors.verticalCenter: parent.verticalCenter
-                font.pointSize: Code.btnFontPoint()/10
-            }
+            Row {
+                width: parent.width
+                spacing: 2
 
-            TextInput {
-                id: textPassword
-                anchors.verticalCenter: parent.verticalCenter
-                text: mainColumn.strPassword
-                color: "white"
-                echoMode: TextInput.Password
-                font.pointSize: Code.btnFontPoint()/10
+                Text {
+                    text: "Password:"
+                    color: "white"
+                    anchors.verticalCenter: parent.verticalCenter
+                    font.pointSize: Code.btnFontPoint()/10
+                }
 
-                opacity: (mainColumn.bIsLoggedIn == true ? 0 : 1)
+                TextInput {
+                    id: textPassword
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: mainColumn.strPassword
+                    color: "white"
+                    echoMode: TextInput.Password
+                    font.pointSize: Code.btnFontPoint()/10
 
-                onTextChanged: container.sigPassChanged(textPassword.text);
-            }
+                    opacity: (mainColumn.bIsLoggedIn == true ? 0 : 1)
 
-            Text {
-                anchors.verticalCenter: parent.verticalCenter
-                text: Array(mainColumn.strPassword.length+1).join("*")
-                color: "white"
-                font.pointSize: Code.btnFontPoint()/10
-                opacity: (mainColumn.bIsLoggedIn == true ? 1 : 0)
-            }
-        }// Row (password)
+                    onTextChanged: container.sigPassChanged(textPassword.text);
+                    KeyNavigation.tab: btnLogin
+                    Keys.onReturnPressed: btnLogin.btnActivated();
+                }
+
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: Array(mainColumn.strPassword.length+1).join("*")
+                    color: "white"
+                    font.pointSize: Code.btnFontPoint()/10
+                    opacity: (mainColumn.bIsLoggedIn == true ? 1 : 0)
+                }
+            }//Row (password)
+        }//Rectangle (password)
 
         MyButton {
+            id: btnLogin
             mainText: (mainColumn.bIsLoggedIn == true ? "Logout" : "Login")
             width: parent.width
             mainFontPoint: Code.btnFontPoint()/8
 
-            onClicked: {
+            function btnActivated() {
                 if (mainColumn.bIsLoggedIn) {
                     container.sigLogout();
                 } else {
@@ -113,48 +131,61 @@ Item {
                 // Comment out when using qml in c++ code.
                 mainColumn.bIsLoggedIn = !mainColumn.bIsLoggedIn;
             }
+
+            onClicked: btnActivated()
+            KeyNavigation.tab: btnProxy
         }// MyButton (login/logout)
 
         MyButton {
+            id: btnProxy
             mainText: "Proxy settings"
             width: parent.width
             mainFontPoint: Code.btnFontPoint()/8
 
             onClicked: container.state = "Proxy"
+            KeyNavigation.tab: btnWebpage
         }// MyButton (proxy settings)
 
         MyButton {
+            id: btnWebpage
             mainText: "Web Page (debug)"
             width: parent.width
             mainFontPoint: Code.btnFontPoint()/8
 
             onClicked: container.sigWebPage();
+            KeyNavigation.tab: btnRefresh
         }//MyButton (Web Page (debug))
 
         MyButton {
+            id: btnRefresh
             mainText: "Refresh"
             width: parent.width
             mainFontPoint: Code.btnFontPoint()/8
 
             onClicked: container.sigRefresh();
             onPressHold: container.sigRefreshAll();
+            KeyNavigation.tab: btnDismiss
         }//MyButton (Refresh all)
 
         MyButton {
+            id: btnDismiss
             mainText: "Dismiss window"
             width: parent.width
             mainFontPoint: Code.btnFontPoint()/8
 
             onClicked: container.sigDismiss();
             onPressHold: container.sigQuit();
+            KeyNavigation.tab: btnAbout
         }//MyButton (Dismiss window/quit)
 
         MyButton {
+            id: btnAbout
             mainText: "About"
             width: parent.width
             mainFontPoint: Code.btnFontPoint()/8
 
             onClicked: container.state = "About"
+            KeyNavigation.tab: textUsername
         }//MyButton (Dismiss window/quit)
     }// Column
 

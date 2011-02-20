@@ -147,6 +147,7 @@
     <ClInclude Include="WebWidget.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\qml\About.qml" />
     <None Include="..\qml\ActionButtons.qml" />
     <None Include="..\qml\ComboBoxPhones.qml" />
     <None Include="..\qml\ContactDetails.qml" />

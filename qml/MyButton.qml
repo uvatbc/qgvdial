@@ -3,7 +3,7 @@ import "helper.js" as Code
 
 Rectangle {
     id: button
-    border.color: "black"
+    border.color: activeFocus?"orange":"black"
     smooth: true
 
     radius: ((height + width) / 20);
@@ -42,6 +42,9 @@ Rectangle {
         onClicked: button.clicked(mainText);
         onPressAndHold: button.pressHold(mainText);
     }// MouseArea
+
+    Keys.onReturnPressed: button.clicked(mainText);
+    Keys.onSpacePressed: button.clicked(mainText);
 
     states: State {
         name: "pressed"
