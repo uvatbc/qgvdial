@@ -1,5 +1,4 @@
 my $repo = "https://qgvdial.googlecode.com/svn/trunk";
-my $nsis = "\"C:\\Program Files (x86)\\NSIS\\makensis.exe\"";
 my $wixbase='C:/Program Files (x86)/Windows Installer XML v3/bin';
 my $cmd;
 my $line;
@@ -44,9 +43,6 @@ system($cmd);
 
 $cmd = "copy qgvdial-$qver\\src\\release\\qgvdial.exe I:\\Uv\\releases\\qgvdial\\win-install\\qgvdial\\bin";
 system($cmd);
-
-# Old setup
-#system("$nsis qgvdial-$qver\\src\\setup.nsi");
 
 # New setup: Create MSI.
 system("cd qgvdial-$qver/build-files & \"$wixbase/candle.exe\" qgvdial.wxs");
