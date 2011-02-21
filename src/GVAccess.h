@@ -87,6 +87,8 @@ public:
                            bool bRequiresAuth,
                            const QString &user, const QString &pass);
 
+    void setTimeout (int seconds = 20);
+
 signals:
     //! Status emitter
     void status(const QString &strText, int timeout = 2000);
@@ -185,6 +187,8 @@ protected:
 
     //! The currently selected registered callback number
     QString                     strCurrentCallback;
+
+    int                         timeout;
 
     friend class Singletons;
 };

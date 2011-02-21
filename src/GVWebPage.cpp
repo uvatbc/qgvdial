@@ -1345,7 +1345,7 @@ GVWebPage::onPageProgress(int progress)
     } else {
         qDebug("Page progressed. Not timing out!");
     }
-    pageTimeoutTimer.setInterval (45 * 1000);
+    pageTimeoutTimer.setInterval (timeout * 1000);
     pageTimeoutTimer.setSingleShot (true);
     pageTimeoutTimer.start ();
 }//GVWebPage::onPageProgress
@@ -1359,7 +1359,7 @@ GVWebPage::onSocketXfer (qint64 bytesXfer, qint64 bytesTotal)
     } else {
         qDebug("Socket transferred data. Not timing out!");
     }
-    pageTimeoutTimer.setInterval (20 * 1000);
+    pageTimeoutTimer.setInterval (timeout * 1000);
     pageTimeoutTimer.setSingleShot (true);
     pageTimeoutTimer.start ();
 }//GVWebPage::onSocketXfer

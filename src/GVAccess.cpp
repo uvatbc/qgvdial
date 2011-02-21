@@ -4,6 +4,7 @@ GVAccess::GVAccess (QObject *parent/* = NULL*/)
 : QObject (parent)
 , mutex(QMutex::Recursive)
 , bLoggedIn(false)
+, timeout(20)
 {
 }//GVAccess::GVAccess
 
@@ -562,4 +563,11 @@ GVAccess::getSystemProxies (QNetworkProxy &http, QNetworkProxy &https)
     } while (0); // End cleanup block (not a loop)
 
     return (true);
-}//GVWebPage::getSystemProxies
+}//GVAccess::getSystemProxies
+
+void
+GVAccess::setTimeout (int seconds /*= 20*/)
+{
+    timeout = seconds;
+    qDebug() << "GVAccess: Timeout is now : " << timeout;
+}//GVAccess::setTimeout

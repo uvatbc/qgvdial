@@ -416,6 +416,8 @@ MainWindow::doLogin ()
 
     bool bOk = false;
     do { // Begin cleanup block (not a loop)
+        webPage.setTimeout(60);
+
         l += strUser;
         l += strPass;
 
@@ -436,6 +438,7 @@ MainWindow::doLogin ()
 
     if (!bOk)
     {
+        webPage.setTimeout(20);
         // Cleanup if any
         strUser.clear ();
         strPass.clear ();
@@ -485,6 +488,8 @@ void
 MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
 {
     strSelfNumber.clear ();
+    GVAccess &webPage = Singletons::getRef().getGVAccess ();
+    webPage.setTimeout(20);
 
     if (!bOk)
     {
