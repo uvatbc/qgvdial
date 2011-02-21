@@ -1077,7 +1077,7 @@ MainWindow::onDialDlgClose (int retval,
     {
         GVAccess &webPage = Singletons::getRef().getGVAccess ();
         bDialCancelled = true;
-        webPage.cancelWork (ctx->bDialOut ? GVAW_dialCallback : GVAW_dialOut);
+        webPage.cancelWork (ctx->bDialOut ? GVAW_dialOut : GVAW_dialCallback);
     }
 }//MainWindow::onDialDlgClose
 
