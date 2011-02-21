@@ -148,6 +148,8 @@ Rectangle {
         anchors.fill: parent
         opacity: 1
 
+        property int inboxWidth: width*1.5
+
         Rectangle { // Selector bar at the top
             id: barTop
             width: parent.width
@@ -160,7 +162,7 @@ Rectangle {
 
             Text {
                 text: strSelected
-                font.pointSize: Code.btnFontPoint()/10
+                font.pointSize: Code.btnFontPoint()/9
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
                 color: "white"
@@ -214,7 +216,7 @@ Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: modelData
-                    font.pointSize: Code.btnFontPoint()/10
+                    font.pointSize: Code.btnFontPoint()/9
                     color: "white"
                 }
 
@@ -234,9 +236,10 @@ Rectangle {
             anchors {
                 top: barTop.bottom
                 left: parent.left
-                right: parent.right
+                right: (parent.right + (parent.width / 2))
                 bottom: parent.bottom
             }
+            width: inboxView.inboxWidth
 
             opacity: 1
 
@@ -267,7 +270,7 @@ Rectangle {
 
                     color: "white"
 
-                    font.pointSize: (Code.btnFontPoint () / 12)
+                    font.pointSize: (Code.btnFontPoint () / 10)
                 }
 
                 MouseArea {

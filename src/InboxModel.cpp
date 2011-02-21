@@ -134,12 +134,6 @@ InboxModel::data (const QModelIndex &index,
                 break;
             }
 
-            if (strNum.startsWith ("Unknown")) {
-                qDebug ("Inbox: Unknown number is unknown");
-                var = "Unknown";
-                break;
-            }
-
             if (!GVAccess::isNumberValid (strNum)) {
                 qWarning () << "Inbox: Display phone number is invalid : "
                             << strNum;
@@ -150,15 +144,11 @@ InboxModel::data (const QModelIndex &index,
 
             CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
             GVContactInfo info;
-            if (dbMain.getContactFromNumber (strNum, info))
-            {
+            if (dbMain.getContactFromNumber (strNum, info)) {
                 var = info.strName;
-                break;
+            } else {
+                var = strNum;
             }
-
-            qDebug () << "Inbox: Number could not be identified: " << strNum
-                      << "Labeling it as unknown.";
-            var = "Unknown";
         }
         else if (4 == column)   // GV_IN_PHONE
         {
