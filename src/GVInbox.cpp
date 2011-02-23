@@ -31,9 +31,17 @@ void
 GVInbox::initModel (QDeclarativeView *pMainWindow)
 {
     deinitModel ();
+    pParent = pMainWindow;
 
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     modelInbox = dbMain.newInboxModel ();
+
+    QString strSelector;
+    if (dbMain.getInboxSelector (strSelector)) {
+        this->strSelectedMessages = strSelector;
+    } else {
+        this->strSelectedMessages = "all";
+    }
 
     QDeclarativeContext *ctx = pMainWindow->rootContext();
     ctx->setContextProperty ("g_inboxModel", modelInbox);
@@ -46,6 +54,30 @@ GVInbox::prepView ()
     emit status ("Re-selecting inbox entries. This will take some time", 0);
     modelInbox->refresh (strSelectedMessages);
     emit status ("Inbox entries selected.");
+
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    dbMain.putInboxSelector(this->strSelectedMessages);
+
+    do { // Begin cleanup block (not a loop)
+        QObject *pRoot = pParent->rootObject ();
+        if (NULL == pRoot) {
+            qWarning ("Could not get to root object in QML!!!");
+            break;
+        }
+
+        QObject *pInbox = pRoot->findChild <QObject*> ("InboxPage");
+        if (NULL == pInbox) {
+            qWarning ("Could not get to InboxPage");
+            break;
+        }
+
+        QString strSend = this->strSelectedMessages;
+        strSend = this->strSelectedMessages[0].toUpper()
+                + this->strSelectedMessages.mid (1);
+
+        QMetaObject::invokeMethod (pInbox, "setSelector",
+                                   Q_ARG (QVariant, QVariant(strSend)));
+    } while (0); // End cleanup block (not a loop)
 }//GVInbox::prepView
 
 void

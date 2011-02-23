@@ -64,6 +64,9 @@ private:
 
     //! The inbox model
     InboxModel     *modelInbox;
+
+    //! The parent window (main window)
+    QDeclarativeView *pParent;
 };
 
 #endif //__GVINBOX_H__

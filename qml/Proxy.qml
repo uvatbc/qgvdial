@@ -3,7 +3,6 @@ import "helper.js" as Code
 
 Item {
     id: container
-
     objectName: "ProxySettingsPage"
 
     function setValues(bEnable, bUseSystemProxy, host, port,

@@ -13,6 +13,7 @@
 #define GV_S_VAR_USER           "user"
 #define GV_S_VAR_PASS           "password"
 #define GV_S_VAR_CALLBACK       "callback"
+#define GV_S_VAR_INBOX_SEL      "inbox_sel"
 #define GV_S_VAR_DB_VER         "db_ver"
 ////////////////////////////////////////////////////////////////////////////////
 // Started using Google Contacts API
@@ -1052,3 +1053,43 @@ CacheDatabase::getProxySettings (bool &bEnable,
     } while (0); // End cleanup block (not a loop)
     return (rv);
 }//CacheDatabase::getProxySettings
+
+bool
+CacheDatabase::getInboxSelector (QString &strSelector)
+{
+    QSqlQuery query(dbMain);
+    query.setForwardOnly (true);
+
+    query.exec ("SELECT " GV_S_VALUE " FROM " GV_SETTINGS_TABLE
+                " WHERE " GV_S_NAME "='" GV_S_VAR_INBOX_SEL "'");
+    if (query.next ())
+    {
+        strSelector = query.value(0).toString();
+        return (true);
+    }
+    return (false);
+}//CacheDatabase::getInboxSelector
+
+bool
+CacheDatabase::putInboxSelector (const QString &strSelector)
+{
+    QSqlQuery query(dbMain);
+    query.setForwardOnly (true);
+
+    QString strQ;
+    if (getCallback (strQ))
+    {
+        query.exec ("DELETE FROM " GV_SETTINGS_TABLE
+                    " WHERE " GV_S_NAME "='" GV_S_VAR_INBOX_SEL "'");
+    }
+
+    QString strScrub = strSelector;
+    strScrub.replace ("'", "''");
+    strQ = QString ("INSERT INTO " GV_SETTINGS_TABLE
+                    " (" GV_S_NAME "," GV_S_VALUE ")"
+                    " VALUES ('" GV_S_VAR_INBOX_SEL "', '%1')")
+           .arg(strScrub);
+    query.exec (strQ);
+
+    return (true);
+}//CacheDatabase::putInboxSelector

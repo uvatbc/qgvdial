@@ -20,7 +20,15 @@ Item {
         }//Text (version)
 
         Text {
-            text: "Project homepage is <a href=http://www.code.google.com/p/qgvdial>here</a>"
+            text: "Project <a href=http://www.code.google.com/p/qgvdial>homepage</a>"
+            width: parent.width
+            font.pointSize: Code.btnFontPoint()/10
+            color: "white"
+            onLinkActivated: container.sigLinkActivated(link)
+        }//Text (homepage)
+
+        Text {
+            text: "Project <a href=http://code.google.com/p/qgvdial/wiki/Changelog>changelog</a>"
             width: parent.width
             font.pointSize: Code.btnFontPoint()/10
             color: "white"

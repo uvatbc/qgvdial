@@ -3,6 +3,7 @@ import "helper.js" as Code
 
 Rectangle {
     id: container
+    objectName: "InboxPage"
     width: 250; height: 320
     color: "black"
 
@@ -19,6 +20,10 @@ Rectangle {
     property string strLink: "BAD LINK!"
     property string strSelected: "All"
     property string strSmsText: "Some text!"
+
+    function setSelector(strSelector) {
+        container.strSelected = strSelector
+    }
 
     Rectangle { // Details
         id: detailsView
@@ -148,8 +153,6 @@ Rectangle {
         anchors.fill: parent
         opacity: 1
 
-        property int inboxWidth: width*1.5
-
         Rectangle { // Selector bar at the top
             id: barTop
             width: parent.width
@@ -203,7 +206,7 @@ Rectangle {
             opacity: 0
             clip: true
 
-            model: ["All", "Placed", "Missed", "Received", "Voicemail", "SMS"]
+            model: ["All", "Placed", "Missed", "Received", "Voicemail", "Sms"]
             delegate:  Rectangle {
                 height: lblSelector.height
                 width: listSelector.width - border.width
@@ -216,7 +219,7 @@ Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: modelData
-                    font.pointSize: Code.btnFontPoint()/9
+                    font.pointSize: Code.btnFontPoint()/8
                     color: "white"
                 }
 
@@ -229,17 +232,16 @@ Rectangle {
                     }
                 }
             }// TextButton
-        }
+        }//ListView (inbox selector: All, Placed, Missed, etc.)
 
         ListView {
             id: listInbox
             anchors {
                 top: barTop.bottom
                 left: parent.left
-                right: (parent.right + (parent.width / 2))
+                right: parent.right
                 bottom: parent.bottom
             }
-            width: inboxView.inboxWidth
 
             opacity: 1
 
@@ -266,11 +268,11 @@ Rectangle {
                         leftMargin: 5
                     }
 
-                    text: type + " " + time + " : " + name
+                    text: type + " " + time_detail + "\n" + name
 
                     color: "white"
 
-                    font.pointSize: (Code.btnFontPoint () / 10)
+                    font.pointSize: (Code.btnFontPoint () / 12)
                 }
 
                 MouseArea {
@@ -293,7 +295,7 @@ Rectangle {
                     }
                 }
             }// delegate Rectangle
-        }// ListView
+        }// ListView (inbox entries)
 
         states: [
             State {

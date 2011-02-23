@@ -90,6 +90,10 @@ public:
                            bool &bRequiresAuth,
                            QString &user, QString &pass);
 
+    // The GV Inbox that is being displayed
+    bool getInboxSelector (QString &strSelector);
+    bool putInboxSelector (const QString &strSelector);
+
 signals:
     void status(const QString &strText, int timeout = 2000);
 
