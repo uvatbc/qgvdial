@@ -143,16 +143,23 @@ MainWindow::setStatus(const QString &strText, int timeout /* = 0*/)
 
 #ifdef Q_WS_MAEMO_5
     infoBox.hide ();
-    QLabel *theLabel = (QLabel *) infoBox.widget ();
-    if (NULL == theLabel) {
-        theLabel = new QLabel (strText, &infoBox);
-        theLabel->setAlignment (Qt::AlignHCenter);
-        infoBox.setWidget (theLabel);
-    } else {
-        theLabel->setText (strText);
+
+    // Show the banner only if the window is invisible. Otherwise the QML
+    // status bar is more than enough for this job.
+    if (!this->isVisible ()) {
+        QLabel *theLabel = (QLabel *) infoBox.widget ();
+        if (NULL == theLabel) {
+            theLabel = new QLabel (strText, &infoBox);
+            theLabel->setAlignment (Qt::AlignHCenter);
+            infoBox.setWidget (theLabel);
+            qDebug("Created the Maemo5 yellow banner label");
+        } else {
+            qDebug() << "Display the status banner:" << strText;
+            theLabel->setText (strText);
+        }
+        infoBox.setTimeout (0 == timeout ? 3000 : timeout);
+        infoBox.show ();
     }
-    infoBox.setTimeout (0 == timeout ? 3000 : timeout);
-    infoBox.show ();
 #else
     if (NULL != pSystray) {
         pSystray->showMessage ("Status", strText,
@@ -163,7 +170,7 @@ MainWindow::setStatus(const QString &strText, int timeout /* = 0*/)
 
     statusTimer.stop ();
     QDeclarativeContext *ctx = this->rootContext();
-    ctx->setContextProperty ("strStatus", strText);
+    ctx->setContextProperty ("g_strStatus", strText);
 
     if (0 != timeout) {
         statusTimer.setSingleShot (true);
@@ -176,7 +183,7 @@ void
 MainWindow::onStatusTimerTick ()
 {
     QDeclarativeContext *ctx = this->rootContext();
-    ctx->setContextProperty ("strStatus", "Ready");
+    ctx->setContextProperty ("g_strStatus", "Ready");
 }//MainWindow::onStatusTimerTick
 
 /** Invoked when the QtSingleApplication sends a message

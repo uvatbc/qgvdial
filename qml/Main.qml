@@ -226,7 +226,6 @@ Rectangle {
 ////////////////////////////////////////////////////////////////////////////////
 //                           Co-existent Items End                            //
 ////////////////////////////////////////////////////////////////////////////////
-
         Rectangle {
             id: barStatus
             width: parent.width
@@ -236,13 +235,13 @@ Rectangle {
             color: "black"
 
             Text {
-                text: strStatus
+                text: g_strStatus
                 font.pointSize: Code.btnFontPoint()/12
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
                 color: "white"
             }
-        }
+        }//Rectangle (status bar)
     }//Item: Main column that has all the co-existent views
 
     states: [
