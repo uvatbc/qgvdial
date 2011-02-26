@@ -77,6 +77,12 @@
 #define GV_P_F_USE_SYSTEM   (1<<1)
 #define GV_P_F_NEEDS_AUTH   (1<<2)
 ////////////////////////////////////////////////////////////////////////////////
+/////////////////////////// Mosquitto settings table ///////////////////////////
+#define GV_MQ_TABLE         "mosquitto_settings"
+#define GV_MQ_ENABLED       "enabled"
+#define GV_MQ_HOST          "host"
+#define GV_MQ_PORT          "port"
+////////////////////////////////////////////////////////////////////////////////
 
 CacheDatabase::CacheDatabase(const QSqlDatabase & other, QObject *parent)
 : QObject (parent)
@@ -154,6 +160,7 @@ CacheDatabase::init ()
         query.exec ("DROP TABLE " GV_INBOX_TABLE);
         query.exec ("DROP TABLE " GV_UPDATES_TABLE);
         query.exec ("DROP TABLE " GV_PROXY_TABLE);
+        query.exec ("DROP TABLE " GV_MQ_TABLE);
 
         // Clear out all settings as well
         query.exec ("DELETE FROM " GV_SETTINGS_TABLE);
@@ -238,6 +245,18 @@ CacheDatabase::init ()
                         GV_P_PORT  " integer, "
                         GV_P_USER  " varchar, "
                         GV_P_PASS  " varchar)");
+    }
+
+    // Ensure that the Mosquitto settings table is present. If not, create it.
+    query.exec ("SELECT * FROM sqlite_master "
+                "WHERE type='table' "
+                "AND name='" GV_MQ_TABLE "'");
+    if (!query.next ())
+    {
+        query.exec ("CREATE TABLE " GV_MQ_TABLE " "
+                    "(" GV_MQ_ENABLED " integer, "
+                        GV_MQ_HOST    " varchar, "
+                        GV_MQ_PORT    " integer)");
     }
 }//CacheDatabase::init
 
@@ -1093,3 +1112,68 @@ CacheDatabase::putInboxSelector (const QString &strSelector)
 
     return (true);
 }//CacheDatabase::putInboxSelector
+
+bool
+CacheDatabase::setMqSettings (bool bEnable, const QString &host, int port)
+{
+    QString scrubHost = host;
+    scrubHost.replace ("'", "''");
+
+    QSqlQuery query(dbMain);
+    query.setForwardOnly (true);
+
+    // Clear the table of all settings
+    query.exec ("DELETE FROM " GV_MQ_TABLE);
+    // Insert the new settings (not that there can ever be more than one)
+    bool rv =
+    query.exec (QString ("INSERT INTO " GV_MQ_TABLE " "
+                         "(" GV_MQ_ENABLED
+                         "," GV_MQ_HOST "," GV_MQ_PORT ") VALUES "
+                         "(%1, '%2', %3)")
+                         .arg (bEnable?1:0)
+                         .arg (scrubHost).arg (port));
+    return (rv);
+}//CacheDatabase::setMqSettings
+
+bool
+CacheDatabase::getMqSettings (bool &bEnable, QString &host, int &port)
+{
+    QSqlQuery query(dbMain);
+    query.setForwardOnly (true);
+    bool rv = false;
+
+    do // Begin cleanup block (not a loop)
+    {
+        rv = query.exec ("SELECT " GV_MQ_ENABLED "," GV_MQ_HOST "," GV_MQ_PORT
+                         " FROM " GV_MQ_TABLE);
+        if (!rv) {
+            qWarning ("Failed to query DB for mosquitto settings");
+            break;
+        }
+
+        rv = query.next ();
+        if (!rv) {
+            qWarning ("No entries in the mosquitto settings table!");
+            break;
+        }
+
+        int flags = query.value(0).toInt (&rv);
+        if (!rv) {
+            qWarning ("Failed to get mosquitto enabled field from the DB");
+            break;
+        }
+        bEnable = (flags == 1);
+        if (!bEnable) {
+            qDebug ("Mosquitto not enabled.");
+            break;
+        }
+
+        host = query.value (1).toString ();
+        port = query.value (2).toInt (&rv);
+        if (!rv) {
+            qWarning ("Failed to query DB for mosquitto port");
+            break;
+        }
+    } while (0); // End cleanup block (not a loop)
+    return (rv);
+}//CacheDatabase::getMqSettings

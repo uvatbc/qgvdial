@@ -37,6 +37,8 @@ MainWindow::MainWindow (QWidget *parent)
 , mtxDial (QMutex::Recursive)
 , bCallInProgress (false)
 , bDialCancelled (false)
+, mqThread (QString("qgvdial:%1").arg(QHostInfo::localHostName())
+            .toLatin1().constData (), this)
 {
     initLogging ();
 
@@ -81,6 +83,7 @@ MainWindow::MainWindow (QWidget *parent)
 
 MainWindow::~MainWindow ()
 {
+    mqThread.terminate ();
 }//MainWindow::~MainWindow
 
 void
@@ -328,6 +331,10 @@ MainWindow::init ()
 
     this->setWindowIcon (icoGoogle);
 
+    // Connect the signals from the Mosquitto thread
+    QObject::connect (&mqThread, SIGNAL(sigUpdateInbox()),
+                      &oInbox  , SLOT  (refresh()));
+
     // If the cache has the username and password, begin login
     if (dbMain.getUserPass (strUser, strPass))
     {
@@ -397,6 +404,9 @@ MainWindow::initQML ()
                                       bool, const QString &, const QString &)),
         this, SLOT (onSigProxyChanges(bool, bool, const QString &, int,
                                       bool, const QString &, const QString &)));
+    QObject::connect (
+        gObj, SIGNAL (sigMosquittoChanges(bool, const QString &, int)),
+        this, SLOT   (onSigMosquittoChanges(bool, const QString &, int)));
 
 #if DESKTOP_OS
     this->setFixedSize (this->size ());
@@ -558,6 +568,13 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
         {
             fillCallbackNumbers (false);
         }
+
+        bool bMqEnabled;
+        QString strMqHost;
+        int mqPort;
+        if (dbMain.getMqSettings (bMqEnabled, strMqHost, mqPort)) {
+            this->onSigMosquittoChanges (bMqEnabled, strMqHost, mqPort);
+        }
     }
 }//MainWindow::loginCompleted
 
@@ -571,6 +588,8 @@ MainWindow::doLogout ()
 
     OsDependent &osd = Singletons::getRef().getOSD ();
     osd.setLongWork (this, true);
+
+    mqThread.setQuit ();
 }//MainWindow::doLogout
 
 void
@@ -624,6 +643,7 @@ MainWindow::msgBox_buttonClicked (QAbstractButton *button)
 void
 MainWindow::on_actionE_xit_triggered ()
 {
+    mqThread.setQuit ();
     this->close ();
 
     for (QMap<QString,QString>::iterator i  = mapVmail.begin ();
@@ -634,7 +654,7 @@ MainWindow::on_actionE_xit_triggered ()
     }
     mapVmail.clear ();
 
-    qApp->quit ();
+    QTimer::singleShot (2 * 1000, qApp, SLOT (quit()));
 }//MainWindow::on_actionE_xit_triggered
 
 void
@@ -1608,3 +1628,40 @@ MainWindow::onLinkActivated (const QString &strLink)
 {
     QDesktopServices::openUrl (QUrl::fromUserInput (strLink));
 }//MainWindow::onLinkActivated
+
+void
+MainWindow::onSigMosquittoChanges (bool bEnable, const QString &host, int port)
+{
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    dbMain.setMqSettings (bEnable, host, port);
+
+    do // Begin cleanup block (not a loop)
+    {
+        QObject *pRoot = this->rootObject ();
+        if (NULL == pRoot) {
+            qWarning ("Could not get to root object in QML!!!");
+            break;
+        }
+
+        QObject *pProxySettings = pRoot->findChild <QObject*>
+                                                  ("MosquittoPage");
+        if (NULL == pProxySettings) {
+            qWarning ("Could not get to MosquittoPage");
+            break;
+        }
+
+        QMetaObject::invokeMethod (pProxySettings, "setValues",
+                                   Q_ARG (QVariant, QVariant(bEnable)),
+                                   Q_ARG (QVariant, QVariant(host)),
+                                   Q_ARG (QVariant, QVariant(port)));
+    } while (0); // End cleanup block (not a loop)
+
+    mqThread.setSettings (bEnable, host, port);
+    if (mqThread.isRunning ()) {
+        mqThread.setQuit ();
+    }
+
+    if (bEnable) {
+        QTimer::singleShot (2 * 1000, &mqThread, SLOT(start()));
+    }
+}//MainWindow::onSigMosquittoChanges

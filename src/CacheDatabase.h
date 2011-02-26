@@ -94,6 +94,10 @@ public:
     bool getInboxSelector (QString &strSelector);
     bool putInboxSelector (const QString &strSelector);
 
+    // Mosquitto settings get and set
+    bool setMqSettings (bool bEnable, const QString &host, int port);
+    bool getMqSettings (bool &bEnable, QString &host, int &port);
+
 signals:
     void status(const QString &strText, int timeout = 2000);
 

@@ -21,7 +21,7 @@ maemo5 {
 unix:!symbian {
     QT *= dbus
     INCLUDEPATH += $$QMAKESPEC/usr/include/telepathy-1.0/
-    LIBS += -ltelepathy-qt4
+    LIBS += -ltelepathy-qt4 -lmosquittopp
 }
 
 PRECOMPILED_HEADER = global.h
@@ -121,6 +121,7 @@ OTHER_FILES  += winrsrc.rc                  \
                 ../qml/MainView_l.qml       \
                 ../qml/MainView_p.qml       \
                 ../qml/MainView.qml         \
+                ../qml/Mosquitto.qml        \
                 ../qml/MyButton.qml         \
                 ../qml/Proxy.qml            \
                 ../qml/RadioButton.qml      \
@@ -132,10 +133,12 @@ OTHER_FILES  += winrsrc.rc                  \
 unix:!symbian {
     HEADERS  += TpObserver.h            \
                 TpCalloutInitiator.h    \
-                QGVDbusServer.h
+                QGVDbusServer.h         \
+                MqClientThread.h
     SOURCES  += TpObserver.cpp          \
                 TpCalloutInitiator.cpp  \
-                QGVDbusServer.cpp
+                QGVDbusServer.cpp       \
+                MqClientThread.cpp
 }
 
 # In desktop Linux, add the Skype client

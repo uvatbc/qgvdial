@@ -7,6 +7,7 @@
 #include "SMSDlg.h"
 #include "WebWidget.h"
 #include "RegNumberModel.h"
+#include "MqClientThread.h"
 
 // Required for Symbian (QSystemTrayIcon)
 #include "OsDependent.h"
@@ -135,6 +136,9 @@ private slots:
     //! Activated when a link is clicked in the QML
     void onLinkActivated (const QString &strLink);
 
+    //! Activated when the user saves the mosquitto settings
+    void onSigMosquittoChanges(bool bEnable, const QString &host, int port);
+
 private:
     void initLogging ();
 
@@ -224,6 +228,9 @@ private:
 
     //! Map between the voice mail link and its temp file name
     QMap<QString,QString> mapVmail;
+
+    //! This holds the thread that communicates with the mosquitto server.
+    MqClientThread  mqThread;
 };
 
 #endif // MAINWINDOW_H

@@ -20,6 +20,7 @@ Item {
                            string host, int port,
                            bool bRequiresAuth,
                            string user, string pass)
+    signal sigMosquittoChanges(bool bEnable, string host, int port)
 
     Column {
         id: mainColumn
@@ -143,6 +144,16 @@ Item {
             mainFontPoint: Code.btnFontPoint()/8
 
             onClicked: container.state = "Proxy"
+            KeyNavigation.tab: btnMosquitto
+        }// MyButton (proxy settings)
+
+        MyButton {
+            id: btnMosquitto
+            mainText: "Mosquitto settings"
+            width: parent.width
+            mainFontPoint: Code.btnFontPoint()/8
+
+            onClicked: container.state = "Mosquitto"
             KeyNavigation.tab: btnWebpage
         }// MyButton (proxy settings)
 
@@ -201,6 +212,16 @@ Item {
                                                      user, pass)
     }//Proxy
 
+    Mosquitto {
+        id: mqSettings
+        anchors.fill: parent
+        anchors.topMargin: 2
+        opacity: 0
+
+        onSigDone: container.state = ''
+        onSigMosquittoChanges: container.sigMosquittoChanges(bEnable, host, port)
+    }
+
     About {
         id: aboutWin
         anchors.fill: parent
@@ -214,13 +235,22 @@ Item {
         State {
             name: "Proxy"
             PropertyChanges { target: proxySettings; opacity: 1 }
+            PropertyChanges { target: mqSettings; opacity: 0 }
+            PropertyChanges { target: aboutWin; opacity: 0 }
+            PropertyChanges { target: mainColumn; opacity: 0 }
+        },
+        State {
+            name: "Mosquitto"
+            PropertyChanges { target: proxySettings; opacity: 0 }
+            PropertyChanges { target: mqSettings; opacity: 1 }
             PropertyChanges { target: aboutWin; opacity: 0 }
             PropertyChanges { target: mainColumn; opacity: 0 }
         },
         State {
             name: "About"
-            PropertyChanges { target: aboutWin; opacity: 1 }
             PropertyChanges { target: proxySettings; opacity: 0 }
+            PropertyChanges { target: mqSettings; opacity: 0 }
+            PropertyChanges { target: aboutWin; opacity: 1 }
             PropertyChanges { target: mainColumn; opacity: 0 }
         }
     ]

@@ -23,6 +23,7 @@
      <file alias="MainView_l.qml">../qml/MainView_l.qml</file>
      <file alias="MainView_p.qml">../qml/MainView_p.qml</file>
      <file alias="MainView.qml">../qml/MainView.qml</file>
+     <file alias="Mosquitto.qml">../qml/Mosquitto.qml</file>
      <file alias="MyButton.qml">../qml/MyButton.qml</file>
      <file alias="Proxy.qml">../qml/Proxy.qml</file>
      <file alias="RadioButton.qml">../qml/RadioButton.qml</file>

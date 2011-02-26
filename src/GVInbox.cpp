@@ -95,9 +95,10 @@ GVInbox::refresh ()
 
     GVAccess &webPage = Singletons::getRef().getGVAccess ();
     QVariantList l;
-    l += strSelectedMessages; // "all";
+//    l += strSelectedMessages;
+    l += "all";
     l += "1";
-    l += "10";
+    l += "30";
     l += dtUpdate;
     QObject::connect (
         &webPage, SIGNAL (oneInboxEntry (const GVInboxEntry &)),

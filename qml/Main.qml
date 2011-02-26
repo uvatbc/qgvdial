@@ -35,6 +35,8 @@ Rectangle {
                            bool bRequiresAuth,
                            string user, string pass)
 
+    signal sigMosquittoChanges(bool bEnable, string host, int port)
+
     onSigCall: console.debug("QML: Call " + number)
     onSigText: console.debug("QML: Text " + number)
 
@@ -221,6 +223,7 @@ Rectangle {
                                                     host, port, bRequiresAuth,
                                                     user, pass)
             onSigLinkActivated: main.sigLinkActivated(strLink)
+            onSigMosquittoChanges: main.sigMosquittoChanges(bEnable, host, port)
         }
 
 ////////////////////////////////////////////////////////////////////////////////
