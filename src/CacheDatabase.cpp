@@ -23,7 +23,9 @@
 // All "last updated" fields moved out of settings table into updates table
 // #define GV_S_VALUE_DB_VER   "2010-08-13 15:24:15"
 // Full text of the sms is now stored in the inbox table.
-#define GV_S_VALUE_DB_VER   "2010-12-30 10:30:03"
+//#define GV_S_VALUE_DB_VER   "2010-12-30 10:30:03"
+// Mosquitto settings changed.
+#define GV_S_VALUE_DB_VER   "2011-02-28 23:41:03"
 ////////////////////////////// GV Contacts table ///////////////////////////////
 #define GV_CONTACTS_TABLE   "gvcontacts"
 #define GV_C_ID             "id"
@@ -82,6 +84,7 @@
 #define GV_MQ_ENABLED       "enabled"
 #define GV_MQ_HOST          "host"
 #define GV_MQ_PORT          "port"
+#define GV_MQ_TOPIC         "topic"
 ////////////////////////////////////////////////////////////////////////////////
 
 CacheDatabase::CacheDatabase(const QSqlDatabase & other, QObject *parent)
@@ -256,7 +259,8 @@ CacheDatabase::init ()
         query.exec ("CREATE TABLE " GV_MQ_TABLE " "
                     "(" GV_MQ_ENABLED " integer, "
                         GV_MQ_HOST    " varchar, "
-                        GV_MQ_PORT    " integer)");
+                        GV_MQ_PORT    " integer, "
+                        GV_MQ_TOPIC   " varchar)");
     }
 }//CacheDatabase::init
 
@@ -1114,10 +1118,12 @@ CacheDatabase::putInboxSelector (const QString &strSelector)
 }//CacheDatabase::putInboxSelector
 
 bool
-CacheDatabase::setMqSettings (bool bEnable, const QString &host, int port)
+CacheDatabase::setMqSettings (bool bEnable, const QString &host, int port,
+                              const QString &topic)
 {
-    QString scrubHost = host;
+    QString scrubHost = host, scrubTopic = topic;
     scrubHost.replace ("'", "''");
+    scrubTopic.replace ("'", "''");
 
     QSqlQuery query(dbMain);
     query.setForwardOnly (true);
@@ -1127,16 +1133,18 @@ CacheDatabase::setMqSettings (bool bEnable, const QString &host, int port)
     // Insert the new settings (not that there can ever be more than one)
     bool rv =
     query.exec (QString ("INSERT INTO " GV_MQ_TABLE " "
-                         "(" GV_MQ_ENABLED
-                         "," GV_MQ_HOST "," GV_MQ_PORT ") VALUES "
-                         "(%1, '%2', %3)")
+                         "(" GV_MQ_ENABLED "," GV_MQ_HOST "," GV_MQ_PORT
+                          "," GV_MQ_TOPIC ") VALUES "
+                         "(%1, '%2', %3, '%4')")
                          .arg (bEnable?1:0)
-                         .arg (scrubHost).arg (port));
+                         .arg (scrubHost).arg (port)
+                         .arg (scrubTopic));
     return (rv);
 }//CacheDatabase::setMqSettings
 
 bool
-CacheDatabase::getMqSettings (bool &bEnable, QString &host, int &port)
+CacheDatabase::getMqSettings (bool &bEnable, QString &host, int &port,
+                              QString &topic)
 {
     QSqlQuery query(dbMain);
     query.setForwardOnly (true);
@@ -1145,7 +1153,7 @@ CacheDatabase::getMqSettings (bool &bEnable, QString &host, int &port)
     do // Begin cleanup block (not a loop)
     {
         rv = query.exec ("SELECT " GV_MQ_ENABLED "," GV_MQ_HOST "," GV_MQ_PORT
-                         " FROM " GV_MQ_TABLE);
+                         "," GV_MQ_TOPIC " FROM " GV_MQ_TABLE);
         if (!rv) {
             qWarning ("Failed to query DB for mosquitto settings");
             break;
@@ -1174,6 +1182,8 @@ CacheDatabase::getMqSettings (bool &bEnable, QString &host, int &port)
             qWarning ("Failed to query DB for mosquitto port");
             break;
         }
+
+        topic = query.value (3).toString ();
     } while (0); // End cleanup block (not a loop)
     return (rv);
 }//CacheDatabase::getMqSettings

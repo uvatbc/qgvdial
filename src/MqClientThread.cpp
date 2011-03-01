@@ -4,6 +4,8 @@ MqClientThread::MqClientThread (const char *name, QObject *parent)
 : QThread(parent)
 , mosquittopp(name)
 , bQuit(false)
+, strHost ("localhost")
+, strTopic ("gv_notify")
 {
 }//MqClientThread::MqClientThread
 
@@ -15,7 +17,7 @@ MqClientThread::on_connect (int rc)
         return;
     }
 
-    rc = this->subscribe (NULL, "gv_notify");
+    rc = this->subscribe (NULL, strTopic.toLatin1().constData ());
     if (0 != rc) {
         qWarning() << "Mosquitto: Failed in subscribe. Error =" << rc;
         return;
@@ -63,6 +65,10 @@ MqClientThread::run ()
         while (!bQuit) {
             this->loop (1*1000);
         }
+
+        this->unsubscribe(NULL, strTopic.toLatin1().constData ());
+        ((mosquittopp*)this)->disconnect ();
+        this->loop (100);
     } while (0); // End cleanup block (not a loop)
 
     // Ready for the next time
@@ -71,7 +77,8 @@ MqClientThread::run ()
 }//MqClientThread::run
 
 void
-MqClientThread::setSettings (bool bEnable, const QString &host, int p)
+MqClientThread::setSettings (bool bEnable, const QString &host, int p,
+                             const QString &topic)
 {
     if (bEnable) {
         strHost = host;
@@ -79,9 +86,11 @@ MqClientThread::setSettings (bool bEnable, const QString &host, int p)
             p = 1883;
         }
         port = p;
+        strTopic = topic;
     } else {
         strHost.clear ();
         port = 0;
+        strTopic.clear ();
     }
 }//MqClientThread::setSettings
 

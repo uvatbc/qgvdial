@@ -137,7 +137,8 @@ private slots:
     void onLinkActivated (const QString &strLink);
 
     //! Activated when the user saves the mosquitto settings
-    void onSigMosquittoChanges(bool bEnable, const QString &host, int port);
+    void onSigMosquittoChanges(bool bEnable, const QString &host, int port,
+                               const QString &topic);
 
 private:
     void initLogging ();

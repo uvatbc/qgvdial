@@ -5,15 +5,16 @@ Item {
     id: container
     objectName: "MosquittoPage"
 
-    function setValues(bEnable, host, port) {
+    function setValues(bEnable, host, port, topic) {
         console.debug ("QML: Setting Mq settings")
         mqSupport.check = bEnable;
         textMqServer.text = host;
         textMqPort.text = port;
+        textMqTopic.text = topic;
     }
 
     signal sigDone(bool bSave)
-    signal sigMosquittoChanges(bool bEnable, string host, int port)
+    signal sigMosquittoChanges(bool bEnable, string host, int port, string topic)
 
     property bool bEnable: mqSupport.check
 
@@ -76,6 +77,27 @@ Item {
 
         Row {
             width: parent.width
+            spacing: 2
+            opacity: (bEnable ? 1 : 0)
+
+            Text {
+                text: "Topic to sub:"
+                color: "white"
+                anchors.verticalCenter: parent.verticalCenter
+                font.pointSize: Code.btnFontPoint()/10
+            }
+
+            TextInput {
+                id: textMqTopic
+                anchors.verticalCenter: parent.verticalCenter
+                text: "gv_notify"
+                color: "white"
+                font.pointSize: Code.btnFontPoint()/10
+            }
+        }// Row (Mq topic to subscribe to)
+
+        Row {
+            width: parent.width
             spacing: 1
 
             MyButton {
@@ -86,7 +108,8 @@ Item {
                 onClicked: {
                     container.sigMosquittoChanges (bEnable,
                                                    textMqServer.text,
-                                                   textMqPort.text);
+                                                   textMqPort.text,
+                                                   textMqTopic.text);
                     container.sigDone(true);
                 }
 
@@ -99,6 +122,6 @@ Item {
 
                 onClicked: container.sigDone(false);
             }//MyButton (Cancel)
-        }
+        }// Save and cancel buttons
     }// Column
 }// Item (top level)

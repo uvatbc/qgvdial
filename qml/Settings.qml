@@ -20,7 +20,7 @@ Item {
                            string host, int port,
                            bool bRequiresAuth,
                            string user, string pass)
-    signal sigMosquittoChanges(bool bEnable, string host, int port)
+    signal sigMosquittoChanges(bool bEnable, string host, int port, string topic)
 
     Column {
         id: mainColumn
@@ -219,7 +219,7 @@ Item {
         opacity: 0
 
         onSigDone: container.state = ''
-        onSigMosquittoChanges: container.sigMosquittoChanges(bEnable, host, port)
+        onSigMosquittoChanges: container.sigMosquittoChanges(bEnable, host, port, topic)
     }
 
     About {

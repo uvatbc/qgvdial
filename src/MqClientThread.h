@@ -14,7 +14,8 @@ class MqClientThread : public QThread, protected mosquittopp
 public:
     MqClientThread(const char *name, QObject *parent = 0);
 
-    void setSettings(bool bEnable, const QString &host, int port = 0);
+    void setSettings(bool bEnable, const QString &host, int port = 0,
+                     const QString &topic = "gv_notify");
     void setUserPass(const QString &user, const QString &pass);
     void setQuit(bool set = true);
 
@@ -28,7 +29,7 @@ private:
 
 private:
     bool    bQuit;
-    QString strHost, strUser, strPass;
+    QString strHost, strTopic, strUser, strPass;
     int     port;
 };
 

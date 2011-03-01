@@ -405,8 +405,10 @@ MainWindow::initQML ()
         this, SLOT (onSigProxyChanges(bool, bool, const QString &, int,
                                       bool, const QString &, const QString &)));
     QObject::connect (
-        gObj, SIGNAL (sigMosquittoChanges(bool, const QString &, int)),
-        this, SLOT   (onSigMosquittoChanges(bool, const QString &, int)));
+        gObj, SIGNAL (sigMosquittoChanges(bool, const QString &, int,
+                                          const QString &)),
+        this, SLOT   (onSigMosquittoChanges(bool, const QString &, int,
+                                            const QString &)));
 
 #if DESKTOP_OS
     this->setFixedSize (this->size ());
@@ -570,10 +572,11 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
         }
 
         bool bMqEnabled;
-        QString strMqHost;
+        QString strMqHost, strMqTopic;
         int mqPort;
-        if (dbMain.getMqSettings (bMqEnabled, strMqHost, mqPort)) {
-            this->onSigMosquittoChanges (bMqEnabled, strMqHost, mqPort);
+        if (dbMain.getMqSettings (bMqEnabled, strMqHost, mqPort, strMqTopic)) {
+            this->onSigMosquittoChanges (bMqEnabled, strMqHost, mqPort,
+                                         strMqTopic);
         }
     }
 }//MainWindow::loginCompleted
@@ -1630,10 +1633,11 @@ MainWindow::onLinkActivated (const QString &strLink)
 }//MainWindow::onLinkActivated
 
 void
-MainWindow::onSigMosquittoChanges (bool bEnable, const QString &host, int port)
+MainWindow::onSigMosquittoChanges (bool bEnable, const QString &host, int port,
+                                   const QString &topic)
 {
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    dbMain.setMqSettings (bEnable, host, port);
+    dbMain.setMqSettings (bEnable, host, port, topic);
 
     do // Begin cleanup block (not a loop)
     {
@@ -1653,7 +1657,8 @@ MainWindow::onSigMosquittoChanges (bool bEnable, const QString &host, int port)
         QMetaObject::invokeMethod (pProxySettings, "setValues",
                                    Q_ARG (QVariant, QVariant(bEnable)),
                                    Q_ARG (QVariant, QVariant(host)),
-                                   Q_ARG (QVariant, QVariant(port)));
+                                   Q_ARG (QVariant, QVariant(port)),
+                                   Q_ARG (QVariant, QVariant(topic)));
     } while (0); // End cleanup block (not a loop)
 
     mqThread.setSettings (bEnable, host, port);

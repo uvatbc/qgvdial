@@ -16,7 +16,7 @@ Flickable {
             top: parent.top
             left: parent.left
         }
-        height: textCalc.height * model.count * 2.5
+        height: (model ? (textCalc.height * model.count * 2.5) : 1)
 
         Text {
             id: textCalc
