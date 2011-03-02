@@ -73,7 +73,6 @@ MqClientThread::run ()
         }
 
         while (!bQuit) {
-            qDebug ("Mosquitto: Working the Mq loop");
             this->loop (1*1000);
         }
 
