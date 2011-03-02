@@ -114,11 +114,20 @@ MainWindow::initLogging ()
 void
 MainWindow::log (const QString &strText, int level /*= 10*/)
 {
+    QString strDisp;
+    QRegExp regex("^\"(.*)\"\\s*");
+    if (strText.indexOf (regex) != -1) {
+        strDisp = regex.cap (1);
+    } else {
+        strDisp = strText;
+    }
+
     QDateTime dt = QDateTime::currentDateTime ();
     QString strLog = QString("%1 : %2 : %3")
                      .arg(dt.toString ("yyyy-MM-dd hh:mm:ss.zzz"))
                      .arg(level)
-                     .arg(strText);
+                     .arg(strDisp);
+
 
     // Send to standard output
     cout << strLog.toStdString () << endl;

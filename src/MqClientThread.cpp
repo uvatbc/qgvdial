@@ -16,12 +16,15 @@ MqClientThread::on_connect (int rc)
         qWarning() << "Mosquitto: Failed in on_connect. Error =" << rc;
         return;
     }
+    qDebug() << "Mosquitto: Connected to" << strHost;
 
     rc = this->subscribe (NULL, strTopic.toLatin1().constData ());
     if (0 != rc) {
         qWarning() << "Mosquitto: Failed in subscribe. Error =" << rc;
+        emit status ("Failed to subscribe to Mosquitto server");
         return;
     }
+    qDebug() << "Mosquitto: Subscribed to" << strTopic << "established.";
 }//MqClientThread::on_connect
 
 void
@@ -60,9 +63,12 @@ MqClientThread::run ()
         QHostInfo hInfo = QHostInfo::fromName (strHost);
         QString strFirst = hInfo.addresses().first().toString();
 
+        qDebug() << "Mosquitto: Attempting to connect to" << strHost
+                 << "at" << strFirst;
         int rv = ((mosquittopp*)this)->connect (strFirst.toLatin1().constData ());
         if (0 != rv) {
             qWarning() << "Mosquitto: Failed to connect. Error =" << rv;
+            emit status ("Failed to connect to Mosquitto server");
             break;
         }
 
