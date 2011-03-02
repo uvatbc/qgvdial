@@ -37,8 +37,12 @@ MqClientThread::on_message (const struct mosquitto_message *message)
              << ". message = " << strPayload;
 
     if (strPayload.startsWith ("inbox")) {
-        qDebug ("New inbox entry");
+        emit status ("Mosquitto: New inbox entry");
         emit sigUpdateInbox();
+    }
+    if (strPayload.startsWith ("contact")) {
+        emit status ("Mosquitto: Contact changes");
+        emit sigUpdateContacts ();
     }
 }//MqClientThread::on_message
 
@@ -63,9 +67,11 @@ MqClientThread::run ()
         }
 
         while (!bQuit) {
+            qDebug ("Mosquitto: Working the Mq loop");
             this->loop (1*1000);
         }
 
+        qDebug ("Mosquitto: End Mq loop. Unsubscribe and disconnect");
         this->unsubscribe(NULL, strTopic.toLatin1().constData ());
         ((mosquittopp*)this)->disconnect ();
         this->loop (100);

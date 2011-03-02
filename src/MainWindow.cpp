@@ -332,8 +332,12 @@ MainWindow::init ()
     this->setWindowIcon (icoGoogle);
 
     // Connect the signals from the Mosquitto thread
-    QObject::connect (&mqThread, SIGNAL(sigUpdateInbox()),
-                      &oInbox  , SLOT  (refresh()));
+    QObject::connect (&mqThread , SIGNAL(sigUpdateInbox()),
+                      &oInbox   , SLOT  (refresh()));
+    QObject::connect (&mqThread , SIGNAL(sigUpdateContacts()),
+                      &oContacts, SLOT  (refreshContacts()));
+    QObject::connect (&mqThread , SIGNAL(status(QString,int)),
+                       this     , SLOT  (setStatus(QString,int)));
 
     // If the cache has the username and password, begin login
     if (dbMain.getUserPass (strUser, strPass))

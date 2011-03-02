@@ -21,6 +21,8 @@ public:
 
 signals:
     void sigUpdateInbox();
+    void sigUpdateContacts();
+    void status (const QString &strText, int timeout = 3000);
 
 private:
     void run ();
