@@ -128,10 +128,8 @@ private slots:
     void onStatusTimerTick ();
 
     //! Proxy changes come into this slot
-    void onSigProxyChanges(bool bEnable,
-                           bool bUseSystemProxy,
-                           const QString &host, int port,
-                           bool bRequiresAuth,
+    void onSigProxyChanges(bool bEnable, bool bUseSystemProxy,
+                           const QString &host, int port, bool bRequiresAuth,
                            const QString &user, const QString &pass);
     //! Activated when a link is clicked in the QML
     void onLinkActivated (const QString &strLink);

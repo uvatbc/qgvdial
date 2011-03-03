@@ -659,7 +659,6 @@ MainWindow::msgBox_buttonClicked (QAbstractButton *button)
 void
 MainWindow::on_actionE_xit_triggered ()
 {
-    mqThread.setQuit ();
     this->close ();
 
     for (QMap<QString,QString>::iterator i  = mapVmail.begin ();
@@ -670,7 +669,8 @@ MainWindow::on_actionE_xit_triggered ()
     }
     mapVmail.clear ();
 
-    QTimer::singleShot (2 * 1000, qApp, SLOT (quit()));
+    mqThread.setQuit ();
+    qApp->quit ();
 }//MainWindow::on_actionE_xit_triggered
 
 void
@@ -1598,10 +1598,8 @@ MainWindow::onRefreshAll ()
 }//MainWindow::onRefreshAll
 
 void
-MainWindow::onSigProxyChanges(bool bEnable,
-                              bool bUseSystemProxy,
-                              const QString &host, int port,
-                              bool bRequiresAuth,
+MainWindow::onSigProxyChanges(bool bEnable, bool bUseSystemProxy,
+                              const QString &host, int port, bool bRequiresAuth,
                               const QString &user, const QString &pass)
 {
     // Send to WebPage.
@@ -1680,6 +1678,9 @@ MainWindow::onSigMosquittoChanges (bool bEnable, const QString &host, int port,
     }
 
     if (bEnable) {
-        QTimer::singleShot (2 * 1000, &mqThread, SLOT(start()));
+        qDebug ("Waiting for MQ thread to end");
+        mqThread.wait ();
+        qDebug ("Finished waiting for Mq thread, starting anew.");
+        mqThread.start();
     }
 }//MainWindow::onSigMosquittoChanges

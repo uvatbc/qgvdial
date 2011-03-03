@@ -9,6 +9,13 @@ MqClientThread::MqClientThread (const char *name, QObject *parent)
 {
 }//MqClientThread::MqClientThread
 
+MqClientThread::~MqClientThread ()
+{
+    qDebug ("Mosquitto: Waiting for the thread to terminate");
+    wait(15 * 1000);
+    qDebug ("Mosquitto: Thread has terminated");
+}//MqClientThread::~MqClientThread
+
 void
 MqClientThread::on_connect (int rc)
 {
@@ -18,7 +25,7 @@ MqClientThread::on_connect (int rc)
     }
     qDebug() << "Mosquitto: Connected to" << strHost;
 
-    rc = this->subscribe (NULL, strTopic.toLatin1().constData ());
+    rc = this->subscribe (NULL, strTopic.toLatin1().constData (), 1);
     if (0 != rc) {
         qWarning() << "Mosquitto: Failed in subscribe. Error =" << rc;
         emit status ("Failed to subscribe to Mosquitto server");

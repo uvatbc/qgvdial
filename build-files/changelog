@@ -1,3 +1,2 @@
-  * Mosquitto support. qgvdial can now subscribe to a mosquitto topic that will inform it of inbox updates. This is at present, Linux and Maemo only.
-  * Added changelog to Maemo and Linux build.
+  * qgvdial main thread now waits for Mosquitto thread to terminate.
 

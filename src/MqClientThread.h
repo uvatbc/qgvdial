@@ -13,6 +13,7 @@ class MqClientThread : public QThread, protected mosquittopp
     Q_OBJECT
 public:
     MqClientThread(const char *name, QObject *parent = 0);
+    ~MqClientThread();
 
     void setSettings(bool bEnable, const QString &host, int port = 0,
                      const QString &topic = "gv_notify");
