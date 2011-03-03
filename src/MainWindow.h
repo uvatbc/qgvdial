@@ -8,7 +8,7 @@
 #include "WebWidget.h"
 #include "RegNumberModel.h"
 
-#if DESKTOP_OS
+#if DESKTOP_OS || defined(Q_WS_MAEMO_5)
 #include "MqClientThread.h"
 #endif
 
