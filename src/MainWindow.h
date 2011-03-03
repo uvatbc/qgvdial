@@ -7,7 +7,10 @@
 #include "SMSDlg.h"
 #include "WebWidget.h"
 #include "RegNumberModel.h"
+
+#if DESKTOP_OS
 #include "MqClientThread.h"
+#endif
 
 // Required for Symbian (QSystemTrayIcon)
 #include "OsDependent.h"

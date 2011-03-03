@@ -17,11 +17,15 @@ maemo5 {
     OTHER_FILES += ../build-files/qgvdial.desktop
 }
 
-# In Linux and maemo, add the telepathy libraries, sources and headers
+# In Linux and maemo, add the telepathy libraries, headers and libmosquitto
 unix:!symbian {
     QT *= dbus
     INCLUDEPATH += $$QMAKESPEC/usr/include/telepathy-1.0/
     LIBS += -ltelepathy-qt4 -lmosquittopp
+}
+# In Windows, add the mosquitto dll
+win32 {
+    LIBS *= -lmosquittopp
 }
 
 PRECOMPILED_HEADER = global.h
@@ -129,7 +133,7 @@ OTHER_FILES  += winrsrc.rc                  \
                 ../qml/TextButton.qml       \
                 readme.txt
 
-# In Linux and maemo, add the telepathy related sources and headers
+# In Linux and maemo, add the telepathy related sources and headers. Also add Mosquitto based sources and headers.
 unix:!symbian {
     HEADERS  += TpObserver.h            \
                 TpCalloutInitiator.h    \
@@ -155,13 +159,15 @@ win32 {
 # Resource file is for windows only - for the icon
     RC_FILE = winrsrc.rc
 
-# In desktop Windows, add the Skype client
+# In desktop Windows, add the Skype client. Also add Mosquitto based sources and headers.
     HEADERS += SkypeWinClient.h             \
                SkypeObserver.h              \
-               DesktopSkypeCallInitiator.h
+               DesktopSkypeCallInitiator.h  \
+               MqClientThread.h
     SOURCES += SkypeWinClient.cpp           \
                SkypeObserver.cpp            \
-               DesktopSkypeCallInitiator.cpp
+               DesktopSkypeCallInitiator.cpp \
+               MqClientThread.cpp
 }
 
 symbian {
