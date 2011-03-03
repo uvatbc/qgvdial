@@ -53,6 +53,8 @@ system("mv $basedir/build-files/qgvdial.Call.service.linux $basedir/build-files/
 system("mv $basedir/build-files/qgvdial.Text.service.linux $basedir/build-files/qgvdial.Text.service");
 system("mv $basedir/qgv-tp/data/org.freedesktop.Telepathy.ConnectionManager.qgvtp.service.linux $basedir/qgv-tp/data/org.freedesktop.Telepathy.ConnectionManager.qgvtp.service");
 
+system("head -1 $basedir/debian/changelog >dest.txt ; cat $basedir/build-files/changelog >>dest.txt ; tail -2 $basedir/debian/changelog | head -1 | sed 's/unknown/Yuvraaj Kelkar/g' >>dest.txt ; mv dest.txt $basedir/debian/changelog");
+
 my $qt_target = "$basedir/debian/qgvdial/usr/share/qgvdial/qt-4.7.1";
 # Copy the relevent Qt shared libraries
 system("mkdir -p $qt_target");

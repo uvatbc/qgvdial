@@ -62,6 +62,8 @@ system("mv $basedir/qgv-tp/data/org.freedesktop.Telepathy.ConnectionManager.qgvt
 # Change the name of the desktop file so that it can be directly used in the compilation
 system("mv $basedir/build-files/qgvdial.desktop.maemo $basedir/build-files/qgvdial.desktop");
 
+system("head -1 $basedir/debian/changelog >dest.txt ; cat $basedir/build-files/changelog >>dest.txt ; tail -2 $basedir/debian/changelog | head -1 | sed 's/unknown/Yuvraaj Kelkar/g' >>dest.txt ; mv dest.txt $basedir/debian/changelog");
+
 if ($machine eq "arm") {
     # Make sure all make files are present before mucking with them.
     system("cd $basedir ; make src/Makefile qgv-tp/Makefile qgv-util/Makefile");
