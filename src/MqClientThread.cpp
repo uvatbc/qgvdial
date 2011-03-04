@@ -121,20 +121,20 @@ MqClientThread::on_disconnect()
 }//MqClientThread::on_disconnect
 
 void
-MqClientThread::on_publish(uint16_t mid)
+MqClientThread::on_publish(uint16_t /*mid*/)
 {
     qDebug ("Mosquitto: publish");
 }
 
 void
-MqClientThread::on_subscribe(uint16_t mid, int qos_count,
-                             const uint8_t *granted_qos)
+MqClientThread::on_subscribe(uint16_t /*mid*/, int /*qos_count*/,
+                             const uint8_t * /*granted_qos*/)
 {
     qDebug ("Mosquitto: Subscribed");
 }
 
 void
-MqClientThread::on_unsubscribe(uint16_t mid)
+MqClientThread::on_unsubscribe(uint16_t /*mid*/)
 {
     qDebug ("Mosquitto: unsubscribed");
 }

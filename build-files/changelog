@@ -1,2 +1,1 @@
-  * qgvdial main thread now waits for Mosquitto thread to terminate.
-
+  * Stop using the Mosquitto cpp class. Use the bare bones C functions and build the class around it. This passes the Windows build, and we shall use it as the gold standard.
