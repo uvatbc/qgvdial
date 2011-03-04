@@ -39,6 +39,9 @@
             <Component Id="ssleay32.dll" Guid="5A660879-F547-49C0-A7D8-F93BFBF92E5C">
                 <File Id="ssleay32.dll" Source="__QTDIR__\bin\ssleay32.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
+            <Component Id="mosquitto.dll" Guid="265055C2-2229-458A-A31A-90D7F11B3EA9">
+                <File Id="mosquitto.dll" Source="__QTDIR__\lib\mosquitto.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
             <Component Id="qt.conf" Guid="F5AA101C-FD8B-4525-9E72-4E32641C11A7">
                 <File Id="qt.conf" Source="..\build-files\qt.conf" KeyPath="yes" Checksum="yes"/>
             </Component>
@@ -148,6 +151,7 @@
             <ComponentRef Id="qgvdial.exe" />
             <ComponentRef Id="libeay32.dll" />
             <ComponentRef Id="ssleay32.dll" />
+            <ComponentRef Id="mosquitto.dll" />
             <ComponentRef Id="qt.conf" />
             <ComponentRef Id="run.bat" />
             <ComponentRef Id="phonon4.dll" />
