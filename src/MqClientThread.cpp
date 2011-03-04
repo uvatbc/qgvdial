@@ -124,26 +124,26 @@ void
 MqClientThread::on_publish(uint16_t /*mid*/)
 {
     qDebug ("Mosquitto: publish");
-}
+}//MqClientThread::on_publish
 
 void
 MqClientThread::on_subscribe(uint16_t /*mid*/, int /*qos_count*/,
                              const uint8_t * /*granted_qos*/)
 {
     qDebug ("Mosquitto: Subscribed");
-}
+}//MqClientThread::on_subscribe
 
 void
 MqClientThread::on_unsubscribe(uint16_t /*mid*/)
 {
     qDebug ("Mosquitto: unsubscribed");
-}
+}//MqClientThread::on_unsubscribe
 
 void
 MqClientThread::on_error()
 {
     qDebug ("Mosquitto: error");
-}
+}//MqClientThread::on_error
 
 void
 MqClientThread::run ()
@@ -224,28 +224,28 @@ int
 MqClientThread::loop(int timeout)
 {
     return mosquitto_loop(mosq, timeout);
-}
+}//MqClientThread::loop
 
 int
 MqClientThread::subscribe(uint16_t *mid, const char *sub, int qos)
 {
     return mosquitto_subscribe(mosq, mid, sub, qos);
-}
+}//MqClientThread::subscribe
 
 int
 MqClientThread::unsubscribe(uint16_t *mid, const char *sub)
 {
     return mosquitto_unsubscribe(mosq, mid, sub);
-}
+}//MqClientThread::unsubscribe
 
 int
 MqClientThread::mq_connect(const char *host, int port, int keepalive, bool clean_session)
 {
     return mosquitto_connect(mosq, host, port, keepalive, clean_session);
-}
+}//MqClientThread::mq_connect
 
 int
 MqClientThread::mq_disconnect()
 {
     return mosquitto_disconnect(mosq);
-}
+}//MqClientThread::mq_disconnect

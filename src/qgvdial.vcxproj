@@ -84,6 +84,7 @@
     <ClCompile Include="MainApp.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="MobileWebPage.cpp" />
+    <ClCompile Include="MqClientThread.cpp" />
     <ClCompile Include="ObserverFactory.cpp" />
     <ClCompile Include="OsDependent.cpp" />
     <ClCompile Include="PhoneNumberValidator.cpp" />
@@ -126,6 +127,7 @@
     <ClInclude Include="MainApp.h" />
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="MobileWebPage.h" />
+    <ClInclude Include="MqClientThread.h" />
     <ClInclude Include="ObserverFactory.h" />
     <ClInclude Include="OsDependent.h" />
     <ClInclude Include="PhoneNumberValidator.h" />
