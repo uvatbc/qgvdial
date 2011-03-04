@@ -21,11 +21,11 @@ maemo5 {
 unix:!symbian {
     QT *= dbus
     INCLUDEPATH += $$QMAKESPEC/usr/include/telepathy-1.0/
-    LIBS += -ltelepathy-qt4 -lmosquittopp
+    LIBS += -ltelepathy-qt4 -lmosquitto
 }
 # In Windows, add the mosquitto dll
 win32 {
-    LIBS *= -lmosquittopp
+    LIBS *= -lmosquitto
 }
 
 PRECOMPILED_HEADER = global.h

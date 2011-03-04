@@ -1,12 +1,69 @@
 #include "MqClientThread.h"
 
+struct mq_class_init {
+    mq_class_init() {
+        mosquitto_lib_init();
+    }
+    ~mq_class_init() {
+        mosquitto_lib_cleanup();
+    }
+}mq_class_init_object;
+
+static void
+on_connect_wrapper(void *obj, int rc)
+{
+    class MqClientThread *m = (class MqClientThread *)obj;
+    m->on_connect(rc);
+}//on_connect_wrapper
+
+static void
+on_disconnect_wrapper(void *obj)
+{
+    class MqClientThread *m = (class MqClientThread *)obj;
+    m->on_disconnect();
+}//on_disconnect_wrapper
+
+static void
+on_publish_wrapper(void *obj, uint16_t mid)
+{
+    class MqClientThread *m = (class MqClientThread *)obj;
+    m->on_publish(mid);
+}//on_publish_wrapper
+
+static void
+on_message_wrapper(void *obj, const struct mosquitto_message *message)
+{
+    class MqClientThread *m = (class MqClientThread *)obj;
+    m->on_message(message);
+}//on_message_wrapper
+
+static void
+on_subscribe_wrapper(void *obj, uint16_t mid, int qos_count, const uint8_t *granted_qos)
+{
+    class MqClientThread *m = (class MqClientThread *)obj;
+    m->on_subscribe(mid, qos_count, granted_qos);
+}//on_subscribe_wrapper
+
+static void
+on_unsubscribe_wrapper(void *obj, uint16_t mid)
+{
+    class MqClientThread *m = (class MqClientThread *)obj;
+    m->on_unsubscribe(mid);
+}//on_unsubscribe_wrapper
+
 MqClientThread::MqClientThread (const char *name, QObject *parent)
 : QThread(parent)
-, mosquittopp(name)
 , bQuit(false)
 , strHost ("localhost")
 , strTopic ("gv_notify")
 {
+    mosq = mosquitto_new(name, this);
+    mosquitto_connect_callback_set(mosq, on_connect_wrapper);
+    mosquitto_disconnect_callback_set(mosq, on_disconnect_wrapper);
+    mosquitto_publish_callback_set(mosq, on_publish_wrapper);
+    mosquitto_message_callback_set(mosq, on_message_wrapper);
+    mosquitto_subscribe_callback_set(mosq, on_subscribe_wrapper);
+    mosquitto_unsubscribe_callback_set(mosq, on_unsubscribe_wrapper);
 }//MqClientThread::MqClientThread
 
 MqClientThread::~MqClientThread ()
@@ -14,6 +71,7 @@ MqClientThread::~MqClientThread ()
     qDebug ("Mosquitto: Waiting for the thread to terminate");
     wait(15 * 1000);
     qDebug ("Mosquitto: Thread has terminated");
+    mosquitto_destroy(mosq);
 }//MqClientThread::~MqClientThread
 
 void
@@ -57,6 +115,37 @@ MqClientThread::on_message (const struct mosquitto_message *message)
 }//MqClientThread::on_message
 
 void
+MqClientThread::on_disconnect()
+{
+    qDebug ("Mosquitto: disconnect");
+}//MqClientThread::on_disconnect
+
+void
+MqClientThread::on_publish(uint16_t mid)
+{
+    qDebug ("Mosquitto: publish");
+}
+
+void
+MqClientThread::on_subscribe(uint16_t mid, int qos_count,
+                             const uint8_t *granted_qos)
+{
+    qDebug ("Mosquitto: Subscribed");
+}
+
+void
+MqClientThread::on_unsubscribe(uint16_t mid)
+{
+    qDebug ("Mosquitto: unsubscribed");
+}
+
+void
+MqClientThread::on_error()
+{
+    qDebug ("Mosquitto: error");
+}
+
+void
 MqClientThread::run ()
 {
     qDebug ("Mosquitto: Enter thread loop");
@@ -72,7 +161,7 @@ MqClientThread::run ()
 
         qDebug() << "Mosquitto: Attempting to connect to" << strHost
                  << "at" << strFirst;
-        int rv = ((mosquittopp*)this)->connect (strFirst.toLatin1().constData ());
+        int rv = this->mq_connect (strFirst.toLatin1().constData ());
         if (0 != rv) {
             qWarning() << "Mosquitto: Failed to connect. Error =" << rv;
             emit status ("Failed to connect to Mosquitto server");
@@ -85,7 +174,7 @@ MqClientThread::run ()
 
         qDebug ("Mosquitto: End Mq loop. Unsubscribe and disconnect");
         this->unsubscribe(NULL, strTopic.toLatin1().constData ());
-        ((mosquittopp*)this)->disconnect ();
+        this->mq_disconnect ();
         this->loop (100);
     } while (0); // End cleanup block (not a loop)
 
@@ -117,9 +206,8 @@ MqClientThread::setUserPass (const QString &user, const QString &pass)
 {
     strUser = user;
     strPass = pass;
-    int rv =
-    this->username_pw_set(strUser.toLatin1().constData (),
-                          strPass.toLatin1().constData ());
+    int rv = mosquitto_username_pw_set(mosq, strUser.toLatin1().constData (),
+                                             strPass.toLatin1().constData ());
     if (0 != rv) {
         qWarning() << "Mosquitto: Failed to set user and pass. Error =" << rv;
     }
@@ -131,3 +219,33 @@ MqClientThread::setQuit (bool set)
     bQuit = set;
     qDebug() << "Mosquitto: quit = " << (bQuit?"True":"False");
 }//MqClientThread::setQuit
+
+int
+MqClientThread::loop(int timeout)
+{
+    return mosquitto_loop(mosq, timeout);
+}
+
+int
+MqClientThread::subscribe(uint16_t *mid, const char *sub, int qos)
+{
+    return mosquitto_subscribe(mosq, mid, sub, qos);
+}
+
+int
+MqClientThread::unsubscribe(uint16_t *mid, const char *sub)
+{
+    return mosquitto_unsubscribe(mosq, mid, sub);
+}
+
+int
+MqClientThread::mq_connect(const char *host, int port, int keepalive, bool clean_session)
+{
+    return mosquitto_connect(mosq, host, port, keepalive, clean_session);
+}
+
+int
+MqClientThread::mq_disconnect()
+{
+    return mosquitto_disconnect(mosq);
+}
