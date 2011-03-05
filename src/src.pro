@@ -175,6 +175,9 @@ symbian {
     # TARGET.CAPABILITY +=
     TARGET.EPOCSTACKSIZE = 0x14000
     TARGET.EPOCHEAPSIZE = 0x020000 0x800000
+
+# This hack is required until the next version of QT SDK
+    QT_CONFIG -= opengl
 }
 
 ###############################################################

@@ -37,8 +37,10 @@ MainWindow::MainWindow (QWidget *parent)
 , mtxDial (QMutex::Recursive)
 , bCallInProgress (false)
 , bDialCancelled (false)
+#if MOSQUITTO_CAPABLE
 , mqThread (QString("qgvdial:%1").arg(QHostInfo::localHostName())
             .toLatin1().constData (), this)
+#endif
 {
     initLogging ();
 
@@ -83,7 +85,9 @@ MainWindow::MainWindow (QWidget *parent)
 
 MainWindow::~MainWindow ()
 {
+#if MOSQUITTO_CAPABLE
     mqThread.terminate ();
+#endif
 }//MainWindow::~MainWindow
 
 void
@@ -340,6 +344,7 @@ MainWindow::init ()
 
     this->setWindowIcon (icoGoogle);
 
+#if MOSQUITTO_CAPABLE
     // Connect the signals from the Mosquitto thread
     QObject::connect (&mqThread , SIGNAL(sigUpdateInbox()),
                       &oInbox   , SLOT  (refresh()));
@@ -347,6 +352,7 @@ MainWindow::init ()
                       &oContacts, SLOT  (refreshContacts()));
     QObject::connect (&mqThread , SIGNAL(status(QString,int)),
                        this     , SLOT  (setStatus(QString,int)));
+#endif
 
     // If the cache has the username and password, begin login
     if (dbMain.getUserPass (strUser, strPass))
@@ -605,7 +611,9 @@ MainWindow::doLogout ()
     OsDependent &osd = Singletons::getRef().getOSD ();
     osd.setLongWork (this, true);
 
+#if MOSQUITTO_CAPABLE
     mqThread.setQuit ();
+#endif
 }//MainWindow::doLogout
 
 void
@@ -669,7 +677,9 @@ MainWindow::on_actionE_xit_triggered ()
     }
     mapVmail.clear ();
 
+#if MOSQUITTO_CAPABLE
     mqThread.setQuit ();
+#endif
     qApp->quit ();
 }//MainWindow::on_actionE_xit_triggered
 
@@ -1672,6 +1682,7 @@ MainWindow::onSigMosquittoChanges (bool bEnable, const QString &host, int port,
                                    Q_ARG (QVariant, QVariant(topic)));
     } while (0); // End cleanup block (not a loop)
 
+#if MOSQUITTO_CAPABLE
     mqThread.setSettings (bEnable, host, port);
     if (mqThread.isRunning ()) {
         mqThread.setQuit ();
@@ -1683,4 +1694,5 @@ MainWindow::onSigMosquittoChanges (bool bEnable, const QString &host, int port,
         qDebug ("Finished waiting for Mq thread, starting anew.");
         mqThread.start();
     }
+#endif
 }//MainWindow::onSigMosquittoChanges

@@ -8,7 +8,7 @@
 #include "WebWidget.h"
 #include "RegNumberModel.h"
 
-#if DESKTOP_OS || defined(Q_WS_MAEMO_5)
+#if MOSQUITTO_CAPABLE
 #include "MqClientThread.h"
 #endif
 
@@ -231,8 +231,10 @@ private:
     //! Map between the voice mail link and its temp file name
     QMap<QString,QString> mapVmail;
 
+#if MOSQUITTO_CAPABLE
     //! This holds the thread that communicates with the mosquitto server.
     MqClientThread  mqThread;
+#endif
 };
 
 #endif // MAINWINDOW_H

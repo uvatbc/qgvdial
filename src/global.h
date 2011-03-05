@@ -179,5 +179,11 @@ Q_DECLARE_METATYPE(ContactInfo)
 #define TELEPATHY_CAPABLE 0
 #endif
 
+#if DESKTOP_OS || defined(Q_WS_MAEMO_5)
+#define MOSQUITTO_CAPABLE 1
+#else
+#define MOSQUITTO_CAPABLE 0
+#endif
+
 #endif //__cplusplus
 #endif //__GLOBAL_H__
