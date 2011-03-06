@@ -94,7 +94,9 @@ void
 MainWindow::initLogging ()
 {
     // Initialize logging
-    QString strLogfile = QDir::homePath ();
+    QString strLogfile;
+#ifndef Q_OS_SYMBIAN
+    strLogfile = QDir::homePath ();
     QDir dirHome(strLogfile);
     if (!strLogfile.endsWith (QDir::separator ()))
     {
@@ -105,6 +107,7 @@ MainWindow::initLogging ()
         dirHome.mkdir (".qgvdial");
     }
     strLogfile += QDir::separator ();
+#endif
     strLogfile += "qgvdial.log";
     fLogfile.setFileName (strLogfile);
     fLogfile.open (QIODevice::WriteOnly | QIODevice::Append);
