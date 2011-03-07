@@ -40,6 +40,13 @@ Rectangle {
     onSigCall: console.debug("QML: Call " + number)
     onSigText: console.debug("QML: Text " + number)
 
+    onSigLogin: console.debug("QML: Login")
+    onSigLogout: console.debug("QML: Logout")
+
+    onSigWebPage: console.debug("QML: Open web page")
+    onSigRefresh: console.debug("QML: Refresh requested")
+    onSigRefreshAll: console.debug("QML: Refresh All requested")
+
     onSigDismiss: console.debug("QML: Dismiss requested");
     onSigQuit: console.debug("QML: Quit requested");
 

@@ -116,6 +116,97 @@ Item {
             }//Row (password)
         }//Rectangle (password)
 
+        ListView {
+            width: parent.width
+            height: parent.height - (textUsername.height * 2)
+            clip: true
+
+            function login_logout_function() {
+                if (mainColumn.bIsLoggedIn) {
+                    container.sigLogout();
+                } else {
+                    container.sigLogin();
+                }
+
+                // Comment out when using qml in c++ code.
+                mainColumn.bIsLoggedIn = !mainColumn.bIsLoggedIn;
+                if (mainColumn.bIsLoggedIn) {
+                    buttonModel.strLoginLogout = "Logout"
+                } else {
+                    buttonModel.strLoginLogout = "Login"
+                }
+            }
+
+            model: ListModel {
+                ListElement {
+                    text: "Login"
+                    newState: ""
+                }//ListElement (login/logout)
+                ListElement {
+                    text: "Proxy settings"
+                    newState: "Proxy"
+                }//ListElement (proxy settings)
+                ListElement {
+                    text: "Mosquitto settings"
+                    newState: "Mosquitto"
+                }//ListElement (mosquitto settings)
+                ListElement {
+                    text: "Web Page (debug)"
+                    newState: ""
+                }//ListElement (Web Page (debug))
+                ListElement {
+                    text: "Refresh"
+                    newState: ""
+                }//ListElement (Web Page (debug))
+                ListElement {
+                    text: "Dismiss window"
+                    newState: ""
+                }//ListElement (Web Page (debug))
+                ListElement {
+                    text: "About"
+                    newState: "About"
+                }//ListElement (Web Page (debug))
+            }
+
+            delegate: MyButton {
+                mainText: (text == "Login" ? (mainColumn.bIsLoggedIn == true ? "Logout" : "Login") : text)
+                width: parent.width
+                mainFontPoint: Code.btnFontPoint()/8
+
+                onClicked: {
+                    if (newState != "") {
+                        container.state = newState
+                    }
+
+                    if (text == "Login") {
+                        if (mainColumn.bIsLoggedIn) {
+                            container.sigLogout();
+                        } else {
+                            container.sigLogin();
+                        }
+
+                        // Comment out when using qml in c++ code.
+                        mainColumn.bIsLoggedIn = !mainColumn.bIsLoggedIn;
+                    } else if (text == "Web Page (debug)") {
+                        container.sigWebPage();
+                    } else if (text == "Refresh") {
+                        container.sigRefresh();
+                    } else if (text == "Dismiss window") {
+                        container.sigDismiss();
+                    }
+                }//onClicked
+
+                onPressHold: {
+                    if (text == "Refresh") {
+                        container.sigRefreshAll();
+                    } else if (text == "Dismiss window") {
+                        container.sigQuit();
+                    }
+                }
+            }//delegate (MyButton)
+        }//ListView
+
+/*
         MyButton {
             id: btnLogin
             mainText: (mainColumn.bIsLoggedIn == true ? "Logout" : "Login")
@@ -155,7 +246,7 @@ Item {
 
             onClicked: container.state = "Mosquitto"
             KeyNavigation.tab: btnWebpage
-        }// MyButton (proxy settings)
+        }// MyButton (mosquitto settings)
 
         MyButton {
             id: btnWebpage
@@ -197,7 +288,8 @@ Item {
 
             onClicked: container.state = "About"
             KeyNavigation.tab: textUsername
-        }//MyButton (Dismiss window/quit)
+        }//MyButton (About)
+*/
     }// Column
 
     Proxy {
