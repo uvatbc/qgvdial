@@ -206,19 +206,25 @@ MainWindow::onStatusTimerTick ()
 }//MainWindow::onStatusTimerTick
 
 /** Invoked when the QtSingleApplication sends a message
- * We have used a QtSignleApplication to ensure that there is only one instance
+ * We have used a QtSingleApplication to ensure that there is only one instance
  * of our program running in a specific user context. When the user attempts to
  * fire up another instance of our application, the second instance communicates
  * with the first and tells it to show the main window. the 2nd instance then
  * self-terminates. The first instance gets the "show" command as a parameter to
  * this SLOT.
+ * It is also possible for the second instance to send a "quit" message. This is
+ * almost always done to quit before uninstall/upgrade.
  * @param message The message passed by the other application.
  */
 void
 MainWindow::messageReceived (const QString &message)
 {
     if (message == "show") {
+        qDebug ("Second instance asked us to show");
         this->show ();
+    } else if (message == "quit") {
+        qDebug ("Second instance asked us to quit");
+        this->on_actionE_xit_triggered ();
     }
 }//MainWindow::messageReceived
 
@@ -604,8 +610,7 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
         QString strMqHost, strMqTopic;
         int mqPort;
         if (dbMain.getMqSettings (bMqEnabled, strMqHost, mqPort, strMqTopic)) {
-            this->onSigMosquittoChanges (bMqEnabled, strMqHost, mqPort,
-                                         strMqTopic);
+            onSigMosquittoChanges (bMqEnabled, strMqHost, mqPort, strMqTopic);
         }
     }
 }//MainWindow::loginCompleted
@@ -1678,31 +1683,58 @@ MainWindow::onSigMosquittoChanges (bool bEnable, const QString &host, int port,
             break;
         }
 
-        QObject *pProxySettings = pRoot->findChild <QObject*>
+        QObject *pMqSettings = pRoot->findChild <QObject*>
                                                   ("MosquittoPage");
-        if (NULL == pProxySettings) {
+        if (NULL == pMqSettings) {
             qWarning ("Could not get to MosquittoPage");
             break;
         }
 
-        QMetaObject::invokeMethod (pProxySettings, "setValues",
+        QString strHost = host, strTopic = topic;
+        if (host.isEmpty ()) {
+            // This definitely does not exist.
+            strHost = "mosquitto.example.com";
+        }
+        if (0 == port) {
+            // Default mosquitto port
+            port = 1883;
+        }
+        if (topic.isEmpty ()) {
+            // Default topic
+            strTopic = "gv_notify";
+        }
+
+        QMetaObject::invokeMethod (pMqSettings, "setValues",
                                    Q_ARG (QVariant, QVariant(bEnable)),
-                                   Q_ARG (QVariant, QVariant(host)),
+                                   Q_ARG (QVariant, QVariant(strHost)),
                                    Q_ARG (QVariant, QVariant(port)),
-                                   Q_ARG (QVariant, QVariant(topic)));
+                                   Q_ARG (QVariant, QVariant(strTopic)));
     } while (0); // End cleanup block (not a loop)
 
 #if MOSQUITTO_CAPABLE
     mqThread.setSettings (bEnable, host, port);
+    bRunMqThread = bEnable;
+    QObject::disconnect (&mqThread, SIGNAL(finished()),
+                       this    , SLOT(onMqThreadFinished()));
+    QObject::connect (&mqThread, SIGNAL(finished()),
+                       this    , SLOT(onMqThreadFinished()));
     if (mqThread.isRunning ()) {
         mqThread.setQuit ();
-    }
-
-    if (bEnable) {
-        qDebug ("Waiting for MQ thread to end");
-        mqThread.wait ();
-        qDebug ("Finished waiting for Mq thread, starting anew.");
-        mqThread.start();
+    } else {
+        onMqThreadFinished ();
     }
 #endif
 }//MainWindow::onSigMosquittoChanges
+
+void
+MainWindow::onMqThreadFinished ()
+{
+    QObject::disconnect (&mqThread, SIGNAL(finished()),
+                          this    , SLOT(onMqThreadFinished()));
+    if (bRunMqThread) {
+        qDebug ("Finished waiting for Mq thread, restarting thread.");
+        mqThread.start();
+    } else {
+        qDebug ("Finished waiting for Mq thread. Not restarting");
+    }
+}//MainWindow::onMqThreadFinished

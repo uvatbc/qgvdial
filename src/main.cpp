@@ -48,8 +48,19 @@ main (int argc, char *argv[])
     pOldHandler = qInstallMsgHandler(myMessageOutput);
 
     MainApp app(argc, argv);
+    bool bQuit = false;
+    if ((app.argc() >= 2) && (0 == strcmp(app.argv()[1],"quit"))) {
+        bQuit = true;
+    }
     if (app.isRunning ()) {
-        app.sendMessage ("show");
+        if (bQuit) {
+            app.sendMessage ("quit");
+        } else {
+            app.sendMessage ("show");
+            bQuit = true;
+        }
+    }
+    if (bQuit == true) {
         return (0);
     }
 

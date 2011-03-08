@@ -1,1 +1,5 @@
-  * Stop using the Mosquitto cpp class. Use the bare bones C functions and build the class around it. This passes the Windows build, and we shall use it as the gold standard.
+  * Lots of improvements for the Symbian build. It runs and actually attempts to connect, but no full login yet. Soon. Soon.
+  * Quit qgvdial on uninstall.
+  * No more hard wait on Mq thread. Slot it.
+  * Stop throwing away Mq settings when it is disabled.
+

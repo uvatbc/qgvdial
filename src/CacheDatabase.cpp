@@ -1176,7 +1176,8 @@ CacheDatabase::getMqSettings (bool &bEnable, QString &host, int &port,
         bEnable = (flags == 1);
         if (!bEnable) {
             qDebug ("Mosquitto not enabled.");
-            break;
+            // But still get the host and port values - This is useful when the
+            // user just disables for the time being.
         }
 
         host = query.value (1).toString ();

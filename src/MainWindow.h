@@ -141,6 +141,8 @@ private slots:
     void onSigMosquittoChanges(bool bEnable, const QString &host, int port,
                                const QString &topic);
 
+    void onMqThreadFinished();
+
 private:
     void initLogging ();
 
@@ -234,6 +236,7 @@ private:
 #if MOSQUITTO_CAPABLE
     //! This holds the thread that communicates with the mosquitto server.
     MqClientThread  mqThread;
+    bool            bRunMqThread;
 #endif
 };
 

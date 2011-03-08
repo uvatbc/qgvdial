@@ -1,3 +1,4 @@
 #!/bin/sh
 run-standalone.sh /opt/qgvdial/bin/qgv-util REMOVE
+run-standalone.sh /opt/qgvdial/bin/qgvdial quit
 
