@@ -32,7 +32,6 @@ Item {
         // Test properties; comment out when adding qml to c++ code.
         property string strUsername: g_strUsername      // "user@gmail.com"
         property string strPassword: g_strPassword      // "hunter2 :p"
-        property bool bIsLoggedIn: g_bIsLoggedIn        // false
 
         Rectangle {
             width: parent.width
@@ -57,11 +56,11 @@ Item {
                     color: "white"
                     font.pointSize: Code.btnFontPoint()/10
 
-                    opacity: (mainColumn.bIsLoggedIn == true ? 0 : 1)
+                    opacity: (g_bIsLoggedIn == true ? 0 : 1)
 
                     onTextChanged: container.sigUserChanged(textUsername.text);
                     KeyNavigation.tab: textPassword
-                    Keys.onReturnPressed: btnLogin.btnActivated();
+                    Keys.onReturnPressed: listButtons.login_logout_function();
                 }
 
                 Text {
@@ -69,7 +68,7 @@ Item {
                     text: mainColumn.strUsername
                     color: "white"
                     font.pointSize: Code.btnFontPoint()/10
-                    opacity: (mainColumn.bIsLoggedIn == true ? 1 : 0)
+                    opacity: (g_bIsLoggedIn == true ? 1 : 0)
                 }
             }//Row
         }//Rectangle (username)
@@ -99,11 +98,11 @@ Item {
                     echoMode: TextInput.Password
                     font.pointSize: Code.btnFontPoint()/10
 
-                    opacity: (mainColumn.bIsLoggedIn == true ? 0 : 1)
+                    opacity: (g_bIsLoggedIn == true ? 0 : 1)
 
                     onTextChanged: container.sigPassChanged(textPassword.text);
-                    KeyNavigation.tab: btnLogin
-                    Keys.onReturnPressed: btnLogin.btnActivated();
+                    KeyNavigation.tab: textUsername
+                    Keys.onReturnPressed: listButtons.login_logout_function();
                 }
 
                 Text {
@@ -111,29 +110,22 @@ Item {
                     text: Array(mainColumn.strPassword.length+1).join("*")
                     color: "white"
                     font.pointSize: Code.btnFontPoint()/10
-                    opacity: (mainColumn.bIsLoggedIn == true ? 1 : 0)
+                    opacity: (g_bIsLoggedIn == true ? 1 : 0)
                 }
             }//Row (password)
         }//Rectangle (password)
 
         ListView {
+            id: listButtons
             width: parent.width
             height: parent.height - (textUsername.height * 2)
             clip: true
 
             function login_logout_function() {
-                if (mainColumn.bIsLoggedIn) {
+                if (g_bIsLoggedIn) {
                     container.sigLogout();
                 } else {
                     container.sigLogin();
-                }
-
-                // Comment out when using qml in c++ code.
-                mainColumn.bIsLoggedIn = !mainColumn.bIsLoggedIn;
-                if (mainColumn.bIsLoggedIn) {
-                    buttonModel.strLoginLogout = "Logout"
-                } else {
-                    buttonModel.strLoginLogout = "Login"
                 }
             }
 
@@ -169,7 +161,7 @@ Item {
             }
 
             delegate: MyButton {
-                mainText: (text == "Login" ? (mainColumn.bIsLoggedIn == true ? "Logout" : "Login") : text)
+                mainText: (text == "Login" ? (g_bIsLoggedIn == true ? "Logout" : "Login") : text)
                 width: parent.width
                 mainFontPoint: Code.btnFontPoint()/8
 
@@ -179,14 +171,11 @@ Item {
                     }
 
                     if (text == "Login") {
-                        if (mainColumn.bIsLoggedIn) {
+                        if (g_bIsLoggedIn) {
                             container.sigLogout();
                         } else {
                             container.sigLogin();
                         }
-
-                        // Comment out when using qml in c++ code.
-                        mainColumn.bIsLoggedIn = !mainColumn.bIsLoggedIn;
                     } else if (text == "Web Page (debug)") {
                         container.sigWebPage();
                     } else if (text == "Refresh") {

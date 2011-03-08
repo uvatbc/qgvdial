@@ -373,6 +373,10 @@ MainWindow::init ()
     {
         setStatus ("No user credentials cached. Please login");
 
+        // Do this otherwise the QML behaves silly.
+        QDeclarativeContext *ctx = this->rootContext();
+        ctx->setContextProperty ("g_bIsLoggedIn", false);
+
         strUser.clear ();
         strPass.clear ();
 
@@ -458,6 +462,9 @@ MainWindow::doLogin ()
     bool bOk = false;
     do { // Begin cleanup block (not a loop)
         webPage.setTimeout(60);
+
+        strUser = "yuvraaj@gmail.com";
+        strPass = "chaus10paus";
 
         l += strUser;
         l += strPass;
@@ -1584,7 +1591,7 @@ MainWindow::onRegPhoneSelectionChange (int index)
     }
 
     QDeclarativeContext *ctx = this->rootContext();
-    ctx->setContextProperty ("currentPhoneName", disp);
+    ctx->setContextProperty ("g_CurrentPhoneName", disp);
 
     OsDependent &osd = Singletons::getRef().getOSD ();
     osd.setLongWork (this, false);

@@ -62,9 +62,6 @@ ObserverFactory::init ()
     SkypeObserver *skypeObs = new SkypeObserver ();
 
     QObject::connect (
-        skypeObs, SIGNAL (log(const QString &, int)),
-        this    , SIGNAL (log(const QString &, int)));
-    QObject::connect (
         skypeObs, SIGNAL (status(const QString &, int)),
         this    , SIGNAL (status(const QString &, int)));
 

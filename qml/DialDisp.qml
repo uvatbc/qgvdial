@@ -28,7 +28,7 @@ Rectangle {
             }
 
             MyButton {
-                mainText: currentPhoneName;
+                mainText: g_CurrentPhoneName;
                 anchors.fill: parent
                 radius: ((height / 10.0) + (width / 60.0))
                 mainFontPoint: Code.btnFontPoint() / 4

@@ -172,9 +172,11 @@ win32 {
 
 symbian {
     TARGET.UID3 = 0xe2d130b9
-    TARGET.CAPABILITY += NetworkServices
-    TARGET.EPOCSTACKSIZE = 0x14000
-    TARGET.EPOCHEAPSIZE = 0x020000 0x800000
+    TARGET.CAPABILITY += NetworkServices ReadUserData
+# Uncomment when you are ready to sign
+#    TARGET.CAPABILITY += ReadDeviceData
+    TARGET.EPOCSTACKSIZE = 0x14000          # 80 KB stack size
+    TARGET.EPOCHEAPSIZE = 0x020000 0x2000000 # 128 KB - 20 MB
 
 # This hack is required until the next version of QT SDK
     QT_CONFIG -= opengl

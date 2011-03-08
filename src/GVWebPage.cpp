@@ -3,6 +3,7 @@
 #include "GVI_XMLJsonHandler.h"
 
 #define GV_DATA_BASE "https://www.google.com/voice"
+#define SYMBIAN_SIGNED 0
 
 GVWebPage::GVWebPage(QObject *parent/* = NULL*/)
 : GVAccess (parent)
@@ -14,6 +15,7 @@ GVWebPage::GVWebPage(QObject *parent/* = NULL*/)
 , pCurrentReply (NULL)
 {
     webPage.settings()->setAttribute (QWebSettings::JavaEnabled, false);
+    webPage.settings()->setAttribute (QWebSettings::AutoLoadImages, false);
     //TODO: Do not download images. Speed up load. Look at other speed ups.
     webPage.setForwardUnsupportedContent (true);
 
@@ -127,6 +129,18 @@ GVWebPage::isLoggedIn ()
 }//GVWebPage::isLoggedIn
 
 bool
+GVWebPage::isOnline ()
+{
+#if !defined(Q_OS_SYMBIAN) || SYMBIAN_SIGNED
+    return nwCfg.isOnline ();
+#else
+    // In Symbian with no signing, pretend we're always online.
+    // This is because we don't want to sign
+    return true;
+#endif
+}//GVWebPage::isOnline
+
+bool
 GVWebPage::aboutBlank ()
 {
     QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
@@ -148,7 +162,7 @@ GVWebPage::aboutBlankDone (bool bOk)
 bool
 GVWebPage::login ()
 {
-    if (!nwCfg.isOnline ()) {
+    if (!this->isOnline ()) {
         qDebug ("Cannot login when offline");
         completeCurrentWork (GVAW_login, false);
         return false;
@@ -342,7 +356,7 @@ GVWebPage::loginStage3 (bool bOk)
 bool
 GVWebPage::logout ()
 {
-    if (!nwCfg.isOnline ()) {
+    if (!this->isOnline ()) {
         qDebug ("Cannot logout when offline");
         completeCurrentWork (GVAW_logout, false);
         return false;
@@ -373,7 +387,7 @@ GVWebPage::logoutDone (bool bOk)
 bool
 GVWebPage::retrieveContacts ()
 {
-    if (!nwCfg.isOnline ()) {
+    if (!this->isOnline ()) {
         qDebug ("Cannot retrieve contacts when offline");
         completeCurrentWork (GVAW_getAllContacts, false);
         return false;
@@ -481,7 +495,7 @@ GVWebPage::isNextContactsPageAvailable ()
 bool
 GVWebPage::dialCallback (bool bCallback)
 {
-    if (!nwCfg.isOnline ()) {
+    if (!this->isOnline ()) {
         qDebug ("Cannot dial back when offline");
         completeCurrentWork (bCallback?GVAW_dialCallback:GVAW_dialOut, false);
         return false;
@@ -678,7 +692,7 @@ GVWebPage::onDataCallCanceled (QNetworkReply * reply)
 bool
 GVWebPage::getContactInfoFromLink ()
 {
-    if (!nwCfg.isOnline ()) {
+    if (!this->isOnline ()) {
         qDebug ("Cannot retrieve contact info when offline");
         completeCurrentWork (GVAW_getContactFromLink, false);
         return false;
@@ -779,7 +793,7 @@ GVWebPage::contactInfoLoaded (bool bOk)
 bool
 GVWebPage::getRegisteredPhones ()
 {
-    if (!nwCfg.isOnline ()) {
+    if (!this->isOnline ()) {
         qDebug ("Cannot get registered phones when offline");
         completeCurrentWork (GVAW_getRegisteredPhones, false);
         return false;
@@ -867,7 +881,7 @@ GVWebPage::userCancel ()
 bool
 GVWebPage::sendInboxRequest ()
 {
-    if (!nwCfg.isOnline ()) {
+    if (!this->isOnline ()) {
         qDebug ("Cannot send request for inbox when offline");
         completeCurrentWork (GVAW_getInbox, false);
         return false;
@@ -931,7 +945,7 @@ GVWebPage::sendInboxRequest ()
 bool
 GVWebPage::getInbox ()
 {
-    if (!nwCfg.isOnline ()) {
+    if (!this->isOnline ()) {
         qDebug ("Cannot get inbox when offline");
         completeCurrentWork (GVAW_getInbox, false);
         return false;
@@ -1015,7 +1029,7 @@ GVWebPage::onGotInboxXML (QNetworkReply *reply)
 bool
 GVWebPage::getContactFromInboxLink ()
 {
-    if (!nwCfg.isOnline ()) {
+    if (!this->isOnline ()) {
         qDebug ("Cannot get contact from inbox link when offline");
         completeCurrentWork (GVAW_getContactFromInboxLink, false);
         return false;
@@ -1122,7 +1136,7 @@ GVWebPage::garbageTimerTimeout ()
 bool
 GVWebPage::sendSMS ()
 {
-    if (!nwCfg.isOnline ()) {
+    if (!this->isOnline ()) {
         qDebug ("Cannot send SMS when offline");
         completeCurrentWork (GVAW_sendSMS, false);
         return false;
@@ -1224,7 +1238,7 @@ GVWebPage::sendSMSResponse (QNetworkReply *reply)
 bool
 GVWebPage::playVmail ()
 {
-    if (!nwCfg.isOnline ()) {
+    if (!this->isOnline ()) {
         qDebug ("Cannot download vmail when offline");
         completeCurrentWork (GVAW_playVmail, false);
         return false;

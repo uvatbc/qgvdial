@@ -76,6 +76,7 @@ private slots:
 private:
     QWebElement doc ();
     bool isLoggedIn ();
+    bool isOnline ();
     bool isNextContactsPageAvailable ();
     void getHostAndQuery (QString &strHost, QString &strQuery);
     void loadUrlString (const QString &strUrl);
