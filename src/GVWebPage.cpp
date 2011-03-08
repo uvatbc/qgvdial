@@ -13,7 +13,8 @@ GVWebPage::GVWebPage(QObject *parent/* = NULL*/)
 , pageTimeoutTimer (this)
 , pCurrentReply (NULL)
 {
-    webPage.settings()->setAttribute (QWebSettings::JavaEnabled   , false);
+    webPage.settings()->setAttribute (QWebSettings::JavaEnabled, false);
+    //TODO: Do not download images. Speed up load. Look at other speed ups.
     webPage.setForwardUnsupportedContent (true);
 
     garbageTimer.setSingleShot (true);
