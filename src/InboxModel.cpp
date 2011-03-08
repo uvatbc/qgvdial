@@ -137,6 +137,7 @@ InboxModel::data (const QModelIndex &index,
             if (!GVAccess::isNumberValid (strNum)) {
                 qWarning () << "Inbox: Display phone number is invalid : "
                             << strNum;
+                var = "Unknown";
                 break;
             }
 
