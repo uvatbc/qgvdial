@@ -469,9 +469,6 @@ MainWindow::doLogin ()
     do { // Begin cleanup block (not a loop)
         webPage.setTimeout(60);
 
-        strUser = "yuvraaj@gmail.com";
-        strPass = "chaus10paus";
-
         l += strUser;
         l += strPass;
 
