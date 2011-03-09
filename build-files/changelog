@@ -1,4 +1,2 @@
-  * Added a lot of debug messages catch the intermittent high CPU usage
-  * Status message about the number of new Inbox entries.
-  * Mq thread termination bug fix.
+  * Damage control
 
