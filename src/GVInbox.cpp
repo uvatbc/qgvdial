@@ -136,9 +136,13 @@ GVInbox::oneInboxEntry (const GVInboxEntry &hevent)
 }//GVInbox::oneInboxEntry
 
 void
-GVInbox::getInboxDone (bool, const QVariantList &)
+GVInbox::getInboxDone (bool, const QVariantList &params)
 {
     emit status ("Inbox retrieved. Sorting...", 0);
+    int nNew = 0;
+    if (params.count() > 4) {
+        nNew = params[4].toInt();
+    }
 
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     dbMain.setQuickAndDirty (false);
@@ -158,7 +162,8 @@ GVInbox::getInboxDone (bool, const QVariantList &)
         dbMain.setLastInboxUpdate (dtUpdate);
     }
 
-    emit status ("Inbox ready");
+    emit status (QString("Inbox ready. %1 %2 retrieved.")
+                 .arg(nNew).arg (nNew == 1?"entry":"entries"));
 }//GVInbox::getInboxDone
 
 void

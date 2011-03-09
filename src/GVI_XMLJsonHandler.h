@@ -14,7 +14,7 @@ class GVI_XMLJsonHandler : public QObject, public QXmlDefaultHandler
 
 public:
     explicit GVI_XMLJsonHandler(QObject *parent = 0);
-    bool parseJSON (const QDateTime &dtUpdate, bool &bGotOld);
+    bool parseJSON (const QDateTime &dtUpdate, bool &bGotOld, int &nNew);
     qint32 getUsableMsgsCount ();
 
 signals:

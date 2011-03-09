@@ -51,7 +51,7 @@ GVI_XMLJsonHandler::characters (const QString &ch)
 }//GVI_XMLJsonHandler::characters
 
 bool
-GVI_XMLJsonHandler::parseJSON (const QDateTime &dtUpdate, bool &bGotOld)
+GVI_XMLJsonHandler::parseJSON (const QDateTime &dtUpdate, bool &bGotOld, int &nNew)
 {
     bool rv = false;
     do // Begin cleanup block (not a loop)
@@ -193,8 +193,10 @@ GVI_XMLJsonHandler::parseJSON (const QDateTime &dtUpdate, bool &bGotOld)
             nUsableMsgs++;
         }
 
-        qDebug () << QString ("Valid messages = %1").arg (nUsableMsgs);
+        nNew = nUsableMsgs - nOldMsgs;
+        qDebug () << QString ("Usable messages = %1").arg (nUsableMsgs);
         qDebug () << QString ("Old messages = %1").arg (nOldMsgs);
+        qDebug () << QString ("New messages = %1").arg (nNew);
 
         rv = true;
     } while (0); // End cleanup block (not a loop)

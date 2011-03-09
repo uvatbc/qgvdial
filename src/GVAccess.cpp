@@ -150,11 +150,13 @@ GVAccess::enqueueWork (GVAccess_Work whatwork, const QVariantList &params,
     QMutexLocker locker(&mutex);
     workList.push_back (workItem);
 
-    qDebug () << "GVAccess: Enqueued " << getNameForWork (whatwork);
+    qDebug() << "GVAccess: Enqueued " << getNameForWork (whatwork);
 
     // If there is no current work in progress...
     doNextWork ();// ... this takes care of when some work is in progress
 
+    qDebug() << "GVAccess: Exit enqueueWork. The work we came in for was "
+             << getNameForWork (whatwork);
     // We've come this far. Always return true because enqueue has succeeded.
     return (true);
 }//GVAccess::enqueueWork
@@ -253,13 +255,15 @@ GVAccess::completeCurrentWork (GVAccess_Work whatwork, bool bOk)
             this, SIGNAL (workCompleted (bool, const QVariantList &)),
             workCurrent.receiver, workCurrent.method);
 
+        qDebug() << "GVAccess: Invoking callback for work "
+                 << getNameForWork(whatwork);
         emit workCompleted (bOk, workCurrent.arrParams);
 
         QObject::disconnect (
             this, SIGNAL (workCompleted (bool, const QVariantList &)),
             workCurrent.receiver, workCurrent.method);
 
-        qDebug () << "GVAccess: Completed work " << getNameForWork(whatwork);
+        qDebug() << "GVAccess: Completed work " << getNameForWork(whatwork);
     } while (0); // End cleanup block (not a loop)
 
     // Init MUST be done after the workCompleted emit to prevent races
@@ -272,6 +276,8 @@ bool
 GVAccess::cancelWork()
 {
     QMutexLocker locker(&mutex);
+    qDebug() << "GVAccess: Request for cancel current. current work is "
+             << getNameForWork (workCurrent.whatwork);
     return cancelWork (workCurrent.whatwork);
 }//GVAccess::cancelWork
 
@@ -280,18 +286,24 @@ GVAccess::cancelWork (GVAccess_Work whatwork)
 {
     bool rv = false;
     QMutexLocker locker(&mutex);
+    qDebug() << "GVAccess: Request for cancel. work to cancel:"
+             << getNameForWork (whatwork);
     do // Begin cleanup block (not a loop)
     {
         if (whatwork == workCurrent.whatwork)
         {
+            qDebug("Work to cancel was the current work");
+
             workCurrent.bCancel = true;
 
             if (NULL != workCurrent.cancel)
             {
+                qDebug("Current work had a cancel callback. Invoking it.");
                 (this->*(workCurrent.cancel)) ();
             }
             else
             {
+                qDebug("Current work had no cancel callback. Moving on.");
                 workCurrent.init ();
                 doNextWork ();
             }
@@ -300,19 +312,29 @@ GVAccess::cancelWork (GVAccess_Work whatwork)
             break;
         }
 
+        qDebug("Work to cancel was NOT the current work. Looking for it...");
+        bool bFound = false;
         for (int i = 0; i < workList.size (); i++)
         {
             if (whatwork == workList[i].whatwork)
             {
+                qDebug() << "Found the work to cancel at index" << i;
+                bFound = true;
                 GVAccess_WorkItem item = workList.takeAt (i);
                 if (NULL != item.cancel)
                 {
+                    qDebug("Work had a cancel callback. Invoking it.");
                     (this->*(workCurrent.cancel)) ();
+                } else {
+                    qDebug("Work had NO cancel callback. Moving on.");
                 }
 
                 rv = true;
                 break;
             }
+        }
+        if (!bFound) {
+            qWarning ("Did not find the work to cancel.");
         }
     } while (0); // End cleanup block (not a loop)
 
@@ -432,6 +454,7 @@ GVAccess::dialCanFinish ()
     QMutexLocker locker(&mutex);
     if (GVAW_dialCallback == workCurrent.whatwork)
     {
+        qDebug ("GVAccess: call in progress can finish. Completing");
         completeCurrentWork (GVAW_dialCallback, true);
     }
     else

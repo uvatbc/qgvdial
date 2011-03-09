@@ -140,11 +140,14 @@ private:
     QNetworkConfigurationManager nwCfg;
 
     //! Timeout timer for web page loading
-    QTimer                      pageTimeoutTimer;
-    QNetworkReply              *pCurrentReply;
+    QTimer                  pageTimeoutTimer;
+    QNetworkReply          *pCurrentReply;
 
     //! This flag is to be set to distinguish between call out and call back.
     bool                    bIsCallback;
+
+    //! This flag mentions if we are in cancellation
+    bool                    bInDialCancel;
 
     friend class Singletons;
 };

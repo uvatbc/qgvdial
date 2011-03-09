@@ -1,5 +1,4 @@
-  * Lots of improvements for the Symbian build. It runs and actually attempts to connect, but no full login yet. Soon. Soon.
-  * Quit qgvdial on uninstall.
-  * No more hard wait on Mq thread. Slot it.
-  * Stop throwing away Mq settings when it is disabled.
+  * Added a lot of debug messages catch the intermittent high CPU usage
+  * Status message about the number of new Inbox entries.
+  * Mq thread termination bug fix.
 

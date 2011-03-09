@@ -34,7 +34,7 @@ bool
 ObserverFactory::init ()
 {
     // Observer for Telepathy on desktop Linux and Maemo 5
-#if defined (Q_OS_UNIX) && !defined (Q_OS_SYMBIAN)
+#if TELEPATHY_CAPABLE
     clientRegistrar = ClientRegistrar::create();
 
     ChannelClassList filters;

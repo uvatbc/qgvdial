@@ -13,6 +13,7 @@ GVWebPage::GVWebPage(QObject *parent/* = NULL*/)
 , nwCfg (this)
 , pageTimeoutTimer (this)
 , pCurrentReply (NULL)
+, bInDialCancel (false)
 {
     webPage.settings()->setAttribute (QWebSettings::JavaEnabled, false);
     webPage.settings()->setAttribute (QWebSettings::AutoLoadImages, false);
@@ -660,19 +661,36 @@ GVWebPage::onDataCallDone (QNetworkReply * reply)
 void
 GVWebPage::cancelDataDial2 ()
 {
+    if (!this->isOnline () || bInDialCancel) {
+        bInDialCancel = false;
+        qDebug ("Cannot cancel dial back when offline");
+        QMutexLocker locker(&mutex);
+        if ((GVAW_dialCallback == workCurrent.whatwork) ||
+            (GVAW_dialOut      == workCurrent.whatwork))
+        {
+            completeCurrentWork (workCurrent.whatwork, false);
+        }
+        return;
+    }
+
+    bInDialCancel = true;
+
     QStringPairList arrPairs;
     arrPairs += QStringPair("outgoingNumber"  , "undefined");
     arrPairs += QStringPair("forwardingNumber", strCurrentCallback);
     arrPairs += QStringPair("cancelType"      , "C2C");
     arrPairs += QStringPair("_rnr_se"         , strRnr_se);
 
+    QNetworkReply *reply =
     postRequest (GV_DATA_BASE "/call/cancel/", arrPairs, QString (),
                  this, SLOT (onDataCallCanceled (QNetworkReply *)));
+    startTimerForReply (reply);
 }//GVWebPage::cancelDataDial2
 
 void
 GVWebPage::onDataCallCanceled (QNetworkReply * reply)
 {
+    bInDialCancel = false;
     QNetworkAccessManager *mgr = webPage.networkAccessManager ();
     QObject::disconnect (mgr , SIGNAL (finished (QNetworkReply *)),
                          this, SLOT (onDataCallCanceled (QNetworkReply *)));
@@ -996,10 +1014,17 @@ GVWebPage::onGotInboxXML (QNetworkReply *reply)
 
         QDateTime dtUpdate = workCurrent.arrParams[3].toDateTime ();
         bool bGotOld = false;
-        if (!xmlHandler.parseJSON (dtUpdate, bGotOld))
+        int nNew;
+        if (!xmlHandler.parseJSON (dtUpdate, bGotOld, nNew))
         {
             qWarning ("Failed to parse GV Inbox JSON");
             break;
+        }
+        if (workCurrent.arrParams.count() < 5) {
+            workCurrent.arrParams.append (nNew);
+        } else {
+            nNew += workCurrent.arrParams[4].toInt();
+            workCurrent.arrParams[4] = nNew;
         }
 
         QMutexLocker locker(&mutex);
