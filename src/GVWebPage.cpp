@@ -10,7 +10,7 @@ GVWebPage::GVWebPage(QObject *parent/* = NULL*/)
 , bUseIphoneUA (true)
 , webPage (this)
 , garbageTimer (this)
-, nwCfg (this)
+, nwCfg (NULL)
 , pageTimeoutTimer (this)
 , pCurrentReply (NULL)
 , bInDialCancel (false)
@@ -133,7 +133,10 @@ bool
 GVWebPage::isOnline ()
 {
 #if !defined(Q_OS_SYMBIAN) || SYMBIAN_SIGNED
-    return nwCfg.isOnline ();
+    if (NULL == nwCfg) {
+        nwCfg = new QNetworkConfigurationManager(this);
+    }
+    return nwCfg->isOnline ();
 #else
     // In Symbian with no signing, pretend we're always online.
     // This is because we don't want to sign

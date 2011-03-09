@@ -25,7 +25,9 @@
 // Full text of the sms is now stored in the inbox table.
 //#define GV_S_VALUE_DB_VER   "2010-12-30 10:30:03"
 // Mosquitto settings changed.
-#define GV_S_VALUE_DB_VER   "2011-02-28 23:41:03"
+//#define GV_S_VALUE_DB_VER   "2011-02-28 23:41:03"
+//Stupidity
+#define GV_S_VALUE_DB_VER   "2011-03-09 14:26:25"
 ////////////////////////////// GV Contacts table ///////////////////////////////
 #define GV_CONTACTS_TABLE   "gvcontacts"
 #define GV_C_ID             "id"

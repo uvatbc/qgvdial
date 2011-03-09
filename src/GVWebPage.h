@@ -137,7 +137,7 @@ private:
     int                     nCurrent;
 
     //! We use this to check if we're online
-    QNetworkConfigurationManager nwCfg;
+    QNetworkConfigurationManager *nwCfg;
 
     //! Timeout timer for web page loading
     QTimer                  pageTimeoutTimer;
