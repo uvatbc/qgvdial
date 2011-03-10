@@ -10,6 +10,7 @@ GVWebPage::GVWebPage(QObject *parent/* = NULL*/)
 , bUseIphoneUA (true)
 , webPage (this)
 , garbageTimer (this)
+, mutex (QMutex::Recursive)
 , nwCfg (NULL)
 , pageTimeoutTimer (this)
 , pCurrentReply (NULL)
@@ -133,8 +134,19 @@ bool
 GVWebPage::isOnline ()
 {
 #if !defined(Q_OS_SYMBIAN) || SYMBIAN_SIGNED
+    QMutexLocker locker(&mutex);
     if (NULL == nwCfg) {
         nwCfg = new QNetworkConfigurationManager(this);
+        QObject::connect (
+            nwCfg, SIGNAL(configurationAdded(const QNetworkConfiguration &)),
+            this,  SLOT(onNwCfgChanged(const QNetworkConfiguration &)));
+        QObject::connect (
+            nwCfg, SIGNAL(configurationChanged(const QNetworkConfiguration &)),
+            this,  SLOT(onNwCfgChanged(const QNetworkConfiguration &)));
+        QObject::connect (
+            nwCfg, SIGNAL(configurationRemoved(const QNetworkConfiguration &)),
+            this,  SLOT(onNwCfgChanged(const QNetworkConfiguration &)));
+        qDebug ("Created nwCfg");
     }
     return nwCfg->isOnline ();
 #else
@@ -1155,8 +1167,8 @@ GVWebPage::getContactFromInboxLinkLoaded (bool bOk)
 void
 GVWebPage::garbageTimerTimeout ()
 {
-//     webPage.settings()->clearIconDatabase ();
-//     webPage.settings()->clearMemoryCaches ();
+    webPage.settings()->clearIconDatabase ();
+    webPage.settings()->clearMemoryCaches ();
 
     garbageTimer.start ();
 }//GVWebPage::garbageTimerTimeout
@@ -1434,3 +1446,14 @@ GVWebPage::startTimerForReply (QNetworkReply *reply)
                       this , SLOT(onSocketXfer(qint64,qint64)));
     onSocketXfer (0,0);
 }//GVWebPage::startTimerForReply
+
+void
+GVWebPage::onNwCfgChanged (const QNetworkConfiguration & /*config*/)
+{
+    QMutexLocker locker(&mutex);
+    if (NULL != nwCfg) {
+        nwCfg->deleteLater ();
+        nwCfg = NULL;
+        qDebug ("Deleted nwCfg");
+    }
+}//GVWebPage::onNwCfgChanged
