@@ -4,6 +4,7 @@
 #include "QGVDbusServer.h"
 #endif
 
+
 OsDependent::OsDependent(QObject *parent) : QObject(parent)
 {
 }//OsDependent::OsDependent
@@ -101,6 +102,21 @@ OsDependent::setLongWork (QWidget *window, bool bSet /*= false*/)
     }
 #endif
 }//OsDependent::setLongWork
+
+//! Initial height and width for different OSes.
+QRect
+OsDependent::getStartingSize ()
+{
+    QRect rect;
+#if DESKTOP_OS
+    rect.setWidth (250);
+    rect.setHeight (400);
+#else
+    rect = qApp->desktop ()->screenGeometry ();
+#endif
+
+    return rect;
+}//OsDependent::getStartingSize
 
 #ifdef QT_NO_SYSTEMTRAYICON
 QSystemTrayIcon::QSystemTrayIcon(QWidget *parent /*= 0*/)

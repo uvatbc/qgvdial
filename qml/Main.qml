@@ -3,7 +3,8 @@ import "helper.js" as Code
 
 Rectangle {
     id: main
-    width: 250; height: 400
+    width: g_MainWidth;
+    height: g_MainHeight
     color: "black"
 
     // Signals from dialpad, contacts and inbox

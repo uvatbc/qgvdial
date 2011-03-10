@@ -151,7 +151,7 @@ GVWebPage::isOnline ()
     return nwCfg->isOnline ();
 #else
     // In Symbian with no signing, pretend we're always online.
-    // This is because we don't want to sign
+    // This is because we don't want to sign... yet
     return true;
 #endif
 }//GVWebPage::isOnline
@@ -1452,8 +1452,18 @@ GVWebPage::onNwCfgChanged (const QNetworkConfiguration & /*config*/)
 {
     QMutexLocker locker(&mutex);
     if (NULL != nwCfg) {
+        qDebug ("Scheduled deletion of nwCfg");
+        QTimer::singleShot (30 * 1000, this, SLOT(onDelayedNwCfgDelete()));
+    }
+}//GVWebPage::onNwCfgChanged
+
+void
+GVWebPage::onDelayedNwCfgDelete ()
+{
+    QMutexLocker locker(&mutex);
+    if (NULL != nwCfg) {
         nwCfg->deleteLater ();
         nwCfg = NULL;
         qDebug ("Deleted nwCfg");
     }
-}//GVWebPage::onNwCfgChanged
+}//GVWebPage::onDelayedNwCfgDelete

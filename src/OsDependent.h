@@ -32,6 +32,8 @@ public:
     void setDefaultWindowAttributes (QWidget *pWidget);
     void setLongWork (QWidget *window, bool bSet = false);
 
+    QRect getStartingSize ();
+
 private:
     OsDependent(QObject *parent = 0);
 

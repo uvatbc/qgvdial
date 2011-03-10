@@ -393,6 +393,12 @@ MainWindow::init ()
 void
 MainWindow::initQML ()
 {
+    OsDependent &osd = Singletons::getRef().getOSD ();
+    QRect rect = osd.getStartingSize ();
+    QDeclarativeContext *ctx = this->rootContext();
+    ctx->setContextProperty ("g_MainWidth", rect.width ());
+    ctx->setContextProperty ("g_MainHeight", rect.height ());
+
     // Initialize the QML view
     this->setSource (QUrl ("qrc:/Main.qml"));
     this->setResizeMode (QDeclarativeView::SizeRootObjectToView);
@@ -451,7 +457,6 @@ void
 MainWindow::initQMLGlobals ()
 {
     QDeclarativeContext *ctx = this->rootContext();
-
     ctx->setContextProperty ("g_registeredPhonesModel", &modelRegNumber);
 }//MainWindow::initQMLGlobals
 

@@ -75,6 +75,8 @@ private slots:
 
     //! Any changes in NW calls into this
     void onNwCfgChanged (const QNetworkConfiguration &config);
+    //! Delayed deletion of NW config manager
+    void onDelayedNwCfgDelete ();
 
 private:
     QWebElement doc ();

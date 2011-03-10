@@ -159,6 +159,12 @@ MqClientThread::run ()
         }
 
         QHostInfo hInfo = QHostInfo::fromName (strHost);
+        if (hInfo.addresses ().length () == 0) {
+            qWarning() << "Mosquitto: Host lookup for"
+                       << strHost
+                       << "failed. Terminating thread.";
+            break;
+        }
         QString strFirst = hInfo.addresses().first().toString();
 
         qDebug() << "Mosquitto: Attempting to connect to" << strHost
