@@ -1726,6 +1726,7 @@ MainWindow::onSigMosquittoChanges (bool bEnable, const QString &host, int port,
 void
 MainWindow::onMqThreadFinished ()
 {
+#if MOSQUITTO_CAPABLE
     QObject::disconnect (&mqThread, SIGNAL(finished()),
                           this    , SLOT(onMqThreadFinished()));
     if (bRunMqThread) {
@@ -1734,4 +1735,5 @@ MainWindow::onMqThreadFinished ()
     } else {
         qDebug ("Finished waiting for Mq thread. Not restarting");
     }
+#endif
 }//MainWindow::onMqThreadFinished
