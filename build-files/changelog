@@ -1,4 +1,2 @@
-  * QML now starts off with a width,height that matches the platform.
-  * If the mq server is invalid, don't crash.
-  * Timer delay in deleting the NwCfg object.
+  * Fix the CPU hogging bug
 

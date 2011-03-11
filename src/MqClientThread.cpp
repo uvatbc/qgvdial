@@ -150,9 +150,10 @@ MqClientThread::on_error()
 void
 MqClientThread::run ()
 {
+    int rv;
     qDebug ("Mosquitto: Enter thread loop");
 
-    do { // Begin cleanup block (not a loop)
+    do {
         if (strHost.length () == 0) {
             qWarning ("Mosquitto: Invalid Host");
             break;
@@ -169,22 +170,40 @@ MqClientThread::run ()
 
         qDebug() << "Mosquitto: Attempting to connect to" << strHost
                  << "at" << strFirst;
-        int rv = this->mq_connect (strFirst.toLatin1().constData ());
+        rv = this->mq_connect (strFirst.toLatin1().constData ());
         if (0 != rv) {
             qWarning() << "Mosquitto: Failed to connect. Error =" << rv;
             emit status ("Failed to connect to Mosquitto server");
-            break;
+            this->sleep(5);
+        } else {
+            emit status ("Connected to Mosquitto server!");
         }
 
         while (!bQuit) {
-            this->loop (1*1000);
+            rv = this->loop (1*1000);
+            if (MOSQ_ERR_SUCCESS == rv) {
+                // In the normal case, continue the loop
+            } else if ((MOSQ_ERR_INVAL == rv) ||
+                       (MOSQ_ERR_NOMEM == rv)) {
+                qWarning() << "Mosquitto: Unrecoverable error in loop:" << rv;
+                bQuit = true;
+            } else if ((MOSQ_ERR_NO_CONN == rv) ||
+                       (MOSQ_ERR_CONN_LOST == rv) ||
+                       (MOSQ_ERR_PROTOCOL == rv)) {
+                qWarning ("Recoverable error, hopefully");
+                this->sleep (1);
+                break;
+            } else {
+                qWarning() << "Mosquitto: Other error in loop:" << rv;
+                bQuit = true;
+            }
         }
 
         qDebug ("Mosquitto: End Mq loop. Unsubscribe and disconnect");
         this->unsubscribe(NULL, strTopic.toLatin1().constData ());
         this->mq_disconnect ();
         this->loop (100);
-    } while (0); // End cleanup block (not a loop)
+    } while (!bQuit);
 
     // Ready for the next time
     bQuit = false;
