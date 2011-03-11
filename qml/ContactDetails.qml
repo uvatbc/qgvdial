@@ -8,29 +8,26 @@ Flickable {
 
     property alias model: listview.model
     property alias notesText: notes.text
+    property int suggestedPixelSize: 500
 
-    ListView {
+    ListView {  // All phone numbers for this contact
         id: listview
         width: parent.width
         anchors {
             top: parent.top
             left: parent.left
+            topMargin: 4
         }
-        height: (model ? (textCalc.height * model.count * 2.5) : 1)
+        height: (model ? ((container.suggestedPixelSize+3) * model.count * 2) : 1)
+        spacing: 3
+        clip: true
 
-        Text {
-            id: textCalc
-            opacity: 0
-            text: "text"
-            font.pointSize: (Code.btnFontPoint() / 12)
-        }
-
-        delegate: Item {
+        delegate: Item { // one phone number
             id: delegateItem
             width: parent.width
-            height: textNumber.height + btnCall.height
+            height: container.suggestedPixelSize * 2
 
-            Text {
+            Text { // The phone number
                 id: textNumber
                 width: parent.width
                 anchors {
@@ -40,33 +37,40 @@ Flickable {
 
                 text: type + " : " + number
                 color: "white"
-                font.pointSize: (Code.btnFontPoint() / 12)
-            }
+                font.pixelSize: (parent.height/2) - 6
+            }// Item (phone number)
 
             Row {
                 anchors {
                     top: textNumber.bottom
-                    right: parent.right
+                    left: parent.left
                 }
+                width: parent.width
+                height: parent.height / 2
+                spacing: 2
 
-                TextButton {
+                MyButton {
                     id: btnCall
-                    text: "Call"
-                    fontPoint: (Code.btnFontPoint() / 12)
+                    mainText: "Call"
+                    mainPixelSize: parent.height - 6
+                    width: parent.width / 2
+                    height: parent.height
 
                     onClicked: container.sigCall(number)
                 }
 
-                TextButton {
+                MyButton {
                     id: btnText
-                    text: "Text"
-                    fontPoint: (Code.btnFontPoint() / 12)
+                    mainText: "Text"
+                    mainPixelSize: parent.height - 6
+                    width: parent.width / 2
+                    height: parent.height
 
                     onClicked: container.sigText(number)
                 }
-            }// Row (of buttons)
-        }// delegate Item
-    }//ListView
+            }// Row (Call and Text buttons)
+        }// delegate Item (one phone number)
+    }//ListView (All phone numbers for this contact)
 
     Text {
         id: notes
@@ -78,7 +82,7 @@ Flickable {
             bottom: parent.bottom
         }
 
-        font.pointSize: Code.btnFontPoint()/12
+        font.pixelSize: (parent.height + parent.width) / 40
         color: "white"
     }
 }//Flickable (container)

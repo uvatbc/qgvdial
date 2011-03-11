@@ -103,7 +103,7 @@ Item {
             MyButton {
                 mainText: "Save"
                 width: (parent.width / 2) - parent.spacing
-                mainFontPoint: Code.btnFontPoint()/10
+                mainPixelSize: container.height / 10
 
                 onClicked: {
                     container.sigMosquittoChanges (bEnable,
@@ -118,7 +118,7 @@ Item {
             MyButton {
                 mainText: "Cancel"
                 width: (parent.width / 2) - parent.spacing
-                mainFontPoint: Code.btnFontPoint()/10
+                mainPixelSize: container.height / 10
 
                 onClicked: container.sigDone(false);
             }//MyButton (Cancel)

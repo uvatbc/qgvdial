@@ -31,7 +31,7 @@ Rectangle {
                 mainText: g_CurrentPhoneName;
                 anchors.fill: parent
                 radius: ((height / 10.0) + (width / 60.0))
-                mainFontPoint: Code.btnFontPoint() / 4
+                mainPixelSize: parent.height - 8
 
                 onClicked: mainItem.state == "PhonesShown" ?
                            mainItem.state = "" : mainItem.state = "PhonesShown"

@@ -11,12 +11,6 @@ Item {
     signal sigInbox
     signal sigSettings
 
-    TextButton {
-        id: btnReference
-        opacity: 0
-        text: "Contacts"
-    }
-
     ListView {
         id: mainBtnList
         anchors.fill: parent
@@ -48,7 +42,7 @@ Item {
             height: mainBtnList.height / (mainBtnList.model.count + mainBtnList.spacing)
             width: mainBtnList.width
 
-            mainFontPoint: Code.btnFontPoint()/3.7
+            mainPixelSize: (mainBtnList.width + mainBtnList.height) / 18
 
             onClicked: {
                 if (name == "Dialpad") {

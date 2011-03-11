@@ -44,7 +44,7 @@ Rectangle {
     id: container
 
     property alias text: label.text
-    property real fontPoint: 40 // Outrageously large so that you are forced to change it.
+    property real pixelSize: 200
 
     signal clicked
     signal pressAndHold
@@ -71,7 +71,7 @@ Rectangle {
         id: label
         color: palette.buttonText
         anchors.centerIn: parent
-        font.pointSize: container.fontPoint
+        font.pixelSize: container.pixelSize
     }
 
     states: State {

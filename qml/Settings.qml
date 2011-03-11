@@ -33,6 +33,10 @@ Item {
         property string strUsername: g_strUsername      // "user@gmail.com"
         property string strPassword: g_strPassword      // "hunter2 :p"
 
+        property int pixDiv: 18
+        property int pixHeight: (container.height + container.width) / 2
+        property int pixSize: pixHeight / (pixDiv + 2)
+
         Rectangle {
             width: parent.width
             height: textUsername.height
@@ -46,7 +50,7 @@ Item {
                     text: "Username:"
                     color: "white"
                     anchors.verticalCenter: parent.verticalCenter
-                    font.pointSize: Code.btnFontPoint()/10
+                    font.pixelSize: mainColumn.pixSize
                 }
 
                 TextInput {
@@ -54,7 +58,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     text: mainColumn.strUsername
                     color: "white"
-                    font.pointSize: Code.btnFontPoint()/10
+                    font.pixelSize: mainColumn.pixSize
 
                     opacity: (g_bIsLoggedIn == true ? 0 : 1)
 
@@ -67,7 +71,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     text: mainColumn.strUsername
                     color: "white"
-                    font.pointSize: Code.btnFontPoint()/10
+                    font.pixelSize: mainColumn.pixSize
                     opacity: (g_bIsLoggedIn == true ? 1 : 0)
                 }
             }//Row
@@ -87,7 +91,7 @@ Item {
                     text: "Password:"
                     color: "white"
                     anchors.verticalCenter: parent.verticalCenter
-                    font.pointSize: Code.btnFontPoint()/10
+                    font.pixelSize: mainColumn.pixSize
                 }
 
                 TextInput {
@@ -96,7 +100,7 @@ Item {
                     text: mainColumn.strPassword
                     color: "white"
                     echoMode: TextInput.Password
-                    font.pointSize: Code.btnFontPoint()/10
+                    font.pixelSize: mainColumn.pixSize
 
                     opacity: (g_bIsLoggedIn == true ? 0 : 1)
 
@@ -109,7 +113,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     text: Array(mainColumn.strPassword.length+1).join("*")
                     color: "white"
-                    font.pointSize: Code.btnFontPoint()/10
+                    font.pixelSize: mainColumn.pixSize
                     opacity: (g_bIsLoggedIn == true ? 1 : 0)
                 }
             }//Row (password)
@@ -163,7 +167,7 @@ Item {
             delegate: MyButton {
                 mainText: (text == "Login" ? (g_bIsLoggedIn == true ? "Logout" : "Login") : text)
                 width: parent.width
-                mainFontPoint: Code.btnFontPoint()/8
+                mainPixelSize: mainColumn.pixHeight / mainColumn.pixDiv
 
                 onClicked: {
                     if (newState != "") {

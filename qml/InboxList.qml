@@ -35,38 +35,38 @@ Rectangle {
 
         opacity: 0
 
-        Item {  // Top row
+        Column {  // Top row
             id: detailTopRow
 
             anchors {
                 top: parent.top
                 left: parent.left
-                right: parent.right
             }
-            height: btnDetailsClose.height
+            width: parent.width
+            height: (parent.height + parent.width) / 15
+
+            MyButton {
+                id: btnDetailsClose
+                mainText: "Close"
+                onClicked: container.state= ''
+                width: parent.width
+                height: (parent.height / 2)
+
+                mainPixelSize: height - 6
+            }
 
             Text {
-                text: strDetailsName
-                anchors.verticalCenter: parent.verticalCenter
+                text: container.strDetailsName
                 color: "white"
-                font.pointSize: Code.btnFontPoint()/8
-                anchors.left: parent.left
+                width: parent.width
+                font.pixelSize: (parent.height / 2) - 6
             }
-
-            TextButton {
-                id: btnDetailsClose
-                text: "Close"
-                onClicked: container.state= ''
-                anchors.right: parent.right
-
-                fontPoint: Code.btnFontPoint()/10
-            }
-        }
+        }//Column (Top row)
 
         Item {  // Number and buttons
             anchors {
                 top: detailTopRow.bottom
-                topMargin: 5
+                topMargin: 6
                 left: parent.left
                 right: parent.right
                 bottom: parent.bottom
@@ -88,7 +88,7 @@ Rectangle {
                 width: parent.width
 
                 color: "white"
-                font.pointSize: Code.btnFontPoint()/12
+                font.pixelSize: (parent.height + parent.width) / 32
 
                 wrapMode: Text.Wrap
             }
@@ -99,39 +99,47 @@ Rectangle {
                     top: theTime.bottom
                     left: parent.left
                 }
-                text: strNumber
+                text: container.strNumber
                 color: "white"
-                font.pointSize: Code.btnFontPoint()/12
+                font.pixelSize: (parent.height + parent.width) / 32
             }
 
             Row {
                 id: btnRow
                 anchors {
                     top: theNumber.bottom
-                    right: parent.right
+                    left: parent.left
                 }
-                height: btnCall.height
+                height: (parent.height + parent.width) / 30
+                width: parent.width
 
-                TextButton {
+                MyButton {
                     id: btnCall
-                    text: "Call"
-                    onClicked: container.sigCall(strNumber)
-                    fontPoint: Code.btnFontPoint()/10
+                    mainText: "Call"
+                    onClicked: container.sigCall(container.strNumber)
+                    width: parent.width / (playButton.opacity == 1 ? 3 : 2)
+                    height: parent.height
+                    mainPixelSize: height - 4
                 }
-                TextButton {
-                    text: "Text"
-                    onClicked: container.sigText(strNumber)
-                    fontPoint: Code.btnFontPoint()/10
+                MyButton {
+                    mainText: "Text"
+                    onClicked: container.sigText(container.strNumber)
+                    width: parent.width / (playButton.opacity == 1 ? 3 : 2)
+                    height: parent.height
+                    mainPixelSize: height - 4
                 }
-                TextButton {
-                    text: "Play"
+                MyButton {
+                    id: playButton
+                    mainText: "Play"
                     opacity: (detailsView.opacity & isVoicemail)
-                    onClicked: container.sigVoicemail(strLink)
-                    fontPoint: Code.btnFontPoint()/10
+                    onClicked: container.sigVoicemail(container.strLink)
+                    width: parent.width / (playButton.opacity == 1 ? 3 : 2)
+                    height: parent.height
+                    mainPixelSize: height - 4
                 }
             }
 
-            Text {
+            Text { // sms text
                 id: theSmsText
                 anchors {
                     top: btnRow.bottom
@@ -140,11 +148,11 @@ Rectangle {
                 width: parent.width
                 wrapMode: Text.Wrap
 
-                text: strSmsText
+                text: container.strSmsText
 
                 color: "white"
-                font.pointSize: Code.btnFontPoint()/12
-            }
+                font.pixelSize: (parent.height + parent.width) / 32
+            }// Text (sms text)
         }
     }
 
@@ -156,7 +164,7 @@ Rectangle {
         Rectangle { // Selector bar at the top
             id: barTop
             width: parent.width
-            height: parent.height / 15
+            height: (parent.height + parent.width) / 30
             anchors.top: parent.top
 
             color: "black"
@@ -165,7 +173,7 @@ Rectangle {
 
             Text {
                 text: strSelected
-                font.pointSize: Code.btnFontPoint()/9
+                font.pixelSize: barTop.height - 4
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
                 color: "white"
@@ -208,7 +216,7 @@ Rectangle {
 
             model: ["All", "Placed", "Missed", "Received", "Voicemail", "Sms"]
             delegate:  Rectangle {
-                height: lblSelector.height
+                height: barTop.height
                 width: listSelector.width - border.width
 
                 color: "black"
@@ -219,7 +227,7 @@ Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: modelData
-                    font.pointSize: Code.btnFontPoint()/8
+                    font.pixelSize: parent.height - 4
                     color: "white"
                 }
 
@@ -279,11 +287,11 @@ Rectangle {
                     anchors.fill: parent
 
                     onClicked: {
-                        strDetailsTime = type + " " + time_detail
-                        strDetailsName = name;
-                        strNumber = number;
-                        strLink = link;
-                        strSmsText = smstext;
+                        container.strDetailsTime = type + " " + time_detail
+                        container.strDetailsName = name;
+                        container.strNumber = number;
+                        container.strLink = link;
+                        container.strSmsText = smstext;
 
                         if (type == "Voicemail") {
                             isVoicemail = true;

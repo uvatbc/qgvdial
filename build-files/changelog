@@ -1,2 +1,1 @@
-  * Fix the CPU hogging bug
-
+  * Changed all the QML elements to use pixel size instead of font point.

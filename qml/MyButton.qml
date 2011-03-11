@@ -11,7 +11,7 @@ Rectangle {
 
     // Main text in the button
     property string mainText: "2"
-    property real mainFontPoint: 80 // Use Code.btnFontPoint()
+    property real mainPixelSize: 100
 
     // Button emits clicks, but we also mention what is the text to display
     signal clicked(string strText)
@@ -32,7 +32,7 @@ Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
 
-        font.pointSize: mainFontPoint
+        font.pixelSize: mainPixelSize
     }// Text
 
     MouseArea {

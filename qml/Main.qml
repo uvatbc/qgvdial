@@ -3,9 +3,13 @@ import "helper.js" as Code
 
 Rectangle {
     id: main
-    width: g_MainWidth;
+    width: g_MainWidth
     height: g_MainHeight
     color: "black"
+
+    //@@UV: Blow me away
+    property int g_MainWidth: 250
+    property int g_MainHeight: 400
 
     // Signals from dialpad, contacts and inbox
     signal sigCall(string number)
@@ -76,7 +80,7 @@ Rectangle {
         Rectangle {
             id: barTop
             width: parent.width
-            height: parent.height / 15
+            height: (parent.height + parent.width) / 30
             anchors.top: parent.top
 
             color: "black"
@@ -85,7 +89,7 @@ Rectangle {
 
             Text {
                 text: "qgvdial"
-                font.pointSize: Code.btnFontPoint()/10
+                font.pixelSize: parent.height - 4
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
                 color: "white"
@@ -240,14 +244,14 @@ Rectangle {
         Rectangle {
             id: barStatus
             width: parent.width
-            height: parent.height / 20
+            height: (parent.height + parent.width) / 30
             anchors.bottom: parent.bottom
 
             color: "black"
 
             Text {
                 text: g_strStatus
-                font.pointSize: Code.btnFontPoint()/12
+                font.pixelSize: parent.height - 4
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
                 color: "white"

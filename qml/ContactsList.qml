@@ -26,7 +26,7 @@ Rectangle {
 //    }
 ////////////////////////////////////////////////////////////////////////////////
 
-    Rectangle {
+    Rectangle { // Contact details
         id: detailsView
 
         anchors.fill: parent
@@ -36,7 +36,7 @@ Rectangle {
 
         opacity: 0
 
-        Item {
+        Column {
             id: detailTopRow
 
             anchors {
@@ -44,43 +44,45 @@ Rectangle {
                 left: parent.left
                 right: parent.right
             }
-            height: btnDetailsClose.height
+            height: (parent.width + parent.height) / 15
+            spacing: 2
+
+            MyButton {
+                mainText: "Close"
+                onClicked: container.state= ''
+                width: parent.width
+                height: (parent.height / 2)
+                mainPixelSize: height - 4
+            }
 
             Text {
                 id: txtContactName
 
                 text: "Contact name"
-                anchors.verticalCenter: parent.verticalCenter
+                width: parent.width
                 color: "white"
-                font.pointSize: Code.btnFontPoint () / 8
+                font.pointSize: (parent.height / 2) - 6
                 anchors.left: parent.left
             }
-
-            TextButton {
-                id: btnDetailsClose
-                text: "Close"
-                onClicked: container.state= ''
-                anchors.right: parent.right
-
-                fontPoint: Code.btnFontPoint() / 8
-            }
-        }// Item (details top row)
+        }// Column (details top row)
 
         ContactDetails {
             id: detailsList
             anchors {
                 top: detailTopRow.bottom
                 left: parent.left
-                right: parent.right
-                bottom: parent.bottom
+                topMargin: 5
             }
+            width:  parent.width
+            height: parent.height - detailTopRow.height - 6
+            suggestedPixelSize: (parent.width + parent.height) / 30
 
             onSigCall: container.sigCall(number)
             onSigText: container.sigText(number)
         }
-    }
+    }// Rectangle (Contact details)
 
-    ListView {
+    ListView { // All contacts
         id: contactsView
 
         anchors.fill: parent
@@ -98,11 +100,9 @@ Rectangle {
             radius: 5
 
             width: contactsView.width - border.width
-            height: textName.height + 8
+            height: (contactsView.height + contactsView.width) / 20
 
             Text {
-                id: textName
-
                 anchors {
                     verticalCenter: parent.verticalCenter
                     left: parent.left
@@ -112,7 +112,7 @@ Rectangle {
                 text: name
                 color: "white"
 
-                font.pointSize: (Code.btnFontPoint () / 8)
+                font.pixelSize: parent.height - 6
             }
 
             MouseArea {
@@ -125,7 +125,7 @@ Rectangle {
                 }
             }
         }// delegate Rectangle
-    }// ListView
+    }// ListView (All contacts)
 
     states: [
         State {
