@@ -10,8 +10,7 @@ GVWebPage::GVWebPage(QObject *parent/* = NULL*/)
 , bUseIphoneUA (true)
 , webPage (this)
 , garbageTimer (this)
-, mutex (QMutex::Recursive)
-, nwCfg (NULL)
+, nwCfg (this)
 , pageTimeoutTimer (this)
 , pCurrentReply (NULL)
 , bInDialCancel (false)
@@ -134,21 +133,7 @@ bool
 GVWebPage::isOnline ()
 {
 #if !defined(Q_OS_SYMBIAN) || SYMBIAN_SIGNED
-    QMutexLocker locker(&mutex);
-    if (NULL == nwCfg) {
-        nwCfg = new QNetworkConfigurationManager(this);
-        QObject::connect (
-            nwCfg, SIGNAL(configurationAdded(const QNetworkConfiguration &)),
-            this,  SLOT(onNwCfgChanged(const QNetworkConfiguration &)));
-        QObject::connect (
-            nwCfg, SIGNAL(configurationChanged(const QNetworkConfiguration &)),
-            this,  SLOT(onNwCfgChanged(const QNetworkConfiguration &)));
-        QObject::connect (
-            nwCfg, SIGNAL(configurationRemoved(const QNetworkConfiguration &)),
-            this,  SLOT(onNwCfgChanged(const QNetworkConfiguration &)));
-        qDebug ("Created nwCfg");
-    }
-    return nwCfg->isOnline ();
+    return nwCfg.isOnline ();
 #else
     // In Symbian with no signing, pretend we're always online.
     // This is because we don't want to sign... yet
@@ -1446,24 +1431,3 @@ GVWebPage::startTimerForReply (QNetworkReply *reply)
                       this , SLOT(onSocketXfer(qint64,qint64)));
     onSocketXfer (0,0);
 }//GVWebPage::startTimerForReply
-
-void
-GVWebPage::onNwCfgChanged (const QNetworkConfiguration & /*config*/)
-{
-    QMutexLocker locker(&mutex);
-    if (NULL != nwCfg) {
-        qDebug ("Scheduled deletion of nwCfg");
-        QTimer::singleShot (30 * 1000, this, SLOT(onDelayedNwCfgDelete()));
-    }
-}//GVWebPage::onNwCfgChanged
-
-void
-GVWebPage::onDelayedNwCfgDelete ()
-{
-    QMutexLocker locker(&mutex);
-    if (NULL != nwCfg) {
-        nwCfg->deleteLater ();
-        nwCfg = NULL;
-        qDebug ("Deleted nwCfg");
-    }
-}//GVWebPage::onDelayedNwCfgDelete

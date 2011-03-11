@@ -73,11 +73,6 @@ private slots:
     //! Invoked when the socket makes any transfers
     void onSocketXfer (qint64 bytesXfer, qint64 bytesTotal);
 
-    //! Any changes in NW calls into this
-    void onNwCfgChanged (const QNetworkConfiguration &config);
-    //! Delayed deletion of NW config manager
-    void onDelayedNwCfgDelete ();
-
 private:
     QWebElement doc ();
     bool isLoggedIn ();
@@ -141,10 +136,8 @@ private:
     //! The current page (contacts or inbox)
     int                     nCurrent;
 
-    //! Mutex to protect variables
-    QMutex                  mutex;
     //! We use this to check if we're online
-    QNetworkConfigurationManager *nwCfg;
+    QNetworkConfigurationManager nwCfg;
 
     //! Timeout timer for web page loading
     QTimer                  pageTimeoutTimer;
