@@ -178,6 +178,8 @@ symbian {
     TARGET.EPOCSTACKSIZE = 0x14000          # 80 KB stack size
     TARGET.EPOCHEAPSIZE = 0x020000 0x2000000 # 128 KB - 20 MB
 
+# the icon for our sis file
+    ICON=../icons/Google.svg
 # This hack is required until the next version of QT SDK
     QT_CONFIG -= opengl
 }
