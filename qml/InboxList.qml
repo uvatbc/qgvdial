@@ -44,6 +44,7 @@ Rectangle {
             }
             width: parent.width
             height: (parent.height + parent.width) / 15
+            spacing: 3
 
             MyButton {
                 id: btnDetailsClose
@@ -52,14 +53,14 @@ Rectangle {
                 width: parent.width
                 height: (parent.height / 2)
 
-                mainPixelSize: height - 6
+                mainPixelSize: height
             }
 
             Text {
                 text: container.strDetailsName
                 color: "white"
                 width: parent.width
-                font.pixelSize: (parent.height / 2) - 6
+                font.pixelSize: (parent.height / 2)
             }
         }//Column (Top row)
 
@@ -78,7 +79,7 @@ Rectangle {
                 anchors.fill: parent
             }
 
-            Text {
+            Text { // the time
                 id: theTime
                 text: strDetailsTime
                 anchors {
@@ -91,9 +92,9 @@ Rectangle {
                 font.pixelSize: (parent.height + parent.width) / 32
 
                 wrapMode: Text.Wrap
-            }
+            }// Text (the time)
 
-            Text {
+            Text { // the number
                 id: theNumber
                 anchors {
                     top: theTime.bottom
@@ -102,9 +103,9 @@ Rectangle {
                 text: container.strNumber
                 color: "white"
                 font.pixelSize: (parent.height + parent.width) / 32
-            }
+            }// Text (the number)
 
-            Row {
+            Row { // call, text and play buttons
                 id: btnRow
                 anchors {
                     top: theNumber.bottom
@@ -137,7 +138,7 @@ Rectangle {
                     height: parent.height
                     mainPixelSize: height - 4
                 }
-            }
+            }// Row (call, text and play buttons)
 
             Text { // sms text
                 id: theSmsText
@@ -252,10 +253,9 @@ Rectangle {
             }
 
             opacity: 1
-
             clip: true
-
             model: g_inboxModel
+            spacing: 2
 
             delegate: Rectangle {
                 id: listDelegate
@@ -265,11 +265,10 @@ Rectangle {
                 radius: 2
 
                 width: inboxView.width - border.width
-                height: textName.height + 6
+                height: entryText.height
 
                 Text {
-                    id: textName
-
+                    id: entryText
                     anchors {
                         verticalCenter: parent.verticalCenter
                         left: parent.left
@@ -277,10 +276,8 @@ Rectangle {
                     }
 
                     text: type + " " + time_detail + "\n" + name
-
                     color: "white"
-
-                    font.pointSize: (Code.btnFontPoint () / 12)
+                    font.pointSize: (listInbox.height + listInbox.width) / 60
                 }
 
                 MouseArea {

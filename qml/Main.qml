@@ -7,10 +7,6 @@ Rectangle {
     height: g_MainHeight
     color: "black"
 
-    //@@UV: Blow me away
-    property int g_MainWidth: 250
-    property int g_MainHeight: 400
-
     // Signals from dialpad, contacts and inbox
     signal sigCall(string number)
     signal sigText(string number)

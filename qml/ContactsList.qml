@@ -61,7 +61,7 @@ Rectangle {
                 text: "Contact name"
                 width: parent.width
                 color: "white"
-                font.pointSize: (parent.height / 2) - 6
+                font.pixelSize: (parent.height / 2) - 4
                 anchors.left: parent.left
             }
         }// Column (details top row)
