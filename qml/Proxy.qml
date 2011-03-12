@@ -36,7 +36,7 @@ Item {
         RadioButton {
             id: proxySupport
             width: parent.width
-            fontPoint: Code.btnFontPoint()/10
+            pixelSize: (container.height + container.width) / 30
 
             text: "Enable proxy support"
         }// RadioButton (proxySupport)
@@ -45,7 +45,7 @@ Item {
             id: proxySystem
             width: parent.width
             opacity: (bEnableProxy? 1 : 0)
-            fontPoint: Code.btnFontPoint()/10
+            pixelSize: (container.height + container.width) / 30
 
             text: "Use system proxy settings"
         }// RadioButton (proxySystem)
@@ -59,7 +59,7 @@ Item {
                 text: "Host:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font.pointSize: Code.btnFontPoint()/10
+                font.pixelSize: (container.height + container.width) / 30
             }
 
             TextInput {
@@ -67,7 +67,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 text: "Enter proxy host"
                 color: "white"
-                font.pointSize: Code.btnFontPoint()/10
+                font.pixelSize: (container.height + container.width) / 30
             }
         }// Row (user proxy host)
 
@@ -81,7 +81,7 @@ Item {
                 text: "Port:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font.pointSize: Code.btnFontPoint()/10
+                font.pixelSize: (container.height + container.width) / 30
             }
 
             TextInput {
@@ -90,7 +90,7 @@ Item {
                 text: "Enter proxy port"
                 color: "white"
                 validator: IntValidator { bottom: 0; top: 65535 }
-                font.pointSize: Code.btnFontPoint()/10
+                font.pixelSize: (container.height + container.width) / 30
             }
         }// Row (user proxy port)
 
@@ -98,7 +98,7 @@ Item {
             id: proxyUserPassRequired
             width: parent.width
             opacity: (bEnableProxy && !bSystemProxy ? 1 : 0)
-            fontPoint: Code.btnFontPoint()/10
+            pixelSize: (container.height + container.width) / 30
 
             text: "Requires username and password"
         }// RadioButton (proxyUserPassRequired)
@@ -113,7 +113,7 @@ Item {
                 text: "Proxy user:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font.pointSize: Code.btnFontPoint()/10
+                font.pixelSize: (container.height + container.width) / 30
             }
 
             TextInput {
@@ -122,7 +122,7 @@ Item {
                 width: parent.width - lblProxyUser.width
                 text: ""
                 color: "white"
-                font.pointSize: Code.btnFontPoint()/10
+                font.pixelSize: (container.height + container.width) / 30
             }
         }// Row (user proxy user name)
 
@@ -136,7 +136,7 @@ Item {
                 text: "Proxy password:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font.pointSize: Code.btnFontPoint()/10
+                font.pixelSize: (container.height + container.width) / 30
             }
 
             TextInput {
@@ -145,7 +145,7 @@ Item {
                 width: parent.width - lblProxyPass.width
                 text: ""
                 color: "white"
-                font.pointSize: Code.btnFontPoint()/10
+                font.pixelSize: (container.height + container.width) / 30
             }
         }// Row (user proxy password)
 
@@ -156,7 +156,7 @@ Item {
             MyButton {
                 mainText: "Save"
                 width: (parent.width / 2) - parent.spacing
-                mainPixelSize: container.height / 10
+                mainPixelSize: (container.height + container.width) / 30
 
                 onClicked: {
                     container.sigProxyChanges (bEnableProxy,
@@ -174,7 +174,7 @@ Item {
             MyButton {
                 mainText: "Cancel"
                 width: (parent.width / 2) - parent.spacing
-                mainPixelSize: container.height / 10
+                mainPixelSize: (container.height + container.width) / 30
 
                 onClicked: container.sigDone(false);
             }//MyButton (Cancel)

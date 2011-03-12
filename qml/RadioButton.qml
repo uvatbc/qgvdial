@@ -10,7 +10,7 @@ Rectangle {
 
     property string text: "Yes or no question?"
     property bool check: false
-    property real fontPoint: 40 // Outrageously large so that you are forced to change it.
+    property int pixelSize: 200 // Outrageously large so that you are forced to change it.
 
     Row {
         anchors.fill: parent
@@ -40,7 +40,7 @@ Rectangle {
             id: textLabel
             text: container.text
             anchors.verticalCenter: parent.verticalCenter
-            font.pointSize: container.fontPoint
+            font.pixelSize: container.pixelSize
 
             color: "white"
         }

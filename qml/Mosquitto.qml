@@ -26,7 +26,7 @@ Item {
         RadioButton {
             id: mqSupport
             width: parent.width
-            fontPoint: Code.btnFontPoint()/10
+            pixelSize: (container.height + container.width) / 30
 
             text: "Enable mosquitto support"
         }// RadioButton (mqSupport)
@@ -40,7 +40,7 @@ Item {
                 text: "Host:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font.pointSize: Code.btnFontPoint()/10
+                font.pixelSize: (container.height + container.width) / 30
             }
 
             TextInput {
@@ -48,7 +48,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 text: "mosquitto.example.com"
                 color: "white"
-                font.pointSize: Code.btnFontPoint()/10
+                font.pixelSize: (container.height + container.width) / 30
             }
         }// Row (Mq server)
 
@@ -62,7 +62,7 @@ Item {
                 text: "Port:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font.pointSize: Code.btnFontPoint()/10
+                font.pixelSize: (container.height + container.width) / 30
             }
 
             TextInput {
@@ -71,7 +71,7 @@ Item {
                 text: "1883"
                 color: "white"
                 validator: IntValidator { bottom: 0; top: 65535 }
-                font.pointSize: Code.btnFontPoint()/10
+                font.pixelSize: (container.height + container.width) / 30
             }
         }// Row (Mq port)
 
@@ -84,7 +84,7 @@ Item {
                 text: "Topic to sub:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font.pointSize: Code.btnFontPoint()/10
+                font.pixelSize: (container.height + container.width) / 30
             }
 
             TextInput {
@@ -92,7 +92,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 text: "gv_notify"
                 color: "white"
-                font.pointSize: Code.btnFontPoint()/10
+                font.pixelSize: (container.height + container.width) / 30
             }
         }// Row (Mq topic to subscribe to)
 
@@ -103,7 +103,7 @@ Item {
             MyButton {
                 mainText: "Save"
                 width: (parent.width / 2) - parent.spacing
-                mainPixelSize: container.height / 10
+                mainPixelSize: (container.height + container.width) / 30
 
                 onClicked: {
                     container.sigMosquittoChanges (bEnable,
@@ -118,7 +118,7 @@ Item {
             MyButton {
                 mainText: "Cancel"
                 width: (parent.width / 2) - parent.spacing
-                mainPixelSize: container.height / 10
+                mainPixelSize: (container.height + container.width) / 30
 
                 onClicked: container.sigDone(false);
             }//MyButton (Cancel)

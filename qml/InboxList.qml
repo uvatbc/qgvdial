@@ -248,9 +248,9 @@ Rectangle {
             anchors {
                 top: barTop.bottom
                 left: parent.left
-                right: parent.right
-                bottom: parent.bottom
             }
+            width: parent.width
+            height: parent.height - barTop.height
 
             opacity: 1
             clip: true

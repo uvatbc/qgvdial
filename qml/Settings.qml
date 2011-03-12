@@ -220,7 +220,7 @@ Item {
 
         onSigDone: container.state = ''
         onSigMosquittoChanges: container.sigMosquittoChanges(bEnable, host, port, topic)
-    }
+    }//Mosquitto
 
     About {
         id: aboutWin
