@@ -173,6 +173,12 @@ Q_DECLARE_METATYPE(ContactInfo)
 #define DESKTOP_OS 0
 #endif
 
+#if defined(Q_OS_SYMBIAN) || defined(Q_WS_MAEMO_5)
+#define MOBILE_OS 1
+#else
+#define MOBILE_OS 0
+#endif
+
 #if defined(Q_WS_X11)
 #define TELEPATHY_CAPABLE 1
 #else

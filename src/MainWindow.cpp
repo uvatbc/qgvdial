@@ -94,9 +94,7 @@ void
 MainWindow::initLogging ()
 {
     // Initialize logging
-    QString strLogfile;
-#ifndef Q_OS_SYMBIAN
-    strLogfile = QDir::homePath ();
+    QString strLogfile = QDir::homePath ();
     QDir dirHome(strLogfile);
     if (!strLogfile.endsWith (QDir::separator ()))
     {
@@ -107,7 +105,6 @@ MainWindow::initLogging ()
         dirHome.mkdir (".qgvdial");
     }
     strLogfile += QDir::separator ();
-#endif
     strLogfile += "qgvdial.log";
     fLogfile.setFileName (strLogfile);
     fLogfile.open (QIODevice::WriteOnly | QIODevice::Append);
@@ -222,6 +219,7 @@ MainWindow::messageReceived (const QString &message)
     if (message == "show") {
         qDebug ("Second instance asked us to show");
         this->show ();
+        this->invalidateScene ();
     } else if (message == "quit") {
         qDebug ("Second instance asked us to quit");
         this->on_actionE_xit_triggered ();
@@ -432,7 +430,7 @@ MainWindow::initQML ()
     QObject::connect (gObj, SIGNAL (sigRefreshAll ()),
                       this, SLOT   (onRefreshAll ()));
     QObject::connect (gObj, SIGNAL (sigDismiss ()),
-                      this, SLOT   (close ()));
+                      this, SLOT   (hide ()));
     QObject::connect (gObj, SIGNAL (sigQuit ()),
                       this, SLOT   (on_actionE_xit_triggered ()));
     QObject::connect (gObj, SIGNAL (sigLinkActivated (const QString &)),

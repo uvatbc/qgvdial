@@ -45,6 +45,10 @@ myMessageOutput(QtMsgType type, const char *msg)
 int
 main (int argc, char *argv[])
 {
+#if defined(Q_WS_S60)
+    MainApp::setAttribute (Qt::AA_S60DontConstructApplicationPanes);
+#endif
+
     pOldHandler = qInstallMsgHandler(myMessageOutput);
 
     MainApp app(argc, argv);
@@ -72,9 +76,7 @@ main (int argc, char *argv[])
     app.setActivationWindow (&w);
     app.setQuitOnLastWindowClosed (false);
 
-#if defined(Q_WS_S60)
-    w.showMaximized();
-#elif defined(Q_WS_MAEMO_5)
+#if MOBILE_OS
     w.showFullScreen ();
 #else
     w.show();
