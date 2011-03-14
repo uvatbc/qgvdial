@@ -18,15 +18,17 @@ Rectangle {
             color: "black"
             border.color: "grey"
             width: listView.width
-            height: (txtName.height + txtNumber.height)
+            height: listView.height / 3
 
             Column {
+                anchors.fill:  parent
+                spacing: 2
                 Text {
                     id: txtName
                     text: name
                     color: "white"
                     width: listView.width
-                    font.pointSize: Code.btnFontPoint() / 5;
+                    font.pixelSize: (rectDelegate.height / 2) - 2
                     elide: Text.ElideMiddle
                 }
 
@@ -35,7 +37,7 @@ Rectangle {
                     text: description
                     color: "white"
                     width: listView.width
-                    font.pointSize: Code.btnFontPoint() / 5;
+                    font.pixelSize: (rectDelegate.height / 2) - 2
                     elide: Text.ElideMiddle
                 }
             }// Column

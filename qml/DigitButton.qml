@@ -51,7 +51,7 @@ Item {
             color: "grey"
             anchors.right: parent.right
             anchors.bottom: parent.bottom
-            font.pointSize: Code.btnSubTextFontPoint ();
+            font.pixelSize: btn.mainPixelSize / 5
         }// Text
     }
 }// Item

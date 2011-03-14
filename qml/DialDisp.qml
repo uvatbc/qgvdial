@@ -24,7 +24,6 @@ Rectangle {
             anchors {
                 top: parent.top
                 left: parent.left
-                right: parent.right
             }
 
             MyButton {
@@ -43,11 +42,10 @@ Rectangle {
             opacity: 1
 
             width: parent.width
+            height: parent.height - btnPhones.height
             anchors {
                 top: btnPhones.bottom
                 left: parent.left
-                right: parent.right
-                bottom: parent.bottom
             }
 
             color: "white"
@@ -56,7 +54,7 @@ Rectangle {
             wrapMode: TextEdit.WrapAnywhere
             selectByMouse: true
             font {
-                pointSize: (Code.btnFontPoint()/3);
+                pixelSize: height - 6
                 bold: true
             }
 

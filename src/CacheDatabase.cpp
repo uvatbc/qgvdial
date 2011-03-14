@@ -114,7 +114,7 @@ QString
 CacheDatabase::get_db_name ()
 {
     QString rv;
-#ifndef Q_OS_SYMBIAN
+#if !defined(Q_OS_SYMBIAN)
     rv = QDir::homePath ();
     if (!rv.endsWith (QDir::separator ()))
     {

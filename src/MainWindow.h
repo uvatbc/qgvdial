@@ -47,6 +47,7 @@ private slots:
     void on_actionE_xit_triggered();
     //! The Singleton Application class invokes this function
     void messageReceived (const QString &message);
+    void onSigHide ();
 
     //! Invoked when the QML says that the username and/or password has changed.
     void onUserTextChanged (const QString &strUsername);

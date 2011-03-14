@@ -16,3 +16,9 @@ SymbianCallInitiator::selfNumber ()
 {
     return "unknown";
 }//SymbianCallInitiator::selfNumber
+
+void
+SymbianCallInitiator::initiateCall (const QString &strDestination)
+{
+    qDebug ("SymbianCallInitiator::initiateCall");
+}//SymbianCallInitiator::initiateCall

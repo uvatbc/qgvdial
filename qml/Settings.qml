@@ -11,7 +11,7 @@ Item {
     signal sigWebPage
     signal sigRefresh
     signal sigRefreshAll
-    signal sigDismiss
+    signal sigHide
     signal sigQuit
     signal sigLinkActivated(string strLink)
 
@@ -22,7 +22,7 @@ Item {
                            string user, string pass)
     signal sigMosquittoChanges(bool bEnable, string host, int port, string topic)
 
-    Column {
+    Column { // all buttons
         id: mainColumn
         anchors.fill: parent
         anchors.topMargin: 2
@@ -33,7 +33,7 @@ Item {
         property string strUsername: g_strUsername      // "user@gmail.com"
         property string strPassword: g_strPassword      // "hunter2 :p"
 
-        property int pixDiv: 18
+        property int pixDiv: 10
         property int pixHeight: (container.height + container.width) / 2
         property int pixSize: pixHeight / (pixDiv + 2)
 
@@ -155,7 +155,7 @@ Item {
                     newState: ""
                 }//ListElement (Web Page (debug))
                 ListElement {
-                    text: "Dismiss window"
+                    text: "Hide window"
                     newState: ""
                 }//ListElement (Web Page (debug))
                 ListElement {
@@ -184,21 +184,21 @@ Item {
                         container.sigWebPage();
                     } else if (text == "Refresh") {
                         container.sigRefresh();
-                    } else if (text == "Dismiss window") {
-                        container.sigDismiss();
+                    } else if (text == "Hide window") {
+                        container.sigHide();
                     }
                 }//onClicked
 
                 onPressHold: {
                     if (text == "Refresh") {
                         container.sigRefreshAll();
-                    } else if (text == "Dismiss window") {
+                    } else if (text == "Hide window") {
                         container.sigQuit();
                     }
                 }
             }//delegate (MyButton)
         }//ListView
-    }// Column
+    }// Column (all buttons)
 
     Proxy {
         id: proxySettings

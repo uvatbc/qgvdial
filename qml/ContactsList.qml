@@ -88,6 +88,7 @@ Rectangle {
         anchors.fill: parent
         clip: true
         opacity: 1
+        spacing: 2
 
         model: g_contactsModel
 //        model: testContactsModelData1

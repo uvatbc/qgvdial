@@ -24,7 +24,7 @@ Rectangle {
     signal sigWebPage
     signal sigRefresh
     signal sigRefreshAll
-    signal sigDismiss
+    signal sigHide
     signal sigQuit
 
     // If there is any link that is activated from anywhere
@@ -48,7 +48,7 @@ Rectangle {
     onSigRefresh: console.debug("QML: Refresh requested")
     onSigRefreshAll: console.debug("QML: Refresh All requested")
 
-    onSigDismiss: console.debug("QML: Dismiss requested");
+    onSigHide: console.debug("QML: Dismiss requested");
     onSigQuit: console.debug("QML: Quit requested");
 
     property bool landscape: (main.width > main.height)
@@ -224,7 +224,7 @@ Rectangle {
             onSigWebPage: main.sigWebPage()
             onSigRefresh: main.sigRefresh()
             onSigRefreshAll: main.sigRefreshAll()
-            onSigDismiss: main.sigDismiss()
+            onSigHide: main.sigHide()
             onSigQuit: main.sigQuit()
 
             onSigProxyChanges: main.sigProxyChanges(bEnable, bUseSystemProxy,

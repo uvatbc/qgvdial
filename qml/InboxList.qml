@@ -277,7 +277,7 @@ Rectangle {
 
                     text: type + " " + time_detail + "\n" + name
                     color: "white"
-                    font.pointSize: (listInbox.height + listInbox.width) / 60
+                    font.pointSize: (listInbox.height + listInbox.width) / 70
                 }
 
                 MouseArea {

@@ -219,12 +219,27 @@ MainWindow::messageReceived (const QString &message)
     if (message == "show") {
         qDebug ("Second instance asked us to show");
         this->show ();
-        this->invalidateScene ();
     } else if (message == "quit") {
         qDebug ("Second instance asked us to quit");
         this->on_actionE_xit_triggered ();
     }
 }//MainWindow::messageReceived
+
+/** Invoked when the user clicks the hide button or long presses the top bar
+ * This function is supposed to hide the qgvdial main window. On all platforms
+ * except Symbian a simple hide() is sufficient. In Symbian, we need to do it
+ * differently.
+ */
+void
+MainWindow::onSigHide ()
+{
+#if defined(Q_OS_SYMBIAN)
+    //@@UV: Something meaningful
+    this->lower ();
+#else
+    this->hide ();
+#endif
+}//MainWindow::onSigHide
 
 /** Deferred initialization function
  * This function does all of the initialization that was originally in the
@@ -429,8 +444,8 @@ MainWindow::initQML ()
                       this, SLOT   (onRefresh ()));
     QObject::connect (gObj, SIGNAL (sigRefreshAll ()),
                       this, SLOT   (onRefreshAll ()));
-    QObject::connect (gObj, SIGNAL (sigDismiss ()),
-                      this, SLOT   (hide ()));
+    QObject::connect (gObj, SIGNAL (sigHide ()),
+                      this, SLOT   (onSigHide ()));
     QObject::connect (gObj, SIGNAL (sigQuit ()),
                       this, SLOT   (on_actionE_xit_triggered ()));
     QObject::connect (gObj, SIGNAL (sigLinkActivated (const QString &)),
@@ -1640,7 +1655,7 @@ MainWindow::onSigProxyChanges(bool bEnable, bool bUseSystemProxy,
     {
         QObject *pRoot = this->rootObject ();
         if (NULL == pRoot) {
-            qWarning ("Could not get to root object in QML!!!");
+            qWarning ("Couldn't get root object in QML for ProxySettingsPage");
             break;
         }
 
@@ -1679,7 +1694,7 @@ MainWindow::onSigMosquittoChanges (bool bEnable, const QString &host, int port,
     {
         QObject *pRoot = this->rootObject ();
         if (NULL == pRoot) {
-            qWarning ("Could not get to root object in QML!!!");
+            qWarning ("Couldn't get root object in QML for MosquittoPage");
             break;
         }
 

@@ -61,7 +61,7 @@ GVInbox::prepView ()
     do { // Begin cleanup block (not a loop)
         QObject *pRoot = pParent->rootObject ();
         if (NULL == pRoot) {
-            qWarning ("Could not get to root object in QML!!!");
+            qWarning ("Couldn't get root object in QML for InboxPage");
             break;
         }
 
