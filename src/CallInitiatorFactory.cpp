@@ -9,6 +9,10 @@
 #include "TpCalloutInitiator.h"
 #endif
 
+#if defined(Q_OS_SYMBIAN)
+#include "SymbianCallInitiator.h"
+#endif
+
 CallInitiatorFactory::CallInitiatorFactory (QObject *parent)
 : QObject(parent)
 , mutex (QMutex::Recursive)
@@ -30,12 +34,8 @@ void
 CallInitiatorFactory::init ()
 {
 #if LINUX_DESKTOP || defined (Q_WS_WIN32)
-    CalloutInitiator *initiator = new DesktopSkypeCallInitiator (this);
-    listInitiators += initiator;
-
-    QObject::connect (
-        initiator, SIGNAL (status(const QString &, int)),
-        this     , SIGNAL (status(const QString &, int)));
+    CalloutInitiator *skype_initiator = new DesktopSkypeCallInitiator (this);
+    listInitiators += skype_initiator;
 #endif
 
 #if TELEPATHY_CAPABLE
@@ -43,6 +43,18 @@ CallInitiatorFactory::init ()
          actMgr->becomeReady (), SIGNAL (finished(Tp::PendingOperation*)),
          this, SLOT (onAccountManagerReady (Tp::PendingOperation *)));
 #endif
+
+#if defined(Q_OS_SYMBIAN)
+    CalloutInitiator *phoneInitiator = new SymbianCallInitiator(this);
+    listInitiators += phoneInitiator;
+#endif
+
+    foreach (i, listInitiators) {
+        qDebug () << "Added initiator" << i->name();
+        QObject::connect (
+            i   , SIGNAL (status(const QString &, int)),
+            this, SIGNAL (status(const QString &, int)));
+    }
 }//CallInitiatorFactory::init
 
 #if TELEPATHY_CAPABLE

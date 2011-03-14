@@ -113,11 +113,14 @@ CacheDatabase::deinit ()
 QString
 CacheDatabase::get_db_name ()
 {
-    QString rv = QDir::homePath ();
+    QString rv;
+#ifndef Q_OS_SYMBIAN
+    rv = QDir::homePath ();
     if (!rv.endsWith (QDir::separator ()))
     {
         rv += QDir::separator ();
     }
+#endif
     rv += DB_NAME;
 
     return (rv);

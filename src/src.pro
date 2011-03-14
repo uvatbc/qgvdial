@@ -171,6 +171,9 @@ win32 {
 }
 
 symbian {
+    HEADERS += SymbianCallInitiator.h
+    SOURCES += SymbianCallInitiator.cpp
+
     TARGET.UID3 = 0xe2d130b9
     TARGET.CAPABILITY += NetworkServices ReadUserData
 # Uncomment when you are ready to sign
