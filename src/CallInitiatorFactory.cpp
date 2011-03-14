@@ -49,7 +49,7 @@ CallInitiatorFactory::init ()
     listInitiators += phoneInitiator;
 #endif
 
-    foreach (i, listInitiators) {
+    foreach (CalloutInitiator *i, listInitiators) {
         qDebug () << "Added initiator" << i->name();
         QObject::connect (
             i   , SIGNAL (status(const QString &, int)),
