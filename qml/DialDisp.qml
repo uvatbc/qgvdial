@@ -11,7 +11,7 @@ Rectangle {
     property alias txtEd: txtNum
     property alias theNumber: txtNum.text
 
-    Item {
+    Item { // phone selector and phone text edit
         id: mainItem
         anchors.fill: parent
 
@@ -35,7 +35,7 @@ Rectangle {
                 onClicked: mainItem.state == "PhonesShown" ?
                            mainItem.state = "" : mainItem.state = "PhonesShown"
             }// MyButton (btnPhones)
-        }// Rectangle (wDisp)
+        }// Rectangle (phone selector button)
 
         TextEdit {
             id: txtNum
@@ -54,7 +54,7 @@ Rectangle {
             wrapMode: TextEdit.WrapAnywhere
             selectByMouse: true
             font {
-                pixelSize: height - 6
+                pixelSize: (height/3) - 4
                 bold: true
             }
 
@@ -65,13 +65,12 @@ Rectangle {
             id: cbPhones
             opacity: 0
 
-            width: parent.width
             anchors {
                 top: btnPhones.bottom
                 left: parent.left
-                right: parent.right
-                bottom: parent.bottom
             }
+            width: parent.width
+            height: (parent.height - btnPhones.height)
 
             onSelectionChanged: {
                 wDisp.sigSelChanged(iIndex)
@@ -92,5 +91,5 @@ Rectangle {
                 PropertyAnimation { property: "opacity"; easing.type: Easing.InOutQuad}
             }
         ]
-    }// Item
+    }// Item (phone selector and phone text edit)
 }// Rectangle

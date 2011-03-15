@@ -74,7 +74,12 @@ main (int argc, char *argv[])
     MainWindow w;
     pw = &w;
     app.setActivationWindow (&w);
+
+#if defined(Q_OS_SYMBIAN)
+    app.setQuitOnLastWindowClosed (true);
+#else
     app.setQuitOnLastWindowClosed (false);
+#endif
 
 #if MOBILE_OS
     w.showFullScreen ();

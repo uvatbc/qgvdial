@@ -51,7 +51,7 @@ Item {
             color: "grey"
             anchors.right: parent.right
             anchors.bottom: parent.bottom
-            font.pixelSize: btn.mainPixelSize / 5
+            font.pixelSize: btn.mainPixelSize / 3
         }// Text
     }
 }// Item

@@ -153,7 +153,7 @@ MainWindow::log (const QString &strText, int level /*= 10*/)
  *          until the next status is to be displayed.
  */
 void
-MainWindow::setStatus(const QString &strText, int timeout /* = 0*/)
+MainWindow::setStatus(const QString &strText, int timeout /* = 3000*/)
 {
     qDebug () << strText;
 
@@ -356,7 +356,7 @@ MainWindow::init ()
     QObject::connect (&actLogin, SIGNAL (triggered()),
                        this    , SLOT   (on_action_Login_triggered()));
     QObject::connect (&actDismiss, SIGNAL (triggered()),
-                       this      , SLOT   (close()));
+                       this      , SLOT   (hide ()));
     QObject::connect (&actRefresh, SIGNAL (triggered()),
                        this      , SLOT   (onRefresh()));
     QObject::connect (&actExit, SIGNAL (triggered()),
@@ -390,7 +390,8 @@ MainWindow::init ()
     }
     else
     {
-        setStatus ("No user credentials cached. Please login");
+        // Show this status for 60 seconds (or until the next status)
+        setStatus ("Please enter email and password", 60 * 1000);
 
         // Do this otherwise the QML behaves silly.
         QDeclarativeContext *ctx = this->rootContext();
@@ -1680,6 +1681,7 @@ MainWindow::onSigProxyChanges(bool bEnable, bool bUseSystemProxy,
 void
 MainWindow::onLinkActivated (const QString &strLink)
 {
+    qDebug() << "MainWindow: Link activated" << strLink;
     QDesktopServices::openUrl (QUrl::fromUserInput (strLink));
 }//MainWindow::onLinkActivated
 

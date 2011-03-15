@@ -28,7 +28,7 @@ Rectangle {
                     text: name
                     color: "white"
                     width: listView.width
-                    font.pixelSize: (rectDelegate.height / 2) - 2
+                    font.pixelSize: (rectDelegate.height / 2) - 4
                     elide: Text.ElideMiddle
                 }
 
@@ -37,7 +37,7 @@ Rectangle {
                     text: description
                     color: "white"
                     width: listView.width
-                    font.pixelSize: (rectDelegate.height / 2) - 2
+                    font.pixelSize: (rectDelegate.height / 2) - 4
                     elide: Text.ElideMiddle
                 }
             }// Column

@@ -101,7 +101,7 @@ Rectangle {
                 }
 
                 onPressAndHold: {
-                    main.sigDismiss();
+                    main.sigHide();
                     barTop.state = '';
                 }
 
