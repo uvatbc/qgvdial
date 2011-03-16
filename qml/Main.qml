@@ -2,6 +2,10 @@ import Qt 4.7
 import "helper.js" as Code
 
 Rectangle {
+    //Uncomment when using qmlviewer
+    property int g_MainWidth: 250
+    property int g_MainHeight: 400
+
     id: main
     width: g_MainWidth
     height: g_MainHeight
@@ -37,6 +41,10 @@ Rectangle {
                            string user, string pass)
 
     signal sigMosquittoChanges(bool bEnable, string host, int port, string topic)
+
+    // Signals from the message box
+    signal sigMsgBoxOk
+    signal sigMsgBoxCancel
 
     onSigCall: console.debug("QML: Call " + number)
     onSigText: console.debug("QML: Text " + number)
@@ -144,7 +152,7 @@ Rectangle {
                 onSigInbox:     { main.state = "Inbox" }
                 onSigSettings:  { main.state = "Settings" }
             }//MainButton
-        }
+        }// Rectangle (contains the MainButtons)
 
         MainView {
             id: dialPad
@@ -234,6 +242,22 @@ Rectangle {
             onSigMosquittoChanges: main.sigMosquittoChanges(bEnable, host, port, topic)
         }
 
+        MsgBox {
+            id: msgBox
+            opacity: 0
+
+            width: mainColumn.centralWidth - 20
+            height: mainColumn.centralHeight / 5
+            anchors.centerIn: mainColumn
+
+            onSigMsgBoxOk: {
+                msgBox.opacity = 0
+            }
+            onSigMsgBoxCancel: {
+                msgBox.opacity = 0
+            }
+        }
+
 ////////////////////////////////////////////////////////////////////////////////
 //                           Co-existent Items End                            //
 ////////////////////////////////////////////////////////////////////////////////
@@ -247,7 +271,7 @@ Rectangle {
 
             Text {
                 text: g_strStatus
-                font.pixelSize: parent.height - 4
+                font.pixelSize: (parent.height * 2 / 3)
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
                 color: "white"
@@ -275,6 +299,10 @@ Rectangle {
             name: "Settings"
             PropertyChanges { target: settingsView; opacity: 1}
             PropertyChanges { target: mainRect; opacity: 0}
+        },
+        State {
+            name: "MsgBox"
+            PropertyChanges { target: msgBox; opacity: 1}
         }
     ]//states
 

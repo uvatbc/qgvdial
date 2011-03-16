@@ -22,7 +22,7 @@ Item {
                            string user, string pass)
     signal sigMosquittoChanges(bool bEnable, string host, int port, string topic)
 
-    Column { // all buttons
+    Column { // user, pass and all buttons
         id: mainColumn
         anchors.fill: parent
         anchors.topMargin: 2
@@ -35,7 +35,8 @@ Item {
 
         property int pixDiv: 10
         property int pixHeight: (container.height + container.width) / 2
-        property int pixSize: pixHeight / (pixDiv + 2)
+        property int outerHeight: pixHeight / (pixDiv + 2)
+        property int pixSize: outerHeight * 2 / 3
 
         Rectangle {
             width: parent.width
@@ -47,9 +48,10 @@ Item {
                 spacing: 2
 
                 Text {
-                    text: "Username:"
+                    text: "Email:"
                     color: "white"
                     anchors.verticalCenter: parent.verticalCenter
+                    height: mainColumn.outerHeight
                     font.pixelSize: mainColumn.pixSize
                 }
 
@@ -58,6 +60,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     text: mainColumn.strUsername
                     color: "white"
+                    height: mainColumn.outerHeight
                     font.pixelSize: mainColumn.pixSize
 
                     opacity: (g_bIsLoggedIn == true ? 0 : 1)
@@ -71,6 +74,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     text: mainColumn.strUsername
                     color: "white"
+                    height: mainColumn.outerHeight
                     font.pixelSize: mainColumn.pixSize
                     opacity: (g_bIsLoggedIn == true ? 1 : 0)
                 }
@@ -91,6 +95,7 @@ Item {
                     text: "Password:"
                     color: "white"
                     anchors.verticalCenter: parent.verticalCenter
+                    height: mainColumn.outerHeight
                     font.pixelSize: mainColumn.pixSize
                 }
 
@@ -100,6 +105,7 @@ Item {
                     text: mainColumn.strPassword
                     color: "white"
                     echoMode: TextInput.Password
+                    height: mainColumn.outerHeight
                     font.pixelSize: mainColumn.pixSize
 
                     opacity: (g_bIsLoggedIn == true ? 0 : 1)
@@ -113,6 +119,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     text: Array(mainColumn.strPassword.length+1).join("*")
                     color: "white"
+                    height: mainColumn.outerHeight
                     font.pixelSize: mainColumn.pixSize
                     opacity: (g_bIsLoggedIn == true ? 1 : 0)
                 }
@@ -199,7 +206,7 @@ Item {
                 }
             }//delegate (MyButton)
         }//ListView
-    }// Column (all buttons)
+    }// Column (user, pass and all buttons)
 
     Proxy {
         id: proxySettings
@@ -255,4 +262,4 @@ Item {
             PropertyChanges { target: mainColumn; opacity: 0 }
         }
     ]
-}// Item (top level)
+}// Item (container)

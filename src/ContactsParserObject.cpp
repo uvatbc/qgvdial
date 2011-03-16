@@ -31,7 +31,7 @@ ContactsParserObject::doWork ()
 
     bool rv = simpleReader.parse (&inputSource, false);
 
-    QString msg = QString("Contact parsing done. total = %1. usable = %2")
+    QString msg = QString("Total contacts: %1. Usable: %2")
             .arg (contactsHandler.getTotalContacts ())
             .arg (contactsHandler.getUsableContacts ());
     emit status(msg);
