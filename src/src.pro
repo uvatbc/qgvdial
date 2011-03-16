@@ -171,8 +171,15 @@ win32 {
 }
 
 symbian {
-    HEADERS += SymbianCallInitiator.h
-    SOURCES += SymbianCallInitiator.cpp
+    HEADERS += SymbianCallInitiator.h           \
+               SymbianCallInitiatorPrivate.h    \
+               SymbianCallObserverPrivate.h
+    SOURCES += SymbianCallInitiator.cpp         \
+               SymbianCallInitiatorPrivate.cpp  \
+               SymbianCallObserverPrivate.cpp
+
+# The Symbian telephony stack library
+    LIBS += -letel3rdparty
 
     TARGET.UID3 = 0xe2d130b9
     TARGET.CAPABILITY += NetworkServices ReadUserData

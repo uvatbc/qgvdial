@@ -167,7 +167,8 @@ Item {
             delegate: MyButton {
                 mainText: (text == "Login" ? (g_bIsLoggedIn == true ? "Logout" : "Login") : text)
                 width: parent.width
-                mainPixelSize: mainColumn.pixHeight / mainColumn.pixDiv
+                height: mainColumn.pixHeight / mainColumn.pixDiv
+                mainPixelSize: height * 2 / 3
 
                 onClicked: {
                     if (newState != "") {
