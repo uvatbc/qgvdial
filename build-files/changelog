@@ -1,1 +1,3 @@
-  * Changed all the QML elements to use pixel size instead of font point.
+  * Quite a lot of work on Symbian, with ported changes.
+  * Dial cancel msg box is QML.
+

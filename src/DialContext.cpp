@@ -31,7 +31,7 @@ DialContext::showMsgBox ()
         return;
     }
 
-    QString strMessage = QString("Dialing %1.").arg(strTarget);
+    QString strMessage = QString("Dialing\n%1").arg(strTarget);
     QMetaObject::invokeMethod (pRoot, "showMessageBox",
                                Q_ARG (QVariant, QVariant(strMessage)));
 }//DialContext::showMsgBox

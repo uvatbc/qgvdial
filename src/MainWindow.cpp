@@ -1156,8 +1156,6 @@ MainWindow::onSigDialComplete (DialContext *ctx, bool ok)
         bDialCancelled = true;
         webPage.cancelWork (ctx->bDialOut ? GVAW_dialOut : GVAW_dialCallback);
     }
-
-    ctx->deleteLater ();
 }//MainWindow::onSigDialComplete
 
 void

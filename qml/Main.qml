@@ -2,9 +2,9 @@ import Qt 4.7
 import "helper.js" as Code
 
 Rectangle {
-    //Uncomment when using qmlviewer
-    property int g_MainWidth: 250
-    property int g_MainHeight: 400
+// Uncomment when using qmlviewer
+//    property int g_MainWidth: 250
+//    property int g_MainHeight: 400
 
     id: main
     width: g_MainWidth
@@ -103,7 +103,7 @@ Rectangle {
             signal clickedTopBar
 
             Text {
-                text: "qgvdial"
+                text: main.state == '' ? "qgvdial" : "Back to main screen"
                 font.pixelSize: parent.height - 4
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -258,7 +258,7 @@ Rectangle {
             opacity: 0
 
             width: mainColumn.centralWidth - 20
-            height: mainColumn.centralHeight / 5
+            height: (mainColumn.centralWidth + mainColumn.centralHeight) / 6
             anchors.centerIn: mainColumn
 
             onSigMsgBoxOk: main.sigMsgBoxDone(true)

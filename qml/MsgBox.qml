@@ -5,7 +5,7 @@ Rectangle {
     border.color: "grey"
     color: "black"
 
-    property string msgText: "Agree or not?"
+    property string msgText: "Dialing\n+1 000 000 0000"
 
     signal sigMsgBoxOk
     signal sigMsgBoxCancel
