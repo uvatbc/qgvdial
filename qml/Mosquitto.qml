@@ -37,18 +37,21 @@ Item {
             opacity: (bEnable ? 1 : 0)
 
             Text {
+                id: lblHost
                 text: "Host:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
                 font.pixelSize: (container.height + container.width) / 30
             }
 
-            TextInput {
+            MyTextEdit {
                 id: textMqServer
+                width: parent.width - lblHost.width
                 anchors.verticalCenter: parent.verticalCenter
                 text: "mosquitto.example.com"
-                color: "white"
-                font.pixelSize: (container.height + container.width) / 30
+                pixelSize: (container.height + container.width) / 30
+                KeyNavigation.tab: textMqPort
+                KeyNavigation.backtab: textMqTopic
             }
         }// Row (Mq server)
 
@@ -59,19 +62,22 @@ Item {
             opacity: (bEnable ? 1 : 0)
 
             Text {
+                id: lblPort
                 text: "Port:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
                 font.pixelSize: (container.height + container.width) / 30
             }
 
-            TextInput {
+            MyTextEdit {
                 id: textMqPort
+                width: parent.width - lblPort.width
                 anchors.verticalCenter: parent.verticalCenter
                 text: "1883"
-                color: "white"
                 validator: IntValidator { bottom: 0; top: 65535 }
-                font.pixelSize: (container.height + container.width) / 30
+                pixelSize: (container.height + container.width) / 30
+                KeyNavigation.tab: textMqTopic
+                KeyNavigation.backtab: textMqServer
             }
         }// Row (Mq port)
 
@@ -81,18 +87,21 @@ Item {
             opacity: (bEnable ? 1 : 0)
 
             Text {
+                id: lblTopic
                 text: "Topic to sub:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
                 font.pixelSize: (container.height + container.width) / 30
             }
 
-            TextInput {
+            MyTextEdit {
                 id: textMqTopic
+                width: parent.width - lblTopic.width
                 anchors.verticalCenter: parent.verticalCenter
                 text: "gv_notify"
-                color: "white"
-                font.pixelSize: (container.height + container.width) / 30
+                pixelSize: (container.height + container.width) / 30
+                KeyNavigation.tab: textMqServer
+                KeyNavigation.backtab: textMqPort
             }
         }// Row (Mq topic to subscribe to)
 

@@ -30,101 +30,85 @@ Item {
         opacity: 1
 
         // Test properties; comment out when adding qml to c++ code.
-        property string strUsername: g_strUsername      // "user@gmail.com"
-        property string strPassword: g_strPassword      // "hunter2 :p"
+        property string strUsername: g_strUsername       //"user@gmail.com"
+        property string strPassword: g_strPassword       //"hunter2 :p"
 
         property int pixDiv: 10
         property int pixHeight: (container.height + container.width) / 2
         property int outerHeight: pixHeight / (pixDiv + 2)
         property int pixSize: outerHeight * 2 / 3
 
-        Rectangle {
+        Row {
             width: parent.width
-            height: textUsername.height
-            color: "black"
-            border.color: textUsername.activeFocus?"orange":"black"
-            Row {
-                width: parent.width
-                spacing: 2
+            spacing: 2
 
-                Text {
-                    text: "Email:"
-                    color: "white"
-                    anchors.verticalCenter: parent.verticalCenter
-                    height: mainColumn.outerHeight
-                    font.pixelSize: mainColumn.pixSize
-                }
+            Text {
+                id: lblEmail
+                text: "Email:"
+                color: "white"
+                anchors.verticalCenter: parent.verticalCenter
+                height: mainColumn.outerHeight
+                font.pixelSize: mainColumn.pixSize
+            }
 
-                TextInput {
-                    id: textUsername
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: mainColumn.strUsername
-                    color: "white"
-                    height: mainColumn.outerHeight
-                    font.pixelSize: mainColumn.pixSize
+            MyTextEdit {
+                id: textUsername
+                height: mainColumn.outerHeight - 2
+                width: parent.width - lblEmail.width
+                opacity: (g_bIsLoggedIn == true ? 0 : 1)
+                text: mainColumn.strUsername
+                pixelSize: mainColumn.pixSize
 
-                    opacity: (g_bIsLoggedIn == true ? 0 : 1)
+                Keys.onReturnPressed: listButtons.login_logout_function();
+                KeyNavigation.tab: textPassword
+                onSigTextChanged: container.sigUserChanged(strText);
+            }
 
-                    onTextChanged: container.sigUserChanged(textUsername.text);
-                    KeyNavigation.tab: textPassword
-                    Keys.onReturnPressed: listButtons.login_logout_function();
-                }
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                text: mainColumn.strUsername
+                color: "white"
+                height: mainColumn.outerHeight
+                font.pixelSize: mainColumn.pixSize
+                opacity: (g_bIsLoggedIn == true ? 1 : 0)
+            }
+        }//Row
 
-                Text {
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: mainColumn.strUsername
-                    color: "white"
-                    height: mainColumn.outerHeight
-                    font.pixelSize: mainColumn.pixSize
-                    opacity: (g_bIsLoggedIn == true ? 1 : 0)
-                }
-            }//Row
-        }//Rectangle (username)
-
-        Rectangle {
+        Row {
             width: parent.width
-            height: textPassword.height
-            color: "black"
-            border.color: textPassword.activeFocus?"orange":"black"
+            spacing: 2
 
-            Row {
-                width: parent.width
-                spacing: 2
+            Text {
+                text: "Password:"
+                color: "white"
+                anchors.verticalCenter: parent.verticalCenter
+                height: mainColumn.outerHeight
+                font.pixelSize: mainColumn.pixSize
+            }
 
-                Text {
-                    text: "Password:"
-                    color: "white"
-                    anchors.verticalCenter: parent.verticalCenter
-                    height: mainColumn.outerHeight
-                    font.pixelSize: mainColumn.pixSize
-                }
+            MyTextEdit {
+                id: textPassword
+                height: mainColumn.outerHeight - 2
+                width: parent.width - lblEmail.width
+                opacity: (g_bIsLoggedIn == true ? 0 : 1)
+                text: mainColumn.strPassword
+                echoMode: TextInput.Password
+                pixelSize: mainColumn.pixSize
 
-                TextInput {
-                    id: textPassword
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: mainColumn.strPassword
-                    color: "white"
-                    echoMode: TextInput.Password
-                    height: mainColumn.outerHeight
-                    font.pixelSize: mainColumn.pixSize
+                Keys.onReturnPressed: listButtons.login_logout_function();
+                KeyNavigation.tab: textUsername
+                onSigTextChanged: container.sigPassChanged(strText);
+            }
 
-                    opacity: (g_bIsLoggedIn == true ? 0 : 1)
-
-                    onTextChanged: container.sigPassChanged(textPassword.text);
-                    KeyNavigation.tab: textUsername
-                    Keys.onReturnPressed: listButtons.login_logout_function();
-                }
-
-                Text {
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: Array(mainColumn.strPassword.length+1).join("*")
-                    color: "white"
-                    height: mainColumn.outerHeight
-                    font.pixelSize: mainColumn.pixSize
-                    opacity: (g_bIsLoggedIn == true ? 1 : 0)
-                }
-            }//Row (password)
-        }//Rectangle (password)
+           Text {
+                anchors.verticalCenter: parent.verticalCenter
+                text: Array(mainColumn.strPassword.length+1).join("*")
+                color: "white"
+                height: mainColumn.outerHeight
+                font.pixelSize: mainColumn.pixSize
+                opacity: (g_bIsLoggedIn == true ? 1 : 0)
+            }
+        }//Row (password)
 
         ListView {
             id: listButtons

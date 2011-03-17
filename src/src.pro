@@ -126,6 +126,7 @@ OTHER_FILES  += winrsrc.rc                  \
                 ../qml/Mosquitto.qml        \
                 ../qml/MsgBox.qml           \
                 ../qml/MyButton.qml         \
+                ../qml/MyTextEdit.qml       \
                 ../qml/Proxy.qml            \
                 ../qml/RadioButton.qml      \
                 ../qml/Settings.qml         \
@@ -183,7 +184,7 @@ symbian {
     TARGET.UID3 = 0xe2d130b9
     TARGET.CAPABILITY += NetworkServices ReadUserData
 # Uncomment when you are ready to sign
-#    TARGET.CAPABILITY += ReadDeviceData
+#    TARGET.CAPABILITY += ReadDeviceData SwEvent
     TARGET.EPOCSTACKSIZE = 0x14000          # 80 KB stack size
     TARGET.EPOCHEAPSIZE = 0x020000 0x2000000 # 128 KB - 20 MB
 

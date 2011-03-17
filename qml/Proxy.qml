@@ -56,18 +56,21 @@ Item {
             opacity: (bEnableProxy && !bSystemProxy ? 1 : 0)
 
             Text {
+                id: lblHost
                 text: "Host:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
                 font.pixelSize: (container.height + container.width) / 30
             }
 
-            TextInput {
+            MyTextEdit {
                 id: textUserProxyHost
+                width: parent.width - lblHost.width
                 anchors.verticalCenter: parent.verticalCenter
-                text: "Enter proxy host"
-                color: "white"
-                font.pixelSize: (container.height + container.width) / 30
+                text: "proxy.example.com"
+                pixelSize: (container.height + container.width) / 30
+                KeyNavigation.tab: textUserProxyPort
+                KeyNavigation.backtab: (bEnableProxy && !bSystemProxy && bProxyUserPass ? textUserProxyPass : textUserProxyPort)
             }
         }// Row (user proxy host)
 
@@ -78,19 +81,22 @@ Item {
             opacity: (bEnableProxy && !bSystemProxy ? 1 : 0)
 
             Text {
+                id: lblPort
                 text: "Port:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
                 font.pixelSize: (container.height + container.width) / 30
             }
 
-            TextInput {
+            MyTextEdit {
                 id: textUserProxyPort
+                width: parent.width - lblPort.width
                 anchors.verticalCenter: parent.verticalCenter
-                text: "Enter proxy port"
-                color: "white"
+                text: "80"
                 validator: IntValidator { bottom: 0; top: 65535 }
-                font.pixelSize: (container.height + container.width) / 30
+                pixelSize: (container.height + container.width) / 30
+                KeyNavigation.tab: (bEnableProxy && !bSystemProxy && bProxyUserPass ? textUserProxyUser : textUserProxyHost)
+                KeyNavigation.backtab: textUserProxyHost
             }
         }// Row (user proxy port)
 
@@ -116,13 +122,14 @@ Item {
                 font.pixelSize: (container.height + container.width) / 30
             }
 
-            TextInput {
+            MyTextEdit {
                 id: textUserProxyUser
                 anchors.verticalCenter: parent.verticalCenter
                 width: parent.width - lblProxyUser.width
-                text: ""
-                color: "white"
-                font.pixelSize: (container.height + container.width) / 30
+                text: "exampleuser"
+                pixelSize: (container.height + container.width) / 30
+                KeyNavigation.tab: textUserProxyPass
+                KeyNavigation.backtab: textUserProxyPort
             }
         }// Row (user proxy user name)
 
@@ -139,13 +146,15 @@ Item {
                 font.pixelSize: (container.height + container.width) / 30
             }
 
-            TextInput {
+            MyTextEdit {
                 id: textUserProxyPass
                 anchors.verticalCenter: parent.verticalCenter
                 width: parent.width - lblProxyPass.width
-                text: ""
-                color: "white"
-                font.pixelSize: (container.height + container.width) / 30
+                text: "hunter2 :P"
+                echoMode: TextInput.Password
+                pixelSize: (container.height + container.width) / 30
+                KeyNavigation.tab: textUserProxyHost
+                KeyNavigation.backtab: textUserProxyUser
             }
         }// Row (user proxy password)
 

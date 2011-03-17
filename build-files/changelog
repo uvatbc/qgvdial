@@ -1,3 +1,3 @@
-  * Quite a lot of work on Symbian, with ported changes.
-  * Dial cancel msg box is QML.
+  * Differentiate the text input boxes from labels
+  * Added tab order to most text fields
 

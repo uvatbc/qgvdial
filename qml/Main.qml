@@ -3,8 +3,8 @@ import "helper.js" as Code
 
 Rectangle {
 // Uncomment when using qmlviewer
-//    property int g_MainWidth: 250
-//    property int g_MainHeight: 400
+    property int g_MainWidth: 250
+    property int g_MainHeight: 400
 
     id: main
     width: g_MainWidth
