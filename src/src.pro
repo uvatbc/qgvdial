@@ -51,7 +51,6 @@ SOURCES  += main.cpp                    \
             GVContactsTable.cpp         \
             CaptchaWidget.cpp           \
             ContactsXmlHandler.cpp      \
-            DialCancelDlg.cpp           \
             DlgSelectContactNumber.cpp  \
             SMSEntryDeleteButton.cpp    \
             SMSDlg.cpp                  \
@@ -88,7 +87,6 @@ HEADERS  += global.h                    \
             GVContactsTable.h           \
             CaptchaWidget.h             \
             ContactsXmlHandler.h        \
-            DialCancelDlg.h             \
             DlgSelectContactNumber.h    \
             SMSEntryDeleteButton.h      \
             SMSDlg.h                    \

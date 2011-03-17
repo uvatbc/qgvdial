@@ -8,17 +8,38 @@
 #include <QObject>
 
 class CalloutInitiator;
-class DialCancelDlg;
 
 class DialContext : public QObject
 {
+    Q_OBJECT
+
 public:
-    DialContext(QObject *parent);
+    DialContext(const QString &strMy, const QString &strT,
+                QDeclarativeView *mainView);
     ~DialContext();
 
+    void showMsgBox();
+    void hideMsgBox();
+
+signals:
+    void sigDialComplete (DialContext *self, bool ok);
+
+public:
     bool bDialOut;
     CalloutInitiator *ci;
-    DialCancelDlg *pDialDlg;
+    QString strMyNumber;
+    QString strTarget;
+
+private slots:
+    //! Invoked by call observers
+    void callStarted ();
+    //! Invoked when the user clicks on the message box
+    void onSigMsgBoxDone(bool ok);
+
+private:
+    // This is pointer duplication only because I was too lazy to typecast and
+    // check validity of the QObject->parent() every time.
+    QDeclarativeView *mainView;
 };
 
 #endif //__DIALCONTEXT_H__

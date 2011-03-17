@@ -7,6 +7,7 @@
 #include "SMSDlg.h"
 #include "WebWidget.h"
 #include "RegNumberModel.h"
+#include "DialContext.h"
 
 #if MOSQUITTO_CAPABLE
 #include "MqClientThread.h"
@@ -80,7 +81,8 @@ private slots:
     //! Invoked by the DBus Text server without any text data
     void onSendTextWithoutData (const QStringList &arrNumbers);
 
-    void onDialDlgClose (int retval, const QString &strNumber, void *pvctx);
+    //! Invoked by the context when either observers or the user says.
+    void onSigDialComplete (DialContext *ctx, bool ok);
     //! Invoked when dialing has started
     void dialInProgress (const QString &strNumber);
     //! Invoked to perform a dial

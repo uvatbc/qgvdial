@@ -1,12 +1,10 @@
 #include "MainWindow.h"
 
 #include "LoginDialog.h"
-#include "DialCancelDlg.h"
 #include "DlgSelectContactNumber.h"
 #include "VMailDialog.h"
 
 #include "PhoneNumberValidator.h"
-#include "DialContext.h"
 
 #include <QDesktopServices>
 
@@ -1031,21 +1029,18 @@ MainWindow::dialNow (const QString &strTarget)
             break;
         }
 
-        DialContext *ctx = new DialContext(this);
+        DialContext *ctx = new DialContext(strSelfNumber, strTarget, this);
         if (NULL == ctx) {
             setStatus ("Failed to dial out because of allocation problem");
             break;
         }
+        QObject::connect (ctx , SIGNAL(sigDialComplete(DialContext*,bool)),
+                          this, SLOT(onSigDialComplete(DialContext*,bool)));
 
         GVAccess &webPage = Singletons::getRef().getGVAccess ();
         QVariantList l;
         l += strTarget;     // The destination number is common between the two
         l += QVariant::fromValue<void*>(ctx);
-
-        DialCancelDlg *pDialDlg = new DialCancelDlg (strTarget, ctx, this);
-        QObject::connect (
-            pDialDlg, SIGNAL (dialDlgDone    (int, const QString &, void *)),
-            this    , SLOT   (onDialDlgClose (int, const QString &, void *)));
 
         OsDependent &osd = Singletons::getRef().getOSD ();
         osd.setLongWork (this, true);
@@ -1053,10 +1048,7 @@ MainWindow::dialNow (const QString &strTarget)
         bCallInProgress = true;
         bDialCancelled = false;
 
-        pDialDlg->setModal (false);
-        pDialDlg->doNonModal (strSelfNumber);
-
-        ctx->pDialDlg = pDialDlg;
+        ctx->showMsgBox ();
 
         if (bDialout)
         {
@@ -1081,7 +1073,7 @@ MainWindow::dialNow (const QString &strTarget)
             {
                 setStatus ("Dialing failed instantly");
                 bCallInProgress = bDialCancelled = false;
-                pDialDlg->deleteLater ();
+                ctx->deleteLater ();
                 break;
             }
         }
@@ -1151,24 +1143,22 @@ MainWindow::onSendTextWithoutData (const QStringList &arrNumbers)
 }//MainWindow::onSendTextWithoutData
 
 void
-MainWindow::onDialDlgClose (int retval,
-                            const QString & /*strNumber*/,
-                            void *pvctx)
+MainWindow::onSigDialComplete (DialContext *ctx, bool ok)
 {
-    DialContext *ctx = (DialContext *) pvctx;
     // Disconnecting this
     QMutexLocker locker (&mtxDial);
-    if (QMessageBox::Ok == retval)
-    {
-        emit dialCanFinish ();
-    }
-    else
-    {
+    if (ok) {
+        if (!ctx->bDialOut) {
+            emit dialCanFinish ();
+        }
+    } else {
         GVAccess &webPage = Singletons::getRef().getGVAccess ();
         bDialCancelled = true;
         webPage.cancelWork (ctx->bDialOut ? GVAW_dialOut : GVAW_dialCallback);
     }
-}//MainWindow::onDialDlgClose
+
+    ctx->deleteLater ();
+}//MainWindow::onSigDialComplete
 
 void
 MainWindow::dialInProgress (const QString & /*strNumber*/)

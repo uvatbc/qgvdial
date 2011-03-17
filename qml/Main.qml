@@ -43,8 +43,7 @@ Rectangle {
     signal sigMosquittoChanges(bool bEnable, string host, int port, string topic)
 
     // Signals from the message box
-    signal sigMsgBoxOk
-    signal sigMsgBoxCancel
+    signal sigMsgBoxDone (bool ok)
 
     onSigCall: console.debug("QML: Call " + number)
     onSigText: console.debug("QML: Text " + number)
@@ -74,6 +73,18 @@ Rectangle {
     }
 
     onSigLinkActivated: console.debug("QML: Link activated: " + strLink);
+
+    function showMessageBox (strMessage) {
+        msgBox.msgText = strMessage
+        main.state = "MsgBox"
+    }
+    function hideMessageBox () {
+        main.state = ''
+    }
+    onSigMsgBoxDone: {
+        console.debug ("QML: Closed the message box. Ok = " + ok)
+        main.state = ''
+    }
 
     Item {
         id: mainColumn
@@ -250,12 +261,8 @@ Rectangle {
             height: mainColumn.centralHeight / 5
             anchors.centerIn: mainColumn
 
-            onSigMsgBoxOk: {
-                msgBox.opacity = 0
-            }
-            onSigMsgBoxCancel: {
-                msgBox.opacity = 0
-            }
+            onSigMsgBoxOk: main.sigMsgBoxDone(true)
+            onSigMsgBoxCancel: main.sigMsgBoxDone(false)
         }
 
 ////////////////////////////////////////////////////////////////////////////////
