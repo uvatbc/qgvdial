@@ -2,6 +2,8 @@ QT      *= core gui webkit sql xml xmlpatterns script declarative
 TARGET   = qgvdial
 TEMPLATE = app
 
+VERSION=__QGVDIAL_VERSION__
+
 CONFIG  *= mobility precompile_header
 MOBILITY *= multimedia
 
