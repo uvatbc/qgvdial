@@ -29,6 +29,5 @@
         <file alias="Proxy.qml">../qml/Proxy.qml</file>
         <file alias="RadioButton.qml">../qml/RadioButton.qml</file>
         <file alias="Settings.qml">../qml/Settings.qml</file>
-        <file alias="TextButton.qml">../qml/TextButton.qml</file>
     </qresource>
 </RCC>

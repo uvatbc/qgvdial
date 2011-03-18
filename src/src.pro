@@ -130,7 +130,6 @@ OTHER_FILES  += winrsrc.rc                  \
                 ../qml/Proxy.qml            \
                 ../qml/RadioButton.qml      \
                 ../qml/Settings.qml         \
-                ../qml/TextButton.qml       \
                 readme.txt
 
 # In Linux and maemo, add the telepathy related sources and headers. Also add Mosquitto based sources and headers.
