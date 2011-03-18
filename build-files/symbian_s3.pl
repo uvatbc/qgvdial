@@ -59,7 +59,7 @@ system($cmd);
 
 my $enterdir = "cd qgvdial-$qver/src & set BUILDDIR=%CD% & set SOURCEDIR=%CD%";
 
-$cmd = "$enterdir & qmake.exe src.pro -r -spec symbian-sbsv2 CONFIG+=release -after OBJECTS_DIR=obj MOC_DIR=moc UI_DIR=ui RCC_DIR=rcc QMLJSDEBUGGER_PATH=%QTSYMBIAN%/../QtCreator/share/qtcreator/qml/qmljsdebugger";
+$cmd = "$enterdir & qmake.exe src.pro -r -spec symbian-sbsv2 CONFIG+=release -after OBJECTS_DIR=obj MOC_DIR=moc UI_DIR=ui RCC_DIR=rcc QMLJSDEBUGGER_PATH=%QTSDK_SLASH%/../QtCreator/share/qtcreator/qml/qmljsdebugger";
 print("$cmd\n");
 system($cmd);
 
