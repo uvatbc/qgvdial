@@ -74,16 +74,13 @@ Rectangle {
 
     onSigLinkActivated: console.debug("QML: Link activated: " + strLink);
 
-    function showMessageBox (strMessage) {
-        msgBox.msgText = strMessage
-        main.state = "MsgBox"
-    }
     function hideMessageBox () {
-        main.state = ''
+        console.debug ("QML: Hide the message box")
+        g_bShowMsg = false
     }
     onSigMsgBoxDone: {
         console.debug ("QML: Closed the message box. Ok = " + ok)
-        main.state = ''
+        hideMessageBox()
     }
 
     Item {
@@ -182,6 +179,7 @@ Rectangle {
             onSigCall: main.sigCall (number)
             onSigText: main.sigText (number)
             onSigSelChanged: main.sigSelChanged(index)
+            onSigMsgBoxDone: main.sigMsgBoxDone(ok)
         }
 
         ContactsList {
@@ -200,6 +198,7 @@ Rectangle {
 
             onSigCall: main.sigCall (number)
             onSigText: main.sigText (number)
+            onSigMsgBoxDone: main.sigMsgBoxDone(ok)
         }
 
         InboxList {
@@ -220,6 +219,7 @@ Rectangle {
             onSigText: main.sigText (number)
             onSigInboxSelect: main.sigInboxSelect(selection)
             onSigVoicemail: main.sigVoicemail(link)
+            onSigMsgBoxDone: main.sigMsgBoxDone(ok)
         }
 
         Settings {
@@ -251,11 +251,13 @@ Rectangle {
                                                     user, pass)
             onSigLinkActivated: main.sigLinkActivated(strLink)
             onSigMosquittoChanges: main.sigMosquittoChanges(bEnable, host, port, topic)
+            onSigMsgBoxDone: main.sigMsgBoxDone(ok)
         }
 
         MsgBox {
             id: msgBox
-            opacity: 0
+            opacity: ((main.state == '' && g_bShowMsg == true) ? 1 : 0)
+            msgText: g_strMsgText
 
             width: mainColumn.centralWidth - 20
             height: (mainColumn.centralWidth + mainColumn.centralHeight) / 6
@@ -306,10 +308,6 @@ Rectangle {
             name: "Settings"
             PropertyChanges { target: settingsView; opacity: 1}
             PropertyChanges { target: mainRect; opacity: 0}
-        },
-        State {
-            name: "MsgBox"
-            PropertyChanges { target: msgBox; opacity: 1}
         }
     ]//states
 

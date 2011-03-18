@@ -25,15 +25,11 @@ DialContext::showMsgBox ()
     ObserverFactory &obsF = Singletons::getRef().getObserverFactory ();
     obsF.startObservers (strMyNumber, this, SLOT (callStarted()));
 
-    QObject *pRoot = mainView->rootObject ();
-    if (NULL == pRoot) {
-        qWarning ("Couldn't get root object in QML to show message box");
-        return;
-    }
-
     QString strMessage = QString("Dialing\n%1").arg(strTarget);
-    QMetaObject::invokeMethod (pRoot, "showMessageBox",
-                               Q_ARG (QVariant, QVariant(strMessage)));
+
+    QDeclarativeContext *ctx = mainView->rootContext();
+    ctx->setContextProperty ("g_bShowMsg", true);
+    ctx->setContextProperty ("g_strMsgText", strMessage);
 }//DialContext::showMsgBox
 
 void
@@ -59,6 +55,9 @@ DialContext::onSigMsgBoxDone (bool ok)
 {
     ObserverFactory &obsF = Singletons::getRef().getObserverFactory ();
     obsF.stopObservers ();
+
+    QDeclarativeContext *ctx = mainView->rootContext();
+    ctx->setContextProperty ("g_bShowMsg", false);
 
     emit sigDialComplete (this, ok);
 }//DialContext::onSigMsgBoxDone

@@ -410,6 +410,7 @@ MainWindow::initQML ()
     QDeclarativeContext *ctx = this->rootContext();
     ctx->setContextProperty ("g_MainWidth", rect.width ());
     ctx->setContextProperty ("g_MainHeight", rect.height ());
+    ctx->setContextProperty ("g_bShowMsg", false);
 
     // Initialize the QML view
     this->setSource (QUrl ("qrc:/Main.qml"));
@@ -459,6 +460,8 @@ MainWindow::initQML ()
                                           const QString &)),
         this, SLOT   (onSigMosquittoChanges(bool, const QString &, int,
                                             const QString &)));
+    QObject::connect (gObj, SIGNAL (sigMsgBoxDone(bool)),
+                      this, SLOT (onSigMsgBoxDone(bool)));
 
 #if DESKTOP_OS
     this->setFixedSize (this->size ());
@@ -479,6 +482,7 @@ MainWindow::initQMLGlobals ()
 void
 MainWindow::doLogin ()
 {
+    OsDependent &osd = Singletons::getRef().getOSD ();
     GVAccess &webPage = Singletons::getRef().getGVAccess ();
     QVariantList l;
 
@@ -490,16 +494,17 @@ MainWindow::doLogin ()
         l += strPass;
 
         setStatus ("Logging in...", 0);
+
+        osd.setLongWork (this, true);
+
         // webPage.workCompleted -> this.loginCompleted
         if (!webPage.enqueueWork (GVAW_login, l, this,
                 SLOT (loginCompleted (bool, const QVariantList &))))
         {
             qWarning ("Login returned immediately with failure!");
+            osd.setLongWork (this, false);
             break;
         }
-
-        OsDependent &osd = Singletons::getRef().getOSD ();
-        osd.setLongWork (this, true);
 
         bOk = true;
     } while (0); // End cleanup block (not a loop)
@@ -561,14 +566,14 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
 
     if (!bOk)
     {
-        setStatus ("User login failed");
-        this->showMsgBox ("User login failed");
-
         QVariantList l;
         logoutCompleted (true, l);
 
         OsDependent &osd = Singletons::getRef().getOSD ();
         osd.setLongWork (this, false);
+
+        setStatus ("User login failed", 30*1000);
+        this->showMsgBox ("User login failed");
     }
     else
     {
@@ -1166,7 +1171,7 @@ MainWindow::dialComplete (bool bOk, const QVariantList &params)
         }
         else
         {
-            setStatus ("Dialing failed", 3);
+            setStatus ("Dialing failed", 10*1000);
             this->showMsgBox ("Dialing failed");
         }
     }
@@ -1684,12 +1689,14 @@ MainWindow::onMqThreadFinished ()
 void
 MainWindow::showMsgBox (const QString &strMessage)
 {
-    QObject *pRoot = this->rootObject ();
-    if (NULL == pRoot) {
-        qWarning ("Main: Couldn't get root object in QML to show message box");
-        return;
-    }
-
-    QMetaObject::invokeMethod (pRoot, "showMessageBox",
-                               Q_ARG (QVariant, QVariant(strMessage)));
+    QDeclarativeContext *ctx = this->rootContext();
+    ctx->setContextProperty ("g_bShowMsg", true);
+    ctx->setContextProperty ("g_strMsgText", strMessage);
 }//MainWindow::showMsgBox
+
+void
+MainWindow::onSigMsgBoxDone (bool /*ok*/)
+{
+    QDeclarativeContext *ctx = this->rootContext();
+    ctx->setContextProperty ("g_bShowMsg", false);
+}//MainWindow::onSigMsgBoxDone

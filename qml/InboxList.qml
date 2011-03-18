@@ -4,13 +4,13 @@ import "helper.js" as Code
 Rectangle {
     id: container
     objectName: "InboxPage"
-    width: 250; height: 320
     color: "black"
 
     signal sigCall(string number)
     signal sigText(string number)
     signal sigVoicemail(string link)
     signal sigInboxSelect(string selection)
+    signal sigMsgBoxDone (bool ok)
 
     // Private properties. DO NOT TOUCH from outside.
     property string strDetailsName: "Detail name"
@@ -330,5 +330,18 @@ Rectangle {
             PropertyAnimation { property: "opacity"; easing.type: Easing.InOutQuad}
         }
     ]
+
+    MsgBox {
+        id: msgBox
+        opacity: ((container.opacity == 1 && g_bShowMsg == true) ? 1 : 0)
+        msgText: g_strMsgText
+
+        width: container.width - 20
+        height: (container.width + container.height) / 6
+        anchors.centerIn: container
+
+        onSigMsgBoxOk: container.sigMsgBoxDone(true)
+        onSigMsgBoxCancel: container.sigMsgBoxDone(false)
+    }
 
 }// Rectangle

@@ -144,6 +144,9 @@ private slots:
 
     void onMqThreadFinished();
 
+    //! Invoked when the message box is done
+    void onSigMsgBoxDone(bool ok);
+
 private:
     void initLogging ();
 
