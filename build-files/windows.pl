@@ -41,7 +41,7 @@ $cmd = "cd qgvdial-$qver & perl build-files/version.pl __QTDIR__ $cmd";
 system($cmd);
 
 # Fix the QML files
-$cmd = "cd $basedir ; perl ./build-files/fixqml.pl ./qml";
+$cmd = "cd qgvdial-$qver & perl ./build-files/fixqml.pl ./qml";
 print "$cmd\n";
 system($cmd);
 
