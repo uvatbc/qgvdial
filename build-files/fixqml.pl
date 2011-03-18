@@ -22,7 +22,12 @@ sub fix_one_file {
         
         #Remove all comments
         if ($line =~ m/(.*)\/\//) {
-            $line = $1;
+            $test = $1;
+            if ($test =~ m/a.href/) {
+                # Leave it alone!!!!
+            } else {
+                $line = $test;
+            }
         }
         
         # If by now the line is NOT empty, use it.
