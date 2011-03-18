@@ -58,7 +58,7 @@ while (defined $entry) {
     }
     
     # Ignore everything other than qml and js
-    if (($entry =~ m/.qml/i) || ($entry =~ m/.js/i)) {
+    if (($entry =~ m/.qml$/i) || ($entry =~ m/.js$/i)) {
         fix_one_file ($entry, $start_dir);
     }
 

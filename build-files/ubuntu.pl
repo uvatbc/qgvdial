@@ -83,4 +83,3 @@ $cmd = "cd $basedir && $mad dpkg-buildpackage && $mad remote -r org.maemo.qgvdia
 system($cmd);
 
 exit();
-
