@@ -562,18 +562,7 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
     if (!bOk)
     {
         setStatus ("User login failed");
-
-        // Cleanup if any
-        QMessageBox *msgBox = new QMessageBox(QMessageBox::Critical,
-                           "Invalid username or password",
-                           "Username or password not recognized",
-                           QMessageBox::Close,
-                           this);
-        msgBox->setModal (false);
-        QObject::connect (
-            msgBox, SIGNAL (buttonClicked (QAbstractButton *)),
-            this  , SLOT   (msgBox_buttonClicked (QAbstractButton *)));
-        msgBox->show ();
+        this->showMsgBox ("User login failed");
 
         QVariantList l;
         logoutCompleted (true, l);
@@ -685,15 +674,6 @@ MainWindow::systray_activated (QSystemTrayIcon::ActivationReason reason)
 }//MainWindow::systray_activated
 
 void
-MainWindow::msgBox_buttonClicked (QAbstractButton *button)
-{
-    if (NULL != button->parent ())
-    {
-        button->parent()->deleteLater ();
-    }
-}//MainWindow::msgBox_buttonClicked
-
-void
 MainWindow::on_actionE_xit_triggered ()
 {
     this->close ();
@@ -717,15 +697,7 @@ MainWindow::getContactsDone (bool bOk)
 {
     if (!bOk)
     {
-        QMessageBox *msgBox = new QMessageBox(QMessageBox::Critical,
-                           "Error",
-                           "Contacts retrieval failed",
-                           QMessageBox::Close);
-        msgBox->setModal (false);
-        QObject::connect (
-            msgBox, SIGNAL (buttonClicked (QAbstractButton *)),
-            this  , SLOT   (msgBox_buttonClicked (QAbstractButton *)));
-        msgBox->show ();
+        this->showMsgBox ("Contacts retrieval failed");
         setStatus ("Contacts retrieval failed");
     }
 }//MainWindow::getContactsDone
@@ -794,17 +766,7 @@ MainWindow::getInfoFrom (const QString &strNumber,
 
         if (!dbMain.getContactFromLink (info))
         {
-            QMessageBox *msgBox = new QMessageBox(QMessageBox::Critical,
-                                        "Get Contact failure",
-                                        "Failed to get contact information",
-                                        QMessageBox::Close,
-                                        this);
-            msgBox->setModal (false);
-            QObject::connect (
-                msgBox, SIGNAL (buttonClicked (QAbstractButton *)),
-                this  , SLOT   (msgBox_buttonClicked (QAbstractButton *)));
-            msgBox->show ();
-
+            this->showMsgBox ("Failed to get contact information");
             return (false);
         }
 
@@ -1205,16 +1167,7 @@ MainWindow::dialComplete (bool bOk, const QVariantList &params)
         else
         {
             setStatus ("Dialing failed", 3);
-            QMessageBox *msgBox = new QMessageBox(QMessageBox::Critical,
-                               "Dial failure",
-                               "Dialing failed",
-                               QMessageBox::Close,
-                               this);
-            msgBox->setModal (false);
-            QObject::connect (
-                msgBox, SIGNAL (buttonClicked (QAbstractButton *)),
-                this  , SLOT   (msgBox_buttonClicked (QAbstractButton *)));
-            msgBox->show ();
+            this->showMsgBox ("Dialing failed");
         }
     }
     else
@@ -1311,17 +1264,8 @@ MainWindow::sendSMS (const QStringList &arrNumbers, const QString &strText)
 
     if (0 != arrFailed.size ())
     {
-        QMessageBox *msgBox = new QMessageBox(QMessageBox::Critical,
-                                    "SMS could not be sent to the following:",
-                                    arrFailed.join (", "),
-                                    QMessageBox::Close,
-                                    this);
-        msgBox->setModal (false);
-        QObject::connect (
-            msgBox, SIGNAL (buttonClicked (QAbstractButton *)),
-            this  , SLOT   (msgBox_buttonClicked (QAbstractButton *)));
-        msgBox->show ();
-
+        this->showMsgBox (QString("Failed to send %1 SMS")
+                                 .arg (arrFailed.size ()));
         msg = QString("Could not send a text to %1")
                 .arg (arrFailed.join (", "));
         setStatus (msg);
@@ -1403,17 +1347,8 @@ MainWindow::gotAllRegisteredPhones (bool bOk, const QVariantList &)
     do { // Begin cleanup block (not a loop)
         if (!bOk)
         {
-            QMessageBox *msgBox = new QMessageBox(
-                    QMessageBox::Critical,
-                    "Error",
-                    "Failed to retrieve registered phones",
-                    QMessageBox::Close);
-            msgBox->setModal (false);
-            QObject::connect (
-                    msgBox, SIGNAL (buttonClicked (QAbstractButton *)),
-                    this  , SLOT   (msgBox_buttonClicked (QAbstractButton *)));
-            msgBox->show ();
-            setStatus ("Failed to retrieve all registered phones");
+            this->showMsgBox ("Failed to retrieve registered phones");
+            setStatus ("Failed to retrieve registered phones");
             break;
         }
 
@@ -1745,3 +1680,16 @@ MainWindow::onMqThreadFinished ()
     }
 #endif
 }//MainWindow::onMqThreadFinished
+
+void
+MainWindow::showMsgBox (const QString &strMessage)
+{
+    QObject *pRoot = this->rootObject ();
+    if (NULL == pRoot) {
+        qWarning ("Main: Couldn't get root object in QML to show message box");
+        return;
+    }
+
+    QMetaObject::invokeMethod (pRoot, "showMessageBox",
+                               Q_ARG (QVariant, QVariant(strMessage)));
+}//MainWindow::showMsgBox

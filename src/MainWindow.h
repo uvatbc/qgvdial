@@ -66,8 +66,6 @@ private slots:
     void logoutCompleted (bool bOk, const QVariantList &arrParams);
     //! Invoked when the system ray is clicked
     void systray_activated (QSystemTrayIcon::ActivationReason reason);
-    //! Invoked when a message box is closed. Purely a cleanup function.
-    void msgBox_buttonClicked (QAbstractButton *button);
 
     //! Invoked after all contacts have been parsed
     void getContactsDone (bool bOk);
@@ -172,6 +170,8 @@ private:
                           CalloutInitiator    *&initiator  );
 
     void playVmail (const QString &strFile);
+
+    void showMsgBox (const QString &strMessage);
 
 private:
     //! Logfile
