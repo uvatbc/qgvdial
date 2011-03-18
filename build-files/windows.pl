@@ -31,10 +31,18 @@ system("svn export $repo qgvdial-$qver");
 system("copy qgvdial-$qver\\icons\\Google.png qgvdial-$qver\\src\\qgvdial.png");
 system("move qgvdial-$qver\\build-files\\qt.conf.win qgvdial-$qver\\build-files\\qt.conf");
 
+# Version replacement
 system("cd qgvdial-$qver & perl build-files/version.pl __QGVDIAL_VERSION__ $qver");
+
+# Replace the QTDIR variable
 $cmd = `echo %QTDIR%`;
 $cmd =~ s/\\/\\\\/g;
 $cmd = "cd qgvdial-$qver & perl build-files/version.pl __QTDIR__ $cmd";
+system($cmd);
+
+# Fix the QML files
+$cmd = "cd $basedir ; perl ./build-files/fixqml.pl ./qml";
+print "$cmd\n";
 system($cmd);
 
 # Compile it!

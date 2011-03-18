@@ -240,7 +240,7 @@ Rectangle {
                         container.sigInboxSelect(modelData)
                     }
                 }
-            }// TextButton
+            }// Rectangle (delegate)
         }//ListView (inbox selector: All, Placed, Missed, etc.)
 
         ListView {
