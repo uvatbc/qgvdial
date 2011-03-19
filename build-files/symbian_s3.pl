@@ -7,7 +7,7 @@ my ($sec,$min,$hour,$day,$month,$yr19,@rest) = localtime(time);
 $yr19 += 1900;
 $month++;
 my $suffix = sprintf("%04d%02d%02d", $yr19, $month, $day);
-$dest = sprintf("I:\\Uv\\releases\\qgvdial\\%04d-%02d-%02d", $yr19, $month, $day);
+$dest = sprintf("I:/Uv/releases/qgvdial/%04d-%02d-%02d", $yr19, $month, $day);
 if ((!(-e $dest)) or (!(-d $dest))) {
     $cmd = "mkdir $dest";
     print("$cmd\n");
@@ -57,16 +57,15 @@ $cmd = "cd qgvdial-$qver & perl ./build-files/fixqml.pl ./qml";
 print "$cmd\n";
 system($cmd);
 
+# This is the way to enter a directory and setup the remainder variables
 my $enterdir = "cd qgvdial-$qver/src & set BUILDDIR=%CD% & set SOURCEDIR=%CD%";
 
-$cmd = "$enterdir & qmake.exe src.pro -r -spec symbian-sbsv2 CONFIG+=release -after OBJECTS_DIR=obj MOC_DIR=moc UI_DIR=ui RCC_DIR=rcc QMLJSDEBUGGER_PATH=%QTSDK_SLASH%/../QtCreator/share/qtcreator/qml/qmljsdebugger";
+# qmake, make release-gcce, make installer_sis
+$cmd = "$enterdir & qmake.exe src.pro -r -spec symbian-sbsv2 CONFIG+=release -after OBJECTS_DIR=obj MOC_DIR=moc UI_DIR=ui RCC_DIR=rcc QMLJSDEBUGGER_PATH=%QTSDK_SLASH%/../QtCreator/share/qtcreator/qml/qmljsdebugger & $s_make release-gcce -w & $s_make installer_sis -w";
 print("$cmd\n");
 system($cmd);
 
-$cmd = "$enterdir & $s_make release-gcce -w";
-print("$cmd\n");
-system($cmd);
-
-$cmd = "$enterdir & $s_make installer_sis -w";
+# Copy the sis files to the outer directory
+$cmd = "$enterdir & copy qgvdial.sis $dest/qgvdial_$qver.sis & copy qgvdial_installer.sis $dest/qgvdial_installer_$qver.sis";
 print("$cmd\n");
 system($cmd);

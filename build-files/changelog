@@ -1,3 +1,2 @@
-  * Fixed the QML message box so that is is definitely visible.
-  * Introduced a perl script that clears out leading whitespace and comments from QML so that the resource section is smaller.
-  * Eliminated TextButton. It wasn't being used anywhere.
+  * Added version to the pro file
+  * Dial back to gtalk works!!

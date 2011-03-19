@@ -49,6 +49,7 @@ system($cmd);
 $cmd = "cd qgvdial-$qver & qmake & make release";
 system($cmd);
 
+# this is required for the old
 $cmd = "copy qgvdial-$qver\\src\\release\\qgvdial.exe I:\\Uv\\releases\\qgvdial\\win-install\\qgvdial\\bin";
 system($cmd);
 
