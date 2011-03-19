@@ -361,6 +361,11 @@ GVAccess::simplify_number (QString &strNumber, bool bAddIntPrefix /*= true*/)
             break;
         }
 
+        if (!strNumber.contains (QRegExp("^\\d*$"))) {
+            // Not numbers. Dont touch it! (anymore!!)
+            break;
+        }
+
         if ((strNumber.length () == 11) && (strNumber.startsWith ('1')))
         {
             strNumber = "+" + strNumber;

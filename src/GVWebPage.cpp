@@ -867,10 +867,10 @@ GVWebPage::phonesListLoaded (bool bOk)
             regNumber.strDescription = arrSplit[1].trimmed();
             // Make the actual number follow the form: +1aaabbbcccc
             regNumber.strDescription.remove (QRegExp("[ \t\n()-]"));
-            regNumber.strDescription = "+1" + regNumber.strDescription;
+            simplify_number (regNumber.strDescription);
 
             QString strFromInput = numbers[index].attribute("value");
-            QRegExp rx1("(\\+{0,1}\\d*)\\|(.)");
+            QRegExp rx1("(.*)\\|(.)");
             if ((strFromInput.contains (rx1)) && (2 == rx1.captureCount ()))
             {
                 QString strTemp = rx1.cap (1);
