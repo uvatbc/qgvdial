@@ -35,13 +35,8 @@ DialContext::showMsgBox ()
 void
 DialContext::hideMsgBox ()
 {
-    QObject *pRoot = mainView->rootObject ();
-    if (NULL == pRoot) {
-        qWarning ("Couldn't get root object in QML to show message box");
-        return;
-    }
-
-    QMetaObject::invokeMethod (pRoot, "hideMessageBox");
+    QDeclarativeContext *ctx = mainView->rootContext();
+    ctx->setContextProperty ("g_bShowMsg", false);
 }//DialContext::hideMsgBox
 
 void
@@ -56,8 +51,7 @@ DialContext::onSigMsgBoxDone (bool ok)
     ObserverFactory &obsF = Singletons::getRef().getObserverFactory ();
     obsF.stopObservers ();
 
-    QDeclarativeContext *ctx = mainView->rootContext();
-    ctx->setContextProperty ("g_bShowMsg", false);
+    hideMsgBox ();
 
     emit sigDialComplete (this, ok);
 }//DialContext::onSigMsgBoxDone

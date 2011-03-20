@@ -31,6 +31,11 @@ system("svn export $repo qgvdial-$qver");
 system("copy qgvdial-$qver\\icons\\Google.png qgvdial-$qver\\src\\qgvdial.png");
 system("move qgvdial-$qver\\build-files\\qt.conf.win qgvdial-$qver\\build-files\\qt.conf");
 
+# Append the version to the pro file
+open(PRO_FILE, ">>qgvdial-$qver/src/src.pro") || die "Cannot open pro file";
+print PRO_FILE "VERSION=__QGVDIAL_VERSION__\n";
+close PRO_FILE;
+
 # Version replacement
 system("cd qgvdial-$qver & perl build-files/version.pl __QGVDIAL_VERSION__ $qver");
 

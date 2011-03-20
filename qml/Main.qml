@@ -74,13 +74,8 @@ Rectangle {
 
     onSigLinkActivated: console.debug("QML: Link activated: " + strLink);
 
-    function hideMessageBox () {
-        console.debug ("QML: Hide the message box")
-        g_bShowMsg = false
-    }
     onSigMsgBoxDone: {
-        console.debug ("QML: Closed the message box. Ok = " + ok)
-        hideMessageBox()
+        console.debug ("QML: User requested close on message box. Ok = " + ok)
     }
 
     Item {

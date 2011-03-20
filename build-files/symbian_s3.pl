@@ -47,6 +47,11 @@ $cmd = "svn export $repo qgvdial-$qver";
 print("$cmd\n");
 system($cmd);
 
+# Append the version to the pro file
+open(PRO_FILE, ">>qgvdial-$qver/src/src.pro") || die "Cannot open pro file";
+print PRO_FILE "VERSION=__QGVDIAL_VERSION__\n";
+close PRO_FILE;
+
 # Version changes
 $cmd = "cd qgvdial-$qver/src & perl ../build-files/version.pl __QGVDIAL_VERSION__ $qver";
 print("$cmd\n");

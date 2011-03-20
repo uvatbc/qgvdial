@@ -41,6 +41,11 @@ $cmd = "svn export $repo $basedir";
 system($cmd);
 system("cp $basedir/icons/Google.png $basedir/src/qgvdial.png");
 
+# Append the version to the pro file
+open(PRO_FILE, ">>$basedir/src/src.pro") || die "Cannot open pro file";
+print PRO_FILE "VERSION=__QGVDIAL_VERSION__\n";
+close PRO_FILE;
+
 # Version replacement
 $cmd = "cd $basedir ; perl ./build-files/version.pl __QGVDIAL_VERSION__ $qver";
 print "$cmd\n";

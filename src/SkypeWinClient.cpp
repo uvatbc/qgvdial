@@ -32,7 +32,7 @@ SkypeWinClient::skypeAttachStatus (bool bOk)
         QMutexLocker locker (&mutex);
         if (SW_Connect != workCurrent.whatwork)
         {
-            qWarning ("We're not in connection phase.");
+            qWarning ("SkypeWinClient: We're not in connection phase.");
             break;
         }
 
@@ -53,12 +53,17 @@ SkypeWinClient::ensureConnected ()
         if (NULL == theApp->getSkypeHandle ())
         {
             MainApp *theApp = (MainApp *)qApp;
-            UINT ret = SendMessage (HWND_BROADCAST,
-                                    theApp->getDiscover (),
-                                    (WPARAM)mainwin.winId (),
-                                    0);
+            UINT ret =
+            SendMessageTimeout (HWND_BROADCAST,
+                                theApp->getDiscover (),
+                                (WPARAM)mainwin.winId (),
+                                0,
+                                SMTO_ABORTIFHUNG,
+                                2 * 1000,   // 2 sec per top level window
+                                NULL);
             if (1 != ret)
             {
+                qWarning ("SkypeWinClient: Failed to send connect message");
                 break;
             }
 
@@ -84,7 +89,7 @@ SkypeWinClient::invoke (const QString &strCommand)
     LRESULT lRet = FALSE;
     do // Begin cleanup block (not a loop)
     {
-        qDebug () << QString("Sending command %1").arg (strCommand);
+        qDebug () << "SkypeWinClient: Sending command" << strCommand;
 
         QMutexLocker locker (&mutex);
         bInvokeInProgress = true;
