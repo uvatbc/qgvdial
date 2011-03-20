@@ -9,7 +9,7 @@ $month++;
 my $suffix = sprintf("%04d%02d%02d", $yr19, $month, $day);
 $dest = sprintf("I:/Uv/releases/qgvdial/%04d-%02d-%02d", $yr19, $month, $day);
 if ((!(-e $dest)) or (!(-d $dest))) {
-    $cmd = "mkdir $dest";
+    $cmd = "powershell mkdir $dest";
     print("$cmd\n");
     system($cmd);
 }
@@ -53,7 +53,7 @@ print PRO_FILE "VERSION=__QGVDIAL_VERSION__\n";
 close PRO_FILE;
 
 # Version changes
-$cmd = "cd qgvdial-$qver/src & perl ../build-files/version.pl __QGVDIAL_VERSION__ $qver";
+$cmd = "cd qgvdial-$qver & perl ./build-files/version.pl __QGVDIAL_VERSION__ $qver";
 print("$cmd\n");
 system($cmd);
 
@@ -71,6 +71,7 @@ print("$cmd\n");
 system($cmd);
 
 # Copy the sis files to the outer directory
-$cmd = "$enterdir & powershell cp qgvdial.sis $dest/qgvdial_$qver.sis & powershell cp qgvdial_installer.sis $dest/qgvdial_installer_$qver.sis";
+#$cmd = "$enterdir & powershell cp qgvdial.sis $dest/qgvdial_$qver.sis & powershell cp qgvdial_installer.sis $dest/qgvdial_installer_$qver.sis";
+$cmd = "$enterdir & powershell cp qgvdial.sis $dest/qgvdial_$qver.sis";
 print("$cmd\n");
 system($cmd);
