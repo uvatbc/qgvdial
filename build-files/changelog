@@ -1,2 +1,2 @@
-  * Added version to the pro file
-  * Dial back to gtalk works!!
+  * Removed version to the pro file and added it only at build time.
+  * Cancel msgbox did not disappear when Observer notices that call has occured.
