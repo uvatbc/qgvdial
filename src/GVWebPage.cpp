@@ -3,7 +3,6 @@
 #include "GVI_XMLJsonHandler.h"
 
 #define GV_DATA_BASE "https://www.google.com/voice"
-#define SYMBIAN_SIGNED 0
 
 GVWebPage::GVWebPage(QObject *parent/* = NULL*/)
 : GVAccess (parent)
@@ -132,13 +131,7 @@ GVWebPage::isLoggedIn ()
 bool
 GVWebPage::isOnline ()
 {
-#if !defined(Q_OS_SYMBIAN) || SYMBIAN_SIGNED
     return nwCfg.isOnline ();
-#else
-    // In Symbian with no signing, pretend we're always online.
-    // This is because we don't want to sign... yet
-    return true;
-#endif
 }//GVWebPage::isOnline
 
 bool
