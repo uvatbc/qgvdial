@@ -70,8 +70,12 @@ $cmd = "$enterdir & qmake.exe src.pro -r -spec symbian-sbsv2 CONFIG+=release -af
 print("$cmd\n");
 system($cmd);
 
+$cmd = "$enterdir & signsis.exe -u qgvdial.sis unsigned_qgvdial.sis";
+print("$cmd\n");
+system($cmd);
+
 # Copy the sis files to the outer directory
 #$cmd = "$enterdir & powershell cp qgvdial.sis $dest/qgvdial_$qver.sis & powershell cp qgvdial_installer.sis $dest/qgvdial_installer_$qver.sis";
-$cmd = "$enterdir & powershell cp qgvdial.sis $dest/qgvdial_$qver.sis";
+$cmd = "$enterdir & powershell cp qgvdial.sis $dest/qgvdial_$qver.sis & powershell cp unsigned_qgvdial.sis $dest/unsigned_qgvdial_$qver.sis";
 print("$cmd\n");
 system($cmd);
