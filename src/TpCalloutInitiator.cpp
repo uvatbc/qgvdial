@@ -5,6 +5,7 @@
 TpCalloutInitiator::TpCalloutInitiator (Tp::AccountPtr act, QObject *parent)
 : CalloutInitiator(parent)
 , account (act)
+, strActCmName("undefined")
 , strSelfNumber("undefined")
 , bIsSpirit (false)
 {
@@ -39,16 +40,23 @@ TpCalloutInitiator::onConnectionReady (Tp::PendingOperation *op)
         }
         qDebug ("Self Contact is null");
 
-        if (account->cmName () == "spirit") {
+        strActCmName = account->cmName ();
+        if (strActCmName == "spirit") {
+            strActCmName = "Skype";
             bIsSpirit = true;
         }
 
-        if (account->cmName () == "sofiasip")
+        if (strActCmName == "sofiasip")
         {
             strSelfNumber = account->parameters()["auth-user"].toString();
             if (!strSelfNumber.isEmpty ()) break;
             strSelfNumber = account->parameters()["account"].toString();
             if (!strSelfNumber.isEmpty ()) break;
+        }
+
+        if (strActCmName == "ring") {
+            strSelfNumber = "This phone's MSISDN";
+            strActCmName = "Phone";
         }
 
         msg = QString ("Yet to figure out how to get phone number from %1")
@@ -111,7 +119,7 @@ TpCalloutInitiator::onChannelReady (Tp::PendingOperation*op)
 QString
 TpCalloutInitiator::name ()
 {
-    return (account->cmName ());
+    return (strActCmName);
 }//TpCalloutInitiator::name
 
 QString

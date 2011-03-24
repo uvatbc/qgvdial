@@ -28,7 +28,7 @@ SymbianCallInitiator::name ()
 QString
 SymbianCallInitiator::selfNumber ()
 {
-    return "unknown";
+    return "This phone's MSISDN";
 }//SymbianCallInitiator::selfNumber
 
 void

@@ -27,6 +27,7 @@ private slots:
 
 private:
     Tp::AccountPtr      account;
+    QString             strActCmName;
     QString             strSelfNumber;
 
     //! Is this the buggy spirit (skype) TP-CM?
