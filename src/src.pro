@@ -181,9 +181,7 @@ symbian {
     LIBS += -letel3rdparty
 
     TARGET.UID3 = 0x2003B499
-    TARGET.CAPABILITY += NetworkServices ReadUserData
-# Uncomment when you are ready to sign
-    TARGET.CAPABILITY += ReadDeviceData SwEvent
+    TARGET.CAPABILITY += NetworkServices ReadUserData ReadDeviceData SwEvent
     TARGET.EPOCSTACKSIZE = 0x14000          # 80 KB stack size
     TARGET.EPOCHEAPSIZE = 0x020000 0x2000000 # 128 KB - 20 MB
 
