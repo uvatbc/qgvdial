@@ -180,7 +180,7 @@ symbian {
 # The Symbian telephony stack library
     LIBS += -letel3rdparty
 
-    TARGET.UID3 = 0xe2d130b9
+    TARGET.UID3 = 0x2003B499
     TARGET.CAPABILITY += NetworkServices ReadUserData
 # Uncomment when you are ready to sign
     TARGET.CAPABILITY += ReadDeviceData SwEvent
