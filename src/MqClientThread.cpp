@@ -69,8 +69,9 @@ MqClientThread::MqClientThread (const char *name, QObject *parent)
 MqClientThread::~MqClientThread ()
 {
     qDebug ("Mosquitto: Waiting for the thread to terminate");
+    this->setQuit ();
     if (isRunning ()) {
-        wait(5 * 1000);
+        wait(10 * 1000);
     }
     qDebug ("Mosquitto: Thread has terminated");
     mosquitto_destroy(mosq);
@@ -244,7 +245,7 @@ void
 MqClientThread::setQuit (bool set)
 {
     bQuit = set;
-    qDebug() << "Mosquitto: quit = " << (bQuit?"True":"False");
+    qDebug() << "Mosquitto: Request for quit =" << (bQuit?"True":"False");
 }//MqClientThread::setQuit
 
 int

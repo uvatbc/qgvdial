@@ -9,7 +9,31 @@ TpCalloutInitiator::TpCalloutInitiator (Tp::AccountPtr act, QObject *parent)
 , strSelfNumber("undefined")
 , bIsSpirit (false)
 {
+    QObject::connect (
+        account.data (), SIGNAL(connectionChanged(const Tp::ConnectionPtr &)),
+        this, SLOT(onConnectionChanged(const Tp::ConnectionPtr &)));
+
+    QObject::connect (
+        account.data(),
+        SIGNAL(connectionStatusChanged(Tp::ConnectionStatus,
+                                       Tp::ConnectionStatusReason)),
+        this, SLOT(onConnectionChanged(Tp::ConnectionStatus,
+                                       Tp::ConnectionStatusReason)));
+
     Tp::ConnectionPtr connection = account->connection();
+    onConnectionChanged (connection);
+}//TpCalloutInitiator::TpCalloutInitiator
+
+void
+TpCalloutInitiator::onConnectionChanged (Tp::ConnectionStatus, Tp::ConnectionStatusReason)
+{
+    Tp::ConnectionPtr connection = account->connection();
+    onConnectionChanged (connection);
+}
+
+void
+TpCalloutInitiator::onConnectionChanged (const Tp::ConnectionPtr &connection)
+{
     if (!connection.isNull ())
     {
         QObject::connect (connection->becomeReady (),
@@ -17,7 +41,7 @@ TpCalloutInitiator::TpCalloutInitiator (Tp::AccountPtr act, QObject *parent)
                           this,
                           SLOT (onConnectionReady (Tp::PendingOperation *)));
     }
-}//TpCalloutInitiator::TpCalloutInitiator
+}//TpCalloutInitiator::onConnectionChanged
 
 void
 TpCalloutInitiator::onConnectionReady (Tp::PendingOperation *op)
@@ -28,6 +52,10 @@ TpCalloutInitiator::onConnectionReady (Tp::PendingOperation *op)
             qWarning ("Connection could not become ready");
             break;
         }
+
+        // Whenever the account changes state, we change state.
+        QObject::connect (account.data (), SIGNAL(stateChanged(bool)),
+                          this           , SIGNAL(changed()));
 
         Tp::ContactPtr contact = account->connection()->selfContact();
         if (!contact.isNull ())
@@ -75,6 +103,7 @@ TpCalloutInitiator::onConnectionReady (Tp::PendingOperation *op)
         }
     } while (0); // End cleanup block (not a loop)
 
+    emit changed ();
     op->deleteLater ();
 }//TpCalloutInitiator::onConnectionReady
 
@@ -127,3 +156,10 @@ TpCalloutInitiator::selfNumber ()
 {
     return (strSelfNumber);
 }//TpCalloutInitiator::selfNumber
+
+bool
+TpCalloutInitiator::isValid ()
+{
+    return (!account.isNull () && !account->connection().isNull () &&
+            account->isEnabled () && account->isValid ());
+}//TpCalloutInitiator::isValid

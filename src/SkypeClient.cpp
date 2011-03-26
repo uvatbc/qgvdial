@@ -323,6 +323,7 @@ SkypeClient::ensureConnected ()
     // to override this function and do some real work.
     bConnected = true;
     completeCurrentWork (SW_Connect, true);
+    emit connectedChanged (bConnected);
     return (true);
 }//SkypeClient::ensureConnected
 

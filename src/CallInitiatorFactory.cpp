@@ -51,9 +51,10 @@ CallInitiatorFactory::init ()
 
     foreach (CalloutInitiator *i, listInitiators) {
         qDebug () << "Added initiator" << i->name();
-        QObject::connect (
-            i   , SIGNAL (status(const QString &, int)),
-            this, SIGNAL (status(const QString &, int)));
+        QObject::connect (i   , SIGNAL (status(const QString &, int)),
+                          this, SIGNAL (status(const QString &, int)));
+        QObject::connect (i   , SIGNAL (changed()),
+                          this, SIGNAL (changed()));
     }
 }//CallInitiatorFactory::init
 

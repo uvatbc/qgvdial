@@ -104,6 +104,8 @@ signals:
     //! Emitted at the end of every internal work (PRIVATE)
     void internalCompleted (int status, const QString &strOutput);
 
+    void connectedChanged(bool bChange);
+
 protected slots:
     //! Invoked when the call initiation is over
     void callInitiated (int status, const QString &strOutput);

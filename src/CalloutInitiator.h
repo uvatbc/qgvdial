@@ -16,10 +16,12 @@ protected:
 
 signals:
     void status(const QString &strText, int timeout = 2000);
+    void changed();
 
 public:
     virtual QString name () = 0;
     virtual QString selfNumber () = 0;
+    virtual bool isValid () = 0;
 
 public slots:
     virtual void initiateCall (const QString &strDestination) = 0;

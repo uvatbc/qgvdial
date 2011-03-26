@@ -17,11 +17,15 @@ private:
 public:
     QString name ();
     QString selfNumber ();
+    bool isValid ();
 
 public slots:
     void initiateCall (const QString &strDestination);
 
 private slots:
+    void onConnectionChanged (const Tp::ConnectionPtr &connection);
+    void onConnectionChanged (Tp::ConnectionStatus, Tp::ConnectionStatusReason);
+
     void onChannelReady (Tp::PendingOperation *op);
     void onConnectionReady (Tp::PendingOperation *op);
 

@@ -36,6 +36,7 @@ private slots:
 
 signals:
     void status(const QString &strText, int timeout = 2000);
+    void changed();
 
 private:
     CalloutInitiatorList listInitiators;

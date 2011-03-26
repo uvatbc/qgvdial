@@ -15,6 +15,7 @@ private:
 public:
     QString name ();
     QString selfNumber ();
+    bool isValid ();
 
 public slots:
     void initiateCall (const QString &strDestination);
@@ -22,6 +23,9 @@ public slots:
 private slots:
     void onSkypeConnected (bool bSuccess, const QVariantList &params);
     void onCallInitiated (bool bSuccess, const QVariantList &params);
+
+private:
+    void attemptCreateSkypeClient ();
 
 private:
     SkypeClient *skypeClient;

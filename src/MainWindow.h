@@ -147,12 +147,14 @@ private slots:
     //! Invoked when the message box is done
     void onSigMsgBoxDone(bool ok);
 
+    //! Invoked when the Call initiators list changes
+    void onCallInitiatorsChange(bool bSave = true);
+
 private:
     void initLogging ();
 
     //! Initialize the QML view
     void initQML ();
-    void initQMLGlobals ();
 
     void initContacts ();
     void deinitContacts ();
@@ -167,7 +169,6 @@ private:
     bool findInfo (const QString &strNumber, GVContactInfo &info);
 
     bool refreshRegisteredNumbers ();
-    void fillCallbackNumbers (bool bSave = true);
     bool getDialSettings (bool                 &bDialout   ,
                           GVRegisteredNumber   &gvRegNumber,
                           CalloutInitiator    *&initiator  );

@@ -6,20 +6,33 @@ DesktopSkypeCallInitiator::DesktopSkypeCallInitiator (QObject *parent)
 : CalloutInitiator(parent)
 , skypeClient (NULL)
 {
+    attemptCreateSkypeClient ();
 }//DesktopSkypeCallInitiator::DesktopSkypeCallInitiator
+
+void
+DesktopSkypeCallInitiator::attemptCreateSkypeClient ()
+{
+    if (NULL == skypeClient) {
+        skypeClient = Singletons::getRef().getSkypeFactory()
+                        .ensureSkypeClient (SKYPE_CLIENT_NAME);
+        if (NULL == skypeClient) {
+            qWarning ("Failed to create skype Client!");
+            return;
+        }
+        QObject::connect (skypeClient, SIGNAL(connectedChanged(bool)),
+                          this       , SIGNAL(changed()));
+        emit changed ();
+    }
+}//DesktopSkypeCallInitiator::attemptCreateSkypeClient
 
 void
 DesktopSkypeCallInitiator::initiateCall (const QString &strDestination)
 {
     bool bOk;
     do { // Begin cleanup block (not a loop)
+        attemptCreateSkypeClient ();
         if (NULL == skypeClient) {
-            skypeClient = Singletons::getRef().getSkypeFactory()
-                            .ensureSkypeClient (SKYPE_CLIENT_NAME);
-            if (NULL == skypeClient) {
-                qWarning ("Failed to create skype Client!");
-                break;
-            }
+            break;
         }
 
         // Save it for onSkypeConnected
@@ -79,3 +92,9 @@ DesktopSkypeCallInitiator::selfNumber ()
 {
     return ("undefined");
 }//DesktopSkypeCallInitiator::selfNumber
+
+bool
+DesktopSkypeCallInitiator::isValid ()
+{
+    return ((NULL != skypeClient) && (skypeClient->isConnected ()));
+}//DesktopSkypeCallInitiator::isValid

@@ -51,10 +51,6 @@ MainWindow::MainWindow (QWidget *parent)
     osd.setDefaultWindowAttributes (pWebWidget);
 
     initQML ();
-    QDeclarativeContext *ctx = this->rootContext();
-    ctx->setContextProperty ("g_strUsername", "example@gmail.com");
-    ctx->setContextProperty ("g_strPassword", "hunter2 :p");
-    ctx->setContextProperty ("g_bShowSettings", false);
 
     // A systray icon if the OS supports it
     if (QSystemTrayIcon::isSystemTrayAvailable ())
@@ -309,8 +305,11 @@ MainWindow::init ()
     QObject::connect (&webPage, SIGNAL (status(const QString &, int)),
                        this   , SLOT   (setStatus(const QString &, int)));
 
-    // Call initiator init and status
+    // When the call initiators change, update us
     CallInitiatorFactory& cif = Singletons::getRef().getCIFactory ();
+    QObject::connect (&cif, SIGNAL(changed()),
+                      this, SLOT(onCallInitiatorsChange()));
+    // Call initiator status
     QObject::connect (&cif , SIGNAL (status(const QString &, int)),
                        this, SLOT   (setStatus(const QString &, int)));
 
@@ -391,10 +390,6 @@ MainWindow::init ()
         // Show this status for 60 seconds (or until the next status)
         setStatus ("Please enter email and password", 60 * 1000);
 
-        // Do this otherwise the QML behaves silly.
-        QDeclarativeContext *ctx = this->rootContext();
-        ctx->setContextProperty ("g_bIsLoggedIn", false);
-
         strUser.clear ();
         strPass.clear ();
 
@@ -407,10 +402,20 @@ MainWindow::initQML ()
 {
     OsDependent &osd = Singletons::getRef().getOSD ();
     QRect rect = osd.getStartingSize ();
+
+    // Prepare the glabally accessible variants for QML.
     QDeclarativeContext *ctx = this->rootContext();
     ctx->setContextProperty ("g_MainWidth", rect.width ());
     ctx->setContextProperty ("g_MainHeight", rect.height ());
     ctx->setContextProperty ("g_bShowMsg", false);
+    ctx->setContextProperty ("g_registeredPhonesModel", &modelRegNumber);
+    ctx->setContextProperty ("g_bIsLoggedIn", false);
+    ctx->setContextProperty ("g_strUsername", "example@gmail.com");
+    ctx->setContextProperty ("g_strPassword", "hunter2 :p");
+    ctx->setContextProperty ("g_bShowSettings", false);
+    ctx->setContextProperty ("g_strStatus", "Getting Ready");
+    ctx->setContextProperty ("g_strMsgText", "No message");
+    ctx->setContextProperty ("g_CurrentPhoneName", "Not loaded");
 
     // Initialize the QML view
     this->setSource (QUrl ("qrc:/Main.qml"));
@@ -467,13 +472,6 @@ MainWindow::initQML ()
     this->setFixedSize (this->size ());
 #endif
 }//MainWindow::initQML
-
-void
-MainWindow::initQMLGlobals ()
-{
-    QDeclarativeContext *ctx = this->rootContext();
-    ctx->setContextProperty ("g_registeredPhonesModel", &modelRegNumber);
-}//MainWindow::initQMLGlobals
 
 /** Invoked to begin the login process.
  * We already have the username and password, so just start the login to the GV
@@ -587,8 +585,6 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
         initContacts ();
         // Prepare the inbox widget for usage
         initInbox ();
-        // Finally prepare the mail QML
-        initQMLGlobals ();
 
         // Allow access to buttons and widgets
         actLogin.setText ("Logout");
@@ -611,7 +607,7 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
         }
         else
         {
-            fillCallbackNumbers (false);
+            onCallInitiatorsChange (false);
         }
 
         bool bMqEnabled;
@@ -1357,47 +1353,11 @@ MainWindow::gotAllRegisteredPhones (bool bOk, const QVariantList &)
             break;
         }
 
-        this->fillCallbackNumbers (true);
+        this->onCallInitiatorsChange (true);
 
         setStatus ("GV callbacks retrieved.");
     } while (0); // End cleanup block (not a loop)
 }//MainWindow::gotAllRegisteredPhones
-
-void
-MainWindow::fillCallbackNumbers (bool bSave)
-{
-    // Set the correct callback
-    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    QString strCallback;
-    bool bGotCallback = dbMain.getCallback (strCallback);
-
-    modelRegNumber.clear ();
-    for (int i = 0; i < arrNumbers.size (); i++)
-    {
-        modelRegNumber.insertRow (arrNumbers[i].strName,
-                                  arrNumbers[i].strDescription,
-                                  arrNumbers[i].chType);
-    }
-
-    // Store the callouts in the same widget as the callbacks
-    CallInitiatorFactory& cif = Singletons::getRef().getCIFactory ();
-    CalloutInitiatorList listCi = cif.getInitiators ();
-    foreach (CalloutInitiator *ci, listCi) {
-        modelRegNumber.insertRow (ci->name (), ci->selfNumber (), ci);
-    }
-
-    if (bGotCallback) {
-        indRegPhone = strCallback.toInt ();
-    }
-
-    if (bSave)
-    {
-        // Save all callbacks into the cache
-        dbMain.putRegisteredNumbers (arrNumbers);
-    }
-
-    onRegPhoneSelectionChange (indRegPhone);
-}//MainWindow::fillCallbackNumbers
 
 bool
 MainWindow::getDialSettings (bool                 &bDialout   ,
@@ -1523,7 +1483,8 @@ MainWindow::on_actionLogs_triggered ()
 void
 MainWindow::onRegPhoneSelectionChange (int index)
 {
-    indRegPhone = index;
+    indRegPhone = index < modelRegNumber.rowCount() ?
+                  index : modelRegNumber.rowCount() - 1;
 
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     dbMain.putCallback (QString("%1").arg (indRegPhone));
@@ -1532,15 +1493,9 @@ MainWindow::onRegPhoneSelectionChange (int index)
     if (!modelRegNumber.getAt (indRegPhone, data)) {
         data.strName = "<Unknown>";
     }
-    QString disp = data.strName;
-    if (RNT_Callback == data.type) {
-        disp = "In : " + disp;
-    } else if (RNT_Callout == data.type) {
-        disp = "Out : " + disp;
-    }
 
     QDeclarativeContext *ctx = this->rootContext();
-    ctx->setContextProperty ("g_CurrentPhoneName", disp);
+    ctx->setContextProperty ("g_CurrentPhoneName", data.strName);
 
     OsDependent &osd = Singletons::getRef().getOSD ();
     osd.setLongWork (this, false);
@@ -1700,3 +1655,44 @@ MainWindow::onSigMsgBoxDone (bool /*ok*/)
     QDeclarativeContext *ctx = this->rootContext();
     ctx->setContextProperty ("g_bShowMsg", false);
 }//MainWindow::onSigMsgBoxDone
+
+void
+MainWindow::onCallInitiatorsChange (bool bSave)
+{
+    // Set the correct callback
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    QString strCallback;
+    bool bGotCallback = dbMain.getCallback (strCallback);
+
+    QString strCiName;
+    modelRegNumber.clear ();
+    for (int i = 0; i < arrNumbers.size (); i++)
+    {
+        strCiName = "Dial back: " + arrNumbers[i].strName;
+        modelRegNumber.insertRow (strCiName,
+                                  arrNumbers[i].strDescription,
+                                  arrNumbers[i].chType);
+    }
+
+    // Store the callouts in the same widget as the callbacks
+    CallInitiatorFactory& cif = Singletons::getRef().getCIFactory ();
+    CalloutInitiatorList listCi = cif.getInitiators ();
+    foreach (CalloutInitiator *ci, listCi) {
+        if (ci->isValid ()) {
+            strCiName = "Dial out: " + ci->name ();
+            modelRegNumber.insertRow (strCiName, ci->selfNumber (), ci);
+        }
+    }
+
+    if (bGotCallback) {
+        indRegPhone = strCallback.toInt ();
+    }
+
+    if (bSave)
+    {
+        // Save all callbacks into the cache
+        dbMain.putRegisteredNumbers (arrNumbers);
+    }
+
+    onRegPhoneSelectionChange (indRegPhone);
+}//MainWindow::onCallInitiatorsChange
