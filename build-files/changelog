@@ -1,4 +1,1 @@
-  * Registered numbers now say Dial out or Dial back. Easier to understand.
-  * If the dial out method is not enabled, not valid or otherwise unusable, don't show it.
-  * Upper bound check on the registered number array
-  * Special case for Desktop Skype: Always online.
+  * Fix Symbian build

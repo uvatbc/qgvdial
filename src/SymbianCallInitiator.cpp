@@ -31,6 +31,12 @@ SymbianCallInitiator::selfNumber ()
     return "This phone's MSISDN";
 }//SymbianCallInitiator::selfNumber
 
+bool
+SymbianCallInitiator::isValid ()
+{
+    return true;
+}//SymbianCallInitiator::isValid
+
 void
 SymbianCallInitiator::initiateCall (const QString &strDestination)
 {

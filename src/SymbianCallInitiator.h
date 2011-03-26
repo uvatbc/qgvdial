@@ -16,10 +16,11 @@ public:
 
     QString name ();
     QString selfNumber ();
+    bool isValid ();
 
 public slots:
     void initiateCall (const QString &strDestination);
-    
+
 signals:
     void callDialed();
 
