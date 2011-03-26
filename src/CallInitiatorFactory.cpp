@@ -126,9 +126,10 @@ CallInitiatorFactory::onAllAccountsReady ()
         CalloutInitiator *initiator = new TpCalloutInitiator (act, this);
         listInitiators += initiator;
 
-        QObject::connect (
-            initiator, SIGNAL (status(const QString &, int)),
-            this     , SIGNAL (status(const QString &, int)));
+        QObject::connect (initiator, SIGNAL (status(const QString &, int)),
+                          this     , SIGNAL (status(const QString &, int)));
+        QObject::connect (initiator, SIGNAL (changed()),
+                          this     , SIGNAL (changed()));
 
         msg += "\tADDED!";
         qDebug () << msg;

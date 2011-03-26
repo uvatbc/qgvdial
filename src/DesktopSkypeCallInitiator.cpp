@@ -96,5 +96,9 @@ DesktopSkypeCallInitiator::selfNumber ()
 bool
 DesktopSkypeCallInitiator::isValid ()
 {
-    return ((NULL != skypeClient) && (skypeClient->isConnected ()));
+    //@@UV: Ideally I need to do this, but I've disabled it because I don't have
+    // a good way to make the Skype Client code monitor for the existance of
+    // Skype and report back.
+//    return ((NULL != skypeClient) && (skypeClient->isConnected ()));
+    return true;
 }//DesktopSkypeCallInitiator::isValid

@@ -228,7 +228,7 @@ void
 MainWindow::onSigHide ()
 {
 #if defined(Q_OS_SYMBIAN)
-    //@@UV: Something meaningful
+    // Symbian qgvdial needs lowering, not hiding.
     this->lower ();
 #else
     this->hide ();
