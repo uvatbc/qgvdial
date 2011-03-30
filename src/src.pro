@@ -120,8 +120,6 @@ OTHER_FILES  += winrsrc.rc                  \
                 ../qml/Keypad.qml           \
                 ../qml/MainButtons.qml      \
                 ../qml/Main.qml             \
-                ../qml/MainView_l.qml       \
-                ../qml/MainView_p.qml       \
                 ../qml/MainView.qml         \
                 ../qml/Mosquitto.qml        \
                 ../qml/MsgBox.qml           \

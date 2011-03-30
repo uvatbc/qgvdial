@@ -56,7 +56,7 @@ Item {
             MyTextEdit {
                 id: textUsername
                 height: mainColumn.outerHeight - 2
-                width: parent.width - lblEmail.width
+                width: parent.width - lblEmail.width - (parent.spacing * 2)
                 opacity: (g_bIsLoggedIn == true ? 0 : 1)
                 text: mainColumn.strUsername
                 pixelSize: mainColumn.pixSize
@@ -81,6 +81,7 @@ Item {
             spacing: 2
 
             Text {
+                id: lblPass
                 text: "Password:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
@@ -91,7 +92,7 @@ Item {
             MyTextEdit {
                 id: textPassword
                 height: mainColumn.outerHeight - 2
-                width: parent.width - lblEmail.width
+                width: parent.width - lblPass.width - (parent.spacing * 2)
                 opacity: (g_bIsLoggedIn == true ? 0 : 1)
                 text: mainColumn.strPassword
                 echoMode: TextInput.Password

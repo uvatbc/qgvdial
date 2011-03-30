@@ -3,6 +3,7 @@ import "helper.js" as Code
 
 Rectangle {
     id: main
+    color: "black"
 
     signal sigCall(string number)
     signal sigText(string number)
@@ -10,30 +11,74 @@ Rectangle {
     signal sigMsgBoxDone (bool ok)
 
     property bool landscape: main.width > main.height
+    property variant rotationDelta: landscape? -90 : 0
 
-    MainView_l {
-        id: m_l
+    // initial state is portrait
+    property real baseWidth: landscape ? main.height : main.width
+    property real baseHeight: landscape ? main.width : main.height
+    property string theNumber: ""
 
-        opacity: (landscape?1:0)
+    Flow {
         anchors.fill: parent
 
-        onSigCall: main.sigCall(number)
-        onSigText: main.sigText(number)
-        onSigSelChanged: main.sigSelChanged(index)
-        onSigNumChanged: m_p.theNumber = strNumber
-    }
+        Column {
+            width: wDisp.width
+            height: wDisp.height + (actBtn_l.height * actBtn_l.opacity)
+            spacing: 0
 
-    MainView_p {
-        id: m_p
+            DialDisp {
+                id: wDisp
 
-        opacity: (landscape?0:1)
-        anchors.fill: parent
+                theNumber: main.theNumber
 
-        onSigCall: main.sigCall(number)
-        onSigText: main.sigText(number)
-        onSigSelChanged: main.sigSelChanged(index)
-        onSigNumChanged: m_l.theNumber = strNumber
-    }
+                color: main.color
+                width: landscape ? main.width / 2 : main.width
+                height: main.height * (landscape ? (3 / 4) : (7.5 / 18))
+
+                onSigSelChanged: main.sigSelChanged (index)
+                onSigNumChanged: {main.theNumber = strNumber;}
+            }//DialDisp
+
+            ActionButtons {
+                id: actBtn_l
+                color: main.color
+
+                opacity: landscape ? 1 : 0
+
+                width: wDisp.width
+                height: wDisp.height / 3
+
+                onSigCall: main.sigCall(wDisp.txtEd.text)
+                onSigText: main.sigText(wDisp.txtEd.text)
+
+                onSigDel: Code.doDel()
+                onSigClear: wDisp.txtEd.text = ""
+            }//ActionButtons (landscape mode - horizontal)
+        }//Column
+
+        Keypad {
+            color: main.color
+            width: parent.width / (landscape ? 2 : 1)
+            height: parent.height * (landscape ? 1 : (8 / 18))
+
+            onBtnClick: Code.doIns(strText)
+            onBtnDelClick: Code.doDel()
+        }//Keypad
+
+        ActionButtons {
+            color: main.color
+            opacity: landscape ? 0 : 1
+
+            width: main.width
+            height: main.height * (2.5 / 18)
+
+            onSigCall: main.sigCall(wDisp.txtEd.text)
+            onSigText: main.sigText(wDisp.txtEd.text)
+
+            onSigDel: Code.doDel()
+            onSigClear: wDisp.txtEd.text = ""
+        }//ActionButtons (portrait mode - vertical)
+    }//Flow
 
     MsgBox {
         id: msgBox
