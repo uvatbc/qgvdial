@@ -2,7 +2,6 @@
 
 #include "LoginDialog.h"
 #include "DlgSelectContactNumber.h"
-#include "VMailDialog.h"
 
 #include "PhoneNumberValidator.h"
 
@@ -1457,11 +1456,26 @@ MainWindow::onVmailDownloaded (bool bOk, const QVariantList &arrParams)
 void
 MainWindow::playVmail (const QString &strFile)
 {
-    VMailDialog *dlgVmail = new VMailDialog (this);
-    dlgVmail->setAttribute (Qt::WA_DeleteOnClose);
-    QObject::connect (dlgVmail, SIGNAL (status (const QString &, int)),
-                      this    , SLOT   (setStatus (const QString &, int)));
-    dlgVmail->play (strFile);
+    do // Begin cleanup block (not a loop)
+    {
+        QObject *pRoot = this->rootObject ();
+        if (NULL == pRoot) {
+            qWarning ("Couldn't get root object in QML for playing vmail");
+            break;
+        }
+
+        QObject *pProxySettings = pRoot->findChild <QObject*> ("InboxPage");
+        if (NULL == pProxySettings) {
+            qWarning ("Could not get to InboxPage for playing vmail");
+            break;
+        }
+
+        // Convert it into a file:// url
+        QString strUrl = "file://" + strFile;
+
+        QMetaObject::invokeMethod (pProxySettings, "startPlayingVmail",
+                                   Q_ARG (QVariant, QVariant(strUrl)));
+    } while (0); // End cleanup block (not a loop)
 }//MainWindow::playVmail
 
 void

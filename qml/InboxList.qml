@@ -1,4 +1,5 @@
-import Qt 4.7
+import QtQuick 1.0
+import QtMultimediaKit 1.1
 import "helper.js" as Code
 
 Rectangle {
@@ -25,6 +26,18 @@ Rectangle {
         container.strSelected = strSelector
     }
 
+    function startPlayingVmail(strPath) {
+        playVmail.source = strPath;
+        playVmail.play();
+    }
+
+    onOpacityChanged: {
+        if (opacity == 0 && playVmail.playing) {
+            console.debug("QML: Inbox being closed. Stop playing the vmail");
+            playVmail.stop();
+        }
+    }
+
     Rectangle { // Details
         id: detailsView
 
@@ -35,7 +48,7 @@ Rectangle {
 
         opacity: 0
 
-        Column {  // Top row
+        Column {  // Top row : Contact name and the close button
             id: detailTopRow
 
             anchors {
@@ -49,7 +62,10 @@ Rectangle {
             MyButton {
                 id: btnDetailsClose
                 mainText: "Close"
-                onClicked: container.state= ''
+                onClicked: {
+                    container.state= ''
+                    playVmail.stop();
+                }
                 width: parent.width
                 height: (parent.height / 2)
 
@@ -62,7 +78,7 @@ Rectangle {
                 width: parent.width
                 font.pixelSize: (parent.height / 2)
             }
-        }//Column (Top row)
+        }//Column (Top row : Contact name and the close button)
 
         Item {  // Number and buttons
             anchors {
@@ -131,14 +147,28 @@ Rectangle {
                 }
                 MyButton {
                     id: playButton
-                    mainText: "Play"
-                    opacity: (detailsView.opacity & isVoicemail)
-                    onClicked: container.sigVoicemail(container.strLink)
+                    mainText: (playVmail.playing & !playVmail.paused) ? "Pause" : "Play"
+                    opacity: (detailsView.opacity & container.isVoicemail)
+                    onClicked: {
+                        if (mainText == "Play") {
+                            if (playVmail.paused) {
+                                playVmail.play();
+                            } else {
+                                container.sigVoicemail(container.strLink);
+                            }
+                        } else {
+                            playVmail.pause();
+                        }
+                    }
                     width: parent.width / (playButton.opacity == 1 ? 3 : 2)
                     height: parent.height
                     mainPixelSize: height - 4
                 }
             }// Row (call, text and play buttons)
+
+            Audio {
+                id: playVmail
+            }
 
             Text { // sms text
                 id: theSmsText
@@ -291,9 +321,9 @@ Rectangle {
                         container.strSmsText = smstext;
 
                         if (type == "Voicemail") {
-                            isVoicemail = true;
+                            container.isVoicemail = true;
                         } else {
-                            isVoicemail = false;
+                            container.isVoicemail = false;
                         }
 
                         container.state = "Details"

@@ -56,7 +56,6 @@ SOURCES  += main.cpp                    \
             SMSDlg.cpp                  \
             ChildWindowBase.cpp         \
             GVInbox.cpp                 \
-            VMailDialog.cpp             \
             WebWidget.cpp               \
             RegNumberModel.cpp          \
             ContactsModel.cpp           \
@@ -92,7 +91,6 @@ HEADERS  += global.h                    \
             SMSDlg.h                    \
             ChildWindowBase.h           \
             GVInbox.h                   \
-            VMailDialog.h               \
             WebWidget.h                 \
             RegNumberModel.h            \
             ContactsModel.h             \
@@ -101,8 +99,7 @@ HEADERS  += global.h                    \
             DialContext.h               \
             ContactsParserObject.h
 
-FORMS    += VMailDialog.ui              \
-            WebWidget.ui
+FORMS    += WebWidget.ui
 
 RESOURCES += qgvdial.qrc
 
