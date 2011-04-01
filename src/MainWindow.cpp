@@ -18,6 +18,7 @@ MainWindow::MainWindow (QWidget *parent)
 , oContacts (this)
 , oInbox (this)
 , pWebWidget (new WebWidget (this, Qt::Window))
+, vmailPlayer (this)
 , statusTimer (this)
 #ifdef Q_WS_MAEMO_5
 , infoBox (this)
@@ -372,6 +373,10 @@ MainWindow::init ()
                        this     , SLOT  (setStatus(QString,int)));
 #endif
 
+    QObject::connect (
+        &vmailPlayer, SIGNAL(stateChanged(QMediaPlayer::State)),
+         this       , SLOT(onVmailPlayerStateChanged(QMediaPlayer::State)));
+
     // If the cache has the username and password, begin login
     if (dbMain.getUserPass (strUser, strPass))
     {
@@ -406,19 +411,23 @@ MainWindow::initQML ()
     this->engine()->addImportPath(QString("/opt/qtm11/imports"));
 #endif
 
+    bool bTempFalse = false;
+    int iTempZero = 0;
+
     // Prepare the glabally accessible variants for QML.
     QDeclarativeContext *ctx = this->rootContext();
     ctx->setContextProperty ("g_MainWidth", rect.width ());
     ctx->setContextProperty ("g_MainHeight", rect.height ());
-    ctx->setContextProperty ("g_bShowMsg", false);
+    ctx->setContextProperty ("g_bShowMsg", bTempFalse);
     ctx->setContextProperty ("g_registeredPhonesModel", &modelRegNumber);
-    ctx->setContextProperty ("g_bIsLoggedIn", false);
+    ctx->setContextProperty ("g_bIsLoggedIn", bTempFalse);
     ctx->setContextProperty ("g_strUsername", "example@gmail.com");
     ctx->setContextProperty ("g_strPassword", "hunter2 :p");
-    ctx->setContextProperty ("g_bShowSettings", false);
+    ctx->setContextProperty ("g_bShowSettings", bTempFalse);
     ctx->setContextProperty ("g_strStatus", "Getting Ready");
     ctx->setContextProperty ("g_strMsgText", "No message");
     ctx->setContextProperty ("g_CurrentPhoneName", "Not loaded");
+    ctx->setContextProperty ("g_vmailPlayerState", iTempZero);
 
     // Initialize the QML view
     this->setSource (QUrl ("qrc:/Main.qml"));
@@ -434,6 +443,8 @@ MainWindow::initQML ()
                       this, SLOT   (onSigText (const QString &)));
     QObject::connect (gObj, SIGNAL (sigVoicemail (QString)),
                       this, SLOT   (retrieveVoicemail (const QString &)));
+    QObject::connect (gObj, SIGNAL (sigVmailPlayback (int)),
+                      this, SLOT   (onSigVmailPlayback (int)));
     QObject::connect (gObj, SIGNAL (sigSelChanged (int)),
                       this, SLOT   (onRegPhoneSelectionChange (int)));
     QObject::connect (gObj   , SIGNAL (sigInboxSelect (QString)),
@@ -1462,25 +1473,44 @@ MainWindow::playVmail (const QString &strFile)
 {
     do // Begin cleanup block (not a loop)
     {
-        QObject *pRoot = this->rootObject ();
-        if (NULL == pRoot) {
-            qWarning ("Couldn't get root object in QML for playing vmail");
-            break;
-        }
-
-        QObject *pProxySettings = pRoot->findChild <QObject*> ("InboxPage");
-        if (NULL == pProxySettings) {
-            qWarning ("Could not get to InboxPage for playing vmail");
-            break;
-        }
-
         // Convert it into a file:// url
         QString strUrl = QUrl::fromLocalFile(strFile).toString ();
 
-        QMetaObject::invokeMethod (pProxySettings, "startPlayingVmail",
-                                   Q_ARG (QVariant, QVariant(strUrl)));
+        vmailPlayer.setMedia (QMediaContent(strUrl));
+        vmailPlayer.play();
     } while (0); // End cleanup block (not a loop)
 }//MainWindow::playVmail
+
+void
+MainWindow::onVmailPlayerStateChanged(QMediaPlayer::State state)
+{
+    int newstate = (int) state;
+    qDebug() << "Vmail player state changed to" << newstate;
+    QDeclarativeContext *ctx = this->rootContext();
+    ctx->setContextProperty ("g_vmailPlayerState", newstate);
+}//MainWindow::onVmailPlayerStateChanged
+
+void
+MainWindow::onSigVmailPlayback (int newstate)
+{
+    switch(newstate) {
+    case 0:
+        qDebug ("QML asked us to stop vmail");
+        vmailPlayer.stop ();
+        break;
+    case 1:
+        qDebug ("QML asked us to play vmail");
+        vmailPlayer.play ();
+        break;
+    case 2:
+        qDebug ("QML asked us to pause vmail");
+        vmailPlayer.pause ();
+        break;
+    default:
+        qDebug() << "Unknown newstate =" << newstate;
+        break;
+    }
+}//MainWindow::onSigVmailPlayback
 
 void
 MainWindow::on_actionWeb_view_triggered ()

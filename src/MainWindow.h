@@ -8,6 +8,7 @@
 #include "WebWidget.h"
 #include "RegNumberModel.h"
 #include "DialContext.h"
+#include <QMediaPlayer>
 
 #if MOSQUITTO_CAPABLE
 #include "MqClientThread.h"
@@ -120,6 +121,10 @@ private slots:
     void retrieveVoicemail (const QString &strVmailLink);
     //! Invoked by GVAccess when the voice mail download has completed
     void onVmailDownloaded (bool bOk, const QVariantList &arrParams);
+    //! Invoked when the vmail player changes state
+    void onVmailPlayerStateChanged(QMediaPlayer::State state);
+    //! Invoked when the QML sends us a vmail play/pause/stop signal
+    void onSigVmailPlayback (int newstate);
 
     //! Invoked by QML when the user selects a new phone method
     void onRegPhoneSelectionChange (int index);
@@ -192,6 +197,8 @@ private:
     SMSDlg          dlgSMS;
     //! Web View
     WebWidget      *pWebWidget;
+
+    QMediaPlayer    vmailPlayer;
 
     //! Timer for status messages
     QTimer          statusTimer;

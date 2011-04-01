@@ -18,6 +18,8 @@ Rectangle {
     signal sigSelChanged(int index)
     // Signal from inbox to play a vmail
     signal sigVoicemail(string link)
+    // Signal from the inbox to play/pause/stop a vmail
+    signal sigVmailPlayback(int playState)
     // Signal from inbox to chose the type of inbox entries to show
     signal sigInboxSelect(string selection)
     // Signals from the Settings page
@@ -215,6 +217,7 @@ Rectangle {
             onSigInboxSelect: main.sigInboxSelect(selection)
             onSigVoicemail: main.sigVoicemail(link)
             onSigMsgBoxDone: main.sigMsgBoxDone(ok)
+            onSigVmailPlayback: main.sigVmailPlayback(playState)
         }
 
         Settings {

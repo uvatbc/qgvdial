@@ -1,5 +1,4 @@
 import Qt 4.7
-import QtMultimediaKit 1.1
 import "helper.js" as Code
 
 Rectangle {
@@ -12,6 +11,9 @@ Rectangle {
     signal sigVoicemail(string link)
     signal sigInboxSelect(string selection)
     signal sigMsgBoxDone (bool ok)
+    signal sigVmailPlayback(int playState)
+
+    property int vmailPlayState: g_vmailPlayerState  // 0=stopped 1=playing 2=paused
 
     // Private properties. DO NOT TOUCH from outside.
     property string strDetailsName: "Detail name"
@@ -26,16 +28,10 @@ Rectangle {
         container.strSelected = strSelector
     }
 
-    function startPlayingVmail(strPath) {
-        console.debug("QML: Play vmail: " + strPath);
-        playVmail.source = strPath;
-        playVmail.play();
-    }
-
     onOpacityChanged: {
-        if (opacity == 0 && playVmail.playing) {
+        if (opacity == 0) {
             console.debug("QML: Inbox being closed. Stop playing the vmail");
-            playVmail.stop();
+            container.sigVmailPlayback(0);
         }
     }
 
@@ -65,10 +61,8 @@ Rectangle {
                 mainText: "Close"
                 onClicked: {
                     container.state= ''
-                    if (playVmail.playing) {
-                        console.debug("QML: Stop vmail playback");
-                        playVmail.stop();
-                    }
+                    console.debug("QML: Stop vmail playback");
+                    container.sigVmailPlayback(0);
                 }
                 width: parent.width
                 height: (parent.height / 2)
@@ -151,20 +145,20 @@ Rectangle {
                 }
                 MyButton {
                     id: playButton
-                    mainText: (playVmail.playing & !playVmail.paused) ? "Pause" : "Play"
+                    mainText: (container.vmailPlayState == 1) ? "Pause" : "Play"
                     opacity: (detailsView.opacity & container.isVoicemail)
                     onClicked: {
                         if (mainText == "Play") {
-                            if (playVmail.paused) {
+                            if (container.vmailPlayState == 2) {
                                 console.debug("QML: Resume vmail playback");
-                                playVmail.play();
+                                container.sigVmailPlayback(1);
                             } else {
                                 console.debug("QML: Request for vmail");
                                 container.sigVoicemail(container.strLink);
                             }
                         } else {
                             console.debug("QML: Pause vmail playback");
-                            playVmail.pause();
+                            container.sigVmailPlayback(2);
                         }
                     }
                     width: parent.width / (playButton.opacity == 1 ? 3 : 2)
@@ -172,10 +166,6 @@ Rectangle {
                     mainPixelSize: height - 4
                 }
             }// Row (call, text and play buttons)
-
-            Audio {
-                id: playVmail
-            }
 
             Text { // sms text
                 id: theSmsText

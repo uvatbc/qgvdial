@@ -1,1 +1,1 @@
-  * Fix Windows and Maemo build. Maemo now depends on libqtm-11
+  * Vmail no longer uses the QtMobility QML element. I cannot afford to use qtm 1.1 unless it is fully supported on the n900.
