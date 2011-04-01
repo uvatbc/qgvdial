@@ -402,6 +402,10 @@ MainWindow::initQML ()
     OsDependent &osd = Singletons::getRef().getOSD ();
     QRect rect = osd.getStartingSize ();
 
+#if defined(Q_WS_MAEMO_5)
+    this->engine()->addImportPath(QString("/opt/qtm11/imports"));
+#endif
+
     // Prepare the glabally accessible variants for QML.
     QDeclarativeContext *ctx = this->rootContext();
     ctx->setContextProperty ("g_MainWidth", rect.width ());
@@ -1471,7 +1475,7 @@ MainWindow::playVmail (const QString &strFile)
         }
 
         // Convert it into a file:// url
-        QString strUrl = "file://" + strFile;
+        QString strUrl = QUrl::fromLocalFile(strFile).toString ();
 
         QMetaObject::invokeMethod (pProxySettings, "startPlayingVmail",
                                    Q_ARG (QVariant, QVariant(strUrl)));

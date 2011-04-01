@@ -18,6 +18,9 @@
                             <Directory Id="plugins_playlistformats" Name="playlistformats" />
                             <Directory Id="plugins_sqldrivers" Name="sqldrivers" />
                         </Directory>
+                        <Directory Id="importsdir" Name="imports">
+                            <Directory Id="imports_QtMultimediaKit" Name="QtMultimediaKit" />
+                        </Directory>
                     </Directory>
                 </Directory>
             </Directory>
@@ -145,6 +148,15 @@
                 <File Id="qsqlite4.dll" Source="__QTDIR__\plugins\sqldrivers\qsqlite4.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
         </DirectoryRef>
+        
+        <DirectoryRef Id="imports_QtMultimediaKit">
+            <Component Id="declarative_multimedia.dll" Guid="EE2584CD-90A6-4392-B1FB-BAB90D796E7B">
+                <File Id="declarative_multimedia.dll" Source="__QTDIR__\imports\QtMultimediaKit\declarative_multimedia.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="imports_QtMultimediaKit_qmldir" Guid="00E4FF79-ED14-4EF4-BA34-019BA18B775A">
+                <File Id="qmldir" Source="__QTDIR__\imports\QtMultimediaKit\qmldir" KeyPath="yes" Checksum="yes"/>
+            </Component>
+        </DirectoryRef>
 
         <!-- Install binaries to the install location -->
         <Feature Id="Binaries" Title="QGVDial binaries" Level="1">
@@ -180,6 +192,8 @@
             <ComponentRef Id="qtmedia_audioengine.dll" />
             <ComponentRef Id="qtmultimediakit_m3u.dll" />
             <ComponentRef Id="qsqlite4.dll" />
+            <ComponentRef Id="declarative_multimedia.dll" />
+            <ComponentRef Id="imports_QtMultimediaKit_qmldir" />
             
             <!-- Tell WiX to install the shortcut -->
             <ComponentRef Id="ApplicationShortcut" />   

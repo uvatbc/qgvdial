@@ -1,2 +1,1 @@
-  * QML corrections
-  * VMail now plays using QtMobility QML element
+  * Fix Windows and Maemo build. Maemo now depends on libqtm-11

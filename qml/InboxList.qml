@@ -1,4 +1,4 @@
-import QtQuick 1.0
+import Qt 4.7
 import QtMultimediaKit 1.1
 import "helper.js" as Code
 
@@ -27,6 +27,7 @@ Rectangle {
     }
 
     function startPlayingVmail(strPath) {
+        console.debug("QML: Play vmail: " + strPath);
         playVmail.source = strPath;
         playVmail.play();
     }
@@ -64,7 +65,10 @@ Rectangle {
                 mainText: "Close"
                 onClicked: {
                     container.state= ''
-                    playVmail.stop();
+                    if (playVmail.playing) {
+                        console.debug("QML: Stop vmail playback");
+                        playVmail.stop();
+                    }
                 }
                 width: parent.width
                 height: (parent.height / 2)
@@ -152,11 +156,14 @@ Rectangle {
                     onClicked: {
                         if (mainText == "Play") {
                             if (playVmail.paused) {
+                                console.debug("QML: Resume vmail playback");
                                 playVmail.play();
                             } else {
+                                console.debug("QML: Request for vmail");
                                 container.sigVoicemail(container.strLink);
                             }
                         } else {
+                            console.debug("QML: Pause vmail playback");
                             playVmail.pause();
                         }
                     }

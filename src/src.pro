@@ -2,7 +2,15 @@ QT      *= core gui webkit sql xml xmlpatterns script declarative
 TARGET   = qgvdial
 TEMPLATE = app
 
-CONFIG  *= mobility precompile_header
+CONFIG  *= precompile_header
+
+# Mobility 1.1 on n900 is currently only supportable like this
+maemo5 {
+    CONFIG  *= mobility11
+} else {
+    CONFIG  *= mobility
+}
+
 MOBILITY *= multimedia
 
 include(qtsingleapplication/qtsingleapplication.pri)
