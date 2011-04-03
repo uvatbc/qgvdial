@@ -407,10 +407,6 @@ MainWindow::initQML ()
     OsDependent &osd = Singletons::getRef().getOSD ();
     QRect rect = osd.getStartingSize ();
 
-#if defined(Q_WS_MAEMO_5)
-    this->engine()->addImportPath(QString("/opt/qtm11/imports"));
-#endif
-
     bool bTempFalse = false;
     int iTempZero = 0;
 
@@ -1525,16 +1521,9 @@ MainWindow::on_actionWeb_view_triggered ()
 }//MainWindow::on_actionWeb_view_triggered
 
 void
-MainWindow::on_actionLogs_triggered ()
-{
-    //
-}//MainWindow::on_actionLogs_triggered
-
-void
 MainWindow::onRegPhoneSelectionChange (int index)
 {
-    indRegPhone = index < modelRegNumber.rowCount() ?
-                  index : modelRegNumber.rowCount() - 1;
+    indRegPhone = index;
 
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     dbMain.putCallback (QString("%1").arg (indRegPhone));

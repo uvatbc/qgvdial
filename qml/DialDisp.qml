@@ -30,7 +30,10 @@ Rectangle {
                 mainText: g_CurrentPhoneName;
                 anchors.fill: parent
                 radius: ((height / 10.0) + (width / 60.0))
+                width: parent.width
                 mainPixelSize: parent.height - 8
+
+                aliasTextElide: Text.ElideRight
 
                 onClicked: mainItem.state == "PhonesShown" ?
                            mainItem.state = "" : mainItem.state = "PhonesShown"

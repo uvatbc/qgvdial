@@ -74,6 +74,7 @@ Rectangle {
         }
     }
 
+    onSigMosquittoChanges: console.debug("QML: Mosquitto setings changed");
     onSigLinkActivated: console.debug("QML: Link activated: " + strLink);
 
     onSigMsgBoxDone: {

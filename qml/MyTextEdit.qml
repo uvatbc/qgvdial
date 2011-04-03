@@ -12,7 +12,6 @@ Rectangle {
     property int pixelSize: 5000
     property alias validator: textEd.validator
 
-
     height: textEd.height
 
     signal sigTextChanged(string strText)
@@ -30,6 +29,9 @@ Rectangle {
         color: "white"
         font.pixelSize: container.pixelSize
 
-        onTextChanged: container.sigTextChanged(text);
+        onTextChanged: {
+            container.sigTextChanged(text);
+            container.text = textEd.text
+        }
     }
 }//Rectangle (around the email)

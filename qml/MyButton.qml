@@ -13,6 +13,9 @@ Rectangle {
     property string mainText: "2"
     property real mainPixelSize: 100
 
+    // Aliases to the mText
+    property alias aliasTextElide: mText.elide
+
     // Button emits clicks, but we also mention what is the text to display
     signal clicked(string strText)
     signal pressHold(string strText)
@@ -23,11 +26,22 @@ Rectangle {
     }
     SystemPalette { id: palette }
 
+    onWidthChanged: updateTextWidth();
+    function updateTextWidth() {
+        if (mText.elide != Text.ElideNone) {
+            // Without this, the elide value is pointless
+            mText.width = button.width
+        }
+    }
+
     // The main text
     Text {
         id: mText
         text: button.mainText
         color: "black"
+
+        // This is specifically for the current phone number button
+        onTextChanged: button.updateTextWidth();
 
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter

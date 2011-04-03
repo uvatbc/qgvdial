@@ -1,1 +1,3 @@
-  * Vmail no longer uses the QtMobility QML element. I cannot afford to use qtm 1.1 unless it is fully supported on the n900.
+  * SIP instead of sofiasip. Also add the account after "SIP:" to be more descriptive.
+  * Mosquitto settings never made it to the cpp code !! - Now fixed.
+  * Fix for the dialout/dialback number not being saved across reboot/restart.

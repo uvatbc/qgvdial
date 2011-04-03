@@ -131,22 +131,25 @@ Rectangle {
                 MyButton {
                     id: btnCall
                     mainText: "Call"
-                    onClicked: container.sigCall(container.strNumber)
                     width: parent.width / (playButton.opacity == 1 ? 3 : 2)
                     height: parent.height
                     mainPixelSize: height - 4
+                    onClicked: container.sigCall(container.strNumber)
                 }
                 MyButton {
                     mainText: "Text"
-                    onClicked: container.sigText(container.strNumber)
                     width: parent.width / (playButton.opacity == 1 ? 3 : 2)
                     height: parent.height
                     mainPixelSize: height - 4
+                    onClicked: container.sigText(container.strNumber)
                 }
                 MyButton {
                     id: playButton
                     mainText: (container.vmailPlayState == 1) ? "Pause" : "Play"
                     opacity: (detailsView.opacity & container.isVoicemail)
+                    width: parent.width / (playButton.opacity == 1 ? 3 : 2)
+                    height: parent.height
+                    mainPixelSize: height - 4
                     onClicked: {
                         if (mainText == "Play") {
                             if (container.vmailPlayState == 2) {
@@ -161,9 +164,6 @@ Rectangle {
                             container.sigVmailPlayback(2);
                         }
                     }
-                    width: parent.width / (playButton.opacity == 1 ? 3 : 2)
-                    height: parent.height
-                    mainPixelSize: height - 4
                 }
             }// Row (call, text and play buttons)
 

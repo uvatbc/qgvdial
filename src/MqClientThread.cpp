@@ -152,28 +152,28 @@ void
 MqClientThread::run ()
 {
     int rv;
-    qDebug ("Mosquitto: Enter thread loop");
+    qDebug ("Mq thread: Enter thread");
 
     do {
         if (strHost.length () == 0) {
-            qWarning ("Mosquitto: Invalid Host");
+            qWarning ("Mq thread: Invalid Host");
             break;
         }
 
         QHostInfo hInfo = QHostInfo::fromName (strHost);
         if (hInfo.addresses ().length () == 0) {
-            qWarning() << "Mosquitto: Host lookup for"
+            qWarning() << "Mq thread: Host lookup for"
                        << strHost
                        << "failed. Terminating thread.";
             break;
         }
         QString strFirst = hInfo.addresses().first().toString();
 
-        qDebug() << "Mosquitto: Attempting to connect to" << strHost
+        qDebug() << "Mq thread: Attempting to connect to" << strHost
                  << "at" << strFirst;
         rv = this->mq_connect (strFirst.toLatin1().constData ());
         if (0 != rv) {
-            qWarning() << "Mosquitto: Failed to connect. Error =" << rv;
+            qWarning() << "Mq thread: Failed to connect. Error =" << rv;
             emit status ("Failed to connect to Mosquitto server");
             this->sleep(5);
         } else {
@@ -186,21 +186,21 @@ MqClientThread::run ()
                 // In the normal case, continue the loop
             } else if ((MOSQ_ERR_INVAL == rv) ||
                        (MOSQ_ERR_NOMEM == rv)) {
-                qWarning() << "Mosquitto: Unrecoverable error in loop:" << rv;
+                qWarning() << "Mq thread: Unrecoverable error in loop:" << rv;
                 bQuit = true;
             } else if ((MOSQ_ERR_NO_CONN == rv) ||
                        (MOSQ_ERR_CONN_LOST == rv) ||
                        (MOSQ_ERR_PROTOCOL == rv)) {
-                qWarning ("Recoverable error, hopefully");
+                qWarning ("Mq thread: Recoverable error, hopefully");
                 this->sleep (1);
                 break;
             } else {
-                qWarning() << "Mosquitto: Other error in loop:" << rv;
+                qWarning() << "Mq thread: Other error in loop:" << rv;
                 bQuit = true;
             }
         }
 
-        qDebug ("Mosquitto: End Mq loop. Unsubscribe and disconnect");
+        qDebug ("Mq thread: End Mq loop. Unsubscribe and disconnect");
         this->unsubscribe(NULL, strTopic.toLatin1().constData ());
         this->mq_disconnect ();
         this->loop (100);
@@ -208,7 +208,7 @@ MqClientThread::run ()
 
     // Ready for the next time
     bQuit = false;
-    qDebug ("Mosquitto: Exit thread loop");
+    qDebug ("Mq thread: Exit thread");
 }//MqClientThread::run
 
 void

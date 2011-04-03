@@ -39,7 +39,6 @@ public slots:
     void setStatus (const QString &strText, int timeout = 3000);
 
 private slots:
-    void on_actionLogs_triggered();
     void on_actionWeb_view_triggered();
 
     // All initializations happen here

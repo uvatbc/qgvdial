@@ -76,10 +76,17 @@ TpCalloutInitiator::onConnectionReady (Tp::PendingOperation *op)
 
         if (strActCmName == "sofiasip")
         {
+            strActCmName = "SIP";
             strSelfNumber = account->parameters()["auth-user"].toString();
-            if (!strSelfNumber.isEmpty ()) break;
+            if (!strSelfNumber.isEmpty ()) {
+                strActCmName += ": " + strSelfNumber;
+                break;
+            }
             strSelfNumber = account->parameters()["account"].toString();
-            if (!strSelfNumber.isEmpty ()) break;
+            if (!strSelfNumber.isEmpty ()) {
+                strActCmName += ": " + strSelfNumber;
+                break;
+            }
         }
 
         if (strActCmName == "ring") {
