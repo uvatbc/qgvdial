@@ -1474,9 +1474,11 @@ MainWindow::playVmail (const QString &strFile)
     do // Begin cleanup block (not a loop)
     {
         // Convert it into a file:// url
-        QString strUrl = QUrl::fromLocalFile(strFile).toString ();
+        QUrl url = QUrl::fromLocalFile(strFile).toString ();
 
-        vmailPlayer.setMedia (QMediaContent(strUrl));
+        qDebug() << "Play vmail file:" << strFile << "Url =" << url;
+
+        vmailPlayer.setMedia (QMediaContent(url));
         vmailPlayer.play();
     } while (0); // End cleanup block (not a loop)
 }//MainWindow::playVmail
