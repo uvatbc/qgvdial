@@ -7,6 +7,7 @@ Rectangle {
     color: "slategray"
 
     property string text: "You should have changed this text"
+    //property alias text: textEd.text
     property alias echoMode: textEd.echoMode
     property bool edHasFocus: textEd.activeFocus
     property int pixelSize: 5000

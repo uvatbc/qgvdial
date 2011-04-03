@@ -3,6 +3,7 @@ import "helper.js" as Code
 
 Item {
     id: container
+    objectName: "SettingsPage"
 
     signal sigUserChanged(string username)
     signal sigPassChanged(string password)
@@ -24,16 +25,23 @@ Item {
 
     signal sigMsgBoxDone (bool ok)
 
+    function setUsername (strU) {
+        textUsername.text = strU;
+        lblUsername.text = strU;
+    }
+    function setPassword (strP) {
+        var strStars = Array(strP.length+1).join("*")
+        textPassword.text = strP;
+        lblPassword.text = strStars;
+        console.debug("p=" + strP + "; *=" + strStars);
+    }
+
     Column { // user, pass and all buttons
         id: mainColumn
         anchors.fill: parent
         anchors.topMargin: 2
         spacing: 2
         opacity: 1
-
-        // Test properties; comment out when adding qml to c++ code.
-        property string strUsername: g_strUsername       //"user@gmail.com"
-        property string strPassword: g_strPassword       //"hunter2 :p"
 
         property int pixDiv: 10
         property int pixHeight: (container.height + container.width) / 2
@@ -58,17 +66,18 @@ Item {
                 height: mainColumn.outerHeight - 2
                 width: parent.width - lblEmail.width - (parent.spacing * 2)
                 opacity: (g_bIsLoggedIn == true ? 0 : 1)
-                text: mainColumn.strUsername
                 pixelSize: mainColumn.pixSize
 
                 Keys.onReturnPressed: listButtons.login_logout_function();
                 KeyNavigation.tab: textPassword
                 onSigTextChanged: container.sigUserChanged(strText);
+
+                onTextChanged: console.debug("User changed: " + text);
             }
 
             Text {
+                id: lblUsername
                 anchors.verticalCenter: parent.verticalCenter
-                text: mainColumn.strUsername
                 color: "white"
                 height: mainColumn.outerHeight
                 font.pixelSize: mainColumn.pixSize
@@ -94,7 +103,6 @@ Item {
                 height: mainColumn.outerHeight - 2
                 width: parent.width - lblPass.width - (parent.spacing * 2)
                 opacity: (g_bIsLoggedIn == true ? 0 : 1)
-                text: mainColumn.strPassword
                 echoMode: TextInput.Password
                 pixelSize: mainColumn.pixSize
 
@@ -103,9 +111,9 @@ Item {
                 onSigTextChanged: container.sigPassChanged(strText);
             }
 
-           Text {
+            Text {
+                id: lblPassword
                 anchors.verticalCenter: parent.verticalCenter
-                text: Array(mainColumn.strPassword.length+1).join("*")
                 color: "white"
                 height: mainColumn.outerHeight
                 font.pixelSize: mainColumn.pixSize

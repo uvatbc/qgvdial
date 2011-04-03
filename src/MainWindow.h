@@ -181,6 +181,9 @@ private:
 
     void showMsgBox (const QString &strMessage);
 
+    void setUsername(const QString &strUsername);
+    void setPassword(const QString &strPassword);
+
 private:
     //! Logfile
     QFile           fLogfile;

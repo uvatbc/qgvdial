@@ -380,9 +380,8 @@ MainWindow::init ()
     // If the cache has the username and password, begin login
     if (dbMain.getUserPass (strUser, strPass))
     {
-        QDeclarativeContext *ctx = this->rootContext();
-        ctx->setContextProperty ("g_strUsername", strUser);
-        ctx->setContextProperty ("g_strPassword", strPass);
+        this->setUsername (strUser);
+        this->setPassword (strPass);
 
         QVariantList l;
         logoutCompleted (true, l);
@@ -417,8 +416,8 @@ MainWindow::initQML ()
     ctx->setContextProperty ("g_bShowMsg", bTempFalse);
     ctx->setContextProperty ("g_registeredPhonesModel", &modelRegNumber);
     ctx->setContextProperty ("g_bIsLoggedIn", bTempFalse);
-    ctx->setContextProperty ("g_strUsername", "example@gmail.com");
-    ctx->setContextProperty ("g_strPassword", "hunter2 :p");
+    this->setUsername ("example@gmail.com");
+    this->setPassword ("hunter2 :p");
     ctx->setContextProperty ("g_bShowSettings", bTempFalse);
     ctx->setContextProperty ("g_strStatus", "Getting Ready");
     ctx->setContextProperty ("g_strMsgText", "No message");
@@ -534,9 +533,7 @@ MainWindow::onUserTextChanged (const QString &strUsername)
 {
     if (strUser != strUsername) {
         strUser = strUsername;
-
-        QDeclarativeContext *ctx = this->rootContext();
-        ctx->setContextProperty ("g_strUsername", strUser);
+        this->setUsername (strUser);
     }
 }//MainWindow::onUserPassTextChanged
 
@@ -546,8 +543,7 @@ MainWindow::onPassTextChanged (const QString &strPassword)
     if (strPass != strPassword) {
         strPass = strPassword;
 
-        QDeclarativeContext *ctx = this->rootContext();
-        ctx->setContextProperty ("g_strPassword", strPass);
+        this->setPassword (strPass);
     }
 }//MainWindow::onUserPassTextChanged
 
@@ -603,9 +599,9 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
         // Save the user name and password that was used to login
         dbMain.putUserPass (strUser, strPass);
 
+        this->setUsername (strUser);
+        this->setPassword (strPass);
         QDeclarativeContext *ctx = this->rootContext();
-        ctx->setContextProperty ("g_strUsername", strUser);
-        ctx->setContextProperty ("g_strPassword", strPass);
         ctx->setContextProperty ("g_bIsLoggedIn", bLoggedIn);
         ctx->setContextProperty ("g_bShowSettings", false);
 
@@ -1735,3 +1731,47 @@ MainWindow::onCallInitiatorsChange (bool bSave)
 
     onRegPhoneSelectionChange (indRegPhone);
 }//MainWindow::onCallInitiatorsChange
+
+void
+MainWindow::setUsername(const QString &strU)
+{
+    do // Begin cleanup block (not a loop)
+    {
+        QObject *pRoot = this->rootObject ();
+        if (NULL == pRoot) {
+            qWarning ("Couldn't get QML root object for setUsername");
+            break;
+        }
+
+        QObject *pSettingsPage = pRoot->findChild <QObject*>("SettingsPage");
+        if (NULL == pSettingsPage) {
+            qWarning ("Could not get to SettingsPage for setUsername");
+            break;
+        }
+
+        QMetaObject::invokeMethod (pSettingsPage, "setUsername",
+                                   Q_ARG (QVariant, QVariant(strU)));
+    } while (0); // End cleanup block (not a loop)
+}//MainWindow::setUsername
+
+void
+MainWindow::setPassword(const QString &strP)
+{
+    do // Begin cleanup block (not a loop)
+    {
+        QObject *pRoot = this->rootObject ();
+        if (NULL == pRoot) {
+            qWarning ("Couldn't get QML root object for setPassword");
+            break;
+        }
+
+        QObject *pSettingsPage = pRoot->findChild <QObject*>("SettingsPage");
+        if (NULL == pSettingsPage) {
+            qWarning ("Could not get to SettingsPage for setPassword");
+            break;
+        }
+
+        QMetaObject::invokeMethod (pSettingsPage, "setPassword",
+                                   Q_ARG (QVariant, QVariant(strP)));
+    } while (0); // End cleanup block (not a loop)
+}//MainWindow::setPassword

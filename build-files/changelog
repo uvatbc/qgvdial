@@ -1,3 +1,1 @@
-  * SIP instead of sofiasip. Also add the account after "SIP:" to be more descriptive.
-  * Mosquitto settings never made it to the cpp code !! - Now fixed.
-  * Fix for the dialout/dialback number not being saved across reboot/restart.
+  * Fix user name and password QML.
