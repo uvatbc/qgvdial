@@ -33,7 +33,6 @@ Item {
         var strStars = Array(strP.length+1).join("*")
         textPassword.text = strP;
         lblPassword.text = strStars;
-        console.debug("p=" + strP + "; *=" + strStars);
     }
 
     Column { // user, pass and all buttons
@@ -71,8 +70,6 @@ Item {
                 Keys.onReturnPressed: listButtons.login_logout_function();
                 KeyNavigation.tab: textPassword
                 onSigTextChanged: container.sigUserChanged(strText);
-
-                onTextChanged: console.debug("User changed: " + text);
             }
 
             Text {
