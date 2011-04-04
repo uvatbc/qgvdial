@@ -3,7 +3,7 @@
 
 static quint32 nChildren = 0;
 
-ContactDetailsModel::ContactDetailsModel (const GVContactInfo &i,
+ContactDetailsModel::ContactDetailsModel (const ContactInfo &i,
                                           QObject *parent)
 : QAbstractListModel (parent)
 , info (i)
@@ -40,28 +40,13 @@ ContactDetailsModel::data (const QModelIndex &index, int role) const
 
     do { // Begin cleanup block (not a loop)
         int row = index.row();
-        GVContactNumber data;
+        PhoneInfo data;
         if (!getAt (row, data)) {
             break;
         }
 
         if (CD_TypeRole == role) {
-            switch (data.chType) {
-            case 'M':
-                var = "Mobile";
-                break;
-            case 'H':
-                var = "Home";
-                break;
-            case 'W':
-                var = "Work";
-                break;
-            default:
-            case 'O':
-                var = "Other";
-                break;
-            }
-
+            var = PhoneInfo::typeToString (data.Type);
             break;
         }
 
@@ -77,7 +62,7 @@ ContactDetailsModel::data (const QModelIndex &index, int role) const
 }//ContactDetailsModel::data
 
 bool
-ContactDetailsModel::getAt (int index, GVContactNumber &data) const
+ContactDetailsModel::getAt (int index, PhoneInfo &data) const
 {
     bool rv = false;
     do { // Begin cleanup block (not a loop)

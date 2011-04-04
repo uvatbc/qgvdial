@@ -34,6 +34,8 @@ public:
 
     QRect getStartingSize ();
 
+    QString getStoreDirectory ();
+
 private:
     OsDependent(QObject *parent = 0);
 

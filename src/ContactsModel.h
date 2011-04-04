@@ -14,6 +14,7 @@ class ContactsModel : public QSqlQueryModel
 public:
     enum ContactsFieldRoles {
         CT_NameRole = Qt::UserRole + 1,
+        CT_NotesRole,
         CT_ContactsRole,
     };
 
@@ -28,8 +29,6 @@ public:
     void refresh ();
 private:
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
-
-    bool convert (const ContactInfo &cInfo, GVContactInfo &gvcInfo);
 
 private:
     QSqlTableModel *modelContacts;

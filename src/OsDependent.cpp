@@ -118,6 +118,23 @@ OsDependent::getStartingSize ()
     return rect;
 }//OsDependent::getStartingSize
 
+QString
+OsDependent::getStoreDirectory ()
+{
+    QString strStoreDir = QDir::homePath ();
+    QDir dirHome(strStoreDir);
+    if (!strStoreDir.endsWith (QDir::separator ()))
+    {
+        strStoreDir += QDir::separator ();
+    }
+    strStoreDir += ".qgvdial";
+    if (!QFileInfo(strStoreDir).exists ()) {
+        dirHome.mkdir (".qgvdial");
+    }
+
+    return strStoreDir;
+}//OsDependent::getStoreDirectory
+
 #ifdef QT_NO_SYSTEMTRAYICON
 QSystemTrayIcon::QSystemTrayIcon(QWidget *parent /*= 0*/)
 : QWidget (parent)

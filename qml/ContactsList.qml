@@ -121,6 +121,7 @@ Rectangle {
 
                 onClicked: {
                     detailsList.model = contacts;
+                    detailsList.notesText = notes;
                     txtContactName.text = name
                     container.state = "Details"
                 }

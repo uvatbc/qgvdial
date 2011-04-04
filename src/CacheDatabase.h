@@ -18,8 +18,6 @@ private:
     CacheDatabase(const QSqlDatabase &other, QObject *parent = 0);
     ~CacheDatabase(void);
 
-    QString get_db_name ();
-
 public:
     void init ();
     void deinit ();
@@ -45,17 +43,14 @@ public:
     bool putRegisteredNumbers (const GVRegisteredNumberArray &listNumbers);
 
     // Single contact based on contact identifier
-    bool existsContact (const QString  &strLink);
-    bool deleteContact (const QString  &strLink);
-    bool insertContact (const QString  &strName,
-                        const QString  &strLink);
+    bool existsContact (const QString &strId);
+    bool deleteContact (const QString &strId);
+    bool insertContact (const ContactInfo &info);
     quint32 getContactsCount ();
 
     // Contact information based on contact identifier
-    bool deleteContactInfo (const QString  &strLink);
-    bool putContactInfo (const GVContactInfo &info);
-    bool getContactFromLink (GVContactInfo &info);
-    bool getContactFromNumber (const QString &strNumber, GVContactInfo &info);
+    bool getContactFromLink (ContactInfo &info);
+    bool getContactFromNumber (const QString &strNumber, ContactInfo &info);
 
     // Last update of contacts
     void clearLastContactUpdate ();
@@ -99,6 +94,10 @@ public:
                         const QString &topic);
     bool getMqSettings (bool &bEnable, QString &host, int &port,
                         QString &topic);
+
+private:
+    bool putContactInfo (const ContactInfo &info);
+    bool deleteContactInfo (const QString &strId);
 
 signals:
     void status(const QString &strText, int timeout = 2000);

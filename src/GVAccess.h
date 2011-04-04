@@ -105,7 +105,7 @@ signals:
     //! Emitted every time a new contact is parsed from the contacts page
     void gotContact (const QString &strName, const QString &strLink);
     //! Emitted when the contact info from the link is retrieved
-    void contactInfo (const GVContactInfo &info);
+    void contactInfo (const ContactInfo &info);
     //! Emitted for each registered phone number
     void registeredPhone (const GVRegisteredNumber &info);
     //! Emitted when dialing has started (for callback method)

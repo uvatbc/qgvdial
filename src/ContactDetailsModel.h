@@ -23,16 +23,16 @@ public:
         CD_NumberRole,
     };
 
-    explicit ContactDetailsModel (const GVContactInfo &i, QObject *parent = 0);
+    explicit ContactDetailsModel (const ContactInfo &i, QObject *parent = 0);
     ~ContactDetailsModel ();
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
-    bool getAt (int index, GVContactNumber &data) const;
+    bool getAt (int index, PhoneInfo &data) const;
 
 private:
-    GVContactInfo info;
+    ContactInfo info;
 };
 
 #endif // CONTACTDETAILSMODEL_H

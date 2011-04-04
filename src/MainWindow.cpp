@@ -1,7 +1,6 @@
 #include "MainWindow.h"
 
 #include "LoginDialog.h"
-#include "DlgSelectContactNumber.h"
 
 #include "PhoneNumberValidator.h"
 
@@ -88,16 +87,8 @@ void
 MainWindow::initLogging ()
 {
     // Initialize logging
-    QString strLogfile = QDir::homePath ();
-    QDir dirHome(strLogfile);
-    if (!strLogfile.endsWith (QDir::separator ()))
-    {
-        strLogfile += QDir::separator ();
-    }
-    strLogfile += ".qgvdial";
-    if (!QFileInfo(strLogfile).exists ()) {
-        dirHome.mkdir (".qgvdial");
-    }
+    OsDependent &osd = Singletons::getRef().getOSD ();
+    QString strLogfile = osd.getStoreDirectory ();
     strLogfile += QDir::separator ();
     strLogfile += "qgvdial.log";
     fLogfile.setFileName (strLogfile);
@@ -416,8 +407,6 @@ MainWindow::initQML ()
     ctx->setContextProperty ("g_bShowMsg", bTempFalse);
     ctx->setContextProperty ("g_registeredPhonesModel", &modelRegNumber);
     ctx->setContextProperty ("g_bIsLoggedIn", bTempFalse);
-    this->setUsername ("example@gmail.com");
-    this->setPassword ("hunter2 :p");
     ctx->setContextProperty ("g_bShowSettings", bTempFalse);
     ctx->setContextProperty ("g_strStatus", "Getting Ready");
     ctx->setContextProperty ("g_strMsgText", "No message");
@@ -427,6 +416,9 @@ MainWindow::initQML ()
     // Initialize the QML view
     this->setSource (QUrl ("qrc:/Main.qml"));
     this->setResizeMode (QDeclarativeView::SizeRootObjectToView);
+
+    this->setUsername ("example@gmail.com");
+    this->setPassword ("hunter2 :p");
 
     // The root object changes when we reload the source. Pick it up again.
     QGraphicsObject *gObj = this->rootObject();
@@ -689,6 +681,7 @@ MainWindow::on_actionE_xit_triggered ()
                                          i != mapVmail.end ();
                                          i++)
     {
+        qDebug() << "Delete vmail cached at" << i.value ();
         QFile::remove (i.value ());
     }
     mapVmail.clear ();
@@ -762,14 +755,14 @@ MainWindow::deinitInbox ()
 bool
 MainWindow::getInfoFrom (const QString &strNumber,
                          const QString &strNameLink,
-                         GVContactInfo &info)
+                         ContactInfo &info)
 {
-    info = GVContactInfo();
+    info.init ();
 
     if (0 != strNameLink.size ())
     {
         CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-        info.strLink = strNameLink;
+        info.strId = strNameLink;
 
         if (!dbMain.getContactFromLink (info))
         {
@@ -793,9 +786,9 @@ MainWindow::getInfoFrom (const QString &strNumber,
     }
     else
     {
-        info.strName = strNumber;
-        GVContactNumber num;
-        num.chType = 'O';
+        info.strTitle = strNumber;
+        PhoneInfo num;
+        num.Type = PType_Unknown;
         num.strNumber = strNumber;
         info.arrPhones += num;
         info.selected = 0;
@@ -805,10 +798,10 @@ MainWindow::getInfoFrom (const QString &strNumber,
 }//MainWindow::getInfoFrom
 
 bool
-MainWindow::findInfo (const QString &strNumber, GVContactInfo &info)
+MainWindow::findInfo (const QString &strNumber, ContactInfo &info)
 {
     bool rv = true;
-    info = GVContactInfo();
+    info.init ();
 
     QString strTrunc = strNumber;
     GVAccess::simplify_number (strTrunc, false);
@@ -817,16 +810,16 @@ MainWindow::findInfo (const QString &strNumber, GVContactInfo &info)
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     if (!dbMain.getContactFromNumber (strTrunc, info)) {
         qDebug ("Could not find info about this number. Using dummy info");
-        info.strName = strNumber;
-        GVContactNumber num;
-        num.chType = 'O';
+        info.strTitle = strNumber;
+        PhoneInfo num;
+        num.Type = PType_Unknown;
         num.strNumber = strNumber;
         info.arrPhones += num;
         info.selected = 0;
     } else {
         // Found it, now set the "selected" field correctly
         info.selected = 0;
-        foreach (GVContactNumber num, info.arrPhones) {
+        foreach (PhoneInfo num, info.arrPhones) {
             QString strNum = num.strNumber;
             GVAccess::simplify_number (strNum, false);
             strNum.remove(' ').remove('+');
@@ -845,118 +838,6 @@ MainWindow::findInfo (const QString &strNumber, GVContactInfo &info)
 
     return (rv);
 }//MainWindow::findInfo
-
-void
-MainWindow::callNumber (const QString &strNumber,
-                        const QString &strNameLink)
-{
-    GVContactInfo info;
-
-    do { // Begin cleanup block (not a loop)
-        if (!getInfoFrom (strNumber, strNameLink, info))
-        {
-            qWarning () << "Failed to get any info for num = " << strNumber
-                        << ", link = " << strNameLink;
-            break;
-        }
-
-        if (info.arrPhones.isEmpty ()) {
-            qWarning ("No phones found!!");
-            break;
-        }
-
-        // Check at least the first number
-        QString strTest = info.arrPhones[0].strNumber;
-        strTest.remove(QRegExp ("\\d*"))
-               .remove(QRegExp ("\\s"))
-               .remove('+')
-               .remove('-');
-        if (!strTest.isEmpty ()) {
-            qWarning ("Cannot use numbers with special symbols or characters");
-            break;
-        }
-
-        callWithContactInfo (info, false);
-    } while (0); // End cleanup block (not a loop)
-}//MainWindow::callNumber
-
-void
-MainWindow::textANumber (const QString &strNumber,
-                         const QString &strNameLink)
-{
-    GVContactInfo info;
-
-    do { // Begin cleanup block (not a loop)
-        if (!getInfoFrom (strNumber, strNameLink, info))
-        {
-            qWarning () << "Failed to get any info for num = " << strNumber
-                        << ", link = " << strNameLink;
-            return;
-        }
-
-        if (info.arrPhones.isEmpty ()) {
-            qWarning ("No phones found!!");
-            break;
-        }
-
-        // Check at least the first number
-        QString strTest = info.arrPhones[0].strNumber;
-        strTest.remove(QRegExp ("\\d*"))
-               .remove(QRegExp ("\\s"))
-               .remove('+')
-               .remove('-');
-        if (!strTest.isEmpty ()) {
-            qWarning ("Cannot use numbers with special symbols or characters");
-            break;
-        }
-
-        sendTextToContact (info, false);
-    } while (0); // End cleanup block (not a loop)
-}//MainWindow::textANumber
-
-void
-MainWindow::callWithContactInfo (const GVContactInfo &info, bool bSaveIt)
-{
-    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    if (bSaveIt)
-    {
-        dbMain.putContactInfo (info);
-    }
-    else
-    {
-        qDebug ("Got contact info from cached location");
-    }
-
-    DlgSelectContactNumber dlg(info, this);
-    int rv = dlg.exec ();
-    do // Begin cleanup block (not a loop)
-    {
-        if (QDialog::Accepted != rv)
-        {
-            qWarning ("User canceled call");
-            break;
-        }
-        rv = dlg.getSelection ();
-        if (-1 == rv)
-        {
-            qWarning ("Invalid selection");
-            break;
-        }
-
-        dialNow (info.arrPhones[rv].strNumber);
-    } while (0); // End cleanup block (not a loop)
-}//MainWindow::callWithContactInfo
-
-void
-MainWindow::contactsLinkWorkDone (bool, const QVariantList &)
-{
-    GVAccess &webPage = Singletons::getRef().getGVAccess ();
-    QObject::disconnect (
-        &webPage, SIGNAL (contactInfo (const GVContactInfo &)),
-         this   , SLOT   (callWithContactInfo (const GVContactInfo &)));
-
-    setStatus ("Retrieved contact info");
-}//MainWindow::contactsLinkWorkDone
 
 void
 MainWindow::dialNow (const QString &strTarget)
@@ -1052,7 +933,7 @@ MainWindow::dialNow (const QString &strTarget)
 void
 MainWindow::onSigText (const QString &strNumber)
 {
-    GVContactInfo info;
+    ContactInfo info;
 
     do { // Begin cleanup block (not a loop)
         // Get info about this number
@@ -1063,7 +944,7 @@ MainWindow::onSigText (const QString &strNumber)
         }
 
         SMSEntry entry;
-        entry.strName = info.strName;
+        entry.strName = info.strTitle;
         entry.sNumber = info.arrPhones[info.selected];
 
         dlgSMS.addSMSEntry (entry);
@@ -1090,7 +971,7 @@ MainWindow::onSendTextWithoutData (const QStringList &arrNumbers)
             continue;
         }
 
-        GVContactInfo info;
+        ContactInfo info;
 
         // Get info about this number
         if (!findInfo (strNumber, info)) {
@@ -1099,7 +980,7 @@ MainWindow::onSendTextWithoutData (const QStringList &arrNumbers)
         }
 
         SMSEntry entry;
-        entry.strName = info.strName;
+        entry.strName = info.strTitle;
         entry.sNumber = info.arrPhones[info.selected];
 
         dlgSMS.addSMSEntry (entry);
@@ -1188,59 +1069,6 @@ MainWindow::dialComplete (bool bOk, const QVariantList &params)
 
     ctx->deleteLater ();
 }//MainWindow::dialComplete
-
-void
-MainWindow::sendTextToContact (const GVContactInfo &info, bool bSaveIt)
-{
-    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    if (bSaveIt)
-    {
-        dbMain.putContactInfo (info);
-    }
-    else
-    {
-        qDebug ("Got contact info from cached location");
-    }
-
-    DlgSelectContactNumber dlg(info, this);
-    int rv = dlg.exec ();
-    do // Begin cleanup block (not a loop)
-    {
-        if (QDialog::Accepted != rv)
-        {
-            qWarning ("User canceled SMS");
-            break;
-        }
-        rv = dlg.getSelection ();
-        if (-1 == rv)
-        {
-            qWarning ("Invalid selection");
-            break;
-        }
-
-        SMSEntry entry;
-        entry.strName = info.strName;
-        entry.sNumber = info.arrPhones[rv];
-
-        dlgSMS.addSMSEntry (entry);
-
-        if (dlgSMS.isHidden ())
-        {
-            dlgSMS.show ();
-        }
-    } while (0); // End cleanup block (not a loop)
-}//MainWindow::sendTextToContact
-
-void
-MainWindow::contactsLinkWorkDoneSMS (bool, const QVariantList &)
-{
-    GVAccess &webPage = Singletons::getRef().getGVAccess ();
-    QObject::disconnect (
-        &webPage, SIGNAL (contactInfo       (const GVContactInfo &)),
-         this   , SLOT   (sendTextToContact (const GVContactInfo &)));
-
-    setStatus ("Retrieved contact info");
-}//MainWindow::contactsLinkWorkDoneSMS
 
 void
 MainWindow::sendSMS (const QStringList &arrNumbers, const QString &strText)

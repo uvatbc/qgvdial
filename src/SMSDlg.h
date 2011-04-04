@@ -8,7 +8,7 @@
 struct SMSEntry
 {
     QString         strName;
-    GVContactNumber sNumber;
+    PhoneInfo       sNumber;
 };
 
 struct SMSGuiElement

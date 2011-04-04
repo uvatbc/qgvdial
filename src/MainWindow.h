@@ -89,23 +89,6 @@ private slots:
     //! Invoked when a number dial is completed.
     void dialComplete (bool bOk, const QVariantList &params);
 
-    //! Invoked on user request to call a number
-    void callNumber (const QString &strNumber,
-                     const QString &strNameLink = QString());
-    //! Invoked on user request to send an SMS to an unknown number
-    void textANumber (const QString &strNumber,
-                      const QString &strNameLink = QString());
-
-    //! Invoked when contact details have been obtained
-    void callWithContactInfo (const GVContactInfo &info, bool bCallback = true);
-    //! Invoked when work for getting contact details is done - success or fail.
-    void contactsLinkWorkDone (bool bOk, const QVariantList &arrParams);
-
-    //! Callback for the webpage when it gets a contacts info
-    void sendTextToContact (const GVContactInfo &info, bool bCallback = true);
-    //! Invoked when the webpage is done sending all contact info for an SMS
-    void contactsLinkWorkDoneSMS (bool bOk, const QVariantList &arrParams);
-
     //! Invoked when the user finally clicks on the send SMS button
     void sendSMS (const QStringList &arrNumbers, const QString &strText);
     //! Invoked whenever the SMS has been sent
@@ -168,9 +151,9 @@ private:
 
     bool getInfoFrom (const QString &strNumber,
                       const QString &strNameLink,
-                      GVContactInfo &info);
+                      ContactInfo &info);
 
-    bool findInfo (const QString &strNumber, GVContactInfo &info);
+    bool findInfo (const QString &strNumber, ContactInfo &info);
 
     bool refreshRegisteredNumbers ();
     bool getDialSettings (bool                 &bDialout   ,

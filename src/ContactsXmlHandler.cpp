@@ -86,6 +86,10 @@ ContactsXmlHandler::endElement (const QString & /*namespaceURI*/,
             currInfo.arrPhones += currPhone;
             break;
         }
+        if (localName == "content") {
+            currInfo.strNotes = strCurrentChars;
+            break;
+        }
 
         if (localName != "entry") break;
         // If execution reaches here then it means it's the end of an entry.

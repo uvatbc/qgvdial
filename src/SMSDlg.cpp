@@ -21,24 +21,8 @@ SMSDlg::~SMSDlg(void)
 bool
 SMSDlg::addSMSEntry (const SMSEntry &entry)
 {
-    QString strNumberinfo = QString ("%1 - %2").arg (entry.sNumber.strNumber);
-    const char *subst = NULL;
-    switch (entry.sNumber.chType)
-    {
-    case 'M':
-        subst = "Mobile";
-        break;
-    case 'H':
-        subst = "Home phone";
-        break;
-    case 'O':
-        subst = "Other";
-        break;
-    default:
-        subst = "Unknown";
-        break;
-    }
-    strNumberinfo = strNumberinfo.arg (subst);
+    QString strNumberinfo = QString ("%1 - %2").arg (entry.sNumber.strNumber)
+                      .arg (PhoneInfo::typeToString (entry.sNumber.Type));
 
     int index = smsGuiEntries.size();
     SMSGuiElement elements;

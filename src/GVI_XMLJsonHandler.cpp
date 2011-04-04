@@ -144,6 +144,7 @@ GVI_XMLJsonHandler::parseJSON (const QDateTime &dtUpdate, bool &bGotOld, int &nN
                 } else if (strPName == "displayStartTime") {
                 } else if (strPName == "relativeStartTime") {
                 } else if (strPName == "note") {
+                    inboxEntry.strNote = strVal;
                 } else if (strPName == "type") {
                 } else if (strPName == "children") {
                 } else {

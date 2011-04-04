@@ -1,1 +1,2 @@
-  * Fix user name and password QML.
+  * Contact and inbox notes functionality added.
+  * Massive code cleanup. merged duplicate structures, removed redundant classes.

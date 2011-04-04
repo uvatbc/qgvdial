@@ -8,6 +8,7 @@ ContactsModel::ContactsModel (QObject *parent)
 {
     QHash<int, QByteArray> roles;
     roles[CT_NameRole]     = "name";
+    roles[CT_NotesRole]    = "notes";
     roles[CT_ContactsRole] = "contacts";
     setRoleNames(roles);
 }//ContactsModel::ContactsModel
@@ -23,13 +24,18 @@ ContactsModel::data (const QModelIndex &index, int role) const
             QSqlQueryModel::data (index.sibling(index.row(), 1), Qt::EditRole);
             break;
         }
+        if (CT_NotesRole == role) {
+            retVar =
+            QSqlQueryModel::data (index.sibling(index.row(), 2), Qt::EditRole);
+            break;
+        }
 
         if (CT_ContactsRole == role) {
-            GVContactInfo info;
-            info.strLink = QSqlQueryModel::data (index.sibling(index.row(), 0),
-                                                 Qt::EditRole)
+            ContactInfo info;
+            info.strId = QSqlQueryModel::data (index.sibling(index.row(), 0),
+                                               Qt::EditRole)
                                   .toString ();
-            if (info.strLink.isEmpty ()) {
+            if (info.strId.isEmpty ()) {
                 qWarning ("This link is empty!");
                 break;
             }
@@ -68,18 +74,14 @@ ContactsModel::insertContact (const ContactInfo &contactInfo)
 {
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
 
-    GVContactInfo gvContactInfo;
-    convert (contactInfo, gvContactInfo);
-
-    bool bExists = dbMain.existsContact (gvContactInfo.strLink);
+    bool bExists = dbMain.existsContact (contactInfo.strId);
     int oldcount = this->rowCount ();
 
     if (!bExists) {
         beginInsertRows (QModelIndex (), oldcount, oldcount);
     }
 
-    dbMain.insertContact (contactInfo.strTitle, contactInfo.strId);
-    dbMain.putContactInfo (gvContactInfo);
+    dbMain.insertContact (contactInfo);
 
     if (!bExists) {
         endInsertRows ();
@@ -102,42 +104,8 @@ ContactsModel::deleteContact (const ContactInfo &contactInfo)
         endRemoveRows ();
     }
     
-    dbMain.deleteContactInfo (contactInfo.strId);
     return (true);
 }//ContactsModel::deleteContact
-
-bool
-ContactsModel::convert (const ContactInfo &cInfo, GVContactInfo &gvcInfo)
-{
-    gvcInfo.strLink = cInfo.strId;
-    gvcInfo.strName = cInfo.strTitle;
-
-    foreach (PhoneInfo pInfo, cInfo.arrPhones)
-    {
-        GVContactNumber gvcn;
-        switch (pInfo.Type)
-        {
-        case PType_Mobile:
-            gvcn.chType = 'M';
-            break;
-        case PType_Home:
-            gvcn.chType = 'H';
-            break;
-        case PType_Other:
-            gvcn.chType = 'O';
-            break;
-        default:
-            gvcn.chType = '?';
-            break;
-        }
-
-        gvcn.strNumber = pInfo.strNumber;
-
-        gvcInfo.arrPhones += gvcn;
-    }
-
-    return (true);
-}//ContactsModel::convert
 
 void
 ContactsModel::clearAll ()

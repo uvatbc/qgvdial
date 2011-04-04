@@ -144,9 +144,9 @@ InboxModel::data (const QModelIndex &index,
             GVAccess::simplify_number (strNum);
 
             CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-            GVContactInfo info;
+            ContactInfo info;
             if (dbMain.getContactFromNumber (strNum, info)) {
-                var = info.strName;
+                var = info.strTitle;
             } else {
                 var = strNum;
             }
@@ -284,13 +284,13 @@ InboxModel::insertEntry (const GVInboxEntry &hEvent)
 
     bool bExists = dbMain.existsInboxEntry (hEvent);
 
-    if (bExists) {
+    if (!bExists) {
         beginInsertRows (QModelIndex(), rowCount, rowCount);
     }
 
     dbMain.insertInboxEntry (hEvent);
 
-    if (bExists) {
+    if (!bExists) {
         endInsertRows ();
     } else {
         //emit dataChanged ();

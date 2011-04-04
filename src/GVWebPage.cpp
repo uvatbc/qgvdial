@@ -737,7 +737,7 @@ GVWebPage::getContactInfoFromLink ()
 void
 GVWebPage::contactInfoLoaded (bool bOk)
 {
-    GVContactInfo info;
+    ContactInfo info;
     QObject::disconnect (&webPage, SIGNAL (loadFinished (bool)),
                           this   , SLOT   (contactInfoLoaded (bool)));
     do // Begin cleanup block (not a loop)
@@ -758,7 +758,7 @@ GVWebPage::contactInfoLoaded (bool bOk)
             qWarning ("Couldn't find user name on page");
             break;
         }
-        info.strName = user.toPlainText ();
+        info.strTitle = user.toPlainText ();
 
 #define GVSELECTOR "div form div input[name=\"call\"]"
         QWebElementCollection numbers = doc().findAll (GVSELECTOR);
@@ -774,13 +774,13 @@ GVWebPage::contactInfoLoaded (bool bOk)
         foreach (QWebElement btnCall, numbers)
         {
             QWebElement divParent = btnCall.parent ();
-            GVContactNumber gvNumber;
+            PhoneInfo gvNumber;
             gvNumber.strNumber = divParent.toPlainText().simplified ();
             int pos = rx.indexIn (gvNumber.strNumber);
             if (-1 != pos)
             {
                 QString strChr = rx.cap ();
-                gvNumber.chType = strChr[0].toAscii ();
+                gvNumber.Type = PhoneInfo::charToType (strChr[0].toAscii ());
                 gvNumber.strNumber.chop (3);
                 gvNumber.strNumber = gvNumber.strNumber.trimmed ();
             }
@@ -801,7 +801,7 @@ GVWebPage::contactInfoLoaded (bool bOk)
     } while (0); // End cleanup block (not a loop)
     if (bOk)
     {
-        info.strLink = workCurrent.arrParams[0].toString();
+        info.strId = workCurrent.arrParams[0].toString();
         emit contactInfo (info);
     }
 
@@ -1087,7 +1087,7 @@ GVWebPage::getContactFromInboxLinkLoaded (bool bOk)
         &webPage, SIGNAL (loadFinished (bool)),
          this   , SLOT   (getContactFromInboxLinkLoaded (bool)));
 
-    GVContactInfo info;
+    ContactInfo info;
     do // Begin cleanup block (not a loop)
     {
         if (isLoadFailed (bOk))
@@ -1106,10 +1106,10 @@ GVWebPage::getContactFromInboxLinkLoaded (bool bOk)
             qWarning ("Couldn't find user name on page");
             break;
         }
-        info.strName = user.attribute ("name");
-        if (0 == info.strName.compare ("number", Qt::CaseInsensitive))
+        info.strTitle = user.attribute ("name");
+        if (0 == info.strTitle.compare ("number", Qt::CaseInsensitive))
         {
-            info.strName = user.attribute ("value");
+            info.strTitle = user.attribute ("value");
         }
 
 #define GVSELECTOR "div form div input[name=\"call\"]"
@@ -1125,13 +1125,13 @@ GVWebPage::getContactFromInboxLinkLoaded (bool bOk)
         foreach (QWebElement btnCall, numbers)
         {
             QWebElement divParent = btnCall.parent ();
-            GVContactNumber gvNumber;
+            PhoneInfo gvNumber;
             gvNumber.strNumber = divParent.toPlainText().simplified ();
             int pos = rx.indexIn (gvNumber.strNumber);
             if (-1 != pos)
             {
                 QString strChr = rx.cap ();
-                gvNumber.chType = strChr[0].toAscii ();
+                gvNumber.Type = PhoneInfo::charToType (strChr[0].toAscii ());
                 gvNumber.strNumber.chop (3);
                 gvNumber.strNumber = gvNumber.strNumber.trimmed ();
             }
@@ -1142,7 +1142,7 @@ GVWebPage::getContactFromInboxLinkLoaded (bool bOk)
     } while (0); // End cleanup block (not a loop)
     if (bOk)
     {
-        info.strLink = workCurrent.arrParams[0].toString();
+        info.strId = workCurrent.arrParams[0].toString();
         emit contactInfo (info);
     }
 
@@ -1397,7 +1397,10 @@ GVWebPage::onSocketXfer (qint64 bytesXfer, qint64 bytesTotal)
     if ((0 == bytesXfer) && (0 == bytesTotal)) {
         qDebug("Started the timeout timer");
     } else {
-        qDebug("Socket transferred data. Not timing out!");
+        qDebug() << QString("Socket transferred %1 byte%2 of data. "
+                            "Not timing out!")
+                    .arg (bytesXfer)
+                    .arg (1 == bytesXfer ? "" : "s");
     }
     pageTimeoutTimer.setInterval (timeout * 1000);
     pageTimeoutTimer.setSingleShot (true);
