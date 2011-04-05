@@ -118,14 +118,16 @@ void
 CacheDatabase::init ()
 {
     OsDependent &osd = Singletons::getRef().getOSD ();
-    QString strDbFile = osd.getStoreDirectory ();
-    strDbFile += QDir::separator ();
+    QString strDbFile;
+    strDbFile = osd.getStoreDirectory () + QDir::separator ();
     strDbFile += DB_NAME;
 
     dbMain.setDatabaseName(strDbFile);
     if (!dbMain.open ()) {
-        qFatal ("Failed to open database.");
+        qWarning() << "Failed to open database" << strDbFile
+                 << ". Error text =" << dbMain.lastError ().text ();
         qApp->quit ();
+        return;
     }
 
     QSqlQuery query(dbMain);
