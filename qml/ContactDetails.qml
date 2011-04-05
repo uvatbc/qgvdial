@@ -82,7 +82,9 @@ Flickable {
             bottom: parent.bottom
         }
 
+        wrapMode: Text.WordWrap
+
         font.pixelSize: (parent.height + parent.width) / 40
         color: "white"
-    }
+    }// Text (contact notes)
 }//Flickable (container)
