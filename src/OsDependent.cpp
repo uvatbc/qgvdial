@@ -132,6 +132,10 @@ OsDependent::getStoreDirectory ()
         dirHome.mkdir (".qgvdial");
     }
 
+#if defined(Q_OS_SYMBIAN)
+    strStoreDir.replace (QChar('/'), "\\");
+#endif
+
     return strStoreDir;
 }//OsDependent::getStoreDirectory
 
