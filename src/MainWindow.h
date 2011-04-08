@@ -39,8 +39,6 @@ public slots:
     void setStatus (const QString &strText, int timeout = 3000);
 
 private slots:
-    void on_actionWeb_view_triggered();
-
     // All initializations happen here
     void init ();
 
@@ -180,8 +178,6 @@ private:
     GVInbox         oInbox;
     //! SMS Window
     SMSDlg          dlgSMS;
-    //! Web View
-    WebWidget      *pWebWidget;
 
     QMediaPlayer    vmailPlayer;
 
@@ -194,7 +190,6 @@ private:
 
     // Menus and actions
     QMenu           menuFile;
-    QAction         actViewWeb;
     QAction         actLogin;
     QAction         actDismiss;
     QAction         actRefresh;

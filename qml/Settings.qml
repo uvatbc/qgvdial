@@ -9,7 +9,6 @@ Item {
     signal sigPassChanged(string password)
     signal sigLogin
     signal sigLogout
-    signal sigWebPage
     signal sigRefresh
     signal sigRefreshAll
     signal sigHide
@@ -147,20 +146,20 @@ Item {
                 }//ListElement (mosquitto settings)
                 ListElement {
                     text: "Web Page (debug)"
-                    newState: ""
+                    newState: "WebPage"
                 }//ListElement (Web Page (debug))
                 ListElement {
                     text: "Refresh"
                     newState: ""
-                }//ListElement (Web Page (debug))
+                }//ListElement (Refresh)
                 ListElement {
                     text: "Hide window"
                     newState: ""
-                }//ListElement (Web Page (debug))
+                }//ListElement (Hide window)
                 ListElement {
                     text: "About"
                     newState: "About"
-                }//ListElement (Web Page (debug))
+                }//ListElement (About)
             }
 
             delegate: MyButton {
@@ -180,8 +179,6 @@ Item {
                         } else {
                             container.sigLogin();
                         }
-                    } else if (text == "Web Page (debug)") {
-                        container.sigWebPage();
                     } else if (text == "Refresh") {
                         container.sigRefresh();
                     } else if (text == "Hide window") {
@@ -224,6 +221,14 @@ Item {
         onSigMsgBoxDone: container.sigMsgBoxDone(ok)
     }//Mosquitto
 
+    DbgWebWidget {
+        id: myWebWidget
+        anchors.fill: parent
+        anchors.topMargin: 2
+        opacity: 0
+        onSigBack: container.state = ''
+    }
+
     About {
         id: aboutWin
         anchors.fill: parent
@@ -252,6 +257,7 @@ Item {
             name: "Proxy"
             PropertyChanges { target: proxySettings; opacity: 1 }
             PropertyChanges { target: mqSettings; opacity: 0 }
+            PropertyChanges { target: myWebWidget; opacity: 0 }
             PropertyChanges { target: aboutWin; opacity: 0 }
             PropertyChanges { target: mainColumn; opacity: 0 }
         },
@@ -259,6 +265,15 @@ Item {
             name: "Mosquitto"
             PropertyChanges { target: proxySettings; opacity: 0 }
             PropertyChanges { target: mqSettings; opacity: 1 }
+            PropertyChanges { target: myWebWidget; opacity: 0 }
+            PropertyChanges { target: aboutWin; opacity: 0 }
+            PropertyChanges { target: mainColumn; opacity: 0 }
+        },
+        State {
+            name: "WebPage"
+            PropertyChanges { target: proxySettings; opacity: 0 }
+            PropertyChanges { target: mqSettings; opacity: 0 }
+            PropertyChanges { target: myWebWidget; opacity: 1 }
             PropertyChanges { target: aboutWin; opacity: 0 }
             PropertyChanges { target: mainColumn; opacity: 0 }
         },
@@ -266,6 +281,7 @@ Item {
             name: "About"
             PropertyChanges { target: proxySettings; opacity: 0 }
             PropertyChanges { target: mqSettings; opacity: 0 }
+            PropertyChanges { target: myWebWidget; opacity: 0 }
             PropertyChanges { target: aboutWin; opacity: 1 }
             PropertyChanges { target: mainColumn; opacity: 0 }
         }

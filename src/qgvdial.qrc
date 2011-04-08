@@ -12,6 +12,7 @@
         <file alias="ComboBoxPhones.qml">../qml/ComboBoxPhones.qml</file>
         <file alias="ContactDetails.qml">../qml/ContactDetails.qml</file>
         <file alias="ContactsList.qml">../qml/ContactsList.qml</file>
+        <file alias="DbgWebWidget.qml">../qml/DbgWebWidget.qml</file>
         <file alias="DialDisp.qml">../qml/DialDisp.qml</file>
         <file alias="DigitButton.qml">../qml/DigitButton.qml</file>
         <file alias="helper.js">../qml/helper.js</file>

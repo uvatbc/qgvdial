@@ -2,28 +2,26 @@
 #define WEBWIDGET_H
 
 #include "global.h"
+#include <QtWebKit>
 
 // For some reason the symbian MOC doesn't like it if I don't include QObject
 // even though it is present in QtCore which is included in global.h
 #include <QObject>
 
-namespace Ui {
-    class WebWidget;
-}
-
-class WebWidget : public QWidget
+class WebWidget : public QDeclarativeItem
 {
     Q_OBJECT
 
 public:
-    explicit WebWidget (QWidget *parent = 0, Qt::WindowFlags f = 0);
+    explicit WebWidget (QDeclarativeItem *parent = 0);
     ~WebWidget();
 
 private:
     void keyPressEvent (QKeyEvent *event);
 
 private:
-    Ui::WebWidget *ui;
+    QWebView *wv;
+    QGraphicsProxyWidget *proxy;
 };
 
 #endif // WEBWIDGET_H

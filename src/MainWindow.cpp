@@ -1,7 +1,4 @@
 #include "MainWindow.h"
-
-#include "LoginDialog.h"
-
 #include "PhoneNumberValidator.h"
 
 #include <QDesktopServices>
@@ -16,14 +13,12 @@ MainWindow::MainWindow (QWidget *parent)
 , pSystray (NULL)
 , oContacts (this)
 , oInbox (this)
-, pWebWidget (new WebWidget (this, Qt::Window))
 , vmailPlayer (this)
 , statusTimer (this)
 #ifdef Q_WS_MAEMO_5
 , infoBox (this)
 #endif
 , menuFile ("&File", this)
-, actViewWeb ("Show web view", this)
 , actLogin ("Login...", this)
 , actDismiss ("Dismiss", this)
 , actRefresh ("Refresh", this)
@@ -45,9 +40,6 @@ MainWindow::MainWindow (QWidget *parent)
 
     OsDependent &osd = Singletons::getRef().getOSD ();
     osd.setDefaultWindowAttributes (this);
-
-    pWebWidget->hide ();
-    osd.setDefaultWindowAttributes (pWebWidget);
 
     initQML ();
 
@@ -327,10 +319,7 @@ MainWindow::init ()
     actRefresh.setShortcut (QKeySequence(Qt::CTRL + Qt::Key_R));
     // Quit = Ctrl+Q
     actExit.setShortcut (QKeySequence(Qt::CTRL + Qt::Key_Q));
-    // Show debug webpage = Ctrl+Shift+W
-    actViewWeb.setShortcut (QKeySequence (Qt::CTRL + Qt::SHIFT + Qt::Key_W));
     // Add these actions to the window
-    menuFile.addAction (&actViewWeb);
     menuFile.addAction (&actLogin);
     menuFile.addAction (&actDismiss);
     menuFile.addAction (&actRefresh);
@@ -339,7 +328,6 @@ MainWindow::init ()
     this->addAction (&actDismiss);
     this->addAction (&actRefresh);
     this->addAction (&actExit);
-    this->addAction (&actViewWeb);
     // When the actions are triggered, do the corresponding work.
     QObject::connect (&actLogin, SIGNAL (triggered()),
                        this    , SLOT   (on_action_Login_triggered()));
@@ -349,8 +337,6 @@ MainWindow::init ()
                        this      , SLOT   (onRefresh()));
     QObject::connect (&actExit, SIGNAL (triggered()),
                        this   , SLOT   (on_actionE_xit_triggered()));
-    QObject::connect (&actViewWeb, SIGNAL (triggered ()),
-                       this      , SLOT (on_actionWeb_view_triggered ()));
 
     this->setWindowIcon (icoGoogle);
 
@@ -396,6 +382,10 @@ MainWindow::initQML ()
 {
     OsDependent &osd = Singletons::getRef().getOSD ();
     QRect rect = osd.getStartingSize ();
+
+    int webwidget_typeid =
+    qmlRegisterType<WebWidget>("org.qgvdial.WebWidget", 1, 0, "MyWebWidget");
+    qDebug() << "Init: Webwidget type ID =" << webwidget_typeid;
 
     bool bTempFalse = false;
     int iTempZero = 0;
@@ -444,8 +434,6 @@ MainWindow::initQML ()
                       this, SLOT   (doLogin ()));
     QObject::connect (gObj, SIGNAL (sigLogout ()),
                       this, SLOT   (doLogout ()));
-    QObject::connect (gObj, SIGNAL (sigWebPage ()),
-                      this, SLOT   (on_actionWeb_view_triggered ()));
     QObject::connect (gObj, SIGNAL (sigRefresh ()),
                       this, SLOT   (onRefresh ()));
     QObject::connect (gObj, SIGNAL (sigRefreshAll ()),
@@ -1333,16 +1321,6 @@ MainWindow::onSigVmailPlayback (int newstate)
         break;
     }
 }//MainWindow::onSigVmailPlayback
-
-void
-MainWindow::on_actionWeb_view_triggered ()
-{
-    if (pWebWidget->isVisible ()) {
-        pWebWidget->hide ();
-    } else {
-        pWebWidget->show ();
-    }
-}//MainWindow::on_actionWeb_view_triggered
 
 void
 MainWindow::onRegPhoneSelectionChange (int index)

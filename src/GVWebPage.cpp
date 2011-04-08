@@ -71,10 +71,6 @@ GVWebPage::loadUrlString (const QString &strUrl)
 {
     webPage.mainFrame()->load (QUrl (strUrl));
     onPageProgress (0);
-    if (NULL != webPage.view ())
-    {
-        webPage.view()->show ();
-    }
 }//GVWebPage::loadUrlString
 
 bool

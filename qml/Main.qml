@@ -27,7 +27,6 @@ Rectangle {
     signal sigPassChanged(string password)
     signal sigLogin
     signal sigLogout
-    signal sigWebPage
     signal sigRefresh
     signal sigRefreshAll
     signal sigHide
@@ -53,7 +52,6 @@ Rectangle {
     onSigLogin: console.debug("QML: Login")
     onSigLogout: console.debug("QML: Logout")
 
-    onSigWebPage: console.debug("QML: Open web page")
     onSigRefresh: console.debug("QML: Refresh requested")
     onSigRefreshAll: console.debug("QML: Refresh All requested")
 
@@ -239,7 +237,6 @@ Rectangle {
             onSigPassChanged: main.sigPassChanged(password)
             onSigLogin: main.sigLogin()
             onSigLogout: main.sigLogout()
-            onSigWebPage: main.sigWebPage()
             onSigRefresh: main.sigRefresh()
             onSigRefreshAll: main.sigRefreshAll()
             onSigHide: main.sigHide()

@@ -97,8 +97,6 @@ HEADERS  += global.h                    \
             DialContext.h               \
             ContactsParserObject.h
 
-FORMS    += WebWidget.ui
-
 RESOURCES += qgvdial.qrc
 
 # This is so that QtCreator can show these files in the files list.
@@ -108,6 +106,7 @@ OTHER_FILES  += winrsrc.rc                  \
                 ../qml/ComboBoxPhones.qml   \
                 ../qml/ContactDetails.qml   \
                 ../qml/ContactsList.qml     \
+                ../qml/DbgWebWidget.qml     \
                 ../qml/DialDisp.qml         \
                 ../qml/DigitButton.qml      \
                 ../qml/helper.js            \

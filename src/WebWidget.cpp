@@ -2,18 +2,19 @@
 #include "ui_WebWidget.h"
 #include "Singletons.h"
 
-WebWidget::WebWidget(QWidget *parent, Qt::WindowFlags f)
-: QWidget(parent, f)
-, ui(new Ui::WebWidget)
+WebWidget::WebWidget(QDeclarativeItem *parent)
+: QDeclarativeItem(parent)
+, wv (new QWebView)
+, proxy (new QGraphicsProxyWidget(this))
 {
+    proxy->setWidget(wv);
+
     GVAccess &webPage = Singletons::getRef().getGVAccess ();
-    ui->setupUi(this);
-    webPage.setView (ui->webView);
+    webPage.setView (wv);
 }//WebWidget::WebWidget
 
 WebWidget::~WebWidget()
 {
-    delete ui;
 }//WebWidget::~WebWidget
 
 void
@@ -36,7 +37,7 @@ WebWidget::keyPressEvent (QKeyEvent *event)
         // Ask for a new page input
         bool ok = false;
         QString strUrl = QInputDialog::getText(
-                            this,
+                            wv,
                             tr("Enter new URL"),
                             tr("URL:"),
                             QLineEdit::Normal,
@@ -49,10 +50,10 @@ WebWidget::keyPressEvent (QKeyEvent *event)
         }
 
         QUrl url = QUrl::fromUserInput (strUrl);
-        ui->webView->load (url);
+        wv->load (url);
     } while (0); // End cleanup block (not a loop)
 
     if (bIgnore) {
-        QWidget::keyPressEvent (event);
+        QDeclarativeItem::keyPressEvent (event);
     }
 }//WebWidget::keyPressEvent
