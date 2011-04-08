@@ -1,3 +1,1 @@
-  * Symbian needs all paths to use backslash
-  * sqlite db moved into $home/.qgvdial/qgvdial.sqlite.db for all platforms.
-  * Word wrap contact notes in QML
+  * Web widget it now embedded in QML

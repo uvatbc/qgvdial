@@ -1,5 +1,4 @@
 #include "WebWidget.h"
-#include "ui_WebWidget.h"
 #include "Singletons.h"
 
 WebWidget::WebWidget(QDeclarativeItem *parent)
@@ -37,7 +36,7 @@ WebWidget::keyPressEvent (QKeyEvent *event)
         // Ask for a new page input
         bool ok = false;
         QString strUrl = QInputDialog::getText(
-                            wv,
+                            NULL,
                             tr("Enter new URL"),
                             tr("URL:"),
                             QLineEdit::Normal,
