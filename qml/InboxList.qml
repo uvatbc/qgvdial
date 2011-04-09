@@ -78,7 +78,7 @@ Rectangle {
             }
         }//Column (Top row : Contact name and the close button)
 
-        Item {  // Number and buttons
+        Item {  // Number, buttons and text
             anchors {
                 top: detailTopRow.bottom
                 topMargin: 6
@@ -167,21 +167,38 @@ Rectangle {
                 }
             }// Row (call, text and play buttons)
 
-            Text { // sms text
-                id: theSmsText
+            Flickable {
                 anchors {
                     top: btnRow.bottom
                     left: parent.left
                 }
                 width: parent.width
-                wrapMode: Text.Wrap
+                height: parent.height - btnRow.bottom
 
-                text: container.strSmsText
+                // 1st bracket = total pixels required for the whole string
+                // 2nd bracket = number of lines of text required
+                // final computation = total height in pixels.
+                contentHeight: ((theSmsText.text.length * theSmsText.font.pixelSize) / width) * theSmsText.font.pixelSize
+                contentWidth: width
 
-                color: "white"
-                font.pixelSize: (parent.height + parent.width) / 32
-            }// Text (sms text)
-        }
+                clip: true
+                boundsBehavior: Flickable.StopAtBounds
+
+                Text { // sms text
+                    id: theSmsText
+
+                    anchors.fill: parent
+                    width: parent.width
+
+                    text: container.strSmsText
+                    wrapMode: Text.Wrap
+                    clip: true
+
+                    color: "white"
+                    font.pixelSize: (detailsView.height + detailsView.width) / 32
+                }// Text (sms text)
+            }
+        }//Item (Number, buttons and text)
     }
 
     Item { //  The combined inbox list and selector list

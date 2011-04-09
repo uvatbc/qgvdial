@@ -32,6 +32,11 @@ GVI_XMLJsonHandler::endElement (const QString & /*namespaceURI*/,
                 + "</html>";
         qDebug ("Got html characters");
 
+//        QFile temp("dump.txt");
+//        temp.open (QIODevice::ReadWrite);
+//        temp.write (strHtml.toAscii ());
+//        temp.close ();
+
         QXmlInputSource inputSource;
         inputSource.setData (strHtml);
         QXmlSimpleReader simpleReader;
@@ -183,7 +188,8 @@ GVI_XMLJsonHandler::parseJSON (const QDateTime &dtUpdate, bool &bGotOld, int &nN
             }
 
             // Pick up the text from the parsed HTML
-            if ((GVIE_TextMessage == inboxEntry.Type) &&
+            if (((GVIE_TextMessage == inboxEntry.Type) ||
+                 (GVIE_Voicemail == inboxEntry.Type)) &&
                 (smsHandler.mapTexts.contains (inboxEntry.id)))
             {
                 inboxEntry.strText = smsHandler.mapTexts[inboxEntry.id];

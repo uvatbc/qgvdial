@@ -30,7 +30,9 @@
 //Stupidity
 //#define GV_S_VALUE_DB_VER   "2011-03-09 14:26:25"
 // Added note to inbox and contacts
-#define GV_S_VALUE_DB_VER   "2011-04-04 16:30:00"
+//#define GV_S_VALUE_DB_VER   "2011-04-04 16:30:00"
+// Voicemail now has transcription
+#define GV_S_VALUE_DB_VER   "2011-04-08 17:30:00"
 ////////////////////////////// GV Contacts table ///////////////////////////////
 #define GV_CONTACTS_TABLE   "gvcontacts"
 #define GV_C_ID             "id"

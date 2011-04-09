@@ -1287,6 +1287,7 @@ MainWindow::playVmail (const QString &strFile)
         qDebug() << "Play vmail file:" << strFile << "Url =" << url;
 
         vmailPlayer.setMedia (QMediaContent(url));
+        vmailPlayer.setVolume (50);
         vmailPlayer.play();
     } while (0); // End cleanup block (not a loop)
 }//MainWindow::playVmail

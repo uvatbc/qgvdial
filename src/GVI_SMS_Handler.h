@@ -13,6 +13,9 @@ class GVI_SMS_Handler : public QObject, public QXmlDefaultHandler
 public:
     explicit GVI_SMS_Handler(QObject *parent = 0);
 
+public:
+    QMap<QString, QString> mapTexts;
+
 protected:
     bool startElement (const QString        &namespaceURI,
                        const QString        &localName   ,
@@ -32,8 +35,9 @@ private:
     quint32 uDepth;
     bool bTextStarted;
 
-public:
-    QMap<QString, QString> mapTexts;
+    bool bVmailStarted;
+    bool bVmailfragmentStarted;
+    QString strVmail;
 };
 
 #endif // GVI_SMS_HANDLER_H
