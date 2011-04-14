@@ -135,6 +135,9 @@ private slots:
     //! Invoked when the Call initiators list changes
     void onCallInitiatorsChange(bool bSave = true);
 
+    //! Invoked when the timer based cleanup of logs array is invoked
+    void onCleanupLogsArray();
+
 private:
     void initLogging ();
 
@@ -227,8 +230,11 @@ private:
     //! Map between the voice mail link and its temp file name
     QMap<QString,QString> mapVmail;
 
+    QMutex          logMutex;
     //! This holds a circular buffer of log messages that will be shown by QML
     QStringList     arrLogMsgs;
+    //! This flag indicates if timer based bleanup of logs has been requested
+    bool            bTimerBasedLogsCleanup;
 
 #if MOSQUITTO_CAPABLE
     //! This holds the thread that communicates with the mosquitto server.

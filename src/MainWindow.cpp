@@ -29,6 +29,8 @@ MainWindow::MainWindow (QWidget *parent)
 , mtxDial (QMutex::Recursive)
 , bCallInProgress (false)
 , bDialCancelled (false)
+, logMutex (QMutex::Recursive)
+, bTimerBasedLogsCleanup (false)
 #if MOSQUITTO_CAPABLE
 , mqThread (QString("qgvdial:%1").arg(QHostInfo::localHostName())
             .toLatin1().constData (), this)
@@ -120,15 +122,28 @@ MainWindow::log (const QString &strText, int level /*= 10*/)
     }
 
     // Append it to the circular buffer
+    QMutexLocker locker(&logMutex);
     arrLogMsgs.prepend (strLog);
-    if (arrLogMsgs.size () > 50) {
-        arrLogMsgs.removeLast ();
+    if ((arrLogMsgs.size () > 50) && !bTimerBasedLogsCleanup) {
+        bTimerBasedLogsCleanup = true;
+        QTimer::singleShot (3000, this, SIGNAL(onCleanupLogsArray()));
     }
     QDeclarativeContext *ctx = this->rootContext();
     if (NULL != ctx) {
         ctx->setContextProperty ("g_logModel", QVariant::fromValue(arrLogMsgs));
     }
 }//MainWindow::log
+
+void
+MainWindow::onCleanupLogsArray()
+{
+    QMutexLocker locker(&logMutex);
+    while (arrLogMsgs.size () > 50) {
+        arrLogMsgs.removeLast ();
+    }
+
+    bTimerBasedLogsCleanup = false;
+}//MainWindow::onCleanupLogsArray
 
 /** Status update function
  * Use this function to update the status. The status is shown dependent on the
