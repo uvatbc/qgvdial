@@ -12,6 +12,10 @@ Item {
         anchors.topMargin: 2
         spacing: 2
 
+        property int pixDiv: 15
+        property int pixHeight: (container.height + container.width) / 2
+        property int pixSize: pixHeight / pixDiv
+
         MyWebWidget {
             height: container.height - btnBack.height
             width: parent.width

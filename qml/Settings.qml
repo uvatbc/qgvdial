@@ -149,6 +149,10 @@ Item {
                     newState: "WebPage"
                 }//ListElement (Web Page (debug))
                 ListElement {
+                    text: "View Log (debug)"
+                    newState: "ViewLog"
+                }//ListElement (View Log (debug))
+                ListElement {
                     text: "Refresh"
                     newState: ""
                 }//ListElement (Refresh)
@@ -266,32 +270,45 @@ Item {
             PropertyChanges { target: proxySettings; opacity: 1 }
             PropertyChanges { target: mqSettings; opacity: 0 }
             PropertyChanges { target: myWebWidget; opacity: 0 }
+            PropertyChanges { target: logView; opacity: 0 }
             PropertyChanges { target: aboutWin; opacity: 0 }
             PropertyChanges { target: mainColumn; opacity: 0 }
-        },
+        },//Proxy
         State {
             name: "Mosquitto"
             PropertyChanges { target: proxySettings; opacity: 0 }
             PropertyChanges { target: mqSettings; opacity: 1 }
             PropertyChanges { target: myWebWidget; opacity: 0 }
+            PropertyChanges { target: logView; opacity: 0 }
             PropertyChanges { target: aboutWin; opacity: 0 }
             PropertyChanges { target: mainColumn; opacity: 0 }
-        },
+        },//Mosquitto
         State {
             name: "WebPage"
             PropertyChanges { target: proxySettings; opacity: 0 }
             PropertyChanges { target: mqSettings; opacity: 0 }
             PropertyChanges { target: myWebWidget; opacity: 1 }
+            PropertyChanges { target: logView; opacity: 0 }
             PropertyChanges { target: aboutWin; opacity: 0 }
             PropertyChanges { target: mainColumn; opacity: 0 }
-        },
+        },//WebPage
+        State {
+            name: "ViewLog"
+            PropertyChanges { target: proxySettings; opacity: 0 }
+            PropertyChanges { target: mqSettings; opacity: 0 }
+            PropertyChanges { target: myWebWidget; opacity: 0 }
+            PropertyChanges { target: logView; opacity: 1 }
+            PropertyChanges { target: aboutWin; opacity: 0 }
+            PropertyChanges { target: mainColumn; opacity: 0 }
+        },//WebPage
         State {
             name: "About"
             PropertyChanges { target: proxySettings; opacity: 0 }
             PropertyChanges { target: mqSettings; opacity: 0 }
             PropertyChanges { target: myWebWidget; opacity: 0 }
+            PropertyChanges { target: logView; opacity: 0 }
             PropertyChanges { target: aboutWin; opacity: 1 }
             PropertyChanges { target: mainColumn; opacity: 0 }
-        }
+        }//About
     ]
 }// Item (container)

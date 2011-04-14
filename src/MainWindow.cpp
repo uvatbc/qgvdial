@@ -120,12 +120,14 @@ MainWindow::log (const QString &strText, int level /*= 10*/)
     }
 
     // Append it to the circular buffer
-    arrLogMsgs += strLog;
+    arrLogMsgs.prepend (strLog);
     if (arrLogMsgs.size () > 50) {
-        arrLogMsgs.removeAt (0);
+        arrLogMsgs.removeLast ();
     }
     QDeclarativeContext *ctx = this->rootContext();
-    ctx->setContextProperty ("g_logModel", QVariant::fromValue(arrLogMsgs));
+    if (NULL != ctx) {
+        ctx->setContextProperty ("g_logModel", QVariant::fromValue(arrLogMsgs));
+    }
 }//MainWindow::log
 
 /** Status update function
