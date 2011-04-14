@@ -219,7 +219,7 @@ Q_DECLARE_METATYPE(ContactInfo)
 #define TELEPATHY_CAPABLE 0
 #endif
 
-#if DESKTOP_OS || defined(Q_WS_MAEMO_5)
+#if DESKTOP_OS || defined(Q_WS_MAEMO_5) || defined(Q_OS_SYMBIAN)
 #define MOSQUITTO_CAPABLE 1
 #else
 #define MOSQUITTO_CAPABLE 0
