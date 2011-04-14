@@ -118,6 +118,14 @@ MainWindow::log (const QString &strText, int level /*= 10*/)
         QTextStream streamLog(&fLogfile);
         streamLog << strLog << endl;
     }
+
+    // Append it to the circular buffer
+    arrLogMsgs += strLog;
+    if (arrLogMsgs.size () > 50) {
+        arrLogMsgs.removeAt (0);
+    }
+    QDeclarativeContext *ctx = this->rootContext();
+    ctx->setContextProperty ("g_logModel", QVariant::fromValue(arrLogMsgs));
 }//MainWindow::log
 
 /** Status update function
@@ -402,6 +410,7 @@ MainWindow::initQML ()
     ctx->setContextProperty ("g_strMsgText", "No message");
     ctx->setContextProperty ("g_CurrentPhoneName", "Not loaded");
     ctx->setContextProperty ("g_vmailPlayerState", iTempZero);
+    ctx->setContextProperty ("g_logModel", QVariant::fromValue(arrLogMsgs));
 
     // Initialize the QML view
     this->setSource (QUrl ("qrc:/Main.qml"));

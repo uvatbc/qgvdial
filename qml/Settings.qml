@@ -229,6 +229,14 @@ Item {
         onSigBack: container.state = ''
     }
 
+    LogView {
+        id: logView
+        anchors.fill: parent
+        anchors.topMargin: 2
+        opacity: 0
+        onSigBack: container.state = ''
+    }
+
     About {
         id: aboutWin
         anchors.fill: parent

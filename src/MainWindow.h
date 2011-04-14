@@ -227,6 +227,9 @@ private:
     //! Map between the voice mail link and its temp file name
     QMap<QString,QString> mapVmail;
 
+    //! This holds a circular buffer of log messages that will be shown by QML
+    QStringList     arrLogMsgs;
+
 #if MOSQUITTO_CAPABLE
     //! This holds the thread that communicates with the mosquitto server.
     MqClientThread  mqThread;

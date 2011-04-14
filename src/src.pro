@@ -112,6 +112,7 @@ OTHER_FILES  += winrsrc.rc                  \
                 ../qml/helper.js            \
                 ../qml/InboxList.qml        \
                 ../qml/Keypad.qml           \
+                ../qml/LogView.qml          \
                 ../qml/MainButtons.qml      \
                 ../qml/Main.qml             \
                 ../qml/MainView.qml         \
