@@ -233,8 +233,8 @@ private:
     QMutex          logMutex;
     //! This holds a circular buffer of log messages that will be shown by QML
     QStringList     arrLogMsgs;
-    //! This flag indicates if timer based bleanup of logs has been requested
-    bool            bTimerBasedLogsCleanup;
+    //! Logs display timer
+    QTimer          logsTimer;
 
 #if MOSQUITTO_CAPABLE
     //! This holds the thread that communicates with the mosquitto server.

@@ -30,7 +30,7 @@ MainWindow::MainWindow (QWidget *parent)
 , bCallInProgress (false)
 , bDialCancelled (false)
 , logMutex (QMutex::Recursive)
-, bTimerBasedLogsCleanup (false)
+, logsTimer (this)
 #if MOSQUITTO_CAPABLE
 , mqThread (QString("qgvdial:%1").arg(QHostInfo::localHostName())
             .toLatin1().constData (), this)
@@ -87,6 +87,10 @@ MainWindow::initLogging ()
     strLogfile += "qgvdial.log";
     fLogfile.setFileName (strLogfile);
     fLogfile.open (QIODevice::WriteOnly | QIODevice::Append);
+
+    logsTimer.setSingleShot (true);
+    QObject::connect (&logsTimer, SIGNAL(timeout()),
+                       this     , SLOT(onCleanupLogsArray()));
 }//MainWindow::initLogging
 
 /** Log information to console and to log file
@@ -124,13 +128,8 @@ MainWindow::log (const QString &strText, int level /*= 10*/)
     // Append it to the circular buffer
     QMutexLocker locker(&logMutex);
     arrLogMsgs.prepend (strLog);
-    if ((arrLogMsgs.size () > 50) && !bTimerBasedLogsCleanup) {
-        bTimerBasedLogsCleanup = true;
-        QTimer::singleShot (3000, this, SIGNAL(onCleanupLogsArray()));
-    }
-    QDeclarativeContext *ctx = this->rootContext();
-    if (NULL != ctx) {
-        ctx->setContextProperty ("g_logModel", QVariant::fromValue(arrLogMsgs));
+    if (!logsTimer.isActive ()) {
+        logsTimer.start (1 * 1000);
     }
 }//MainWindow::log
 
@@ -142,7 +141,10 @@ MainWindow::onCleanupLogsArray()
         arrLogMsgs.removeLast ();
     }
 
-    bTimerBasedLogsCleanup = false;
+    QDeclarativeContext *ctx = this->rootContext();
+    if (NULL != ctx) {
+        ctx->setContextProperty ("g_logModel", QVariant::fromValue(arrLogMsgs));
+    }
 }//MainWindow::onCleanupLogsArray
 
 /** Status update function
