@@ -26,20 +26,31 @@ Item {
         }//Text (version)
 
         Text {
-            text: "Project <a href=http://www.code.google.com/p/qgvdial>homepage</a>"
+            text: "<a href=http://www.code.google.com/p/qgvdial>Project homepage</a>"
             width: parent.width
+            horizontalAlignment: Text.AlignHCenter
             font.pixelSize: mainColumn.pixSize
             color: "white"
             onLinkActivated: container.sigLinkActivated(link)
         }//Text (homepage)
 
         Text {
-            text: "Project <a href=http://code.google.com/p/qgvdial/wiki/Changelog>changelog</a>"
+            text: "<a href=http://code.google.com/p/qgvdial/wiki/Changelog>Changelog</a>"
             width: parent.width
+            horizontalAlignment: Text.AlignHCenter
             font.pixelSize: mainColumn.pixSize
             color: "white"
             onLinkActivated: container.sigLinkActivated(link)
-        }//Text (homepage)
+        }//Text (Changelog)
+
+        Text {
+            text: "<a href=http://code.google.com/p/qgvdial/w/list>Wiki</a>"
+            width: parent.width
+            horizontalAlignment: Text.AlignHCenter
+            font.pixelSize: mainColumn.pixSize
+            color: "white"
+            onLinkActivated: container.sigLinkActivated(link)
+        }//Text (wiki)
 
         MyButton {
             mainText: "Back"
