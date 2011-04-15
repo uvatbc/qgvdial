@@ -160,18 +160,8 @@ MqClientThread::run ()
             break;
         }
 
-        QHostInfo hInfo = QHostInfo::fromName (strHost);
-        if (hInfo.addresses ().length () == 0) {
-            qWarning() << "Mq thread: Host lookup for"
-                       << strHost
-                       << "failed. Terminating thread.";
-            break;
-        }
-        QString strFirst = hInfo.addresses().first().toString();
-
-        qDebug() << "Mq thread: Attempting to connect to" << strHost
-                 << "at" << strFirst;
-        rv = this->mq_connect (strFirst.toLatin1().constData ());
+        qDebug() << "Mq thread: Attempting to connect to" << strHost;
+        rv = this->mq_connect (strHost.toLatin1().constData ());
         if (0 != rv) {
             qWarning() << "Mq thread: Failed to connect. Error =" << rv;
             emit status ("Failed to connect to Mosquitto server");

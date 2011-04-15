@@ -31,6 +31,7 @@ MainWindow::MainWindow (QWidget *parent)
 , bDialCancelled (false)
 , logMutex (QMutex::Recursive)
 , logsTimer (this)
+, bKickLocksTimer (false)
 #if MOSQUITTO_CAPABLE
 , mqThread (QString("qgvdial:%1").arg(QHostInfo::localHostName())
             .toLatin1().constData (), this)
@@ -89,6 +90,7 @@ MainWindow::initLogging ()
     fLogfile.open (QIODevice::WriteOnly | QIODevice::Append);
 
     logsTimer.setSingleShot (true);
+    logsTimer.start (3 * 1000);
     QObject::connect (&logsTimer, SIGNAL(timeout()),
                        this     , SLOT(onCleanupLogsArray()));
 }//MainWindow::initLogging
@@ -128,23 +130,28 @@ MainWindow::log (const QString &strText, int level /*= 10*/)
     // Append it to the circular buffer
     QMutexLocker locker(&logMutex);
     arrLogMsgs.prepend (strLog);
-    if (!logsTimer.isActive ()) {
-        logsTimer.start (1 * 1000);
-    }
+    bKickLocksTimer = true;
 }//MainWindow::log
 
 void
 MainWindow::onCleanupLogsArray()
 {
-    QMutexLocker locker(&logMutex);
-    while (arrLogMsgs.size () > 50) {
-        arrLogMsgs.removeLast ();
-    }
+    do { // Begin cleanup block (not a loop)
+        QMutexLocker locker(&logMutex);
+        if (!bKickLocksTimer) {
+            break;
+        }
+        bKickLocksTimer = false;
 
-    QDeclarativeContext *ctx = this->rootContext();
-    if (NULL != ctx) {
+        while (arrLogMsgs.size () > 50) {
+            arrLogMsgs.removeLast ();
+        }
+
+        QDeclarativeContext *ctx = this->rootContext();
         ctx->setContextProperty ("g_logModel", QVariant::fromValue(arrLogMsgs));
-    }
+    } while (0); // End cleanup block (not a loop)
+
+    logsTimer.start (3 * 1000);
 }//MainWindow::onCleanupLogsArray
 
 /** Status update function

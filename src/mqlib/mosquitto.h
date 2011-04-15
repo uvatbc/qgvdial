@@ -46,10 +46,10 @@ extern "C" {
 
 #ifdef WIN32
 #	if _MSC_VER < 1600
-		typedef unsigned char uint8_t;
-		typedef unsigned short uint16_t;
-		typedef unsigned int uint32_t;
-		typedef unsigned long long uint64_t;
+        typedef unsigned char uint8_t;
+        typedef unsigned short uint16_t;
+        typedef unsigned int uint32_t;
+        typedef unsigned long long uint64_t;
 #	else
 #		include <stdint.h>
 #	endif
@@ -92,19 +92,19 @@ extern "C" {
 #define MOSQ_ERR_CONN_LOST 7
 
 struct mosquitto_message{
-	uint16_t mid;
-	char *topic;
-	uint8_t *payload;
-	uint32_t payloadlen;
-	int qos;
-	bool retain;
+    uint16_t mid;
+    char *topic;
+    uint8_t *payload;
+    uint32_t payloadlen;
+    int qos;
+    bool retain;
 };
 
 struct mosquitto;
 
 /***************************************************
  * Important note
- * 
+ *
  * The following functions that deal with network operations will return 0 on
  * success, but this does not mean that the operation has taken place. Rather,
  * the appropriate messages will have been queued and will be completed when
@@ -193,7 +193,7 @@ libmosq_EXPORT int mosquitto_username_pw_set(struct mosquitto *mosq, const char 
 
 libmosq_EXPORT int mosquitto_connect(struct mosquitto *mosq, const char *host, int port, int keepalive, bool clean_session);
 /* Connect to an MQTT broker.
- * 
+ *
  * mosq :          a valid mosquitto instance
  * host :          the hostname or ip address of the broker to connect to
  * port :          the network port to connect to. Usually 1883.
@@ -209,7 +209,7 @@ libmosq_EXPORT int mosquitto_connect(struct mosquitto *mosq, const char *host, i
 
 libmosq_EXPORT int mosquitto_disconnect(struct mosquitto *mosq);
 /* Disconnect from the broker.
- * 
+ *
  * mosq : a valid mosquitto instance
  *
  * Returns 0 on success, 1 on failure.
@@ -217,7 +217,7 @@ libmosq_EXPORT int mosquitto_disconnect(struct mosquitto *mosq);
 
 libmosq_EXPORT int mosquitto_publish(struct mosquitto *mosq, uint16_t *mid, const char *topic, uint32_t payloadlen, const uint8_t *payload, int qos, bool retain);
 /* Publish a message
- * 
+ *
  * mosq :       a valid mosquitto instance
  * mid :        pointer to a uint16_t. If not NULL, the function will set this
  *              to the message id of this particular message. This can be then
@@ -240,7 +240,7 @@ libmosq_EXPORT int mosquitto_publish(struct mosquitto *mosq, uint16_t *mid, cons
 
 libmosq_EXPORT int mosquitto_subscribe(struct mosquitto *mosq, uint16_t *mid, const char *sub, int qos);
 /* Subscribe to a topic
- * 
+ *
  * mosq : a valid mosquitto instance
  * mid :        pointer to a uint16_t. If not NULL, the function will set this
  *              to the message id of this particular message. This can be then
@@ -254,7 +254,7 @@ libmosq_EXPORT int mosquitto_subscribe(struct mosquitto *mosq, uint16_t *mid, co
 
 libmosq_EXPORT int mosquitto_unsubscribe(struct mosquitto *mosq, uint16_t *mid, const char *sub);
 /* Unsubscribe from a topic
- * 
+ *
  * mosq : a valid mosquitto instance
  * mid :        pointer to a uint16_t. If not NULL, the function will set this
  *              to the message id of this particular message. This can be then
@@ -340,7 +340,7 @@ libmosq_EXPORT void mosquitto_connect_callback_set(struct mosquitto *mosq, void 
 /* Set the connect callback. This is called when the broker sends a CONNACK
  * message in response to a connection.
  * The callback function should be in the following form:
- * 
+ *
  * void callback(void *obj, int rc)
  *
  * obj : the user data provided to mosquitto_new().
@@ -351,23 +351,23 @@ libmosq_EXPORT void mosquitto_connect_callback_set(struct mosquitto *mosq, void 
  *       3 : connection refused (broker unavailable)
  *       4-255 : reserved for future use
  */
- 
+
 libmosq_EXPORT void mosquitto_disconnect_callback_set(struct mosquitto *mosq, void (*on_disconnect)(void *));
 /* Set the disconnect callback. This is called when the broker has received the
  * DISCONNECT command and has disconnected.
  *
  * The callback function should be in the following form:
- * 
+ *
  * void callback(void *obj)
  *
  * obj : the user data provided to mosquitto_new().
  */
- 
+
 libmosq_EXPORT void mosquitto_publish_callback_set(struct mosquitto *mosq, void (*on_publish)(void *, uint16_t));
 /* Set the publish callback. This is called when a message initiated with
  * mosquitto_publish() has been sent to the broker successfully.
  * The callback function should be in the following form:
- * 
+ *
  * void callback(void *obj, uint16_t mid)
  *
  * obj : the user data provided to mosquitto_new().
@@ -378,7 +378,7 @@ libmosq_EXPORT void mosquitto_message_callback_set(struct mosquitto *mosq, void 
 /* Set the message callback. This is called when a message is received from the
  * broker.
  * The callback function should be in the following form:
- * 
+ *
  * void callback(void *obj, const struct mosquitto_message *message)
  *
  * obj :     the user data provided to mosquitto_new().
@@ -386,14 +386,14 @@ libmosq_EXPORT void mosquitto_message_callback_set(struct mosquitto *mosq, void 
  *
  * The message variable and associated memory will be free'd by the library
  * after the callback has run. The client should make copies of any of the data
- * it requires. 
+ * it requires.
  */
 
 libmosq_EXPORT void mosquitto_subscribe_callback_set(struct mosquitto *mosq, void (*on_subscribe)(void *, uint16_t, int, const uint8_t *));
 /* Set the subscribe callback. This is called when the broker responds to a
  * subscription request.
  * The callback function should be in the following form:
- * 
+ *
  * void callback(void *obj, uint16_t mid, int qos_count, const uint8_t *granted_qos)
  *
  * obj :         the user data provided to mosquitto_new().
@@ -407,7 +407,7 @@ libmosq_EXPORT void mosquitto_unsubscribe_callback_set(struct mosquitto *mosq, v
 /* Set the unsubscribe callback. This is called when the broker responds to an
  * unsubscription request.
  * The callback function should be in the following form:
- * 
+ *
  * void callback(void *obj, uint16_t mid)
  *
  * obj : the user data provided to mosquitto_new().
@@ -423,6 +423,8 @@ libmosq_EXPORT void mosquitto_message_retry_set(struct mosquitto *mosq, unsigned
  * message_retry : the number of seconds to wait for a response before
  *                 retrying. Defaults to 60.
  */
+
+int mq_get_error(char **str);
 
 #ifdef __cplusplus
 }

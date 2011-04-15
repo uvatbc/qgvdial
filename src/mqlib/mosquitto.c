@@ -56,6 +56,9 @@ typedef int ssize_t;
 #define ECONNRESET 104
 #endif
 
+char *errStr = NULL;
+int iErr;
+
 void mosquitto_lib_version(int *major, int *minor, int *revision)
 {
     if(major) *major = LIBMOSQUITTO_MAJOR;
@@ -681,3 +684,8 @@ void mosquitto_unsubscribe_callback_set(struct mosquitto *mosq, void (*on_unsubs
     mosq->on_unsubscribe = on_unsubscribe;
 }
 
+int mq_get_error(char **str)
+{
+    *str = errStr;
+    return iErr;
+}

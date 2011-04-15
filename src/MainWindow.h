@@ -235,6 +235,8 @@ private:
     QStringList     arrLogMsgs;
     //! Logs display timer
     QTimer          logsTimer;
+    //! kick timer
+    bool            bKickLocksTimer;
 
 #if MOSQUITTO_CAPABLE
     //! This holds the thread that communicates with the mosquitto server.

@@ -47,6 +47,9 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <memory_mosq.h>
 #include <net_mosq.h>
 
+extern char *errStr;
+extern int iErr;
+
 void _mosquitto_packet_cleanup(struct _mosquitto_packet *packet)
 {
     if(!packet) return;
@@ -118,6 +121,7 @@ int _mosquitto_socket_connect(const char *host, uint16_t port)
     uint32_t val = 1;
 #endif
 
+    errStr = "host or port is NULL";
     if(!host || !port) return INVALID_SOCKET;
 
     memset(&hints, 0, sizeof(struct addrinfo));
@@ -126,6 +130,7 @@ int _mosquitto_socket_connect(const char *host, uint16_t port)
     hints.ai_socktype = SOCK_STREAM;
 
     s = getaddrinfo(host, NULL, &hints, &ainfo);
+    errStr = "getaddrinfo failed";
     if(s) return INVALID_SOCKET;
 
     for(rp = ainfo; rp != NULL; rp = rp->ai_next){
@@ -143,17 +148,21 @@ int _mosquitto_socket_connect(const char *host, uint16_t port)
 #else
             closesocket(sock);
 #endif
+            errStr = "Invalid ai_family";
             return INVALID_SOCKET;
         }
         if(connect(sock, rp->ai_addr, rp->ai_addrlen) != -1){
             break;
         }
 
+        iErr = errno;
+
 #ifndef WIN32
         close(sock);
 #else
         closesocket(sock);
 #endif
+        errStr = "connect failed";
         return INVALID_SOCKET;
     }
     if(!rp){
@@ -163,6 +172,7 @@ int _mosquitto_socket_connect(const char *host, uint16_t port)
 #else
         closesocket(sock);
 #endif
+        errStr = strerror(errno);
         return INVALID_SOCKET;
     }
     freeaddrinfo(ainfo);
@@ -172,15 +182,18 @@ int _mosquitto_socket_connect(const char *host, uint16_t port)
     opt = fcntl(sock, F_GETFL, 0);
     if(opt == -1 || fcntl(sock, F_SETFL, opt | O_NONBLOCK) == -1){
         close(sock);
+        errStr = "fcntl failed";
         return INVALID_SOCKET;
     }
 #else
     if(ioctlsocket(sock, FIONBIO, &val)){
         closesocket(sock);
+        errStr = "ioctlsocket failed";
         return INVALID_SOCKET;
     }
 #endif
 
+    errStr = NULL;
     return sock;
 }
 
