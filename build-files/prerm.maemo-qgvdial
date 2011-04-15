@@ -1,0 +1,2 @@
+#!/bin/sh
+run-standalone.sh /opt/qgvdial/bin/qgvdial quit

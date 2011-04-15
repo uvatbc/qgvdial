@@ -1,0 +1,3 @@
+#!/bin/sh
+chmod +x /opt/qgvdial/bin/qgvdial
+rm -f /home/user/.qgvdial/*.log

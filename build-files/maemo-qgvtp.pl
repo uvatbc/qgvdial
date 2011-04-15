@@ -61,16 +61,12 @@ $cmd = "cd $basedir ; $mad qmake && echo y | $mad dh_make --createorig --single 
 system($cmd);
 
 # Add a post install file to add the executable bit after installation on the device
-system("mv $basedir/build-files/postinst.maemo $basedir/debian/postinst");
-system("mv $basedir/build-files/prerm.maemo $basedir/debian/prerm");
+system("mv $basedir/build-files/postinst.maemo-qgvtp $basedir/debian/postinst");
+system("mv $basedir/build-files/prerm.maemo-qgvtp $basedir/debian/prerm");
 # Fix the control file
-system("mv $basedir/build-files/control.maemo $basedir/debian/control");
+system("mv $basedir/build-files/control.maemo-qgvtp $basedir/debian/control");
 # Fix the dbus service file name
-system("mv $basedir/build-files/qgvdial.Call.service.maemo $basedir/build-files/qgvdial.Call.service");
-system("mv $basedir/build-files/qgvdial.Text.service.maemo $basedir/build-files/qgvdial.Text.service");
 system("mv $basedir/qgv-tp/data/org.freedesktop.Telepathy.ConnectionManager.qgvtp.service.maemo $basedir/qgv-tp/data/org.freedesktop.Telepathy.ConnectionManager.qgvtp.service");
-# Change the name of the desktop file so that it can be directly used in the compilation
-system("mv $basedir/build-files/qgvdial.desktop.maemo $basedir/build-files/qgvdial.desktop");
 
 system("head -1 $basedir/debian/changelog >dest.txt ; cat $basedir/build-files/changelog >>dest.txt ; tail -2 $basedir/debian/changelog | head -1 | sed 's/unknown/Yuvraaj Kelkar/g' >>dest.txt ; mv dest.txt $basedir/debian/changelog");
 
@@ -107,9 +103,9 @@ if ($machine eq "arm") {
 system($cmd);
 
 if ($machine ne "arm") {
-    $cmd = "dput -f fremantle-upload qgvdial*.changes";
+    $cmd = "dput -f fremantle-upload qgvtp*.changes";
 } else {
-    $cmd = "dput -f fremantle-extras-builder qgvdial*.changes";
+    $cmd = "dput -f fremantle-extras-builder qgvtp*.changes";
 }
 system($cmd);
 

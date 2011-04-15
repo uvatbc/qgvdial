@@ -1,0 +1,14 @@
+Source: qgvtp
+Section: user/network
+Priority: extra
+Maintainer: Yuvraaj <yuvraaj@gmail.com>
+Build-Depends: debhelper (>= 5), libqt4-dev, libtelepathy-qt4-dev, libqtm-dev, qgvdial (>= 0.2.482)
+Standards-Version: 3.7.3
+Homepage: http://code.google.com/p/qgvdial/
+XSBC-Bugtracker: http://code.google.com/p/qgvdial/issues/list
+
+Package: qgvtp
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, qgvdial (>= 0.2.482)
+Description: Telepathy plugin for qgvdial.
+ This component has been split from qgvdial.
