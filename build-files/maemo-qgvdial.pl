@@ -74,11 +74,11 @@ system("mv $basedir/build-files/qgvdial.Text.service.maemo $basedir/build-files/
 # Change the name of the desktop file so that it can be directly used in the compilation
 system("mv $basedir/build-files/qgvdial.desktop.maemo $basedir/build-files/qgvdial.desktop");
 
-system("head -1 $basedir/debian/changelog >dest.txt ; cat $basedir/build-files/changelog >>dest.txt ; tail -2 $basedir/debian/changelog | head -1 | sed 's/unknown/Yuvraaj Kelkar/g' >>dest.txt ; mv dest.txt $basedir/debian/changelog");
+system("head -1 $basedir/debian/changelog >dest.txt ; cat $basedir/build-files/changelog.qgvdial >>dest.txt ; tail -2 $basedir/debian/changelog | head -1 | sed 's/unknown/Yuvraaj Kelkar/g' >>dest.txt ; mv dest.txt $basedir/debian/changelog");
 
 if ($machine eq "arm") {
     # Make sure all make files are present before mucking with them.
-    system("cd $basedir ; make src/Makefile qgv-tp/Makefile qgv-util/Makefile");
+    system("cd $basedir ; make src/Makefile");
 
     # Strip out "/targets/FREMANTLE_ARMEL/"
     $cmd="sed 's/\\/targets\\/FREMANTLE_ARMEL//g' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/\\/targets\\/FREMANTLE_ARMEL//g' $basedir/qgv-tp/Makefile >$basedir/qgv-tp/Makefile1 ; mv $basedir/qgv-tp/Makefile1 $basedir/qgv-tp/Makefile ; sed 's/\\/targets\\/FREMANTLE_ARMEL//g' $basedir/qgv-util/Makefile >$basedir/qgv-util/Makefile1 ; mv $basedir/qgv-util/Makefile1 $basedir/qgv-util/Makefile ; sed 's/\\/targets\\/FREMANTLE_ARMEL//g' $basedir/src/Makefile >$basedir/src/Makefile1 ; mv $basedir/src/Makefile1 $basedir/src/Makefile";
