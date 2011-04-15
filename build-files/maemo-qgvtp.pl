@@ -33,10 +33,10 @@ $svnver =~ m/^r(\d+)*/;
 $svnver = $1;
 # Create the version suffix
 $qver = "$qver.$svnver";
-my $basedir = "./qgvdial-$qver";
+my $basedir = "./qgvtp-$qver";
 
 # Delete any previous checkout directories
-system("rm -rf qgvdial*");
+system("rm -rf qgvdial* qgvtp*");
 $cmd = "svn export $repo $basedir";
 system($cmd);
 system("cp $basedir/icons/Google.png $basedir/src/qgvdial.png");
@@ -55,6 +55,9 @@ system($cmd);
 $cmd = "cd $basedir ; perl ./build-files/fixqml.pl ./qml";
 print "$cmd\n";
 system($cmd);
+
+# Copy the correct pro file
+system("cp $basedir/build-files/pro.qgvtp $basedir/qgvdial.pro");
 
 # Do everything upto the preparation of the debian directory. Code is still not compiled.
 $cmd = "cd $basedir ; $mad qmake && echo y | $mad dh_make --createorig --single -e yuvraaj\@gmail.com -c lgpl && $mad qmake";
@@ -84,7 +87,7 @@ if ($machine eq "arm") {
     $cmd =~ s/\//\\\//g;
 
     # Replace hard coded current directory with relative directory.
-    $cmd="sed 's/$cmd\\/qgvdial-$qver/../g' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/$cmd\\/qgvdial-$qver/../g' $basedir/qgv-tp/Makefile >$basedir/qgv-tp/Makefile1 ; mv $basedir/qgv-tp/Makefile1 $basedir/qgv-tp/Makefile ; sed 's/$cmd\\/qgvdial-$qver/../g' $basedir/qgv-util/Makefile >$basedir/qgv-util/Makefile1 ; mv $basedir/qgv-util/Makefile1 $basedir/qgv-util/Makefile ; sed 's/$cmd\\/qgvdial-$qver/../g' $basedir/src/Makefile >$basedir/src/Makefile1 ; mv $basedir/src/Makefile1 $basedir/src/Makefile";
+    $cmd="sed 's/$cmd\\/qgvtp-$qver/../g' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/$cmd\\/qgvtp-$qver/../g' $basedir/qgv-tp/Makefile >$basedir/qgv-tp/Makefile1 ; mv $basedir/qgv-tp/Makefile1 $basedir/qgv-tp/Makefile ; sed 's/$cmd\\/qgvtp-$qver/../g' $basedir/qgv-util/Makefile >$basedir/qgv-util/Makefile1 ; mv $basedir/qgv-util/Makefile1 $basedir/qgv-util/Makefile ; sed 's/$cmd\\/qgvtp-$qver/../g' $basedir/src/Makefile >$basedir/src/Makefile1 ; mv $basedir/src/Makefile1 $basedir/src/Makefile";
     print "$cmd\n";
     system($cmd);
 

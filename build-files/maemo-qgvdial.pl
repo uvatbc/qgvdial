@@ -56,6 +56,9 @@ $cmd = "cd $basedir ; perl ./build-files/fixqml.pl ./qml";
 print "$cmd\n";
 system($cmd);
 
+# Copy the correct pro file
+system("cp $basedir/build-files/pro.qgvdial $basedir/qgvdial.pro");
+
 # Do everything upto the preparation of the debian directory. Code is still not compiled.
 $cmd = "cd $basedir ; $mad qmake && echo y | $mad dh_make --createorig --single -e yuvraaj\@gmail.com -c lgpl && $mad qmake";
 system($cmd);
