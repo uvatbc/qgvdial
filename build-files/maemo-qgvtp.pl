@@ -78,7 +78,7 @@ if ($machine eq "arm") {
     system("cd $basedir ; make qgv-tp/Makefile qgv-util/Makefile");
 
     # Strip out "/targets/FREMANTLE_ARMEL/"
-    $cmd="sed 's/\\/targets\\/FREMANTLE_ARMEL//g' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/\\/targets\\/FREMANTLE_ARMEL//g' $basedir/qgv-tp/Makefile >$basedir/qgv-tp/Makefile1 ; mv $basedir/qgv-tp/Makefile1 $basedir/qgv-tp/Makefile ; sed 's/\\/targets\\/FREMANTLE_ARMEL//g' $basedir/qgv-util/Makefile >$basedir/qgv-util/Makefile1 ; mv $basedir/qgv-util/Makefile1 $basedir/qgv-util/Makefile ; sed 's/\\/targets\\/FREMANTLE_ARMEL//g' $basedir/src/Makefile >$basedir/src/Makefile1 ; mv $basedir/src/Makefile1 $basedir/src/Makefile";
+    $cmd="sed 's/\\/targets\\/FREMANTLE_ARMEL//g' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/\\/targets\\/FREMANTLE_ARMEL//g' $basedir/qgv-tp/Makefile >$basedir/qgv-tp/Makefile1 ; mv $basedir/qgv-tp/Makefile1 $basedir/qgv-tp/Makefile ; sed 's/\\/targets\\/FREMANTLE_ARMEL//g' $basedir/qgv-util/Makefile >$basedir/qgv-util/Makefile1 ; mv $basedir/qgv-util/Makefile1 $basedir/qgv-util/Makefile";
     print "$cmd\n";
     system($cmd);
 
@@ -87,12 +87,12 @@ if ($machine eq "arm") {
     $cmd =~ s/\//\\\//g;
 
     # Replace hard coded current directory with relative directory.
-    $cmd="sed 's/$cmd\\/qgvtp-$qver/../g' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/$cmd\\/qgvtp-$qver/../g' $basedir/qgv-tp/Makefile >$basedir/qgv-tp/Makefile1 ; mv $basedir/qgv-tp/Makefile1 $basedir/qgv-tp/Makefile ; sed 's/$cmd\\/qgvtp-$qver/../g' $basedir/qgv-util/Makefile >$basedir/qgv-util/Makefile1 ; mv $basedir/qgv-util/Makefile1 $basedir/qgv-util/Makefile ; sed 's/$cmd\\/qgvtp-$qver/../g' $basedir/src/Makefile >$basedir/src/Makefile1 ; mv $basedir/src/Makefile1 $basedir/src/Makefile";
+    $cmd="sed 's/$cmd\\/qgvtp-$qver/../g' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/$cmd\\/qgvtp-$qver/../g' $basedir/qgv-tp/Makefile >$basedir/qgv-tp/Makefile1 ; mv $basedir/qgv-tp/Makefile1 $basedir/qgv-tp/Makefile ; sed 's/$cmd\\/qgvtp-$qver/../g' $basedir/qgv-util/Makefile >$basedir/qgv-util/Makefile1 ; mv $basedir/qgv-util/Makefile1 $basedir/qgv-util/Makefile";
     print "$cmd\n";
     system($cmd);
 
     # Remove the GLESv2 dependency
-    $cmd="sed 's/ -lGLESv2//g' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/ -lGLESv2//g' $basedir/qgv-tp/Makefile >$basedir/qgv-tp/Makefile1 ; mv $basedir/qgv-tp/Makefile1 $basedir/qgv-tp/Makefile ; sed 's/ -lGLESv2//g' $basedir/qgv-util/Makefile >$basedir/qgv-util/Makefile1 ; mv $basedir/qgv-util/Makefile1 $basedir/qgv-util/Makefile ; sed 's/ -lGLESv2//g' $basedir/src/Makefile >$basedir/src/Makefile1 ; mv $basedir/src/Makefile1 $basedir/src/Makefile";
+    $cmd="sed 's/ -lGLESv2//g' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/ -lGLESv2//g' $basedir/qgv-tp/Makefile >$basedir/qgv-tp/Makefile1 ; mv $basedir/qgv-tp/Makefile1 $basedir/qgv-tp/Makefile ; sed 's/ -lGLESv2//g' $basedir/qgv-util/Makefile >$basedir/qgv-util/Makefile1 ; mv $basedir/qgv-util/Makefile1 $basedir/qgv-util/Makefile";
     print "$cmd\n";
     system($cmd);
 
