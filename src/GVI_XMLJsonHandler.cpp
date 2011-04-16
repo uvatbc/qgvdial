@@ -25,17 +25,27 @@ GVI_XMLJsonHandler::endElement (const QString & /*namespaceURI*/,
     if (localName == "json") {
         strJson = strChars;
         qDebug ("Got json characters");
+
+#if 0
+        QFile temp("dump.txt");
+        temp.open (QIODevice::ReadWrite);
+        temp.write (strJson.toAscii ());
+        temp.close ();
+#endif
     }
+
     if (localName == "html") {
         strHtml = "<html>"
                 + strChars
                 + "</html>";
         qDebug ("Got html characters");
 
-//        QFile temp("dump.txt");
-//        temp.open (QIODevice::ReadWrite);
-//        temp.write (strHtml.toAscii ());
-//        temp.close ();
+#if 0
+        QFile temp("dump.txt");
+        temp.open (QIODevice::ReadWrite);
+        temp.write (strHtml.toAscii ());
+        temp.close ();
+#endif
 
         QXmlInputSource inputSource;
         inputSource.setData (strHtml);
