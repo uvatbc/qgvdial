@@ -32,7 +32,9 @@
 // Added note to inbox and contacts
 //#define GV_S_VALUE_DB_VER   "2011-04-04 16:30:00"
 // Voicemail now has transcription
-#define GV_S_VALUE_DB_VER   "2011-04-08 17:30:00"
+//#define GV_S_VALUE_DB_VER   "2011-04-08 17:30:00"
+// Encryption introduced into qgvdial
+#define GV_S_VALUE_DB_VER   "2011-04-18 11:20:00"
 ////////////////////////////// GV Contacts table ///////////////////////////////
 #define GV_CONTACTS_TABLE   "gvcontacts"
 #define GV_C_ID             "id"
@@ -314,6 +316,8 @@ CacheDatabase::refreshContactsModel (ContactsModel *modelContacts)
 bool
 CacheDatabase::getUserPass (QString &strUser, QString &strPass)
 {
+    QByteArray byD1, byD2;
+    OsDependent &osd = Singletons::getRef().getOSD ();
     QString strResult;
     bool bGotUser = false;
     QSqlQuery query(dbMain);
@@ -323,7 +327,9 @@ CacheDatabase::getUserPass (QString &strUser, QString &strPass)
     if (query.next ())
     {
         strResult = query.value(0).toString();
-        strUser = strResult;
+        byD1 = QByteArray::fromHex (strResult.toAscii ());
+        osd.cipher (byD1, byD2, false);
+        strUser = byD2;
         bGotUser = true;
     }
     query.exec ("SELECT " GV_S_VALUE " FROM " GV_SETTINGS_TABLE
@@ -338,7 +344,9 @@ CacheDatabase::getUserPass (QString &strUser, QString &strPass)
         else
         {
             strResult = query.value(0).toString();
-            strPass = strResult;
+            byD1 = QByteArray::fromHex (strResult.toAscii ());
+            osd.cipher (byD1, byD2, false);
+            strPass = byD2;
         }
     }
 
@@ -348,9 +356,12 @@ CacheDatabase::getUserPass (QString &strUser, QString &strPass)
 bool
 CacheDatabase::putUserPass (const QString &strUser, const QString &strPass)
 {
-    QString strQ, strP;
+    QByteArray byD;
+    OsDependent &osd = Singletons::getRef().getOSD ();
+    QString strQ;
     QSqlQuery query(dbMain);
     query.setForwardOnly (true);
+
 
     // Delete the old user pass always
     query.exec ("DELETE FROM " GV_SETTINGS_TABLE
@@ -358,7 +369,8 @@ CacheDatabase::putUserPass (const QString &strUser, const QString &strPass)
     query.exec ("DELETE FROM " GV_SETTINGS_TABLE
                 " WHERE " GV_S_NAME "='" GV_S_VAR_PASS "'");
 
-    QString strScrub = strUser;
+    osd.cipher (strUser.toAscii (), byD, true);
+    QString strScrub = byD.toHex ();
     strScrub.replace ("'", "''");
     strQ = QString ("INSERT INTO " GV_SETTINGS_TABLE
                     " (" GV_S_NAME "," GV_S_VALUE ")"
@@ -366,7 +378,8 @@ CacheDatabase::putUserPass (const QString &strUser, const QString &strPass)
            .arg(strScrub);
     query.exec (strQ);
 
-    strScrub = strPass;
+    osd.cipher (strPass.toAscii (), byD, true);
+    strScrub = byD.toHex ();
     strScrub.replace ("'", "''");
     strQ = QString ("INSERT INTO " GV_SETTINGS_TABLE
                     " (" GV_S_NAME "," GV_S_VALUE ")"

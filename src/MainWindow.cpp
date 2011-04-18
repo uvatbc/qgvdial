@@ -110,12 +110,17 @@ MainWindow::log (const QString &strText, int level /*= 10*/)
         strDisp = strText;
     }
 
+    if ((strDisp.contains ("password", Qt::CaseInsensitive)) ||
+        ((!strPass.isEmpty ()) &&
+         (strDisp.contains (strPass, Qt::CaseInsensitive)))) {
+        strDisp = "Log message with password blocked";
+    }
+
     QDateTime dt = QDateTime::currentDateTime ();
     QString strLog = QString("%1 : %2 : %3")
                      .arg(dt.toString ("yyyy-MM-dd hh:mm:ss.zzz"))
                      .arg(level)
                      .arg(strDisp);
-
 
     // Send to standard output
     cout << strLog.toStdString () << endl;
@@ -388,8 +393,7 @@ MainWindow::init ()
          this       , SLOT(onVmailPlayerStateChanged(QMediaPlayer::State)));
 
     // If the cache has the username and password, begin login
-    if (dbMain.getUserPass (strUser, strPass))
-    {
+    if (dbMain.getUserPass (strUser, strPass)) {
         this->setUsername (strUser);
         this->setPassword (strPass);
 
@@ -397,9 +401,7 @@ MainWindow::init ()
         logoutCompleted (true, l);
         // Login without popping up the "enter user/pass" dialog
         doLogin ();
-    }
-    else
-    {
+    } else {
         // Show this status for 60 seconds (or until the next status)
         setStatus ("Please enter email and password", 60 * 1000);
 
