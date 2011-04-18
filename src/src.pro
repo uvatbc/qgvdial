@@ -17,13 +17,13 @@ maemo5 {
     OTHER_FILES += ../build-files/qgvdial.desktop
 }
 
-# In Linux and maemo, add the telepathy libraries, headers and libmosquitto
+# In Linux and maemo, add telepathy, libmosquitto and openssl
 unix:!symbian {
     QT *= dbus
     INCLUDEPATH += $$QMAKESPEC/usr/include/telepathy-1.0/
-    LIBS += -ltelepathy-qt4 -lmosquitto -leay32
+    LIBS += -ltelepathy-qt4 -lmosquitto -lssl
 }
-# In Windows, add the mosquitto dll
+# In Windows, add the mosquitto dll and openssl
 win32 {
     LIBS *= -lmosquitto -llibeay32
 }
@@ -175,7 +175,7 @@ symbian {
     HEADERS += MqClientThread.h
     SOURCES += MqClientThread.cpp
 
-# The Symbian telephony stack library
+# The Symbian telephony stack library and the equivalent of openssl
     LIBS += -letel3rdparty -llibcrypto
 
     TARGET.UID3 = 0x2003B499
