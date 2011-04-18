@@ -17,6 +17,8 @@ QVariant
 ContactsModel::data (const QModelIndex &index, int role) const
 {
     QVariant retVar;
+    QByteArray byD;
+    OsDependent &osd = Singletons::getRef().getOSD ();
 
     do { // Begin cleanup block (not a loop)
         if (CT_NameRole == role) {
@@ -24,23 +26,27 @@ ContactsModel::data (const QModelIndex &index, int role) const
             QSqlQueryModel::data (index.sibling(index.row(), 1), Qt::EditRole);
             break;
         }
+
         if (CT_NotesRole == role) {
             retVar =
             QSqlQueryModel::data (index.sibling(index.row(), 2), Qt::EditRole);
+            osd.cipher (QByteArray::fromHex(retVar.toByteArray()), byD, false);
+            retVar = QString(byD);
             break;
         }
 
         if (CT_ContactsRole == role) {
             ContactInfo info;
             info.strId = QSqlQueryModel::data (index.sibling(index.row(), 0),
-                                               Qt::EditRole)
-                                  .toString ();
-            if (info.strId.isEmpty ()) {
+                            Qt::EditRole).toString ();
+            osd.cipher (QByteArray::fromHex(info.strId.toAscii()), byD, false);
+            if (byD.isEmpty ()) {
                 qWarning ("This link is empty!");
                 break;
             }
 
             CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+            info.strId = byD;
             dbMain.getContactFromLink (info);
 
             QObject *pNonConst = (QObject *) this;

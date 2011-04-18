@@ -74,13 +74,12 @@ struct GVInboxEntry
 
     void init () {
         id.clear ();
-        strPhoneNumber.clear ();
+        Type = GVIE_Unknown;
+        startTime = QDateTime();
         strDisplayNumber.clear ();
+        strPhoneNumber.clear ();
         strText.clear ();
         strNote.clear ();
-
-        startTime = QDateTime();
-        Type = GVIE_Unknown;
 
         bRead = bSpam = bTrash = bStar = false;
     }

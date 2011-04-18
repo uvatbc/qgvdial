@@ -280,10 +280,12 @@ GVContactsTable::onGotContacts (QNetworkReply *reply)
             break;
         }
 
-//        QFile temp("dump.txt");
-//        temp.open (QIODevice::ReadWrite);
-//        temp.write (byData);
-//        temp.close ();
+#if 0
+        QFile temp("dump.txt");
+        temp.open (QIODevice::ReadWrite);
+        temp.write (byData);
+        temp.close ();
+#endif
 
         QDateTime currDT = QDateTime::currentDateTime().toUTC ();
         CacheDatabase &dbMain = Singletons::getRef().getDBMain ();

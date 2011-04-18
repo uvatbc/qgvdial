@@ -175,10 +175,14 @@ Rectangle {
                 width: parent.width
                 height: parent.height - btnRow.bottom
 
-                // 1st bracket = total pixels required for the whole string
-                // 2nd bracket = number of lines of text required
-                // final computation = total height in pixels.
-                contentHeight: ((theSmsText.text.length * theSmsText.font.pixelSize) / width) * theSmsText.font.pixelSize
+                contentHeight: {
+                    // 1st bracket = total pixels required for the whole string
+                    // 2nd bracket = number of lines of text required
+                    var lines = (theSmsText.text.length * theSmsText.font.pixelSize) / width;
+                    if (lines < 1) lines = 1;
+                    // final computation = total height in pixels.
+                    return lines * theSmsText.font.pixelSize
+                }
                 contentWidth: width
 
                 clip: true

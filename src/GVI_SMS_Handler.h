@@ -33,10 +33,11 @@ private:
     QString id;
 
     quint32 uDepth;
-    bool bTextStarted;
 
-    bool bVmailStarted;
-    bool bVmailfragmentStarted;
+    bool bTextStarted;
+    bool bTextFragmentStarted;
+    qint32 uDepthSinceTextStart;
+
     QString strVmail;
 };
 

@@ -4,8 +4,7 @@ GVI_SMS_Handler::GVI_SMS_Handler (QObject *parent)
 : QObject(parent)
 , uDepth (0)
 , bTextStarted (false)
-, bVmailStarted (false)
-, bVmailfragmentStarted (false)
+, bTextFragmentStarted (false)
 {
 }//GVI_SMS_Handler::GVI_SMS_Handler
 
@@ -18,11 +17,13 @@ GVI_SMS_Handler::startElement (const QString        & /*namespaceURI*/,
     do {
         if (localName == "div") {
             uDepth++;
+            uDepthSinceTextStart++;
 
             if (atts.value ("class").contains ("gc-message-message-display")) {
-                qDebug ("Found a voicemail");
+                qDebug ("Found a text or voicemail");
                 strChars.clear ();
-                bVmailStarted = true;
+                bTextStarted = true;
+                uDepthSinceTextStart = 0;
             }
 
             if (uDepth != 1) {
@@ -35,19 +36,14 @@ GVI_SMS_Handler::startElement (const QString        & /*namespaceURI*/,
 
             id = atts.value ("id");
         } else if (localName == "span") {
-            if (atts.value ("class") == "gc-message-sms-text") {
-                bTextStarted = true;
-                strChars.clear ();
-                break;
-            }
-
-            if (bVmailStarted) {
+            if (bTextStarted) {
                 if ((atts.value ("class") == "gc-word-high") ||
                     (atts.value ("class") == "gc-word-med1") ||
-                    (atts.value ("class") == "gc-word-med2"))
+                    (atts.value ("class") == "gc-word-med2") ||
+                    (atts.value ("class") == "gc-message-sms-text"))
                 {
                     strChars.clear ();
-                    bVmailfragmentStarted = true;
+                    bTextFragmentStarted = true;
                 }
             }
         }
@@ -62,18 +58,23 @@ GVI_SMS_Handler::endElement (const QString & /*namespaceURI*/,
                              const QString & /*qName       */)
 {
     if (localName == "span") {
-        if (bTextStarted) {
-            mapTexts[id] = strChars;
-            bTextStarted = false;
-        } else if (bVmailfragmentStarted) {
+        if (bTextStarted && bTextFragmentStarted) {
             strVmail += strChars + " ";
+            bTextFragmentStarted = false;
         }
     } else if (localName == "div") {
         uDepth--;
+        uDepthSinceTextStart--;
 
-        if (bVmailStarted) {
+        if (bTextStarted) {
+            if (strVmail.endsWith (' ')) {
+                strVmail.truncate (strVmail.size()-1);
+            }
             mapTexts[id] = strVmail;
-            bVmailStarted = false;
+            strVmail.clear ();
+            if (uDepthSinceTextStart <= 0) {
+                bTextStarted = false;
+            }
         }
     }
     return (true);

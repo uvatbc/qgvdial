@@ -65,7 +65,7 @@ private:
 
 
 private:
-    ContactsModel  *modelContacts;
+    ContactsModel *modelContacts;
 
     //! Username and password for google authentication
     QString         strUser, strPass;

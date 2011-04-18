@@ -340,6 +340,16 @@ MainWindow::init ()
         &dlgSMS, SIGNAL (sendSMS (const QStringList &, const QString &)),
          this  , SLOT   (sendSMS (const QStringList &, const QString &)));
 
+    // Status from contacts object
+    QObject::connect (&oContacts, SIGNAL (status   (const QString &, int)),
+                       this     , SLOT   (setStatus(const QString &, int)));
+    // oContacts.allContacts -> this.getContactsDone
+    QObject::connect (&oContacts, SIGNAL (allContacts (bool)),
+                      this      , SLOT   (getContactsDone (bool)));
+    // Status from inbox object
+    QObject::connect (&oInbox, SIGNAL (status   (const QString &, int)),
+                       this  , SLOT   (setStatus(const QString &, int)));
+
     // Additional UI initializations:
     //@@UV: Need this for later
 //    ui->edNumber->setValidator (new PhoneNumberValidator (ui->edNumber));
@@ -729,14 +739,6 @@ MainWindow::getContactsDone (bool bOk)
 void
 MainWindow::initContacts ()
 {
-    // Status
-    QObject::connect (&oContacts, SIGNAL (status   (const QString &, int)),
-                       this     , SLOT   (setStatus(const QString &, int)));
-
-    // oContacts.allContacts -> this.getContactsDone
-    QObject::connect (&oContacts, SIGNAL (allContacts (bool)),
-                      this      , SLOT   (getContactsDone (bool)));
-
     oContacts.setUserPass (strUser, strPass);
     oContacts.loginSuccess ();
     oContacts.initModel (this);
@@ -753,11 +755,6 @@ MainWindow::deinitContacts ()
 void
 MainWindow::initInbox ()
 {
-    // Status
-    QObject::connect (
-            &oInbox, SIGNAL (status   (const QString &, int)),
-            this   , SLOT   (setStatus(const QString &, int)));
-
     oInbox.loginSuccess ();
     oInbox.initModel (this);
     oInbox.refresh ();
