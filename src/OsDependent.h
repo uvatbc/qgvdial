@@ -15,6 +15,13 @@
 #include <QtMaemo5>
 #endif
 
+#if defined(Q_OS_SYMBIAN)
+#include <openssl/aes.h>
+#else
+#include <openssl/blowfish.h>
+#endif
+#include <openssl/evp.h>
+
 // For some reason the symbian MOC doesn't like it if I don't include QObject
 // even though it is present in QtCore which is included in global.h
 #include <QObject>
@@ -35,6 +42,8 @@ public:
     QRect getStartingSize ();
 
     QString getStoreDirectory ();
+
+    bool cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt);
 
 private:
     OsDependent(QObject *parent = 0);

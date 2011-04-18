@@ -4,6 +4,11 @@
 #include "QGVDbusServer.h"
 #endif
 
+#if defined(Q_OS_SYMBIAN)
+#define EVP_impl EVP_aes_256_cbc
+#else
+#define EVP_impl EVP_bf_cbc
+#endif
 
 OsDependent::OsDependent(QObject *parent) : QObject(parent)
 {
@@ -138,6 +143,59 @@ OsDependent::getStoreDirectory ()
 
     return strStoreDir;
 }//OsDependent::getStoreDirectory
+
+bool
+OsDependent::cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt)
+{
+    int iEVP, inl, outl, c;
+    EVP_CIPHER_CTX cipherCtx;
+    char cipherIv[8], cipherIn[8], cipherOut[8 + EVP_MAX_BLOCK_LENGTH];
+    memset (&cipherCtx, 0, sizeof cipherCtx);
+    memset (&cipherIv, 0xFA, sizeof cipherIv);
+
+#define QGV_CIPHER_KEY "0123456789012345"
+    EVP_CIPHER_CTX_init (&cipherCtx);
+    iEVP = EVP_CipherInit_ex (&cipherCtx, EVP_impl (), NULL, NULL, NULL,
+                              bEncrypt?1:0);
+    if (1 != iEVP) return false;
+    EVP_CIPHER_CTX_set_key_length(&cipherCtx, sizeof(QGV_CIPHER_KEY)-1);
+    iEVP = EVP_CipherInit_ex (&cipherCtx, EVP_impl (), NULL,
+                              (quint8 *) QGV_CIPHER_KEY, (quint8 *) cipherIv,
+                               bEncrypt?1:0);
+    if (1 != iEVP) return false;
+
+    byOut.clear ();
+    c = 0;
+    while (c < byIn.size ()) {
+        inl = byIn.size () - c;
+        inl = inl > sizeof (cipherIn) ? sizeof (cipherIn) : inl;
+        memcpy (cipherIn, &(byIn.constData()[c]), inl);
+        memset (&cipherOut, 0, sizeof cipherOut);
+        outl = sizeof cipherOut;
+        iEVP = EVP_CipherUpdate (&cipherCtx,
+                                (quint8 *) &cipherOut, &outl,
+                                 (quint8 *) &cipherIn , inl);
+        if (1 != iEVP) {
+            qWarning ("Cipher update failed.join Aborting");
+            break;
+        }
+        byOut += QByteArray(cipherOut, outl);
+        c += inl;
+    }
+
+    if (1 == iEVP) {
+        outl = sizeof cipherOut;
+        memset (&cipherOut, 0, sizeof cipherOut);
+        iEVP = EVP_CipherFinal_ex (&cipherCtx, (quint8 *) &cipherOut, &outl);
+        if (1 == iEVP) {
+            byOut += QByteArray(cipherOut, outl);
+        }
+    }
+
+    EVP_CIPHER_CTX_cleanup(&cipherCtx);
+
+    return (1 == iEVP);
+}//OsDependent::cipher
 
 #ifdef QT_NO_SYSTEMTRAYICON
 QSystemTrayIcon::QSystemTrayIcon(QWidget *parent /*= 0*/)

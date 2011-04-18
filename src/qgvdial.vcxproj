@@ -70,7 +70,6 @@
     <ClCompile Include="DesktopSkypeCallInitiator.cpp" />
     <ClCompile Include="DialCancelDlg.cpp" />
     <ClCompile Include="DialContext.cpp" />
-    <ClCompile Include="DlgSelectContactNumber.cpp" />
     <ClCompile Include="global.cpp" />
     <ClCompile Include="GVAccess.cpp" />
     <ClCompile Include="GVContactsTable.cpp" />
@@ -100,7 +99,6 @@
     <ClCompile Include="SMSEntryDeleteButton.cpp" />
     <ClCompile Include="TpCalloutInitiator.cpp" />
     <ClCompile Include="TpObserver.cpp" />
-    <ClCompile Include="VMailDialog.cpp" />
     <ClCompile Include="WebWidget.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -111,9 +109,7 @@
     <ClInclude Include="ChildWindowBase.h" />
     <ClInclude Include="ContactsXmlHandler.h" />
     <ClInclude Include="DesktopSkypeCallInitiator.h" />
-    <ClInclude Include="DialCancelDlg.h" />
     <ClInclude Include="DialContext.h" />
-    <ClInclude Include="DlgSelectContactNumber.h" />
     <ClInclude Include="global.h" />
     <ClInclude Include="GVAccess.h" />
     <ClInclude Include="GVContactsTable.h" />
@@ -143,9 +139,6 @@
     <ClInclude Include="SMSEntryDeleteButton.h" />
     <ClInclude Include="TpCalloutInitiator.h" />
     <ClInclude Include="TpObserver.h" />
-    <ClInclude Include="ui_VMailDialog.h" />
-    <ClInclude Include="ui_WebWidget.h" />
-    <ClInclude Include="VMailDialog.h" />
     <ClInclude Include="WebWidget.h" />
   </ItemGroup>
   <ItemGroup>
@@ -156,28 +149,26 @@
     <None Include="..\qml\ContactsList.qml" />
     <None Include="..\qml\ContactsModelData1.qml" />
     <None Include="..\qml\ContactsModelData2.xml" />
+    <None Include="..\qml\DbgWebWidget.qml" />
     <None Include="..\qml\DialDisp.qml" />
     <None Include="..\qml\DigitButton.qml" />
     <None Include="..\qml\helper.js" />
     <None Include="..\qml\InboxList.qml" />
     <None Include="..\qml\Keypad.qml" />
+    <None Include="..\qml\LogView.qml" />
     <None Include="..\qml\Main.qml" />
     <None Include="..\qml\MainButtons.qml" />
     <None Include="..\qml\MainView.qml" />
-    <None Include="..\qml\MainView_l.qml" />
-    <None Include="..\qml\MainView_p.qml" />
+    <None Include="..\qml\Mosquitto.qml" />
+    <None Include="..\qml\MsgBox.qml" />
     <None Include="..\qml\MyButton.qml" />
+    <None Include="..\qml\MyTextEdit.qml" />
     <None Include="..\qml\Proxy.qml" />
     <None Include="..\qml\RadioButton.qml" />
     <None Include="..\qml\Settings.qml" />
-    <None Include="..\qml\TextButton.qml" />
     <None Include="qgvdial.qrc" />
-    <None Include="stylesheets\dialpad_desktop.qss" />
-    <None Include="stylesheets\dialpad_maemo.qss" />
     <None Include="readme.txt" />
     <None Include="src.pro" />
-    <None Include="VMailDialog.ui" />
-    <None Include="WebWidget.ui" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="winrsrc.rc" />

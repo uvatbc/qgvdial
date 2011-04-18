@@ -2,7 +2,6 @@
 #include "PhoneNumberValidator.h"
 
 #include <QDesktopServices>
-
 #include <iostream>
 using namespace std;
 

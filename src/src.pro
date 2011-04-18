@@ -21,11 +21,11 @@ maemo5 {
 unix:!symbian {
     QT *= dbus
     INCLUDEPATH += $$QMAKESPEC/usr/include/telepathy-1.0/
-    LIBS += -ltelepathy-qt4 -lmosquitto
+    LIBS += -ltelepathy-qt4 -lmosquitto -leay32
 }
 # In Windows, add the mosquitto dll
 win32 {
-    LIBS *= -lmosquitto
+    LIBS *= -lmosquitto -llibeay32
 }
 
 PRECOMPILED_HEADER = global.h
@@ -171,12 +171,12 @@ symbian {
                SymbianCallObserverPrivate.cpp
 
 # Add the mosquitto lib to symbian
-include(mqlib/mqlib.pri)
-HEADERS += MqClientThread.h
-SOURCES += MqClientThread.cpp
+    include(mqlib/mqlib.pri)
+    HEADERS += MqClientThread.h
+    SOURCES += MqClientThread.cpp
 
 # The Symbian telephony stack library
-    LIBS += -letel3rdparty
+    LIBS += -letel3rdparty -llibcrypto
 
     TARGET.UID3 = 0x2003B499
     TARGET.CAPABILITY += NetworkServices ReadUserData ReadDeviceData SwEvent
