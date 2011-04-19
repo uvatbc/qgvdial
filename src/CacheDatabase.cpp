@@ -33,8 +33,8 @@
 //#define GV_S_VALUE_DB_VER   "2011-04-04 16:30:00"
 // Voicemail now has transcription
 //#define GV_S_VALUE_DB_VER   "2011-04-08 17:30:00"
-// Encryption introduced into qgvdial
-#define GV_S_VALUE_DB_VER   "2011-04-18 14:16:30"
+// Encryption introduced into qgvdial. Only for username and password
+#define GV_S_VALUE_DB_VER   "2011-04-19 00:19:00"
 ////////////////////////////// GV Contacts table ///////////////////////////////
 #define GV_CONTACTS_TABLE   "gvcontacts"
 #define GV_C_ID             "id"
@@ -486,14 +486,11 @@ CacheDatabase::putRegisteredNumbers (const GVRegisteredNumberArray &listNumbers)
 bool
 CacheDatabase::existsContact (const QString &strId)
 {
-    QByteArray byD;
-    OsDependent &osd = Singletons::getRef().getOSD ();
     QSqlQuery query(dbMain);
     query.setForwardOnly (true);
 
-    // Encrypt data; Do not need to scrub for single quotes because of this
-    osd.cipher (strId.toAscii (), byD, true);
-    QString scrubId = byD.toHex ();
+    QString scrubId = strId;
+    scrubId.replace ("'", "''");
 
     query.exec (QString ("SELECT " GV_C_ID " FROM " GV_CONTACTS_TABLE " "
                          "WHERE " GV_C_ID "='%1'")
@@ -507,14 +504,11 @@ CacheDatabase::existsContact (const QString &strId)
 bool
 CacheDatabase::deleteContact (const QString &strId)
 {
-    QByteArray byD;
-    OsDependent &osd = Singletons::getRef().getOSD ();
     QSqlQuery query(dbMain);
     query.setForwardOnly (true);
 
-    // Encrypt data; Do not need to scrub for single quotes because of this
-    osd.cipher (strId.toAscii (), byD, true);
-    QString scrubLink = byD.toHex ();
+    QString scrubLink = strId;
+    scrubLink.replace ("'", "''");
 
     query.exec (QString ("DELETE FROM " GV_CONTACTS_TABLE " "
                          "WHERE " GV_C_ID "='%1'")
@@ -526,8 +520,6 @@ CacheDatabase::deleteContact (const QString &strId)
 bool
 CacheDatabase::insertContact (const ContactInfo &info)
 {
-    QByteArray byD;
-    OsDependent &osd = Singletons::getRef().getOSD ();
     bool rv = false;
     do { // Begin cleanup block (not a loop)
         QSqlQuery query(dbMain);
@@ -536,13 +528,9 @@ CacheDatabase::insertContact (const ContactInfo &info)
         // Delete always succeeds (whether the row exists or not)
         deleteContact (info.strId);
 
-        // Encrypt data; Do not need to scrub for single quotes because of this
         ContactInfo scrubInfo = info;
-        osd.cipher (scrubInfo.strId.toAscii (), byD, true);
-        scrubInfo.strId = byD.toHex ();
-        osd.cipher (scrubInfo.strNotes.toAscii (), byD, true);
-        scrubInfo.strNotes = byD.toHex ();
-        // DO NOT ENCRYPT THE NAME
+        scrubInfo.strId.replace ("'", "''");
+        scrubInfo.strNotes.replace ("'", "''");
         scrubInfo.strTitle.replace ("'", "''");
 
         QString strQ = QString ("INSERT INTO " GV_CONTACTS_TABLE ""
@@ -590,15 +578,12 @@ CacheDatabase::getContactsCount ()
 bool
 CacheDatabase::deleteContactInfo (const QString &strId)
 {
-    QByteArray byD;
-    OsDependent &osd = Singletons::getRef().getOSD ();
     QSqlQuery query(dbMain);
     QString strQ;
     query.setForwardOnly (true);
 
-    // Encrypt data; Do not need to scrub for single quotes because of this
-    osd.cipher (strId.toAscii (), byD, true);
-    QString scrubId = byD.toHex ();
+    QString scrubId = strId;
+    scrubId.replace ("'", "''");
 
     strQ = QString ("DELETE FROM " GV_LINKS_TABLE " WHERE "
                     GV_L_LINK "='%1'").arg (scrubId);
@@ -610,18 +595,14 @@ CacheDatabase::deleteContactInfo (const QString &strId)
 bool
 CacheDatabase::putContactInfo (const ContactInfo &info)
 {
-    QByteArray byD;
-    OsDependent &osd = Singletons::getRef().getOSD ();
     QSqlQuery query(dbMain);
     QString strQ, strTemplate;
     query.setForwardOnly (true);
 
     deleteContactInfo (info.strId);
 
-    // Encrypt data; Do not need to scrub for single quotes because of this
     ContactInfo scrubInfo = info;
-    osd.cipher (scrubInfo.strId.toAscii (), byD, true);
-    scrubInfo.strId = byD.toHex ();
+    scrubInfo.strId.replace ("'", "''");
 
     strTemplate = QString ("INSERT INTO " GV_LINKS_TABLE
                            " (" GV_L_LINK "," GV_L_TYPE "," GV_L_DATA ")"
@@ -636,8 +617,7 @@ CacheDatabase::putContactInfo (const ContactInfo &info)
             GVAccess::simplify_number (strNum);
         }
         strNum = PhoneInfo::typeToChar(entry.Type) + strNum;
-        osd.cipher (strNum.toAscii (), byD, true);
-        strNum = byD.toHex ();
+        strNum.replace ("'", "''");
 
         strQ = strTemplate.arg (GV_L_TYPE_NUMBER).arg (strNum);
         query.exec (strQ);
@@ -653,16 +633,14 @@ CacheDatabase::getContactFromLink (ContactInfo &info)
         return false;
     }
 
-    QByteArray byD;
-    OsDependent &osd = Singletons::getRef().getOSD ();
     QSqlQuery query(dbMain);
     query.setForwardOnly (true);
 
     quint16 count = 0;
     bool rv = false;
 
-    osd.cipher (info.strId.toAscii (), byD, true);
-    QString scrubId = byD.toHex ();
+    QString scrubId = info.strId;
+    scrubId.replace ("'", "''");
 
     QString strQ;
     strQ = QString ("SELECT " GV_C_NAME ", " GV_C_NOTES " "
@@ -675,8 +653,7 @@ CacheDatabase::getContactFromLink (ContactInfo &info)
         return false;
     }
     info.strTitle = query.value(0).toString ();
-    osd.cipher (QByteArray::fromHex (query.value(1).toByteArray()), byD, false);
-    info.strNotes = byD;
+    info.strNotes = query.value(1).toString ();
 
     strQ = QString ("SELECT " GV_L_TYPE ", " GV_L_DATA
                     " FROM " GV_LINKS_TABLE " WHERE "
@@ -689,9 +666,7 @@ CacheDatabase::getContactFromLink (ContactInfo &info)
     while (query.next ())
     {
         strType = query.value (0).toString ();
-        osd.cipher (QByteArray::fromHex (query.value(1).toByteArray()), byD,
-                    false);
-        strData = byD;
+        strData = query.value(1).toString ();
 
         if (strType == GV_L_TYPE_NUMBER)
         {
@@ -716,14 +691,12 @@ bool
 CacheDatabase::getContactFromNumber (const QString &strNumber,
                                      ContactInfo &info)
 {
-    QByteArray byD;
-    OsDependent &osd = Singletons::getRef().getOSD ();
     QSqlQuery query(dbMain);
     query.setForwardOnly (true);
 
     bool rv = false;
-    osd.cipher (strNumber.toAscii().toHex (), byD, true);
-    QString strQ, scrubNumber = byD.toHex ();
+    QString strQ, scrubNumber = strNumber;
+    scrubNumber.replace ("'", "''");
     strQ = QString ("SELECT " GV_L_LINK " FROM " GV_LINKS_TABLE " "
                     "WHERE " GV_L_TYPE "='" GV_L_TYPE_NUMBER "' "
                     "AND " GV_L_DATA " LIKE '%%%1'")
@@ -732,10 +705,7 @@ CacheDatabase::getContactFromNumber (const QString &strNumber,
 
     if (query.next ())
     {
-        osd.cipher (QByteArray::fromHex (query.value(0).toByteArray()), byD,
-                    false);
-        info.strId = byD;
-
+        info.strId = query.value(0).toString ();
         rv = getContactFromLink (info);
     }
     return (rv);

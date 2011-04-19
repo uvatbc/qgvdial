@@ -17,8 +17,6 @@ QVariant
 ContactsModel::data (const QModelIndex &index, int role) const
 {
     QVariant retVar;
-    QByteArray byD;
-    OsDependent &osd = Singletons::getRef().getOSD ();
 
     do { // Begin cleanup block (not a loop)
         if (CT_NameRole == role) {
@@ -30,8 +28,6 @@ ContactsModel::data (const QModelIndex &index, int role) const
         if (CT_NotesRole == role) {
             retVar =
             QSqlQueryModel::data (index.sibling(index.row(), 2), Qt::EditRole);
-            osd.cipher (QByteArray::fromHex(retVar.toByteArray()), byD, false);
-            retVar = QString(byD);
             break;
         }
 
@@ -39,14 +35,12 @@ ContactsModel::data (const QModelIndex &index, int role) const
             ContactInfo info;
             info.strId = QSqlQueryModel::data (index.sibling(index.row(), 0),
                             Qt::EditRole).toString ();
-            osd.cipher (QByteArray::fromHex(info.strId.toAscii()), byD, false);
-            if (byD.isEmpty ()) {
+            if (info.strId.isEmpty ()) {
                 qWarning ("This link is empty!");
                 break;
             }
 
             CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-            info.strId = byD;
             dbMain.getContactFromLink (info);
 
             QObject *pNonConst = (QObject *) this;
@@ -92,7 +86,7 @@ ContactsModel::insertContact (const ContactInfo &contactInfo)
     if (!bExists) {
         endInsertRows ();
     }
-    
+
     return (true);
 }//ContactsModel::insertContact
 
@@ -109,7 +103,7 @@ ContactsModel::deleteContact (const ContactInfo &contactInfo)
         dbMain.deleteContact (contactInfo.strId);
         endRemoveRows ();
     }
-    
+
     return (true);
 }//ContactsModel::deleteContact
 
