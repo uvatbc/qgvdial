@@ -176,8 +176,8 @@ Rectangle {
                 height: parent.height - btnRow.bottom
 
                 contentHeight: {
+                    // Calculate the number of lines of text required
                     // 1st bracket = total pixels required for the whole string
-                    // 2nd bracket = number of lines of text required
                     var lines = (theSmsText.text.length * theSmsText.font.pixelSize) / width;
                     if (lines < 1) lines = 1;
                     // final computation = total height in pixels.
@@ -315,18 +315,48 @@ Rectangle {
                 width: inboxView.width - border.width
                 height: entryText.height
 
-                Text {
-                    id: entryText
+                Row {
                     anchors {
                         verticalCenter: parent.verticalCenter
                         left: parent.left
                         leftMargin: 5
                     }
+                    width: parent.width
 
-                    text: type + " " + time_detail + "\n" + name
-                    color: "white"
-                    font.pointSize: (listInbox.height + listInbox.width) / 70
+                    Image {
+                        height: entryText.height
+                        fillMode: Image.PreserveAspectFit
+                        source: "green_arrow.png"
+                        opacity: type == "Received" ? 1 : 0
+                    }
+                    Image {
+                        height: entryText.height
+                        fillMode: Image.PreserveAspectFit
+                        source: "green_arrow_out.png"
+                        opacity: type == "Placed" ? 1 : 0
+                    }
+                    Image {
+                        height: entryText.height
+                        fillMode: Image.PreserveAspectFit
+                        source: "red_arrow.png"
+                        opacity: type == "Missed" ? 1 : 0
+                    }
+                    Image {
+                        height: entryText.height
+                        fillMode: Image.PreserveAspectFit
+                        source: "vmail_icon.png"
+                        opacity: type == "Voicemail" ? 1 : 0
+                    }
+
+                    Text {
+                        id: entryText
+
+                        text: time_detail + "\n" + name
+                        color: "white"
+                        font.pointSize: (listInbox.height + listInbox.width) / 70
+                    }
                 }
+
 
                 MouseArea {
                     anchors.fill: parent

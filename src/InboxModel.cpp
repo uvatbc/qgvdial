@@ -104,10 +104,9 @@ InboxModel::data (const QModelIndex &index,
                 } else if (1 == daysTo) {
                     strDisp = "yesterday at " + dt.toString ("hh:mm:ss");
                 } else {
-                    strDisp = "on "
-                              + dt.toString ("dddd, dd-MMM")
-                              + " at "
-                              + dt.toString ("hh:mm:ss");
+                    strDisp = dt.toString ("dddd, dd-MMM")
+                            + " at "
+                            + dt.toString ("hh:mm:ss");
                 }
             } else {
                 if (0 == daysTo) {
