@@ -9,6 +9,7 @@
         <file alias="tick.png">../icons/tick.png</file>
         <file alias="green_arrow.png">../icons/green_arrow.png</file>
         <file alias="green_arrow_out.png">../icons/green_arrow_out.png</file>
+        <file alias="in_sms.png">../icons/in_sms.png</file>
         <file alias="red_arrow.png">../icons/red_arrow.png</file>
         <file alias="vmail_icon.png">../icons/vmail_icon.png</file>
         <file alias="About.qml">../qml/About.qml</file>

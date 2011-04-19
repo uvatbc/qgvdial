@@ -1,4 +1,1 @@
-  * Incorporate encryption into qgvdial. Username, password and contacts info (except names) encrypted.
-  * Blocked passwords from the log dump.
-  * Added icons to inbox view
-  * Fixed voicemail and text parsing
+  * Attempted to fix inbox icons

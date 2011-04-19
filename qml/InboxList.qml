@@ -328,25 +328,31 @@ Rectangle {
                         fillMode: Image.PreserveAspectFit
                         source: "green_arrow.png"
                         opacity: type == "Received" ? 1 : 0
-                    }
+                    }// green arrow
                     Image {
                         height: entryText.height
                         fillMode: Image.PreserveAspectFit
                         source: "green_arrow_out.png"
                         opacity: type == "Placed" ? 1 : 0
-                    }
+                    }// green arrow out
                     Image {
                         height: entryText.height
                         fillMode: Image.PreserveAspectFit
                         source: "red_arrow.png"
                         opacity: type == "Missed" ? 1 : 0
-                    }
+                    }// red arrow
                     Image {
                         height: entryText.height
                         fillMode: Image.PreserveAspectFit
                         source: "vmail_icon.png"
                         opacity: type == "Voicemail" ? 1 : 0
-                    }
+                    }// vmail icon
+                    Image {
+                        height: entryText.height
+                        fillMode: Image.PreserveAspectFit
+                        source: "in_sms.png"
+                        opacity: type == "SMS" ? 1 : 0
+                    }// SMS icon
 
                     Text {
                         id: entryText
@@ -356,7 +362,6 @@ Rectangle {
                         font.pointSize: (listInbox.height + listInbox.width) / 70
                     }
                 }
-
 
                 MouseArea {
                     anchors.fill: parent
