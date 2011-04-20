@@ -122,6 +122,7 @@ OTHER_FILES  += winrsrc.rc                  \
                 ../qml/MyTextEdit.qml       \
                 ../qml/Proxy.qml            \
                 ../qml/RadioButton.qml      \
+                ../qml/Scrollbar.qml        \
                 ../qml/Settings.qml         \
                 readme.txt
 

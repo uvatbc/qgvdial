@@ -61,7 +61,6 @@ Rectangle {
                 mainText: "Close"
                 onClicked: {
                     container.state= ''
-                    console.debug("QML: Stop vmail playback");
                     container.sigVmailPlayback(0);
                 }
                 width: parent.width
@@ -384,6 +383,16 @@ Rectangle {
                 }
             }// delegate Rectangle
         }// ListView (inbox entries)
+
+        Scrollbar {
+            scrollArea: listInbox
+            width: 8
+            anchors {
+                right: parent.right
+                top: parent.top
+                bottom: parent.bottom
+            }
+        }
 
         states: [
             State {

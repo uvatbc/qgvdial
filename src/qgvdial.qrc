@@ -12,6 +12,7 @@
         <file alias="in_Received.png">../icons/in_Received.png</file>
         <file alias="in_Sms.png">../icons/in_Sms.png</file>
         <file alias="in_Voicemail.png">../icons/in_Voicemail.png</file>
+        <file alias="scrollbar.png">../icons/scrollbar.png</file>
         <file alias="About.qml">../qml/About.qml</file>
         <file alias="ActionButtons.qml">../qml/ActionButtons.qml</file>
         <file alias="ComboBoxPhones.qml">../qml/ComboBoxPhones.qml</file>
@@ -33,6 +34,7 @@
         <file alias="MyTextEdit.qml">../qml/MyTextEdit.qml</file>
         <file alias="Proxy.qml">../qml/Proxy.qml</file>
         <file alias="RadioButton.qml">../qml/RadioButton.qml</file>
+        <file alias="Scrollbar.qml">../qml/Scrollbar.qml</file>
         <file alias="Settings.qml">../qml/Settings.qml</file>
     </qresource>
 </RCC>
