@@ -34,7 +34,7 @@
 // Voicemail now has transcription
 //#define GV_S_VALUE_DB_VER   "2011-04-08 17:30:00"
 // Encryption introduced into qgvdial. Only for username and password
-#define GV_S_VALUE_DB_VER   "2011-04-19 00:19:00"
+#define GV_S_VALUE_DB_VER   "2011-04-19 23:51:00"
 ////////////////////////////// GV Contacts table ///////////////////////////////
 #define GV_CONTACTS_TABLE   "gvcontacts"
 #define GV_C_ID             "id"

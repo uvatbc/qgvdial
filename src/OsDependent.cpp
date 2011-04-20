@@ -4,12 +4,6 @@
 #include "QGVDbusServer.h"
 #endif
 
-#if defined(Q_OS_SYMBIAN)
-#define EVP_impl EVP_aes_256_cbc
-#else
-#define EVP_impl EVP_bf_cbc
-#endif
-
 OsDependent::OsDependent(QObject *parent) : QObject(parent)
 {
 }//OsDependent::OsDependent
@@ -149,17 +143,17 @@ OsDependent::cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt)
 {
     int iEVP, inl, outl, c;
     EVP_CIPHER_CTX cipherCtx;
-    char cipherIv[8], cipherIn[8], cipherOut[8 + EVP_MAX_BLOCK_LENGTH];
+    char cipherIv[16], cipherIn[16], cipherOut[16 + EVP_MAX_BLOCK_LENGTH];
     memset (&cipherCtx, 0, sizeof cipherCtx);
     memset (&cipherIv, 0xFA, sizeof cipherIv);
 
-#define QGV_CIPHER_KEY "0123456789012345"
+#define QGV_CIPHER_KEY "01234567890123456789012345678901"
     EVP_CIPHER_CTX_init (&cipherCtx);
-    iEVP = EVP_CipherInit_ex (&cipherCtx, EVP_impl (), NULL, NULL, NULL,
+    iEVP = EVP_CipherInit_ex (&cipherCtx, EVP_aes_256_cbc (), NULL, NULL, NULL,
                               bEncrypt?1:0);
     if (1 != iEVP) return false;
     EVP_CIPHER_CTX_set_key_length(&cipherCtx, sizeof(QGV_CIPHER_KEY)-1);
-    iEVP = EVP_CipherInit_ex (&cipherCtx, EVP_impl (), NULL,
+    iEVP = EVP_CipherInit_ex (&cipherCtx, EVP_aes_256_cbc (), NULL,
                               (quint8 *) QGV_CIPHER_KEY, (quint8 *) cipherIv,
                                bEncrypt?1:0);
     if (1 != iEVP) return false;
@@ -176,7 +170,7 @@ OsDependent::cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt)
                                 (quint8 *) &cipherOut, &outl,
                                  (quint8 *) &cipherIn , inl);
         if (1 != iEVP) {
-            qWarning ("Cipher update failed.join Aborting");
+            qWarning ("Cipher update failed. Aborting");
             break;
         }
         byOut += QByteArray(cipherOut, outl);

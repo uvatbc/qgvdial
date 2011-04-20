@@ -28,6 +28,7 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         text: container.text
         color: "white"
+        width: container.width
         font.pixelSize: container.pixelSize
 
         onTextChanged: {
