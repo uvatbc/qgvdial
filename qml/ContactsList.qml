@@ -93,6 +93,9 @@ Rectangle {
         model: g_contactsModel
 //        model: testContactsModelData1
 
+        section.property: "name"
+        section.criteria: ViewSection.FirstCharacter
+
         delegate: Rectangle {
             id: listDelegate
 
@@ -128,6 +131,37 @@ Rectangle {
             }
         }// delegate Rectangle
     }// ListView (All contacts)
+
+    Scrollbar {
+        scrollArea: contactsView
+        width: 8
+        anchors {
+            right: parent.right
+            top: parent.top
+            bottom: parent.bottom
+        }
+    }//scroll bar for the contacts list
+
+    Rectangle {
+        opacity: contactsView.moving ? 0.5 : 0
+        anchors {
+            verticalCenter: parent.verticalCenter
+            right: parent.right
+        }
+
+        height: container.height/5
+        width: container.width/5
+        color: "black"
+        border.color: "green"
+
+        Text {
+            text: contactsView.currentSection
+            font.pixelSize: parent.height / 2
+            anchors.centerIn: parent
+
+            color: "white"
+        }
+    }// The first letter view
 
     states: [
         State {

@@ -392,7 +392,7 @@ Rectangle {
                 top: parent.top
                 bottom: parent.bottom
             }
-        }
+        }//scroll bar for the inbox list
 
         states: [
             State {
