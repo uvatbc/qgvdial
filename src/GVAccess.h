@@ -15,13 +15,10 @@ enum GVAccess_Work {
     GVAW_aboutBlank,
     GVAW_login,                     // user and password
     GVAW_logout,
-    GVAW_getAllContacts,
-    GVAW_getContactFromLink,        // Page link and default number
     GVAW_dialCallback,              // Destination number, callback number, type
     GVAW_dialOut,                   // Destination number, callout number
     GVAW_getRegisteredPhones,
     GVAW_getInbox,                  // type, start page, page count, last update
-    GVAW_getContactFromInboxLink,   // Inbox link
     GVAW_sendSMS,                   // Number, text
     GVAW_playVmail,                 // Voicemail link
 };
@@ -102,10 +99,6 @@ signals:
     //! Emitted at the end of every work item
     void workCompleted (bool bSuccess, const QVariantList &arrParams);
 
-    //! Emitted every time a new contact is parsed from the contacts page
-    void gotContact (const QString &strName, const QString &strLink);
-    //! Emitted when the contact info from the link is retrieved
-    void contactInfo (const ContactInfo &info);
     //! Emitted for each registered phone number
     void registeredPhone (const GVRegisteredNumber &info);
     //! Emitted when dialing has started (for callback method)
@@ -151,18 +144,12 @@ protected:
     virtual bool login () = 0;
     //! Log out of Google voice
     virtual bool logout () = 0;
-    //! Retrieve all contacts for the logged in user
-    virtual bool retrieveContacts () = 0;
-    //! Get the contact info for the link provided
-    virtual bool getContactInfoFromLink () = 0;
     //! Make a phone call to an arbitrary number
     virtual bool dialCallback (bool bCallback) = 0;
     //! Get registered phones from the settings page
     virtual bool getRegisteredPhones () = 0;
     //! Begin the process to get inbox
     virtual bool getInbox () = 0;
-    //! Call a number given the inbox entry link
-    virtual bool getContactFromInboxLink () = 0;
     //! This sends SMSes
     virtual bool sendSMS () = 0;
     //! Play a voicemail

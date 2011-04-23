@@ -8,7 +8,9 @@
 #include "WebWidget.h"
 #include "RegNumberModel.h"
 #include "DialContext.h"
+
 #include <QMediaPlayer>
+#include <QtDeclarative>
 
 #if MOSQUITTO_CAPABLE
 #include "MqClientThread.h"

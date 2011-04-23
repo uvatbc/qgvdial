@@ -7,6 +7,7 @@ GVDataAccess::GVDataAccess (QObject *parent /*= NULL*/)
 , nwMgr (this)
 , nwReply (NULL)
 {
+    nwMgr.setCookieJar (new MyCookieJar(this));
 }//GVDataAccess::GVDataAccess
 
 GVDataAccess::~GVDataAccess ()
@@ -47,8 +48,58 @@ GVDataAccess::aboutBlank ()
 bool
 GVDataAccess::login ()
 {
-    return (loginCaptcha (QString(), QString()));
+    //return (loginCaptcha (QString(), QString()));
+
+#define GV_LOGIN_PAGE "https://www.google.com/accounts/ServiceLoginAuth"
+    QVariantList &arrParams = workCurrent.arrParams;
+    QStringPairList arrPairs;
+    arrPairs += QStringPair("ltmpl"     , "mobile");
+    arrPairs += QStringPair("btmpl"     , "mobile");
+    arrPairs += QStringPair("Email"     , arrParams[0].toString());
+    arrPairs += QStringPair("Passwd"    , arrParams[1].toString());
+    arrPairs += QStringPair("service"   , "grandcentral");
+    arrPairs += QStringPair("continue"  , GV_HTTPS_M);
+    arrPairs += QStringPair("timeStmp"  , "");
+    arrPairs += QStringPair("secTok"    , "");
+    arrPairs += QStringPair("signIn"    , "Sign+in");
+    postRequest (GV_LOGIN_PAGE, arrPairs, UA_IPHONE,
+                 this, SLOT (onLoginResponse1 (QNetworkReply *)));
+
+    return true;
 }//GVDataAccess::login
+
+void
+GVDataAccess::onLoginResponse1 (QNetworkReply *reply)
+{
+    QObject::disconnect (&nwMgr, SIGNAL (finished (QNetworkReply *)),
+                          this , SLOT   (onLoginResponse1 (QNetworkReply *)));
+
+    bool bOk;
+    bool bError = (reply->error () != QNetworkReply::NoError);
+    if (bError) {
+        qWarning ("Error logging in");
+        return;
+    }
+    int iRetCode =
+    reply->attribute (QNetworkRequest::HttpStatusCodeAttribute).toInt (&bOk);
+    if (iRetCode != 200) {
+        qWarning () << "Retcode not 200. it is" << iRetCode;
+    }
+
+    QString strReply = reply->readAll ();
+    qDebug () << "Response: " << strReply << ".";
+
+    MyCookieJar *jar = (MyCookieJar *) nwMgr.cookieJar ();
+    QList<QNetworkCookie> cookies = jar->getAllCookies ();
+    foreach (QNetworkCookie cookie, cookies)
+    {
+        qDebug () << cookie;
+        if (cookie.name() == "gvx")
+        {
+            bLoggedIn = true;
+        }
+    }
+}//GVDataAccess::onLoginResponse
 
 bool
 GVDataAccess::loginCaptcha (const QString &strToken, const QString &strCaptcha)
@@ -65,7 +116,7 @@ GVDataAccess::loginCaptcha (const QString &strToken, const QString &strCaptcha)
         arrPairs += QStringPair("logintoken"  , strToken);
         arrPairs += QStringPair("logincaptcha", strCaptcha);
     }
-    postRequest (GV_CLIENTLOGIN, arrPairs, QString (),
+    postRequest (GV_CLIENTLOGIN, arrPairs, UA_IPHONE,
                  this, SLOT (onLoginResponse (QNetworkReply *)));
 
     return (true);
@@ -131,6 +182,18 @@ GVDataAccess::onLoginResponse (QNetworkReply *reply)
 
         qDebug ("Login success");
         bOk = true;
+
+        MyCookieJar *jar = (MyCookieJar *) nwMgr.cookieJar ();
+        QList<QNetworkCookie> cookies = jar->getAllCookies ();
+        foreach (QNetworkCookie cookie, cookies)
+        {
+            qDebug () << cookie;
+            if (cookie.name() == "gvx")
+            {
+                bLoggedIn = true;
+            }
+        }
+
     } while (0); // End cleanup block (not a loop)
 
     reply->deleteLater ();
@@ -162,37 +225,6 @@ GVDataAccess::onLogout (QNetworkReply *reply)
 }//GVDataAccess::onLogout
 
 bool
-GVDataAccess::retrieveContacts ()
-{
-    if (strAuth.isEmpty ())
-    {
-        completeCurrentWork (GVAW_getAllContacts, false);
-        return (false);
-    }
-
-    QStringPairList arrPairs;
-    arrPairs += QStringPair("Auth", strAuth);
-    postRequest (GV_BASE "contacts/", arrPairs, QString (),
-                 this , SLOT (onRetrieveContacts (QNetworkReply *)));
-    return (true);
-}//GVDataAccess::retrieveContacts
-
-void
-GVDataAccess::onRetrieveContacts (QNetworkReply *reply)
-{
-    QByteArray btData = reply->readAll ();
-    reply->deleteLater ();
-    completeCurrentWork (GVAW_getAllContacts, true);
-}//GVDataAccess::onRetrieveContacts
-
-bool
-GVDataAccess::getContactInfoFromLink ()
-{
-    completeCurrentWork (GVAW_getContactFromLink, false);
-    return (false);
-}//GVDataAccess::getContactInfoFromLink
-
-bool
 GVDataAccess::dialCallback (bool /*bCallback*/)
 {
     completeCurrentWork (GVAW_dialCallback, false);
@@ -214,13 +246,6 @@ GVDataAccess::getInbox ()
 }//GVDataAccess::getInbox
 
 bool
-GVDataAccess::getContactFromInboxLink ()
-{
-    completeCurrentWork (GVAW_getContactFromInboxLink, false);
-    return (false);
-}//GVDataAccess::getContactFromInboxLink
-
-bool
 GVDataAccess::sendSMS ()
 {
     completeCurrentWork (GVAW_sendSMS, false);
@@ -233,3 +258,14 @@ GVDataAccess::playVmail ()
     completeCurrentWork (GVAW_playVmail, false);
     return (false);
 }//GVDataAccess::playVmail
+
+MyCookieJar::MyCookieJar(QObject *parent /*= 0*/)
+: QNetworkCookieJar(parent)
+{
+}//MyCookieJar::MyCookieJar
+
+QList<QNetworkCookie>
+MyCookieJar::getAllCookies ()
+{
+    return allCookies ();
+}//MyCookieJar::getAllCookies

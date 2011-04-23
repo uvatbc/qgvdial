@@ -26,9 +26,6 @@ GVAccess::getNameForWork (GVAccess_Work whatwork)
     case GVAW_logout:
         func = "logout";
         break;
-    case GVAW_getAllContacts:
-        func = "getAllContacts";
-        break;
     case GVAW_getRegisteredPhones:
         func = "getRegisteredPhones";
         break;
@@ -37,12 +34,6 @@ GVAccess::getNameForWork (GVAccess_Work whatwork)
         break;
     case GVAW_dialOut:
         func = "dialOut";
-        break;
-    case GVAW_getContactFromInboxLink:
-        func = "getContactFromInboxLink";
-        break;
-    case GVAW_getContactFromLink:
-        func = "getContactFromLink";
         break;
     case GVAW_login:
         func = "login";
@@ -87,7 +78,6 @@ GVAccess::enqueueWork (GVAccess_Work whatwork, const QVariantList &params,
     {
     case GVAW_aboutBlank:
     case GVAW_logout:
-    case GVAW_getAllContacts:
     case GVAW_getRegisteredPhones:
         // No params needed here
         if (0 != params.size ())
@@ -97,15 +87,8 @@ GVAccess::enqueueWork (GVAccess_Work whatwork, const QVariantList &params,
         }
         break;
 
-    case GVAW_getContactFromInboxLink:  // Inbox link
-        if (1 != params.size ())
-        {
-            msg = "GVAccess: Invalid parameter count";
-            bValid = false;
-        }
-        break;
+    // No enum values that need only one parameter!!
 
-    case GVAW_getContactFromLink:   // Page link and default number
     case GVAW_login:                // user and password
     case GVAW_sendSMS:              // Number, text
     case GVAW_playVmail:            // Voicemail link, destination filename
@@ -195,12 +178,6 @@ GVAccess::doNextWork ()
         case GVAW_logout:
             logout ();
             break;
-        case GVAW_getAllContacts:
-            retrieveContacts ();
-            break;
-        case GVAW_getContactFromLink:
-            getContactInfoFromLink ();
-            break;
         case GVAW_dialCallback:
         case GVAW_dialOut:
             dialCallback (workCurrent.whatwork == GVAW_dialCallback);
@@ -210,9 +187,6 @@ GVAccess::doNextWork ()
             break;
         case GVAW_getInbox:
             getInbox ();
-            break;
-        case GVAW_getContactFromInboxLink:
-            getContactFromInboxLink ();
             break;
         case GVAW_sendSMS:
             sendSMS ();

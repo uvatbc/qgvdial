@@ -39,23 +39,14 @@ private slots:
     //! Invoked when the logout page has loaded
     void logoutDone (bool bOk);
 
-    //! Repeatedly invoked when the next page in the contacts list is loaded
-    void contactsLoaded (bool bOk);
-
     void onDataCallDone (QNetworkReply * reply);
     void onDataCallCanceled (QNetworkReply * reply);
-
-    //! Invoked when the contact info link is loaded
-    void contactInfoLoaded (bool bOk);
 
     //! Invoked when the registered phone list page is loaded
     void phonesListLoaded (bool bOk);
 
     //! Invoked when GV responds with a inbox page.
     void onGotInboxXML (QNetworkReply *reply);
-
-    //! Invoked when the inbox entry link for an unknown number is loaded
-    void getContactFromInboxLinkLoaded (bool bOk);
 
     //! Invoked when the garbage timer times out.
     void garbageTimerTimeout ();
@@ -74,10 +65,8 @@ private slots:
     void onSocketXfer (qint64 bytesXfer, qint64 bytesTotal);
 
 private:
-    QWebElement doc ();
     bool isLoggedIn ();
     bool isOnline ();
-    bool isNextContactsPageAvailable ();
     void getHostAndQuery (QString &strHost, QString &strQuery);
     void loadUrlString (const QString &strUrl);
     bool isLoadFailed (bool bOk);
@@ -95,10 +84,6 @@ private:
     bool login ();
     //! Log out of Google voice
     bool logout ();
-    //! Retrieve all contacts for the logged in user
-    bool retrieveContacts ();
-    //! Get the contact info for the link provided
-    bool getContactInfoFromLink ();
     //! Make a phone call to an arbitrary number
     bool dialCallback (bool bCallback);
     //! Get registered phones from the settings page
@@ -107,8 +92,6 @@ private:
     bool getInbox ();
     //! Create and send an inbox request
     bool sendInboxRequest ();
-    //! Call a number given the inbox entry link
-    bool getContactFromInboxLink ();
     //! This sends SMSes
     bool sendSMS ();
     //! Play a voicemail
@@ -122,8 +105,6 @@ private:
     void startTimerForReply(QNetworkReply *reply);
 
 private:
-    bool                    bUseIphoneUA;
-
     //! The webkit page that does all our work
     MobileWebPage           webPage;
 
@@ -136,8 +117,10 @@ private:
     //! The current page (contacts or inbox)
     int                     nCurrent;
 
+#if MOBILITY_PRESENT
     //! We use this to check if we're online
     QNetworkConfigurationManager nwCfg;
+#endif
 
     //! Timeout timer for web page loading
     QTimer                  pageTimeoutTimer;

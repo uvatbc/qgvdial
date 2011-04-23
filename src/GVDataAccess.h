@@ -35,18 +35,12 @@ private:
     bool login ();
     //! Log out of Google voice
     bool logout ();
-    //! Retrieve all contacts for the logged in user
-    bool retrieveContacts ();
-    //! Get the contact info for the link provided
-    bool getContactInfoFromLink ();
     //! Make a phone call to an arbitrary number
     bool dialCallback (bool bCallback);
     //! Get registered phones from the settings page
     bool getRegisteredPhones ();
     //! Begin the process to get inbox
     bool getInbox ();
-    //! Call a number given the inbox entry link
-    bool getContactFromInboxLink ();
     //! This sends SMSes
     bool sendSMS ();
     //! Play a voicemail
@@ -58,7 +52,8 @@ private:
 private slots:
     void onLoginResponse (QNetworkReply *reply);
     void onLogout (QNetworkReply *reply);
-    void onRetrieveContacts (QNetworkReply *reply);
+
+    void onLoginResponse1 (QNetworkReply *reply);
 
 private:
     //! The network access manager to use
@@ -69,6 +64,15 @@ private:
     QString                 strAuth;
 
     friend class Singletons;
+};
+
+class MyCookieJar : public QNetworkCookieJar
+{
+    Q_OBJECT
+
+public:
+    MyCookieJar(QObject * parent = 0);
+    QList<QNetworkCookie> getAllCookies ();
 };
 
 #endif //__GVDATAACCESS_H__

@@ -26,6 +26,7 @@ Singletons::getGVAccess ()
     if (NULL == pGVAccess)
     {
         pGVAccess = new GVWebPage;
+//        pGVAccess = new GVDataAccess;
     }
 
     return (*pGVAccess);

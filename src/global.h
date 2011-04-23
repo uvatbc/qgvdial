@@ -8,7 +8,6 @@
 #include <QtNetwork>
 #include <QtSql>
 #include <QtXml>
-#include <QtDeclarative>
 #include <QtScript>
 
 #ifdef QT_NO_DEBUG
@@ -194,6 +193,12 @@ struct ContactInfo
 Q_DECLARE_METATYPE(ContactInfo)
 ////////////////////////////////////////////////////////////////////////////////
 
+#if defined(Q_WS_HILDON) && !defined(Q_WS_MAEMO_5)
+#define DIABLO_OS 1
+#else
+#define DIABLO_OS 0
+#endif
+
 #if defined(Q_WS_X11) && !defined(Q_WS_MAEMO_5)
 #define LINUX_DESKTOP 1
 #else
@@ -206,7 +211,7 @@ Q_DECLARE_METATYPE(ContactInfo)
 #define DESKTOP_OS 0
 #endif
 
-#if defined(Q_OS_SYMBIAN) || defined(Q_WS_MAEMO_5)
+#if defined(Q_OS_SYMBIAN) || defined(Q_WS_MAEMO_5) || DIABLO_OS
 #define MOBILE_OS 1
 #else
 #define MOBILE_OS 0
@@ -222,6 +227,12 @@ Q_DECLARE_METATYPE(ContactInfo)
 #define MOSQUITTO_CAPABLE 1
 #else
 #define MOSQUITTO_CAPABLE 0
+#endif
+
+#if DIABLO_OS
+#define MOBILITY_PRESENT 0
+#else
+#define MOBILITY_PRESENT 1
 #endif
 
 #endif //__cplusplus

@@ -3,6 +3,7 @@
 
 #include "global.h"
 #include <QtWebKit>
+#include <QtDeclarative>
 
 // For some reason the symbian MOC doesn't like it if I don't include QObject
 // even though it is present in QtCore which is included in global.h
