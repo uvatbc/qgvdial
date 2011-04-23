@@ -488,7 +488,9 @@ GVAccess::setProxySettings (bool bEnable,
 bool
 GVAccess::getSystemProxies (QNetworkProxy &http, QNetworkProxy &https)
 {
+#if !DIABLO_OS
     QNetworkProxyFactory::setUseSystemConfiguration (true);
+#endif
 
     do { // Begin cleanup block (not a loop)
         QList<QNetworkProxy> netProxies =
