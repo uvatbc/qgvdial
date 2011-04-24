@@ -11,6 +11,8 @@ MainWindow::MainWindow(QObject *parent /*= 0*/)
 {
     initLogging ();
 
+    qRegisterMetaType<ContactInfo>("ContactInfo");
+
     GVAccess &webPage = Singletons::getRef().getGVAccess ();
     // webPage status
     QObject::connect (&webPage, SIGNAL (status(const QString &, int)),
