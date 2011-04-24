@@ -84,12 +84,12 @@ GVWebPage::isLoadFailed (bool bOk)
         QMutexLocker locker(&mutex);
         if (workCurrent.bCancel)
         {
-            qDebug ("Work canceled. Fail safely");
+            if (bEmitLog) qDebug ("Work canceled. Fail safely");
             break;
         }
         if (GVAW_Nothing == workCurrent.whatwork)
         {
-            qDebug ("Invalid work. Fail safely");
+            if (bEmitLog) qDebug ("Invalid work. Fail safely");
             break;
         }
 
@@ -158,7 +158,7 @@ bool
 GVWebPage::login ()
 {
     if (!this->isOnline ()) {
-        qDebug ("Cannot login when offline");
+        if (bEmitLog) qDebug ("Cannot login when offline");
         completeCurrentWork (GVAW_login, false);
         return false;
     }
@@ -188,7 +188,7 @@ GVWebPage::loginStage1 (bool bOk)
         }
         bOk = false;
 
-        qDebug ("Login page loaded");
+        if (bEmitLog) qDebug ("Login page loaded");
 
         QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
                            this   , SLOT   (loginStage2 (bool)));
@@ -311,7 +311,7 @@ bool
 GVWebPage::logout ()
 {
     if (!this->isOnline ()) {
-        qDebug ("Cannot logout when offline");
+        if (bEmitLog) qDebug ("Cannot logout when offline");
         completeCurrentWork (GVAW_logout, false);
         return false;
     }
@@ -342,7 +342,7 @@ bool
 GVWebPage::dialCallback (bool bCallback)
 {
     if (!this->isOnline ()) {
-        qDebug ("Cannot dial back when offline");
+        if (bEmitLog) qDebug ("Cannot dial back when offline");
         completeCurrentWork (bCallback?GVAW_dialCallback:GVAW_dialOut, false);
         return false;
     }
@@ -449,7 +449,7 @@ GVWebPage::onDataCallDone (QNetworkReply * reply)
 
     bool bOk = false;
     do { // Begin cleanup block (not a loop)
-        qDebug () << msg;
+        if (bEmitLog) qDebug () << msg;
         QRegExp rx("\"access_number\":\"([+\\d]*)\"");
         if (msg.contains (rx) && (1 == rx.numCaptures ()))
         {
@@ -501,7 +501,7 @@ GVWebPage::cancelDataDial2 ()
 {
     if (!this->isOnline () || bInDialCancel) {
         bInDialCancel = false;
-        qDebug ("Cannot cancel dial back when offline");
+        if (bEmitLog) qDebug ("Cannot cancel dial back when offline");
         QMutexLocker locker(&mutex);
         if ((GVAW_dialCallback == workCurrent.whatwork) ||
             (GVAW_dialOut      == workCurrent.whatwork))
@@ -549,7 +549,7 @@ bool
 GVWebPage::getRegisteredPhones ()
 {
     if (!this->isOnline ()) {
-        qDebug ("Cannot get registered phones when offline");
+        if (bEmitLog) qDebug ("Cannot get registered phones when offline");
         completeCurrentWork (GVAW_getRegisteredPhones, false);
         return false;
     }
@@ -609,7 +609,7 @@ GVWebPage::phonesListLoaded (bool bOk)
             QString strOneNum = rx.cap (1);
             strHtml.remove (0, strHtml.indexOf (strOneNum) + strOneNum.length ());
 
-            qDebug () << strOneNum;
+            if (bEmitLog) qDebug () << strOneNum;
 
             rx.setPattern (strRx2);
             rx.setMinimal (false);
@@ -656,7 +656,7 @@ bool
 GVWebPage::sendInboxRequest ()
 {
     if (!this->isOnline ()) {
-        qDebug ("Cannot send request for inbox when offline");
+        if (bEmitLog) qDebug ("Cannot send request for inbox when offline");
         completeCurrentWork (GVAW_getInbox, false);
         return false;
     }
@@ -672,7 +672,9 @@ GVWebPage::sendInboxRequest ()
     {
         QString strWhich = workCurrent.arrParams[0].toString();
 
-        emit status (QString("Getting inbox page %1...").arg(nCurrent), 0);
+        if (bEmitLog) {
+            emit status (QString("Getting inbox page %1...").arg(nCurrent), 0);
+        }
 
         QString strLink = QString (GV_HTTPS "/inbox/recent/%1?page=p%2")
                             .arg(strWhich).arg(nCurrent);
@@ -720,7 +722,7 @@ bool
 GVWebPage::getInbox ()
 {
     if (!this->isOnline ()) {
-        qDebug ("Cannot get inbox when offline");
+        if (bEmitLog) qDebug ("Cannot get inbox when offline");
         completeCurrentWork (GVAW_getInbox, false);
         return false;
     }
@@ -749,6 +751,7 @@ GVWebPage::onGotInboxXML (QNetworkReply *reply)
     QXmlSimpleReader simpleReader;
     inputSource.setData (strReply);
     GVI_XMLJsonHandler xmlHandler;
+    xmlHandler.setEmitLog (bEmitLog);
 
     QObject::connect (
         &xmlHandler, SIGNAL (oneElement (const GVInboxEntry &)),
@@ -760,13 +763,13 @@ GVWebPage::onGotInboxXML (QNetworkReply *reply)
         simpleReader.setContentHandler (&xmlHandler);
         simpleReader.setErrorHandler (&xmlHandler);
 
-        qDebug ("Begin parsing");
+        if (bEmitLog) qDebug ("Begin parsing");
         if (!simpleReader.parse (&inputSource, false))
         {
             qWarning ("Failed to parse XML");
             break;
         }
-        qDebug ("End parsing");
+        if (bEmitLog) qDebug ("End parsing");
 
         QDateTime dtUpdate = workCurrent.arrParams[3].toDateTime ();
         bool bGotOld = false;
@@ -822,7 +825,7 @@ bool
 GVWebPage::sendSMS ()
 {
     if (!this->isOnline ()) {
-        qDebug ("Cannot send SMS when offline");
+        if (bEmitLog) qDebug ("Cannot send SMS when offline");
         completeCurrentWork (GVAW_sendSMS, false);
         return false;
     }
@@ -924,7 +927,7 @@ bool
 GVWebPage::playVmail ()
 {
     if (!this->isOnline ()) {
-        qDebug ("Cannot download vmail when offline");
+        if (bEmitLog) qDebug ("Cannot download vmail when offline");
         completeCurrentWork (GVAW_playVmail, false);
         return false;
     }
@@ -1002,7 +1005,8 @@ GVWebPage::onVmailDownloaded (QNetworkReply *reply)
             break;
         }
 
-        qDebug () << QString ("Saving vmail in %1").arg(file.fileName ());
+        if (bEmitLog)
+            qDebug () << QString ("Saving vmail in %1").arg(file.fileName ());
         file.write(reply->readAll());
         emit status ("vmail saved");
 
@@ -1041,9 +1045,9 @@ GVWebPage::onPageProgress(int progress)
 {
     pageTimeoutTimer.stop ();
     if (0 == progress) {
-        qDebug ("Page timeout timer started");
+        if (bEmitLog) qDebug ("Page timeout timer started");
     } else {
-        qDebug("Page progressed. Not timing out!");
+        if (bEmitLog) qDebug ("Page progressed. Not timing out!");
     }
     pageTimeoutTimer.setInterval (timeout * 1000);
     pageTimeoutTimer.setSingleShot (true);
@@ -1055,12 +1059,13 @@ GVWebPage::onSocketXfer (qint64 bytesXfer, qint64 bytesTotal)
 {
     pageTimeoutTimer.stop ();
     if ((0 == bytesXfer) && (0 == bytesTotal)) {
-        qDebug("Started the timeout timer");
+        if (bEmitLog) qDebug("Started the timeout timer");
     } else {
-        qDebug() << QString("Socket transferred %1 byte%2 of data. "
-                            "Not timing out!")
-                    .arg (bytesXfer)
-                    .arg (1 == bytesXfer ? "" : "s");
+        if (bEmitLog)
+            qDebug() << QString("Socket transferred %1 byte%2 of data. "
+                                "Not timing out!")
+                            .arg (bytesXfer)
+                            .arg (1 == bytesXfer ? "" : "s");
     }
     pageTimeoutTimer.setInterval (timeout * 1000);
     pageTimeoutTimer.setSingleShot (true);

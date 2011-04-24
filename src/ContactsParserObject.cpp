@@ -4,6 +4,7 @@
 ContactsParserObject::ContactsParserObject (QByteArray data, QObject *parent)
 : QObject(parent)
 , byData (data)
+, bEmitLog (true)
 {
 }//ContactsParserObject::ContactsParserObject
 
@@ -13,6 +14,7 @@ ContactsParserObject::doWork ()
     QXmlInputSource inputSource;
     QXmlSimpleReader simpleReader;
     ContactsXmlHandler contactsHandler;
+    contactsHandler.setEmitLog (bEmitLog);
 
     inputSource.setData (byData);
 
@@ -31,7 +33,15 @@ ContactsParserObject::doWork ()
     QString msg = QString("Total contacts: %1. Usable: %2")
             .arg (contactsHandler.getTotalContacts ())
             .arg (contactsHandler.getUsableContacts ());
-    emit status(msg);
+    if (bEmitLog) {
+        emit status(msg);
+    }
 
     emit done(rv);
 }//ContactsParserObject::doWork
+
+void
+ContactsParserObject::setEmitLog (bool enable /*= true*/)
+{
+    bEmitLog = enable;
+}//ContactsParserObject::setEmitLog

@@ -18,6 +18,8 @@ public:
     quint32 getTotalContacts ();
     quint32 getUsableContacts ();
 
+    void setEmitLog (bool enable = true);
+
 signals:
     void status (const QString &text, int timeout = 2000);
 
@@ -46,6 +48,8 @@ protected:
 
     PhoneInfo   currPhone;
     ContactInfo currInfo;
+
+    bool        bEmitLog;
 };
 
 #endif //__CONTACTSXMLHANDLER_H__

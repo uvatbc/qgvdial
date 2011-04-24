@@ -94,7 +94,6 @@ GVContactsTable::refreshContacts ()
         bRefreshIsUpdate = true;
     }
 
-    emit status ("Retrieving contacts", 0);
     getRequest (strUrl, this , SLOT (onGotContacts (QNetworkReply *)));
 }//GVContactsTable::refreshContacts
 
@@ -178,8 +177,6 @@ GVContactsTable::onLoginResponse (QNetworkReply *reply)
         QMutexLocker locker (&mutex);
         bLoggedIn = true;
 
-        qDebug ("Login success");
-
         if (bRefreshRequested)
         {
             refreshContacts ();
@@ -193,7 +190,6 @@ GVContactsTable::onGotContacts (QNetworkReply *reply)
 {
     QObject::disconnect (&nwMgr, SIGNAL (finished (QNetworkReply *)),
                           this , SLOT   (onGotContacts (QNetworkReply *)));
-    emit status ("Contacts retrieved, parsing", 0);
 
     do // Begin cleanup block (not a loop)
     {
@@ -215,6 +211,7 @@ GVContactsTable::onGotContacts (QNetworkReply *reply)
 
         QThread *workerThread = new QThread(this);
         ContactsParserObject *pObj = new ContactsParserObject(byData);
+        pObj->setEmitLog (false);
         pObj->moveToThread (workerThread);
         QObject::connect (workerThread, SIGNAL(started()),
                           pObj        , SLOT  (doWork()));

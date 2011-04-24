@@ -30,6 +30,8 @@ MainWindow::MainWindow(QObject *parent /*= 0*/)
     // Timer tick
     QObject::connect (&mainTimer, SIGNAL(timeout()), this, SLOT(doWork()));
 
+    webPage.setEmitLog (false);
+
     if (!checkParams ()) {
         qApp->quit();
         return;
@@ -107,12 +109,9 @@ MainWindow::doWork ()
         return;
     }
 
-    // Prepare the contacts
-    oContacts.setUserPass (strUser, strPass);
-    oContacts.loginSuccess ();
+    // Get the contacts
     oContacts.refreshContacts ();
-    // Prepare the inbox widget for usage
-    oInbox.loginSuccess ();
+    // Get inbox
     oInbox.refresh ();
 }//MainWindow::doWork
 
@@ -307,6 +306,10 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
         // Save the users GV number returned by the login completion
         strSelfNumber = varList[varList.size()-1].toString ();
 
+        oContacts.setUserPass (strUser, strPass);
+        oContacts.loginSuccess ();
+        oInbox.loginSuccess ();
+
         QTimer::singleShot (100, this, SLOT(doWork ()));
     }
 }//MainWindow::loginCompleted
@@ -332,7 +335,7 @@ void
 MainWindow::getContactsDone (bool bChanges, bool bOK)
 {
     if (bOK && bChanges) {
-        qDebug ("Contacts changed, update mq server topic");
+        qDebug ("Contacts changed, update mosquitto");
 
         MqPublisher pub(QString("qgvnotify:%1").arg(QHostInfo::localHostName()),
                         m_strMqServer, m_mqPort, m_strMqTopic,
@@ -346,7 +349,7 @@ MainWindow::getContactsDone (bool bChanges, bool bOK)
 void
 MainWindow::inboxChanged ()
 {
-    qDebug ("Inbox changed, update mq server topic");
+    qDebug ("Inbox changed, update mosquitto");
 
     MqPublisher pub(QString("qgvnotify:%1").arg(QHostInfo::localHostName()),
                     m_strMqServer, m_mqPort, m_strMqTopic,

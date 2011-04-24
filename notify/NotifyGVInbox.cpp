@@ -31,7 +31,6 @@ GVInbox::refresh ()
     QObject::connect (
         &webPage, SIGNAL (oneInboxEntry (const GVInboxEntry &)),
          this   , SLOT   (oneInboxEntry (const GVInboxEntry &)));
-    emit status ("Retrieving Inbox...", 0);
     if (!webPage.enqueueWork (GVAW_getInbox, l, this,
             SLOT (getInboxDone (bool, const QVariantList &))))
     {
@@ -51,15 +50,11 @@ GVInbox::oneInboxEntry (const GVInboxEntry &hevent)
     if (hevent.startTime > dtUpdate) {
         dtUpdate = hevent.startTime;
     }
-
-    qDebug () << "New inbox entry at" << hevent.startTime
-              << "from" << hevent.strDisplayNumber;
 }//GVInbox::oneInboxEntry
 
 void
 GVInbox::getInboxDone (bool, const QVariantList &params)
 {
-    emit status ("Inbox retrieved. Sorting...", 0);
     int nNew = 0;
     if (params.count() > 4) {
         nNew = params[4].toInt();
@@ -70,8 +65,6 @@ GVInbox::getInboxDone (bool, const QVariantList &params)
         &webPage, SIGNAL (oneInboxEntry (const GVInboxEntry &)),
          this   , SLOT   (oneInboxEntry (const GVInboxEntry &)));
 
-    emit status (QString("Inbox ready. %1 %2 retrieved.")
-                 .arg(nNew).arg (nNew == 1?"entry":"entries"));
     if (nNew) {
         emit inboxChanged ();
     }

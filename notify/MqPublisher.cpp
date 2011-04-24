@@ -51,8 +51,6 @@ MqPublisher::publish (const QByteArray &byPayload)
         qWarning ("MqPub: Failed to allocate mosquitto context");
         return;
     }
-    mosquitto_log_init(mosq, MOSQ_LOG_DEBUG | MOSQ_LOG_ERR | MOSQ_LOG_WARNING
-                           | MOSQ_LOG_NOTICE | MOSQ_LOG_INFO, MOSQ_LOG_STDERR);
 
     m_byPayload = byPayload;
 

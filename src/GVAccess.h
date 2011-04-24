@@ -85,6 +85,7 @@ public:
                            const QString &user, const QString &pass);
 
     void setTimeout (int seconds = 20);
+    void setEmitLog (bool enable);
 
 signals:
     //! Status emitter
@@ -176,6 +177,9 @@ protected:
     QString                     strCurrentCallback;
 
     int                         timeout;
+
+    //! Should qDebug messages be emitted or not?
+    bool                        bEmitLog;
 
     friend class Singletons;
 };

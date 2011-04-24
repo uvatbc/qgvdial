@@ -4,6 +4,7 @@
 GVI_XMLJsonHandler::GVI_XMLJsonHandler (QObject *parent)
 : QObject (parent)
 , nUsableMsgs (0)
+, bEmitLog (true)
 {
 }//GVI_XMLJsonHandler::GVI_XMLJsonHandler
 
@@ -24,7 +25,7 @@ GVI_XMLJsonHandler::endElement (const QString & /*namespaceURI*/,
 {
     if (localName == "json") {
         strJson = strChars;
-        qDebug ("Got json characters");
+        if (bEmitLog) qDebug ("Got json characters");
 
 #if 0
         QFile temp("dump.txt");
@@ -38,7 +39,7 @@ GVI_XMLJsonHandler::endElement (const QString & /*namespaceURI*/,
         strHtml = "<html>"
                 + strChars
                 + "</html>";
-        qDebug ("Got html characters");
+        if (bEmitLog) qDebug ("Got html characters");
 
 #if 0
         QFile temp("dump.txt");
@@ -90,7 +91,7 @@ GVI_XMLJsonHandler::parseJSON (const QDateTime &dtUpdate, bool &bGotOld, int &nN
         }
 
         qint32 nMsgCount = scriptEngine.evaluate("msgList.length;").toInt32 ();
-        qDebug () << QString ("message count = %1").arg (nMsgCount);
+        if (bEmitLog) qDebug() << QString("message count = %1").arg (nMsgCount);
 
         qint32 nOldMsgs = 0;
 
@@ -190,10 +191,10 @@ GVI_XMLJsonHandler::parseJSON (const QDateTime &dtUpdate, bool &bGotOld, int &nN
             {
                 nOldMsgs++;
                 if (1 == nOldMsgs) {
-                    qDebug ("Started getting old entries.");
+                    if (bEmitLog) qDebug ("Started getting old entries.");
                     bGotOld = true;
                 } else {
-                    qDebug ("Another old entry");
+                    if (bEmitLog) qDebug ("Another old entry");
                 }
             }
 
@@ -211,9 +212,9 @@ GVI_XMLJsonHandler::parseJSON (const QDateTime &dtUpdate, bool &bGotOld, int &nN
         }
 
         nNew = nUsableMsgs - nOldMsgs;
-        qDebug () << QString ("Usable messages = %1").arg (nUsableMsgs);
-        qDebug () << QString ("Old messages = %1").arg (nOldMsgs);
-        qDebug () << QString ("New messages = %1").arg (nNew);
+        if (bEmitLog)
+            qDebug () << QString ("Usable %1, old %2, new %3")
+                            .arg (nUsableMsgs).arg (nOldMsgs).arg (nNew);
 
         rv = true;
     } while (0); // End cleanup block (not a loop)
@@ -226,3 +227,9 @@ GVI_XMLJsonHandler::getUsableMsgsCount ()
 {
     return (nUsableMsgs);
 }//GVI_XMLJsonHandler::getUsableMsgsCount
+
+void
+GVI_XMLJsonHandler::setEmitLog (bool enable)
+{
+    bEmitLog = enable;
+}//GVI_XMLJsonHandler::setEmitLog

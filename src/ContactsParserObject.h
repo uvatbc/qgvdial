@@ -13,6 +13,7 @@ class ContactsParserObject : public QObject
 
 public:
     ContactsParserObject(QByteArray data, QObject *parent = 0);
+    void setEmitLog (bool enable = true);
 
 signals:
     //! Status emitter for status bar
@@ -26,7 +27,9 @@ public slots:
     void doWork ();
 
 private:
-    QByteArray byData;
+    QByteArray  byData;
+
+    bool        bEmitLog;
 };
 
 #endif // CONTACTSPARSEROBJECT_H

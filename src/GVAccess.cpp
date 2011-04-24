@@ -5,6 +5,7 @@ GVAccess::GVAccess (QObject *parent/* = NULL*/)
 , mutex(QMutex::Recursive)
 , bLoggedIn(false)
 , timeout(20)
+, bEmitLog(true)
 {
 }//GVAccess::GVAccess
 
@@ -133,13 +134,14 @@ GVAccess::enqueueWork (GVAccess_Work whatwork, const QVariantList &params,
     QMutexLocker locker(&mutex);
     workList.push_back (workItem);
 
-    qDebug() << "GVAccess: Enqueued " << getNameForWork (whatwork);
+    if (bEmitLog) qDebug() << "GVAccess: Enqueued " << getNameForWork (whatwork);
 
     // If there is no current work in progress...
     doNextWork ();// ... this takes care of when some work is in progress
 
-    qDebug() << "GVAccess: Exit enqueueWork. The work we came in for was "
-             << getNameForWork (whatwork);
+    if (bEmitLog) qDebug() << "GVAccess: Exit enqueueWork. "
+                              "The work we came in for was "
+                           << getNameForWork (whatwork);
     // We've come this far. Always return true because enqueue has succeeded.
     return (true);
 }//GVAccess::enqueueWork
@@ -153,20 +155,21 @@ GVAccess::doNextWork ()
     {
         if (0 == workList.size ())
         {
-            qDebug ("GVAccess: No work to be done. Sleep now.");
+            if (bEmitLog) qDebug ("GVAccess: No work to be done. Sleep now.");
             break;
         }
         if (GVAW_Nothing != workCurrent.whatwork)
         {
-            qDebug () << QString ("GVAccess: Work %1 in progress. Wait for it "
-                                  "to finish.")
-                            .arg (getNameForWork (workCurrent.whatwork));
+            if (bEmitLog)
+                qDebug () << QString ("GVAccess: Work %1 in progress. "
+                                      "Wait for it to finish.")
+                                .arg (getNameForWork (workCurrent.whatwork));
             break;
         }
 
         workCurrent = workList.takeFirst ();
-        qDebug () << "GVAccess: Starting work "
-                  << getNameForWork (workCurrent.whatwork);
+        if (bEmitLog) qDebug () << "GVAccess: Starting work "
+                                << getNameForWork (workCurrent.whatwork);
         switch (workCurrent.whatwork)
         {
         case GVAW_aboutBlank:
@@ -229,15 +232,16 @@ GVAccess::completeCurrentWork (GVAccess_Work whatwork, bool bOk)
             this, SIGNAL (workCompleted (bool, const QVariantList &)),
             workCurrent.receiver, workCurrent.method);
 
-        qDebug() << "GVAccess: Invoking callback for work "
-                 << getNameForWork(whatwork);
+        if (bEmitLog) qDebug() << "GVAccess: Invoking callback for work "
+                               << getNameForWork(whatwork);
         emit workCompleted (bOk, workCurrent.arrParams);
 
         QObject::disconnect (
             this, SIGNAL (workCompleted (bool, const QVariantList &)),
             workCurrent.receiver, workCurrent.method);
 
-        qDebug() << "GVAccess: Completed work " << getNameForWork(whatwork);
+        if (bEmitLog) qDebug() << "GVAccess: Completed work "
+                               << getNameForWork(whatwork);
     } while (0); // End cleanup block (not a loop)
 
     // Init MUST be done after the workCompleted emit to prevent races
@@ -250,8 +254,9 @@ bool
 GVAccess::cancelWork()
 {
     QMutexLocker locker(&mutex);
-    qDebug() << "GVAccess: Request for cancel current. current work is "
-             << getNameForWork (workCurrent.whatwork);
+    if (bEmitLog) qDebug() << "GVAccess: Request for cancel current. "
+                              "current work is "
+                           << getNameForWork (workCurrent.whatwork);
     return cancelWork (workCurrent.whatwork);
 }//GVAccess::cancelWork
 
@@ -260,24 +265,26 @@ GVAccess::cancelWork (GVAccess_Work whatwork)
 {
     bool rv = false;
     QMutexLocker locker(&mutex);
-    qDebug() << "GVAccess: Request for cancel. work to cancel:"
-             << getNameForWork (whatwork);
+    if (bEmitLog) qDebug() << "GVAccess: Request for cancel. work to cancel:"
+                           << getNameForWork (whatwork);
     do // Begin cleanup block (not a loop)
     {
         if (whatwork == workCurrent.whatwork)
         {
-            qDebug("Work to cancel was the current work");
+            if (bEmitLog) qDebug("Work to cancel was the current work");
 
             workCurrent.bCancel = true;
 
             if (NULL != workCurrent.cancel)
             {
-                qDebug("Current work had a cancel callback. Invoking it.");
+                if (bEmitLog)
+                    qDebug("Current work had a cancel callback. Invoking it.");
                 (this->*(workCurrent.cancel)) ();
             }
             else
             {
-                qDebug("Current work had no cancel callback. Moving on.");
+                if (bEmitLog)
+                    qDebug("Current work had no cancel callback. Moving on.");
                 workCurrent.init ();
                 doNextWork ();
             }
@@ -286,21 +293,26 @@ GVAccess::cancelWork (GVAccess_Work whatwork)
             break;
         }
 
-        qDebug("Work to cancel was NOT the current work. Looking for it...");
+        if (bEmitLog)
+            qDebug("Work to cancel was NOT the current work. Looking for it...");
+
         bool bFound = false;
         for (int i = 0; i < workList.size (); i++)
         {
             if (whatwork == workList[i].whatwork)
             {
-                qDebug() << "Found the work to cancel at index" << i;
+                if (bEmitLog)
+                    qDebug() << "Found the work to cancel at index" << i;
                 bFound = true;
                 GVAccess_WorkItem item = workList.takeAt (i);
                 if (NULL != item.cancel)
                 {
-                    qDebug("Work had a cancel callback. Invoking it.");
+                    if (bEmitLog)
+                        qDebug("Work had a cancel callback. Invoking it.");
                     (this->*(workCurrent.cancel)) ();
                 } else {
-                    qDebug("Work had NO cancel callback. Moving on.");
+                    if (bEmitLog)
+                        qDebug("Work had NO cancel callback. Moving on.");
                 }
 
                 rv = true;
@@ -433,7 +445,8 @@ GVAccess::dialCanFinish ()
     QMutexLocker locker(&mutex);
     if (GVAW_dialCallback == workCurrent.whatwork)
     {
-        qDebug ("GVAccess: call in progress can finish. Completing");
+        if (bEmitLog)
+            qDebug ("GVAccess: call in progress can finish. Completing");
         completeCurrentWork (GVAW_dialCallback, true);
     }
     else
@@ -458,14 +471,14 @@ GVAccess::setProxySettings (bool bEnable,
     do // Begin cleanup block (not a loop)
     {
         if (!bEnable) {
-            qDebug ("GVAccess: Clearing all proxy information");
+            if (bEmitLog) qDebug ("GVAccess: Clearing all proxy information");
             break;
         }
 
         if (bUseSystemProxy) {
             QNetworkProxy https;
             getSystemProxies (proxySettings, https);
-            qDebug ("GVAccess: Using system proxy settings");
+            if (bEmitLog) qDebug ("GVAccess: Using system proxy settings");
             break;
         }
 
@@ -478,7 +491,7 @@ GVAccess::setProxySettings (bool bEnable,
             proxySettings.setPassword (pass);
         }
 
-        qDebug ("GVAccess: Using user defined proxy settings.");
+        if (bEmitLog) qDebug ("GVAccess: Using user defined proxy settings.");
     } while (0); // End cleanup block (not a loop)
     QNetworkProxy::setApplicationProxy (proxySettings);
 
@@ -498,8 +511,9 @@ GVAccess::getSystemProxies (QNetworkProxy &http, QNetworkProxy &https)
         QNetworkProxyQuery(QUrl("http://www.google.com")));
         http = netProxies[0];
         if (QNetworkProxy::NoProxy != http.type ()) {
-            qDebug () << "GVAccess: Got proxy: host = " << http.hostName ()
-                      << ", port = " << http.port ();
+            if (bEmitLog) qDebug () << "GVAccess: Got proxy: host = "
+                                    << http.hostName ()
+                                    << ", port = " << http.port ();
             break;
         }
 
@@ -520,8 +534,8 @@ GVAccess::getSystemProxies (QNetworkProxy &http, QNetworkProxy &https)
             strPort.remove (':').remove ('/');
             int port = strPort.toInt ();
 
-            qDebug () << "GVAccess: Found http proxy: "
-                      << strHost << ":" << port;
+            if (bEmitLog) qDebug () << "GVAccess: Found http proxy: "
+                                    << strHost << ":" << port;
             http.setHostName (strHost);
             http.setPort (port);
             http.setType (QNetworkProxy::HttpProxy);
@@ -535,8 +549,9 @@ GVAccess::getSystemProxies (QNetworkProxy &http, QNetworkProxy &https)
         QNetworkProxyQuery(QUrl("https://www.google.com")));
         https = netProxies[0];
         if (QNetworkProxy::NoProxy != https.type ()) {
-            qDebug () << "GVAccess: Got proxy: host = " << https.hostName ()
-                      << ", port = " << https.port ();
+            if (bEmitLog)
+                qDebug () << "GVAccess: Got proxy: host = " << https.hostName ()
+                          << ", port = " << https.port ();
             break;
         }
 
@@ -557,8 +572,9 @@ GVAccess::getSystemProxies (QNetworkProxy &http, QNetworkProxy &https)
             strPort.remove (':').remove ('/');
             int port = strPort.toInt ();
 
-            qDebug () << "GVAccess: Found http proxy: "
-                      << strHost << ":" << port;
+            if (bEmitLog)
+                qDebug () << "GVAccess: Found http proxy: "
+                          << strHost << ":" << port;
             https.setHostName (strHost);
             https.setPort (port);
             https.setType (QNetworkProxy::HttpProxy);
@@ -573,5 +589,11 @@ void
 GVAccess::setTimeout (int seconds /*= 20*/)
 {
     timeout = seconds;
-    qDebug() << "GVAccess: Timeout is now : " << timeout;
+    if (bEmitLog) qDebug() << "GVAccess: Timeout is now : " << timeout;
 }//GVAccess::setTimeout
+
+void
+GVAccess::setEmitLog (bool enable)
+{
+    bEmitLog = enable;
+}//GVAccess::setEmitLog

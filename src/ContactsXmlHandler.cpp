@@ -6,6 +6,7 @@ ContactsXmlHandler::ContactsXmlHandler (QObject *parent)
 , bEntryStarted (false)
 , countContacts (0)
 , countUsableContacts (0)
+, bEmitLog (true)
 {
 }//ContactsXmlHandler::ContactsXmlHandler
 
@@ -97,27 +98,30 @@ ContactsXmlHandler::endElement (const QString & /*namespaceURI*/,
 
         if (currInfo.bDeleted)
         {
-            qDebug () << QString("GV reports deleted contact: "
-                                 "id = %1, name = %2")
+            if (bEmitLog)
+                qDebug () << QString("GV reports deleted contact : "
+                                     "id = %1, name = %2")
                                 .arg (currInfo.strId)
                                 .arg (currInfo.strTitle);
         }
 
         if ((0 == currInfo.arrPhones.size ()) && (!currInfo.bDeleted))
         {
-            qDebug() << "Contact does not have any phone numbers : "
-                     << currInfo.strTitle;
+            if (bEmitLog)
+                qDebug() << "Contact does not have any phone numbers :"
+                         << currInfo.strTitle;
             // Just in case, delete it!
             currInfo.bDeleted = true;
         } else {
-            qDebug() << "Pulled one contact from Google with valid numbers: "
-                     << currInfo.strTitle;
+            if (bEmitLog)
+                qDebug() << "Pulled one contact from Google with valid numbers:"
+                         << currInfo.strTitle;
         }
 
 #if !NO_DBGINFO
         // For debug
         if (currInfo.strTitle.contains ("Jamie", Qt::CaseInsensitive)) {
-            qDebug ("It's Jamie");
+            if (bEmitLog) qDebug ("It's Jamie");
         }
 #endif
 
@@ -146,3 +150,9 @@ ContactsXmlHandler::getUsableContacts ()
 {
     return (countUsableContacts);
 }//ContactsXmlHandler::getUsableContacts
+
+void
+ContactsXmlHandler::setEmitLog (bool enable /*= true*/)
+{
+    bEmitLog = enable;
+}//ContactsXmlHandler::setEmitLog

@@ -16,6 +16,7 @@ public:
     explicit GVI_XMLJsonHandler(QObject *parent = 0);
     bool parseJSON (const QDateTime &dtUpdate, bool &bGotOld, int &nNew);
     qint32 getUsableMsgsCount ();
+    void setEmitLog (bool enable);
 
 signals:
     void oneElement (const GVInboxEntry &element);
@@ -39,6 +40,8 @@ private:
     qint32 nUsableMsgs;
 
     GVI_SMS_Handler smsHandler;
+
+    bool bEmitLog;
 };
 
 #endif // GVI_XMLJSONHANDLER_H
