@@ -49,8 +49,6 @@ main (int argc, char **argv)
     MainWindow w;
     pw = &w;
 
-    w.show ();
-
     int rv = app.exec ();
     pw = NULL;
     return rv;

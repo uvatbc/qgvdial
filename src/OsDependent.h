@@ -15,11 +15,7 @@
 #include <QtMaemo5>
 #endif
 
-#if defined(Q_OS_SYMBIAN)
 #include <openssl/aes.h>
-#else
-#include <openssl/blowfish.h>
-#endif
 #include <openssl/evp.h>
 
 // For some reason the symbian MOC doesn't like it if I don't include QObject

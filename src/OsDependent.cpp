@@ -162,7 +162,7 @@ OsDependent::cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt)
     c = 0;
     while (c < byIn.size ()) {
         inl = byIn.size () - c;
-        inl = inl > sizeof (cipherIn) ? sizeof (cipherIn) : inl;
+        inl = (uint)inl > sizeof (cipherIn) ? sizeof (cipherIn) : inl;
         memcpy (cipherIn, &(byIn.constData()[c]), inl);
         memset (&cipherOut, 0, sizeof cipherOut);
         outl = sizeof cipherOut;

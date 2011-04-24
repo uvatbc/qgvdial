@@ -322,7 +322,7 @@ MainWindow::init ()
     QObject::connect (&obF , SIGNAL (status(const QString &, int)),
                        this, SLOT   (setStatus(const QString &, int)));
 
-    // webPage init and status. This webpage is for debug purposes only
+    // webPage status
     QObject::connect (&webPage, SIGNAL (status(const QString &, int)),
                        this   , SLOT   (setStatus(const QString &, int)));
 

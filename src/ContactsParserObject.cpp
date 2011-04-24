@@ -1,8 +1,5 @@
 #include "ContactsParserObject.h"
-
-#include "Singletons.h"
 #include "ContactsXmlHandler.h"
-#include "ContactsModel.h"
 
 ContactsParserObject::ContactsParserObject (QByteArray data, QObject *parent)
 : QObject(parent)
