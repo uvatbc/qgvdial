@@ -29,6 +29,7 @@ SOURCES  += main.cpp                        \
             MainWindow.cpp                  \
             NotifySingletons.cpp            \
             NotifyGVContactsTable.cpp       \
+            NotifyGVInbox.cpp               \
             ../src/GVAccess.cpp             \
             ../src/GVWebPage.cpp            \
             ../src/MobileWebPage.cpp        \
@@ -37,10 +38,12 @@ SOURCES  += main.cpp                        \
             ../src/ContactsParserObject.cpp \
             ../src/ContactsXmlHandler.cpp
 
+
 HEADERS  += ../src/global.h                 \
             MainWindow.h                    \
             NotifySingletons.h              \
             NotifyGVContactsTable.h         \
+            NotifyGVInbox.h                 \
             ../src/GVAccess.h               \
             ../src/GVWebPage.h              \
             ../src/MobileWebPage.h          \

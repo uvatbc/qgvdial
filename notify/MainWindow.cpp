@@ -6,6 +6,7 @@ using namespace std;
 MainWindow::MainWindow(QObject *parent /*= 0*/)
 : QObject(parent)
 , oContacts (this)
+, oInbox (this)
 {
     initLogging ();
 
@@ -19,6 +20,19 @@ MainWindow::MainWindow(QObject *parent /*= 0*/)
     // oContacts.allContacts -> this.getContactsDone
     QObject::connect (&oContacts, SIGNAL (allContacts (bool, bool)),
                       this      , SLOT   (getContactsDone (bool, bool)));
+    // Status from inbox object
+    QObject::connect (&oInbox, SIGNAL (status   (const QString &, int)),
+                       this  , SLOT   (setStatus(const QString &, int)));
+    // Inbox has updated
+    QObject::connect (&oInbox, SIGNAL (inboxChanged ()),
+                       this  , SLOT   (inboxChanged ()));
+    // Timer tick
+    QObject::connect (&mainTimer, SIGNAL(timeout()), this, SLOT(doWork()));
+
+    if (!checkParams ()) {
+        qApp->quit();
+        return;
+    }
 
     QTimer::singleShot (100, this, SLOT(doWork ()));
 }//MainWindow::MainWindow
@@ -87,12 +101,18 @@ MainWindow::baseDir()
 void
 MainWindow::doWork ()
 {
-    if (!checkParams ()) {
-        qApp->quit();
+    if (strSelfNumber.isEmpty ()) {
+        doLogin ();
         return;
     }
 
-    doLogin ();
+    // Prepare the contacts
+    oContacts.setUserPass (strUser, strPass);
+    oContacts.loginSuccess ();
+    oContacts.refreshContacts ();
+    // Prepare the inbox widget for usage
+    oInbox.loginSuccess ();
+    oInbox.refresh ();
 }//MainWindow::doWork
 
 bool
@@ -240,7 +260,7 @@ MainWindow::doLogin ()
         if (!webPage.enqueueWork (GVAW_login, l, this,
                 SLOT (loginCompleted (bool, const QVariantList &))))
         {
-            qWarning ("Login returned immediately with failure!");
+            qCritical ("Login returned immediately with failure!");
             break;
         }
 
@@ -273,7 +293,8 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
         QVariantList l;
         logoutCompleted (true, l);
 
-        qDebug ("User login failed");
+        qCritical ("User login failed");
+        qApp->quit ();
     }
     else
     {
@@ -282,13 +303,7 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
         // Save the users GV number returned by the login completion
         strSelfNumber = varList[varList.size()-1].toString ();
 
-        // Prepare then contacts
-        oContacts.setUserPass (strUser, strPass);
-        oContacts.loginSuccess ();
-        oContacts.refreshContacts ();
-        // Prepare the inbox widget for usage
-//        oInbox.loginSuccess ();
-//        oInbox.refresh ();
+        QTimer::singleShot (100, this, SLOT(doWork ()));
     }
 }//MainWindow::loginCompleted
 
@@ -306,7 +321,7 @@ MainWindow::logoutCompleted (bool, const QVariantList &)
 {
     // This clears out the table and the view as well
     oContacts.loggedOut ();
-//    oInbox.loggedOut ();
+    oInbox.loggedOut ();
 }//MainWindow::logoutCompleted
 
 void
@@ -316,4 +331,24 @@ MainWindow::getContactsDone (bool bChanges, bool bOK)
         qDebug ("Contacts changed, update mq server topic");
         //TODO: Send mq signal
     }
+
+    startTimer ();
 }//MainWindow::getContactsDone
+
+void
+MainWindow::inboxChanged ()
+{
+    qDebug ("Inbox changed, update mq server topic");
+    //TODO: Send mq signal
+
+    startTimer ();
+}//MainWindow::inboxChanged
+
+void
+MainWindow::startTimer ()
+{
+    mainTimer.stop ();
+    mainTimer.setSingleShot (true);
+    mainTimer.setInterval (5 * 1000);
+    mainTimer.start ();
+}//MainWindow::startTimer

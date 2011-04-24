@@ -6,6 +6,7 @@
 #include <openssl/evp.h>
 #include "GVWebPage.h"
 #include "NotifyGVContactsTable.h"
+#include "NotifyGVInbox.h"
 
 class MainWindow : public QObject
 {
@@ -21,11 +22,13 @@ private slots:
     void loginCompleted (bool bOk, const QVariantList &varList);
     void logoutCompleted (bool bOk, const QVariantList &);
     void getContactsDone (bool bChanges, bool bOK);
+    void inboxChanged ();
 
 private:
     void initLogging ();
     void doLogin ();
     void doLogout ();
+    void startTimer ();
 
     QString baseDir();
     bool checkParams ();
@@ -45,8 +48,12 @@ private:
     // Needed by GV webpage
     QString strSelfNumber;
 
-    //! Contacts table widget
+    //! GV Contacts object
     GVContactsTable oContacts;
+    //! GV Inbox object
+    GVInbox         oInbox;
+
+    QTimer          mainTimer;
 };
 
 #endif //_MAINWINDOW_H_

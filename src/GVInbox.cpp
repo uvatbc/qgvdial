@@ -123,9 +123,9 @@ GVInbox::refreshFullInbox ()
 void
 GVInbox::oneInboxEntry (const GVInboxEntry &hevent)
 {
-    QString strType = modelInbox->type_to_string (hevent.Type);
-    if (0 == strType.size ())
+    if (GVIE_Unknown == hevent.Type)
     {
+        qWarning () << "Invalid inbox entry type:" << (int)hevent.Type;
         return;
     }
 

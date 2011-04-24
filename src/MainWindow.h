@@ -177,9 +177,9 @@ private:
     // Tray, icons, widgets
     QIcon           icoGoogle;
     QSystemTrayIcon *pSystray;
-    //! Contacts table widget
+    //! GV Contacts object
     GVContactsTable oContacts;
-    //! Contacts table widget
+    //! GV Inbox object
     GVInbox         oInbox;
     //! SMS Window
     SMSDlg          dlgSMS;
