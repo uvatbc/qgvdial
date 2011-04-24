@@ -41,9 +41,11 @@ private:
     // Settings parsed from the ini file
     QString strUser;
     QString strPass;
-    QString strMqServer;
-    int mqPort;
-    QString strMqTopic;
+
+    // Mosquitto settings
+    QString m_strMqServer;
+    int m_mqPort;
+    QString m_strMqTopic;
 
     // Needed by GV webpage
     QString strSelfNumber;
@@ -53,6 +55,7 @@ private:
     //! GV Inbox object
     GVInbox         oInbox;
 
+    //! This is the timer on which this entire app runs
     QTimer          mainTimer;
 };
 

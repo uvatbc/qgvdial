@@ -30,6 +30,7 @@ SOURCES  += main.cpp                        \
             NotifySingletons.cpp            \
             NotifyGVContactsTable.cpp       \
             NotifyGVInbox.cpp               \
+            MqPublisher.cpp                 \
             ../src/GVAccess.cpp             \
             ../src/GVWebPage.cpp            \
             ../src/MobileWebPage.cpp        \
@@ -44,6 +45,7 @@ HEADERS  += ../src/global.h                 \
             NotifySingletons.h              \
             NotifyGVContactsTable.h         \
             NotifyGVInbox.h                 \
+            MqPublisher.h                   \
             ../src/GVAccess.h               \
             ../src/GVWebPage.h              \
             ../src/MobileWebPage.h          \

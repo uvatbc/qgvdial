@@ -1,5 +1,6 @@
 #include "MainWindow.h"
 #include "NotifySingletons.h"
+#include "MqPublisher.h"
 #include <iostream>
 using namespace std;
 
@@ -152,30 +153,33 @@ MainWindow::checkParams ()
         if (!settings.contains ("mqserver")) {
             qWarning ("Ini file does not contain the mq server hostname");
             cout << "Enter server hostname:";
-            in >> strMqServer;
-            settings.setValue ("mqserver", strMqServer);
+            in >> m_strMqServer;
+            settings.setValue ("mqserver", m_strMqServer);
         } else {
-            strMqServer = settings.value ("mqserver").toString ();
+            m_strMqServer = settings.value ("mqserver").toString ();
         }
 
         if (!settings.contains ("mqport")) {
             qWarning ("Ini file does not contain the mq server port");
             cout << "Enter server port:";
-            in >> mqPort;
-            settings.setValue ("mqport", mqPort);
+            in >> m_mqPort;
+            if (0 == m_mqPort) m_mqPort = 1883;
+            settings.setValue ("mqport", m_mqPort);
         } else {
-            mqPort = settings.value ("mqport").toInt (&rv);
+            m_mqPort = settings.value ("mqport").toInt (&rv);
             if (!rv) break;
+            if (0 == m_mqPort) m_mqPort = 1883;
+            settings.setValue ("mqport", m_mqPort);
             rv = false;
         }
 
         if (!settings.contains ("mqtopic")) {
             qWarning ("Ini file does not contain the mq topic");
             cout << "Enter topic:";
-            in >> strMqTopic;
-            settings.setValue ("mqtopic", strMqTopic);
+            in >> m_strMqTopic;
+            settings.setValue ("mqtopic", m_strMqTopic);
         } else {
-            strMqTopic = settings.value ("mqtopic").toString ();
+            m_strMqTopic = settings.value ("mqtopic").toString ();
         }
 
         rv = true;
@@ -329,7 +333,11 @@ MainWindow::getContactsDone (bool bChanges, bool bOK)
 {
     if (bOK && bChanges) {
         qDebug ("Contacts changed, update mq server topic");
-        //TODO: Send mq signal
+
+        MqPublisher pub(QString("qgvnotify:%1").arg(QHostInfo::localHostName()),
+                        m_strMqServer, m_mqPort, m_strMqTopic,
+                        this);
+        pub.publish ("contact");
     }
 
     startTimer ();
@@ -339,7 +347,11 @@ void
 MainWindow::inboxChanged ()
 {
     qDebug ("Inbox changed, update mq server topic");
-    //TODO: Send mq signal
+
+    MqPublisher pub(QString("qgvnotify:%1").arg(QHostInfo::localHostName()),
+                    m_strMqServer, m_mqPort, m_strMqTopic,
+                    this);
+    pub.publish ("inbox");
 
     startTimer ();
 }//MainWindow::inboxChanged
