@@ -154,7 +154,7 @@ GVI_XMLJsonHandler::parseJSON (const QDateTime &dtUpdate, bool &bGotOld, int &nN
                     } else if (strVal.contains ("sms")) {
                         inboxEntry.Type = GVIE_TextMessage;
                     } else {
-                        qWarning () << QString("Unknown label %1").arg(strVal);
+                        if (bEmitLog) qWarning () << "Unknown label" << strVal;
                     }
                 } else if (strPName == "displayStartDateTime") {
                 } else if (strPName == "displayStartTime") {
@@ -164,9 +164,9 @@ GVI_XMLJsonHandler::parseJSON (const QDateTime &dtUpdate, bool &bGotOld, int &nN
                 } else if (strPName == "type") {
                 } else if (strPName == "children") {
                 } else {
-                    qDebug () << QString ("param = %1. value = %2")
-                                    .arg (strPName)
-                                    .arg (strVal);
+                    if (bEmitLog)
+                        qDebug () << QString ("param = %1. value = %2")
+                                        .arg (strPName) .arg (strVal);
                 }
             }
 
@@ -232,4 +232,5 @@ void
 GVI_XMLJsonHandler::setEmitLog (bool enable)
 {
     bEmitLog = enable;
+    smsHandler.setEmitLog (bEmitLog);
 }//GVI_XMLJsonHandler::setEmitLog

@@ -12,6 +12,7 @@ class GVI_SMS_Handler : public QObject, public QXmlDefaultHandler
     Q_OBJECT
 public:
     explicit GVI_SMS_Handler(QObject *parent = 0);
+    void setEmitLog (bool enable);
 
 public:
     QMap<QString, QString> mapTexts;
@@ -39,6 +40,8 @@ private:
     qint32 uDepthSinceTextStart;
 
     QString strVmail;
+
+    bool bEmitLog;
 };
 
 #endif // GVI_SMS_HANDLER_H

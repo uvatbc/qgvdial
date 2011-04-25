@@ -5,6 +5,7 @@ GVI_SMS_Handler::GVI_SMS_Handler (QObject *parent)
 , uDepth (0)
 , bTextStarted (false)
 , bTextFragmentStarted (false)
+, bEmitLog (true)
 {
 }//GVI_SMS_Handler::GVI_SMS_Handler
 
@@ -20,7 +21,7 @@ GVI_SMS_Handler::startElement (const QString        & /*namespaceURI*/,
             uDepthSinceTextStart++;
 
             if (atts.value ("class").contains ("gc-message-message-display")) {
-                qDebug ("Found a text or voicemail");
+                if (bEmitLog) qDebug ("Found a text or voicemail");
                 strChars.clear ();
                 bTextStarted = true;
                 uDepthSinceTextStart = 0;
@@ -29,7 +30,7 @@ GVI_SMS_Handler::startElement (const QString        & /*namespaceURI*/,
             if (uDepth != 1) {
                 if ((!atts.value ("id").isEmpty ()) &&
                     (atts.value ("class").contains ("gc-message"))) {
-                    qDebug ("Got next ID!!!");
+                    if (bEmitLog) qDebug ("Got next ID!!!");
                 }
                 break;
             }
@@ -86,3 +87,9 @@ GVI_SMS_Handler::characters (const QString &ch)
     strChars += ch;
     return (true);
 }//GVI_SMS_Handler::characters
+
+void
+GVI_SMS_Handler::setEmitLog (bool enable)
+{
+    bEmitLog = enable;
+}//GVI_SMS_Handler::setEmitLog

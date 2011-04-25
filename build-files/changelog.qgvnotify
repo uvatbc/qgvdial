@@ -1,1 +1,3 @@
-  * Initial build
+  * Bug fix for invalid inbox entry
+  * Proxy support
+  * Debug log silence

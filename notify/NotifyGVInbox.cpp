@@ -41,12 +41,6 @@ GVInbox::refresh ()
 void
 GVInbox::oneInboxEntry (const GVInboxEntry &hevent)
 {
-    if (GVIE_Unknown == hevent.Type)
-    {
-        qWarning () << "Invalid inbox entry type:" << (int)hevent.Type;
-        return;
-    }
-
     if (hevent.startTime > dtUpdate) {
         dtUpdate = hevent.startTime;
     }
