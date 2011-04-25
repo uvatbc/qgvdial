@@ -1,5 +1,5 @@
 my $target = $ARGV[0];
-if (($target eq "") || (($target ne "maemo") && ($target ne "diablo"))) {
+if (($target eq "") || (($target ne "fremantle") && ($target ne "diablo"))) {
     print "Need target: Either maemo or diablo\n";
     exit();
 }
