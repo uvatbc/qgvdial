@@ -33,7 +33,7 @@ ContactsParserObject::doWork ()
     QString msg = QString("Total contacts: %1. Usable: %2")
             .arg (contactsHandler.getTotalContacts ())
             .arg (contactsHandler.getUsableContacts ());
-    if (bEmitLog) {
+    if (bEmitLog || (contactsHandler.getUsableContacts () != 0)) {
         emit status(msg);
     }
 
