@@ -1,2 +1,2 @@
 #!/bin/sh
-killall qgvnotify
+killall -q qgvnotify

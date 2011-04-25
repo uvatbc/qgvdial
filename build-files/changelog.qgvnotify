@@ -1,3 +1,1 @@
-  * Bug fix for invalid inbox entry
-  * Proxy support
-  * Debug log silence
+  * don't complain if killall couldn't kill anything
