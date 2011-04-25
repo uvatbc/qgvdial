@@ -57,6 +57,9 @@ private:
 
     //! This is the timer on which this entire app runs
     QTimer          mainTimer;
+
+    //! Number of times we checked
+    quint64         checkCounter;
 };
 
 #endif //_MAINWINDOW_H_

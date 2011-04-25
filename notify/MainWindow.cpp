@@ -8,6 +8,7 @@ MainWindow::MainWindow(QObject *parent /*= 0*/)
 : QObject(parent)
 , oContacts (this)
 , oInbox (this)
+, checkCounter (0)
 {
     initLogging ();
 
@@ -109,6 +110,11 @@ MainWindow::doWork ()
     if (strSelfNumber.isEmpty ()) {
         doLogin ();
         return;
+    }
+
+    checkCounter++;
+    if (0 == checkCounter % 100) {
+        qDebug() << "Checked" << checkCounter << "times";
     }
 
     // Get the contacts
