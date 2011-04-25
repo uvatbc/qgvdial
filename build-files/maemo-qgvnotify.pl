@@ -1,3 +1,5 @@
+my $target = $ARGV[0]
+
 my $machine = `uname -m`;
 chomp $machine;
 my $mad;
@@ -110,9 +112,9 @@ system($cmd);
 exit();
 
 if ($machine ne "arm") {
-    $cmd = "dput -f fremantle-upload qgvnotify*.changes";
+    $cmd = "dput -f $target-upload qgvnotify*.changes";
 } else {
-    $cmd = "dput -f fremantle-extras-builder qgvnotify*.changes";
+    $cmd = "dput -f $target-extras-builder qgvnotify*.changes";
 }
 system($cmd);
 
