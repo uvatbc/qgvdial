@@ -1,4 +1,4 @@
-my $target = $ARGV[0]
+my $target = $ARGV[0];
 
 my $machine = `uname -m`;
 chomp $machine;
