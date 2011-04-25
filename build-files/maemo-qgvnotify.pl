@@ -42,7 +42,7 @@ system($cmd);
 system("cp $basedir/icons/Google.png $basedir/src/qgvdial.png");
 
 # Append the version to the pro file
-open(PRO_FILE, ">>$basedir/src/src.pro") || die "Cannot open pro file";
+open(PRO_FILE, ">>$basedir/notify/notify.pro") || die "Cannot open pro file";
 print PRO_FILE "VERSION=__QGVDIAL_VERSION__\n";
 close PRO_FILE;
 
@@ -73,10 +73,15 @@ system("head -1 $basedir/debian/changelog >dest.txt ; cat $basedir/build-files/c
 
 if ($machine eq "arm") {
     # Make sure all make files are present before mucking with them.
-    system("cd $basedir ; make src/Makefile");
+    system("cd $basedir ; make notify/Makefile");
+
+    # Strip out "/targets/DIABLO_ARMEL/"
+    $cmd="sed 's/\\/targets\\/DIABLO_ARMEL//g' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/\\/targets\\/DIABLO_ARMEL//g' $basedir/notify/Makefile >$basedir/notify/Makefile1 ; mv $basedir/notify/Makefile1 $basedir/notify/Makefile";
+    print "$cmd\n";
+    system($cmd);
 
     # Strip out "/targets/FREMANTLE_ARMEL/"
-    $cmd="sed 's/\\/targets\\/FREMANTLE_ARMEL//g' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/\\/targets\\/FREMANTLE_ARMEL//g' $basedir/src/Makefile >$basedir/src/Makefile1 ; mv $basedir/src/Makefile1 $basedir/src/Makefile";
+    $cmd="sed 's/\\/targets\\/FREMANTLE_ARMEL//g' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/\\/targets\\/FREMANTLE_ARMEL//g' $basedir/notify/Makefile >$basedir/notify/Makefile1 ; mv $basedir/notify/Makefile1 $basedir/notify/Makefile";
     print "$cmd\n";
     system($cmd);
 
@@ -85,12 +90,12 @@ if ($machine eq "arm") {
     $cmd =~ s/\//\\\//g;
 
     # Replace hard coded current directory with relative directory.
-    $cmd="sed 's/$cmd\\/qgvnotify-$qver/../g' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/$cmd\\/qgvnotify-$qver/../g' $basedir/src/Makefile >$basedir/src/Makefile1 ; mv $basedir/src/Makefile1 $basedir/src/Makefile";
+    $cmd="sed 's/$cmd\\/qgvnotify-$qver/../g' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/$cmd\\/qgvnotify-$qver/../g' $basedir/notify/Makefile >$basedir/notify/Makefile1 ; mv $basedir/notify/Makefile1 $basedir/notify/Makefile";
     print "$cmd\n";
     system($cmd);
 
     # Remove the GLESv2 dependency
-    $cmd="sed 's/ -lGLESv2//g' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/ -lGLESv2//g' $basedir/src/Makefile >$basedir/src/Makefile1 ; mv $basedir/src/Makefile1 $basedir/src/Makefile";
+    $cmd="sed 's/ -lGLESv2//g' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/ -lGLESv2//g' $basedir/notify/Makefile >$basedir/notify/Makefile1 ; mv $basedir/notify/Makefile1 $basedir/notify/Makefile";
     print "$cmd\n";
     system($cmd);
 
@@ -102,6 +107,7 @@ if ($machine eq "arm") {
 }
 # Execute the rest of the build command
 system($cmd);
+exit();
 
 if ($machine ne "arm") {
     $cmd = "dput -f fremantle-upload qgvnotify*.changes";

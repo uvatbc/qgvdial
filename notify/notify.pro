@@ -15,11 +15,20 @@ unix:!symbian {
     QT *= dbus
     LIBS *= -lmosquitto -lssl
 
-    maemo5 {
-        target.path = /opt/usr/bin
+    exists(../../buildit.sh) {
+        PREFIX = ../debian/qgvdial/usr
+        message(Built using my scripts... probably inside scratchbox)
     } else {
-        target.path = /usr/local/bin
+        PREFIX = /opt/usr
     }
+    
+    OPTPREFIX  = $$PREFIX/../opt/qgvdial
+    BINDIR     = $$OPTPREFIX/bin
+    DATADIR    = $$PREFIX/share
+    OPTDATADIR = $$OPTPREFIX/share
+    DEFINES += DATADIR=\"$$DATADIR\" PKGDATADIR=\"$$PKGDATADIR\"
+
+    target.path =$$BINDIR
     INSTALLS += target
 }
 
