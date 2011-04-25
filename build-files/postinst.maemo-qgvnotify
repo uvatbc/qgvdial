@@ -1,0 +1,3 @@
+#!/bin/sh
+chmod +x /opt/qgvdial/bin/qgvnotify
+rm -f /home/user/.qgvdial/notify.log

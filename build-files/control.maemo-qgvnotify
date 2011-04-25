@@ -1,0 +1,14 @@
+Source: qgvnotify
+Section: user/network
+Priority: extra
+Maintainer: Yuvraaj <yuvraaj@gmail.com>
+Build-Depends: debhelper (>= 5), libqt4-dev, libmosquitto (>= 0.9.3), libssl-dev
+Standards-Version: 3.7.3
+Homepage: http://code.google.com/p/qgvdial/
+XSBC-Bugtracker: http://code.google.com/p/qgvdial/issues/list
+
+Package: qgvnotify
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libmosquitto (>= 0.9.3), libssl0.9.8
+Description: Multi-platform Google Voice Dialer
+ Multi-platform Google Voice Dialer written in QT. Works so far in Windows, Linux, Maemo5-fremantle and MacOSX Snow Leopard.
