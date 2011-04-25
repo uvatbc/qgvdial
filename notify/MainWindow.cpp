@@ -131,6 +131,10 @@ MainWindow::checkParams ()
     strIni += QDir::separator();
     strIni += "notify.ini";
 
+    bool bUseProxy = false, bUseSystemProxy = false, bProxyAuth = false;
+    QString strProxy, strProxyUser, strProxyPass;
+    int proxyport;
+
     do { // Begin cleanup block (not a loop)
         QSettings settings (strIni, QSettings::IniFormat, this);
 
@@ -189,6 +193,72 @@ MainWindow::checkParams ()
             m_strMqTopic = settings.value ("mqtopic").toString ();
         }
 
+        if (!settings.contains ("useproxy")) {
+            settings.setValue ("useproxy", false);
+            bUseProxy = false;
+        } else {
+            bUseProxy = settings.value ("useproxy", false).toBool ();
+        }
+
+        if (!settings.contains ("usesystemproxy")) {
+            settings.setValue ("usesystemproxy", false);
+            bUseSystemProxy = false;
+        } else {
+            bUseSystemProxy = settings.value ("usesystemproxy", false).toBool();
+        }
+
+        if (!settings.contains ("proxyserver")) {
+            settings.setValue ("proxyserver", "proxy.example.com");
+        } else {
+            strProxy = settings.value ("proxyserver", "").toString ();
+        }
+
+        if (!settings.contains ("proxyport")) {
+            settings.setValue ("proxyport", 80);
+            proxyport = 80;
+        } else {
+            proxyport = settings.value ("proxyport", 80).toInt ();
+        }
+
+        if (!settings.contains ("proxyauth")) {
+            settings.setValue ("proxyauth", false);
+            bProxyAuth = false;
+        } else {
+            bProxyAuth = settings.value ("proxyauth", false).toBool ();
+        }
+
+        if (!settings.contains ("proxyuser")) {
+            if (bUseProxy & !bUseSystemProxy && bProxyAuth) {
+                qWarning ("Ini file needs proxy authentication user");
+                cout << "Enter proxy user:";
+                in >> strProxyUser;
+                settings.setValue ("proxyuser", "proxy_user");
+            }
+        } else {
+            strProxyUser = settings.value ("proxyuser", "").toString ();
+        }
+
+        if (!settings.contains ("proxypass")) {
+            if (bUseProxy & !bUseSystemProxy && bProxyAuth) {
+                qWarning ("Ini file needs proxy authentication password");
+                cout << "Enter proxy password:";
+                in >> strProxyPass;
+                cipher (strPass.toLocal8Bit (), byD, true);
+                settings.setValue ("proxypass", QString(byD.toHex ()));
+            }
+        } else {
+            byD = settings.value("proxypass", "").toByteArray ();
+            cipher (QByteArray::fromHex (byD), byD, false);
+            strProxyPass = byD;
+        }
+
+        if (bUseProxy) {
+            GVAccess &webPage = Singletons::getRef().getGVAccess ();
+            webPage.setProxySettings (bUseProxy, bUseSystemProxy,
+                                      strProxy, proxyport,
+                                      bProxyAuth,
+                                      strProxyUser, strProxyPass);
+        }
         rv = true;
     } while (0); // End cleanup block (not a loop)
 
