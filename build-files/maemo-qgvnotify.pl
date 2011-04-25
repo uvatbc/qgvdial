@@ -109,13 +109,13 @@ if ($machine eq "arm") {
 }
 # Execute the rest of the build command
 system($cmd);
-exit();
 
 if ($machine ne "arm") {
     $cmd = "dput -f $target-upload qgvnotify*.changes";
 } else {
     $cmd = "dput -f $target-extras-builder qgvnotify*.changes";
 }
+print "$cmd\n";
 system($cmd);
 
 exit();
