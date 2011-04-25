@@ -16,7 +16,7 @@ unix:!symbian {
     LIBS *= -lmosquitto -lssl
 
     exists(../../buildit.sh) {
-        PREFIX = ../debian/qgvdial/usr
+        PREFIX = ../debian/qgvnotify/usr
         message(Built using my scripts... probably inside scratchbox)
     } else {
         PREFIX = /opt/usr
