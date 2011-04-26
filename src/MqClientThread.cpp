@@ -151,7 +151,8 @@ MqClientThread::on_error()
 void
 MqClientThread::run ()
 {
-    int rv;
+#define MQTHREAD_MAX_RETRIES 5
+    int rv, retries = 0;
     qDebug ("Mq thread: Enter thread");
 
     do {
@@ -173,20 +174,24 @@ MqClientThread::run ()
         while (!bQuit) {
             rv = this->loop (1*1000);
             if (MOSQ_ERR_SUCCESS == rv) {
+                retries = 0;
                 // In the normal case, continue the loop
             } else if ((MOSQ_ERR_INVAL == rv) ||
                        (MOSQ_ERR_NOMEM == rv)) {
                 qWarning() << "Mq thread: Unrecoverable error in loop:" << rv;
-                bQuit = true;
+                retries++;
+                break;
             } else if ((MOSQ_ERR_NO_CONN == rv) ||
                        (MOSQ_ERR_CONN_LOST == rv) ||
                        (MOSQ_ERR_PROTOCOL == rv)) {
                 qWarning ("Mq thread: Recoverable error, hopefully");
                 this->sleep (1);
+                retries++;
                 break;
             } else {
                 qWarning() << "Mq thread: Other error in loop:" << rv;
-                bQuit = true;
+                retries++;
+                break;
             }
         }
 
@@ -194,6 +199,11 @@ MqClientThread::run ()
         this->unsubscribe(NULL, strTopic.toLatin1().constData ());
         this->mq_disconnect ();
         this->loop (100);
+
+        if (retries > MQTHREAD_MAX_RETRIES) {
+            qWarning ("MqThread: Too many retires!");
+            bQuit = true;
+        }
     } while (!bQuit);
 
     // Ready for the next time
