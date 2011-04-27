@@ -30,12 +30,20 @@ CallInitiatorFactory::getInitiators ()
     return (listInitiators);
 }//CallInitiatorFactory::getInitiators
 
+const CalloutInitiatorList &
+CallInitiatorFactory::getFallbacks ()
+{
+    return (listFallback);
+}//CallInitiatorFactory::getInitiators
+
 void
 CallInitiatorFactory::init ()
 {
 #if LINUX_DESKTOP || defined (Q_WS_WIN32)
     CalloutInitiator *skype_initiator = new DesktopSkypeCallInitiator (this);
     listInitiators += skype_initiator;
+    //@@UV: Add this when you manage to send DTMF to skype
+    //listFallback += skype_initiator;
 #endif
 
 #if TELEPATHY_CAPABLE
@@ -47,6 +55,8 @@ CallInitiatorFactory::init ()
 #if defined(Q_OS_SYMBIAN)
     CalloutInitiator *phoneInitiator = new SymbianCallInitiator(this);
     listInitiators += phoneInitiator;
+    //@@UV: Add this when you manage to send DTMF to the Symbian phone interface
+    //listFallback += phoneInitiator;
 #endif
 
     foreach (CalloutInitiator *i, listInitiators) {
@@ -125,6 +135,11 @@ CallInitiatorFactory::onAllAccountsReady ()
 
         CalloutInitiator *initiator = new TpCalloutInitiator (act, this);
         listInitiators += initiator;
+
+        if (act->cmName () == "ring") {
+            //@@UV: Add this when you manage to send DTMF to ring
+            //listFallback += initiator;
+        }
 
         QObject::connect (initiator, SIGNAL (status(const QString &, int)),
                           this     , SIGNAL (status(const QString &, int)));

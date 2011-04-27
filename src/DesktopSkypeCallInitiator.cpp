@@ -102,3 +102,10 @@ DesktopSkypeCallInitiator::isValid ()
 //    return ((NULL != skypeClient) && (skypeClient->isConnected ()));
     return true;
 }//DesktopSkypeCallInitiator::isValid
+
+bool
+DesktopSkypeCallInitiator::sendDTMF (const QString &strTones)
+{
+    //@@UV: Add DTMF to skype
+    return false;
+}//DesktopSkypeCallInitiator::sendDTMF

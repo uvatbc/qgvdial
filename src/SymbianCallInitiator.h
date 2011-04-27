@@ -20,6 +20,7 @@ public:
 
 public slots:
     void initiateCall (const QString &strDestination);
+    bool sendDTMF(const QString &strTones);
 
 signals:
     void callDialed();

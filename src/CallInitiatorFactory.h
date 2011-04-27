@@ -23,6 +23,7 @@ private:
 
 public:
     const CalloutInitiatorList & getInitiators ();
+    const CalloutInitiatorList & getFallbacks ();
 
 private:
     void init ();
@@ -40,6 +41,7 @@ signals:
 
 private:
     CalloutInitiatorList listInitiators;
+    CalloutInitiatorList listFallback;
 
     QMutex  mutex;
 

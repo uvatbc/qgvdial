@@ -97,3 +97,10 @@ SymbianCallInitiator::callInitiated ()
         emit callDialed();
     }
 }//SymbianCallInitiator::callInitiated
+
+bool
+SymbianCallInitiator::sendDTMF (const QString &strTones)
+{
+    //@@UV: Add DTMF to Symbian
+    return false;
+}//SymbianCallInitiator::sendDTMF

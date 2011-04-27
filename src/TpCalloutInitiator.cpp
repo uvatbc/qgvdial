@@ -170,3 +170,10 @@ TpCalloutInitiator::isValid ()
     return (!account.isNull () && !account->connection().isNull () &&
             account->isEnabled () && account->isValid ());
 }//TpCalloutInitiator::isValid
+
+bool
+TpCalloutInitiator::sendDTMF (const QString &strTones)
+{
+    //@@UV: Add DTMF to Telepathy
+    return false;
+}//TpCalloutInitiator::sendDTMF

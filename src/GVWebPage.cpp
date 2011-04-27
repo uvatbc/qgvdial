@@ -17,7 +17,6 @@ GVWebPage::GVWebPage(QObject *parent/* = NULL*/)
 {
     webPage.settings()->setAttribute (QWebSettings::JavaEnabled, false);
     webPage.settings()->setAttribute (QWebSettings::AutoLoadImages, false);
-    //TODO: Do not download images. Speed up load. Look at other speed ups.
     webPage.setForwardUnsupportedContent (true);
 
     garbageTimer.setSingleShot (true);

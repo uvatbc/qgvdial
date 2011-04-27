@@ -25,6 +25,7 @@ public:
 
 public slots:
     virtual void initiateCall (const QString &strDestination) = 0;
+    virtual bool sendDTMF(const QString &strTones) = 0;
 
     friend class CallInitiatorFactory;
 };

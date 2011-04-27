@@ -21,6 +21,7 @@ public:
 
 public slots:
     void initiateCall (const QString &strDestination);
+    bool sendDTMF(const QString &strTones);
 
 private slots:
     void onConnectionChanged (const Tp::ConnectionPtr &connection);

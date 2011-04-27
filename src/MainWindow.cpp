@@ -864,6 +864,7 @@ void
 MainWindow::dialNow (const QString &strTarget)
 {
     CalloutInitiator *ci;
+    bool bTryFallback = false;
 
     do // Begin cleanup block (not a loop)
     {
@@ -932,6 +933,7 @@ MainWindow::dialNow (const QString &strTarget)
                 setStatus ("Dialing failed instantly");
                 bCallInProgress = bDialCancelled = false;
                 ctx->deleteLater ();
+                bTryFallback = true;
                 break;
             }
         }
@@ -945,10 +947,15 @@ MainWindow::dialNow (const QString &strTarget)
                 setStatus ("Dialing failed instantly");
                 bCallInProgress = bDialCancelled = false;
                 ctx->deleteLater ();
+                bTryFallback = true;
                 break;
             }
         }
     } while (0); // End cleanup block (not a loop)
+
+    if (bTryFallback) {
+        qDebug ("Should try fallback here");
+    }
 }//MainWindow::dialNow
 
 void
@@ -1067,6 +1074,8 @@ MainWindow::dialComplete (bool bOk, const QVariantList &params)
 {
     QMutexLocker locker (&mtxDial);
     DialContext *ctx = (DialContext *) params[1].value <void*> ();
+    bool bTryFallback = false;
+
     if (!bOk)
     {
         if (bDialCancelled)
@@ -1077,6 +1086,7 @@ MainWindow::dialComplete (bool bOk, const QVariantList &params)
         {
             setStatus ("Dialing failed", 10*1000);
             this->showMsgBox ("Dialing failed");
+            bTryFallback = true;
         }
     }
     else
