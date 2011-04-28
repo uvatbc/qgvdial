@@ -190,8 +190,7 @@ TpCalloutInitiator::sendDTMF (const QString &strTones)
         QDBusMessage::createMethodCall(CSD_SERVICE,
                                        CSD_CALL_PATH,
                                        CSD_CALL_INTERFACE,
-                                       QString("SendDTMF"),
-                                       argsToSend);
+                                       QString("SendDTMF"));
         dbusMethodCall.setArguments(argsToSend);
         return systemBus.send(dbusMethodCall);
     }
