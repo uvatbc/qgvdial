@@ -21,6 +21,7 @@ Item {
                            bool bRequiresAuth,
                            string user, string pass)
     signal sigMosquittoChanges(bool bEnable, string host, int port, string topic)
+    signal sigPinSettingChanges(bool bEnable, string pin)
 
     signal sigMsgBoxDone (bool ok)
 
@@ -145,6 +146,10 @@ Item {
                     newState: "Mosquitto"
                 }//ListElement (mosquitto settings)
                 ListElement {
+                    text: "Pin settings"
+                    newState: "PinSettings"
+                }//ListElement (Pin settings)
+                ListElement {
                     text: "Web Page (debug)"
                     newState: "WebPage"
                 }//ListElement (Web Page (debug))
@@ -225,6 +230,17 @@ Item {
         onSigMsgBoxDone: container.sigMsgBoxDone(ok)
     }//Mosquitto
 
+    PinSetting {
+        id: pinSettings
+        anchors.fill: parent
+        anchors.topMargin: 2
+        opacity: 0
+
+        onSigDone: container.state = ''
+        onSigPinSettingChanges: container.sigPinSettingChanges(bEnable, pin)
+        onSigMsgBoxDone: container.sigMsgBoxDone(ok)
+    }//Pin settings
+
     DbgWebWidget {
         id: myWebWidget
         anchors.fill: parent
@@ -269,6 +285,7 @@ Item {
             name: "Proxy"
             PropertyChanges { target: proxySettings; opacity: 1 }
             PropertyChanges { target: mqSettings; opacity: 0 }
+            PropertyChanges { target: pinSettings; opacity: 0 }
             PropertyChanges { target: myWebWidget; opacity: 0 }
             PropertyChanges { target: logView; opacity: 0 }
             PropertyChanges { target: aboutWin; opacity: 0 }
@@ -278,15 +295,27 @@ Item {
             name: "Mosquitto"
             PropertyChanges { target: proxySettings; opacity: 0 }
             PropertyChanges { target: mqSettings; opacity: 1 }
+            PropertyChanges { target: pinSettings; opacity: 0 }
             PropertyChanges { target: myWebWidget; opacity: 0 }
             PropertyChanges { target: logView; opacity: 0 }
             PropertyChanges { target: aboutWin; opacity: 0 }
             PropertyChanges { target: mainColumn; opacity: 0 }
         },//Mosquitto
         State {
+            name: "PinSettings"
+            PropertyChanges { target: proxySettings; opacity: 0 }
+            PropertyChanges { target: mqSettings; opacity: 0 }
+            PropertyChanges { target: pinSettings; opacity: 1 }
+            PropertyChanges { target: myWebWidget; opacity: 0 }
+            PropertyChanges { target: logView; opacity: 0 }
+            PropertyChanges { target: aboutWin; opacity: 0 }
+            PropertyChanges { target: mainColumn; opacity: 0 }
+        },//Pin settings
+        State {
             name: "WebPage"
             PropertyChanges { target: proxySettings; opacity: 0 }
             PropertyChanges { target: mqSettings; opacity: 0 }
+            PropertyChanges { target: pinSettings; opacity: 0 }
             PropertyChanges { target: myWebWidget; opacity: 1 }
             PropertyChanges { target: logView; opacity: 0 }
             PropertyChanges { target: aboutWin; opacity: 0 }
@@ -296,15 +325,17 @@ Item {
             name: "ViewLog"
             PropertyChanges { target: proxySettings; opacity: 0 }
             PropertyChanges { target: mqSettings; opacity: 0 }
+            PropertyChanges { target: pinSettings; opacity: 0 }
             PropertyChanges { target: myWebWidget; opacity: 0 }
             PropertyChanges { target: logView; opacity: 1 }
             PropertyChanges { target: aboutWin; opacity: 0 }
             PropertyChanges { target: mainColumn; opacity: 0 }
-        },//WebPage
+        },//View Log
         State {
             name: "About"
             PropertyChanges { target: proxySettings; opacity: 0 }
             PropertyChanges { target: mqSettings; opacity: 0 }
+            PropertyChanges { target: pinSettings; opacity: 0 }
             PropertyChanges { target: myWebWidget; opacity: 0 }
             PropertyChanges { target: logView; opacity: 0 }
             PropertyChanges { target: aboutWin; opacity: 1 }

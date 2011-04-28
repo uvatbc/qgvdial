@@ -120,6 +120,7 @@ OTHER_FILES  += winrsrc.rc                  \
                 ../qml/MsgBox.qml           \
                 ../qml/MyButton.qml         \
                 ../qml/MyTextEdit.qml       \
+                ../qml/PinSetting.qml       \
                 ../qml/Proxy.qml            \
                 ../qml/RadioButton.qml      \
                 ../qml/Scrollbar.qml        \

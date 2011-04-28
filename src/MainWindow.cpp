@@ -500,6 +500,9 @@ MainWindow::initQML ()
                                           const QString &)),
         this, SLOT   (onSigMosquittoChanges(bool, const QString &, int,
                                             const QString &)));
+    QObject::connect (
+        gObj, SIGNAL(sigPinSettingChanges  (bool, const QString &)),
+        this, SLOT  (onSigPinSettingChanges(bool, const QString &)));
     QObject::connect (gObj, SIGNAL (sigMsgBoxDone(bool)),
                       this, SLOT (onSigMsgBoxDone(bool)));
 
@@ -647,6 +650,10 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
         int mqPort;
         if (dbMain.getMqSettings (bMqEnabled, strMqHost, mqPort, strMqTopic)) {
             onSigMosquittoChanges (bMqEnabled, strMqHost, mqPort, strMqTopic);
+        }
+
+        if (dbMain.getGvPin (bMqEnabled, strMqHost)) {
+            onSigPinSettingChanges (bMqEnabled, strMqHost);
         }
     }
 }//MainWindow::loginCompleted
@@ -864,7 +871,6 @@ void
 MainWindow::dialNow (const QString &strTarget)
 {
     CalloutInitiator *ci;
-    bool bTryFallback = false;
 
     do // Begin cleanup block (not a loop)
     {
@@ -932,8 +938,7 @@ MainWindow::dialNow (const QString &strTarget)
             {
                 setStatus ("Dialing failed instantly");
                 bCallInProgress = bDialCancelled = false;
-                ctx->deleteLater ();
-                bTryFallback = true;
+                fallbackDialout (ctx);
                 break;
             }
         }
@@ -946,16 +951,11 @@ MainWindow::dialNow (const QString &strTarget)
             {
                 setStatus ("Dialing failed instantly");
                 bCallInProgress = bDialCancelled = false;
-                ctx->deleteLater ();
-                bTryFallback = true;
+                fallbackDialout (ctx);
                 break;
             }
         }
     } while (0); // End cleanup block (not a loop)
-
-    if (bTryFallback) {
-        qDebug ("Should try fallback here");
-    }
 }//MainWindow::dialNow
 
 void
@@ -1074,31 +1074,43 @@ MainWindow::dialComplete (bool bOk, const QVariantList &params)
 {
     QMutexLocker locker (&mtxDial);
     DialContext *ctx = (DialContext *) params[1].value <void*> ();
-    bool bTryFallback = false;
+    bool bReleaseContext = true;
 
-    if (!bOk)
-    {
-        if (bDialCancelled)
-        {
+    if (!bOk) {
+        if (bDialCancelled) {
             setStatus ("Cancelled dial out");
-        }
-        else
-        {
+        } else if (NULL == ctx->fallbackCi) {
+            // Not currently in fallback modem and there was a problem
+            // ... so start fallback mode
+            bReleaseContext = false;
+            fallbackDialout (ctx);
+        } else {
             setStatus ("Dialing failed", 10*1000);
             this->showMsgBox ("Dialing failed");
-            bTryFallback = true;
         }
-    }
-    else
-    {
-        setStatus (QString("Dial successful to %1.").arg(params[0].toString()));
+    } else {
+        if (NULL != ctx->fallbackCi) {
+            // IS currently in fallback mode and callback has completed.
+            // ... so perform the Google Voice dialout.
+            QString strDTMF;
+            if (!strGvPin.isEmpty ()) {
+                strDTMF = strGvPin + "p";
+            }
+            strDTMF += "2p" + ctx->strTarget;
+            ctx->fallbackCi->sendDTMF (strDTMF);
+        } else {
+            setStatus (QString("Dial successful to %1.")
+                       .arg(params[0].toString()));
+        }
     }
     bCallInProgress = false;
 
     OsDependent &osd = Singletons::getRef().getOSD ();
     osd.setLongWork (this, false);
 
-    ctx->deleteLater ();
+    if (bReleaseContext) {
+        ctx->deleteLater ();
+    }
 }//MainWindow::dialComplete
 
 void
@@ -1512,6 +1524,33 @@ MainWindow::onSigMosquittoChanges (bool bEnable, const QString &host, int port,
 }//MainWindow::onSigMosquittoChanges
 
 void
+MainWindow::onSigPinSettingChanges(bool bEnable, const QString &pin)
+{
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    dbMain.setGvPin (bEnable, pin);
+    strGvPin = pin;
+
+    do // Begin cleanup block (not a loop)
+    {
+        QObject *pRoot = this->rootObject ();
+        if (NULL == pRoot) {
+            qWarning ("Couldn't get root object in QML for MosquittoPage");
+            break;
+        }
+
+        QObject *pMqSettings = pRoot->findChild <QObject*>
+                                                  ("PinSettingsPage");
+        if (NULL == pMqSettings) {
+            qWarning ("Could not get to PinSettingsPage");
+            break;
+        }
+
+        QMetaObject::invokeMethod (pMqSettings, "setValues",
+                                   Q_ARG (QVariant, QVariant(pin)));
+    } while (0); // End cleanup block (not a loop)
+}//MainWindow::onSigPinSettingChanges
+
+void
 MainWindow::onMqThreadFinished ()
 {
 #if MOSQUITTO_CAPABLE
@@ -1625,3 +1664,19 @@ MainWindow::setPassword(const QString &strP)
                                    Q_ARG (QVariant, QVariant(strP)));
     } while (0); // End cleanup block (not a loop)
 }//MainWindow::setPassword
+
+void
+MainWindow::fallbackDialout (DialContext *ctx)
+{
+    CallInitiatorFactory& cif = Singletons::getRef().getCIFactory ();
+    CalloutInitiatorList listCi = cif.getFallbacks ();
+    if (listCi.length () < 1) {
+        ctx->deleteLater ();
+        setStatus ("Dialing failed", 10*1000);
+        this->showMsgBox ("Dialing failed");
+        return;
+    }
+
+    ctx->fallbackCi = listCi[0];
+    ctx->fallbackCi->initiateCall (ctx->strMyNumber);
+}//MainWindow::fallbackDialout

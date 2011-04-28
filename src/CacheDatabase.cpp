@@ -15,6 +15,7 @@
 #define GV_S_VAR_PASS           "password"
 #define GV_S_VAR_CALLBACK       "callback"
 #define GV_S_VAR_INBOX_SEL      "inbox_sel"
+#define GV_S_VAR_PIN            "gvpin"
 #define GV_S_VAR_DB_VER         "db_ver"
 ////////////////////////////////////////////////////////////////////////////////
 // Started using Google Contacts API
@@ -1217,3 +1218,48 @@ CacheDatabase::getMqSettings (bool &bEnable, QString &host, int &port,
     } while (0); // End cleanup block (not a loop)
     return (rv);
 }//CacheDatabase::getMqSettings
+
+bool
+CacheDatabase::setGvPin (bool bEnable, const QString &pin)
+{
+    QSqlQuery query(dbMain);
+    query.setForwardOnly (true);
+
+    // Clear the table of all settings
+    query.exec ("DELETE FROM " GV_SETTINGS_TABLE " "
+                "WHERE " GV_S_NAME "='" GV_S_VAR_PIN "'");
+    if (!bEnable) {
+        return true;
+    }
+
+    QByteArray byD;
+    OsDependent &osd = Singletons::getRef().getOSD ();
+    osd.cipher (pin.toAscii (), byD, true);
+    QString strQ = QString ("INSERT INTO " GV_SETTINGS_TABLE
+                            " (" GV_S_NAME "," GV_S_VALUE ")"
+                            " VALUES ('" GV_S_VAR_PIN "', '%1')")
+                    .arg(QString(byD.toHex ()));
+    return (query.exec (strQ));
+}//CacheDatabase::setGvPin
+
+bool
+CacheDatabase::getGvPin (bool &bEnable, QString &pin)
+{
+    OsDependent &osd = Singletons::getRef().getOSD ();
+    QByteArray byD;
+    QString strResult;
+    QSqlQuery query(dbMain);
+    query.setForwardOnly (true);
+    query.exec ("SELECT " GV_S_VALUE " FROM " GV_SETTINGS_TABLE " "
+                "WHERE " GV_S_NAME "='" GV_S_VAR_PIN "'");
+    pin = "0000";
+    if (query.next ())
+    {
+        bEnable = true;
+        strResult = query.value(0).toString();
+        osd.cipher (QByteArray::fromHex (strResult.toAscii ()), byD, false);
+        pin = byD;
+    }
+
+    return (true);
+}//CacheDatabase::getGvPin

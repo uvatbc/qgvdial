@@ -42,6 +42,7 @@ Rectangle {
                            string user, string pass)
 
     signal sigMosquittoChanges(bool bEnable, string host, int port, string topic)
+    signal sigPinSettingChanges(bool bEnable, string pin)
 
     // Signals from the message box
     signal sigMsgBoxDone (bool ok)

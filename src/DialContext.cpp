@@ -8,6 +8,7 @@ DialContext::DialContext (const QString &strMy, const QString &strT,
 , ci (NULL)
 , strMyNumber (strMy)
 , strTarget (strT)
+, fallbackCi (NULL)
 , mainView (mV)
 {
     QObject *pRoot = mainView->rootObject ();

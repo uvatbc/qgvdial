@@ -32,6 +32,7 @@
         <file alias="MsgBox.qml">../qml/MsgBox.qml</file>
         <file alias="MyButton.qml">../qml/MyButton.qml</file>
         <file alias="MyTextEdit.qml">../qml/MyTextEdit.qml</file>
+        <file alias="PinSetting.qml">../qml/PinSetting.qml</file>
         <file alias="Proxy.qml">../qml/Proxy.qml</file>
         <file alias="RadioButton.qml">../qml/RadioButton.qml</file>
         <file alias="Scrollbar.qml">../qml/Scrollbar.qml</file>

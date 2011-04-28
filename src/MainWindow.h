@@ -129,6 +129,9 @@ private slots:
     void onSigMosquittoChanges(bool bEnable, const QString &host, int port,
                                const QString &topic);
 
+    //! Activated when the user saves the GV pin
+    void onSigPinSettingChanges(bool bEnable, const QString &pin);
+
     void onMqThreadFinished();
 
     //! Invoked when the message box is done
@@ -169,6 +172,8 @@ private:
 
     void setUsername(const QString &strUsername);
     void setPassword(const QString &strPassword);
+
+    void fallbackDialout (DialContext *ctx);
 
 private:
     //! Logfile
@@ -213,6 +218,9 @@ private:
     RegNumberModel  modelRegNumber;
     //! Index of the registered phone currently in use
     int             indRegPhone;
+
+    //! GV PIN for the fallback method
+    QString         strGvPin;
 
 ///////////////////////////////////////////////////////////////////////////////
 // This block of variable is protected by the one mutex in it

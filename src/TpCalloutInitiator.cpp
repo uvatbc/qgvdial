@@ -2,6 +2,12 @@
 #include <TelepathyQt4/PendingChannelRequest>
 #include <TelepathyQt4/Connection>
 
+#if defined(Q_WS_MAEMO_5)
+#define CSD_SERVICE         "com.nokia.csd"
+#define CSD_CALL_PATH		"/com/nokia/csd/call"
+#define CSD_CALL_INTERFACE	"com.nokia.csd.Call"
+#endif
+
 TpCalloutInitiator::TpCalloutInitiator (Tp::AccountPtr act, QObject *parent)
 : CalloutInitiator(parent)
 , account (act)
@@ -174,6 +180,23 @@ TpCalloutInitiator::isValid ()
 bool
 TpCalloutInitiator::sendDTMF (const QString &strTones)
 {
+#if defined(Q_WS_MAEMO_5)
+    if ("ring" == account->cmName ()) {
+        QList<QVariant> argsToSend;
+        argsToSend.append(strTones);
+        argsToSend.append(0);
+        QDBusConnection systemBus = QDBusConnection::systemBus();
+        QDBusMessage dbusMethodCall =
+        QDBusMessage::createMethodCall(CSD_SERVICE,
+                                       CSD_CALL_PATH,
+                                       CSD_CALL_INTERFACE,
+                                       QString("SendDTMF"),
+                                       argsToSend);
+        dbusMethodCall.setArguments(argsToSend);
+        return systemBus.send(dbusMethodCall);
+    }
+#endif
+
     //@@UV: Add DTMF to Telepathy
     return false;
 }//TpCalloutInitiator::sendDTMF

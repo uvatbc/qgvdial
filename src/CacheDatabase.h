@@ -95,6 +95,10 @@ public:
     bool getMqSettings (bool &bEnable, QString &host, int &port,
                         QString &topic);
 
+    // GV Pin settings get and set
+    bool setGvPin (bool bEnable, const QString &pin);
+    bool getGvPin (bool &bEnable, QString &pin);
+
 private:
     bool putContactInfo (const ContactInfo &info);
     bool deleteContactInfo (const QString &strId);

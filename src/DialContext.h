@@ -26,10 +26,12 @@ signals:
     void sigDialComplete (DialContext *self, bool ok);
 
 public:
-    bool bDialOut;
+    bool    bDialOut;
     CalloutInitiator *ci;
     QString strMyNumber;
     QString strTarget;
+
+    CalloutInitiator *fallbackCi;
 
 private slots:
     //! Invoked by call observers
