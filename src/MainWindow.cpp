@@ -1082,6 +1082,7 @@ MainWindow::dialComplete (bool bOk, const QVariantList &params)
         } else if (NULL == ctx->fallbackCi) {
             // Not currently in fallback modem and there was a problem
             // ... so start fallback mode
+            qDebug ("Attempting fallback dial");
             bReleaseContext = false;
             fallbackDialout (ctx);
         } else {
@@ -1089,19 +1090,7 @@ MainWindow::dialComplete (bool bOk, const QVariantList &params)
             this->showMsgBox ("Dialing failed");
         }
     } else {
-        if (NULL != ctx->fallbackCi) {
-            // IS currently in fallback mode and callback has completed.
-            // ... so perform the Google Voice dialout.
-            QString strDTMF;
-            if (!strGvPin.isEmpty ()) {
-                strDTMF = strGvPin + "p";
-            }
-            strDTMF += "2p" + ctx->strTarget;
-            ctx->fallbackCi->sendDTMF (strDTMF);
-        } else {
-            setStatus (QString("Dial successful to %1.")
-                       .arg(params[0].toString()));
-        }
+        setStatus (QString("Dial successful to %1.").arg(params[0].toString()));
     }
     bCallInProgress = false;
 
@@ -1528,7 +1517,11 @@ MainWindow::onSigPinSettingChanges(bool bEnable, const QString &pin)
 {
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     dbMain.setGvPin (bEnable, pin);
-    strGvPin = pin;
+    if (bEnable) {
+        strGvPin = pin;
+    } else {
+        strGvPin.clear ();
+    }
 
     do // Begin cleanup block (not a loop)
     {
@@ -1538,14 +1531,14 @@ MainWindow::onSigPinSettingChanges(bool bEnable, const QString &pin)
             break;
         }
 
-        QObject *pMqSettings = pRoot->findChild <QObject*>
-                                                  ("PinSettingsPage");
-        if (NULL == pMqSettings) {
+        QObject *pPinSettings = pRoot->findChild <QObject*> ("PinSettingsPage");
+        if (NULL == pPinSettings) {
             qWarning ("Could not get to PinSettingsPage");
             break;
         }
 
-        QMetaObject::invokeMethod (pMqSettings, "setValues",
+        QMetaObject::invokeMethod (pPinSettings, "setValues",
+                                   Q_ARG (QVariant, QVariant(bEnable)),
                                    Q_ARG (QVariant, QVariant(pin)));
     } while (0); // End cleanup block (not a loop)
 }//MainWindow::onSigPinSettingChanges
@@ -1672,11 +1665,41 @@ MainWindow::fallbackDialout (DialContext *ctx)
     CalloutInitiatorList listCi = cif.getFallbacks ();
     if (listCi.length () < 1) {
         ctx->deleteLater ();
-        setStatus ("Dialing failed", 10*1000);
         this->showMsgBox ("Dialing failed");
+        setStatus ("No fallback dial methods", 10*1000);
         return;
     }
 
     ctx->fallbackCi = listCi[0];
-    ctx->fallbackCi->initiateCall (ctx->strMyNumber);
+    QObject::connect (ctx->fallbackCi, SIGNAL(callInitiated(bool,void*)),
+                      this,            SLOT  (onFallbackDialout(bool,void*)));
+    ctx->fallbackCi->initiateCall (ctx->strMyNumber, ctx);
 }//MainWindow::fallbackDialout
+
+void
+MainWindow::onFallbackDialout (bool bSuccess, void *v_ctx)
+{
+    DialContext *ctx = (DialContext *) v_ctx;
+    QObject::disconnect (
+        ctx->fallbackCi, SIGNAL(callInitiated(bool,void*)),
+        this,            SLOT  (onFallbackDialout(bool,void*)));
+
+    if (!bSuccess) {
+        this->showMsgBox ("Dialing failed");
+        qWarning ("Fallback dial failed. Aborting DTMF");
+        setStatus ("Fallback dial failed", 10*1000);
+        return;
+    }
+
+    QString strDTMF;
+    strDTMF = "2p" + ctx->strTarget;
+    // Add the pin if it is there
+    if (!strGvPin.isEmpty ()) {
+        strDTMF = strGvPin + "p" + strDTMF;
+    }
+    strDTMF = "p" + strDTMF + "#";
+
+    ctx->fallbackCi->sendDTMF (strDTMF);
+
+    ctx->deleteLater ();
+}//MainWindow::onFallbackDialout

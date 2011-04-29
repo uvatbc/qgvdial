@@ -143,6 +143,9 @@ private slots:
     //! Invoked when the timer based cleanup of logs array is invoked
     void onCleanupLogsArray();
 
+    //! Invoked when the call is completed on fallback
+    void onFallbackDialout (bool bSuccess, void *v_ctx);
+
 private:
     void initLogging ();
 

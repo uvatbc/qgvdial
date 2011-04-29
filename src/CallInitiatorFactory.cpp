@@ -137,8 +137,7 @@ CallInitiatorFactory::onAllAccountsReady ()
         listInitiators += initiator;
 
         if (act->cmName () == "ring") {
-            //@@UV: Add this when you manage to send DTMF to ring
-            //listFallback += initiator;
+            listFallback += initiator;
         }
 
         QObject::connect (initiator, SIGNAL (status(const QString &, int)),

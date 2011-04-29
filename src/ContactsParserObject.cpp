@@ -30,6 +30,10 @@ ContactsParserObject::doWork ()
 
     bool rv = simpleReader.parse (&inputSource, false);
 
+    if (!rv) {
+        qDebug() << "Contacts parser failed to parse. Data =" << byData;
+    }
+
     QString msg = QString("Total contacts: %1. Usable: %2")
             .arg (contactsHandler.getTotalContacts ())
             .arg (contactsHandler.getUsableContacts ());

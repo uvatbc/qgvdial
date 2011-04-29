@@ -8,7 +8,7 @@ Item {
     function setValues(bEnable, pin) {
         console.debug ("QML: Setting Pin settings")
         pinSupport.check = bEnable;
-        textPin.text = port;
+        textPin.text = pin;
     }
 
     signal sigDone(bool bSave)

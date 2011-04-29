@@ -1,1 +1,1 @@
-  * Retry on Mosquitto connection a few more times before giving up.
+  * Fallback mode for Maemo.

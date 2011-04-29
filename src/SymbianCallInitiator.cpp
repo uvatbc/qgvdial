@@ -38,28 +38,35 @@ SymbianCallInitiator::isValid ()
 }//SymbianCallInitiator::isValid
 
 void
-SymbianCallInitiator::initiateCall (const QString &strDestination)
+SymbianCallInitiator::initiateCall (const QString &strDestination,
+                                    void *ctx = NULL)
 {
-    if (NULL != dialer) {
-        qWarning ("Call in progress. Ask again later.");
-        return;// false;
-    }
-    if (NULL != observer) {
-        qWarning ("observer was still alive. WTF?");
-        delete observer;
-    }
-    observer = SymbianCallObserverPrivate::NewL (this);
+    bool bOk = false;
+    m_Context = ctx;
+    do { // Begin cleanup block (not a loop)
+        if (NULL != dialer) {
+            qWarning ("Call in progress. Ask again later.");
+            break;  // false
+        }
+        if (NULL != observer) {
+            qWarning ("observer was still alive. WTF?");
+            delete observer;
+        }
+        observer = SymbianCallObserverPrivate::NewL (this);
 
-    QMutexLocker locker(&mutex);
-    strObservedNumber = strDestination;
+        QMutexLocker locker(&mutex);
+        strObservedNumber = strDestination;
 
-    dialer = SymbianCallInitiatorPrivate::NewL (this, strDestination);
-    if (NULL == dialer) {
-        qWarning ("Could not dial out.");
-        return; // false;
+        dialer = SymbianCallInitiatorPrivate::NewL (this, strDestination);
+        if (NULL == dialer) {
+            qWarning ("Could not dial out.");
+            break;  // false
+        }
+        bOk = true;
+    } while (0); // End cleanup block (not a loop)
+    if (!bOk) {
+        emit callInitiated (false, m_Context);
     }
-
-    return; // true;
 }//SymbianCallInitiator::initiateCall
 
 void
@@ -80,6 +87,8 @@ SymbianCallInitiator::callDone (SymbianCallInitiatorPrivate *self, int status)
     } else {
         qWarning ("Dialer does not match!!!");
     }
+
+    emit callInitiated ((status == KErrNone), m_Context);
 }//SymbianCallInitiator::callDone
 
 void

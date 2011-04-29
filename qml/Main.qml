@@ -248,6 +248,7 @@ Rectangle {
                                                     user, pass)
             onSigLinkActivated: main.sigLinkActivated(strLink)
             onSigMosquittoChanges: main.sigMosquittoChanges(bEnable, host, port, topic)
+            onSigPinSettingChanges: main.sigPinSettingChanges(bEnable, pin)
             onSigMsgBoxDone: main.sigMsgBoxDone(ok)
         }
 

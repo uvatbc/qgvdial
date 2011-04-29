@@ -26,9 +26,11 @@ DesktopSkypeCallInitiator::attemptCreateSkypeClient ()
 }//DesktopSkypeCallInitiator::attemptCreateSkypeClient
 
 void
-DesktopSkypeCallInitiator::initiateCall (const QString &strDestination)
+DesktopSkypeCallInitiator::initiateCall (const QString &strDestination,
+                                         void *ctx /*= NULL*/)
 {
-    bool bOk;
+    bool bOk = false;
+    m_Context = ctx;
     do { // Begin cleanup block (not a loop)
         attemptCreateSkypeClient ();
         if (NULL == skypeClient) {
@@ -50,13 +52,17 @@ DesktopSkypeCallInitiator::initiateCall (const QString &strDestination)
         }
 
         onSkypeConnected (true, l);
+        bOk = true;
     } while (0); // End cleanup block (not a loop)
+    if (!bOk) {
+        emit callInitiated (false, m_Context);
+    }
 }//DesktopSkypeCallInitiator::initiateCall
 
 void
 DesktopSkypeCallInitiator::onSkypeConnected (bool bSuccess, const QVariantList&)
 {
-    bool bOk;
+    bool bOk = false;
     do { // Begin cleanup block (not a loop)
         if (!bSuccess) {
             qWarning ("Failed to connect to skype");
@@ -73,12 +79,21 @@ DesktopSkypeCallInitiator::onSkypeConnected (bool bSuccess, const QVariantList&)
             break;
         }
     } while (0); // End cleanup block (not a loop)
+
+    if (!bOk) {
+        emit callInitiated (false, m_Context);
+    }
 }//DesktopSkypeCallInitiator::onSkypeConnected
 
 void
-DesktopSkypeCallInitiator::onCallInitiated (bool, const QVariantList &)
+DesktopSkypeCallInitiator::onCallInitiated (bool bSuccess, const QVariantList &)
 {
-    qDebug ("Callout is successful");
+    if (bSuccess) {
+        qDebug ("DesktopSkype: Callout is successful");
+    } else {
+        qWarning ("DesktopSkype: Callout failed.");
+    }
+    emit callInitiated (bSuccess, m_Context);
 }//DesktopSkypeCallInitiator::onCallInitiated
 
 QString

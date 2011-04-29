@@ -121,8 +121,11 @@ TpCalloutInitiator::onConnectionReady (Tp::PendingOperation *op)
 }//TpCalloutInitiator::onConnectionReady
 
 void
-TpCalloutInitiator::initiateCall (const QString &strDestination)
+TpCalloutInitiator::initiateCall (const QString &strDestination,
+                                  void *ctx /*= NULL*/)
 {
+    m_Context = ctx;
+
     QVariantMap request;
     request.insert(TELEPATHY_INTERFACE_CHANNEL ".ChannelType",
                    TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAMED_MEDIA);
@@ -146,6 +149,7 @@ TpCalloutInitiator::initiateCall (const QString &strDestination)
 void
 TpCalloutInitiator::onChannelReady (Tp::PendingOperation*op)
 {
+    bool bSuccess = false;
     do { // Begin cleanup block (not a loop)
         if (op->isError ()) {
             qWarning ("Channel could not become ready");
@@ -153,9 +157,12 @@ TpCalloutInitiator::onChannelReady (Tp::PendingOperation*op)
         }
 
         qDebug ("Call successful");
+        bSuccess = true;
     } while (0); // End cleanup block (not a loop)
 
-     op->deleteLater ();
+    emit callInitiated (bSuccess, m_Context);
+
+    op->deleteLater ();
 }//TpCalloutInitiator::onChannelReady
 
 QString
@@ -192,7 +199,11 @@ TpCalloutInitiator::sendDTMF (const QString &strTones)
                                        CSD_CALL_INTERFACE,
                                        QString("SendDTMF"));
         dbusMethodCall.setArguments(argsToSend);
-        return systemBus.send(dbusMethodCall);
+        bool rv = systemBus.send(dbusMethodCall);
+        if (!rv) {
+            qDebug ("Dbus method call to send DTMF failed.");
+        }
+        return rv;
     }
 #endif
 

@@ -18,16 +18,22 @@ signals:
     void status(const QString &strText, int timeout = 2000);
     void changed();
 
+signals:
+    void callInitiated (bool bSuccess, void *ctx);
+
 public:
     virtual QString name () = 0;
     virtual QString selfNumber () = 0;
     virtual bool isValid () = 0;
 
 public slots:
-    virtual void initiateCall (const QString &strDestination) = 0;
+    virtual void initiateCall (const QString &strDestination, void *ctx = NULL) = 0;
     virtual bool sendDTMF(const QString &strTones) = 0;
 
     friend class CallInitiatorFactory;
+
+protected:
+    void *m_Context;
 };
 typedef QList<CalloutInitiator *> CalloutInitiatorList;
 

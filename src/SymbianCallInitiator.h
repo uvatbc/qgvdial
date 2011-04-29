@@ -19,7 +19,7 @@ public:
     bool isValid ();
 
 public slots:
-    void initiateCall (const QString &strDestination);
+    void initiateCall (const QString &strDestination, void *ctx = NULL);
     bool sendDTMF(const QString &strTones);
 
 signals:
