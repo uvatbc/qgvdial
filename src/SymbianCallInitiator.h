@@ -36,6 +36,7 @@ private:
 
     SymbianCallInitiatorPrivate *dialer;
     SymbianCallObserverPrivate  *observer;
+    SymbianDTMFPrivate          *dtmfSender;
 
     QMutex mutex;
     QString strObservedNumber;

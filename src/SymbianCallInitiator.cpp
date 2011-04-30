@@ -7,7 +7,9 @@ SymbianCallInitiator::SymbianCallInitiator (QObject *parent)
 : CalloutInitiator(parent)
 , dialer (NULL)
 , observer (NULL)
+, dtmfSender (NULL)
 {
+    dtmfSender = new SymbianDTMFPrivate (this);
 }//SymbianCallInitiator::SymbianCallInitiator
 
 SymbianCallInitiator::~SymbianCallInitiator()
@@ -17,6 +19,9 @@ SymbianCallInitiator::~SymbianCallInitiator()
     }
     if (NULL != dialer) {
         delete dialer;
+    }
+    if (NULL != dtmfSender) {
+        delete dtmfSender;
     }
 }//SymbianCallInitiator::~SymbianCallInitiator
 
@@ -121,7 +126,6 @@ SymbianCallInitiator::sendDTMF (const QString &strTones)
 void
 SymbianCallInitiator::onDtmfSent (SymbianDTMFPrivate *self, bool bSuccess)
 {
-    delete self;
     qDebug() << "Send DTMF " << (bSuccess ? "suceeded" : "failed");
     QTimer::singleShot (1000, this, SLOT(nextDtmf ()));
 }//SymbianCallInitiator::onDtmfSent
@@ -143,11 +147,6 @@ SymbianCallInitiator::nextDtmf()
     } else {
         qDebug () << "Current tone =" << strTones;
 
-        SymbianDTMFPrivate *dtmf = new SymbianDTMFPrivate(this);
-        if (NULL == dtmf) {
-            qCritical ("Failed to create DTMF sender object");
-            return;
-        }
-        dtmf->sendDTMF (strTones);
+        dtmfSender->sendDTMF (strTones);
     }
 }//SymbianCallInitiator::nextDtmf
