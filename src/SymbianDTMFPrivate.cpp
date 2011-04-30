@@ -59,6 +59,5 @@ SymbianDTMFPrivate::sendDTMF (const QString &strTones)
     qDebug("Before sending DTMF");
     iTelephony->SendDTMFTones(iStatus, aNumber);
     qDebug("After sending DTMF");
-    SetActive ();
-    qDebug("After SetActive");
+    RunL ();
 }//SymbianDTMFPrivate::sendDTMF
