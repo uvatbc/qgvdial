@@ -7,9 +7,8 @@ SymbianCallInitiator::SymbianCallInitiator (QObject *parent)
 : CalloutInitiator(parent)
 , dialer (NULL)
 , observer (NULL)
-, dtmfSender (NULL)
+, dtmfSender (new SymbianDTMFPrivate (this))
 {
-    dtmfSender = new SymbianDTMFPrivate (this);
 }//SymbianCallInitiator::SymbianCallInitiator
 
 SymbianCallInitiator::~SymbianCallInitiator()

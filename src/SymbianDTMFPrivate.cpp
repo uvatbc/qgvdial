@@ -56,8 +56,6 @@ SymbianDTMFPrivate::sendDTMF (const QString &strTones)
     TPtrC8 ptr(reinterpret_cast<const TUint8*>(strTones.toLatin1().constData()));
     aNumber.Copy(ptr);
 
-    qDebug("Before sending DTMF");
     iTelephony->SendDTMFTones(iStatus, aNumber);
-    qDebug("After sending DTMF");
-    RunL ();
+    SetActive ();
 }//SymbianDTMFPrivate::sendDTMF
