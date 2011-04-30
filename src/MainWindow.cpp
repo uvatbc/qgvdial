@@ -1593,8 +1593,7 @@ MainWindow::onCallInitiatorsChange (bool bSave)
 
     // Store the callouts in the same widget as the callbacks
     CallInitiatorFactory& cif = Singletons::getRef().getCIFactory ();
-    CalloutInitiatorList listCi = cif.getInitiators ();
-    foreach (CalloutInitiator *ci, listCi) {
+    foreach (CalloutInitiator *ci, cif.getFallbacks()) {
         if (ci->isValid ()) {
             strCiName = "Dial out: " + ci->name ();
             modelRegNumber.insertRow (strCiName, ci->selfNumber (), ci);
@@ -1662,15 +1661,14 @@ void
 MainWindow::fallbackDialout (DialContext *ctx)
 {
     CallInitiatorFactory& cif = Singletons::getRef().getCIFactory ();
-    CalloutInitiatorList listCi = cif.getFallbacks ();
-    if (listCi.length () < 1) {
+    if (cif.getFallbacks().length () < 1) {
         ctx->deleteLater ();
         this->showMsgBox ("Dialing failed");
         setStatus ("No fallback dial methods", 10*1000);
         return;
     }
 
-    ctx->fallbackCi = listCi[0];
+    ctx->fallbackCi = cif.getFallbacks()[0];
     QObject::connect (ctx->fallbackCi, SIGNAL(callInitiated(bool,void*)),
                       this,            SLOT  (onFallbackDialout(bool,void*)));
     ctx->fallbackCi->initiateCall (ctx->strMyNumber, ctx);

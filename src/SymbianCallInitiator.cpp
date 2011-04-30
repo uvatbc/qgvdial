@@ -1,6 +1,7 @@
 #include "SymbianCallInitiator.h"
 #include "SymbianCallInitiatorPrivate.h"
 #include "SymbianCallObserverPrivate.h"
+#include "SymbianDTMFPrivate.h"
 
 SymbianCallInitiator::SymbianCallInitiator (QObject *parent)
 : CalloutInitiator(parent)
@@ -39,7 +40,7 @@ SymbianCallInitiator::isValid ()
 
 void
 SymbianCallInitiator::initiateCall (const QString &strDestination,
-                                    void *ctx = NULL)
+                                    void *ctx /*= NULL*/)
 {
     bool bOk = false;
     m_Context = ctx;
@@ -92,7 +93,7 @@ SymbianCallInitiator::callDone (SymbianCallInitiatorPrivate *self, int status)
 }//SymbianCallInitiator::callDone
 
 void
-SymbianCallInitiator::callInitiated ()
+SymbianCallInitiator::onCallInitiated ()
 {
     bool bObserving = false;
     {
@@ -105,11 +106,48 @@ SymbianCallInitiator::callInitiated ()
     if (bObserving) {
         emit callDialed();
     }
-}//SymbianCallInitiator::callInitiated
+}//SymbianCallInitiator::onCallInitiated
 
 bool
 SymbianCallInitiator::sendDTMF (const QString &strTones)
 {
-    //@@UV: Add DTMF to Symbian
-    return false;
+    arrTones.clear ();
+    arrTones = strTones.split ('p');
+
+    nextDtmf ();
+    return true;
 }//SymbianCallInitiator::sendDTMF
+
+void
+SymbianCallInitiator::onDtmfSent (SymbianDTMFPrivate *self, bool bSuccess)
+{
+    delete self;
+    qDebug() << "Send DTMF " << (bSuccess ? "suceeded" : "failed");
+    QTimer::singleShot (1000, this, SLOT(nextDtmf ()));
+}//SymbianCallInitiator::onDtmfSent
+
+void
+SymbianCallInitiator::nextDtmf()
+{
+    if (arrTones.isEmpty ()) {
+        qDebug ("No more tones");
+        return;
+    }
+
+    QString strTones = arrTones.first ();
+    arrTones.pop_front ();
+
+    if (strTones.isEmpty ()) {
+        qDebug ("Blank tone");
+        QTimer::singleShot (1000, this, SLOT(nextDtmf ()));
+    } else {
+        qDebug () << "Current tone =" << strTones;
+
+        SymbianDTMFPrivate *dtmf = new SymbianDTMFPrivate(this);
+        if (NULL == dtmf) {
+            qCritical ("Failed to create DTMF sender object");
+            return;
+        }
+        dtmf->sendDTMF (strTones);
+    }
+}//SymbianCallInitiator::nextDtmf

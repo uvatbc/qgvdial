@@ -56,10 +56,13 @@ SymbianCallInitiatorPrivate*
 SymbianCallInitiatorPrivate::NewLC (SymbianCallInitiator *parent,
                                     const QString &strNumber)
 {
-    if (strNumber.length () > 20) {
-        qWarning ("Number to dial exceeds 20 characters");
+#define SIZE_LIMIT 20
+    if (strNumber.length () > SIZE_LIMIT) {
+        qWarning ("Number to dial has too many characters");
         return NULL;
     }
+    TBuf<SIZE_LIMIT>aNumber;
+#undef SIZE_LIMIT
 
     SymbianCallInitiatorPrivate *self =
             new (ELeave) SymbianCallInitiatorPrivate(parent);
@@ -76,7 +79,6 @@ SymbianCallInitiatorPrivate::NewLC (SymbianCallInitiator *parent,
     CleanupStack::PushL(self);
 
     TPtrC8 ptr(reinterpret_cast<const TUint8*>(strNumber.toLatin1().constData()));
-    TBuf<20>aNumber;
     aNumber.Copy(ptr);
 
     self->ConstructL(aNumber);

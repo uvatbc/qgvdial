@@ -165,12 +165,14 @@ win32 {
 }
 
 symbian {
-    HEADERS += SymbianCallInitiator.h           \
-               SymbianCallInitiatorPrivate.h    \
-               SymbianCallObserverPrivate.h
-    SOURCES += SymbianCallInitiator.cpp         \
-               SymbianCallInitiatorPrivate.cpp  \
-               SymbianCallObserverPrivate.cpp
+    HEADERS  += SymbianCallInitiator.h          \
+                SymbianCallInitiatorPrivate.h   \
+                SymbianCallObserverPrivate.h    \
+                SymbianDTMFPrivate.h
+    SOURCES  += SymbianCallInitiator.cpp        \
+                SymbianCallInitiatorPrivate.cpp \
+                SymbianCallObserverPrivate.cpp  \
+                SymbianDTMFPrivate.cpp
 
 # Add the mosquitto lib to symbian
     include(mqlib/mqlib.pri)

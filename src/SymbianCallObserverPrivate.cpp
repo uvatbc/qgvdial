@@ -33,7 +33,7 @@ void
 SymbianCallObserverPrivate::RunL ()
 {
     if (CTelephony::EStatusDialling == iCurrentStatus.iStatus) {
-        parent->callInitiated ();
+        parent->onCallInitiated ();
     }
     if (iStatus != KErrCancel) {
         StartListening();

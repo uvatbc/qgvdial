@@ -4,6 +4,9 @@
 #define GV_DATA_BASE "https://www.google.com/voice"
 #define SYMBIAN_SIGNED 0
 
+// Used ONLY for debug purposes - specifically to test fallback method.
+#define FAIL_DIAL 1
+
 GVWebPage::GVWebPage(QObject *parent/* = NULL*/)
 : GVAccess (parent)
 , webPage (this)
@@ -340,6 +343,12 @@ GVWebPage::logoutDone (bool bOk)
 bool
 GVWebPage::dialCallback (bool bCallback)
 {
+#if FAIL_DIAL
+    qWarning ("Fail dial out to test fallback method");
+    completeCurrentWork (bCallback?GVAW_dialCallback:GVAW_dialOut, false);
+    return false;
+#endif
+
     if (!this->isOnline ()) {
         if (bEmitLog) qDebug ("Cannot dial back when offline");
         completeCurrentWork (bCallback?GVAW_dialCallback:GVAW_dialOut, false);
