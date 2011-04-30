@@ -55,7 +55,8 @@ CallInitiatorFactory::init ()
 #if defined(Q_OS_SYMBIAN)
     CalloutInitiator *phoneInitiator = new SymbianCallInitiator(this);
     listInitiators += phoneInitiator;
-    listFallback += phoneInitiator;
+    //@@UV: Put this back in when you figure out how to send DTMF.
+    //listFallback += phoneInitiator;
 #endif
 
     foreach (CalloutInitiator *i, listInitiators) {
