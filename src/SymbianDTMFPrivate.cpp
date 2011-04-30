@@ -61,6 +61,4 @@ SymbianDTMFPrivate::sendDTMF (const QString &strTones)
     qDebug("After sending DTMF");
     SetActive ();
     qDebug("After SetActive");
-    CleanupStack::PopAndDestroy();
-    qDebug("After PopAndDestroy");
 }//SymbianDTMFPrivate::sendDTMF
