@@ -42,7 +42,7 @@ SymbianDTMFPrivate::sendDTMF (const QString &strTones)
     TBuf<SIZE_LIMIT>aNumber;
 #undef SIZE_LIMIT
 
-    TPtrC8 ptr(reinterpret_cast<const TUint8*>(strTones.toLatin1().constData()));
+    TPtrC8 ptr(reinterpret_cast<const TUint8*>(strTones.toUtf8().constData()));
     aNumber.Copy(ptr);
 
     parent->iTelephony->SendDTMFTones(iStatus, aNumber);
