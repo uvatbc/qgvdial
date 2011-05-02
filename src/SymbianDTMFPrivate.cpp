@@ -3,19 +3,13 @@
 
 SymbianDTMFPrivate::SymbianDTMFPrivate(SymbianCallInitiator *p)
 : CActive(EPriorityNormal)
-, iTelephony (NULL)
 , parent (p)
 {
-    iTelephony = CTelephony::NewL();
 }//SymbianDTMFPrivate::SymbianDTMFPrivate
 
 SymbianDTMFPrivate::~SymbianDTMFPrivate ()
 {
     Cancel();
-    if (NULL != iTelephony) {
-        delete iTelephony;
-    }
-    iTelephony = NULL;
     parent = NULL;
 }//SymbianDTMFPrivate::~SymbianDTMFPrivate
 
@@ -34,17 +28,12 @@ SymbianDTMFPrivate::RunL ()
 void
 SymbianDTMFPrivate::DoCancel ()
 {
-    iTelephony->CancelAsync(CTelephony::ESendDTMFTonesCancel);
+    parent->iTelephony->CancelAsync(CTelephony::ESendDTMFTonesCancel);
 }//SymbianDTMFPrivate::DoCancel
 
 void
 SymbianDTMFPrivate::sendDTMF (const QString &strTones)
 {
-    if (NULL == iTelephony) {
-        qCritical ("CTelephony object not initialized");
-        return;
-    }
-
 #define SIZE_LIMIT 40
     if (strTones.length () > SIZE_LIMIT) {
         qDebug ("Too many DTMF characters");
@@ -56,6 +45,6 @@ SymbianDTMFPrivate::sendDTMF (const QString &strTones)
     TPtrC8 ptr(reinterpret_cast<const TUint8*>(strTones.toLatin1().constData()));
     aNumber.Copy(ptr);
 
-    iTelephony->SendDTMFTones(iStatus, aNumber);
+    parent->iTelephony->SendDTMFTones(iStatus, aNumber);
     SetActive ();
 }//SymbianDTMFPrivate::sendDTMF

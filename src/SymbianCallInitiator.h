@@ -2,6 +2,7 @@
 #define SYMBIANCALLINITIATOR_H
 
 #include "CalloutInitiator.h"
+#include <Etel3rdParty.h>
 
 // Forward declaration
 class SymbianCallInitiatorPrivate;
@@ -23,17 +24,18 @@ public slots:
     void initiateCall (const QString &strDestination, void *ctx = NULL);
     bool sendDTMF(const QString &strTones);
 
-private slots:
-    void nextDtmf();
-
 signals:
     void callDialed();
+
+private slots:
+    void nextDtmf();
 
 private:
     void callDone (SymbianCallInitiatorPrivate *self, int status);
     void onCallInitiated();
     void onDtmfSent (SymbianDTMFPrivate *self, bool bSuccess);
 
+    CTelephony                  *iTelephony;
     SymbianCallInitiatorPrivate *dialer;
     SymbianCallObserverPrivate  *observer;
     SymbianDTMFPrivate          *dtmfSender;

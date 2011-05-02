@@ -3,7 +3,6 @@
 
 SymbianCallObserverPrivate::SymbianCallObserverPrivate(SymbianCallInitiator *p)
 : CActive(EPriorityNormal)
-, iTelephony (NULL)
 , iCurrentStatusPckg(iCurrentStatus)
 , bUsable (false)
 , parent (p)
@@ -22,10 +21,6 @@ SymbianCallObserverPrivate::SymbianCallObserverPrivate(SymbianCallInitiator *p)
 SymbianCallObserverPrivate::~SymbianCallObserverPrivate ()
 {
     Cancel();
-    if (NULL != iTelephony) {
-        delete iTelephony;
-    }
-    iTelephony = NULL;
     parent = NULL;
 }//SymbianCallObserverPrivate::~SymbianCallObserverPrivate
 
@@ -43,7 +38,7 @@ SymbianCallObserverPrivate::RunL ()
 void
 SymbianCallObserverPrivate::DoCancel ()
 {
-    iTelephony->CancelAsync(CTelephony::EVoiceLineStatusChangeCancel);
+    parent->iTelephony->CancelAsync(CTelephony::EVoiceLineStatusChangeCancel);
 }//SymbianCallObserverPrivate::DoCancel
 
 
@@ -79,7 +74,6 @@ SymbianCallObserverPrivate::NewLC (SymbianCallInitiator *parent)
 void
 SymbianCallObserverPrivate::ConstructL ()
 {
-    iTelephony = CTelephony::NewL();
     StartListening ();
 }//SymbianCallObserverPrivate::ConstructL
 
@@ -88,8 +82,8 @@ SymbianCallObserverPrivate::StartListening ()
 {
     Cancel();
     iCurrentStatus.iStatus = CTelephony::EStatusUnknown;
-    iTelephony->NotifyChange (iStatus,
-                              CTelephony::EVoiceLineStatusChange,
-                              iCurrentStatusPckg);
+    parent->iTelephony->NotifyChange (iStatus,
+                                      CTelephony::EVoiceLineStatusChange,
+                                      iCurrentStatusPckg);
     SetActive();
 }//SymbianCallObserverPrivate::StartListening

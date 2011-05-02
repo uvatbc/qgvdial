@@ -7,8 +7,13 @@ SymbianCallInitiator::SymbianCallInitiator (QObject *parent)
 : CalloutInitiator(parent)
 , dialer (NULL)
 , observer (NULL)
-, dtmfSender (new SymbianDTMFPrivate (this))
+, dtmfSender (NULL)
 {
+    iTelephony = CTelephony::NewL();
+    dtmfSender = new SymbianDTMFPrivate (this);
+    if (NULL != iTelephony) {
+        delete iTelephony;
+    }
 }//SymbianCallInitiator::SymbianCallInitiator
 
 SymbianCallInitiator::~SymbianCallInitiator()

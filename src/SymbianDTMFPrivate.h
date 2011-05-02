@@ -18,7 +18,6 @@ private:
     void DoCancel();
 
 private:
-    CTelephony           *iTelephony;
     SymbianCallInitiator *parent;
 };
 

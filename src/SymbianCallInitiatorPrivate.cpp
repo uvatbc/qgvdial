@@ -3,7 +3,6 @@
 
 SymbianCallInitiatorPrivate::SymbianCallInitiatorPrivate(SymbianCallInitiator *p)
 : CActive(EPriorityNormal)
-, iTelephony (NULL)
 , iCallParamsPckg(iCallParams)
 , bUsable (false)
 , parent (p)
@@ -22,10 +21,6 @@ SymbianCallInitiatorPrivate::SymbianCallInitiatorPrivate(SymbianCallInitiator *p
 SymbianCallInitiatorPrivate::~SymbianCallInitiatorPrivate ()
 {
     Cancel();
-    if (NULL != iTelephony) {
-        delete iTelephony;
-    }
-    iTelephony = NULL;
     parent = NULL;
 }//SymbianCallInitiatorPrivate::~SymbianCallInitiatorPrivate
 
@@ -38,7 +33,7 @@ SymbianCallInitiatorPrivate::RunL ()
 void
 SymbianCallInitiatorPrivate::DoCancel ()
 {
-    iTelephony->CancelAsync(CTelephony::EDialNewCallCancel);
+    parent->iTelephony->CancelAsync(CTelephony::EDialNewCallCancel);
 }//SymbianCallInitiatorPrivate::DoCancel
 
 
@@ -88,11 +83,10 @@ SymbianCallInitiatorPrivate::NewLC (SymbianCallInitiator *parent,
 void
 SymbianCallInitiatorPrivate::ConstructL (const TDesC& aNumber)
 {
-    iTelephony = CTelephony::NewL();
     CTelephony::TTelNumber telNumber(aNumber);
 
     iCallParams.iIdRestrict = CTelephony::ESendMyId;
 
-    iTelephony->DialNewCall(iStatus, iCallParamsPckg, telNumber, iCallId);
+    parent->iTelephony->DialNewCall(iStatus,iCallParamsPckg,telNumber,iCallId);
     SetActive();
 }//SymbianCallInitiatorPrivate::ConstructL

@@ -23,7 +23,6 @@ private:
     SymbianCallInitiatorPrivate(SymbianCallInitiator *p);
 
 private:
-    CTelephony*                   iTelephony;
     CTelephony::TCallId           iCallId;
     CTelephony::TCallParamsV1     iCallParams;
     CTelephony::TCallParamsV1Pckg iCallParamsPckg;

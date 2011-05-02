@@ -20,7 +20,6 @@ private:
     void StartListening ();
 
 private:
-    CTelephony*                   iTelephony;
     TInt                          iState;
     CTelephony::TCallStatusV1     iCurrentStatus;
     CTelephony::TCallStatusV1Pckg iCurrentStatusPckg;
