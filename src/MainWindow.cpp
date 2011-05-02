@@ -1593,7 +1593,7 @@ MainWindow::onCallInitiatorsChange (bool bSave)
 
     // Store the callouts in the same widget as the callbacks
     CallInitiatorFactory& cif = Singletons::getRef().getCIFactory ();
-    foreach (CalloutInitiator *ci, cif.getFallbacks()) {
+    foreach (CalloutInitiator *ci, cif.getInitiators ()) {
         if (ci->isValid ()) {
             strCiName = "Dial out: " + ci->name ();
             modelRegNumber.insertRow (strCiName, ci->selfNumber (), ci);
