@@ -33,7 +33,9 @@
 // Voicemail now has transcription
 //#define GV_S_VALUE_DB_VER   "2011-04-08 17:30:00"
 // Encryption introduced into qgvdial. Only for username and password
-#define GV_S_VALUE_DB_VER   "2011-05-03 00:38:51"
+//#define GV_S_VALUE_DB_VER   "2011-04-19 23:51:00"
+// Started using settings ini
+#define GV_S_VALUE_DB_VER   "2011-05-03 11:03:50"
 ////////////////////////////// GV Contacts table ///////////////////////////////
 #define GV_CONTACTS_TABLE   "gvcontacts"
 #define GV_C_ID             "id"
@@ -150,6 +152,7 @@ CacheDatabase::init ()
     QSqlQuery query(dbMain);
     query.setForwardOnly (true);
 
+    QStringList arrTables;
     bool bBlowAway = true;
     QString strVer = settings->value(GV_S_VAR_DB_VER).toString();
     if (strVer == GV_S_VALUE_DB_VER) {
@@ -158,14 +161,14 @@ CacheDatabase::init ()
         bBlowAway = false;
     }
     if (bBlowAway) {
-        // Drop it all!
-        query.exec ("DROP TABLE " GV_CONTACTS_TABLE);
-        query.exec ("DROP TABLE " GV_LINKS_TABLE);
-        query.exec ("DROP TABLE " GV_REG_NUMS_TABLE);
-        query.exec ("DROP TABLE " GV_INBOX_TABLE);
-        query.exec ("DROP TABLE " GV_UPDATES_TABLE);
-        query.exec ("DROP TABLE " GV_PROXY_TABLE);
-        query.exec ("DROP TABLE " GV_MQ_TABLE);
+        // Drop all tables!
+        arrTables = dbMain.tables ();
+        foreach (QString strTable, arrTables) {
+            strTable.replace ("'", "''");
+            QString strQ = QString("DROP TABLE '%1'").arg(strTable);
+            query.exec (strQ);
+        }
+        query.exec ("VACUUM");
 
         // Clear out all settings as well
         settings->clear ();
@@ -174,11 +177,9 @@ CacheDatabase::init ()
         settings->setValue(GV_S_VAR_DB_VER, GV_S_VALUE_DB_VER);
     }
 
+    arrTables = dbMain.tables ();
     // Ensure that the contacts table is present. If not, create it.
-    query.exec ("SELECT * FROM sqlite_master "
-                "WHERE type='table' "
-                "AND name='" GV_CONTACTS_TABLE "'");
-    if (!query.next ())
+    if (!arrTables.contains (GV_CONTACTS_TABLE))
     {
         query.exec ("CREATE TABLE " GV_CONTACTS_TABLE " "
                     "(" GV_C_NAME  " varchar, "
@@ -187,10 +188,7 @@ CacheDatabase::init ()
     }
 
     // Ensure that the cached links table is present. If not, create it.
-    query.exec ("SELECT * FROM sqlite_master "
-                "WHERE type='table' "
-                "AND name='" GV_LINKS_TABLE "'");
-    if (!query.next ())
+    if (!arrTables.contains (GV_LINKS_TABLE))
     {
         query.exec ("CREATE TABLE " GV_LINKS_TABLE " "
                     "(" GV_L_LINK   " varchar, "
@@ -199,10 +197,7 @@ CacheDatabase::init ()
     }
 
     // Ensure that the registered numbers table is present. If not, create it.
-    query.exec ("SELECT * FROM sqlite_master "
-                "WHERE type='table' "
-                "AND name='" GV_REG_NUMS_TABLE "'");
-    if (!query.next ())
+    if (!arrTables.contains (GV_REG_NUMS_TABLE))
     {
         query.exec ("CREATE TABLE " GV_REG_NUMS_TABLE " "
                     "(" GV_RN_NAME  " varchar, "
@@ -211,10 +206,7 @@ CacheDatabase::init ()
     }
 
     // Ensure that the inbox table is present. If not, create it.
-    query.exec ("SELECT * FROM sqlite_master "
-                "WHERE type='table' "
-                "AND name='" GV_INBOX_TABLE "'");
-    if (!query.next ())
+    if (!arrTables.contains (GV_INBOX_TABLE))
     {
         query.exec ("CREATE TABLE " GV_INBOX_TABLE " "
                     "(" GV_IN_ID        " varchar, "
@@ -225,44 +217,6 @@ CacheDatabase::init ()
                         GV_IN_FLAGS     " integer, "
                         GV_IN_SMSTEXT   " varchar, "
                         GV_IN_NOTE      " varchar)");
-    }
-
-    // Ensure that the updates table is present. If not, create it.
-    query.exec ("SELECT * FROM sqlite_master "
-                "WHERE type='table' "
-                "AND name='" GV_UPDATES_TABLE "'");
-    if (!query.next ())
-    {
-        query.exec ("CREATE TABLE " GV_UPDATES_TABLE " "
-                    "(" GV_UP_WHAT  " varchar, "
-                        GV_UP_WHEN  " varchar)");
-    }
-
-    // Ensure that the proxy information table is present. If not, create it.
-    query.exec ("SELECT * FROM sqlite_master "
-                "WHERE type='table' "
-                "AND name='" GV_PROXY_TABLE "'");
-    if (!query.next ())
-    {
-        query.exec ("CREATE TABLE " GV_PROXY_TABLE " "
-                    "(" GV_P_FLAGS " integer, "
-                        GV_P_HOST  " varchar, "
-                        GV_P_PORT  " integer, "
-                        GV_P_USER  " varchar, "
-                        GV_P_PASS  " varchar)");
-    }
-
-    // Ensure that the Mosquitto settings table is present. If not, create it.
-    query.exec ("SELECT * FROM sqlite_master "
-                "WHERE type='table' "
-                "AND name='" GV_MQ_TABLE "'");
-    if (!query.next ())
-    {
-        query.exec ("CREATE TABLE " GV_MQ_TABLE " "
-                    "(" GV_MQ_ENABLED " integer, "
-                        GV_MQ_HOST    " varchar, "
-                        GV_MQ_PORT    " integer, "
-                        GV_MQ_TOPIC   " varchar)");
     }
 }//CacheDatabase::init
 
@@ -315,15 +269,15 @@ CacheDatabase::getUserPass (QString &strUser, QString &strPass)
     QString strResult;
     bool bGotUser = false;
 
-    strResult = settings->value(GV_S_VAR_USER).toString();
-    if (!strResult.isEmpty ()) {
+    if (settings->contains (GV_S_VAR_USER)) {
+        strResult = settings->value(GV_S_VAR_USER).toString();
         osd.cipher (QByteArray::fromHex (strResult.toAscii ()), byD, false);
         strUser = byD;
         bGotUser = true;
     }
 
-    strResult = settings->value(GV_S_VAR_PASS).toString();
-    if (!strResult.isEmpty ()) {
+    if (settings->contains (GV_S_VAR_PASS)) {
+        strResult = settings->value(GV_S_VAR_PASS).toString();
         if (!bGotUser) {
             settings->remove (GV_S_VAR_PASS);
         } else {
@@ -344,10 +298,6 @@ CacheDatabase::putUserPass (const QString &strUser, const QString &strPass)
     QSqlQuery query(dbMain);
     query.setForwardOnly (true);
 
-    // Delete the old user pass always
-    settings->remove (GV_S_VAR_USER);
-    settings->remove (GV_S_VAR_PASS);
-
     osd.cipher (strUser.toAscii (), byD, true);
     settings->setValue (GV_S_VAR_USER, QString (byD.toHex ()));
 
@@ -360,9 +310,8 @@ CacheDatabase::putUserPass (const QString &strUser, const QString &strPass)
 bool
 CacheDatabase::getCallback (QString &strCallback)
 {
-    QString strResult = settings->value (GV_S_VAR_CALLBACK).toString ();
-    if (!strResult.isEmpty ()) {
-        strCallback = strResult;
+    if (settings->contains (GV_S_VAR_CALLBACK)) {
+        strCallback = settings->value (GV_S_VAR_CALLBACK).toString ();
         return true;
     }
     return false;
@@ -660,62 +609,31 @@ CacheDatabase::getContactFromNumber (const QString &strNumber,
 void
 CacheDatabase::clearLastContactUpdate ()
 {
-    QSqlQuery query(dbMain);
-    query.setForwardOnly (true);
-    query.exec ("DELETE FROM " GV_UPDATES_TABLE
-                " WHERE " GV_UP_WHAT "='" GV_UP_CONTACTS "'");
+    settings->beginGroup (GV_UPDATES_TABLE);
+    settings->remove (GV_UP_CONTACTS);
+    settings->endGroup ();
 }//CacheDatabase::clearLastContactUpdate
 
 bool
 CacheDatabase::setLastContactUpdate (const QDateTime &dateTime)
 {
-    clearLastContactUpdate ();
-
-    QSqlQuery query(dbMain);
-    query.setForwardOnly (true);
-
-    QString strQ = QString ("INSERT INTO " GV_UPDATES_TABLE
-                            " (" GV_UP_WHAT "," GV_UP_WHEN ")"
-                            " VALUES ('" GV_UP_CONTACTS "', '%1')")
-                    .arg(dateTime.toString (UPDATE_DATE_FORMAT));
-    query.exec (strQ);
-
-    return (true);
+    settings->beginGroup (GV_UPDATES_TABLE);
+    settings->setValue (GV_UP_CONTACTS, dateTime);
+    settings->endGroup ();
+    return true;
 }//CacheDatabase::setLastContactUpdate
 
 bool
 CacheDatabase::getLastContactUpdate (QDateTime &dateTime)
 {
-    QSqlQuery query(dbMain);
-    query.setForwardOnly (true);
-
-    dateTime = QDateTime();
-
     bool rv = false;
-    query.exec ("SELECT " GV_UP_WHEN " FROM " GV_UPDATES_TABLE
-                " WHERE " GV_UP_WHAT "='" GV_UP_CONTACTS "'");
-    do // Begin cleanup block (not a loop)
-    {
-        if (!query.next ())
-        {
-            qWarning ("No last contact update");
-            break;
-        }
-
-        QString strDateTime = query.value(0).toString();
-
-        QRegExp rx(UPDATE_DATE_REGEXP);
-        if (!strDateTime.contains (rx) || (6 != rx.captureCount ()))
-        {
-            qDebug ("Last updated contact update does not match regexp");
-            break;
-        }
-
-        dateTime = QDateTime::fromString (strDateTime, UPDATE_DATE_FORMAT);
-
+    dateTime = QDateTime();
+    settings->beginGroup (GV_UPDATES_TABLE);
+    if (settings->contains (GV_UP_CONTACTS)) {
+        dateTime = settings->value (GV_UP_CONTACTS).toDateTime ();
         rv = true;
-    } while (0); // End cleanup block (not a loop)
-
+    }
+    settings->endGroup ();
     return (rv);
 }//CacheDatabase::getLastContactUpdate
 
@@ -788,63 +706,24 @@ CacheDatabase::getInboxCount (GVI_Entry_Type Type)
 bool
 CacheDatabase::setLastInboxUpdate (const QDateTime &dateTime)
 {
-    QSqlQuery query(dbMain);
-    query.setForwardOnly (true);
-
-    QString strQ;
-    QDateTime dtUpdate;
-    if (getLastContactUpdate (dtUpdate))
-    {
-        query.exec ("DELETE FROM " GV_UPDATES_TABLE
-                    " WHERE " GV_UP_WHAT "='" GV_UP_INBOX "'");
-    }
-
-    QString strDateTime = dateTime.toString (UPDATE_DATE_FORMAT);
-
-    strQ = QString ("INSERT INTO " GV_UPDATES_TABLE
-                    " (" GV_UP_WHAT "," GV_UP_WHEN ")"
-                    " VALUES ('" GV_UP_INBOX "', '%1')")
-           .arg(strDateTime);
-    query.exec (strQ);
-
-    return (true);
+    settings->beginGroup (GV_UPDATES_TABLE);
+    settings->setValue (GV_UP_INBOX, dateTime);
+    settings->endGroup ();
+    return true;
 }//CacheDatabase::setLastInboxUpdate
 
 bool
 CacheDatabase::getLastInboxUpdate (QDateTime &dateTime)
 {
-    QSqlQuery query(dbMain);
-    query.setForwardOnly (true);
-
-    dateTime = QDateTime();
-
     bool rv = false;
-    query.exec ("SELECT " GV_UP_WHEN " FROM " GV_UPDATES_TABLE
-                " WHERE " GV_UP_WHAT "='" GV_UP_INBOX "'");
-    do // Begin cleanup block (not a loop)
-    {
-        if (!query.next ())
-        {
-            qWarning ("No last contact update");
-            break;
-        }
-
-        QString strDateTime = query.value(0).toString();
-
-        QRegExp rx(UPDATE_DATE_REGEXP);
-        if (!strDateTime.contains (rx) || (6 != rx.captureCount ()))
-        {
-            qDebug ("Last updated contact update does not match regexp");
-            break;
-        }
-
-        dateTime = QDateTime::fromString (strDateTime, UPDATE_DATE_FORMAT);
-
+    dateTime = QDateTime();
+    settings->beginGroup (GV_UPDATES_TABLE);
+    if (settings->contains (GV_UP_INBOX)) {
+        dateTime = settings->value (GV_UP_INBOX).toDateTime ();
         rv = true;
-    } while (0); // End cleanup block (not a loop)
-
+    }
+    settings->endGroup ();
     return (rv);
-
 }//CacheDatabase::getLastInboxUpdate
 
 bool
@@ -971,27 +850,15 @@ CacheDatabase::setProxySettings (bool bEnable,
               | (bUseSystemProxy ? GV_P_F_USE_SYSTEM : 0)
               | (bRequiresAuth ? GV_P_F_NEEDS_AUTH : 0);
 
-    QString scrubHost = host, scrubUser = user, scrubPass = pass;
-    scrubHost.replace ("'", "''");
-    scrubUser.replace ("'", "''");
-    scrubPass.replace ("'", "''");
+    settings->beginGroup (GV_PROXY_TABLE);
+    settings->setValue (GV_P_FLAGS, flags);
+    settings->setValue (GV_P_HOST , host);
+    settings->setValue (GV_P_PORT , port);
+    settings->setValue (GV_P_USER , user);
+    settings->setValue (GV_P_PASS , pass);
+    settings->endGroup ();
 
-    QSqlQuery query(dbMain);
-    query.setForwardOnly (true);
-
-    // Clear the table of all settings
-    query.exec ("DELETE FROM " GV_PROXY_TABLE);
-    // Insert the new settings (not that there can ever be more than one)
-    bool rv =
-    query.exec (QString ("INSERT INTO " GV_PROXY_TABLE " "
-                         "(" GV_P_FLAGS
-                         "," GV_P_HOST "," GV_P_PORT
-                         "," GV_P_USER "," GV_P_PASS ") VALUES "
-                         "(%1, '%2', %3, '%4', '%5')")
-                         .arg (flags)
-                         .arg (scrubHost).arg (port)
-                         .arg (scrubUser).arg (scrubPass));
-    return (rv);
+    return true;
 }//CacheDatabase::setProxySettings
 
 bool
@@ -1005,26 +872,36 @@ CacheDatabase::getProxySettings (bool &bEnable,
     query.setForwardOnly (true);
     bool rv = false;
 
-    do // Begin cleanup block (not a loop)
-    {
-        rv = query.exec ("SELECT " GV_P_FLAGS "," GV_P_HOST "," GV_P_PORT
-                         "," GV_P_USER "," GV_P_PASS " FROM " GV_PROXY_TABLE);
-        if (!rv) {
-            qWarning ("Failed to query DB for proxy settings");
-            break;
+    settings->beginGroup (GV_PROXY_TABLE);
+    do { // Begin cleanup block (not a loop)
+        host = "proxy.example.com";
+        if (settings->contains (GV_P_HOST)) {
+            host = settings->value (GV_P_HOST).toString ();
         }
 
-        rv = query.next ();
-        if (!rv) {
-            qWarning ("No entries in the proxy settings table!");
-            break;
+        port = 80;
+        if (settings->contains (GV_P_PORT)) {
+            port = settings->value (GV_P_PORT).toInt ();
         }
 
-        int flags = query.value(0).toInt (&rv);
-        if (!rv) {
+        user = "example_user";
+        if (settings->contains (GV_P_USER)) {
+            user = settings->value (GV_P_USER).toString ();
+        }
+
+        pass = "hunter2 :)";
+        if (settings->contains (GV_P_PASS)) {
+            pass = settings->value (GV_P_PASS).toString ();
+        }
+
+        bEnable = bUseSystemProxy = bRequiresAuth = false;
+        if (!settings->contains (GV_P_FLAGS)) {
             qWarning ("Failed to pull the flags from the DB");
             break;
         }
+
+        int flags = settings->value (GV_P_FLAGS).toInt ();
+
         bEnable = (flags & GV_P_F_ENABLE ? true : false);
         if (!bEnable) {
             qDebug ("Proxy not enabled.");
@@ -1035,29 +912,23 @@ CacheDatabase::getProxySettings (bool &bEnable,
             qDebug ("Use system settings");
             break;
         }
-        host = query.value (1).toString ();
-        port = query.value (2).toInt (&rv);
-        if (!rv) {
-            qWarning ("Failed to query DB for proxy port");
-            break;
-        }
+
         bRequiresAuth = (flags & GV_P_F_NEEDS_AUTH ? true : false);
         if (!bRequiresAuth) {
             qDebug ("Proxy does not require authentication");
             break;
         }
-        user = query.value (3).toString ();
-        pass = query.value (4).toString ();
     } while (0); // End cleanup block (not a loop)
+    settings->endGroup ();
+
     return (rv);
 }//CacheDatabase::getProxySettings
 
 bool
 CacheDatabase::getInboxSelector (QString &strSelector)
 {
-    QString strRv = settings->value (GV_S_VAR_INBOX_SEL).toString ();
-    if (!strRv.isEmpty ()) {
-        strSelector = strRv;
+    if (settings->contains (GV_S_VAR_INBOX_SEL)) {
+        strSelector = settings->value (GV_S_VAR_INBOX_SEL).toString ();
         return true;
     }
     return false;
@@ -1074,25 +945,14 @@ bool
 CacheDatabase::setMqSettings (bool bEnable, const QString &host, int port,
                               const QString &topic)
 {
-    QString scrubHost = host, scrubTopic = topic;
-    scrubHost.replace ("'", "''");
-    scrubTopic.replace ("'", "''");
+    settings->beginGroup (GV_MQ_TABLE);
+    settings->setValue (GV_MQ_ENABLED, bEnable);
+    settings->setValue (GV_MQ_HOST, host);
+    settings->setValue (GV_MQ_PORT, port);
+    settings->setValue (GV_MQ_TOPIC, topic);
+    settings->endGroup ();
 
-    QSqlQuery query(dbMain);
-    query.setForwardOnly (true);
-
-    // Clear the table of all settings
-    query.exec ("DELETE FROM " GV_MQ_TABLE);
-    // Insert the new settings (not that there can ever be more than one)
-    bool rv =
-    query.exec (QString ("INSERT INTO " GV_MQ_TABLE " "
-                         "(" GV_MQ_ENABLED "," GV_MQ_HOST "," GV_MQ_PORT
-                          "," GV_MQ_TOPIC ") VALUES "
-                         "(%1, '%2', %3, '%4')")
-                         .arg (bEnable?1:0)
-                         .arg (scrubHost).arg (port)
-                         .arg (scrubTopic));
-    return (rv);
+    return true;
 }//CacheDatabase::setMqSettings
 
 bool
@@ -1103,42 +963,30 @@ CacheDatabase::getMqSettings (bool &bEnable, QString &host, int &port,
     query.setForwardOnly (true);
     bool rv = false;
 
-    do // Begin cleanup block (not a loop)
-    {
-        rv = query.exec ("SELECT " GV_MQ_ENABLED "," GV_MQ_HOST "," GV_MQ_PORT
-                         "," GV_MQ_TOPIC " FROM " GV_MQ_TABLE);
-        if (!rv) {
-            qWarning ("Failed to query DB for mosquitto settings");
-            break;
+    settings->beginGroup (GV_MQ_TABLE);
+    do  {// Begin cleanup block (not a loop)
+        bEnable = false;
+        if (settings->contains (GV_MQ_ENABLED)) {
+            bEnable = settings->value (GV_MQ_ENABLED).toBool ();
         }
 
-        rv = query.next ();
-        if (!rv) {
-            qWarning ("No entries in the mosquitto settings table!");
-            break;
+        host = "mosquitto.example.com";
+        if (settings->contains (GV_MQ_HOST)) {
+            host = settings->value (GV_MQ_HOST).toString ();
         }
 
-        int flags = query.value(0).toInt (&rv);
-        if (!rv) {
-            qWarning ("Failed to get mosquitto enabled field from the DB");
-            break;
-        }
-        bEnable = (flags == 1);
-        if (!bEnable) {
-            qDebug ("Mosquitto not enabled.");
-            // But still get the host and port values - This is useful when the
-            // user just disables for the time being.
+        port = 1883;
+        if (settings->contains (GV_MQ_PORT)) {
+            port = settings->value (GV_MQ_PORT).toInt ();
         }
 
-        host = query.value (1).toString ();
-        port = query.value (2).toInt (&rv);
-        if (!rv) {
-            qWarning ("Failed to query DB for mosquitto port");
-            break;
+        topic = "gv_notify";
+        if (settings->contains (GV_MQ_TOPIC)) {
+            topic = settings->value (GV_MQ_TOPIC).toString ();
         }
-
-        topic = query.value (3).toString ();
     } while (0); // End cleanup block (not a loop)
+    settings->endGroup ();
+
     return (rv);
 }//CacheDatabase::getMqSettings
 
@@ -1158,15 +1006,17 @@ CacheDatabase::setGvPin (bool bEnable, const QString &pin)
 bool
 CacheDatabase::getGvPin (bool &bEnable, QString &pin)
 {
-    bEnable = settings->value (GV_S_VAR_PIN_ENABLE).toBool ();
+    bEnable = false;
+    if (settings->contains (GV_S_VAR_PIN_ENABLE)) {
+        bEnable = settings->value (GV_S_VAR_PIN_ENABLE).toBool ();
+    }
 
     pin = "0000";
-    OsDependent &osd = Singletons::getRef().getOSD ();
-    QByteArray byD;
-    QString strResult = settings->value (GV_S_VAR_PIN).toString ();
-    if (!strResult.isEmpty ())
-    {
-        osd.cipher (QByteArray::fromHex (strResult.toAscii ()), byD, false);
+    if (settings->contains (GV_S_VAR_PIN)) {
+        OsDependent &osd = Singletons::getRef().getOSD ();
+        QByteArray byD;
+        pin = settings->value (GV_S_VAR_PIN).toString ();
+        osd.cipher (QByteArray::fromHex (pin.toAscii ()), byD, false);
         pin = byD;
     }
 
