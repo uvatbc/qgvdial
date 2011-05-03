@@ -4,18 +4,16 @@
 #include "InboxModel.h"
 #include "Singletons.h"
 
-#define DB_NAME "qgvdial.sqlite.db"
+#define QGVDIAL_DB_NAME     "qgvdial.sqlite.db"
+#define QGVDIAL_INI_NAME    "qgvdial.ini"
 
 //////////////////////////////// Settings table ////////////////////////////////
-#define GV_SETTINGS_TABLE   "gvsettings"
-#define GV_S_NAME           "name"
-#define GV_S_VALUE          "value"
-
 #define GV_S_VAR_USER           "user"
 #define GV_S_VAR_PASS           "password"
 #define GV_S_VAR_CALLBACK       "callback"
 #define GV_S_VAR_INBOX_SEL      "inbox_sel"
 #define GV_S_VAR_PIN            "gvpin"
+#define GV_S_VAR_PIN_ENABLE     "gvpin_enable"
 #define GV_S_VAR_DB_VER         "db_ver"
 ////////////////////////////////////////////////////////////////////////////////
 // Started using Google Contacts API
@@ -35,7 +33,7 @@
 // Voicemail now has transcription
 //#define GV_S_VALUE_DB_VER   "2011-04-08 17:30:00"
 // Encryption introduced into qgvdial. Only for username and password
-#define GV_S_VALUE_DB_VER   "2011-04-19 23:51:00"
+#define GV_S_VALUE_DB_VER   "2011-05-03 00:38:51"
 ////////////////////////////// GV Contacts table ///////////////////////////////
 #define GV_CONTACTS_TABLE   "gvcontacts"
 #define GV_C_ID             "id"
@@ -101,6 +99,7 @@
 CacheDatabase::CacheDatabase(const QSqlDatabase & other, QObject *parent)
 : QObject (parent)
 , dbMain (other)
+, settings (NULL)
 {
 }//CacheDatabase::CacheDatabase
 
@@ -112,6 +111,10 @@ CacheDatabase::~CacheDatabase(void)
 void
 CacheDatabase::deinit ()
 {
+    if (NULL != settings) {
+        delete settings;
+        settings = NULL;
+    }
     if (dbMain.isOpen ())
     {
         dbMain.close ();
@@ -123,14 +126,23 @@ void
 CacheDatabase::init ()
 {
     OsDependent &osd = Singletons::getRef().getOSD ();
-    QString strDbFile;
+    QString strDbFile, strIniFile;
     strDbFile = osd.getStoreDirectory () + QDir::separator ();
-    strDbFile += DB_NAME;
+    strIniFile = strDbFile;
+    strDbFile += QGVDIAL_DB_NAME;
+    strIniFile += QGVDIAL_INI_NAME;
 
     dbMain.setDatabaseName(strDbFile);
     if (!dbMain.open ()) {
         qWarning() << "Failed to open database" << strDbFile
-                 << ". Error text =" << dbMain.lastError ().text ();
+                   << ". Error text =" << dbMain.lastError ().text ();
+        qApp->quit ();
+        return;
+    }
+
+    settings = new QSettings(strIniFile, QSettings::IniFormat, this);
+    if (NULL == settings) {
+        qCritical ("Failed to open settings file");
         qApp->quit ();
         return;
     }
@@ -138,32 +150,14 @@ CacheDatabase::init ()
     QSqlQuery query(dbMain);
     query.setForwardOnly (true);
 
-    // Ensure that the settings table is present. If not, create it.
-    query.exec ("SELECT * FROM sqlite_master "
-                "WHERE type='table' "
-                "AND name='" GV_SETTINGS_TABLE "'");
-    if (!query.next ())
-    {
-        query.exec ("CREATE TABLE " GV_SETTINGS_TABLE " "
-                    "(" GV_S_NAME " varchar, " GV_S_VALUE " varchar, "
-                    " PRIMARY KEY (" GV_S_NAME "))");
-    }
-
-    query.exec ("SELECT * from " GV_SETTINGS_TABLE " "
-                "WHERE " GV_S_NAME "='" GV_S_VAR_DB_VER "'");
     bool bBlowAway = true;
-    if (query.next ())
-    {
-        // Then ensure that the version matches what we have hardcoded into
-        // this binary. If not drop all cache tables.
-        QString strVer = query.value(1).toString ();
-        if (strVer == GV_S_VALUE_DB_VER)
-        {
-            bBlowAway = false;
-        }
+    QString strVer = settings->value(GV_S_VAR_DB_VER).toString();
+    if (strVer == GV_S_VALUE_DB_VER) {
+        // Ensure that the version matches what we have hardcoded into this
+        // binary. If not drop all cache tables.
+        bBlowAway = false;
     }
-    if (bBlowAway)
-    {
+    if (bBlowAway) {
         // Drop it all!
         query.exec ("DROP TABLE " GV_CONTACTS_TABLE);
         query.exec ("DROP TABLE " GV_LINKS_TABLE);
@@ -174,12 +168,10 @@ CacheDatabase::init ()
         query.exec ("DROP TABLE " GV_MQ_TABLE);
 
         // Clear out all settings as well
-        query.exec ("DELETE FROM " GV_SETTINGS_TABLE);
+        settings->clear ();
 
-        // Delete the DB version number (if it exists)
-        query.exec ("INSERT INTO " GV_SETTINGS_TABLE " "
-                    "(" GV_S_NAME "," GV_S_VALUE ") VALUES "
-                    "('" GV_S_VAR_DB_VER "','" GV_S_VALUE_DB_VER "')");
+        // Insert the DB version number
+        settings->setValue(GV_S_VAR_DB_VER, GV_S_VALUE_DB_VER);
     }
 
     // Ensure that the contacts table is present. If not, create it.
@@ -318,37 +310,25 @@ CacheDatabase::refreshContactsModel (ContactsModel *modelContacts)
 bool
 CacheDatabase::getUserPass (QString &strUser, QString &strPass)
 {
-    QByteArray byD1, byD2;
+    QByteArray byD;
     OsDependent &osd = Singletons::getRef().getOSD ();
     QString strResult;
     bool bGotUser = false;
-    QSqlQuery query(dbMain);
-    query.setForwardOnly (true);
-    query.exec ("SELECT " GV_S_VALUE " FROM " GV_SETTINGS_TABLE
-                " WHERE " GV_S_NAME "='" GV_S_VAR_USER "'");
-    if (query.next ())
-    {
-        strResult = query.value(0).toString();
-        byD1 = QByteArray::fromHex (strResult.toAscii ());
-        osd.cipher (byD1, byD2, false);
-        strUser = byD2;
+
+    strResult = settings->value(GV_S_VAR_USER).toString();
+    if (!strResult.isEmpty ()) {
+        osd.cipher (QByteArray::fromHex (strResult.toAscii ()), byD, false);
+        strUser = byD;
         bGotUser = true;
     }
-    query.exec ("SELECT " GV_S_VALUE " FROM " GV_SETTINGS_TABLE
-                " WHERE " GV_S_NAME "='" GV_S_VAR_PASS "'");
-    if (query.next ())
-    {
-        if (!bGotUser)
-        {
-            query.exec ("DELETE FROM " GV_SETTINGS_TABLE
-                        " WHERE " GV_S_NAME "='" GV_S_VAR_PASS "'");
-        }
-        else
-        {
-            strResult = query.value(0).toString();
-            byD1 = QByteArray::fromHex (strResult.toAscii ());
-            osd.cipher (byD1, byD2, false);
-            strPass = byD2;
+
+    strResult = settings->value(GV_S_VAR_PASS).toString();
+    if (!strResult.isEmpty ()) {
+        if (!bGotUser) {
+            settings->remove (GV_S_VAR_PASS);
+        } else {
+            osd.cipher (QByteArray::fromHex (strResult.toAscii ()), byD, false);
+            strPass = byD;
         }
     }
 
@@ -364,28 +344,15 @@ CacheDatabase::putUserPass (const QString &strUser, const QString &strPass)
     QSqlQuery query(dbMain);
     query.setForwardOnly (true);
 
-
     // Delete the old user pass always
-    query.exec ("DELETE FROM " GV_SETTINGS_TABLE
-                " WHERE " GV_S_NAME "='" GV_S_VAR_USER "'");
-    query.exec ("DELETE FROM " GV_SETTINGS_TABLE
-                " WHERE " GV_S_NAME "='" GV_S_VAR_PASS "'");
+    settings->remove (GV_S_VAR_USER);
+    settings->remove (GV_S_VAR_PASS);
 
     osd.cipher (strUser.toAscii (), byD, true);
-    QString strScrub = byD.toHex ();
-    strQ = QString ("INSERT INTO " GV_SETTINGS_TABLE
-                    " (" GV_S_NAME "," GV_S_VALUE ")"
-                    " VALUES ('" GV_S_VAR_USER "', '%1')")
-           .arg(strScrub);
-    query.exec (strQ);
+    settings->setValue (GV_S_VAR_USER, QString (byD.toHex ()));
 
     osd.cipher (strPass.toAscii (), byD, true);
-    strScrub = byD.toHex ();
-    strQ = QString ("INSERT INTO " GV_SETTINGS_TABLE
-                    " (" GV_S_NAME "," GV_S_VALUE ")"
-                    " VALUES ('" GV_S_VAR_PASS "', '%1')")
-           .arg(strScrub);
-    query.exec (strQ);
+    settings->setValue (GV_S_VAR_PASS, QString (byD.toHex ()));
 
     return (true);
 }//CacheDatabase::putUserPass
@@ -393,40 +360,18 @@ CacheDatabase::putUserPass (const QString &strUser, const QString &strPass)
 bool
 CacheDatabase::getCallback (QString &strCallback)
 {
-    QSqlQuery query(dbMain);
-    query.setForwardOnly (true);
-
-    query.exec ("SELECT " GV_S_VALUE " FROM " GV_SETTINGS_TABLE
-                " WHERE " GV_S_NAME "='" GV_S_VAR_CALLBACK "'");
-    if (query.next ())
-    {
-        strCallback = query.value(0).toString();
-        return (true);
+    QString strResult = settings->value (GV_S_VAR_CALLBACK).toString ();
+    if (!strResult.isEmpty ()) {
+        strCallback = strResult;
+        return true;
     }
-    return (false);
+    return false;
 }//CacheDatabase::getCallback
 
 bool
 CacheDatabase::putCallback (const QString &strCallback)
 {
-    QSqlQuery query(dbMain);
-    query.setForwardOnly (true);
-
-    QString strQ;
-    if (getCallback (strQ))
-    {
-        query.exec ("DELETE FROM " GV_SETTINGS_TABLE
-                    " WHERE " GV_S_NAME "='" GV_S_VAR_CALLBACK "'");
-    }
-
-    QString strScrub = strCallback;
-    strScrub.replace ("'", "''");
-    strQ = QString ("INSERT INTO " GV_SETTINGS_TABLE
-                    " (" GV_S_NAME "," GV_S_VALUE ")"
-                    " VALUES ('" GV_S_VAR_CALLBACK "', '%1')")
-           .arg(strScrub);
-    query.exec (strQ);
-
+    settings->setValue (GV_S_VAR_CALLBACK, strCallback);
     return (true);
 }//CacheDatabase::putCallback
 
@@ -1110,41 +1055,19 @@ CacheDatabase::getProxySettings (bool &bEnable,
 bool
 CacheDatabase::getInboxSelector (QString &strSelector)
 {
-    QSqlQuery query(dbMain);
-    query.setForwardOnly (true);
-
-    query.exec ("SELECT " GV_S_VALUE " FROM " GV_SETTINGS_TABLE
-                " WHERE " GV_S_NAME "='" GV_S_VAR_INBOX_SEL "'");
-    if (query.next ())
-    {
-        strSelector = query.value(0).toString();
-        return (true);
+    QString strRv = settings->value (GV_S_VAR_INBOX_SEL).toString ();
+    if (!strRv.isEmpty ()) {
+        strSelector = strRv;
+        return true;
     }
-    return (false);
+    return false;
 }//CacheDatabase::getInboxSelector
 
 bool
 CacheDatabase::putInboxSelector (const QString &strSelector)
 {
-    QSqlQuery query(dbMain);
-    query.setForwardOnly (true);
-
-    QString strQ;
-    if (getCallback (strQ))
-    {
-        query.exec ("DELETE FROM " GV_SETTINGS_TABLE
-                    " WHERE " GV_S_NAME "='" GV_S_VAR_INBOX_SEL "'");
-    }
-
-    QString strScrub = strSelector;
-    strScrub.replace ("'", "''");
-    strQ = QString ("INSERT INTO " GV_SETTINGS_TABLE
-                    " (" GV_S_NAME "," GV_S_VALUE ")"
-                    " VALUES ('" GV_S_VAR_INBOX_SEL "', '%1')")
-           .arg(strScrub);
-    query.exec (strQ);
-
-    return (true);
+    settings->setValue (GV_S_VAR_INBOX_SEL, strSelector);
+    return true;
 }//CacheDatabase::putInboxSelector
 
 bool
@@ -1222,41 +1145,27 @@ CacheDatabase::getMqSettings (bool &bEnable, QString &host, int &port,
 bool
 CacheDatabase::setGvPin (bool bEnable, const QString &pin)
 {
-    QSqlQuery query(dbMain);
-    query.setForwardOnly (true);
-
-    // Clear the table of all settings
-    query.exec ("DELETE FROM " GV_SETTINGS_TABLE " "
-                "WHERE " GV_S_NAME "='" GV_S_VAR_PIN "'");
-    if (!bEnable) {
-        return true;
-    }
-
     QByteArray byD;
     OsDependent &osd = Singletons::getRef().getOSD ();
     osd.cipher (pin.toAscii (), byD, true);
-    QString strQ = QString ("INSERT INTO " GV_SETTINGS_TABLE
-                            " (" GV_S_NAME "," GV_S_VALUE ")"
-                            " VALUES ('" GV_S_VAR_PIN "', '%1')")
-                    .arg(QString(byD.toHex ()));
-    return (query.exec (strQ));
+
+    settings->setValue (GV_S_VAR_PIN, QString(byD.toHex ()));
+    settings->setValue (GV_S_VAR_PIN_ENABLE, bEnable);
+
+    return true;
 }//CacheDatabase::setGvPin
 
 bool
 CacheDatabase::getGvPin (bool &bEnable, QString &pin)
 {
+    bEnable = settings->value (GV_S_VAR_PIN_ENABLE).toBool ();
+
+    pin = "0000";
     OsDependent &osd = Singletons::getRef().getOSD ();
     QByteArray byD;
-    QString strResult;
-    QSqlQuery query(dbMain);
-    query.setForwardOnly (true);
-    query.exec ("SELECT " GV_S_VALUE " FROM " GV_SETTINGS_TABLE " "
-                "WHERE " GV_S_NAME "='" GV_S_VAR_PIN "'");
-    pin = "0000";
-    if (query.next ())
+    QString strResult = settings->value (GV_S_VAR_PIN).toString ();
+    if (!strResult.isEmpty ())
     {
-        bEnable = true;
-        strResult = query.value(0).toString();
         osd.cipher (QByteArray::fromHex (strResult.toAscii ()), byD, false);
         pin = byD;
     }

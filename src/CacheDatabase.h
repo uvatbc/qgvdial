@@ -108,6 +108,7 @@ signals:
 
 private:
     QSqlDatabase    dbMain;
+    QSettings      *settings;
 
     friend class Singletons;
 };
