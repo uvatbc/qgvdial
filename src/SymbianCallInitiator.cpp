@@ -11,9 +11,6 @@ SymbianCallInitiator::SymbianCallInitiator (QObject *parent)
 {
     iTelephony = CTelephony::NewL();
     dtmfSender = new SymbianDTMFPrivate (this);
-    if (NULL != iTelephony) {
-        delete iTelephony;
-    }
 }//SymbianCallInitiator::SymbianCallInitiator
 
 SymbianCallInitiator::~SymbianCallInitiator()
@@ -26,6 +23,9 @@ SymbianCallInitiator::~SymbianCallInitiator()
     }
     if (NULL != dtmfSender) {
         delete dtmfSender;
+    }
+    if (NULL != iTelephony) {
+        delete iTelephony;
     }
 }//SymbianCallInitiator::~SymbianCallInitiator
 
@@ -69,6 +69,8 @@ SymbianCallInitiator::initiateCall (const QString &strDestination,
 
         dialer = SymbianCallInitiatorPrivate::NewL (this, strDestination);
         if (NULL == dialer) {
+            delete observer;
+            observer = NULL;
             qWarning ("Could not dial out.");
             break;  // false
         }
