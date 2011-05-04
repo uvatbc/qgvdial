@@ -959,10 +959,6 @@ bool
 CacheDatabase::getMqSettings (bool &bEnable, QString &host, int &port,
                               QString &topic)
 {
-    QSqlQuery query(dbMain);
-    query.setForwardOnly (true);
-    bool rv = false;
-
     settings->beginGroup (GV_MQ_TABLE);
     do  {// Begin cleanup block (not a loop)
         bEnable = false;
@@ -987,7 +983,7 @@ CacheDatabase::getMqSettings (bool &bEnable, QString &host, int &port,
     } while (0); // End cleanup block (not a loop)
     settings->endGroup ();
 
-    return (rv);
+    return true;
 }//CacheDatabase::getMqSettings
 
 bool
