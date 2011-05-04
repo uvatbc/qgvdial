@@ -1515,10 +1515,12 @@ MainWindow::onSigMosquittoChanges (bool bEnable, const QString &host, int port,
 void
 MainWindow::onSigPinSettingChanges(bool bEnable, const QString &pin)
 {
+    QString strPin = QString("%1").arg (pin.toInt (), 4, 10, QChar('0'));
+
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    dbMain.setGvPin (bEnable, pin);
+    dbMain.setGvPin (bEnable, strPin);
     if (bEnable) {
-        strGvPin = pin;
+        strGvPin = strPin;
     } else {
         strGvPin.clear ();
     }
@@ -1539,7 +1541,7 @@ MainWindow::onSigPinSettingChanges(bool bEnable, const QString &pin)
 
         QMetaObject::invokeMethod (pPinSettings, "setValues",
                                    Q_ARG (QVariant, QVariant(bEnable)),
-                                   Q_ARG (QVariant, QVariant(pin)));
+                                   Q_ARG (QVariant, QVariant(strPin)));
     } while (0); // End cleanup block (not a loop)
 }//MainWindow::onSigPinSettingChanges
 

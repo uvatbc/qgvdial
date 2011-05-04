@@ -163,8 +163,10 @@
     <None Include="..\qml\MsgBox.qml" />
     <None Include="..\qml\MyButton.qml" />
     <None Include="..\qml\MyTextEdit.qml" />
+    <None Include="..\qml\PinSetting.qml" />
     <None Include="..\qml\Proxy.qml" />
     <None Include="..\qml\RadioButton.qml" />
+    <None Include="..\qml\Scrollbar.qml" />
     <None Include="..\qml\Settings.qml" />
     <None Include="qgvdial.qrc" />
     <None Include="readme.txt" />
