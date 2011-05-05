@@ -30,6 +30,10 @@ POSSIBILITY OF SUCH DAMAGE.
 #ifndef _MOSQUITTO_H_
 #define _MOSQUITTO_H_
 
+#if !defined(__cplusplus) && !defined(bool)
+typedef char bool;
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
