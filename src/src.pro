@@ -191,6 +191,12 @@ symbian {
     ICON=../icons/Google.svg
 # This hack is required until the next version of QT SDK
     QT_CONFIG -= opengl
+
+    vendorinfo = "%{\"Yuvraaj Kelkar\"}" \
+                 ":\"Yuvraaj Kelkar\""
+
+    my_deployment.pkg_prerules = vendorinfo
+    DEPLOYMENT += my_deployment
 }
 
 ###############################################################
