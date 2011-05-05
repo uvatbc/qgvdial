@@ -896,7 +896,7 @@ CacheDatabase::getProxySettings (bool &bEnable,
 
         bEnable = bUseSystemProxy = bRequiresAuth = false;
         if (!settings->contains (GV_P_FLAGS)) {
-            qWarning ("Failed to pull the flags from the DB");
+            qWarning ("Failed to pull the proxy flags from the DB");
             break;
         }
 
@@ -918,6 +918,8 @@ CacheDatabase::getProxySettings (bool &bEnable,
             qDebug ("Proxy does not require authentication");
             break;
         }
+
+        rv = true;
     } while (0); // End cleanup block (not a loop)
     settings->endGroup ();
 

@@ -28,79 +28,79 @@ win32 {
     LIBS *= -lmosquitto -llibeay32
 }
 
-PRECOMPILED_HEADER = global.h
+PRECOMPILED_HEADER = ../src/global.h
 
-SOURCES  += main.cpp                    \
-            MainApp.cpp                 \
-            MainWindow.cpp              \
-            Singletons.cpp              \
-            CacheDatabase.cpp           \
-            OsDependent.cpp             \
-            SkypeClientFactory.cpp      \
-            SkypeClient.cpp             \
-            ObserverFactory.cpp         \
-            GVWebPage.cpp               \
-            GVDataAccess.cpp            \
-            GVAccess.cpp                \
-            CalloutInitiator.cpp        \
-            CallInitiatorFactory.cpp    \
-            MobileWebPage.cpp           \
-            InboxModel.cpp              \
-            GVI_XMLJsonHandler.cpp      \
-            PhoneNumberValidator.cpp    \
-            GVContactsTable.cpp         \
-            CaptchaWidget.cpp           \
-            ContactsXmlHandler.cpp      \
-            SMSEntryDeleteButton.cpp    \
-            SMSDlg.cpp                  \
-            ChildWindowBase.cpp         \
-            GVInbox.cpp                 \
-            WebWidget.cpp               \
-            RegNumberModel.cpp          \
-            ContactsModel.cpp           \
-            ContactDetailsModel.cpp     \
-            GVI_SMS_Handler.cpp         \
-            DialContext.cpp             \
-            ContactsParserObject.cpp
+SOURCES  += ../src/main.cpp                 \
+            ../src/MainApp.cpp              \
+            ../src/MainWindow.cpp           \
+            ../src/Singletons.cpp           \
+            ../src/CacheDatabase.cpp        \
+            ../src/OsDependent.cpp          \
+            ../src/SkypeClientFactory.cpp   \
+            ../src/SkypeClient.cpp          \
+            ../src/ObserverFactory.cpp      \
+            ../src/GVWebPage.cpp            \
+            ../src/GVDataAccess.cpp         \
+            ../src/GVAccess.cpp             \
+            ../src/CalloutInitiator.cpp     \
+            ../src/CallInitiatorFactory.cpp \
+            ../src/MobileWebPage.cpp        \
+            ../src/InboxModel.cpp           \
+            ../src/GVI_XMLJsonHandler.cpp   \
+            ../src/PhoneNumberValidator.cpp \
+            ../src/GVContactsTable.cpp      \
+            ../src/CaptchaWidget.cpp        \
+            ../src/ContactsXmlHandler.cpp   \
+            ../src/SMSEntryDeleteButton.cpp \
+            ../src/SMSDlg.cpp               \
+            ../src/ChildWindowBase.cpp      \
+            ../src/GVInbox.cpp              \
+            ../src/WebWidget.cpp            \
+            ../src/RegNumberModel.cpp       \
+            ../src/ContactsModel.cpp        \
+            ../src/ContactDetailsModel.cpp  \
+            ../src/GVI_SMS_Handler.cpp      \
+            ../src/DialContext.cpp          \
+            ../src/ContactsParserObject.cpp
 
-HEADERS  += global.h                    \
-            IObserver.h                 \
-            MainApp.h                   \
-            MainWindow.h                \
-            Singletons.h                \
-            CacheDatabase.h             \
-            OsDependent.h               \
-            SkypeClientFactory.h        \
-            SkypeClient.h               \
-            ObserverFactory.h           \
-            GVWebPage.h                 \
-            GVDataAccess.h              \
-            GVAccess.h                  \
-            CalloutInitiator.h          \
-            CallInitiatorFactory.h      \
-            MobileWebPage.h             \
-            InboxModel.h                \
-            GVI_XMLJsonHandler.h        \
-            PhoneNumberValidator.h      \
-            GVContactsTable.h           \
-            CaptchaWidget.h             \
-            ContactsXmlHandler.h        \
-            SMSEntryDeleteButton.h      \
-            SMSDlg.h                    \
-            ChildWindowBase.h           \
-            GVInbox.h                   \
-            WebWidget.h                 \
-            RegNumberModel.h            \
-            ContactsModel.h             \
-            ContactDetailsModel.h       \
-            GVI_SMS_Handler.h           \
-            DialContext.h               \
-            ContactsParserObject.h
+HEADERS  += ../src/global.h                 \
+            ../src/IObserver.h              \
+            ../src/MainApp.h                \
+            ../src/MainWindow.h             \
+            ../src/Singletons.h             \
+            ../src/CacheDatabase.h          \
+            ../src/OsDependent.h            \
+            ../src/SkypeClientFactory.h     \
+            ../src/SkypeClient.h            \
+            ../src/ObserverFactory.h        \
+            ../src/GVWebPage.h              \
+            ../src/GVDataAccess.h           \
+            ../src/GVAccess.h               \
+            ../src/CalloutInitiator.h       \
+            ../src/CallInitiatorFactory.h   \
+            ../src/MobileWebPage.h          \
+            ../src/InboxModel.h             \
+            ../src/GVI_XMLJsonHandler.h     \
+            ../src/PhoneNumberValidator.h   \
+            ../src/GVContactsTable.h        \
+            ../src/CaptchaWidget.h          \
+            ../src/ContactsXmlHandler.h     \
+            ../src/SMSEntryDeleteButton.h   \
+            ../src/SMSDlg.h                 \
+            ../src/ChildWindowBase.h        \
+            ../src/GVInbox.h                \
+            ../src/WebWidget.h              \
+            ../src/RegNumberModel.h         \
+            ../src/ContactsModel.h          \
+            ../src/ContactDetailsModel.h    \
+            ../src/GVI_SMS_Handler.h        \
+            ../src/DialContext.h            \
+            ../src/ContactsParserObject.h
 
-RESOURCES += qgvdial.qrc
+RESOURCES += ../src/qgvdial.qrc
 
 # This is so that QtCreator can show these files in the files list.
-OTHER_FILES  += winrsrc.rc                  \
+OTHER_FILES  += ../src/winrsrc.rc           \
                 ../qml/About.qml            \
                 ../qml/ActionButtons.qml    \
                 ../qml/ComboBoxPhones.qml   \
@@ -129,55 +129,55 @@ OTHER_FILES  += winrsrc.rc                  \
 
 # In Linux and maemo, add the telepathy related sources and headers. Also add Mosquitto based sources and headers.
 unix:!symbian {
-    HEADERS  += TpObserver.h            \
-                TpCalloutInitiator.h    \
-                QGVDbusServer.h         \
-                MqClientThread.h
-    SOURCES  += TpObserver.cpp          \
-                TpCalloutInitiator.cpp  \
-                QGVDbusServer.cpp       \
-                MqClientThread.cpp
+    HEADERS  += ../src/TpObserver.h            \
+                ../src/TpCalloutInitiator.h    \
+                ../src/QGVDbusServer.h         \
+                ../src/MqClientThread.h
+    SOURCES  += ../src/TpObserver.cpp          \
+                ../src/TpCalloutInitiator.cpp  \
+                ../src/QGVDbusServer.cpp       \
+                ../src/MqClientThread.cpp
 }
 
 # In desktop Linux, add the Skype client
 unix:!symbian:!maemo5 {
-    HEADERS  += SkypeLinuxClient.h              \
-                SkypeObserver.h                 \
-                DesktopSkypeCallInitiator.h
-    SOURCES  += SkypeLinuxClient.cpp            \
-                SkypeObserver.cpp               \
-                DesktopSkypeCallInitiator.cpp
+    HEADERS  += ../src/SkypeLinuxClient.h              \
+                ../src/SkypeObserver.h                 \
+                ../src/DesktopSkypeCallInitiator.h
+    SOURCES  += ../src/SkypeLinuxClient.cpp            \
+                ../src/SkypeObserver.cpp               \
+                ../src/DesktopSkypeCallInitiator.cpp
 }
 
 win32 {
 # Resource file is for windows only - for the icon
-    RC_FILE = winrsrc.rc
+    RC_FILE = ../src/winrsrc.rc
 
 # In desktop Windows, add the Skype client. Also add Mosquitto based sources and headers.
-    HEADERS += SkypeWinClient.h             \
-               SkypeObserver.h              \
-               DesktopSkypeCallInitiator.h  \
-               MqClientThread.h
-    SOURCES += SkypeWinClient.cpp           \
-               SkypeObserver.cpp            \
-               DesktopSkypeCallInitiator.cpp \
-               MqClientThread.cpp
+    HEADERS += ../src/SkypeWinClient.h             \
+               ../src/SkypeObserver.h              \
+               ../src/DesktopSkypeCallInitiator.h  \
+               ../src/MqClientThread.h
+    SOURCES += ../src/SkypeWinClient.cpp           \
+               ../src/SkypeObserver.cpp            \
+               ../src/DesktopSkypeCallInitiator.cpp \
+               ../src/MqClientThread.cpp
 }
 
 symbian {
-    HEADERS  += SymbianCallInitiator.h          \
-                SymbianCallInitiatorPrivate.h   \
-                SymbianCallObserverPrivate.h    \
-                SymbianDTMFPrivate.h
-    SOURCES  += SymbianCallInitiator.cpp        \
-                SymbianCallInitiatorPrivate.cpp \
-                SymbianCallObserverPrivate.cpp  \
-                SymbianDTMFPrivate.cpp
+    HEADERS  += ../src/SymbianCallInitiator.h          \
+                ../src/SymbianCallInitiatorPrivate.h   \
+                ../src/SymbianCallObserverPrivate.h    \
+                ../src/SymbianDTMFPrivate.h
+    SOURCES  += ../src/SymbianCallInitiator.cpp        \
+                ../src/SymbianCallInitiatorPrivate.cpp \
+                ../src/SymbianCallObserverPrivate.cpp  \
+                ../src/SymbianDTMFPrivate.cpp
 
 # Add the mosquitto lib to symbian
-    include(mqlib/mqlib.pri)
-    HEADERS += MqClientThread.h
-    SOURCES += MqClientThread.cpp
+    include(../src/mqlib/mqlib.pri)
+    HEADERS += ../src/MqClientThread.h
+    SOURCES += ../src/MqClientThread.cpp
 
 # The Symbian telephony stack library and the equivalent of openssl
     LIBS += -letel3rdparty -llibcrypto

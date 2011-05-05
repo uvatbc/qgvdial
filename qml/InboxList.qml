@@ -311,7 +311,7 @@ Rectangle {
                 border.color: "orange"
                 radius: 2
 
-                width: inboxView.width - border.width
+                width: listInbox.width - border.width
                 height: entryText.height
 
                 Row {
@@ -355,10 +355,11 @@ Rectangle {
 
                     Text {
                         id: entryText
+                        height: (listInbox.height + listInbox.width) / 20
 
                         text: time_detail + "\n" + name
                         color: "white"
-                        font.pointSize: (listInbox.height + listInbox.width) / 70
+                        font.pixelSize: (entryText.height / 2) - 3
                     }
                 }
 
