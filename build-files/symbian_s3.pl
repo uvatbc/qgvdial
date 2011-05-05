@@ -75,7 +75,6 @@ print("$cmd\n");
 system($cmd);
 
 # Copy the sis files to the outer directory
-#$cmd = "$enterdir & powershell cp qgvdial.sis $dest/qgvdial_$qver.sis & powershell cp qgvdial_installer.sis $dest/qgvdial_installer_$qver.sis";
-$cmd = "$enterdir & powershell cp qgvdial.sis $dest/qgvdial_s3_$qver.sis & powershell cp unsigned_qgvdial.sis $dest/unsigned_qgvdial_s3_$qver.sis";
+$cmd = "$enterdir & powershell cp qgvdial.sis $dest/qgvdial_s3_$qver.sis & powershell cp unsigned_qgvdial.sis $dest/unsigned_qgvdial_s3_$qver.sis & powershell cp qgvdial_installer.sis $dest/qgvdial_installer_s3_$qver.sis";
 print("$cmd\n");
 system($cmd);
