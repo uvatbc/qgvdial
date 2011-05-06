@@ -161,6 +161,17 @@ MainWindow::checkParams ()
             strPass = byD;
         }
 
+        checkTimeout = 0;
+        if (settings.contains ("check_timeout")) {
+            checkTimeout = settings.value ("check_timeout").toUInt ();
+        }
+        if (checkTimeout < 5) {
+            qWarning () << "Check frequency =" << checkTimeout
+                        << "is not valid. Resetting to lowest value = 5";
+            checkTimeout = 5;
+            settings.setValue ("check_timeout", checkTimeout);
+        }
+
         if (!settings.contains ("mqserver")) {
             qWarning ("Ini file does not contain the mq server hostname");
             cout << "Enter server hostname:";
@@ -442,6 +453,6 @@ MainWindow::startTimer ()
 {
     mainTimer.stop ();
     mainTimer.setSingleShot (true);
-    mainTimer.setInterval (5 * 1000);
+    mainTimer.setInterval (checkTimeout * 1000);
     mainTimer.start ();
 }//MainWindow::startTimer

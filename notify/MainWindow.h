@@ -42,6 +42,9 @@ private:
     QString strUser;
     QString strPass;
 
+    // Frequency of checking in seconds
+    quint8 checkTimeout;
+
     // Mosquitto settings
     QString m_strMqServer;
     int m_mqPort;
