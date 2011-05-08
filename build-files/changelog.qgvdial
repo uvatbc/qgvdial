@@ -1,1 +1,1 @@
-  * Fix the inbox font messup in Symbian and in everything else.
+  * Changed the fallback DTMF based on kbyork's suggestion

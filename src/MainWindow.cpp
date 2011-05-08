@@ -1692,7 +1692,7 @@ MainWindow::onFallbackDialout (bool bSuccess, void *v_ctx)
     }
 
     QString strDTMF;
-    strDTMF = "2p" + ctx->strTarget;
+    strDTMF = "p*p2p" + ctx->strTarget;
     // Add the pin if it is there
     if (!strGvPin.isEmpty ()) {
         strDTMF = strGvPin + "p" + strDTMF;
