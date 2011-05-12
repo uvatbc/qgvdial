@@ -126,10 +126,24 @@ MainWindow::doWork ()
 bool
 MainWindow::checkParams ()
 {
-    bool rv = false;
-    QString strIni = baseDir ();
-    strIni += QDir::separator();
-    strIni += "notify.ini";
+    bool rv = false, bUseDefaultIni = false;
+    QString strIni;
+    QStringList args = qApp->arguments ();
+    if (args.length () < 2) {
+        qWarning ("No ini file specified, using default");
+        bUseDefaultIni = true;
+    } else {
+        QFileInfo fi(args[1]);
+        strIni = fi.absoluteFilePath ();
+    }
+
+    if (bUseDefaultIni) {
+        strIni = baseDir ();
+        strIni += QDir::separator();
+        strIni += "notify.ini";
+    }
+
+    qDebug () << "Using ini file at" << strIni;
 
     bool bUseProxy = false, bUseSystemProxy = false, bProxyAuth = false;
     QString strProxy, strProxyUser, strProxyPass;
