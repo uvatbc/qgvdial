@@ -135,6 +135,11 @@ MainWindow::checkParams ()
     } else {
         QFileInfo fi(args[1]);
         strIni = fi.absoluteFilePath ();
+
+        QString strLogfile = strIni + ".log";
+        fLogfile.close ();
+        fLogfile.setFileName (strLogfile);
+        fLogfile.open (QIODevice::WriteOnly | QIODevice::Append);
     }
 
     if (bUseDefaultIni) {
