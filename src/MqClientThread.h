@@ -38,7 +38,8 @@ private:
     void run ();
     int subscribe(uint16_t *mid, const char *sub, int qos=0);
     int unsubscribe(uint16_t *mid, const char *sub);
-    int mq_connect(const char *host, int port=1883, int keepalive=60, bool clean_session=true);
+    int mq_connect(const char *host, int port=1883, int keepalive=60,
+                   bool clean_session = true);
     int mq_disconnect();
     int loop(int timeout=-1);
 

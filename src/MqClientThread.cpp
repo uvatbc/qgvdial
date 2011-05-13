@@ -162,7 +162,7 @@ MqClientThread::run ()
         }
 
         qDebug() << "Mq thread: Attempting to connect to" << strHost;
-        rv = this->mq_connect (strHost.toLatin1().constData ());
+        rv = this->mq_connect (strHost.toLatin1().constData(), port, 60, false);
         if (0 != rv) {
             qWarning() << "Mq thread: Failed to connect. Error =" << rv;
             emit status ("Failed to connect to Mosquitto server");
@@ -267,7 +267,8 @@ MqClientThread::unsubscribe(uint16_t *mid, const char *sub)
 }//MqClientThread::unsubscribe
 
 int
-MqClientThread::mq_connect(const char *host, int port, int keepalive, bool clean_session)
+MqClientThread::mq_connect(const char *host, int port, int keepalive,
+                           bool clean_session)
 {
     return mosquitto_connect(mosq, host, port, keepalive, clean_session);
 }//MqClientThread::mq_connect
