@@ -15,6 +15,7 @@
 #define GV_S_VAR_PIN            "gvpin"
 #define GV_S_VAR_PIN_ENABLE     "gvpin_enable"
 #define GV_S_VAR_DB_VER         "db_ver"
+#define GV_S_VAR_VER            "settings_ver"
 ////////////////////////////////////////////////////////////////////////////////
 // Started using Google Contacts API
 // #define GV_S_VALUE_DB_VER   "2010-08-03 11:08:00"
@@ -36,6 +37,9 @@
 //#define GV_S_VALUE_DB_VER   "2011-04-19 23:51:00"
 // Started using settings ini
 #define GV_S_VALUE_DB_VER   "2011-05-03 11:03:50"
+////////////////////////////////////////////////////////////////////////////////
+// Started using versioning for the settings
+#define GV_SETTINGS_VER     "2011-05-13 16:33:50"
 ////////////////////////////// GV Contacts table ///////////////////////////////
 #define GV_CONTACTS_TABLE   "gvcontacts"
 #define GV_C_ID             "id"
@@ -160,6 +164,14 @@ CacheDatabase::init ()
         // binary. If not drop all cache tables.
         bBlowAway = false;
     }
+    strVer = settings->value(GV_S_VAR_VER).toString();
+    if (strVer != GV_SETTINGS_VER) {
+        // If the settings change, EVERYTHING GOES!
+        bBlowAway = true;
+        // Clear out all settings as well
+        settings->clear ();
+        settings->setValue (GV_S_VAR_VER, GV_SETTINGS_VER);
+    }
     if (bBlowAway) {
         // Drop all tables!
         arrTables = dbMain.tables ();
@@ -169,9 +181,6 @@ CacheDatabase::init ()
             query.exec (strQ);
         }
         query.exec ("VACUUM");
-
-        // Clear out all settings as well
-        settings->clear ();
 
         // Insert the DB version number
         settings->setValue(GV_S_VAR_DB_VER, GV_S_VALUE_DB_VER);

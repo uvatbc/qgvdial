@@ -96,7 +96,7 @@ TpCalloutInitiator::onConnectionReady (Tp::PendingOperation *op)
         }
 
         if (strActCmName == "ring") {
-            strSelfNumber = "This phone's MSISDN";
+            strSelfNumber = "This phone's number";
             strActCmName = "Phone";
         }
 
