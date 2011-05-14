@@ -162,7 +162,7 @@ MqClientThread::run ()
         }
 
         qDebug() << "Mq thread: Attempting to connect to" << strHost;
-        rv = this->mq_connect (strHost.toLatin1().constData(), port, 60, false);
+        rv = this->mq_connect (strHost.toLatin1().constData(), port, 60, true);
         if (0 != rv) {
             qWarning() << "Mq thread: Failed to connect. Error =" << rv;
             emit status ("Failed to connect to Mosquitto server");
@@ -182,12 +182,15 @@ MqClientThread::run ()
                 retries++;
                 break;
             } else if ((MOSQ_ERR_NO_CONN == rv) ||
-                       (MOSQ_ERR_CONN_LOST == rv) ||
                        (MOSQ_ERR_PROTOCOL == rv)) {
-                qWarning ("Mq thread: Recoverable error, hopefully");
+                qWarning() << "Mq thread: error=" << rv
+                           << "Recoverable hopefully";
                 this->sleep (1);
                 retries++;
                 break;
+            } else if (MOSQ_ERR_CONN_LOST == rv) {
+                qWarning ("Lost connection to mosquitto server");
+                rv = this->mq_connect (strHost.toLatin1().constData(), port, 60, true);
             } else {
                 qWarning() << "Mq thread: Other error in loop:" << rv;
                 retries++;
