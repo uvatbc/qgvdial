@@ -29,7 +29,8 @@ DialContext::showMsgBox ()
     QString strMessage = QString("Dialing\n%1").arg(strTarget);
 
     QDeclarativeContext *ctx = mainView->rootContext();
-    ctx->setContextProperty ("g_bShowMsg", true);
+    bool bTemp = true;
+    ctx->setContextProperty ("g_bShowMsg", bTemp);
     ctx->setContextProperty ("g_strMsgText", strMessage);
 }//DialContext::showMsgBox
 
@@ -37,7 +38,8 @@ void
 DialContext::hideMsgBox ()
 {
     QDeclarativeContext *ctx = mainView->rootContext();
-    ctx->setContextProperty ("g_bShowMsg", false);
+    bool bTemp = false;
+    ctx->setContextProperty ("g_bShowMsg", bTemp);
 }//DialContext::hideMsgBox
 
 void

@@ -24,8 +24,13 @@ class TpObserver : public IObserver, public AbstractClientObserver
     Q_OBJECT
 
 public:
+#if DESKTOP_OS
+    TpObserver (const ChannelClassSpecList &channelFilter,
+                      QObject              *parent = NULL);
+#else
     TpObserver (const ChannelClassList &channelFilter,
                       QObject          *parent = NULL);
+#endif
     void setId (int i);
 
 protected:
@@ -36,13 +41,25 @@ private slots:
 
 protected:
     void observeChannels(
-            const MethodInvocationContextPtr<> & context,
-            const AccountPtr                   & account,
-            const ConnectionPtr                & connection,
-            const QList <ChannelPtr>           & channels,
-            const ChannelDispatchOperationPtr  & dispatchOperation,
-            const QList <ChannelRequestPtr>    & requestsSatisfied,
-            const QVariantMap                  & observerInfo);
+            const MethodInvocationContextPtr<>  &context,
+            const AccountPtr                    &account,
+            const ConnectionPtr                 &connection,
+            const QList <ChannelPtr>            &channels,
+            const ChannelDispatchOperationPtr   &dispatchOperation,
+            const QList <ChannelRequestPtr>     &requestsSatisfied,
+            const QVariantMap                   &observerInfo);
+
+#if DESKTOP_OS
+    // Linux has moved on to newer telepathy.
+    void observeChannels(
+            const MethodInvocationContextPtr<>  &context,
+            const AccountPtr                    &account,
+            const ConnectionPtr                 &connection,
+            const QList<ChannelPtr>             &channels,
+            const ChannelDispatchOperationPtr   &dispatchOperation,
+            const QList<ChannelRequestPtr>      &requestsSatisfied,
+            const ObserverInfo                  &observerInfo);
+#endif
 
 private:
     int     id;

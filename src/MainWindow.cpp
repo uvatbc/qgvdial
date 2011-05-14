@@ -632,7 +632,8 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
         this->setPassword (strPass);
         QDeclarativeContext *ctx = this->rootContext();
         ctx->setContextProperty ("g_bIsLoggedIn", bLoggedIn);
-        ctx->setContextProperty ("g_bShowSettings", false);
+        bool bTemp = false;
+        ctx->setContextProperty ("g_bShowSettings", bTemp);
 
         // Fill up the combobox on the main page
         if ((!dbMain.getRegisteredNumbers (arrNumbers)) ||
@@ -1572,7 +1573,8 @@ void
 MainWindow::onSigMsgBoxDone (bool /*ok*/)
 {
     QDeclarativeContext *ctx = this->rootContext();
-    ctx->setContextProperty ("g_bShowMsg", false);
+    bool bTemp = false;
+    ctx->setContextProperty ("g_bShowMsg", bTemp);
 }//MainWindow::onSigMsgBoxDone
 
 void

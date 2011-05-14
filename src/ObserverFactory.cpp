@@ -4,7 +4,12 @@
 #include "TpObserver.h"
 #include <TelepathyQt4/ClientRegistrar>
 
+#if LINUX_DESKTOP
+#include <TelepathyQt4/ChannelClassSpecList>
+#endif
+
 ClientRegistrarPtr  clientRegistrar;
+
 #endif
 
 #if LINUX_DESKTOP || defined(Q_WS_WIN32)
@@ -37,6 +42,12 @@ ObserverFactory::init ()
 #if TELEPATHY_CAPABLE
     clientRegistrar = ClientRegistrar::create();
 
+#if DESKTOP_OS
+    ChannelClassSpecList filters;
+    filters.append (Tp::ChannelClassSpec(
+                    TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAMED_MEDIA,
+                    Tp::HandleTypeContact));
+#else
     ChannelClassList filters;
     QMap<QString, QDBusVariant> filter;
     filter.insert(
@@ -46,6 +57,7 @@ ObserverFactory::init ()
             QLatin1String(TELEPATHY_INTERFACE_CHANNEL ".TargetHandleType"),
             QDBusVariant((uint) Tp::HandleTypeContact));
     filters.append(filter);
+#endif
     TpObserver *myobserver = new TpObserver(filters, this);
     AbstractClientPtr appr = (AbstractClientPtr) myobserver;
     clientRegistrar->registerClient(appr, "QGVStreamObserver");

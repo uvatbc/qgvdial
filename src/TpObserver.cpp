@@ -1,7 +1,12 @@
 #include "TpObserver.h"
 
+#if DESKTOP_OS
+TpObserver::TpObserver (const ChannelClassSpecList &channelFilter,
+                              QObject              *parent       )
+#else
 TpObserver::TpObserver (const ChannelClassList &channelFilter,
                               QObject          *parent       )
+#endif
 : IObserver (parent)
 , AbstractClientObserver(channelFilter)
 , id(1) // Always ignore
@@ -77,7 +82,23 @@ TpObserver::observeChannels(
             break;
         }
     }
-}//TpObserver::addDispatchOperation
+}//TpObserver::observeChannels
+
+#if DESKTOP_OS
+void
+TpObserver::observeChannels(
+        const MethodInvocationContextPtr<>  &context,
+        const AccountPtr                    &account,
+        const ConnectionPtr                 &connection,
+        const QList<ChannelPtr>             &channels,
+        const ChannelDispatchOperationPtr   &dispatchOperation,
+        const QList<ChannelRequestPtr>      &requestsSatisfied,
+        const ObserverInfo                  &observerInfo)
+{
+    observeChannels (context, account, connection, channels, dispatchOperation,
+                     requestsSatisfied, observerInfo.allInfo ());
+}//TpObserver::observeChannels
+#endif
 
 ChannelAccepter::ChannelAccepter (
     const MethodInvocationContextPtr<> & ctx,
