@@ -428,9 +428,7 @@ MainWindow::initQML ()
     OsDependent &osd = Singletons::getRef().getOSD ();
     QRect rect = osd.getStartingSize ();
 
-    int webwidget_typeid =
     qmlRegisterType<WebWidget>("org.qgvdial.WebWidget", 1, 0, "MyWebWidget");
-    qDebug() << "Init: Webwidget type ID =" << webwidget_typeid;
 
     bool bTempFalse = false;
     int iTempZero = 0;
@@ -505,6 +503,9 @@ MainWindow::initQML ()
         this, SLOT  (onSigPinSettingChanges(bool, const QString &)));
     QObject::connect (gObj, SIGNAL (sigMsgBoxDone(bool)),
                       this, SLOT (onSigMsgBoxDone(bool)));
+    QObject::connect (
+        gObj      , SIGNAL  (sigSearchContacts(const QString &)),
+        &oContacts, SLOT (onSearchQueryChanged(const QString &)));
 
 #if DESKTOP_OS
     this->setFixedSize (this->size ());

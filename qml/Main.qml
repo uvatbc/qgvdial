@@ -44,6 +44,9 @@ Rectangle {
     signal sigMosquittoChanges(bool bEnable, string host, int port, string topic)
     signal sigPinSettingChanges(bool bEnable, string pin)
 
+    // Contacts search query changes
+    signal sigSearchContacts(string query)
+
     // Signals from the message box
     signal sigMsgBoxDone (bool ok)
 
@@ -196,6 +199,7 @@ Rectangle {
             onSigCall: main.sigCall (number)
             onSigText: main.sigText (number)
             onSigMsgBoxDone: main.sigMsgBoxDone(ok)
+            onSigSearchContacts: main.sigSearchContacts(query)
         }
 
         InboxList {

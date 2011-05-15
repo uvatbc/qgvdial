@@ -8,6 +8,7 @@ Rectangle {
     signal sigCall(string number)
     signal sigText(string number)
     signal sigMsgBoxDone (bool ok)
+    signal sigSearchContacts(string query)
 
 ////////////////////////////////////////////////////////////////////////////////
 //                              Test Data models                              //
@@ -82,65 +83,99 @@ Rectangle {
         }
     }// Rectangle (Contact details)
 
-    ListView { // All contacts
-        id: contactsView
-
+    Item { // All contacts
+        id: allContacts
         anchors.fill: parent
-        clip: true
-        opacity: 1
-        spacing: 2
 
-        model: g_contactsModel
-//        model: testContactsModelData1
-
-        section.property: "name"
-        section.criteria: ViewSection.FirstCharacter
-
-        delegate: Rectangle {
-            id: listDelegate
-
-            color: "darkslategray"
-            border.color: "orange"
-            radius: 5
-
-            width: contactsView.width - border.width
-            height: (contactsView.height + contactsView.width) / 20
+        Row {
+            id: searchRow
+            height: lblSearch.height
+            width: parent.width
+            spacing: 1
 
             Text {
-                anchors {
-                    verticalCenter: parent.verticalCenter
-                    left: parent.left
-                    leftMargin: 5
-                }
-
-                text: name
+                id: lblSearch
+                text: "?"
                 color: "white"
-
-                font.pixelSize: parent.height - 6
+                font.pixelSize: ((allContacts.height + allContacts.width) / 21)
             }
 
-            MouseArea {
-                anchors.fill: parent
-
-                onClicked: {
-                    detailsList.model = contacts;
-                    detailsList.notesText = notes;
-                    txtContactName.text = name
-                    container.state = "Details"
-                }
+            MyTextEdit {
+                id: edSearch
+                width: parent.width - lblSearch.width - parent.spacing
+                pixelSize: lblSearch.font.pixelSize
+                text: ""
+                onSigTextChanged: container.sigSearchContacts(strText)
             }
-        }// delegate Rectangle
-    }// ListView (All contacts)
-
-    Scrollbar {
-        scrollArea: contactsView
-        width: 8
-        anchors {
-            right: parent.right
-            top: parent.top
-            bottom: parent.bottom
         }
-    }//scroll bar for the contacts list
+
+        ListView {
+            id: contactsView
+
+            anchors {
+                top: searchRow.bottom
+                topMargin: 2
+                left: parent.left
+            }
+            height: parent.height - searchRow.height
+            width: parent.width
+
+            clip: true
+            opacity: 1
+            spacing: 2
+
+            model: g_contactsModel
+    //        model: testContactsModelData1
+
+            section.property: "name"
+            section.criteria: ViewSection.FirstCharacter
+
+            delegate: Rectangle {
+                id: listDelegate
+
+                color: "darkslategray"
+                border.color: "orange"
+                radius: 5
+
+                width: allContacts.width - border.width
+                height: (allContacts.height + allContacts.width) / 20
+
+                Text {
+                    anchors {
+                        verticalCenter: parent.verticalCenter
+                        left: parent.left
+                        leftMargin: 5
+                    }
+
+                    text: name
+                    color: "white"
+
+                    font.pixelSize: parent.height - 6
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+
+                    onClicked: {
+                        detailsList.model = contacts;
+                        detailsList.notesText = notes;
+                        txtContactName.text = name
+                        container.state = "Details"
+                    }
+                }
+            }// delegate Rectangle
+        }// ListView (contacts list)
+
+        Scrollbar {
+            scrollArea: contactsView
+            width: 8
+            anchors {
+                right: parent.right
+                top: parent.top
+                bottom: parent.bottom
+            }
+        }//scroll bar for the contacts list
+    }// Item (All contacts)
 
     Rectangle {
         opacity: contactsView.moving ? 0.5 : 0
@@ -166,7 +201,7 @@ Rectangle {
     states: [
         State {
             name: "Details"
-            PropertyChanges { target: contactsView; opacity: 0 }
+            PropertyChanges { target: allContacts; opacity: 0 }
             PropertyChanges { target: detailsView; opacity: 1 }
         }
     ]

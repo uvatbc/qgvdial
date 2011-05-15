@@ -260,11 +260,19 @@ CacheDatabase::clearContacts ()
 }//CacheDatabase::clearContacts
 
 void
-CacheDatabase::refreshContactsModel (ContactsModel *modelContacts)
+CacheDatabase::refreshContactsModel (ContactsModel *modelContacts,
+                                     const QString &query)
 {
-    modelContacts->setQuery ("SELECT " GV_C_ID "," GV_C_NAME "," GV_C_NOTES " "
-                             "FROM " GV_CONTACTS_TABLE " "
-                             "ORDER BY " GV_C_NAME, dbMain);
+    QString strQ = "SELECT " GV_C_ID "," GV_C_NAME "," GV_C_NOTES " "
+                   "FROM " GV_CONTACTS_TABLE " ";
+    if (!query.isEmpty ()) {
+        QString scrubQuery = query;
+        scrubQuery.replace ("'", "''");
+        strQ += QString("WHERE " GV_C_NAME " LIKE '%%%1%%'").arg (scrubQuery);
+    }
+    strQ += " ORDER BY " GV_C_NAME;
+
+    modelContacts->setQuery (strQ, dbMain);
     modelContacts->setHeaderData (0, Qt::Horizontal, QObject::tr("Id"));
     modelContacts->setHeaderData (1, Qt::Horizontal, QObject::tr("Name"));
     modelContacts->setHeaderData (2, Qt::Horizontal, QObject::tr("Notes"));
@@ -462,13 +470,20 @@ CacheDatabase::insertContact (const ContactInfo &info)
 }//CacheDatabase::insertContact
 
 quint32
-CacheDatabase::getContactsCount ()
+CacheDatabase::getContactsCount (const QString &filter)
 {
+    QString strQ = "SELECT COUNT (*) FROM " GV_CONTACTS_TABLE;
+    if (!filter.isEmpty ()) {
+        QString scrubFilter = filter;
+        scrubFilter.replace ("'", "''");
+        strQ += QString(" WHERE " GV_C_NAME " LIKE '%%%1%%'").arg (scrubFilter);
+    }
+
     quint32 nCountContacts = 0;
     QSqlQuery query;
 
     query.setForwardOnly (true);
-    query.exec ("SELECT COUNT (*) FROM " GV_CONTACTS_TABLE);
+    query.exec (strQ);
     if (query.next ()) {
         bool bOk = false;
         int val = query.value (0).toInt (&bOk);

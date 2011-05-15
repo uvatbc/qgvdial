@@ -39,6 +39,7 @@ signals:
 public slots:
     void refreshAllContacts ();
     void refreshContacts ();
+    void onSearchQueryChanged (const QString &query);
 
 private slots:
     //! Invoked on response to login to contacts API

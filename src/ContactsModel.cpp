@@ -66,7 +66,7 @@ int
 ContactsModel::rowCount (const QModelIndex & /*parent*/) const
 {
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    return (dbMain.getContactsCount ());
+    return (dbMain.getContactsCount (strSearchQuery));
 }//ContactsModel::rowCount
 
 bool
@@ -122,15 +122,22 @@ ContactsModel::clearAll ()
 }//ContactsModel::clearAll
 
 void
-ContactsModel::refresh ()
+ContactsModel::refresh (const QString &query)
 {
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    strSearchQuery = query;
 
     beginResetModel ();
-    dbMain.refreshContactsModel (this);
+    dbMain.refreshContactsModel (this, query);
     endResetModel ();
 
     while (this->canFetchMore ()) {
         this->fetchMore ();
     }
+}//ContactsModel::refresh
+
+void
+ContactsModel::refresh ()
+{
+    refresh (strSearchQuery);
 }//ContactsModel::refresh

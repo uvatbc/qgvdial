@@ -343,3 +343,9 @@ GVContactsTable::onContactsParsed (bool rv)
     modelContacts->refresh ();
     emit allContacts (rv);
 }//GVContactsTable::onContactsParsed
+
+void
+GVContactsTable::onSearchQueryChanged (const QString &query)
+{
+    modelContacts->refresh (query);
+}//GVContactsTable::onSearchQuerychanged

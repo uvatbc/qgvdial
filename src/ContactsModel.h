@@ -26,12 +26,15 @@ public:
     bool deleteContact (const ContactInfo &contactInfo);
 
     void clearAll ();
+    void refresh (const QString &query);
     void refresh ();
+
 private:
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
 private:
     QSqlTableModel *modelContacts;
+    QString         strSearchQuery;
 };
 
 #endif // CONTACTSMODEL_H

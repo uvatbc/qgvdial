@@ -28,7 +28,8 @@ public:
     // Contacts model
     ContactsModel *newContactsModel();
     void clearContacts ();
-    void refreshContactsModel (ContactsModel *modelContacts);
+    void refreshContactsModel (ContactsModel *modelContacts,
+                               const QString &query = QString());
 
     // username and password
     bool getUserPass (QString &strUser, QString &strPass);
@@ -46,7 +47,7 @@ public:
     bool existsContact (const QString &strId);
     bool deleteContact (const QString &strId);
     bool insertContact (const ContactInfo &info);
-    quint32 getContactsCount ();
+    quint32 getContactsCount (const QString &filter);
 
     // Contact information based on contact identifier
     bool getContactFromLink (ContactInfo &info);
