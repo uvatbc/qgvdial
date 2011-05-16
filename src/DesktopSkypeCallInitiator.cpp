@@ -121,6 +121,22 @@ DesktopSkypeCallInitiator::isValid ()
 bool
 DesktopSkypeCallInitiator::sendDTMF (const QString &strTones)
 {
-    //@@UV: Add DTMF to skype
-    return false;
+    QVariantList l;
+    l += strTones;
+    bool bOk = skypeClient->enqueueWork (SW_SendDtmf, l, this,
+                        SLOT (onDTMFSent (bool, const QVariantList &)));
+    if (!bOk) {
+        qWarning ("Failed to even begin sending DTMF");
+    }
+    return bOk;
 }//DesktopSkypeCallInitiator::sendDTMF
+
+void
+DesktopSkypeCallInitiator::onDTMFSent (bool bSuccess, const QVariantList &)
+{
+    if (bSuccess) {
+        qDebug ("DTMF sent!");
+    } else {
+        qWarning ("DTMF failed!!");
+    }
+}//DesktopSkypeCallInitiator::onDTMFSent

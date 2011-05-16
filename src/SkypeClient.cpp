@@ -71,6 +71,7 @@ SkypeClient::enqueueWork (Skype_Work whatwork, const QVariantList &params,
         }
         break;
 
+    case SW_SendDtmf:
     case SW_GetCallInfo:
         // Count of params must be = 1
         if (1 != params.size ())
@@ -138,6 +139,9 @@ SkypeClient::doNextWork ()
             break;
         case SW_GetCallInfo:
             getCallInfo ();
+            break;
+        case SW_SendDtmf:
+            sendDTMF ();
             break;
         default:
             qDebug ("SkypeClient: Invalid work specified. Moving on to next work.");
@@ -294,7 +298,7 @@ SkypeClient::callInitiated (int status, const QString &strOutput)
         }
 
         strStatus = rx.cap (2);
-        uint callId = rx.cap (1).toULong ();
+        ulong callId = rx.cap (1).toULong ();
 
         emit callStatusChanged (callId, strStatus);
 
@@ -408,11 +412,10 @@ SkypeClient::onGotContacts (int status, const QString &strOutput)
 bool
 SkypeClient::skypeNotifyPre (const QString &strData)
 {
-    qDebug () << "SkypeClient: Skype notify : " << strData;
+    qDebug() << "SkypeClient: Skype notify : " << strData;
 
     bool rv = true;
-    do // Begin cleanup block (not a loop)
-    {
+    do { // Begin cleanup block (not a loop)
         if (strData.startsWith ("CONNDATA"))
         {
             break;
@@ -429,7 +432,6 @@ SkypeClient::skypeNotifyPre (const QString &strData)
         {
             break;
         }
-
         if (strData.startsWith ("CALL "))
         {
             QMutexLocker locker (&mutex);
@@ -451,7 +453,7 @@ SkypeClient::skypeNotifyPre (const QString &strData)
             }
 
             strStatus = rx.cap (2);
-            uint callId = rx.cap (1).toULong ();
+            ulong callId = rx.cap (1).toULong ();
 
             emit callStatusChanged (callId, strStatus);
 
@@ -462,8 +464,11 @@ SkypeClient::skypeNotifyPre (const QString &strData)
                 if ((strText.contains ("MISSED")) ||
                     (strText.contains ("FINISHED")))
                 {
-                    qDebug () << "SkypeClient: Remove call id=" << callId;
+                    qDebug() << "SkypeClient: Remove call id =" << callId;
                     mapCallInfo.remove (callId);
+                    if (mapCallInfo.size () == 0) {
+                        qDebug ("SkypeClient: All calls are over");
+                    }
                 }
             }
 
@@ -524,8 +529,7 @@ SkypeClient::getCallInfo ()
         rv = true;
     }while (0);
 
-    if (!rv)
-    {
+    if (!rv) {
         completeCurrentWork (SW_GetCallInfo, false);
     }
 }//SkypeClient::getCallInfo
@@ -829,3 +833,49 @@ SkypeClient::onCI_GetTarget (uint incomingCallId, const QString &strOutput,
 
     completeCurrentWork (SW_GetCallInfo, rv);
 }//SkypeClient::onCI_GetTarget
+
+void
+SkypeClient::sendDTMF ()
+{
+    bool rv = false;
+    do {
+        if (!bConnected)
+        {
+            qWarning ("SkypeClient: Skype not connected");
+            break;
+        }
+
+        QString strTones = workCurrent.arrParams[0].toString ();
+        if (strTones.isEmpty ())
+        {
+            qWarning ("SkypeClient: No DTMF tones??");
+            break;
+        }
+
+        foreach (QChar chTone, strTones) {
+            if (chTone == 'p') {
+                QThread::sleep (1);
+                continue;
+            }
+
+            Skype_CallInfoMap::Iterator i =  mapCallInfo.begin ();
+            for (; i != mapCallInfo.end (); i++) {
+                QString cmd = QString ("SET CALL %1 DTMF %2")
+                                .arg (i.key ()).arg (chTone);
+                rv = invoke (cmd);
+                if (!rv)
+                {
+                    qWarning ("SkypeClient: Failed to send DTMF tone");
+                    rv = false;
+                    break;
+                }
+            }
+        }
+
+        rv = true;
+    }while (0);
+
+    if (!rv) {
+        completeCurrentWork (SW_GetCallInfo, false);
+    }
+}//SkypeClient::sendDTMF

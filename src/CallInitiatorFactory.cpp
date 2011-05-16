@@ -42,8 +42,7 @@ CallInitiatorFactory::init ()
 #if LINUX_DESKTOP || defined (Q_WS_WIN32)
     CalloutInitiator *skype_initiator = new DesktopSkypeCallInitiator (this);
     listInitiators += skype_initiator;
-    //@@UV: Add this when you manage to send DTMF to skype
-    //listFallback += skype_initiator;
+    listFallback += skype_initiator;
 #endif
 
 #if TELEPATHY_CAPABLE

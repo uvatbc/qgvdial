@@ -77,6 +77,12 @@ MainWindow::~MainWindow ()
 #endif
 }//MainWindow::~MainWindow
 
+/** Initialize the log file name and timer.
+ * The log timer is required to update the log view every 3 seconds.
+ * The log cannot be updated every time a log is entered because the view MUST
+ * be updated only in the GUI thread. The timer always runs in the context of
+ * the main thread - which is the GUI thread.
+ */
 void
 MainWindow::initLogging ()
 {
@@ -1676,7 +1682,9 @@ MainWindow::fallbackDialout (DialContext *ctx)
     ctx->fallbackCi = cif.getFallbacks()[0];
     QObject::connect (ctx->fallbackCi, SIGNAL(callInitiated(bool,void*)),
                       this,            SLOT  (onFallbackDialout(bool,void*)));
-    ctx->fallbackCi->initiateCall (ctx->strMyNumber, ctx);
+    QString strFull = ctx->strMyNumber;
+    GVAccess::simplify_number (strFull);
+    ctx->fallbackCi->initiateCall (strFull, ctx);
 }//MainWindow::fallbackDialout
 
 void

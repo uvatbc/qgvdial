@@ -5,7 +5,7 @@
 #define SYMBIAN_SIGNED 0
 
 // Used ONLY for debug purposes - specifically to test fallback method.
-#define FAIL_DIAL 0
+#define FAIL_DIAL 1
 
 GVWebPage::GVWebPage(QObject *parent/* = NULL*/)
 : GVAccess (parent)

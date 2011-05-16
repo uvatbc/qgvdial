@@ -14,6 +14,7 @@ enum Skype_Work {
     SW_InitiateCall,    // Target contacts (1 or more)
     SW_GetContacts,     // No params
     SW_GetCallInfo,     // Call id
+    SW_SendDtmf,        // Send DTMF to the current call
 };
 
 struct Skype_CallInfo
@@ -152,6 +153,8 @@ protected:
     //! Get all call related information
     void getCallInfo ();
 
+    //! Send DTMF to current call
+    void sendDTMF();
 
 protected:
     //! Name of the client
@@ -172,6 +175,7 @@ protected:
 
     int                     nRefCount;
 
+    //! This has the info of every call thats currently on.
     Skype_CallInfoMap       mapCallInfo;
 
     friend class SkypeClientFactory;

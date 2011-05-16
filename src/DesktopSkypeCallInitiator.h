@@ -24,6 +24,7 @@ public slots:
 private slots:
     void onSkypeConnected (bool bSuccess, const QVariantList &params);
     void onCallInitiated (bool bSuccess, const QVariantList &params);
+    void onDTMFSent (bool bSuccess, const QVariantList &params);
 
 private:
     void attemptCreateSkypeClient ();
