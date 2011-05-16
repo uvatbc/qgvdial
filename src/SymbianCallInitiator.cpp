@@ -89,16 +89,18 @@ SymbianCallInitiator::callDone (SymbianCallInitiatorPrivate *self, int status)
     QMutexLocker locker(&mutex);
     strObservedNumber.clear ();
 
-    if (dialer == self) {
-        dialer = NULL;
-
-        if (NULL != observer) {
-            delete observer;
-            observer = NULL;
-        }
-    } else {
-        qWarning ("Dialer does not match!!!");
+    if (NULL != observer) {
+        delete observer;
+        observer = NULL;
     }
+
+    if (dialer != self) {
+        qWarning ("Dialer does not match!!!");
+        if (NULL != dialer) {
+            delete dialer;
+        }
+    }
+    dialer = NULL;
 
     emit callInitiated ((status == KErrNone), m_Context);
 }//SymbianCallInitiator::callDone

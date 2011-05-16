@@ -14,12 +14,13 @@ public:
                                               const QString &strNumber);
     ~SymbianCallInitiatorPrivate ();
 
+    void DoCancel();
+
 protected:
     void ConstructL(const TDesC& aNumber);
 
 private:
     void RunL();
-    void DoCancel();
     SymbianCallInitiatorPrivate(SymbianCallInitiator *p);
 
 private:
