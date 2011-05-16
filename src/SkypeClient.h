@@ -22,12 +22,13 @@ struct Skype_CallInfo
     Skype_CallInfo () {init ();}
     void init () {
         bPSTN_valid = bIncoming_valid = bPartnerHandle_valid =
-        bPartnerName_valid = bSelfNumber_valid = bPSTN = bIncoming
+        bPartnerName_valid = bSelfNumber_valid = bPSTN = bIncoming = bInprogress
         = false;
 
         strPartnerHandle.clear ();
         strPartnerName.clear ();
         strSelfNumber.clear ();
+        strDeferredTones.clear ();
     }
 
     quint32 bPSTN_valid             :1;
@@ -40,6 +41,7 @@ struct Skype_CallInfo
     quint32 bPSTN                   :1;
     // true = incoming, false = outgoing
     quint32 bIncoming               :1;
+    quint32 bInprogress             :1;
 
     //! The handle of the other party
     QString strPartnerHandle;
@@ -47,6 +49,8 @@ struct Skype_CallInfo
     QString strPartnerName;
     //! If this is a PSTN call, what is my number?
     QString strSelfNumber;
+    // Any DTMF tones to send after call becomes in progress?
+    QString strDeferredTones;
 };
 typedef QMap<ulong, Skype_CallInfo> Skype_CallInfoMap;
 Q_DECLARE_METATYPE (Skype_CallInfo)
@@ -155,6 +159,7 @@ protected:
 
     //! Send DTMF to current call
     void sendDTMF();
+    bool sendDTMF(QString strTones, bool bFirstTime);
 
 protected:
     //! Name of the client

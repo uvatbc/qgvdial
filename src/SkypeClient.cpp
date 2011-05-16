@@ -212,6 +212,9 @@ SkypeClient::getNameForWork (Skype_Work whatwork)
     case SW_GetCallInfo:
         func = "GetCallInfo";
         break;
+    case SW_SendDtmf:
+        func = "SendDtmf";
+        break;
     default:
         func = "unknown";
         break;
@@ -285,6 +288,7 @@ SkypeClient::callInitiated (int status, const QString &strOutput)
                         << workCurrent.arrParams[0].toString ();
             break;
         }
+        rv = false;
 
         QString strStatus = strOutput;
         strStatus.remove ("CALL ");
@@ -469,6 +473,10 @@ SkypeClient::skypeNotifyPre (const QString &strData)
                     if (mapCallInfo.size () == 0) {
                         qDebug ("SkypeClient: All calls are over");
                     }
+                }
+                else if (strText.contains ("INPROGRESS")) {
+                    mapCallInfo[callId].bInprogress = true;
+                    sendDTMF (QString(), false);
                 }
             }
 
@@ -852,30 +860,58 @@ SkypeClient::sendDTMF ()
             break;
         }
 
+        rv = sendDTMF (strTones, true);
+    }while (0);
+    completeCurrentWork (SW_SendDtmf, rv);
+}//SkypeClient::sendDTMF
+
+bool
+SkypeClient::sendDTMF (QString strTones, bool bFirstTime)
+{
+    bool rv = true;
+    QList<ulong>ids = mapCallInfo.keys ();
+    Skype_CallInfoMap::Iterator mapIter =  mapCallInfo.begin ();
+    for (; mapIter != mapCallInfo.end (); mapIter++) {
+        if (!mapIter->bInprogress) {
+            if (bFirstTime) {
+                qDebug() << "SkypeClient: Call" << mapIter.key()
+                         << "not in progress. Defering tones";
+                mapIter->strDeferredTones += strTones;
+            } else {
+                qDebug() << "SkypeClient: Call" << mapIter.key()
+                         << "still not in progress at repeat invocation.";
+            }
+            ids.removeOne (mapIter.key ());
+        }
+    }
+
+    if (ids.size () == 0) {
+        return true;
+    }
+
+    rv = true;
+    foreach (ulong callId, ids) {
+        if (!bFirstTime) {
+            strTones = mapCallInfo[callId].strDeferredTones;
+        }
+
         foreach (QChar chTone, strTones) {
+            QThread::sleep (1);
             if (chTone == 'p') {
                 QThread::sleep (1);
                 continue;
             }
-
-            Skype_CallInfoMap::Iterator i =  mapCallInfo.begin ();
-            for (; i != mapCallInfo.end (); i++) {
-                QString cmd = QString ("SET CALL %1 DTMF %2")
-                                .arg (i.key ()).arg (chTone);
-                rv = invoke (cmd);
-                if (!rv)
-                {
-                    qWarning ("SkypeClient: Failed to send DTMF tone");
-                    rv = false;
-                    break;
-                }
+            QString cmd = QString ("SET CALL %1 DTMF %2")
+                            .arg (callId).arg (chTone);
+            rv = invoke (cmd);
+            if (!rv)
+            {
+                qWarning ("SkypeClient: Failed to send DTMF tone");
+                rv = false;
+                break;
             }
         }
-
-        rv = true;
-    }while (0);
-
-    if (!rv) {
-        completeCurrentWork (SW_GetCallInfo, false);
     }
-}//SkypeClient::sendDTMF
+
+    return rv;
+}//SkypeClient::sendDTMF (const QString &strTones)
