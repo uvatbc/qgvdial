@@ -97,7 +97,7 @@ Rectangle {
                 id: lblSearch
                 text: "?"
                 color: "white"
-                font.pixelSize: ((allContacts.height + allContacts.width) / 21)
+                font.pixelSize: ((allContacts.height + allContacts.width) / 25)
             }
 
             MyTextEdit {
@@ -107,7 +107,7 @@ Rectangle {
                 text: ""
                 onSigTextChanged: container.sigSearchContacts(strText)
             }
-        }
+        }//Search box
 
         ListView {
             id: contactsView
