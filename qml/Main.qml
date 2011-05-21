@@ -175,12 +175,11 @@ Rectangle {
         TabbedUI {
             id: tabbedUI
 
-            tabsHeight: 45
+            tabsHeight: (main.height + main.width) / 20
             tabIndex: 3
             tabsModel: tabsModel
             anchors {
                 top: parent.top
-                bottom: barStatus.top
                 topMargin: nMargins
                 bottomMargin: nMargins
             }
