@@ -1,8 +1,8 @@
 <RCC>
     <qresource prefix="/">
         <file alias="Google.png">../icons/Google.png</file>
-        <file alias="Phone.png">../icons/telephone.png</file>
-        <file alias="SMS.png">../icons/email_send.png</file>
+        <file alias="Phone.png">../icons/Phone.png</file>
+        <file alias="SMS.png">../icons/SMS.png</file>
         <file alias="note.png">../icons/note.png</file>
         <file alias="left_arrow.png">../icons/left_arrow.png</file>
         <file alias="tick.png">../icons/tick.png</file>
