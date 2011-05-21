@@ -113,7 +113,6 @@ OTHER_FILES  += ../src/winrsrc.rc           \
                 ../qml/InboxList.qml        \
                 ../qml/Keypad.qml           \
                 ../qml/LogView.qml          \
-                ../qml/MainButtons.qml      \
                 ../qml/Main.qml             \
                 ../qml/MainView.qml         \
                 ../qml/Mosquitto.qml        \

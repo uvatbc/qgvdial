@@ -3,7 +3,6 @@
         <file alias="Google.png">../icons/Google.png</file>
         <file alias="Phone.png">../icons/telephone.png</file>
         <file alias="SMS.png">../icons/email_send.png</file>
-        <file alias="users.png">../icons/users.png</file>
         <file alias="note.png">../icons/note.png</file>
         <file alias="left_arrow.png">../icons/left_arrow.png</file>
         <file alias="tick.png">../icons/tick.png</file>
@@ -13,6 +12,7 @@
         <file alias="in_Sms.png">../icons/in_Sms.png</file>
         <file alias="in_Voicemail.png">../icons/in_Voicemail.png</file>
         <file alias="scrollbar.png">../icons/scrollbar.png</file>
+        <file alias="settings.svg">../icons/settings.svg</file>
         <file alias="About.qml">../qml/About.qml</file>
         <file alias="ActionButtons.qml">../qml/ActionButtons.qml</file>
         <file alias="ComboBoxPhones.qml">../qml/ComboBoxPhones.qml</file>
@@ -25,7 +25,6 @@
         <file alias="InboxList.qml">../qml/InboxList.qml</file>
         <file alias="Keypad.qml">../qml/Keypad.qml</file>
         <file alias="LogView.qml">../qml/LogView.qml</file>
-        <file alias="MainButtons.qml">../qml/MainButtons.qml</file>
         <file alias="Main.qml">../qml/Main.qml</file>
         <file alias="MainView.qml">../qml/MainView.qml</file>
         <file alias="Mosquitto.qml">../qml/Mosquitto.qml</file>

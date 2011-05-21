@@ -85,175 +85,107 @@ Rectangle {
 
     Item {
         id: mainColumn
-        anchors.fill: parent
-        property int centralHeight: height - barTop.height - barStatus.height
-        property int centralWidth: width
+        property int centralHeight: mainColumn.height - barStatus.height
+        property int centralWidth: mainColumn.width
 
-        Rectangle {
-            id: barTop
-            width: parent.width
-            height: (parent.height + parent.width) / 30
-            anchors.top: parent.top
-
-            color: "black"
-
-            signal clickedTopBar
-
-            Text {
-                text: main.state == '' ? "qgvdial" : "Back to main screen"
-                font.pixelSize: parent.height - 4
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.horizontalCenter: parent.horizontalCenter
-                color: "white"
-            }
-
-            MouseArea {
-                id: mouseAreaTopBar
-                anchors.fill: parent
-
-                onClicked: {
-                    barTop.clickedTopBar();
-                    main.state = '';
-                }
-
-                onPressAndHold: {
-                    main.sigHide();
-                    barTop.state = '';
-                }
-
-                onPressed: barTop.state = "pressed"
-                onReleased: barTop.state = ''
-            }// MouseArea
-
-            states: [
-                State {
-                    name: "pressed"
-                    PropertyChanges { target: barTop; color: "orange" }
-                }
-            ]
-        }//Rectangle (barTop)
+        anchors {
+            top: parent.top
+            left: parent.left
+            right: parent.right
+            bottom: barStatus.top
+        }
 
 ////////////////////////////////////////////////////////////////////////////////
 //                          Co-existent Items Begin                           //
 ////////////////////////////////////////////////////////////////////////////////
-        Rectangle {
-            id: mainRect
+        VisualItemModel {
+            id: tabsModel
+            Tab {
+                icon: "dialpad.svg"
 
-            width: mainColumn.centralWidth
-            height: mainColumn.centralHeight
+                MainView {
+                    id: dialPad
+                    anchors.fill: parent
+
+                    onSigCall: main.sigCall (number)
+                    onSigText: main.sigText (number)
+                    onSigSelChanged: main.sigSelChanged(index)
+                    onSigMsgBoxDone: main.sigMsgBoxDone(ok)
+                }
+            }//Tab (Dialpad)
+            Tab {
+                icon: "people.svg"
+
+                ContactsList {
+                    id: contactsList
+
+                    anchors.fill: parent
+
+                    onSigCall: main.sigCall (number)
+                    onSigText: main.sigText (number)
+                    onSigMsgBoxDone: main.sigMsgBoxDone(ok)
+                    onSigSearchContacts: main.sigSearchContacts(query)
+                }
+            }//Tab (Contacts)
+            Tab {
+                icon: "history.svg"
+
+                InboxList {
+                    id: inboxList
+
+                    anchors.fill: parent
+
+                    onSigCall: main.sigCall (number)
+                    onSigText: main.sigText (number)
+                    onSigInboxSelect: main.sigInboxSelect(selection)
+                    onSigVoicemail: main.sigVoicemail(link)
+                    onSigMsgBoxDone: main.sigMsgBoxDone(ok)
+                    onSigVmailPlayback: main.sigVmailPlayback(playState)
+                }
+            }//Tab (Inbox)
+            Tab {
+                icon: "settings.svg"
+                color: "black"
+
+                Settings {
+                    id: settingsView
+
+                    anchors.fill: parent
+
+                    onSigUserChanged: main.sigUserChanged(username)
+                    onSigPassChanged: main.sigPassChanged(password)
+                    onSigLogin: main.sigLogin()
+                    onSigLogout: main.sigLogout()
+                    onSigRefresh: main.sigRefresh()
+                    onSigRefreshAll: main.sigRefreshAll()
+                    onSigHide: main.sigHide()
+                    onSigQuit: main.sigQuit()
+
+                    onSigProxyChanges: main.sigProxyChanges(bEnable, bUseSystemProxy,
+                                                            host, port, bRequiresAuth,
+                                                            user, pass)
+                    onSigLinkActivated: main.sigLinkActivated(strLink)
+                    onSigMosquittoChanges: main.sigMosquittoChanges(bEnable, host, port, topic)
+                    onSigPinSettingChanges: main.sigPinSettingChanges(bEnable, pin)
+                    onSigMsgBoxDone: main.sigMsgBoxDone(ok)
+                }
+            }//Tab (Settings)
+        }//VisualDataModel (contains the tabs)
+
+        TabbedUI {
+            id: tabbedUI
+
+            tabsHeight: 45
+            tabIndex: 3
+            tabsModel: tabsModel
             anchors {
-                top: barTop.bottom
+                top: parent.top
                 bottom: barStatus.top
                 topMargin: nMargins
                 bottomMargin: nMargins
             }
-
-            color: "black"
-            opacity: 1
-
-            MainButtons {
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.verticalCenter: parent.verticalCenter
-
-                onSigDialpad:   { main.state = "Dialpad" }
-                onSigContacts:  { main.state = "Contacts" }
-                onSigInbox:     { main.state = "Inbox" }
-                onSigSettings:  { main.state = "Settings" }
-            }//MainButton
-        }// Rectangle (contains the MainButtons)
-
-        MainView {
-            id: dialPad
-
             width: mainColumn.centralWidth
             height: mainColumn.centralHeight
-            anchors {
-                top: barTop.bottom
-                bottom: barStatus.top
-                topMargin: nMargins
-                bottomMargin: nMargins
-            }
-
-            opacity: 0
-
-            onSigCall: main.sigCall (number)
-            onSigText: main.sigText (number)
-            onSigSelChanged: main.sigSelChanged(index)
-            onSigMsgBoxDone: main.sigMsgBoxDone(ok)
-        }
-
-        ContactsList {
-            id: contactsList
-
-            width: mainColumn.centralWidth
-            height: mainColumn.centralHeight
-            anchors {
-                top: barTop.bottom
-                bottom: barStatus.top
-                topMargin: nMargins
-                bottomMargin: nMargins
-            }
-
-            opacity: 0
-
-            onSigCall: main.sigCall (number)
-            onSigText: main.sigText (number)
-            onSigMsgBoxDone: main.sigMsgBoxDone(ok)
-            onSigSearchContacts: main.sigSearchContacts(query)
-        }
-
-        InboxList {
-            id: inboxList
-
-            width: mainColumn.centralWidth
-            height: mainColumn.centralHeight
-            anchors {
-                top: barTop.bottom
-                bottom: barStatus.top
-                topMargin: nMargins
-                bottomMargin: nMargins
-            }
-
-            opacity: 0
-
-            onSigCall: main.sigCall (number)
-            onSigText: main.sigText (number)
-            onSigInboxSelect: main.sigInboxSelect(selection)
-            onSigVoicemail: main.sigVoicemail(link)
-            onSigMsgBoxDone: main.sigMsgBoxDone(ok)
-            onSigVmailPlayback: main.sigVmailPlayback(playState)
-        }
-
-        Settings {
-            id: settingsView
-
-            width: mainColumn.centralWidth
-            height: mainColumn.centralHeight
-            anchors {
-                top: barTop.bottom
-                bottom: barStatus.top
-                topMargin: nMargins
-                bottomMargin: nMargins
-            }
-
-            opacity: 0
-
-            onSigUserChanged: main.sigUserChanged(username)
-            onSigPassChanged: main.sigPassChanged(password)
-            onSigLogin: main.sigLogin()
-            onSigLogout: main.sigLogout()
-            onSigRefresh: main.sigRefresh()
-            onSigRefreshAll: main.sigRefreshAll()
-            onSigHide: main.sigHide()
-            onSigQuit: main.sigQuit()
-
-            onSigProxyChanges: main.sigProxyChanges(bEnable, bUseSystemProxy,
-                                                    host, port, bRequiresAuth,
-                                                    user, pass)
-            onSigLinkActivated: main.sigLinkActivated(strLink)
-            onSigMosquittoChanges: main.sigMosquittoChanges(bEnable, host, port, topic)
-            onSigPinSettingChanges: main.sigPinSettingChanges(bEnable, pin)
-            onSigMsgBoxDone: main.sigMsgBoxDone(ok)
         }
 
         MsgBox {
@@ -272,51 +204,22 @@ Rectangle {
 ////////////////////////////////////////////////////////////////////////////////
 //                           Co-existent Items End                            //
 ////////////////////////////////////////////////////////////////////////////////
-        Rectangle {
-            id: barStatus
-            width: parent.width
-            height: (parent.height + parent.width) / 30
-            anchors.bottom: parent.bottom
-
-            color: "black"
-
-            Text {
-                text: g_strStatus
-                font.pixelSize: (parent.height * 2 / 3)
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.horizontalCenter: parent.horizontalCenter
-                color: "white"
-            }
-        }//Rectangle (status bar)
     }//Item: Main column that has all the co-existent views
 
-    states: [
-        State {
-            name: "Dialpad"
-            PropertyChanges { target: dialPad; opacity: 1}
-            PropertyChanges { target: mainRect; opacity: 0}
-        },
-        State {
-            name: "Contacts"
-            PropertyChanges { target: contactsList; opacity: 1}
-            PropertyChanges { target: mainRect; opacity: 0}
-        },
-        State {
-            name: "Inbox"
-            PropertyChanges { target: inboxList; opacity: 1}
-            PropertyChanges { target: mainRect; opacity: 0}
-        },
-        State {
-            name: "Settings"
-            PropertyChanges { target: settingsView; opacity: 1}
-            PropertyChanges { target: mainRect; opacity: 0}
-        }
-    ]//states
+    Rectangle {
+        id: barStatus
+        width: parent.width
+        height: (parent.height + parent.width) / 30
+        anchors.bottom: parent.bottom
 
-    transitions: [
-        Transition {
-            PropertyAnimation { property: "opacity"; easing.type: Easing.InOutQuad}
-            PropertyAnimation { target: dialPad; property: "opacity"; easing.type: Easing.InOutQuad}
+        color: "black"
+
+        Text {
+            text: g_strStatus
+            font.pixelSize: (parent.height * 2 / 3)
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.horizontalCenter: parent.horizontalCenter
+            color: "white"
         }
-    ]
+    }//Rectangle (status bar)
 }

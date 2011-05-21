@@ -157,7 +157,6 @@
     <None Include="..\qml\Keypad.qml" />
     <None Include="..\qml\LogView.qml" />
     <None Include="..\qml\Main.qml" />
-    <None Include="..\qml\MainButtons.qml" />
     <None Include="..\qml\MainView.qml" />
     <None Include="..\qml\Mosquitto.qml" />
     <None Include="..\qml\MsgBox.qml" />
