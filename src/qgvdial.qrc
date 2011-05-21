@@ -12,6 +12,9 @@
         <file alias="in_Sms.png">../icons/in_Sms.png</file>
         <file alias="in_Voicemail.png">../icons/in_Voicemail.png</file>
         <file alias="scrollbar.png">../icons/scrollbar.png</file>
+        <file alias="dialpad.svg">../icons/dialpad.svg</file>
+        <file alias="history.svg">../icons/history.svg</file>
+        <file alias="people.svg">../icons/people.svg</file>
         <file alias="settings.svg">../icons/settings.svg</file>
         <file alias="About.qml">../qml/About.qml</file>
         <file alias="ActionButtons.qml">../qml/ActionButtons.qml</file>
@@ -36,5 +39,7 @@
         <file alias="RadioButton.qml">../qml/RadioButton.qml</file>
         <file alias="Scrollbar.qml">../qml/Scrollbar.qml</file>
         <file alias="Settings.qml">../qml/Settings.qml</file>
+        <file alias="Tab.qml">../qml/Tab.qml</file>
+        <file alias="TabbedUI.qml">../qml/TabbedUI.qml</file>
     </qresource>
 </RCC>
