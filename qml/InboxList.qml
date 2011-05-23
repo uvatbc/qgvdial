@@ -313,29 +313,26 @@ Rectangle {
                 width: listInbox.width - border.width
                 height: entryName.height
 
-                Row {
-                    anchors {
-                        verticalCenter: parent.verticalCenter
-                        left: parent.left
-                        leftMargin: 5
+                function calcImgLen() {
+                    var len = 10;
+                    if (imgReceived.opacity == 1) {
+                        len = imgReceived.width;
+                    } else if (imgPlaced.opacity == 1) {
+                        len = imgPlaced.width;
+                    } else if (imgMissed.opacity == 1) {
+                        len = imgMissed.width;
+                    } else if (imgVmail.opacity == 1) {
+                        len = imgVmail.width;
+                    } else if (imgSMS.opacity == 1) {
+                        len = imgSMS.width;
                     }
-                    width: parent.width
+                    return len;
+                }
 
-                    function calcImgLen() {
-                        var len = 10;
-                        if (imgReceived.opacity == 1) {
-                            len = imgReceived.width;
-                        } else if (imgPlaced.opacity == 1) {
-                            len = imgPlaced.width;
-                        } else if (imgMissed.opacity == 1) {
-                            len = imgMissed.width;
-                        } else if (imgVmail.opacity == 1) {
-                            len = imgVmail.width;
-                        } else if (imgSMS.opacity == 1) {
-                            len = imgSMS.width;
-                        }
-                        return len;
-                    }
+                Item {
+                    id: imageItem
+                    anchors.left: parent.left
+                    width: calcImgLen();
 
                     Image {
                         id: imgReceived
@@ -372,28 +369,32 @@ Rectangle {
                         source: "in_Sms.png"
                         opacity: type == "SMS" ? 1 : 0
                     }// SMS icon
+                }
 
-                    Text {
-                        id: entryName
-                        height: (listInbox.height + listInbox.width) / 20
-                        width: parent.width - (2 * calcImgLen()) - (4 * parent.spacing)
-
-                        text: name
-                        color: "white"
-                        font.pixelSize: (entryName.height * 0.7) - 3
+                Text {
+                    id: entryName
+                    height: (listInbox.height + listInbox.width) / 20
+                    anchors {
+                        left: imageItem.right
+                        right: entryTime.left
                     }
 
-                    Text {
-                        id: entryTime
-                        height: (listInbox.height + listInbox.width) / 20
-                        width: calcImgLen()
-                        horizontalAlignment: Text.AlignRight
-                        verticalAlignment: Text.AlignVCenter
+                    clip: true
+                    text: name
+                    color: "white"
+                    font.pixelSize: (entryName.height * 0.7) - 3
+                }//Text (name)
 
-                        text: time
-                        color: "white"
-                        font.pixelSize: (entryTime.height / 2) - 3
-                    }
+                Text {
+                    id: entryTime
+                    height: (listInbox.height + listInbox.width) / 20
+                    horizontalAlignment: Text.AlignRight
+                    verticalAlignment: Text.AlignVCenter
+                    anchors.right: parent.right
+
+                    text: time
+                    color: "white"
+                    font.pixelSize: (entryTime.height / 2) - 3
                 }
 
                 MouseArea {
