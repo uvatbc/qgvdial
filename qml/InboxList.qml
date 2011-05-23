@@ -306,12 +306,12 @@ Rectangle {
             delegate: Rectangle {
                 id: listDelegate
 
-                color: "darkslategray"
-                border.color: "orange"
+                color: "black"
+                border.color: "darkslategray"
                 radius: 2
 
                 width: listInbox.width - border.width
-                height: entryText.height
+                height: entryName.height
 
                 Row {
                     anchors {
@@ -321,44 +321,78 @@ Rectangle {
                     }
                     width: parent.width
 
+                    function calcImgLen() {
+                        var len = 10;
+                        if (imgReceived.opacity == 1) {
+                            len = imgReceived.width;
+                        } else if (imgPlaced.opacity == 1) {
+                            len = imgPlaced.width;
+                        } else if (imgMissed.opacity == 1) {
+                            len = imgMissed.width;
+                        } else if (imgVmail.opacity == 1) {
+                            len = imgVmail.width;
+                        } else if (imgSMS.opacity == 1) {
+                            len = imgSMS.width;
+                        }
+                        return len;
+                    }
+
                     Image {
-                        height: entryText.height
+                        id: imgReceived
+                        height: entryName.height
                         fillMode: Image.PreserveAspectFit
                         source: "in_Received.png"
                         opacity: type == "Received" ? 1 : 0
                     }// green arrow
                     Image {
-                        height: entryText.height
+                        id: imgPlaced
+                        height: entryName.height
                         fillMode: Image.PreserveAspectFit
                         source: "in_Placed.png"
                         opacity: type == "Placed" ? 1 : 0
                     }// green arrow out
                     Image {
-                        height: entryText.height
+                        id: imgMissed
+                        height: entryName.height
                         fillMode: Image.PreserveAspectFit
                         source: "in_Missed.png"
                         opacity: type == "Missed" ? 1 : 0
                     }// red arrow
                     Image {
-                        height: entryText.height
+                        id: imgVmail
+                        height: entryName.height
                         fillMode: Image.PreserveAspectFit
                         source: "in_Voicemail.png"
                         opacity: type == "Voicemail" ? 1 : 0
                     }// vmail icon
                     Image {
-                        height: entryText.height
+                        id: imgSMS
+                        height: entryName.height
                         fillMode: Image.PreserveAspectFit
                         source: "in_Sms.png"
                         opacity: type == "SMS" ? 1 : 0
                     }// SMS icon
 
                     Text {
-                        id: entryText
+                        id: entryName
                         height: (listInbox.height + listInbox.width) / 20
+                        width: parent.width - (2 * calcImgLen()) - (4 * parent.spacing)
 
-                        text: time_detail + "\n" + name
+                        text: name
                         color: "white"
-                        font.pixelSize: (entryText.height / 2) - 3
+                        font.pixelSize: (entryName.height * 0.7) - 3
+                    }
+
+                    Text {
+                        id: entryTime
+                        height: (listInbox.height + listInbox.width) / 20
+                        width: calcImgLen()
+                        horizontalAlignment: Text.AlignRight
+                        verticalAlignment: Text.AlignVCenter
+
+                        text: time
+                        color: "white"
+                        font.pixelSize: (entryTime.height / 2) - 3
                     }
                 }
 

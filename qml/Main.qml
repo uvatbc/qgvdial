@@ -95,9 +95,6 @@ Rectangle {
             bottom: barStatus.top
         }
 
-////////////////////////////////////////////////////////////////////////////////
-//                          Co-existent Items Begin                           //
-////////////////////////////////////////////////////////////////////////////////
         VisualItemModel {
             id: tabsModel
             Tab {
@@ -184,24 +181,20 @@ Rectangle {
 
             onLongPress: main.sigHide();
         }
-
-        MsgBox {
-            id: msgBox
-            opacity: ((main.state == '' && g_bShowMsg == true) ? 1 : 0)
-            msgText: g_strMsgText
-
-            width: mainColumn.centralWidth - 20
-            height: (mainColumn.centralWidth + mainColumn.centralHeight) / 6
-            anchors.centerIn: mainColumn
-
-            onSigMsgBoxOk: main.sigMsgBoxDone(true)
-            onSigMsgBoxCancel: main.sigMsgBoxDone(false)
-        }
-
-////////////////////////////////////////////////////////////////////////////////
-//                           Co-existent Items End                            //
-////////////////////////////////////////////////////////////////////////////////
     }//Item: Main column that has all the co-existent views
+
+    MsgBox {
+        id: msgBox
+        opacity: ((g_bShowMsg == true) ? 1 : 0)
+        msgText: g_strMsgText
+
+        width: main.width - 20
+        height: (main.width + main.height) / 6
+        anchors.centerIn: main
+
+        onSigMsgBoxOk: main.sigMsgBoxDone(true)
+        onSigMsgBoxCancel: main.sigMsgBoxDone(false)
+    }
 
     Rectangle {
         id: barStatus

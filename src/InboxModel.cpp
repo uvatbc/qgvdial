@@ -110,15 +110,15 @@ InboxModel::data (const QModelIndex &index,
                 }
             } else {
                 if (0 == daysTo) {
-                    strDisp = "at " + dt.toString ("hh:mm");
+                    strDisp = dt.toString ("hh:mm");
                 } else if (1 == daysTo) {
-                    strDisp = "yesterday";
+                    strDisp = dt.toString ("hh:mm") + "\nyesterday";
                 } else if (daysTo < currentDate.dayOfWeek ()) {
-                    strDisp = "on " + dt.toString ("dddd");
+                    strDisp = dt.toString ("hh:mm\ndddd");
                 } else if (daysTo < (currentDate.dayOfWeek () + 7)) {
                     strDisp = "last week";
                 } else {
-                    strDisp = "on " + dt.toString ("dd-MMM");
+                    strDisp = dt.toString ("dd-MMM");
                 }
             }
 

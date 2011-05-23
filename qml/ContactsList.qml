@@ -132,8 +132,8 @@ Rectangle {
             delegate: Rectangle {
                 id: listDelegate
 
-                color: "darkslategray"
-                border.color: "orange"
+                color: "black"
+                border.color: "darkslategray"
                 radius: 5
 
                 width: allContacts.width - border.width
