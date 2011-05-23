@@ -7,7 +7,6 @@ Rectangle {
 
     signal sigCall(string number)
     signal sigText(string number)
-    signal sigMsgBoxDone (bool ok)
     signal sigSearchContacts(string query)
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -211,18 +210,5 @@ Rectangle {
             PropertyAnimation { property: "opacity"; easing.type: Easing.InOutQuad}
         }
     ]
-
-    MsgBox {
-        id: msgBox
-        opacity: ((container.opacity == 1 && g_bShowMsg == true) ? 1 : 0)
-        msgText: g_strMsgText
-
-        width: container.width - 20
-        height: (container.width + container.height) / 6
-        anchors.centerIn: container
-
-        onSigMsgBoxOk: container.sigMsgBoxDone(true)
-        onSigMsgBoxCancel: container.sigMsgBoxDone(false)
-    }
 
 }// Rectangle

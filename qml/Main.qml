@@ -110,7 +110,6 @@ Rectangle {
                     onSigCall: main.sigCall (number)
                     onSigText: main.sigText (number)
                     onSigSelChanged: main.sigSelChanged(index)
-                    onSigMsgBoxDone: main.sigMsgBoxDone(ok)
                 }
             }//Tab (Dialpad)
             Tab {
@@ -123,7 +122,6 @@ Rectangle {
 
                     onSigCall: main.sigCall (number)
                     onSigText: main.sigText (number)
-                    onSigMsgBoxDone: main.sigMsgBoxDone(ok)
                     onSigSearchContacts: main.sigSearchContacts(query)
                 }
             }//Tab (Contacts)
@@ -139,7 +137,6 @@ Rectangle {
                     onSigText: main.sigText (number)
                     onSigInboxSelect: main.sigInboxSelect(selection)
                     onSigVoicemail: main.sigVoicemail(link)
-                    onSigMsgBoxDone: main.sigMsgBoxDone(ok)
                     onSigVmailPlayback: main.sigVmailPlayback(playState)
                 }
             }//Tab (Inbox)
@@ -167,7 +164,6 @@ Rectangle {
                     onSigLinkActivated: main.sigLinkActivated(strLink)
                     onSigMosquittoChanges: main.sigMosquittoChanges(bEnable, host, port, topic)
                     onSigPinSettingChanges: main.sigPinSettingChanges(bEnable, pin)
-                    onSigMsgBoxDone: main.sigMsgBoxDone(ok)
                 }
             }//Tab (Settings)
         }//VisualDataModel (contains the tabs)
@@ -185,6 +181,8 @@ Rectangle {
             }
             width: mainColumn.centralWidth
             height: mainColumn.centralHeight
+
+            onLongPress: main.sigHide();
         }
 
         MsgBox {

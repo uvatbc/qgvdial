@@ -1,6 +1,10 @@
 import Qt 4.7
 
 Rectangle {
+    id: container
+
+    signal longPress
+
     // height of the tab bar
     property int tabsHeight : 50
 
@@ -78,6 +82,7 @@ Rectangle {
                 onClicked: {
                     tabClicked(index);
                 }
+                onPressAndHold: container.longPress();
             }
         }
     }//Component (tabBarItem)

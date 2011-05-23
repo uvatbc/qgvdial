@@ -8,7 +8,6 @@ Rectangle {
     signal sigCall(string number)
     signal sigText(string number)
     signal sigSelChanged (int index)
-    signal sigMsgBoxDone (bool ok)
 
     property bool landscape: main.width > main.height
     property variant rotationDelta: landscape? -90 : 0
@@ -79,17 +78,4 @@ Rectangle {
             onSigClear: wDisp.txtEd.text = ""
         }//ActionButtons (portrait mode - vertical)
     }//Flow
-
-    MsgBox {
-        id: msgBox
-        opacity: ((main.opacity == 1 && g_bShowMsg == true) ? 1 : 0)
-        msgText: g_strMsgText
-
-        width: main.width - 20
-        height: (main.width + main.height) / 6
-        anchors.centerIn: main
-
-        onSigMsgBoxOk: main.sigMsgBoxDone(true)
-        onSigMsgBoxCancel: main.sigMsgBoxDone(false)
-    }
-}
+}//main

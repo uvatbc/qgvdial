@@ -23,8 +23,6 @@ Item {
     signal sigMosquittoChanges(bool bEnable, string host, int port, string topic)
     signal sigPinSettingChanges(bool bEnable, string pin)
 
-    signal sigMsgBoxDone (bool ok)
-
     function setUsername (strU) {
         textUsername.text = strU;
         lblUsername.text = strU;
@@ -216,7 +214,6 @@ Item {
         onSigProxyChanges: container.sigProxyChanges(bEnable, bUseSystemProxy,
                                                      host, port, bRequiresAuth,
                                                      user, pass)
-        onSigMsgBoxDone: container.sigMsgBoxDone(ok)
     }//Proxy
 
     Mosquitto {
@@ -227,7 +224,6 @@ Item {
 
         onSigDone: container.state = ''
         onSigMosquittoChanges: container.sigMosquittoChanges(bEnable, host, port, topic)
-        onSigMsgBoxDone: container.sigMsgBoxDone(ok)
     }//Mosquitto
 
     PinSetting {
@@ -238,7 +234,6 @@ Item {
 
         onSigDone: container.state = ''
         onSigPinSettingChanges: container.sigPinSettingChanges(bEnable, pin)
-        onSigMsgBoxDone: container.sigMsgBoxDone(ok)
     }//Pin settings
 
     DbgWebWidget {
@@ -264,21 +259,7 @@ Item {
         opacity: 0
         onSigBack: container.state = ''
         onSigLinkActivated: container.sigLinkActivated(strLink)
-        onSigMsgBoxDone: container.sigMsgBoxDone(ok)
     }//About
-
-    MsgBox {
-        id: msgBox
-        opacity: ((container.opacity == 1 && g_bShowMsg == true) ? 1 : 0)
-        msgText: g_strMsgText
-
-        width: container.width - 20
-        height: (container.width + container.height) / 6
-        anchors.centerIn: container
-
-        onSigMsgBoxOk: container.sigMsgBoxDone(true)
-        onSigMsgBoxCancel: container.sigMsgBoxDone(false)
-    }
 
     states: [
         State {

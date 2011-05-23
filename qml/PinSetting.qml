@@ -13,7 +13,6 @@ Item {
 
     signal sigDone(bool bSave)
     signal sigPinSettingChanges(bool bEnable, string pin)
-    signal sigMsgBoxDone (bool ok)
 
     property bool bEnable: pinSupport.check
 
@@ -78,17 +77,4 @@ Item {
             }//MyButton (Cancel)
         }// Save and cancel buttons
     }// Column
-
-    MsgBox {
-        id: msgBox
-        opacity: ((container.opacity == 1 && g_bShowMsg == true) ? 1 : 0)
-        msgText: g_strMsgText
-
-        width: container.width - 20
-        height: (container.width + container.height) / 6
-        anchors.centerIn: container
-
-        onSigMsgBoxOk: container.sigMsgBoxDone(true)
-        onSigMsgBoxCancel: container.sigMsgBoxDone(false)
-    }
 }// Item (top level)
