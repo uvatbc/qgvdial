@@ -329,9 +329,15 @@ Rectangle {
                     return len;
                 }
 
+                property real margins: 1
+
                 Item {
                     id: imageItem
-                    anchors.left: parent.left
+                    anchors {
+                        left: parent.left
+                        leftMargin: listDelegate.margins
+                    }
+
                     width: calcImgLen();
 
                     Image {
@@ -390,7 +396,12 @@ Rectangle {
                     height: (listInbox.height + listInbox.width) / 20
                     horizontalAlignment: Text.AlignRight
                     verticalAlignment: Text.AlignVCenter
-                    anchors.right: parent.right
+
+                    anchors {
+                        right: parent.right
+                        rightMargin: listDelegate.margins
+                    }
+
 
                     text: time
                     color: "white"
