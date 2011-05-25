@@ -9,14 +9,14 @@ Item {
         id: mainColumn
         anchors.fill: parent
         anchors.topMargin: 2
-        spacing: 2
+        spacing: 1
 
         property int pixDiv: 15
         property int pixHeight: (container.height + container.width) / 2
         property int pixSize: pixHeight / pixDiv
 
         ListView {
-            height: container.height - btnBack.height
+            height: container.height - btnBack.height - mainColumn.spacing
             width: parent.width
             model: g_logModel
             clip: true

@@ -31,7 +31,7 @@ Rectangle {
                 theNumber: main.theNumber
 
                 color: main.color
-                width: landscape ? main.width / 2 : main.width
+                width: (landscape ? main.width / 2 : main.width) - 1
                 height: main.height * (landscape ? (3 / 4) : (7.5 / 18))
 
                 onSigSelChanged: main.sigSelChanged (index)
@@ -57,7 +57,7 @@ Rectangle {
 
         Keypad {
             color: main.color
-            width: parent.width / (landscape ? 2 : 1)
+            width: (parent.width / (landscape ? 2 : 1)) - 1
             height: parent.height * (landscape ? 1 : (8 / 18))
 
             onBtnClick: Code.doIns(strText)

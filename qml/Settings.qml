@@ -171,7 +171,7 @@ Item {
 
             delegate: MyButton {
                 mainText: (text == "Login" ? (g_bIsLoggedIn == true ? "Logout" : "Login") : text)
-                width: listButtons.width
+                width: listButtons.width - 1
                 height: mainColumn.pixHeight / mainColumn.pixDiv
                 mainPixelSize: height * 2 / 3
 
