@@ -4,7 +4,7 @@ import "helper.js" as Code
 Rectangle {
     id: container
     objectName: "InboxPage"
-    color: "black"
+    color: "#202020"
 
     signal sigCall(string number)
     signal sigText(string number)
@@ -306,7 +306,7 @@ Rectangle {
             delegate: Rectangle {
                 id: listDelegate
 
-                color: "black"
+                color: "#202020"
                 border.color: "darkslategray"
                 radius: 2
 

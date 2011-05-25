@@ -3,7 +3,8 @@ import "helper.js" as Code
 
 Rectangle {
     id: button
-    border.color: activeFocus?"orange":"black"
+    border.color: activeFocus?"orange":"white"
+    color: "#202020"
     smooth: true
 
     radius: ((height + width) / 20);
@@ -20,12 +21,6 @@ Rectangle {
     signal clicked(string strText)
     signal pressHold(string strText)
 
-    gradient: Gradient {
-        GradientStop { id: gradientStop; position: 0.0; color: "azure" }
-        GradientStop { position: 1.0; color: palette.button }
-    }
-    SystemPalette { id: palette }
-
     onWidthChanged: updateTextWidth();
     function updateTextWidth() {
         if (mText.elide != Text.ElideNone) {
@@ -38,7 +33,7 @@ Rectangle {
     Text {
         id: mText
         text: button.mainText
-        color: "black"
+        color: "white"
 
         // This is specifically for the current phone number button
         onTextChanged: button.updateTextWidth();
@@ -63,6 +58,7 @@ Rectangle {
     states: State {
         name: "pressed"
         when: mouseArea.pressed
-        PropertyChanges { target: gradientStop; color: "orange" }
+        PropertyChanges { target: button; color: "orange" }
+        PropertyChanges { target: mText; color: "black" }
     }
 }// Rectangle

@@ -4,6 +4,7 @@ Rectangle {
     id: container
     border.color: "grey"
     color: "black"
+    radius: 7
 
     property string msgText: "Dialing\n+1 000 000 0000"
 
@@ -46,8 +47,9 @@ Rectangle {
             id: btnOk
             height: parent.height - 1
             width: parent.width / 2
-            border.color: "green"
-            color: "black"
+            border.color: "white"
+            color: "green"
+            radius: 7
 
             Text {
                 text: "Ok"
@@ -73,8 +75,9 @@ Rectangle {
             id: btnCancel
             height: parent.height - 1
             width: parent.width / 2
-            border.color: "red"
-            color: "black"
+            border.color: "white"
+            color: "red"
+            radius: 7
 
             Text {
                 text: "Cancel"

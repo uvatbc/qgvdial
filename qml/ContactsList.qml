@@ -30,7 +30,7 @@ Rectangle {
         id: detailsView
 
         anchors.fill: parent
-        color: "darkslategray"
+        color: "#202020"
         border.color: "orange"
         radius: 10
 
@@ -132,7 +132,7 @@ Rectangle {
             delegate: Rectangle {
                 id: listDelegate
 
-                color: "black"
+                color: "#202020"
                 border.color: "darkslategray"
                 radius: 5
 
