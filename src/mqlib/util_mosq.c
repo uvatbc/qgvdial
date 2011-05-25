@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2009,2010, Roger Light <roger@atchoo.org>
+Copyright (c) 2009-2011 Roger Light <roger@atchoo.org>
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -36,6 +36,41 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <net_mosq.h>
 #include <send_mosq.h>
 #include <util_mosq.h>
+
+int _mosquitto_packet_alloc(struct _mosquitto_packet *packet)
+{
+	uint8_t remaining_bytes[5], byte;
+	uint32_t remaining_length;
+	int i;
+
+	assert(packet);
+
+	remaining_length = packet->remaining_length;
+	packet->payload = NULL;
+	packet->remaining_count = 0;
+	do{
+		byte = remaining_length % 128;
+		remaining_length = remaining_length / 128;
+		/* If there are more digits to encode, set the top bit of this digit */
+		if(remaining_length > 0){
+			byte = byte | 0x80;
+		}
+		remaining_bytes[packet->remaining_count] = byte;
+		packet->remaining_count++;
+	}while(remaining_length > 0 && packet->remaining_count < 5);
+	if(packet->remaining_count == 5) return MOSQ_ERR_PAYLOAD_SIZE;
+	packet->packet_length = packet->remaining_length + 1 + packet->remaining_count;
+	packet->payload = _mosquitto_malloc(sizeof(uint8_t)*packet->packet_length);
+	if(!packet->payload) return MOSQ_ERR_NOMEM;
+
+	packet->payload[0] = packet->command;
+	for(i=0; i<packet->remaining_count; i++){
+		packet->payload[i+1] = remaining_bytes[i];
+	}
+	packet->pos = 1 + packet->remaining_count;
+
+	return MOSQ_ERR_SUCCESS;
+}
 
 #ifndef WITH_BROKER
 void _mosquitto_check_keepalive(struct mosquitto *mosq)

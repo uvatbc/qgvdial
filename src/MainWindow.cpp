@@ -402,6 +402,8 @@ MainWindow::init ()
                       &oContacts, SLOT  (refreshContacts()));
     QObject::connect (&mqThread , SIGNAL(status(QString,int)),
                        this     , SLOT  (setStatus(QString,int)));
+    QObject::connect (&mqThread, SIGNAL(finished()),
+                       this    , SLOT(onMqThreadFinished()));
 #endif
 
     QObject::connect (
@@ -1469,6 +1471,23 @@ MainWindow::onSigMosquittoChanges (bool bEnable, const QString &host, int port,
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     dbMain.setMqSettings (bEnable, host, port, topic);
 
+    setMqSettingsInQml (bEnable, host, port, topic);
+
+#if MOSQUITTO_CAPABLE
+    mqThread.setSettings (bEnable, host, port);
+    bRunMqThread = bEnable;
+    if (mqThread.isRunning ()) {
+        mqThread.setQuit ();
+    } else {
+        onMqThreadFinished ();
+    }
+#endif
+}//MainWindow::onSigMosquittoChanges
+
+void
+MainWindow::setMqSettingsInQml (bool bEnable, const QString &host, int port,
+                                const QString &topic)
+{
     do // Begin cleanup block (not a loop)
     {
         QObject *pRoot = this->rootObject ();
@@ -1504,21 +1523,7 @@ MainWindow::onSigMosquittoChanges (bool bEnable, const QString &host, int port,
                                    Q_ARG (QVariant, QVariant(port)),
                                    Q_ARG (QVariant, QVariant(strTopic)));
     } while (0); // End cleanup block (not a loop)
-
-#if MOSQUITTO_CAPABLE
-    mqThread.setSettings (bEnable, host, port);
-    bRunMqThread = bEnable;
-    QObject::disconnect (&mqThread, SIGNAL(finished()),
-                       this    , SLOT(onMqThreadFinished()));
-    QObject::connect (&mqThread, SIGNAL(finished()),
-                       this    , SLOT(onMqThreadFinished()));
-    if (mqThread.isRunning ()) {
-        mqThread.setQuit ();
-    } else {
-        onMqThreadFinished ();
-    }
-#endif
-}//MainWindow::onSigMosquittoChanges
+}//MainWindow::setMqSettingsInQml
 
 void
 MainWindow::onSigPinSettingChanges(bool bEnable, const QString &pin)
@@ -1557,13 +1562,21 @@ void
 MainWindow::onMqThreadFinished ()
 {
 #if MOSQUITTO_CAPABLE
-    QObject::disconnect (&mqThread, SIGNAL(finished()),
-                          this    , SLOT(onMqThreadFinished()));
     if (bRunMqThread) {
+        bRunMqThread = false;
         qDebug ("Finished waiting for Mq thread, restarting thread.");
         mqThread.start();
     } else {
         qDebug ("Finished waiting for Mq thread. Not restarting");
+
+        // Just send a command to turn off mosquitto enable
+        CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+        bool bEnable;
+        QString host, topic;
+        int port;
+        dbMain.getMqSettings (bEnable, host, port, topic);
+        bEnable = false;
+        setMqSettingsInQml (bEnable, host, port, topic);
     }
 #endif
 }//MainWindow::onMqThreadFinished

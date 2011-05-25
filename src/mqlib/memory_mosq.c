@@ -29,7 +29,6 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include <mq_config.h>
 
-#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 

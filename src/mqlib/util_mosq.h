@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2009,2010, Roger Light <roger@atchoo.org>
+Copyright (c) 2009-2011 Roger Light <roger@atchoo.org>
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -31,6 +31,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include <mosquitto.h>
 
+int _mosquitto_packet_alloc(struct _mosquitto_packet *packet);
 void _mosquitto_check_keepalive(struct mosquitto *mosq);
 int _mosquitto_fix_sub_topic(char **subtopic);
 uint16_t _mosquitto_mid_generate(struct _mosquitto_core *core);

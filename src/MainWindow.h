@@ -178,6 +178,9 @@ private:
 
     void fallbackDialout (DialContext *ctx);
 
+    void setMqSettingsInQml(bool bEnable, const QString &host, int port,
+                            const QString &topic);
+
 private:
     //! Logfile
     QFile           fLogfile;

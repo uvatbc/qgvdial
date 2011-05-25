@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2010, Roger Light <roger@atchoo.org>
+Copyright (c) 2010,2011 Roger Light <roger@atchoo.org>
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -30,13 +30,15 @@ POSSIBILITY OF SUCH DAMAGE.
 #ifndef _MOSQUITTO_INTERNAL_H_
 #define _MOSQUITTO_INTERNAL_H_
 
+#include <config.h>
+
+#ifdef WITH_SSL
+#include <openssl/ssl.h>
+#endif
 #include <stdlib.h>
 #include <time.h>
 #ifdef WIN32
 #include <winsock2.h>
-#else
-#include <stdbool.h>
-#include <stdint.h>
 #endif
 
 #include <mosquitto.h>
@@ -62,12 +64,12 @@ enum mosquitto_client_state {
 
 struct _mosquitto_packet{
 	uint8_t command;
-	uint8_t command_saved;
 	uint8_t have_remaining;
 	uint8_t remaining_count;
 	uint16_t mid;
 	uint32_t remaining_mult;
 	uint32_t remaining_length;
+	uint32_t packet_length;
 	uint32_t to_process;
 	uint32_t pos;
 	uint8_t *payload;
@@ -83,6 +85,16 @@ struct mosquitto_message_all{
 	struct mosquitto_message msg;
 };
 
+#ifdef WITH_SSL
+struct _mosquitto_ssl{
+	SSL_CTX *ssl_ctx;
+	SSL *ssl;
+	BIO *bio;
+	bool want_read;
+	bool want_write;
+};
+#endif
+
 struct _mosquitto_core
 {
 #ifndef WIN32
@@ -90,10 +102,12 @@ struct _mosquitto_core
 #else
 	SOCKET sock;
 #endif
+	char *address;
 	char *id;
 	char *username;
 	char *password;
 	uint16_t keepalive;
+	bool clean_session;
 	enum mosquitto_client_state state;
 	time_t last_msg_in;
 	time_t last_msg_out;
@@ -101,6 +115,9 @@ struct _mosquitto_core
 	struct _mosquitto_packet in_packet;
 	struct _mosquitto_packet *out_packet;
 	struct mosquitto_message *will;
+#ifdef WITH_SSL
+	struct _mosquitto_ssl *ssl;
+#endif
 };
 
 struct mosquitto {

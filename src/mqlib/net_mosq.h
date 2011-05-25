@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2010, Roger Light <roger@atchoo.org>
+Copyright (c) 2010,2011 Roger Light <roger@atchoo.org>
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,6 @@ POSSIBILITY OF SUCH DAMAGE.
 #ifndef _NET_MOSQ_H_
 #define _NET_MOSQ_H_
 
-#include <stdint.h>
 #ifndef WIN32
 #include <unistd.h>
 #else
@@ -49,9 +48,12 @@ typedef int ssize_t;
 #define MOSQ_MSB(A) (uint8_t)((A & 0xFF00) >> 8)
 #define MOSQ_LSB(A) (uint8_t)(A & 0x00FF)
 
+void _mosquitto_net_init(void);
+void _mosquitto_net_cleanup(void);
+
 void _mosquitto_packet_cleanup(struct _mosquitto_packet *packet);
 void _mosquitto_packet_queue(struct _mosquitto_core *core, struct _mosquitto_packet *packet);
-int _mosquitto_socket_connect(const char *host, uint16_t port);
+int _mosquitto_socket_connect(struct _mosquitto_core *core, const char *host, uint16_t port);
 int _mosquitto_socket_close(struct _mosquitto_core *core);
 
 int _mosquitto_read_byte(struct _mosquitto_packet *packet, uint8_t *byte);
