@@ -36,36 +36,36 @@ POSSIBILITY OF SUCH DAMAGE.
 
 int mosquitto_log_init(struct mosquitto *mosq, int priorities, int destinations)
 {
-	assert(mosq);
+    assert(mosq);
 
-	mosq->log_priorities = priorities;
-	mosq->log_destinations = destinations;
+    mosq->log_priorities = priorities;
+    mosq->log_destinations = destinations;
 
-	return MOSQ_ERR_SUCCESS;
+    return MOSQ_ERR_SUCCESS;
 }
 
 int _mosquitto_log_printf(struct mosquitto *mosq, int priority, const char *fmt, ...)
 {
-	va_list va;
-	char s[500];
+    va_list va;
+    char s[500];
 
-	assert(mosq);
+    assert(mosq);
 
-	if((mosq->log_priorities & priority) && mosq->log_destinations != MOSQ_LOG_NONE){
-		va_start(va, fmt);
-		vsnprintf(s, 500, fmt, va);
-		va_end(va);
+    if((mosq->log_priorities & priority) && mosq->log_destinations != MOSQ_LOG_NONE){
+        va_start(va, fmt);
+        vsnprintf(s, 500, fmt, va);
+        va_end(va);
 
-		if(mosq->log_destinations & MOSQ_LOG_STDOUT){
-			fprintf(stdout, "%s\n", s);
-			fflush(stdout);
-		}
-		if(mosq->log_destinations & MOSQ_LOG_STDERR){
-			fprintf(stderr, "%s\n", s);
-			fflush(stderr);
-		}
-	}
+        if(mosq->log_destinations & MOSQ_LOG_STDOUT){
+            fprintf(stdout, "%s\n", s);
+            fflush(stdout);
+        }
+        if(mosq->log_destinations & MOSQ_LOG_STDERR){
+            fprintf(stderr, "%s\n", s);
+            fflush(stderr);
+        }
+    }
 
-	return MOSQ_ERR_SUCCESS;
+    return MOSQ_ERR_SUCCESS;
 }
 

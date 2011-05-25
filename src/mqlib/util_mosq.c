@@ -39,50 +39,50 @@ POSSIBILITY OF SUCH DAMAGE.
 
 int _mosquitto_packet_alloc(struct _mosquitto_packet *packet)
 {
-	uint8_t remaining_bytes[5], byte;
-	uint32_t remaining_length;
-	int i;
+    uint8_t remaining_bytes[5], byte;
+    uint32_t remaining_length;
+    int i;
 
-	assert(packet);
+    assert(packet);
 
-	remaining_length = packet->remaining_length;
-	packet->payload = NULL;
-	packet->remaining_count = 0;
-	do{
-		byte = remaining_length % 128;
-		remaining_length = remaining_length / 128;
-		/* If there are more digits to encode, set the top bit of this digit */
-		if(remaining_length > 0){
-			byte = byte | 0x80;
-		}
-		remaining_bytes[packet->remaining_count] = byte;
-		packet->remaining_count++;
-	}while(remaining_length > 0 && packet->remaining_count < 5);
-	if(packet->remaining_count == 5) return MOSQ_ERR_PAYLOAD_SIZE;
-	packet->packet_length = packet->remaining_length + 1 + packet->remaining_count;
-	packet->payload = _mosquitto_malloc(sizeof(uint8_t)*packet->packet_length);
-	if(!packet->payload) return MOSQ_ERR_NOMEM;
+    remaining_length = packet->remaining_length;
+    packet->payload = NULL;
+    packet->remaining_count = 0;
+    do{
+        byte = remaining_length % 128;
+        remaining_length = remaining_length / 128;
+        /* If there are more digits to encode, set the top bit of this digit */
+        if(remaining_length > 0){
+            byte = byte | 0x80;
+        }
+        remaining_bytes[packet->remaining_count] = byte;
+        packet->remaining_count++;
+    }while(remaining_length > 0 && packet->remaining_count < 5);
+    if(packet->remaining_count == 5) return MOSQ_ERR_PAYLOAD_SIZE;
+    packet->packet_length = packet->remaining_length + 1 + packet->remaining_count;
+    packet->payload = _mosquitto_malloc(sizeof(uint8_t)*packet->packet_length);
+    if(!packet->payload) return MOSQ_ERR_NOMEM;
 
-	packet->payload[0] = packet->command;
-	for(i=0; i<packet->remaining_count; i++){
-		packet->payload[i+1] = remaining_bytes[i];
-	}
-	packet->pos = 1 + packet->remaining_count;
+    packet->payload[0] = packet->command;
+    for(i=0; i<packet->remaining_count; i++){
+        packet->payload[i+1] = remaining_bytes[i];
+    }
+    packet->pos = 1 + packet->remaining_count;
 
-	return MOSQ_ERR_SUCCESS;
+    return MOSQ_ERR_SUCCESS;
 }
 
 #ifndef WITH_BROKER
 void _mosquitto_check_keepalive(struct mosquitto *mosq)
 {
-	assert(mosq);
-	if(mosq->core.sock != INVALID_SOCKET && time(NULL) - mosq->core.last_msg_out >= mosq->core.keepalive){
-		if(mosq->core.state == mosq_cs_connected){
-			_mosquitto_send_pingreq(mosq);
-		}else{
-			_mosquitto_socket_close(&mosq->core);
-		}
-	}
+    assert(mosq);
+    if(mosq->core.sock != INVALID_SOCKET && time(NULL) - mosq->core.last_msg_out >= mosq->core.keepalive){
+        if(mosq->core.state == mosq_cs_connected){
+            _mosquitto_send_pingreq(mosq);
+        }else{
+            _mosquitto_socket_close(&mosq->core);
+        }
+    }
 }
 #endif
 
@@ -91,39 +91,39 @@ void _mosquitto_check_keepalive(struct mosquitto *mosq)
  */
 int _mosquitto_fix_sub_topic(char **subtopic)
 {
-	char *fixed = NULL;
-	char *token;
+    char *fixed = NULL;
+    char *token;
 
-	assert(subtopic);
-	assert(*subtopic);
+    assert(subtopic);
+    assert(*subtopic);
 
-	/* size of fixed here is +1 for the terminating 0 and +1 for the spurious /
-	 * that gets appended. */
-	fixed = _mosquitto_calloc(strlen(*subtopic)+2, 1);
-	if(!fixed) return MOSQ_ERR_NOMEM;
+    /* size of fixed here is +1 for the terminating 0 and +1 for the spurious /
+     * that gets appended. */
+    fixed = _mosquitto_calloc(strlen(*subtopic)+2, 1);
+    if(!fixed) return MOSQ_ERR_NOMEM;
 
-	if((*subtopic)[0] == '/'){
-		fixed[0] = '/';
-	}
-	token = strtok(*subtopic, "/");
-	while(token){
-		strcat(fixed, token);
-		strcat(fixed, "/");
-		token = strtok(NULL, "/");
-	}
+    if((*subtopic)[0] == '/'){
+        fixed[0] = '/';
+    }
+    token = strtok(*subtopic, "/");
+    while(token){
+        strcat(fixed, token);
+        strcat(fixed, "/");
+        token = strtok(NULL, "/");
+    }
 
-	fixed[strlen(fixed)-1] = '\0';
-	_mosquitto_free(*subtopic);
-	*subtopic = fixed;
-	return MOSQ_ERR_SUCCESS;
+    fixed[strlen(fixed)-1] = '\0';
+    _mosquitto_free(*subtopic);
+    *subtopic = fixed;
+    return MOSQ_ERR_SUCCESS;
 }
 
 uint16_t _mosquitto_mid_generate(struct _mosquitto_core *core)
 {
-	assert(core);
+    assert(core);
 
-	core->last_mid++;
-	if(core->last_mid == 0) core->last_mid++;
-	
-	return core->last_mid;
+    core->last_mid++;
+    if(core->last_mid == 0) core->last_mid++;
+
+    return core->last_mid;
 }

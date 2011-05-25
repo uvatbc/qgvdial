@@ -58,20 +58,20 @@ extern int iErr;
 void _mosquitto_net_init(void)
 {
 #ifdef WIN32
-	WSADATA wsaData;
-	WSAStartup(MAKEWORD(2,2), &wsaData);
+    WSADATA wsaData;
+    WSAStartup(MAKEWORD(2,2), &wsaData);
 #endif
 
 #ifdef WITH_SSL
-	SSL_library_init();
-	OpenSSL_add_all_algorithms();
+    SSL_library_init();
+    OpenSSL_add_all_algorithms();
 #endif
 }
 
 void _mosquitto_net_cleanup(void)
 {
 #ifdef WIN32
-	WSACleanup();
+    WSACleanup();
 #endif
 }
 
@@ -98,8 +98,8 @@ void _mosquitto_packet_queue(struct _mosquitto_core *core, struct _mosquitto_pac
     assert(core);
     assert(packet);
 
-	packet->pos = 0;
-	packet->to_process = packet->packet_length;
+    packet->pos = 0;
+    packet->to_process = packet->packet_length;
 
     packet->next = NULL;
     if(core->out_packet){
@@ -122,9 +122,9 @@ int _mosquitto_socket_close(struct _mosquitto_core *core)
     int rc = 0;
 
     assert(core);
-	/* FIXME - need to shutdown SSL here. */
+    /* FIXME - need to shutdown SSL here. */
     if(core->sock != INVALID_SOCKET){
-		rc = COMPAT_CLOSE(core->sock);
+        rc = COMPAT_CLOSE(core->sock);
         core->sock = INVALID_SOCKET;
     }
 
@@ -146,7 +146,7 @@ int _mosquitto_socket_connect(struct _mosquitto_core *core, const char *host, ui
     uint32_t val = 1;
 #endif
 #ifdef WITH_SSL
-	int ret;
+    int ret;
 #endif
 
     errStr = "host or port is NULL";
@@ -170,7 +170,7 @@ int _mosquitto_socket_connect(struct _mosquitto_core *core, const char *host, ui
         }else if(rp->ai_family == PF_INET6){
             ((struct sockaddr_in6 *)rp->ai_addr)->sin6_port = htons(port);
         }else{
-			continue;
+            continue;
         }
         if(connect(sock, rp->ai_addr, rp->ai_addrlen) != -1){
             break;
@@ -191,20 +191,20 @@ int _mosquitto_socket_connect(struct _mosquitto_core *core, const char *host, ui
     freeaddrinfo(ainfo);
 
 #ifdef WITH_SSL
-	if(core->ssl){
-		core->ssl->bio = BIO_new_socket(sock, BIO_NOCLOSE);
-		if(!core->ssl->bio){
-			COMPAT_CLOSE(sock);
-			return MOSQ_ERR_SSL;
-		}
-		SSL_set_bio(core->ssl->ssl, core->ssl->bio, core->ssl->bio);
+    if(core->ssl){
+        core->ssl->bio = BIO_new_socket(sock, BIO_NOCLOSE);
+        if(!core->ssl->bio){
+            COMPAT_CLOSE(sock);
+            return MOSQ_ERR_SSL;
+        }
+        SSL_set_bio(core->ssl->ssl, core->ssl->bio, core->ssl->bio);
 
-		ret = SSL_connect(core->ssl->ssl);
-		if(ret != 1){
-			COMPAT_CLOSE(sock);
-			return MOSQ_ERR_SSL;
-		}
-	}
+        ret = SSL_connect(core->ssl->ssl);
+        if(ret != 1){
+            COMPAT_CLOSE(sock);
+            return MOSQ_ERR_SSL;
+        }
+    }
 #endif
 
     /* Set non-blocking */
@@ -212,32 +212,32 @@ int _mosquitto_socket_connect(struct _mosquitto_core *core, const char *host, ui
     opt = fcntl(sock, F_GETFL, 0);
     if(opt == -1 || fcntl(sock, F_SETFL, opt | O_NONBLOCK) == -1){
 #ifdef WITH_SSL
-		if(core->ssl){
-			_mosquitto_free(core->ssl);
-			core->ssl = NULL;
-		}
+        if(core->ssl){
+            _mosquitto_free(core->ssl);
+            core->ssl = NULL;
+        }
 #endif
-		COMPAT_CLOSE(sock);
+        COMPAT_CLOSE(sock);
         errStr = "fcntl failed";
-		return MOSQ_ERR_UNKNOWN;
+        return MOSQ_ERR_UNKNOWN;
     }
 #else
     if(ioctlsocket(sock, FIONBIO, &val)){
 #ifdef WITH_SSL
-		if(core->ssl){
-			_mosquitto_free(core->ssl);
-			core->ssl = NULL;
-		}
+        if(core->ssl){
+            _mosquitto_free(core->ssl);
+            core->ssl = NULL;
+        }
 #endif
-		COMPAT_CLOSE(sock);
+        COMPAT_CLOSE(sock);
         errStr = "ioctlsocket failed";
-		return MOSQ_ERR_UNKNOWN;
+        return MOSQ_ERR_UNKNOWN;
     }
 #endif
 
-	core->sock = sock;
+    core->sock = sock;
     errStr = NULL;
-	return MOSQ_ERR_SUCCESS;
+    return MOSQ_ERR_SUCCESS;
 }
 
 int _mosquitto_read_byte(struct _mosquitto_packet *packet, uint8_t *byte)
@@ -254,7 +254,7 @@ int _mosquitto_read_byte(struct _mosquitto_packet *packet, uint8_t *byte)
 void _mosquitto_write_byte(struct _mosquitto_packet *packet, uint8_t byte)
 {
     assert(packet);
-	assert(packet->pos+1 <= packet->packet_length);
+    assert(packet->pos+1 <= packet->packet_length);
 
     packet->payload[packet->pos] = byte;
     packet->pos++;
@@ -274,7 +274,7 @@ int _mosquitto_read_bytes(struct _mosquitto_packet *packet, uint8_t *bytes, uint
 void _mosquitto_write_bytes(struct _mosquitto_packet *packet, const uint8_t *bytes, uint32_t count)
 {
     assert(packet);
-	assert(packet->pos+count <= packet->packet_length);
+    assert(packet->pos+count <= packet->packet_length);
 
     memcpy(&(packet->payload[packet->pos]), bytes, count);
     packet->pos += count;
@@ -335,28 +335,28 @@ void _mosquitto_write_uint16(struct _mosquitto_packet *packet, uint16_t word)
 ssize_t _mosquitto_net_read(struct _mosquitto_core *core, void *buf, size_t count)
 {
 #ifdef WITH_SSL
-	int ret;
-	int err;
+    int ret;
+    int err;
 #endif
     assert(core);
 #ifdef WITH_SSL
-	if(core->ssl){
-		ret = SSL_read(core->ssl->ssl, buf, count);
-		if(ret < 0){
-			err = SSL_get_error(core->ssl->ssl, ret);
-			if(err == SSL_ERROR_WANT_READ){
-				ret = -1;
-				core->ssl->want_read = true;
-				errno = EAGAIN;
-			}else if(err == SSL_ERROR_WANT_WRITE){
-				ret = -1;
-				core->ssl->want_write = true;
-				errno = EAGAIN;
-			}
-		}
-		return (ssize_t )ret;
-	}else{
-		/* Call normal read/recv */
+    if(core->ssl){
+        ret = SSL_read(core->ssl->ssl, buf, count);
+        if(ret < 0){
+            err = SSL_get_error(core->ssl->ssl, ret);
+            if(err == SSL_ERROR_WANT_READ){
+                ret = -1;
+                core->ssl->want_read = true;
+                errno = EAGAIN;
+            }else if(err == SSL_ERROR_WANT_WRITE){
+                ret = -1;
+                core->ssl->want_write = true;
+                errno = EAGAIN;
+            }
+        }
+        return (ssize_t )ret;
+    }else{
+        /* Call normal read/recv */
 
 #endif
 
@@ -367,34 +367,34 @@ ssize_t _mosquitto_net_read(struct _mosquitto_core *core, void *buf, size_t coun
 #endif
 
 #ifdef WITH_SSL
-	}
+    }
 #endif
 }
 
 ssize_t _mosquitto_net_write(struct _mosquitto_core *core, void *buf, size_t count)
 {
 #ifdef WITH_SSL
-	int ret;
-	int err;
+    int ret;
+    int err;
 #endif
     assert(core);
 
 #ifdef WITH_SSL
-	if(core->ssl){
-		ret = SSL_write(core->ssl->ssl, buf, count);
-		if(ret < 0){
-			err = SSL_get_error(core->ssl->ssl, ret);
-			if(err == SSL_ERROR_WANT_READ){
-				ret = -1;
-				core->ssl->want_read = true;
-			}else if(err == SSL_ERROR_WANT_WRITE){
-				ret = -1;
-				core->ssl->want_write = true;
-			}
-		}
-		return (ssize_t )ret;
-	}else{
-		/* Call normal write/send */
+    if(core->ssl){
+        ret = SSL_write(core->ssl->ssl, buf, count);
+        if(ret < 0){
+            err = SSL_get_error(core->ssl->ssl, ret);
+            if(err == SSL_ERROR_WANT_READ){
+                ret = -1;
+                core->ssl->want_read = true;
+            }else if(err == SSL_ERROR_WANT_WRITE){
+                ret = -1;
+                core->ssl->want_write = true;
+            }
+        }
+        return (ssize_t )ret;
+    }else{
+        /* Call normal write/send */
 #endif
 
 #ifndef WIN32
@@ -404,7 +404,7 @@ ssize_t _mosquitto_net_write(struct _mosquitto_core *core, void *buf, size_t cou
 #endif
 
 #ifdef WITH_SSL
-	}
+    }
 #endif
 }
 

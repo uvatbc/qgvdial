@@ -39,151 +39,151 @@ POSSIBILITY OF SUCH DAMAGE.
 
 int _mosquitto_send_connect(struct mosquitto *mosq, uint16_t keepalive, bool clean_session)
 {
-	struct _mosquitto_packet *packet = NULL;
-	int payloadlen;
-	uint8_t will = 0;
-	uint8_t byte;
-	int rc;
+    struct _mosquitto_packet *packet = NULL;
+    int payloadlen;
+    uint8_t will = 0;
+    uint8_t byte;
+    int rc;
 
-	assert(mosq);
-	assert(mosq->core.id);
+    assert(mosq);
+    assert(mosq->core.id);
 
-	packet = _mosquitto_calloc(1, sizeof(struct _mosquitto_packet));
-	if(!packet) return MOSQ_ERR_NOMEM;
+    packet = _mosquitto_calloc(1, sizeof(struct _mosquitto_packet));
+    if(!packet) return MOSQ_ERR_NOMEM;
 
-	payloadlen = 2+strlen(mosq->core.id);
-	if(mosq->core.will){
-		will = 1;
-		assert(mosq->core.will->topic);
+    payloadlen = 2+strlen(mosq->core.id);
+    if(mosq->core.will){
+        will = 1;
+        assert(mosq->core.will->topic);
 
-		payloadlen += 2+strlen(mosq->core.will->topic) + 2+mosq->core.will->payloadlen;
-	}
-	if(mosq->core.username){
-		payloadlen += 2+strlen(mosq->core.username);
-		if(mosq->core.password){
-			payloadlen += 2+strlen(mosq->core.password);
-		}
-	}
+        payloadlen += 2+strlen(mosq->core.will->topic) + 2+mosq->core.will->payloadlen;
+    }
+    if(mosq->core.username){
+        payloadlen += 2+strlen(mosq->core.username);
+        if(mosq->core.password){
+            payloadlen += 2+strlen(mosq->core.password);
+        }
+    }
 
-	packet->command = CONNECT;
-	packet->remaining_length = 12+payloadlen;
-	rc = _mosquitto_packet_alloc(packet);
-	if(rc){
-		_mosquitto_free(packet);
-		return rc;
-	}
+    packet->command = CONNECT;
+    packet->remaining_length = 12+payloadlen;
+    rc = _mosquitto_packet_alloc(packet);
+    if(rc){
+        _mosquitto_free(packet);
+        return rc;
+    }
 
-	/* Variable header */
-	_mosquitto_write_string(packet, PROTOCOL_NAME, strlen(PROTOCOL_NAME));
-	_mosquitto_write_byte(packet, PROTOCOL_VERSION);
-	byte = (clean_session&0x1)<<1;
-	if(will){
-		byte = byte | ((mosq->core.will->retain&0x1)<<5) | ((mosq->core.will->qos&0x3)<<3) | ((will&0x1)<<2);
-	}
-	if(mosq->core.username){
-		byte = byte | 0x1<<7;
-		if(mosq->core.password){
-			byte = byte | 0x1<<6;
-		}
-	}
-	_mosquitto_write_byte(packet, byte);
-	_mosquitto_write_uint16(packet, keepalive);
+    /* Variable header */
+    _mosquitto_write_string(packet, PROTOCOL_NAME, strlen(PROTOCOL_NAME));
+    _mosquitto_write_byte(packet, PROTOCOL_VERSION);
+    byte = (clean_session&0x1)<<1;
+    if(will){
+        byte = byte | ((mosq->core.will->retain&0x1)<<5) | ((mosq->core.will->qos&0x3)<<3) | ((will&0x1)<<2);
+    }
+    if(mosq->core.username){
+        byte = byte | 0x1<<7;
+        if(mosq->core.password){
+            byte = byte | 0x1<<6;
+        }
+    }
+    _mosquitto_write_byte(packet, byte);
+    _mosquitto_write_uint16(packet, keepalive);
 
-	/* Payload */
-	_mosquitto_write_string(packet, mosq->core.id, strlen(mosq->core.id));
-	if(will){
-		_mosquitto_write_string(packet, mosq->core.will->topic, strlen(mosq->core.will->topic));
-		_mosquitto_write_string(packet, (const char *)mosq->core.will->payload, mosq->core.will->payloadlen);
-	}
-	if(mosq->core.username){
-		_mosquitto_write_string(packet, mosq->core.username, strlen(mosq->core.username));
-		if(mosq->core.password){
-			_mosquitto_write_string(packet, mosq->core.password, strlen(mosq->core.password));
-		}
-	}
+    /* Payload */
+    _mosquitto_write_string(packet, mosq->core.id, strlen(mosq->core.id));
+    if(will){
+        _mosquitto_write_string(packet, mosq->core.will->topic, strlen(mosq->core.will->topic));
+        _mosquitto_write_string(packet, (const char *)mosq->core.will->payload, mosq->core.will->payloadlen);
+    }
+    if(mosq->core.username){
+        _mosquitto_write_string(packet, mosq->core.username, strlen(mosq->core.username));
+        if(mosq->core.password){
+            _mosquitto_write_string(packet, mosq->core.password, strlen(mosq->core.password));
+        }
+    }
 
-	mosq->core.keepalive = keepalive;
-	_mosquitto_packet_queue(&mosq->core, packet);
-	return MOSQ_ERR_SUCCESS;
+    mosq->core.keepalive = keepalive;
+    _mosquitto_packet_queue(&mosq->core, packet);
+    return MOSQ_ERR_SUCCESS;
 }
 
 int _mosquitto_send_disconnect(struct mosquitto *mosq)
 {
-	assert(mosq);
-	return _mosquitto_send_simple_command(mosq, DISCONNECT);
+    assert(mosq);
+    return _mosquitto_send_simple_command(mosq, DISCONNECT);
 }
 
 int _mosquitto_send_subscribe(struct mosquitto *mosq, uint16_t *mid, bool dup, const char *topic, uint8_t topic_qos)
 {
-	/* FIXME - only deals with a single topic */
-	struct _mosquitto_packet *packet = NULL;
-	uint32_t packetlen;
-	uint16_t local_mid;
-	int rc;
+    /* FIXME - only deals with a single topic */
+    struct _mosquitto_packet *packet = NULL;
+    uint32_t packetlen;
+    uint16_t local_mid;
+    int rc;
 
-	assert(mosq);
-	assert(topic);
+    assert(mosq);
+    assert(topic);
 
-	packet = _mosquitto_calloc(1, sizeof(struct _mosquitto_packet));
-	if(!packet) return MOSQ_ERR_NOMEM;
+    packet = _mosquitto_calloc(1, sizeof(struct _mosquitto_packet));
+    if(!packet) return MOSQ_ERR_NOMEM;
 
-	packetlen = 2 + 2+strlen(topic) + 1;
+    packetlen = 2 + 2+strlen(topic) + 1;
 
-	packet->command = SUBSCRIBE | (dup<<3) | (1<<1);
-	packet->remaining_length = packetlen;
-	rc = _mosquitto_packet_alloc(packet);
-	if(rc){
-		_mosquitto_free(packet);
-		return rc;
-	}
+    packet->command = SUBSCRIBE | (dup<<3) | (1<<1);
+    packet->remaining_length = packetlen;
+    rc = _mosquitto_packet_alloc(packet);
+    if(rc){
+        _mosquitto_free(packet);
+        return rc;
+    }
 
-	/* Variable header */
-	local_mid = _mosquitto_mid_generate(&mosq->core);
-	if(mid) *mid = local_mid;
-	_mosquitto_write_uint16(packet, local_mid);
+    /* Variable header */
+    local_mid = _mosquitto_mid_generate(&mosq->core);
+    if(mid) *mid = local_mid;
+    _mosquitto_write_uint16(packet, local_mid);
 
-	/* Payload */
-	_mosquitto_write_string(packet, topic, strlen(topic));
-	_mosquitto_write_byte(packet, topic_qos);
+    /* Payload */
+    _mosquitto_write_string(packet, topic, strlen(topic));
+    _mosquitto_write_byte(packet, topic_qos);
 
-	_mosquitto_packet_queue(&mosq->core, packet);
-	return MOSQ_ERR_SUCCESS;
+    _mosquitto_packet_queue(&mosq->core, packet);
+    return MOSQ_ERR_SUCCESS;
 }
 
 
 int _mosquitto_send_unsubscribe(struct mosquitto *mosq, uint16_t *mid, bool dup, const char *topic)
 {
-	/* FIXME - only deals with a single topic */
-	struct _mosquitto_packet *packet = NULL;
-	uint32_t packetlen;
-	uint16_t local_mid;
-	int rc;
+    /* FIXME - only deals with a single topic */
+    struct _mosquitto_packet *packet = NULL;
+    uint32_t packetlen;
+    uint16_t local_mid;
+    int rc;
 
-	assert(mosq);
-	assert(topic);
+    assert(mosq);
+    assert(topic);
 
-	packet = _mosquitto_calloc(1, sizeof(struct _mosquitto_packet));
-	if(!packet) return MOSQ_ERR_NOMEM;
+    packet = _mosquitto_calloc(1, sizeof(struct _mosquitto_packet));
+    if(!packet) return MOSQ_ERR_NOMEM;
 
-	packetlen = 2 + 2+strlen(topic);
+    packetlen = 2 + 2+strlen(topic);
 
-	packet->command = UNSUBSCRIBE | (dup<<3) | (1<<1);
-	packet->remaining_length = packetlen;
-	rc = _mosquitto_packet_alloc(packet);
-	if(rc){
-		_mosquitto_free(packet);
-		return rc;
-	}
+    packet->command = UNSUBSCRIBE | (dup<<3) | (1<<1);
+    packet->remaining_length = packetlen;
+    rc = _mosquitto_packet_alloc(packet);
+    if(rc){
+        _mosquitto_free(packet);
+        return rc;
+    }
 
-	/* Variable header */
-	local_mid = _mosquitto_mid_generate(&mosq->core);
-	if(mid) *mid = local_mid;
-	_mosquitto_write_uint16(packet, local_mid);
+    /* Variable header */
+    local_mid = _mosquitto_mid_generate(&mosq->core);
+    if(mid) *mid = local_mid;
+    _mosquitto_write_uint16(packet, local_mid);
 
-	/* Payload */
-	_mosquitto_write_string(packet, topic, strlen(topic));
+    /* Payload */
+    _mosquitto_write_string(packet, topic, strlen(topic));
 
-	_mosquitto_packet_queue(&mosq->core, packet);
-	return MOSQ_ERR_SUCCESS;
+    _mosquitto_packet_queue(&mosq->core, packet);
+    return MOSQ_ERR_SUCCESS;
 }
 
