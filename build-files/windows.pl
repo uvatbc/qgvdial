@@ -28,7 +28,7 @@ $qver = "$qver.$svnver";
 
 system("powershell Remove-Item -Recurse -Force qgvdial*");
 system("svn export $repo qgvdial-$qver");
-system("copy qgvdial-$qver\\icons\\Google.png qgvdial-$qver\\src\\qgvdial.png");
+system("copy qgvdial-$qver\\icons\\qgv.png qgvdial-$qver\\src\\qgvdial.png");
 system("move qgvdial-$qver\\build-files\\qt.conf.win qgvdial-$qver\\build-files\\qt.conf");
 
 # Append the version to the pro file

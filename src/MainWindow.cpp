@@ -8,7 +8,7 @@ using namespace std;
 MainWindow::MainWindow (QWidget *parent)
 : QDeclarativeView (parent)
 , fLogfile (this)
-, icoGoogle (":/Google.png")
+, icoQgv (":/qgv.png")
 , pSystray (NULL)
 , oContacts (this)
 , oInbox (this)
@@ -49,7 +49,7 @@ MainWindow::MainWindow (QWidget *parent)
     if (QSystemTrayIcon::isSystemTrayAvailable ())
     {
         pSystray = new QSystemTrayIcon (this);
-        pSystray->setIcon (icoGoogle);
+        pSystray->setIcon (icoQgv);
         pSystray->setToolTip ("Google Voice dialer");
         pSystray->setContextMenu (&menuFile);
         QObject::connect (
@@ -392,7 +392,7 @@ MainWindow::init ()
     QObject::connect (&actExit, SIGNAL (triggered()),
                        this   , SLOT   (on_actionE_xit_triggered()));
 
-    this->setWindowIcon (icoGoogle);
+    this->setWindowIcon (icoQgv);
 
 #if MOSQUITTO_CAPABLE
     // Connect the signals from the Mosquitto thread

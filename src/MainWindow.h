@@ -186,7 +186,7 @@ private:
     QFile           fLogfile;
 
     // Tray, icons, widgets
-    QIcon           icoGoogle;
+    QIcon           icoQgv;
     QSystemTrayIcon *pSystray;
     //! GV Contacts object
     GVContactsTable oContacts;
