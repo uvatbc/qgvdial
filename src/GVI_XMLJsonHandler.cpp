@@ -176,7 +176,7 @@ GVI_XMLJsonHandler::parseJSON (const QDateTime &dtUpdate, bool &bGotOld, int &nN
             }
             if (0 == inboxEntry.strPhoneNumber.size()) {
                 qWarning ("Invalid Phone number");
-                continue;
+                inboxEntry.strPhoneNumber = "Unknown";
             }
             if (0 == inboxEntry.strDisplayNumber.size()) {
                 inboxEntry.strDisplayNumber = "Unknown";
