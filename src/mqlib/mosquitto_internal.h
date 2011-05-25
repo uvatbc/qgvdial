@@ -30,7 +30,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #ifndef _MOSQUITTO_INTERNAL_H_
 #define _MOSQUITTO_INTERNAL_H_
 
-#include <config.h>
+#include "mq_config.h"
 
 #ifdef WITH_SSL
 #include <openssl/ssl.h>
@@ -44,97 +44,97 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <mosquitto.h>
 
 enum mosquitto_msg_direction {
-	mosq_md_in = 0,
-	mosq_md_out = 1
+    mosq_md_in = 0,
+    mosq_md_out = 1
 };
 
 enum mosquitto_msg_state {
-	mosq_ms_invalid = 0,
-	mosq_ms_wait_puback = 1,
-	mosq_ms_wait_pubrec = 2,
-	mosq_ms_wait_pubrel = 3,
-	mosq_ms_wait_pubcomp = 4
+    mosq_ms_invalid = 0,
+    mosq_ms_wait_puback = 1,
+    mosq_ms_wait_pubrec = 2,
+    mosq_ms_wait_pubrel = 3,
+    mosq_ms_wait_pubcomp = 4
 };
 
 enum mosquitto_client_state {
-	mosq_cs_new = 0,
-	mosq_cs_connected = 1,
-	mosq_cs_disconnecting = 2
+    mosq_cs_new = 0,
+    mosq_cs_connected = 1,
+    mosq_cs_disconnecting = 2
 };
 
 struct _mosquitto_packet{
-	uint8_t command;
-	uint8_t have_remaining;
-	uint8_t remaining_count;
-	uint16_t mid;
-	uint32_t remaining_mult;
-	uint32_t remaining_length;
-	uint32_t packet_length;
-	uint32_t to_process;
-	uint32_t pos;
-	uint8_t *payload;
-	struct _mosquitto_packet *next;
+    uint8_t command;
+    uint8_t have_remaining;
+    uint8_t remaining_count;
+    uint16_t mid;
+    uint32_t remaining_mult;
+    uint32_t remaining_length;
+    uint32_t packet_length;
+    uint32_t to_process;
+    uint32_t pos;
+    uint8_t *payload;
+    struct _mosquitto_packet *next;
 };
 
 struct mosquitto_message_all{
-	struct mosquitto_message_all *next;
-	time_t timestamp;
-	enum mosquitto_msg_direction direction;
-	enum mosquitto_msg_state state;
-	bool dup;
-	struct mosquitto_message msg;
+    struct mosquitto_message_all *next;
+    time_t timestamp;
+    enum mosquitto_msg_direction direction;
+    enum mosquitto_msg_state state;
+    bool dup;
+    struct mosquitto_message msg;
 };
 
 #ifdef WITH_SSL
 struct _mosquitto_ssl{
-	SSL_CTX *ssl_ctx;
-	SSL *ssl;
-	BIO *bio;
-	bool want_read;
-	bool want_write;
+    SSL_CTX *ssl_ctx;
+    SSL *ssl;
+    BIO *bio;
+    bool want_read;
+    bool want_write;
 };
 #endif
 
 struct _mosquitto_core
 {
 #ifndef WIN32
-	int sock;
+    int sock;
 #else
-	SOCKET sock;
+    SOCKET sock;
 #endif
-	char *address;
-	char *id;
-	char *username;
-	char *password;
-	uint16_t keepalive;
-	bool clean_session;
-	enum mosquitto_client_state state;
-	time_t last_msg_in;
-	time_t last_msg_out;
-	uint16_t last_mid;
-	struct _mosquitto_packet in_packet;
-	struct _mosquitto_packet *out_packet;
-	struct mosquitto_message *will;
+    char *address;
+    char *id;
+    char *username;
+    char *password;
+    uint16_t keepalive;
+    bool clean_session;
+    enum mosquitto_client_state state;
+    time_t last_msg_in;
+    time_t last_msg_out;
+    uint16_t last_mid;
+    struct _mosquitto_packet in_packet;
+    struct _mosquitto_packet *out_packet;
+    struct mosquitto_message *will;
 #ifdef WITH_SSL
-	struct _mosquitto_ssl *ssl;
+    struct _mosquitto_ssl *ssl;
 #endif
 };
 
 struct mosquitto {
-	struct _mosquitto_core core;
-	void *obj;
-	unsigned int message_retry;
-	time_t last_retry_check;
-	struct mosquitto_message_all *messages;
-	int log_priorities;
-	int log_destinations;
-	void (*on_connect)(void *obj, int rc);
-	void (*on_disconnect)(void *obj);
-	void (*on_publish)(void *obj, uint16_t mid);
-	void (*on_message)(void *obj, const struct mosquitto_message *message);
-	void (*on_subscribe)(void *obj, uint16_t mid, int qos_count, const uint8_t *granted_qos);
-	void (*on_unsubscribe)(void *obj, uint16_t mid);
-	//void (*on_error)();
+    struct _mosquitto_core core;
+    void *obj;
+    unsigned int message_retry;
+    time_t last_retry_check;
+    struct mosquitto_message_all *messages;
+    int log_priorities;
+    int log_destinations;
+    void (*on_connect)(void *obj, int rc);
+    void (*on_disconnect)(void *obj);
+    void (*on_publish)(void *obj, uint16_t mid);
+    void (*on_message)(void *obj, const struct mosquitto_message *message);
+    void (*on_subscribe)(void *obj, uint16_t mid, int qos_count, const uint8_t *granted_qos);
+    void (*on_unsubscribe)(void *obj, uint16_t mid);
+    //void (*on_error)();
 };
 
 #endif

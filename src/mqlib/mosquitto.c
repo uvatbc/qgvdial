@@ -51,6 +51,8 @@ typedef int ssize_t;
 #include <send_mosq.h>
 #include <util_mosq.h>
 
+#include <sys/select.h>
+
 #ifndef ECONNRESET
 #define ECONNRESET 104
 #endif
@@ -67,14 +69,14 @@ void mosquitto_lib_version(int *major, int *minor, int *revision)
 
 int mosquitto_lib_init(void)
 {
-	_mosquitto_net_init();
+    _mosquitto_net_init();
 
     return MOSQ_ERR_SUCCESS;
 }
 
 int mosquitto_lib_cleanup(void)
 {
-	_mosquitto_net_cleanup();
+    _mosquitto_net_cleanup();
 
     return MOSQ_ERR_SUCCESS;
 }
@@ -127,7 +129,7 @@ int mosquitto_will_set(struct mosquitto *mosq, bool will, const char *topic, uin
     int rc = MOSQ_ERR_SUCCESS;
 
     if(!mosq || (will && !topic)) return MOSQ_ERR_INVAL;
-	if(payloadlen > 268435455) return MOSQ_ERR_PAYLOAD_SIZE;
+    if(payloadlen > 268435455) return MOSQ_ERR_PAYLOAD_SIZE;
 
     if(mosq->core.will){
         if(mosq->core.will->topic){
@@ -224,15 +226,15 @@ void mosquitto_destroy(struct mosquitto *mosq)
     }
     _mosquitto_free(mosq->core.will);
 #ifdef WITH_SSL
-	if(mosq->core.ssl){
-		if(mosq->core.ssl->ssl){
-			SSL_free(mosq->core.ssl->ssl);
-		}
-		if(mosq->core.ssl->ssl_ctx){
-			SSL_CTX_free(mosq->core.ssl->ssl_ctx);
-		}
-		_mosquitto_free(mosq->core.ssl);
-	}
+    if(mosq->core.ssl){
+        if(mosq->core.ssl->ssl){
+            SSL_free(mosq->core.ssl->ssl);
+        }
+        if(mosq->core.ssl->ssl_ctx){
+            SSL_CTX_free(mosq->core.ssl->ssl_ctx);
+        }
+        _mosquitto_free(mosq->core.ssl);
+    }
 #endif
     _mosquitto_free(mosq);
 }
@@ -245,13 +247,13 @@ int mosquitto_socket(struct mosquitto *mosq)
 
 int mosquitto_connect(struct mosquitto *mosq, const char *host, int port, int keepalive, bool clean_session)
 {
-	int rc;
+    int rc;
     if(!mosq) return MOSQ_ERR_INVAL;
     if(!host || !port) return MOSQ_ERR_INVAL;
 
-	rc = _mosquitto_socket_connect(&mosq->core, host, port);
-	if(rc){
-		return rc;
+    rc = _mosquitto_socket_connect(&mosq->core, host, port);
+    if(rc){
+        return rc;
     }
 
     return _mosquitto_send_connect(mosq, keepalive, clean_session);
@@ -273,7 +275,7 @@ int mosquitto_publish(struct mosquitto *mosq, uint16_t *mid, const char *topic, 
     uint16_t local_mid;
 
     if(!mosq || !topic || qos<0 || qos>2) return MOSQ_ERR_INVAL;
-	if(payloadlen > 268435455) return MOSQ_ERR_PAYLOAD_SIZE;
+    if(payloadlen > 268435455) return MOSQ_ERR_PAYLOAD_SIZE;
 
     local_mid = _mosquitto_mid_generate(&mosq->core);
     if(mid){
@@ -341,19 +343,19 @@ int mosquitto_unsubscribe(struct mosquitto *mosq, uint16_t *mid, const char *sub
 int mosquitto_ssl_set(struct mosquitto *mosq, const char *pemfile, const char *password)
 {
 #ifdef WITH_SSL
-	if(!mosq || mosq->core.ssl) return MOSQ_ERR_INVAL; //FIXME
+    if(!mosq || mosq->core.ssl) return MOSQ_ERR_INVAL; //FIXME
 
-	mosq->core.ssl = _mosquitto_malloc(sizeof(struct _mosquitto_ssl));
-	if(!mosq->core.ssl) return MOSQ_ERR_NOMEM;
+    mosq->core.ssl = _mosquitto_malloc(sizeof(struct _mosquitto_ssl));
+    if(!mosq->core.ssl) return MOSQ_ERR_NOMEM;
 
-	mosq->core.ssl->ssl_ctx = SSL_CTX_new(TLSv1_method());
-	if(!mosq->core.ssl->ssl_ctx) return MOSQ_ERR_SSL;
+    mosq->core.ssl->ssl_ctx = SSL_CTX_new(TLSv1_method());
+    if(!mosq->core.ssl->ssl_ctx) return MOSQ_ERR_SSL;
 
-	mosq->core.ssl->ssl = SSL_new(mosq->core.ssl->ssl_ctx);
+    mosq->core.ssl->ssl = SSL_new(mosq->core.ssl->ssl_ctx);
 
-	return MOSQ_ERR_SUCCESS;
+    return MOSQ_ERR_SUCCESS;
 #else
-	return MOSQ_ERR_NOT_SUPPORTED;
+    return MOSQ_ERR_NOT_SUPPORTED;
 #endif
 }
 #endif
@@ -378,8 +380,8 @@ int mosquitto_loop(struct mosquitto *mosq, int timeout)
     if(mosq->core.out_packet){
         FD_SET(mosq->core.sock, &writefds);
 #ifdef WITH_SSL
-	}else if(mosq->core.ssl && mosq->core.ssl->want_write){
-		FD_SET(mosq->core.sock, &writefds);
+    }else if(mosq->core.ssl && mosq->core.ssl->want_write){
+        FD_SET(mosq->core.sock, &writefds);
 #endif
     }
     if(timeout >= 0){
@@ -404,7 +406,7 @@ int mosquitto_loop(struct mosquitto *mosq, int timeout)
     fdcount = select(mosq->core.sock+1, &readfds, &writefds, NULL, &local_timeout);
 #endif
     if(fdcount == -1){
-		return MOSQ_ERR_UNKNOWN; // FIXME what error to return?
+        return MOSQ_ERR_UNKNOWN; // FIXME what error to return?
     }else{
         if(FD_ISSET(mosq->core.sock, &readfds)){
             rc = mosquitto_loop_read(mosq);
@@ -494,7 +496,7 @@ int mosquitto_loop_read(struct mosquitto *mosq)
                     case ECONNRESET:
                         return MOSQ_ERR_CONN_LOST;
                     default:
-						return MOSQ_ERR_UNKNOWN;
+                        return MOSQ_ERR_UNKNOWN;
                 }
             }
         }
@@ -528,7 +530,7 @@ int mosquitto_loop_read(struct mosquitto *mosq)
                         case ECONNRESET:
                             return MOSQ_ERR_CONN_LOST;
                         default:
-							return MOSQ_ERR_UNKNOWN;
+                            return MOSQ_ERR_UNKNOWN;
                     }
                 }
             }
@@ -558,7 +560,7 @@ int mosquitto_loop_read(struct mosquitto *mosq)
                     case ECONNRESET:
                         return MOSQ_ERR_CONN_LOST;
                     default:
-						return MOSQ_ERR_UNKNOWN;
+                        return MOSQ_ERR_UNKNOWN;
                 }
             }
         }
@@ -603,13 +605,13 @@ int mosquitto_loop_write(struct mosquitto *mosq)
                         case ECONNRESET:
                             return MOSQ_ERR_CONN_LOST;
                         default:
-							return MOSQ_ERR_UNKNOWN;
+                            return MOSQ_ERR_UNKNOWN;
                     }
                 }
             }
         }
 
-		if(((packet->command)&0xF6) == PUBLISH && mosq->on_publish){
+        if(((packet->command)&0xF6) == PUBLISH && mosq->on_publish){
             /* This is a QoS=0 message */
             mosq->on_publish(mosq->obj, packet->mid);
         }
