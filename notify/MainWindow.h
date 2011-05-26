@@ -23,6 +23,7 @@ private slots:
     void logoutCompleted (bool bOk, const QVariantList &);
     void getContactsDone (bool bChanges, bool bOK);
     void inboxChanged ();
+    void dailyTimeout();
 
 private:
     void initLogging ();

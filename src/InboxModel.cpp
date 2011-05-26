@@ -100,9 +100,9 @@ InboxModel::data (const QModelIndex &index,
             int daysTo = dt.daysTo (QDateTime::currentDateTime ());
             if (IN_TimeDetail == role) {
                 if (0 == daysTo) {
-                    strDisp = "today at " + dt.toString ("hh:mm:ss");
+                    strDisp = dt.toString ("hh:mm:ss")  + " today";
                 } else if (1 == daysTo) {
-                    strDisp = "yesterday at " + dt.toString ("hh:mm:ss");
+                    strDisp = dt.toString ("hh:mm:ss") + " yesterday";
                 } else {
                     strDisp = dt.toString ("dddd, dd-MMM")
                             + " at "
@@ -115,10 +115,9 @@ InboxModel::data (const QModelIndex &index,
                     strDisp = dt.toString ("hh:mm") + "\nyesterday";
                 } else if (daysTo < currentDate.dayOfWeek ()) {
                     strDisp = dt.toString ("hh:mm\ndddd");
-                } else if (daysTo < (currentDate.dayOfWeek () + 7)) {
-                    strDisp = "last week";
                 } else {
-                    strDisp = dt.toString ("dd-MMM");
+                    strDisp = dt.toString ("hh:mm:ss") + "\n"
+                            + dt.toString ("dd-MMM");
                 }
             }
 

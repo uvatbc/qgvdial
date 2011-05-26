@@ -40,6 +40,14 @@ MainWindow::MainWindow(QObject *parent /*= 0*/)
         return;
     }
 
+    QDateTime dtNow = QDateTime::currentDateTime ();
+    QDateTime dtTomorrow = dtNow.addDays (1);
+    dtTomorrow.setTime (QTime(0, 0));
+    int sec = (dtTomorrow.toMSecsSinceEpoch() - dtNow.toMSecsSinceEpoch()) / 1000;
+    if (sec < 0) sec = 1;
+    QTimer::singleShot (sec * 1000, this, SLOT(dailyTimeout()));
+    qDebug() << "Daily timer first shot after" << sec << "seconds";
+
     QTimer::singleShot (100, this, SLOT(doWork ()));
 }//MainWindow::MainWindow
 
@@ -475,3 +483,11 @@ MainWindow::startTimer ()
     mainTimer.setInterval (checkTimeout * 1000);
     mainTimer.start ();
 }//MainWindow::startTimer
+
+void
+MainWindow::dailyTimeout ()
+{
+    qDebug() << "Daily timer timed out at" << QDateTime::currentDateTime ();
+    inboxChanged ();
+    QTimer::singleShot (24 * 60 * 60 * 1000, this, SLOT(dailyTimeout()));
+}//MainWindow::dailyTimeout

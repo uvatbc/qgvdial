@@ -1,1 +1,1 @@
-  * Allow non-standard ini location so that multiple accounts can be notified
+  * Daily ping and Unknown numbers don't quit the loop.
