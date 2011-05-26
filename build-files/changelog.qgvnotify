@@ -1,1 +1,2 @@
-  * Daily ping and Unknown numbers don't quit the loop.
+  * Fix for Diablo because it is Qt 4.6
+

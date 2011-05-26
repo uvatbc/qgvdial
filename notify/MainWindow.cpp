@@ -43,7 +43,7 @@ MainWindow::MainWindow(QObject *parent /*= 0*/)
     QDateTime dtNow = QDateTime::currentDateTime ();
     QDateTime dtTomorrow = dtNow.addDays (1);
     dtTomorrow.setTime (QTime(0, 0));
-    int sec = (dtTomorrow.toMSecsSinceEpoch() - dtNow.toMSecsSinceEpoch()) / 1000;
+    int sec = dtTomorrow.toTime_t() - dtNow.toTime_t();
     if (sec < 0) sec = 1;
     QTimer::singleShot (sec * 1000, this, SLOT(dailyTimeout()));
     qDebug() << "Daily timer first shot after" << sec << "seconds";
