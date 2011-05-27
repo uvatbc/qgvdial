@@ -21,7 +21,7 @@ unix:!symbian {
     } else {
         PREFIX = /opt/usr
     }
-    
+
     OPTPREFIX  = $$PREFIX/../opt/qgvdial
     BINDIR     = $$OPTPREFIX/bin
     DATADIR    = $$PREFIX/share
@@ -44,7 +44,6 @@ SOURCES  += main.cpp                        \
             ../src/GVWebPage.cpp            \
             ../src/MobileWebPage.cpp        \
             ../src/GVI_XMLJsonHandler.cpp   \
-            ../src/GVI_SMS_Handler.cpp      \
             ../src/ContactsParserObject.cpp \
             ../src/ContactsXmlHandler.cpp
 
@@ -59,6 +58,5 @@ HEADERS  += ../src/global.h                 \
             ../src/GVWebPage.h              \
             ../src/MobileWebPage.h          \
             ../src/GVI_XMLJsonHandler.h     \
-            ../src/GVI_SMS_Handler.h        \
             ../src/ContactsParserObject.h   \
             ../src/ContactsXmlHandler.h
