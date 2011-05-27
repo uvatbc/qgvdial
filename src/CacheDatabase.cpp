@@ -59,7 +59,7 @@ Contact: yuvraaj@gmail.com
 // Started using settings ini
 //#define GV_S_VALUE_DB_VER   "2011-05-03 11:03:50"
 // SMS Text became rich text
-#define GV_S_VALUE_DB_VER   "2011-05-26 23:06:02"
+#define GV_S_VALUE_DB_VER   "2011-05-27 14:14:40"
 ////////////////////////////////////////////////////////////////////////////////
 // Started using versioning for the settings
 #define GV_SETTINGS_VER     "2011-05-13 16:33:50"

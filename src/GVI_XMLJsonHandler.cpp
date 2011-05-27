@@ -71,6 +71,7 @@ GVI_XMLJsonHandler::endElement (const QString & /*namespaceURI*/,
 
         mapTexts.clear ();
 
+        QDomNamedNodeMap attrs;
         QDomDocument doc;
         doc.setContent (strHtml);
         if (1 != doc.elementsByTagName("html").size()) {
@@ -106,49 +107,101 @@ GVI_XMLJsonHandler::endElement (const QString & /*namespaceURI*/,
                     continue;
                 }
 
-                bool bSmsRow = false;
-                QDomNamedNodeMap attrs = subDivs.at(j).toElement().attributes();
+                bool bMessageDisplay = false;
+                attrs = subDivs.at(j).toElement().attributes();
                 for (int k = 0; k < attrs.size (); k++) {
-                    if (attrs.item(k).toAttr().value() == "gc-message-sms-row") {
-                        bSmsRow = true;
+                    if (attrs.item(k).toAttr().value() == "gc-message-message-display") {
+                        bMessageDisplay = true;
                         break;
                     }
                 }
-                if (!bSmsRow) {
+                if (!bMessageDisplay) {
                     continue;
                 }
 
-                QDomNodeList smsRow = subDivs.at(j).toElement().childNodes();
-                for (int k = 0; k < smsRow.size (); k++) {
-                    if (!smsRow.at(k).isElement()) {
-                        qDebug() << "SMS row child" << k << "is not an element";
+                // Children could be either SMS rows or vmail transcription
+                QDomNodeList childDivs = subDivs.at(j).toElement().childNodes();
+                for (int k = 0; k < childDivs.size (); k++) {
+                    if (!childDivs.at(k).isElement ()) {
                         continue;
                     }
 
-                    QDomElement smsSpan = smsRow.at(k).toElement();
-                    if (smsSpan.tagName () != "span") {
-                        qDebug() << "SMS row child" << k << "is not a span";
-                        continue;
-                    }
-
-                    QDomNamedNodeMap attrs = smsSpan.attributes();
-                    for (int l = 0; l < attrs.size (); l++) {
-                        QString strTemp = smsSpan.text ().simplified ();
-                        QDomAttr attr = attrs.item(l).toAttr();
-                        if (attr.value() == "gc-message-sms-from") {
-                            strSmsRow += "<b>" + strTemp + "</b> ";
-                        } else if (attr.value() == "gc-message-sms-text") {
-                            strSmsRow += strTemp;
-                        } else if (attr.value() == "gc-message-sms-time") {
-                            strSmsRow += " <i>(" + strTemp + ")</i><br>";
+                    // Find out if it is a div and has the sms atttribute
+                    bool bInteresting = false;
+                    if (childDivs.at(k).toElement().tagName () == "div") {
+                        attrs = childDivs.at(k).toElement().attributes();
+                        for (int l = 0; l < attrs.size (); l++) {
+                            if (attrs.item(l).toAttr().value() == "gc-message-sms-row") {
+                                bInteresting = true;
+                                break;
+                            }
                         }
                     }
-                }
-            }
+                    if (bInteresting) {
+                        QDomNodeList smsRow = childDivs.at(k).toElement().childNodes();
+                        for (int l = 0; l < smsRow.size (); l++) {
+                            if (!smsRow.at(l).isElement()) {
+                                continue;
+                            }
 
-            mapTexts[id] = strSmsRow;
-        }
-    }
+                            QDomElement smsSpan = smsRow.at(l).toElement();
+                            if (smsSpan.tagName () != "span") {
+                                continue;
+                            }
+
+                            attrs = smsSpan.attributes();
+                            for (int m = 0; m < attrs.size (); m++) {
+                                QString strTemp = smsSpan.text ().simplified ();
+                                QDomAttr attr = attrs.item(m).toAttr();
+                                if (attr.value() == "gc-message-sms-from") {
+                                    strSmsRow += "<b>" + strTemp + "</b> ";
+                                } else if (attr.value() == "gc-message-sms-text") {
+                                    strSmsRow += strTemp;
+                                } else if (attr.value() == "gc-message-sms-time") {
+                                    strSmsRow += " <i>(" + strTemp + ")</i><br>";
+                                }
+                            }// loop thru the parts of a single sms
+                        }//loop through sms row
+                        // done with the sms. move to the next child of message display
+                        continue;
+                    }//if bSmsRow
+
+                    // Its not an SMS. Check to see if it's a vmail.
+                    if (childDivs.at(k).toElement().tagName () != "span") {
+                        // I don't care about anything other than the div and
+                        // span children of message-display
+                        continue;
+                    }
+
+                    bInteresting = false;
+                    QDomElement vmailSpan = childDivs.at(k).toElement();
+                    attrs = vmailSpan.attributes();
+                    for (int l = 0; l < attrs.size (); l++) {
+                        QDomAttr attr = attrs.item(l).toAttr();
+                        if (attr.name () != "class") {
+                            continue;
+                        }
+                        if (attr.value().startsWith ("gc-word-")) {
+                            bInteresting = true;
+                            break;
+                        }
+                    }// loop thru the attributes of a single span looking for something interesting
+                    if (!bInteresting) {
+                        continue;
+                    }
+
+                    if (!strSmsRow.isEmpty ()) {
+                        strSmsRow += ' ';
+                    }
+                    strSmsRow += vmailSpan.text ();
+                }//loop thru children of a messages-display div
+            }//loop thru sub-divs under the main divs in the document
+
+            if (!strSmsRow.isEmpty ()) {
+                mapTexts[id] = strSmsRow;
+            }
+        }//loop through the main divs just under the html tag
+    }// if html
     return (true);
 }//GVI_XMLJsonHandler::endElement
 
