@@ -48,13 +48,85 @@ GVI_XMLJsonHandler::endElement (const QString & /*namespaceURI*/,
         temp.close ();
 #endif
 
-        QXmlInputSource inputSource;
-        inputSource.setData (strHtml);
-        QXmlSimpleReader simpleReader;
+        mapTexts.clear ();
 
-        simpleReader.setContentHandler (&smsHandler);
-        simpleReader.setErrorHandler (&smsHandler);
-        simpleReader.parse (&inputSource, false);
+        QDomDocument doc;
+        doc.setContent (strHtml);
+        if (1 != doc.elementsByTagName("html").size()) {
+            qWarning ("Unexpected number of html tags");
+            return false;
+        }
+
+        QDomNodeList mainDivs = doc.elementsByTagName("html").at(0).childNodes();
+        for (int i = 0; i < mainDivs.size (); i++) {
+            QDomNode oneDivNode = mainDivs.at (i);
+            if (!oneDivNode.isElement ()) {
+                continue;
+            }
+
+            QDomElement oneDivElement = oneDivNode.toElement ();
+            if (oneDivElement.tagName() != "div") {
+                continue;
+            }
+
+            if (!oneDivElement.hasAttribute ("id")) {
+                continue;
+            }
+
+            QString id = oneDivElement.attribute("id");
+            QString strSmsRow;
+            QDomNodeList subDivs = oneDivElement.elementsByTagName("div");
+            for (int j = 0; j < subDivs.size (); j++) {
+                if (!subDivs.at(j).isElement ()) {
+                    continue;
+                }
+
+                if (!subDivs.at(j).toElement().hasAttribute("class")) {
+                    continue;
+                }
+
+                bool bSmsRow = false;
+                QDomNamedNodeMap attrs = subDivs.at(j).toElement().attributes();
+                for (int k = 0; k < attrs.size (); k++) {
+                    if (attrs.item(k).toAttr().value() == "gc-message-sms-row") {
+                        bSmsRow = true;
+                        break;
+                    }
+                }
+                if (!bSmsRow) {
+                    continue;
+                }
+
+                QDomNodeList smsRow = subDivs.at(j).toElement().childNodes();
+                for (int k = 0; k < smsRow.size (); k++) {
+                    if (!smsRow.at(k).isElement()) {
+                        qDebug() << "SMS row child" << k << "is not an element";
+                        continue;
+                    }
+
+                    QDomElement smsSpan = smsRow.at(k).toElement();
+                    if (smsSpan.tagName () != "span") {
+                        qDebug() << "SMS row child" << k << "is not a span";
+                        continue;
+                    }
+
+                    QDomNamedNodeMap attrs = smsSpan.attributes();
+                    for (int l = 0; l < attrs.size (); l++) {
+                        QString strTemp = smsSpan.text ().simplified ();
+                        QDomAttr attr = attrs.item(l).toAttr();
+                        if (attr.value() == "gc-message-sms-from") {
+                            strSmsRow += "<b>" + strTemp + "</b> ";
+                        } else if (attr.value() == "gc-message-sms-text") {
+                            strSmsRow += strTemp;
+                        } else if (attr.value() == "gc-message-sms-time") {
+                            strSmsRow += " <i>(" + strTemp + ")</i><br>";
+                        }
+                    }
+                }
+            }
+
+            mapTexts[id] = strSmsRow;
+        }
     }
     return (true);
 }//GVI_XMLJsonHandler::endElement
@@ -201,9 +273,9 @@ GVI_XMLJsonHandler::parseJSON (const QDateTime &dtUpdate, bool &bGotOld, int &nN
             // Pick up the text from the parsed HTML
             if (((GVIE_TextMessage == inboxEntry.Type) ||
                  (GVIE_Voicemail == inboxEntry.Type)) &&
-                (smsHandler.mapTexts.contains (inboxEntry.id)))
+                (mapTexts.contains (inboxEntry.id)))
             {
-                inboxEntry.strText = smsHandler.mapTexts[inboxEntry.id];
+                inboxEntry.strText = mapTexts[inboxEntry.id];
             }
 
             // emit the inbox element
@@ -232,5 +304,4 @@ void
 GVI_XMLJsonHandler::setEmitLog (bool enable)
 {
     bEmitLog = enable;
-    smsHandler.setEmitLog (bEmitLog);
 }//GVI_XMLJsonHandler::setEmitLog

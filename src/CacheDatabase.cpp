@@ -36,7 +36,9 @@
 // Encryption introduced into qgvdial. Only for username and password
 //#define GV_S_VALUE_DB_VER   "2011-04-19 23:51:00"
 // Started using settings ini
-#define GV_S_VALUE_DB_VER   "2011-05-03 11:03:50"
+//#define GV_S_VALUE_DB_VER   "2011-05-03 11:03:50"
+// SMS Text became rich text
+#define GV_S_VALUE_DB_VER   "2011-05-26 23:06:02"
 ////////////////////////////////////////////////////////////////////////////////
 // Started using versioning for the settings
 #define GV_SETTINGS_VER     "2011-05-13 16:33:50"
@@ -184,6 +186,10 @@ CacheDatabase::init ()
 
         // Insert the DB version number
         settings->setValue(GV_S_VAR_DB_VER, GV_S_VALUE_DB_VER);
+        settings->beginGroup (GV_UPDATES_TABLE);
+        settings->remove (GV_UP_CONTACTS);
+        settings->remove (GV_UP_INBOX);
+        settings->endGroup ();
     }
 
     arrTables = dbMain.tables ();

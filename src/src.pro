@@ -59,7 +59,6 @@ SOURCES  += ../src/main.cpp                 \
             ../src/RegNumberModel.cpp       \
             ../src/ContactsModel.cpp        \
             ../src/ContactDetailsModel.cpp  \
-            ../src/GVI_SMS_Handler.cpp      \
             ../src/DialContext.cpp          \
             ../src/ContactsParserObject.cpp
 
@@ -93,7 +92,6 @@ HEADERS  += ../src/global.h                 \
             ../src/RegNumberModel.h         \
             ../src/ContactsModel.h          \
             ../src/ContactDetailsModel.h    \
-            ../src/GVI_SMS_Handler.h        \
             ../src/DialContext.h            \
             ../src/ContactsParserObject.h
 

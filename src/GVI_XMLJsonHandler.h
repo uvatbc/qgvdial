@@ -2,7 +2,6 @@
 #define GVI_XMLJSONHANDLER_H
 
 #include "global.h"
-#include "GVI_SMS_Handler.h"
 
 // For some reason the symbian MOC doesn't like it if I don't include QObject
 // even though it is present in QtCore which is included in global.h
@@ -39,7 +38,7 @@ private:
     QString strHtml;
     qint32 nUsableMsgs;
 
-    GVI_SMS_Handler smsHandler;
+    QMap<QString,QString> mapTexts;
 
     bool bEmitLog;
 };
