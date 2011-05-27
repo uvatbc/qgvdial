@@ -51,7 +51,9 @@ typedef int ssize_t;
 #include <send_mosq.h>
 #include <util_mosq.h>
 
+#if !defined(WIN32)
 #include <sys/select.h>
+#endif
 
 #ifndef ECONNRESET
 #define ECONNRESET 104

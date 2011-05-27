@@ -65,8 +65,10 @@
 #undef WITH_SQLITE_UPGRADE
 #endif
 
-#if defined(Q_OS_SYMBIAN)
+#if defined(__SYMBIAN32__)
 #define IS_SYMBIAN 1
+#else
+#define IS_SYMBIAN 0
 #endif
 
 #endif // MQ_CONFIG_H
