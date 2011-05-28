@@ -122,6 +122,8 @@ OTHER_FILES  += ../src/winrsrc.rc           \
                 ../qml/RadioButton.qml      \
                 ../qml/Scrollbar.qml        \
                 ../qml/Settings.qml         \
+                ../qml/Tab.qml              \
+                ../qml/TabbedUI.qml         \
                 readme.txt
 
 # In Linux and maemo, add the telepathy related sources and headers. Also add Mosquitto based sources and headers.

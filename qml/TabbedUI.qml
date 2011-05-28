@@ -41,6 +41,7 @@ Rectangle {
     Rectangle {
         id: tabViewContainer
         width: parent.width
+        color: "black"
 
         anchors.top: tabBar.bottom
         anchors.bottom: parent.bottom
@@ -53,11 +54,6 @@ Rectangle {
 
     Component.onCompleted:
     {
-        // hide all the tab views
-        for(var i = 0; i < tabsModel.children.length; i++)
-        {
-            tabsModel.children[i].visible = false;
-        }
         // select the default tab index
         tabClicked(tabIndex);
     }
@@ -68,7 +64,7 @@ Rectangle {
         tabs.children[tabIndex].color = "transparent";
 
         // hide the currently selected tab view
-        tabsModel.children[tabIndex].visible = false;
+        tabsModel.children[tabIndex].state = '';
 
         // change the current tab index
         tabIndex = index;
@@ -77,7 +73,7 @@ Rectangle {
         tabs.children[tabIndex].color = "#30ffffff";
 
         // show the new tab view
-        tabsModel.children[tabIndex].visible = true;
+        tabsModel.children[tabIndex].state = "Visible";
     }
 
     Component {

@@ -22,8 +22,31 @@ Contact: yuvraaj@gmail.com
 import Qt 4.7
 
 Rectangle {
+    id: container
+
     // icon to be displayed in the tab
     property string icon
 
-    anchors.fill: parent
+    opacity: 0
+    anchors {
+        left: parent.left
+        right: parent.right
+        top: parent.top
+    }
+    height: 0
+
+    states: [
+        State {
+            name: "Visible"
+            PropertyChanges { target: container; opacity: 1 }
+            PropertyChanges { target: container; height: parent.height }
+        }
+    ]
+
+    transitions: [
+        Transition {
+            PropertyAnimation { target: container; property: "opacity"; easing: Easing.Linear }
+            PropertyAnimation { target: container; property: "height"; easing: Easing.OutElastic }
+        }
+    ]
 }
