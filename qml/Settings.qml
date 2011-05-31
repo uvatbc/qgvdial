@@ -181,10 +181,6 @@ Item {
                     newState: ""
                 }//ListElement (Refresh)
                 ListElement {
-                    text: "Hide window"
-                    newState: ""
-                }//ListElement (Hide window)
-                ListElement {
                     text: "About"
                     newState: "About"
                 }//ListElement (About)
@@ -209,16 +205,12 @@ Item {
                         }
                     } else if (text == "Refresh") {
                         container.sigRefresh();
-                    } else if (text == "Hide window") {
-                        container.sigHide();
                     }
                 }//onClicked
 
                 onPressHold: {
                     if (text == "Refresh") {
                         container.sigRefreshAll();
-                    } else if (text == "Hide window") {
-                        container.sigQuit();
                     }
                 }
             }//delegate (MyButton)

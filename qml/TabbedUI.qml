@@ -25,6 +25,8 @@ Rectangle {
     id: container
 
     signal longPress
+    signal sigHide
+    signal sigClose
 
     // height of the tab bar
     property int tabsHeight : 50
@@ -96,16 +98,14 @@ Rectangle {
 
             MouseArea {
                 anchors.fill: parent
-                onClicked: {
-                    tabClicked(index);
-                }
-                onPressAndHold: container.longPress();
+                onClicked: tabClicked(index);
             }
         }
     }//Component (tabBarItem)
 
     // the tab bar
     Rectangle {
+        id: tabBar
         height: tabsHeight
         width: parent.width
 
@@ -118,16 +118,49 @@ Rectangle {
             top: parent.top
         }
 
-        id: tabBar
-
         gradient: Gradient {
             GradientStop {position: 0.0; color: "#666666"}
             GradientStop {position: 1.0; color: "#000000"}
         }
 
+        Rectangle {
+            id: rectX
+            color: "black"
+            anchors.right: tabBar.right
+            width: tabBar.height
+            height: tabBar.height
+
+            Image {
+                id: imgClose
+                source: "close.png"
+                anchors.centerIn: parent
+                width: parent.width / 2
+                height: parent.height / 2
+                fillMode: Image.Stretch
+            }
+
+            MouseArea {
+                id: xMouseArea
+                anchors.fill: parent
+                onClicked: container.sigHide();
+                onPressAndHold: container.sigClose();
+            }
+
+            states: State {
+                name: "pressed"
+                when: xMouseArea.pressed
+                PropertyChanges { target: rectX; color: "orange" }
+            }
+        }//X button
+
         // place all the tabs in a row
         Row {
-            anchors.fill: parent
+            anchors {
+                left: tabBar.left
+                right: rectX.left
+                top: parent.top
+                bottom: parent.bottom
+            }
 
             id: tabs
 
@@ -136,6 +169,6 @@ Rectangle {
 
                 delegate: tabBarItem
             }
-        }
-    }
+        }// Row of tabs
+    }// Rectangle (tab bar)
 }

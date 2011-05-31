@@ -200,7 +200,8 @@ Rectangle {
             width: mainColumn.centralWidth
             height: mainColumn.centralHeight
 
-            onLongPress: main.sigHide();
+            onSigHide: main.sigHide();
+            onSigClose: main.sigQuit();
         }
     }//Item: Main column that has all the co-existent views
 
