@@ -126,16 +126,14 @@ OTHER_FILES  += ../src/winrsrc.rc           \
                 ../qml/TabbedUI.qml         \
                 readme.txt
 
-# In Linux and maemo, add the telepathy related sources and headers. Also add Mosquitto based sources and headers.
+# In Linux and maemo, add the telepathy related sources and headers.
 unix:!symbian {
     HEADERS  += ../src/TpObserver.h            \
                 ../src/TpCalloutInitiator.h    \
-                ../src/QGVDbusServer.h         \
-                ../src/MqClientThread.h
+                ../src/QGVDbusServer.h
     SOURCES  += ../src/TpObserver.cpp          \
                 ../src/TpCalloutInitiator.cpp  \
-                ../src/QGVDbusServer.cpp       \
-                ../src/MqClientThread.cpp
+                ../src/QGVDbusServer.cpp
 }
 
 # In desktop Linux, add the Skype client
@@ -152,16 +150,31 @@ win32 {
 # Resource file is for windows only - for the icon
     RC_FILE = ../src/winrsrc.rc
 
-# In desktop Windows, add the Skype client. Also add Mosquitto based sources and headers.
+# In desktop Windows, add the Skype client.
     HEADERS += ../src/SkypeWinClient.h             \
                ../src/SkypeObserver.h              \
-               ../src/DesktopSkypeCallInitiator.h  \
-               ../src/MqClientThread.h
+               ../src/DesktopSkypeCallInitiator.h
     SOURCES += ../src/SkypeWinClient.cpp           \
                ../src/SkypeObserver.cpp            \
-               ../src/DesktopSkypeCallInitiator.cpp \
-               ../src/MqClientThread.cpp
+               ../src/DesktopSkypeCallInitiator.cpp
 }
+
+############################## Mosquitto ##############################
+# Add mosquitto support sources to EVERYONE.
+    HEADERS  += ../src/MqClientThread.h
+    SOURCES  += ../src/MqClientThread.cpp
+
+symbian {
+# Add the mosquitto lib to symbian
+    include(../src/mqlib/mqlib.pri)
+}
+
+exists(./meego-build) {
+    message(Building for Meego!)
+# Add the mosquitto lib to symbian
+    include(../src/mqlib/mqlib.pri)
+}
+#######################################################################
 
 symbian {
     HEADERS  += ../src/SymbianCallInitiator.h          \
@@ -172,11 +185,6 @@ symbian {
                 ../src/SymbianCallInitiatorPrivate.cpp \
                 ../src/SymbianCallObserverPrivate.cpp  \
                 ../src/SymbianDTMFPrivate.cpp
-
-# Add the mosquitto lib to symbian
-    include(../src/mqlib/mqlib.pri)
-    HEADERS += ../src/MqClientThread.h
-    SOURCES += ../src/MqClientThread.cpp
 
 # The Symbian telephony stack library and the equivalent of openssl
     LIBS += -letel3rdparty -llibcrypto
