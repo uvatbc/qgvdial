@@ -17,6 +17,7 @@
         <file alias="people.svg">../icons/people.svg</file>
         <file alias="settings.svg">../icons/settings.svg</file>
         <file alias="close.png">../icons/close.png</file>
+        <file alias="search.png">../icons/search.png</file>
         <file alias="About.qml">../qml/About.qml</file>
         <file alias="ActionButtons.qml">../qml/ActionButtons.qml</file>
         <file alias="ComboBoxPhones.qml">../qml/ComboBoxPhones.qml</file>

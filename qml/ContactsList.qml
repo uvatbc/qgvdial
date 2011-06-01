@@ -109,21 +109,22 @@ Rectangle {
 
         Row {
             id: searchRow
-            height: lblSearch.height
+            height: (allContacts.height + allContacts.width) / 20
             width: parent.width
             spacing: 1
 
-            Text {
-                id: lblSearch
-                text: "?"
-                color: "white"
-                font.pixelSize: ((allContacts.height + allContacts.width) / 25)
+            Image {
+                id: imgSearch
+                source: "search.png"
+                height: searchRow.height
+                width: searchRow.height
+                fillMode: Image.PreserveAspectFit
             }
 
             MyTextEdit {
                 id: edSearch
-                width: parent.width - lblSearch.width - parent.spacing
-                pixelSize: lblSearch.font.pixelSize
+                width: parent.width - imgSearch.width - parent.spacing
+                pixelSize: searchRow.height - 6
                 text: ""
                 onSigTextChanged: container.sigSearchContacts(strText)
             }
