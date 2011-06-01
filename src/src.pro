@@ -169,7 +169,7 @@ symbian {
     include(../src/mqlib/mqlib.pri)
 }
 
-exists(./meego-build) {
+exists(../src/meego-build) {
     message(Building for Meego!)
 # Add the mosquitto lib to symbian
     include(../src/mqlib/mqlib.pri)
