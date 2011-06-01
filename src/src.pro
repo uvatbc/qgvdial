@@ -169,9 +169,8 @@ symbian {
     include(../src/mqlib/mqlib.pri)
 }
 
-exists(../src/meego-build) {
-    message(Building for Meego!)
-# Add the mosquitto lib to symbian
+exists(../src/mqlib-build) {
+    message(Forcible inclusion of mqlib!)
     include(../src/mqlib/mqlib.pri)
 }
 #######################################################################
