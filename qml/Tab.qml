@@ -45,8 +45,8 @@ Rectangle {
 
     transitions: [
         Transition {
-            PropertyAnimation { target: container; property: "opacity"; easing: Easing.Linear }
-            PropertyAnimation { target: container; property: "height"; easing: Easing.OutElastic }
+            PropertyAnimation { target: container; property: "opacity"; easing.type: Easing.Linear }
+            PropertyAnimation { target: container; property: "height"; easing.type: Easing.OutElastic }
         }
     ]
 }
