@@ -32,7 +32,7 @@ my $basedir = "./qgvdial-$qver";
 system("rm -rf qgvdial*");
 $cmd = "svn export $repo $basedir";
 system($cmd);
-system("cp $basedir/icons/qgv.png $basedir/src/qgvdial.png");
+system("cp $basedir/icons/qgv64.png $basedir/src/qgvdial.png");
 
 # Append the version to the pro file
 open(PRO_FILE, ">>$basedir/src/src.pro") || die "Cannot open pro file";
