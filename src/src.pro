@@ -232,7 +232,7 @@ maemo5 {
 
     DEFINES += DATADIR=\"$$DATADIR\" PKGDATADIR=\"$$PKGDATADIR\"
 
-    INSTALLS += target desktop icon dbusservice
+    INSTALLS += target desktop icon icon48 icon64 icon_scalable dbusservice
 
     target.path =$$BINDIR
 
@@ -241,6 +241,15 @@ maemo5 {
 
     icon.path = $$OPTDATADIR
     icon.files += qgvdial.png
+
+    icon48.path = $$DATADIR/icons/hicolor/48x48/hildon
+    icon48.files = ../icons/48/qgvdial.png
+
+    icon64.path = $$DATADIR/icons/hicolor/64x64/hildon
+    icon64.files = ../icons/64/qgvdial.png
+    
+    icon_scalable.path = $$DATADIR/icons/hicolor/scalable/hildon
+    icon_scalable.files = qgvdial.png
 
     dbusservice.path = $$DATADIR/dbus-1/services
     dbusservice.files += ../build-files/qgvdial.Call.service

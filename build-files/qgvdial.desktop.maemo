@@ -2,8 +2,8 @@
 Encoding=UTF-8
 Version=__QGVDIAL_VERSION__
 Type=Application
-Name=QGVDial
+Name=qgvdial
 Exec=/opt/qgvdial/bin/qgvdial
-Icon=/opt/qgvdial/share/qgvdial.png
+Icon=qgvdial
 X-HildonDesk-ShowInToolbar=true
 X-Osso-Type=application/x-executable

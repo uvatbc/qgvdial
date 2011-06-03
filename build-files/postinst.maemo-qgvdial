@@ -2,3 +2,5 @@
 chmod +x /opt/qgvdial/bin/qgvdial
 rm -f /home/user/.qgvdial/qgvdial.log
 rm -f /home/user/.gvdial.sqlite.db
+gtk-update-icon-cache
+
