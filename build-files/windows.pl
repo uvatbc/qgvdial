@@ -45,11 +45,6 @@ $cmd =~ s/\\/\\\\/g;
 $cmd = "cd qgvdial-$qver & perl build-files/version.pl __QTDIR__ $cmd";
 system($cmd);
 
-# Fix the QML files
-$cmd = "cd qgvdial-$qver & perl ./build-files/fixqml.pl ./qml";
-print "$cmd\n";
-system($cmd);
-
 # Compile it!
 $cmd = "cd qgvdial-$qver & qmake & make release";
 system($cmd);

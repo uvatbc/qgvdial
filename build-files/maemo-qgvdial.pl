@@ -52,7 +52,7 @@ print "$cmd\n";
 system($cmd);
 
 # Fix the QML files
-$cmd = "cd $basedir ; perl ./build-files/fixqml.pl ./qml";
+$cmd = "cd qgvdial-$qver/src & echo something>mqlib-build";
 print "$cmd\n";
 system($cmd);
 

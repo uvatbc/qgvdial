@@ -44,11 +44,6 @@ $cmd = "cd $basedir ; perl ./build-files/version.pl __QGVDIAL_VERSION__ $qver";
 print "$cmd\n";
 system($cmd);
 
-# Fix the QML files
-$cmd = "cd $basedir ; perl ./build-files/fixqml.pl ./qml";
-print "$cmd\n";
-system($cmd);
-
 # Do everything upto the preparation of the debian directory. Code is still not compiled.
 $cmd = "cd $basedir ; $mad qmake && echo y | $mad dh_make --createorig --single -e yuvraaj\@gmail.com -c lgpl && $mad qmake";
 system($cmd);
