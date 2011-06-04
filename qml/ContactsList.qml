@@ -119,6 +119,11 @@ Rectangle {
                 height: searchRow.height
                 width: searchRow.height
                 fillMode: Image.PreserveAspectFit
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: edSearch.text = ""
+                }
             }
 
             MyTextEdit {
