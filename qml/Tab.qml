@@ -27,26 +27,27 @@ Rectangle {
     // icon to be displayed in the tab
     property string icon
 
-    opacity: 0
     anchors {
         left: parent.left
         right: parent.right
-        top: parent.top
     }
-    height: 0
+    height: parent.height
+    y: parent.height
 
     states: [
         State {
             name: "Visible"
-            PropertyChanges { target: container; opacity: 1 }
-            PropertyChanges { target: container; height: parent.height }
+            PropertyChanges { target: container; y: 0 }
         }
     ]
 
     transitions: [
         Transition {
-            PropertyAnimation { target: container; property: "opacity"; easing.type: Easing.Linear }
-            PropertyAnimation { target: container; property: "height"; easing.type: Easing.OutElastic }
+            PropertyAnimation {
+                target: container; property: "y"
+                easing.type: Easing.OutBounce
+                duration: 800
+            }
         }
     ]
 }
