@@ -34,8 +34,6 @@ Rectangle {
     property variant rotationDelta: landscape? -90 : 0
 
     // initial state is portrait
-    property real baseWidth: landscape ? main.height : main.width
-    property real baseHeight: landscape ? main.width : main.height
     property string theNumber: ""
 
     Flow {

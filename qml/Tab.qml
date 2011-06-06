@@ -32,7 +32,7 @@ Rectangle {
         right: parent.right
     }
     height: parent.height
-    y: parent.height
+    y: parent.height + 5
 
     states: [
         State {
