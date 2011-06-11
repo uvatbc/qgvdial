@@ -34,12 +34,12 @@ unix:!symbian {
 
 PRECOMPILED_HEADER = ../src/global.h
 
-SOURCES  += main.cpp                        \
-            MainWindow.cpp                  \
-            OldSingletons.cpp               \
-            NotifyGVContactsTable.cpp       \
-            NotifyGVInbox.cpp               \
-            MqPublisher.cpp                 \
+SOURCES  += ../old/main.cpp                 \
+            ../old/MainWindow.cpp           \
+            ../src/Singletons.cpp           \
+            ../src/OsDependent.cpp          \
+            ../src/GVContactsTable.cpp      \
+            ../src/GVInbox.cpp              \
             ../src/GVAccess.cpp             \
             ../src/GVWebPage.cpp            \
             ../src/MobileWebPage.cpp        \
@@ -49,11 +49,11 @@ SOURCES  += main.cpp                        \
 
 
 HEADERS  += ../src/global.h                 \
-            MainWindow.h                    \
-            OldSingletons.h                 \
-            NotifyGVContactsTable.h         \
-            NotifyGVInbox.h                 \
-            MqPublisher.h                   \
+            ../old/MainWindow.h             \
+            ../src/Singletons.h             \
+            ../src/OsDependent.h            \
+            ../src/GVContactsTable.h        \
+            ../src/GVInbox.h                \
             ../src/GVAccess.h               \
             ../src/GVWebPage.h              \
             ../src/MobileWebPage.h          \
