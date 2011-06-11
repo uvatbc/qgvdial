@@ -167,6 +167,14 @@ private slots:
     //! Invoked when the call is completed on fallback
     void onFallbackDialout (bool bSuccess, void *v_ctx);
 
+    //! Invoked when the Inbox model is created
+    void onSetInboxModel(QAbstractItemModel *model);
+    //! Invoked when the Inbox selector is to be set
+    void onSetInboxSelector(const QString &strSelector);
+
+    //! Invoked when the contacts model is created
+    void onSetContactsModel(QAbstractItemModel *model);
+
 private:
     void initLogging ();
 

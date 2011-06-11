@@ -377,6 +377,18 @@ MainWindow::init ()
     QObject::connect (&oInbox, SIGNAL (status   (const QString &, int)),
                        this  , SLOT   (setStatus(const QString &, int)));
 
+    // Inbox Model creation
+    QObject::connect (&oInbox, SIGNAL (setInboxModel(QAbstractItemModel *)),
+                       this  , SLOT (onSetInboxModel(QAbstractItemModel *)));
+    // Inbox selector changes
+    QObject::connect (&oInbox, SIGNAL (setInboxSelector(const QString &)),
+                       this  , SLOT (onSetInboxSelector(const QString &)));
+
+    // Inbox Model creation
+    QObject::connect (
+        &oContacts, SIGNAL (setContactsModel(QAbstractItemModel *)),
+         this     , SLOT (onSetContactsModel(QAbstractItemModel *)));
+
     // Additional UI initializations:
     //@@UV: Need this for later
 //    ui->edNumber->setValidator (new PhoneNumberValidator (ui->edNumber));
@@ -779,7 +791,7 @@ MainWindow::initContacts ()
 {
     oContacts.setUserPass (strUser, strPass);
     oContacts.loginSuccess ();
-    oContacts.initModel (this);
+    oContacts.initModel ();
     oContacts.refreshContacts ();
 }//MainWindow::initContacts
 
@@ -794,7 +806,7 @@ void
 MainWindow::initInbox ()
 {
     oInbox.loginSuccess ();
-    oInbox.initModel (this);
+    oInbox.initModel ();
     oInbox.refresh ();
 }//MainWindow::initInbox
 
@@ -1748,3 +1760,38 @@ MainWindow::onFallbackDialout (bool bSuccess, void *v_ctx)
 
     ctx->deleteLater ();
 }//MainWindow::onFallbackDialout
+
+void
+MainWindow::onSetInboxModel(QAbstractItemModel *model)
+{
+    QDeclarativeContext *ctx = this->rootContext();
+    ctx->setContextProperty ("g_inboxModel", model);
+}//MainWindow::onSetInboxModel
+
+void
+MainWindow::onSetInboxSelector(const QString &strSelector)
+{
+    do { // Begin cleanup block (not a loop)
+        QObject *pRoot = this->rootObject ();
+        if (NULL == pRoot) {
+            qWarning ("Couldn't get root object in QML for InboxPage");
+            break;
+        }
+
+        QObject *pInbox = pRoot->findChild <QObject*> ("InboxPage");
+        if (NULL == pInbox) {
+            qWarning ("Could not get to InboxPage");
+            break;
+        }
+
+        QMetaObject::invokeMethod (pInbox, "setSelector",
+                                   Q_ARG (QVariant, QVariant(strSelector)));
+    } while (0); // End cleanup block (not a loop)
+}//MainWindow::onSetInboxSelector
+
+void
+MainWindow::onSetContactsModel(QAbstractItemModel *model)
+{
+    QDeclarativeContext *ctx = this->rootContext();
+    ctx->setContextProperty ("g_contactsModel", model);
+}//MainWindow::onSetContactsModel

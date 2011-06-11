@@ -53,15 +53,14 @@ GVContactsTable::deinitModel ()
 }//GVContactsTable::deinitModel
 
 void
-GVContactsTable::initModel (QDeclarativeView *pMainWindow)
+GVContactsTable::initModel ()
 {
     deinitModel ();
 
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     modelContacts = dbMain.newContactsModel ();
 
-    QDeclarativeContext *ctx = pMainWindow->rootContext();
-    ctx->setContextProperty ("g_contactsModel", modelContacts);
+    emit setContactsModel (modelContacts);
 
     while (modelContacts->canFetchMore ()) {
         modelContacts->fetchMore ();

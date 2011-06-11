@@ -49,10 +49,9 @@ GVInbox::deinitModel ()
 }//GVInbox::deinitModel
 
 void
-GVInbox::initModel (QDeclarativeView *pMainWindow)
+GVInbox::initModel ()
 {
     deinitModel ();
-    pParent = pMainWindow;
 
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     modelInbox = dbMain.newInboxModel ();
@@ -64,8 +63,8 @@ GVInbox::initModel (QDeclarativeView *pMainWindow)
         this->strSelectedMessages = "all";
     }
 
-    QDeclarativeContext *ctx = pMainWindow->rootContext();
-    ctx->setContextProperty ("g_inboxModel", modelInbox);
+    emit setInboxModel (modelInbox);
+
     prepView ();
 }//GVInbox::initModel
 
@@ -79,26 +78,10 @@ GVInbox::prepView ()
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     dbMain.putInboxSelector(this->strSelectedMessages);
 
-    do { // Begin cleanup block (not a loop)
-        QObject *pRoot = pParent->rootObject ();
-        if (NULL == pRoot) {
-            qWarning ("Couldn't get root object in QML for InboxPage");
-            break;
-        }
+    QString strSend = this->strSelectedMessages[0].toUpper()
+                    + this->strSelectedMessages.mid (1);
 
-        QObject *pInbox = pRoot->findChild <QObject*> ("InboxPage");
-        if (NULL == pInbox) {
-            qWarning ("Could not get to InboxPage");
-            break;
-        }
-
-        QString strSend = this->strSelectedMessages;
-        strSend = this->strSelectedMessages[0].toUpper()
-                + this->strSelectedMessages.mid (1);
-
-        QMetaObject::invokeMethod (pInbox, "setSelector",
-                                   Q_ARG (QVariant, QVariant(strSend)));
-    } while (0); // End cleanup block (not a loop)
+    emit setInboxSelector(strSend);
 }//GVInbox::prepView
 
 void

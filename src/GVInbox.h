@@ -23,7 +23,6 @@ Contact: yuvraaj@gmail.com
 #define __GVINBOX_H__
 
 #include "global.h"
-#include <QtDeclarative>
 
 // For some reason the symbian MOC doesn't like it if I don't include QObject
 // even though it is present in QtCore which is included in global.h
@@ -40,7 +39,7 @@ public:
     ~GVInbox(void);
 
     void deinitModel ();
-    void initModel (QDeclarativeView *pMainWindow);
+    void initModel ();
 
 signals:
     //! Status emitter for status bar
@@ -54,7 +53,14 @@ signals:
     void textANumber (const QString &strNumber,
                       const QString &strNameLink = QString ());
 
+    //! Emitted when we identify a voicemail link
     void retrieveVoicemail (const QString &strVmailLink);
+
+    //! Emitted when the Inbox AbstractModel is created
+    void setInboxModel(QAbstractItemModel *model);
+
+    //! Emitted when the Inbox selector is to be set
+    void setInboxSelector(const QString &strSelector);
 
 public slots:
     //! Invoked when the user requests a refresh
@@ -86,9 +92,6 @@ private:
 
     //! The inbox model
     InboxModel     *modelInbox;
-
-    //! The parent window (main window)
-    QDeclarativeView *pParent;
 };
 
 #endif //__GVINBOX_H__

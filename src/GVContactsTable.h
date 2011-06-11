@@ -23,7 +23,6 @@ Contact: yuvraaj@gmail.com
 #define __GVCONTACTSTABLE_H__
 
 #include "global.h"
-#include <QtDeclarative>
 
 // For some reason the symbian MOC doesn't like it if I don't include QObject
 // even though it is present in QtCore which is included in global.h
@@ -40,7 +39,7 @@ public:
     ~GVContactsTable ();
 
     void deinitModel ();
-    void initModel (QDeclarativeView *pMainWindow);
+    void initModel ();
 
     //! Use this to set the username and password for the contacts API login
     void setUserPass (const QString &strU, const QString &strP);
@@ -56,6 +55,9 @@ signals:
 
     //! Emitted when all contacts are done
     void allContacts (bool bOk);
+
+    //! Emitted when the contacts model is created
+    void setContactsModel(QAbstractItemModel *model);
 
 public slots:
     void refreshAllContacts ();
