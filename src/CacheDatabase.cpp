@@ -59,7 +59,9 @@ Contact: yuvraaj@gmail.com
 // Started using settings ini
 //#define GV_S_VALUE_DB_VER   "2011-05-03 11:03:50"
 // SMS Text became rich text
-#define GV_S_VALUE_DB_VER   "2011-05-27 14:14:40"
+//#define GV_S_VALUE_DB_VER   "2011-05-27 14:14:40"
+// Added photo link to Contacts
+#define GV_S_VALUE_DB_VER   "2011-06-14 23:52:34"
 ////////////////////////////////////////////////////////////////////////////////
 // Started using versioning for the settings
 #define GV_SETTINGS_VER     "2011-05-13 16:33:50"
@@ -68,6 +70,7 @@ Contact: yuvraaj@gmail.com
 #define GV_C_ID             "id"
 #define GV_C_NAME           "name"
 #define GV_C_NOTES          "notes"
+#define GV_C_PICLINK        "piclink"
 ////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////// GV links table /////////////////////////////////
 #define GV_LINKS_TABLE      "gvlinks"
@@ -218,9 +221,10 @@ CacheDatabase::init ()
     if (!arrTables.contains (GV_CONTACTS_TABLE))
     {
         query.exec ("CREATE TABLE " GV_CONTACTS_TABLE " "
-                    "(" GV_C_NAME  " varchar, "
-                        GV_C_ID    " varchar, "
-                        GV_C_NOTES " varchar)");
+                    "(" GV_C_NAME    " varchar, "
+                        GV_C_ID      " varchar, "
+                        GV_C_NOTES   " varchar, "
+                        GV_C_PICLINK " varchar)");
     }
 
     // Ensure that the cached links table is present. If not, create it.
@@ -290,7 +294,8 @@ void
 CacheDatabase::refreshContactsModel (ContactsModel *modelContacts,
                                      const QString &query)
 {
-    QString strQ = "SELECT " GV_C_ID "," GV_C_NAME "," GV_C_NOTES " "
+    QString strQ = "SELECT " GV_C_ID "," GV_C_NAME "," GV_C_NOTES ","
+                             GV_C_PICLINK " "
                    "FROM " GV_CONTACTS_TABLE " ";
     if (!query.isEmpty ()) {
         QString scrubQuery = query;
@@ -300,9 +305,6 @@ CacheDatabase::refreshContactsModel (ContactsModel *modelContacts,
     strQ += " ORDER BY " GV_C_NAME;
 
     modelContacts->setQuery (strQ, dbMain);
-    modelContacts->setHeaderData (0, Qt::Horizontal, QObject::tr("Id"));
-    modelContacts->setHeaderData (1, Qt::Horizontal, QObject::tr("Name"));
-    modelContacts->setHeaderData (2, Qt::Horizontal, QObject::tr("Notes"));
 }//CacheDatabase::refreshContactsModel
 
 bool
@@ -471,15 +473,18 @@ CacheDatabase::insertContact (const ContactInfo &info)
         scrubInfo.strId.replace ("'", "''");
         scrubInfo.strNotes.replace ("'", "''");
         scrubInfo.strTitle.replace ("'", "''");
+        scrubInfo.hrefPhoto.replace ("'", "''");
 
         QString strQ = QString ("INSERT INTO " GV_CONTACTS_TABLE ""
                                 "(" GV_C_ID
                                 "," GV_C_NAME
                                 "," GV_C_NOTES
-                                ") VALUES ('%1', '%2', '%3')")
-                       .arg (scrubInfo.strId)
-                       .arg (scrubInfo.strTitle)
-                       .arg (scrubInfo.strNotes);
+                                "," GV_C_PICLINK
+                                ") VALUES ('%1', '%2', '%3', '%4')")
+                        .arg (scrubInfo.strId)
+                        .arg (scrubInfo.strTitle)
+                        .arg (scrubInfo.strNotes)
+                        .arg (scrubInfo.hrefPhoto);
         rv = query.exec (strQ);
         if (!rv) {
             qWarning () << "Failed to insert row into contacts table. ID:["
@@ -589,7 +594,7 @@ CacheDatabase::getContactFromLink (ContactInfo &info)
     scrubId.replace ("'", "''");
 
     QString strQ;
-    strQ = QString ("SELECT " GV_C_NAME ", " GV_C_NOTES " "
+    strQ = QString ("SELECT " GV_C_NAME ", " GV_C_NOTES ", " GV_C_PICLINK " "
                     "FROM " GV_CONTACTS_TABLE " WHERE " GV_C_ID "='%1'")
            .arg (scrubId);
     query.exec (strQ);
@@ -598,8 +603,9 @@ CacheDatabase::getContactFromLink (ContactInfo &info)
                  "I thought we confirmed this at the top of the function!!");
         return false;
     }
-    info.strTitle = query.value(0).toString ();
-    info.strNotes = query.value(1).toString ();
+    info.strTitle  = query.value(0).toString ();
+    info.strNotes  = query.value(1).toString ();
+    info.hrefPhoto = query.value(2).toString ();
 
     strQ = QString ("SELECT " GV_L_TYPE ", " GV_L_DATA
                     " FROM " GV_LINKS_TABLE " WHERE "

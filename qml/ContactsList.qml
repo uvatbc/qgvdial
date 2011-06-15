@@ -115,7 +115,7 @@ Rectangle {
 
             Image {
                 id: imgSearch
-                source: "search.png"
+                source: (edSearch.text.length == 0 ? "search.png" : "close.png")
                 height: searchRow.height
                 width: searchRow.height
                 fillMode: Image.PreserveAspectFit

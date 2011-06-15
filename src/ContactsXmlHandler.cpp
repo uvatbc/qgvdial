@@ -41,8 +41,6 @@ ContactsXmlHandler::startElement (const QString        & /*namespaceURI*/,
                                   const QString        &qName       ,
                                   const QXmlAttributes &atts        )
 {
-    QString msg;
-
     do // Begin cleanup block (not a loop)
     {
         strCurrentChars.clear ();
@@ -82,6 +80,13 @@ ContactsXmlHandler::startElement (const QString        & /*namespaceURI*/,
         if (qName == "gd:deleted")
         {
             currInfo.bDeleted = true;
+        }
+
+        if (qName == "link") {
+            QString rel = atts.value ("rel");
+            if (rel.endsWith ("photo")) {
+                currInfo.hrefPhoto = atts.value ("href");
+            }
         }
     } while (0); // End cleanup block (not a loop)
     return (true);

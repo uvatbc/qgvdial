@@ -1,2 +1,3 @@
-  * Minor UI improvement: Dialpad had a blue line at the bottom edge.
+  * Minor UI improvement: Contact search button changes to X when there is text to indicate that it can be cleared in one shot.
+  * Added photo link to contacts table
 

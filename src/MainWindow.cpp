@@ -167,12 +167,14 @@ MainWindow::log (const QString &strText, int level /*= 10*/)
 void
 MainWindow::onCleanupLogsArray()
 {
+    int timeout = 3 * 1000;
     do { // Begin cleanup block (not a loop)
         QMutexLocker locker(&logMutex);
         if (!bKickLocksTimer) {
             break;
         }
         bKickLocksTimer = false;
+        timeout = 1 * 1000;
 
         while (arrLogMsgs.size () > 50) {
             arrLogMsgs.removeLast ();
@@ -182,7 +184,7 @@ MainWindow::onCleanupLogsArray()
         ctx->setContextProperty ("g_logModel", QVariant::fromValue(arrLogMsgs));
     } while (0); // End cleanup block (not a loop)
 
-    logsTimer.start (3 * 1000);
+    logsTimer.start (timeout);
 }//MainWindow::onCleanupLogsArray
 
 /** Status update function

@@ -197,6 +197,9 @@ struct ContactInfo
     //! The notes that the user may have added to the contact
     QString         strNotes;
 
+    //! Link to this contact's photo
+    QString         hrefPhoto;
+
     //! Is this contact deleted?
     bool            bDeleted;
 
@@ -207,6 +210,7 @@ struct ContactInfo
         strTitle.clear ();
         arrPhones.clear ();
         strNotes.clear ();
+        hrefPhoto.clear ();
         bDeleted = false;
         selected = 0;
     }

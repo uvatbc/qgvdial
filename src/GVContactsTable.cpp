@@ -301,7 +301,7 @@ GVContactsTable::onGotContacts (QNetworkReply *reply)
         }
 
 #if 0
-        QFile temp("dump.txt");
+        QFile temp("contacts.txt");
         temp.open (QIODevice::ReadWrite);
         temp.write (byData);
         temp.close ();
@@ -341,13 +341,10 @@ GVContactsTable::gotOneContact (const ContactInfo &contactInfo)
     dbMain.setQuickAndDirty();
 
     QMutexLocker locker(&mutex);
-    if (contactInfo.bDeleted)
-    {
+    if (contactInfo.bDeleted) {
         qDebug() << "Delete contact " << contactInfo.strTitle;
         modelContacts->deleteContact (contactInfo);
-    }
-    else    // add or modify
-    {
+    } else {   // add or modify
         qDebug() << "Insert contact " << contactInfo.strTitle;
         modelContacts->insertContact (contactInfo);
     }
