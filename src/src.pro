@@ -164,11 +164,6 @@ win32 {
     HEADERS  += ../src/MqClientThread.h
     SOURCES  += ../src/MqClientThread.cpp
 
-symbian {
-# Add the mosquitto lib to symbian
-    include(../src/mqlib/mqlib.pri)
-}
-
 exists(../src/mqlib-build) {
     message(Forcible inclusion of mqlib!)
     include(../src/mqlib/mqlib.pri)
