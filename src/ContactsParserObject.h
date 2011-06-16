@@ -33,7 +33,8 @@ class ContactsParserObject : public QObject
     Q_OBJECT
 
 public:
-    ContactsParserObject(QByteArray data, QObject *parent = 0);
+    ContactsParserObject(QByteArray data, QNetworkAccessManager &mgr,
+                         QObject *parent = 0);
     void setEmitLog (bool enable = true);
 
 signals:
@@ -55,7 +56,32 @@ private:
 
     bool        bEmitLog;
 
-    int         refCount;
+    QNetworkAccessManager &nwMgr;
+
+    QAtomicInt  refCount;
+};
+
+class PhotoReplyTracker : public QObject
+{
+    Q_OBJECT
+
+public:
+    PhotoReplyTracker(const ContactInfo &ci,
+                            QNetworkReply *r,
+                            QObject *parent = NULL);
+
+signals:
+    // Emitted when the photo is retrieved from the contact
+    void gotOneContact (const ContactInfo &contactInfo);
+
+public slots:
+    void onFinished();
+
+private:
+    QNetworkReply  *reply;
+    QString         hrefLink;
+
+    ContactInfo     contactInfo;
 };
 
 #endif // CONTACTSPARSEROBJECT_H

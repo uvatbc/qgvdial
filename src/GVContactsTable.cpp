@@ -310,7 +310,7 @@ GVContactsTable::onGotContacts (QNetworkReply *reply)
         dbMain.setLastContactUpdate (currDT);
 
         QThread *workerThread = new QThread(this);
-        ContactsParserObject *pObj = new ContactsParserObject(byData);
+        ContactsParserObject *pObj = new ContactsParserObject(byData, nwMgr);
         pObj->moveToThread (workerThread);
         QObject::connect (workerThread, SIGNAL(started()),
                           pObj        , SLOT  (doWork()));
@@ -345,12 +345,6 @@ GVContactsTable::gotOneContact (const ContactInfo &contactInfo)
     } else {   // add or modify
         qDebug() << "Insert contact " << contactInfo.strTitle;
         modelContacts->insertContact (contactInfo);
-
-        QNetworkRequest request = createRequest (contactInfo.hrefPhoto);
-        QNetworkReply *reply = nwMgr.get (request);
-        PhotoReplyTracker *tracker =
-        new PhotoReplyTracker(contactInfo.hrefPhoto, reply, this);
-        connect (reply, SIGNAL(finished()), tracker, SLOT(onFinished()));
     }
 
 }//GVContactsTable::gotOneContact
@@ -370,48 +364,3 @@ GVContactsTable::onSearchQueryChanged (const QString &query)
 {
     modelContacts->refresh (query);
 }//GVContactsTable::onSearchQuerychanged
-
-PhotoReplyTracker::PhotoReplyTracker(const QString &strLink, QNetworkReply *r,
-                                           QObject *parent /*= NULL*/)
-: QObject(parent)
-, reply(r)
-, hrefLink (strLink)
-{
-}//PhotoReplyTracker::PhotoReplyTracker
-
-void
-PhotoReplyTracker::onFinished()
-{
-    QByteArray ba = reply->readAll ();
-    do { // Begin cleanup block (not a loop)
-        if (QNetworkReply::NoError != reply->error ()) {
-            qDebug() << "Error in photo nw response:" << (int)reply->error();
-            break;
-        }
-
-        if (0 == ba.length ()) {
-            qDebug("Zero length response");
-            break;
-        }
-
-        QString strTemplate = QDir::tempPath ()
-                            + QDir::separator ()
-                            + "qgv_XXXXXX.tmp.jpg";
-        QTemporaryFile tempFile (strTemplate);
-        if (!tempFile.open ()) {
-            qWarning ("Failed to get a temp file name");
-            break;
-        }
-
-        qDebug() << "Temp photo file =" << tempFile.fileName ();
-
-        tempFile.setAutoRemove (false);
-        tempFile.write (ba);
-
-        CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-        dbMain.putTempFile (hrefLink, tempFile.fileName ());
-    } while (0); // End cleanup block (not a loop)
-
-    reply->deleteLater ();
-    this->deleteLater ();
-}//PhotoReplyTracker::onFinished

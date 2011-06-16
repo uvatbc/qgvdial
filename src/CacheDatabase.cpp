@@ -407,6 +407,25 @@ CacheDatabase::insertContact (const ContactInfo &info)
         }
 
         rv = putContactInfo (info);
+        if (!rv) {
+            qWarning () << "Failed to insert contact info into contacts table. ID:["
+                        << info.strId
+                        << "] name=["
+                        << info.strTitle
+                        << "]";
+            break;
+        }
+
+        rv = putTempFile (info.hrefPhoto, info.strPhotoPath);
+        if (!rv) {
+            qWarning () << "Failed to insert photo into contacts table. ID:["
+                        << info.strId
+                        << "] name=["
+                        << info.strTitle
+                        << "]";
+            break;
+        }
+
     } while (0); // End cleanup block (not a loop)
 
     return (rv);
