@@ -78,6 +78,8 @@ private slots:
     void onContactsParsed(bool rv);
 
 private:
+    QNetworkRequest createRequest(QString strUrl);
+
     QNetworkReply *
     postRequest (QString         strUrl,
                  QStringPairList arrPairs,
@@ -111,6 +113,22 @@ private:
 
     //! Is the contacts refresh an update process?
     bool            bRefreshIsUpdate;
+};
+
+class PhotoReplyTracker : public QObject
+{
+    Q_OBJECT
+
+public:
+    PhotoReplyTracker(const QString &strLink, QNetworkReply *r,
+                            QObject *parent = NULL);
+
+public slots:
+    void onFinished();
+
+private:
+    QNetworkReply *reply;
+    QString        hrefLink;
 };
 
 #endif // __GVCONTACTSTABLE_H__

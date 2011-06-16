@@ -199,6 +199,8 @@ struct ContactInfo
 
     //! Link to this contact's photo
     QString         hrefPhoto;
+    //! Path to the temp file that has this contacts photo
+    QString         strPhotoPath;
 
     //! Is this contact deleted?
     bool            bDeleted;
@@ -211,6 +213,7 @@ struct ContactInfo
         arrPhones.clear ();
         strNotes.clear ();
         hrefPhoto.clear ();
+        strPhotoPath.clear();
         bDeleted = false;
         selected = 0;
     }

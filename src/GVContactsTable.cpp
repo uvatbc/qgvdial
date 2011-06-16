@@ -67,6 +67,23 @@ GVContactsTable::initModel ()
     }
 }//GVContactsTable::initModel
 
+QNetworkRequest
+GVContactsTable::createRequest(QString strUrl)
+{
+    QUrl url (strUrl);
+    QNetworkRequest request(url);
+    request.setHeader (QNetworkRequest::ContentTypeHeader,
+                       "application/x-www-form-urlencoded");
+    if (0 != strGoogleAuth.size ())
+    {
+        QByteArray byAuth = QString("GoogleLogin auth=%1")
+                                    .arg(strGoogleAuth).toAscii ();
+        request.setRawHeader ("Authorization", byAuth);
+    }
+
+    return request;
+}//GVContactsTable::createRequest
+
 QNetworkReply *
 GVContactsTable::postRequest (QString         strUrl,
                               QStringPairList arrPairs,
@@ -82,16 +99,7 @@ GVContactsTable::postRequest (QString         strUrl,
     }
     QString strParams = arrParams.join ("&");
 
-    QUrl url (strUrl);
-    QNetworkRequest request(url);
-    request.setHeader (QNetworkRequest::ContentTypeHeader,
-                       "application/x-www-form-urlencoded");
-    if (0 != strGoogleAuth.size ())
-    {
-        QByteArray byAuth = QString("GoogleLogin auth=%1")
-                                    .arg(strGoogleAuth).toAscii ();
-        request.setRawHeader ("Authorization", byAuth);
-    }
+    QNetworkRequest request = createRequest (strUrl);
     QByteArray byPostData = strParams.toAscii ();
 
     QObject::connect (&nwMgr   , SIGNAL (finished (QNetworkReply *)),
@@ -105,17 +113,7 @@ GVContactsTable::getRequest (QString         strUrl,
                              QObject        *receiver,
                              const char     *method)
 {
-    QUrl url (strUrl);
-    QNetworkRequest request(url);
-    request.setHeader (QNetworkRequest::ContentTypeHeader,
-                       "application/x-www-form-urlencoded");
-    if (0 != strGoogleAuth.size ())
-    {
-        QByteArray byAuth = QString("GoogleLogin auth=%1")
-                                    .arg(strGoogleAuth).toAscii ();
-        request.setRawHeader ("Authorization", byAuth);
-    }
-
+    QNetworkRequest request = createRequest (strUrl);
     QObject::connect (&nwMgr   , SIGNAL (finished (QNetworkReply *)),
                        receiver, method);
     QNetworkReply *reply = nwMgr.get (request);
@@ -347,6 +345,12 @@ GVContactsTable::gotOneContact (const ContactInfo &contactInfo)
     } else {   // add or modify
         qDebug() << "Insert contact " << contactInfo.strTitle;
         modelContacts->insertContact (contactInfo);
+
+        QNetworkRequest request = createRequest (contactInfo.hrefPhoto);
+        QNetworkReply *reply = nwMgr.get (request);
+        PhotoReplyTracker *tracker =
+        new PhotoReplyTracker(contactInfo.hrefPhoto, reply, this);
+        connect (reply, SIGNAL(finished()), tracker, SLOT(onFinished()));
     }
 
 }//GVContactsTable::gotOneContact
@@ -366,3 +370,48 @@ GVContactsTable::onSearchQueryChanged (const QString &query)
 {
     modelContacts->refresh (query);
 }//GVContactsTable::onSearchQuerychanged
+
+PhotoReplyTracker::PhotoReplyTracker(const QString &strLink, QNetworkReply *r,
+                                           QObject *parent /*= NULL*/)
+: QObject(parent)
+, reply(r)
+, hrefLink (strLink)
+{
+}//PhotoReplyTracker::PhotoReplyTracker
+
+void
+PhotoReplyTracker::onFinished()
+{
+    QByteArray ba = reply->readAll ();
+    do { // Begin cleanup block (not a loop)
+        if (QNetworkReply::NoError != reply->error ()) {
+            qDebug() << "Error in photo nw response:" << (int)reply->error();
+            break;
+        }
+
+        if (0 == ba.length ()) {
+            qDebug("Zero length response");
+            break;
+        }
+
+        QString strTemplate = QDir::tempPath ()
+                            + QDir::separator ()
+                            + "qgv_XXXXXX.tmp.jpg";
+        QTemporaryFile tempFile (strTemplate);
+        if (!tempFile.open ()) {
+            qWarning ("Failed to get a temp file name");
+            break;
+        }
+
+        qDebug() << "Temp photo file =" << tempFile.fileName ();
+
+        tempFile.setAutoRemove (false);
+        tempFile.write (ba);
+
+        CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+        dbMain.putTempFile (hrefLink, tempFile.fileName ());
+    } while (0); // End cleanup block (not a loop)
+
+    reply->deleteLater ();
+    this->deleteLater ();
+}//PhotoReplyTracker::onFinished

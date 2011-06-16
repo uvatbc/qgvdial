@@ -121,9 +121,15 @@ public:
     bool setGvPin (bool bEnable, const QString &pin);
     bool getGvPin (bool &bEnable, QString &pin);
 
+    // Insert temp file and it's link
+    bool putTempFile(const QString &strLink, const QString &strPath);
+    bool getTempFile(const QString &strLink, QString &strPath);
+
 private:
     bool putContactInfo (const ContactInfo &info);
     bool deleteContactInfo (const QString &strId);
+
+    void clean_temp_files(quint64 howmany);
 
 signals:
     void status(const QString &strText, int timeout = 2000);

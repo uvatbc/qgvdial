@@ -103,6 +103,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CacheDatabase.h" />
+    <ClInclude Include="CacheDatabase_int.h" />
     <ClInclude Include="CallInitiatorFactory.h" />
     <ClInclude Include="CalloutInitiator.h" />
     <ClInclude Include="CaptchaWidget.h" />

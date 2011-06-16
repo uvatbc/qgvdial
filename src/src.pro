@@ -68,6 +68,7 @@ HEADERS  += ../src/global.h                 \
             ../src/MainWindow.h             \
             ../src/Singletons.h             \
             ../src/CacheDatabase.h          \
+            ../src/CacheDatabase_int.h      \
             ../src/OsDependent.h            \
             ../src/SkypeClientFactory.h     \
             ../src/SkypeClient.h            \

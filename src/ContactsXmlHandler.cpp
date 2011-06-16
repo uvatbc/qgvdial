@@ -152,6 +152,8 @@ ContactsXmlHandler::endElement (const QString & /*namespaceURI*/,
 #endif
 
         countUsableContacts ++;
+
+        currInfo.hrefPhoto.replace ("%40", "@");
         emit oneContact (currInfo);
     } while (0); // End cleanup block (not a loop)
     return (true);

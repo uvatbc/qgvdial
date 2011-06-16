@@ -25,108 +25,7 @@ Contact: yuvraaj@gmail.com
 #include "InboxModel.h"
 #include "Singletons.h"
 
-#define QGVDIAL_DB_NAME     "qgvdial.sqlite.db"
-#define QGVDIAL_INI_NAME    "qgvdial.ini"
-
-//////////////////////////////// Settings table ////////////////////////////////
-#define GV_S_VAR_USER           "user"
-#define GV_S_VAR_PASS           "password"
-#define GV_S_VAR_CALLBACK       "callback"
-#define GV_S_VAR_INBOX_SEL      "inbox_sel"
-#define GV_S_VAR_PIN            "gvpin"
-#define GV_S_VAR_PIN_ENABLE     "gvpin_enable"
-#define GV_S_VAR_DB_VER         "db_ver"
-#define GV_S_VAR_VER            "settings_ver"
-////////////////////////////////////////////////////////////////////////////////
-// Started using Google Contacts API
-// #define GV_S_VALUE_DB_VER   "2010-08-03 11:08:00"
-// Registered numbers now include the phone type.
-// #define GV_S_VALUE_DB_VER   "2010-08-07 13:48:26"
-// All "last updated" fields moved out of settings table into updates table
-// #define GV_S_VALUE_DB_VER   "2010-08-13 15:24:15"
-// Full text of the sms is now stored in the inbox table.
-//#define GV_S_VALUE_DB_VER   "2010-12-30 10:30:03"
-// Mosquitto settings changed.
-//#define GV_S_VALUE_DB_VER   "2011-02-28 23:41:03"
-//Stupidity
-//#define GV_S_VALUE_DB_VER   "2011-03-09 14:26:25"
-// Added note to inbox and contacts
-//#define GV_S_VALUE_DB_VER   "2011-04-04 16:30:00"
-// Voicemail now has transcription
-//#define GV_S_VALUE_DB_VER   "2011-04-08 17:30:00"
-// Encryption introduced into qgvdial. Only for username and password
-//#define GV_S_VALUE_DB_VER   "2011-04-19 23:51:00"
-// Started using settings ini
-//#define GV_S_VALUE_DB_VER   "2011-05-03 11:03:50"
-// SMS Text became rich text
-//#define GV_S_VALUE_DB_VER   "2011-05-27 14:14:40"
-// Added photo link to Contacts
-#define GV_S_VALUE_DB_VER   "2011-06-14 23:52:34"
-////////////////////////////////////////////////////////////////////////////////
-// Started using versioning for the settings
-#define GV_SETTINGS_VER     "2011-05-13 16:33:50"
-////////////////////////////// GV Contacts table ///////////////////////////////
-#define GV_CONTACTS_TABLE   "gvcontacts"
-#define GV_C_ID             "id"
-#define GV_C_NAME           "name"
-#define GV_C_NOTES          "notes"
-#define GV_C_PICLINK        "piclink"
-////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////// GV links table /////////////////////////////////
-#define GV_LINKS_TABLE      "gvlinks"
-#define GV_L_LINK           "link"
-#define GV_L_TYPE           "data_type"
-#define GV_L_DATA           "data"
-
-#define GV_L_TYPE_NUMBER    "contact number"
-////////////////////////////////////////////////////////////////////////////////
-///////////////////////// GV registered numbers table //////////////////////////
-#define GV_REG_NUMS_TABLE   "gvregnumbers"
-#define GV_RN_NAME          "name"
-#define GV_RN_NUM           "number"
-#define GV_RN_TYPE          "type"
-////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////// GV inbox table ////////////////////////////////
-#define GV_INBOX_TABLE      "gvinbox"
-#define GV_IN_ID            "id"
-#define GV_IN_TYPE          "type"          // voicemail,missed,etc.
-#define GV_IN_ATTIME        "happened_at"
-#define GV_IN_DISPNUM       "display_number"
-#define GV_IN_PHONE         "number"
-#define GV_IN_FLAGS         "flags"         // read, starred, etc.
-#define GV_IN_SMSTEXT       "smstext"       // Full text of the SMS
-#define GV_IN_NOTE          "note"          // Note associated with this entry
-////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////// GV updates table ///////////////////////////////
-#define GV_UPDATES_TABLE    "gvupdates"
-#define GV_UP_WHAT          "update_what"
-#define GV_UP_WHEN          "updated_when"
-
-#define UPDATE_DATE_FORMAT "yyyy-MM-dd hh:mm:ss"
-#define UPDATE_DATE_REGEXP "(\\d{4})-(\\d{2})-(\\d{2}) (\\d{2}):(\\d{2}):(\\d{2})"
-
-#define GV_UP_CONTACTS      "contacts"
-#define GV_UP_INBOX         "inbox"
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////// GV proxy information table //////////////////////////
-#define GV_PROXY_TABLE      "proxy_information"
-#define GV_P_FLAGS          "flags"
-#define GV_P_HOST           "host"
-#define GV_P_PORT           "port"
-#define GV_P_USER           "user"
-#define GV_P_PASS           "pass"
-
-#define GV_P_F_ENABLE       (1<<0)
-#define GV_P_F_USE_SYSTEM   (1<<1)
-#define GV_P_F_NEEDS_AUTH   (1<<2)
-////////////////////////////////////////////////////////////////////////////////
-/////////////////////////// Mosquitto settings table ///////////////////////////
-#define GV_MQ_TABLE         "mosquitto_settings"
-#define GV_MQ_ENABLED       "enabled"
-#define GV_MQ_HOST          "host"
-#define GV_MQ_PORT          "port"
-#define GV_MQ_TOPIC         "topic"
-////////////////////////////////////////////////////////////////////////////////
+#include "CacheDatabase_int.h"
 
 CacheDatabase::CacheDatabase(const QSqlDatabase & other, QObject *parent)
 : QObject (parent)
@@ -199,6 +98,8 @@ CacheDatabase::init ()
         settings->setValue (GV_S_VAR_VER, GV_SETTINGS_VER);
     }
     if (bBlowAway) {
+        clean_temp_files ((quint64)-1);
+
         // Drop all tables!
         arrTables = dbMain.tables ();
         foreach (QString strTable, arrTables) {
@@ -257,6 +158,15 @@ CacheDatabase::init ()
                         GV_IN_FLAGS     " integer, "
                         GV_IN_SMSTEXT   " varchar, "
                         GV_IN_NOTE      " varchar)");
+    }
+
+    // Ensure that the inbox table is present. If not, create it.
+    if (!arrTables.contains (GV_TEMP_TABLE))
+    {
+        query.exec ("CREATE TABLE " GV_TEMP_TABLE " "
+                    "(" GV_TT_CTIME " varchar, "
+                        GV_TT_LINK  " varchar, "
+                        GV_TT_PATH  " varchar)");
     }
 }//CacheDatabase::init
 
@@ -1077,3 +987,87 @@ CacheDatabase::getGvPin (bool &bEnable, QString &pin)
 
     return (true);
 }//CacheDatabase::getGvPin
+
+void
+CacheDatabase::clean_temp_files(quint64 howmany)
+{
+    QMap <QString, QString> mapLinkPath;
+    int count;
+    QSqlQuery query(dbMain);
+    query.setForwardOnly (true);
+
+    while (0 != howmany) {
+        mapLinkPath.clear ();
+
+        query.exec ("SELECT " GV_TT_LINK "," GV_TT_PATH " FROM " GV_TEMP_TABLE
+                    " ORDER BY " GV_TT_CTIME);
+        count = 10 > howmany ? howmany : 10;
+        howmany -= count;
+        while (query.next () && (0 != count)) {
+            mapLinkPath[query.value(0).toString()] = query.value(1).toString();
+            count--;
+        }
+
+        QMap<QString, QString>::Iterator i = mapLinkPath.begin ();
+        while (i != mapLinkPath.end ()) {
+            query.exec(QString("DELETE FROM " GV_TEMP_TABLE " WHERE "
+                               GV_TT_LINK "='%1'").arg(i.key()));
+            QFile::remove (i.value());
+            i++;
+        }
+
+        if (0 != count) {
+            qDebug("Clean up temp files cut short because we got less records "
+                   "than expected");
+            break;
+        }
+    }
+}//CacheDatabase::clean_temp_files
+
+bool
+CacheDatabase::putTempFile(const QString &strLink, const QString &strPath)
+{
+    bool rv = false;
+    QSqlQuery query(dbMain);
+    query.setForwardOnly (true);
+
+    QString scrubLink = strLink;
+    QString scrubPath = strPath;
+    scrubLink.replace ("'", "''");
+    scrubPath.replace ("'", "''");
+
+    QString strOldPath;
+    if (getTempFile (strLink, strOldPath)) {
+        QFile::remove (strOldPath);
+        query.exec (QString("DELETE FROM " GV_TEMP_TABLE
+                            " WHERE " GV_TT_LINK "='%1'").arg(scrubLink));
+    }
+
+    QString strCTime = QDateTime::currentDateTime().toString (Qt::ISODate);
+    query.exec (QString("INSERT INTO " GV_TEMP_TABLE " "
+                        "("GV_TT_CTIME","GV_TT_LINK","GV_TT_PATH") VALUES "
+                        "('%1','%2','%3'")
+                        .arg(strCTime).arg(scrubLink).arg(scrubPath));
+
+    return (true);
+}//CacheDatabase::putTempFile
+
+bool
+CacheDatabase::getTempFile(const QString &strLink, QString &strPath)
+{
+    bool rv = false;
+    QSqlQuery query(dbMain);
+    query.setForwardOnly (true);
+
+    QString scrubLink = strLink;
+    scrubLink.replace ("'", "''");
+
+    query.exec (QString("SELECT " GV_TT_PATH " FROM " GV_TEMP_TABLE
+                " WHERE " GV_TT_LINK "='%1'").arg(scrubLink));
+    if (query.next ()) {
+        strPath = query.value(0).toString();
+        rv = true;
+    }
+
+    return (rv);
+}//CacheDatabase::getTempFile
