@@ -97,7 +97,6 @@ ContactsXmlHandler::endElement (const QString & /*namespaceURI*/,
                                 const QString &localName        ,
                                 const QString & /*qName*/       )
 {
-    QString msg;
     do // Begin cleanup block (not a loop)
     {
         if (localName == "id") {

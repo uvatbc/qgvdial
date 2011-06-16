@@ -64,26 +64,46 @@ Rectangle {
                 top: parent.top
                 left: parent.left
                 right: parent.right
+                leftMargin: 2
+                rightMargin: 2
             }
-            height: (parent.width + parent.height) / 15
             spacing: 2
 
             MyButton {
+                id: detailsCloseButton
                 mainText: "Close"
                 onClicked: container.state= ''
                 width: parent.width
-                height: (parent.height / 2)
+                height: txtContactName.height
                 mainPixelSize: height - 4
             }
 
-            Text {
-                id: txtContactName
-
-                text: "Contact name"
+            Item {
+                height: contactDetailImage.height
                 width: parent.width
-                color: "white"
-                font.pixelSize: (parent.height / 2) - 4
-                anchors.left: parent.left
+
+                Image {
+                    id: contactDetailImage
+                    anchors.left: parent.left
+                    height: (txtContactName.height * 2.5)
+                    width: (txtContactName.height * 2.5)
+
+                    fillMode: Image.PreserveAspectFit
+                }
+
+                Text {
+                    id: txtContactName
+
+                    anchors {
+                        left: contactDetailImage.right
+                        verticalCenter: parent.verticalCenter
+                    }
+                    width: parent.width - contactDetailImage.width
+
+                    text: "Contact name"
+                    color: "white"
+                    font.pixelSize: (detailsView.width + detailsView.height) / 30
+                }
             }
         }// Column (details top row)
 
@@ -91,11 +111,12 @@ Rectangle {
             id: detailsList
             anchors {
                 top: detailTopRow.bottom
+                bottom: parent.bottom
                 left: parent.left
                 topMargin: 5
             }
             width:  parent.width
-            height: parent.height - detailTopRow.height - 6
+//            height: parent.height - detailTopRow.height - 6
             suggestedPixelSize: (parent.width + parent.height) / 30
 
             onSigCall: container.sigCall(number)
@@ -166,12 +187,27 @@ Rectangle {
                 width: allContacts.width - border.width
                 height: (allContacts.height + allContacts.width) / 20
 
+                Image {
+                    id: contactImage
+                    anchors {
+                        left: parent.left
+                        verticalCenter: parent.verticalCenter
+                        leftMargin: 2
+                    }
+                    height: parent.height
+                    width: parent.height
+
+                    source: imagePath
+                    fillMode: Image.PreserveAspectFit
+                }
+
                 Text {
                     anchors {
                         verticalCenter: parent.verticalCenter
-                        left: parent.left
-                        leftMargin: 5
+                        left: contactImage.right
+                        leftMargin: 3
                     }
+                    width: parent.width - contactImage.width
 
                     text: name
                     color: "white"
@@ -185,8 +221,9 @@ Rectangle {
                     onClicked: {
                         detailsList.model = contacts;
                         detailsList.notesText = notes;
-                        txtContactName.text = name
-                        container.state = "Details"
+                        txtContactName.text = name;
+                        contactDetailImage.source = imagePath;
+                        container.state = "Details";
                     }
                 }
             }// delegate Rectangle

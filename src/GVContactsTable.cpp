@@ -310,12 +310,15 @@ GVContactsTable::onGotContacts (QNetworkReply *reply)
         dbMain.setLastContactUpdate (currDT);
 
         QThread *workerThread = new QThread(this);
-        ContactsParserObject *pObj = new ContactsParserObject(byData, nwMgr);
+        ContactsParserObject *pObj =
+        new ContactsParserObject(byData, strGoogleAuth);
         pObj->moveToThread (workerThread);
         QObject::connect (workerThread, SIGNAL(started()),
                           pObj        , SLOT  (doWork()));
         QObject::connect (pObj, SIGNAL(done(bool)),
                           this, SLOT  (onContactsParsed(bool)));
+        QObject::connect (pObj, SIGNAL(done(bool)),
+                          pObj, SLOT  (deleteLater ()));
         QObject::connect (pObj        , SIGNAL(done(bool)),
                           workerThread, SLOT  (quit()));
         QObject::connect (workerThread, SIGNAL(terminated()),

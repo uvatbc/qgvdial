@@ -33,9 +33,11 @@ class ContactsParserObject : public QObject
     Q_OBJECT
 
 public:
-    ContactsParserObject(QByteArray data, QNetworkAccessManager &mgr,
+    ContactsParserObject(QByteArray data,
+                         const QString strAuth,
                          QObject *parent = 0);
     void setEmitLog (bool enable = true);
+    ~ContactsParserObject();
 
 signals:
     //! Status emitter for status bar
@@ -50,13 +52,19 @@ public slots:
 
 private slots:
     void onGotOneContact (const ContactInfo &contactInfo);
+    void onGotOnePhoto (const ContactInfo &contactInfo);
+
+private:
+    QNetworkRequest createRequest(QString strUrl);
+    void decRef (bool rv = true);
 
 private:
     QByteArray  byData;
 
     bool        bEmitLog;
 
-    QNetworkAccessManager &nwMgr;
+    QNetworkAccessManager *nwMgr;
+    QString               strGoogleAuth;
 
     QAtomicInt  refCount;
 };
@@ -77,11 +85,15 @@ signals:
 public slots:
     void onFinished();
 
+private slots:
+    void onResponseTimeout();
+
 private:
     QNetworkReply  *reply;
-    QString         hrefLink;
-
     ContactInfo     contactInfo;
+    QTimer          responseTimeout;
+
+    bool            aborted;
 };
 
 #endif // CONTACTSPARSEROBJECT_H

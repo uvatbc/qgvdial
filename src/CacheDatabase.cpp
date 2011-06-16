@@ -537,6 +537,8 @@ CacheDatabase::getContactFromLink (ContactInfo &info)
     info.strNotes  = query.value(1).toString ();
     info.hrefPhoto = query.value(2).toString ();
 
+    getTempFile (info.hrefPhoto, info.strPhotoPath);
+
     strQ = QString ("SELECT " GV_L_TYPE ", " GV_L_DATA
                     " FROM " GV_LINKS_TABLE " WHERE "
                     GV_L_LINK "='%1'").arg (scrubId);
@@ -1054,7 +1056,10 @@ CacheDatabase::purge_temp_files(quint64 howmany)
         while (i != mapLinkPath.end ()) {
             query.exec(QString("DELETE FROM " GV_TEMP_TABLE " WHERE "
                                GV_TT_LINK "='%1'").arg(i.key()));
-            QFile::remove (i.value());
+
+            if (!i.value().isEmpty () && (QFileInfo(i.value()).exists ())) {
+                QFile::remove (i.value());
+            }
             i++;
         }
 
@@ -1069,7 +1074,6 @@ CacheDatabase::purge_temp_files(quint64 howmany)
 bool
 CacheDatabase::putTempFile(const QString &strLink, const QString &strPath)
 {
-    bool rv = false;
     QSqlQuery query(dbMain);
     query.setForwardOnly (true);
 
@@ -1080,7 +1084,10 @@ CacheDatabase::putTempFile(const QString &strLink, const QString &strPath)
 
     QString strOldPath;
     if (getTempFile (strLink, strOldPath)) {
-        QFile::remove (strOldPath);
+        if (!strOldPath.isEmpty () && (QFileInfo(strOldPath).exists ())) {
+            QFile::remove (strOldPath);
+        }
+
         query.exec (QString("DELETE FROM " GV_TEMP_TABLE
                             " WHERE " GV_TT_LINK "='%1'").arg(scrubLink));
     }
@@ -1088,7 +1095,7 @@ CacheDatabase::putTempFile(const QString &strLink, const QString &strPath)
     QString strCTime = QDateTime::currentDateTime().toString (Qt::ISODate);
     query.exec (QString("INSERT INTO " GV_TEMP_TABLE " "
                         "("GV_TT_CTIME","GV_TT_LINK","GV_TT_PATH") VALUES "
-                        "('%1','%2','%3'")
+                        "('%1','%2','%3')")
                         .arg(strCTime).arg(scrubLink).arg(scrubPath));
 
     return (true);
@@ -1104,8 +1111,8 @@ CacheDatabase::getTempFile(const QString &strLink, QString &strPath)
     QString scrubLink = strLink;
     scrubLink.replace ("'", "''");
 
-    query.exec (QString("SELECT " GV_TT_PATH " FROM " GV_TEMP_TABLE
-                " WHERE " GV_TT_LINK "='%1'").arg(scrubLink));
+    rv = query.exec (QString("SELECT " GV_TT_PATH " FROM " GV_TEMP_TABLE
+                            " WHERE " GV_TT_LINK "='%1'").arg(scrubLink));
     if (query.next ()) {
         strPath = query.value(0).toString();
         rv = true;

@@ -23,12 +23,13 @@ Contact: yuvraaj@gmail.com
 #include "ContactsXmlHandler.h"
 
 ContactsParserObject::ContactsParserObject (QByteArray data,
-                                            QNetworkAccessManager &mgr,
+                                            const QString strAuth,
                                             QObject *parent)
 : QObject(parent)
 , byData (data)
 , bEmitLog (true)
-, nwMgr (mgr)
+, nwMgr (NULL)
+, strGoogleAuth (strAuth)
 , refCount (0)
 {
 }//ContactsParserObject::ContactsParserObject
@@ -47,8 +48,8 @@ ContactsParserObject::doWork ()
                        this,            SIGNAL (status(const QString &, int)));
 
     QObject::connect (
-        &contactsHandler, SIGNAL (oneContact (const ContactInfo &)),
-         this,            SIGNAL (onGotOneContact (const ContactInfo &)));
+        &contactsHandler, SIGNAL   (oneContact (const ContactInfo &)),
+         this,            SLOT(onGotOneContact (const ContactInfo &)));
 
     simpleReader.setContentHandler (&contactsHandler);
     simpleReader.setErrorHandler (&contactsHandler);
@@ -67,10 +68,25 @@ ContactsParserObject::doWork ()
         emit status(msg);
     }
 
+    this->decRef (rv);
+}//ContactsParserObject::doWork
+
+void
+ContactsParserObject::decRef (bool rv /*= true*/)
+{
     if (!refCount.deref ()) {
+        if (bEmitLog) qDebug("All contacts and photos downloaded.");
         emit done(rv);
     }
-}//ContactsParserObject::doWork
+}//ContactsParserObject::decRef
+
+ContactsParserObject::~ContactsParserObject()
+{
+    if (NULL != nwMgr) {
+        delete nwMgr;
+        nwMgr = NULL;
+    }
+}//ContactsParserObject::~ContactsParserObject
 
 void
 ContactsParserObject::setEmitLog (bool enable /*= true*/)
@@ -78,25 +94,50 @@ ContactsParserObject::setEmitLog (bool enable /*= true*/)
     bEmitLog = enable;
 }//ContactsParserObject::setEmitLog
 
+
+QNetworkRequest
+ContactsParserObject::createRequest(QString strUrl)
+{
+    QUrl url (strUrl);
+    QNetworkRequest request(url);
+    request.setHeader (QNetworkRequest::ContentTypeHeader,
+                       "application/x-www-form-urlencoded");
+    QByteArray byAuth = QString("GoogleLogin auth=%1")
+                                .arg(strGoogleAuth).toAscii ();
+    request.setRawHeader ("Authorization", byAuth);
+
+    return request;
+}//ContactsParserObject::createRequest
+
 void
 ContactsParserObject::onGotOneContact (const ContactInfo &contactInfo)
 {
+    refCount.ref ();
+
     if (contactInfo.bDeleted) {
-        emit gotOneContact (contactInfo);
-        if (!refCount.deref ()) {
-            emit done(rv);
-        }
+        onGotOnePhoto (contactInfo);
         return;
     }
 
+    if (NULL == nwMgr) {
+        nwMgr = new QNetworkAccessManager(this);
+    }
+
     QNetworkRequest request = createRequest (contactInfo.hrefPhoto);
-    QNetworkReply *reply = nwMgr.get (request);
+    QNetworkReply *reply = nwMgr->get (request);
     PhotoReplyTracker *tracker =
     new PhotoReplyTracker(contactInfo, reply, this);
     connect (reply, SIGNAL(finished()), tracker, SLOT(onFinished()));
     connect (tracker, SIGNAL(gotOneContact(const ContactInfo &)),
-             this   , SIGNAL(gotOneContact(const ContactInfo &)));
-}
+             this   , SLOT  (onGotOnePhoto(const ContactInfo &)));
+}//ContactsParserObject::onGotOneContact
+
+void
+ContactsParserObject::onGotOnePhoto (const ContactInfo &contactInfo)
+{
+    emit gotOneContact (contactInfo);
+    this->decRef ();
+}//ContactsParserObject::onGotOnePhoto
 
 PhotoReplyTracker::PhotoReplyTracker(const ContactInfo &ci,
                                            QNetworkReply *r,
@@ -104,43 +145,80 @@ PhotoReplyTracker::PhotoReplyTracker(const ContactInfo &ci,
 : QObject(parent)
 , reply(r)
 , contactInfo(ci)
+, responseTimeout(this)
+, aborted (false)
 {
+    responseTimeout.setSingleShot (true);
+    connect(&responseTimeout,SIGNAL(timeout()), this,SLOT(onResponseTimeout()));
+    responseTimeout.start (30 * 1000);
 }//PhotoReplyTracker::PhotoReplyTracker
 
 void
 PhotoReplyTracker::onFinished()
 {
+    responseTimeout.stop ();
+    if (aborted) {
+        qWarning ("Reply aborted!");
+        return;
+    }
+
     QByteArray ba = reply->readAll ();
     do { // Begin cleanup block (not a loop)
-        if (QNetworkReply::NoError != reply->error ()) {
-            qDebug() << "Error in photo nw response:" << (int)reply->error();
+        QNetworkReply::NetworkError err = reply->error ();
+        if (QNetworkReply::ContentNotFoundError == err) {
+            break;
+        }
+        if (QNetworkReply::NoError != err) {
+            qWarning() << "Error in photo nw response:" << (int)err;
             break;
         }
 
         if (0 == ba.length ()) {
-            qDebug("Zero length response");
+            qWarning ("Zero length response for photo");
             break;
+        }
+
+        char sPng[] = {0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a};
+        QByteArray baPng(sPng, sizeof(sPng));
+        char sBmp[] = {'B', 'M'};
+        QByteArray baBmp(sBmp, sizeof(sBmp));
+
+        QString extension = "jpg";
+        if (ba.startsWith (baPng)) {
+            extension = "png";
+        } else if (ba.startsWith (baBmp)) {
+            extension = "bmp";
         }
 
         QString strTemplate = QDir::tempPath ()
                             + QDir::separator ()
-                            + "qgv_XXXXXX.tmp.jpg";
+                            + "qgv_XXXXXX.tmp."
+                            + extension;
         QTemporaryFile tempFile (strTemplate);
         if (!tempFile.open ()) {
-            qWarning ("Failed to get a temp file name");
+            qWarning ("Failed to get a temp file name for the photo");
             break;
         }
-
-        qDebug() << "Temp photo file =" << tempFile.fileName ();
 
         tempFile.setAutoRemove (false);
         tempFile.write (ba);
 
         contactInfo.strPhotoPath = tempFile.fileName ();
-
-        emit gotOneContact (contactInfo);
     } while (0); // End cleanup block (not a loop)
-
     reply->deleteLater ();
     this->deleteLater ();
+
+    emit gotOneContact (contactInfo);
 }//PhotoReplyTracker::onFinished
+
+void
+PhotoReplyTracker::onResponseTimeout()
+{
+    aborted = true;
+
+    emit gotOneContact (contactInfo);
+
+    reply->abort ();
+    reply->deleteLater ();
+    this->deleteLater ();
+}//PhotoReplyTracker::onResponseTimeout

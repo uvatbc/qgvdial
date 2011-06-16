@@ -31,6 +31,7 @@ ContactsModel::ContactsModel (QObject *parent)
     roles[CT_NameRole]     = "name";
     roles[CT_NotesRole]    = "notes";
     roles[CT_ContactsRole] = "contacts";
+    roles[CT_ImagePathRole] = "imagePath";
     setRoleNames(roles);
 }//ContactsModel::ContactsModel
 
@@ -52,18 +53,17 @@ ContactsModel::data (const QModelIndex &index, int role) const
             break;
         }
 
+        CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+        ContactInfo info;
+        info.strId = QSqlQueryModel::data (index.sibling(index.row(), 0),
+                        Qt::EditRole).toString ();
+        if (info.strId.isEmpty ()) {
+            qWarning ("This link is empty!");
+            break;
+        }
+        dbMain.getContactFromLink (info);
+
         if (CT_ContactsRole == role) {
-            ContactInfo info;
-            info.strId = QSqlQueryModel::data (index.sibling(index.row(), 0),
-                            Qt::EditRole).toString ();
-            if (info.strId.isEmpty ()) {
-                qWarning ("This link is empty!");
-                break;
-            }
-
-            CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-            dbMain.getContactFromLink (info);
-
             QObject *pNonConst = (QObject *) this;
             ContactDetailsModel *pCdm = new ContactDetailsModel (info,
                                                                  pNonConst);
@@ -73,6 +73,16 @@ ContactsModel::data (const QModelIndex &index, int role) const
                 qWarning ("Failed to allocate contact detail");
             }
 
+            break;
+        }
+
+        if (CT_ImagePathRole == role) {
+            if ((!info.strPhotoPath.isEmpty ()) &&
+                (QFileInfo(info.strPhotoPath).exists ())) {
+                retVar = QUrl::fromLocalFile (info.strPhotoPath);
+            } else {
+                retVar = QUrl("qrc:/unknown_contact.png");
+            }
             break;
         }
 

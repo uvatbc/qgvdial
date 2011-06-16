@@ -37,6 +37,7 @@ public:
         CT_NameRole = Qt::UserRole + 1,
         CT_NotesRole,
         CT_ContactsRole,
+        CT_ImagePathRole,
     };
 
     explicit ContactsModel(QObject *parent = 0);
