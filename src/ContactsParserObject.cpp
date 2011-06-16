@@ -26,6 +26,7 @@ ContactsParserObject::ContactsParserObject (QByteArray data, QObject *parent)
 : QObject(parent)
 , byData (data)
 , bEmitLog (true)
+, refCount (0)
 {
 }//ContactsParserObject::ContactsParserObject
 
@@ -49,6 +50,7 @@ ContactsParserObject::doWork ()
     simpleReader.setContentHandler (&contactsHandler);
     simpleReader.setErrorHandler (&contactsHandler);
 
+    refCount = 1;
     bool rv = simpleReader.parse (&inputSource, false);
 
     if (!rv) {
@@ -70,3 +72,8 @@ ContactsParserObject::setEmitLog (bool enable /*= true*/)
 {
     bEmitLog = enable;
 }//ContactsParserObject::setEmitLog
+
+void
+ContactsParserObject::onGotOneContact (const ContactInfo &contactInfo)
+{
+}

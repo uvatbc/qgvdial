@@ -98,7 +98,7 @@ CacheDatabase::init ()
         settings->setValue (GV_S_VAR_VER, GV_SETTINGS_VER);
     }
     if (bBlowAway) {
-        clean_temp_files ((quint64)-1);
+        purge_temp_files ((quint64)-1);
 
         // Drop all tables!
         arrTables = dbMain.tables ();
@@ -160,13 +160,14 @@ CacheDatabase::init ()
                         GV_IN_NOTE      " varchar)");
     }
 
-    // Ensure that the inbox table is present. If not, create it.
-    if (!arrTables.contains (GV_TEMP_TABLE))
-    {
+    // Ensure that the temp file table is present. If not, create it.
+    if (!arrTables.contains (GV_TEMP_TABLE)) {
         query.exec ("CREATE TABLE " GV_TEMP_TABLE " "
                     "(" GV_TT_CTIME " varchar, "
                         GV_TT_LINK  " varchar, "
                         GV_TT_PATH  " varchar)");
+    } else {
+        cleanup_temp_files ();
     }
 }//CacheDatabase::init
 
@@ -989,7 +990,29 @@ CacheDatabase::getGvPin (bool &bEnable, QString &pin)
 }//CacheDatabase::getGvPin
 
 void
-CacheDatabase::clean_temp_files(quint64 howmany)
+CacheDatabase::cleanup_temp_files()
+{
+    QStringList arrPaths;
+    QSqlQuery query(dbMain);
+    query.setForwardOnly (true);
+
+    query.exec ("SELECT " GV_TT_PATH " FROM " GV_TEMP_TABLE);
+    while (query.next ()) {
+        if (!QFileInfo(query.value(0).toString ()).exists ()) {
+            arrPaths.append (query.value(0).toString ());
+        }
+    }
+
+    for (int i = 0; i < arrPaths.length() ; i++) {
+        QString strPath = arrPaths[i];
+        strPath.replace ("'", "''");
+        query.exec(QString("DELETE FROM " GV_TEMP_TABLE " WHERE "
+                    GV_TT_PATH "='%1'").arg(strPath));
+    }
+}//CacheDatabase::cleanup_temp_files
+
+void
+CacheDatabase::purge_temp_files(quint64 howmany)
 {
     QMap <QString, QString> mapLinkPath;
     int count;
@@ -1022,7 +1045,7 @@ CacheDatabase::clean_temp_files(quint64 howmany)
             break;
         }
     }
-}//CacheDatabase::clean_temp_files
+}//CacheDatabase::purge_temp_files
 
 bool
 CacheDatabase::putTempFile(const QString &strLink, const QString &strPath)

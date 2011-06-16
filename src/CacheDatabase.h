@@ -129,7 +129,8 @@ private:
     bool putContactInfo (const ContactInfo &info);
     bool deleteContactInfo (const QString &strId);
 
-    void clean_temp_files(quint64 howmany);
+    void cleanup_temp_files();
+    void purge_temp_files(quint64 howmany);
 
 signals:
     void status(const QString &strText, int timeout = 2000);

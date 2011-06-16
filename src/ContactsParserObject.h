@@ -47,10 +47,15 @@ signals:
 public slots:
     void doWork ();
 
+private slots:
+    void onGotOneContact (const ContactInfo &contactInfo);
+
 private:
     QByteArray  byData;
 
     bool        bEmitLog;
+
+    int         refCount;
 };
 
 #endif // CONTACTSPARSEROBJECT_H
