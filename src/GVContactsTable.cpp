@@ -59,6 +59,8 @@ GVContactsTable::initModel ()
 
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     modelContacts = dbMain.newContactsModel ();
+    connect(modelContacts, SIGNAL(noContactPhoto(const ContactInfo &)),
+                     this, SLOT(onNoContactPhoto(const ContactInfo &)));
 
     emit setContactsModel (modelContacts);
 
@@ -367,3 +369,15 @@ GVContactsTable::onSearchQueryChanged (const QString &query)
 {
     modelContacts->refresh (query);
 }//GVContactsTable::onSearchQuerychanged
+
+void
+GVContactsTable::onNoContactPhoto(const ContactInfo &contactInfo)
+{
+    QNetworkRequest request = createRequest (contactInfo.hrefPhoto);
+    QNetworkReply *reply = nwMgr.get (request);
+    PhotoReplyTracker *tracker =
+    new PhotoReplyTracker(contactInfo, reply, this);
+    connect (reply, SIGNAL(finished()), tracker, SLOT(onFinished()));
+    connect (tracker, SIGNAL(gotOneContact(const ContactInfo &)),
+             this   , SLOT  (gotOneContact(const ContactInfo &)));
+}//GVContactsTable::onNoContactPhoto

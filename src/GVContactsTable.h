@@ -77,6 +77,9 @@ private slots:
     //! Invoked when all the contacts are parsed
     void onContactsParsed(bool rv);
 
+    //! Invoked when the contact model tells us that the photo is not present
+    void onNoContactPhoto(const ContactInfo &contactInfo);
+
 private:
     QNetworkRequest createRequest(QString strUrl);
 

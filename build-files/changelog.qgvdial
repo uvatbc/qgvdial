@@ -1,4 +1,2 @@
-  * Minor UI improvement: Contact search button changes to X when there is text to indicate that it can be cleared in one shot.
-  * Added photo link to contacts table
-  * Contact photos!
+  * Contact photos get refreshed if the temp files are misplaced.
 

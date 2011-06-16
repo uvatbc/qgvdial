@@ -166,8 +166,6 @@ CacheDatabase::init ()
                     "(" GV_TT_CTIME " varchar, "
                         GV_TT_LINK  " varchar, "
                         GV_TT_PATH  " varchar)");
-    } else {
-        cleanup_temp_files ();
     }
 }//CacheDatabase::init
 
@@ -1019,7 +1017,11 @@ CacheDatabase::cleanup_temp_files()
 
     query.exec ("SELECT " GV_TT_PATH " FROM " GV_TEMP_TABLE);
     while (query.next ()) {
-        if (!QFileInfo(query.value(0).toString ()).exists ()) {
+        QString strPath = query.value(0).toString ();
+        if (strPath.isEmpty ()) {
+            continue;
+        }
+        if (!QFileInfo(strPath).exists ()) {
             arrPaths.append (query.value(0).toString ());
         }
     }

@@ -81,6 +81,9 @@ ContactsModel::data (const QModelIndex &index, int role) const
                 (QFileInfo(info.strPhotoPath).exists ())) {
                 retVar = QUrl::fromLocalFile (info.strPhotoPath);
             } else {
+                if (!info.strPhotoPath.isEmpty ()) {
+                    emit noContactPhoto(info);
+                }
                 retVar = QUrl("qrc:/unknown_contact.png");
             }
             break;

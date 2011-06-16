@@ -51,6 +51,9 @@ public:
     void refresh (const QString &query);
     void refresh ();
 
+signals:
+    void noContactPhoto(const ContactInfo &contactInfo) const;
+
 private:
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
