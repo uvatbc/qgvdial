@@ -108,6 +108,8 @@ public:
     void setTimeout (int seconds = 20);
     void setEmitLog (bool enable);
 
+    QString getLastErrorString();
+
 signals:
     //! Status emitter
     void status(const QString &strText, int timeout = 2000);
@@ -201,6 +203,9 @@ protected:
 
     //! Should qDebug messages be emitted or not?
     bool                        bEmitLog;
+
+    //! Store the last error string here
+    QString                     strLastError;
 
     friend class Singletons;
 };

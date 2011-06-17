@@ -43,6 +43,9 @@ public:
     void init ();
     void deinit ();
 
+    void blowAwayCache();
+    void ensureCache ();
+
     // Toggle quick and dirty!
     void setQuickAndDirty(bool bBeDirty = true);
 

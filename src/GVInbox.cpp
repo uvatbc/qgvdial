@@ -46,6 +46,8 @@ GVInbox::deinitModel ()
         delete modelInbox;
         modelInbox = NULL;
     }
+
+    emit setInboxModel (NULL);
 }//GVInbox::deinitModel
 
 void

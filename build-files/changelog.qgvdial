@@ -1,2 +1,3 @@
-  * Contact photos get refreshed if the temp files are misplaced.
+  * Bubble up an error string for misconfigured or unconfigured user accounts.
+  * When a different user logs in, make sure that the old cached data is purged
 

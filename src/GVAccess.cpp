@@ -618,3 +618,9 @@ GVAccess::setEmitLog (bool enable)
 {
     bEmitLog = enable;
 }//GVAccess::setEmitLog
+
+QString
+GVAccess::getLastErrorString()
+{
+    return strLastError;
+}//GVAccess::getLastErrorString

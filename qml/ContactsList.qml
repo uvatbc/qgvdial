@@ -116,7 +116,6 @@ Rectangle {
                 topMargin: 5
             }
             width:  parent.width
-//            height: parent.height - detailTopRow.height - 6
             suggestedPixelSize: (parent.width + parent.height) / 30
 
             onSigCall: container.sigCall(number)

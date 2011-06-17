@@ -50,6 +50,7 @@ GVContactsTable::deinitModel ()
         delete modelContacts;
         modelContacts = NULL;
     }
+    emit setContactsModel (NULL);
 }//GVContactsTable::deinitModel
 
 void
@@ -203,7 +204,6 @@ GVContactsTable::onLoginResponse (QNetworkReply *reply)
     QObject::disconnect (&nwMgr, SIGNAL (finished (QNetworkReply *)),
                           this , SLOT   (onLoginResponse (QNetworkReply *)));
 
-    QString msg;
     QString strReply = reply->readAll ();
     QString strCaptchaToken, strCaptchaUrl;
 

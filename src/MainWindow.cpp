@@ -650,7 +650,11 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
         osd.setLongWork (this, false);
 
         setStatus ("User login failed", 30*1000);
-        this->showMsgBox ("User login failed");
+        QString strErr = webPage.getLastErrorString ();
+        if (strErr.isEmpty ()) {
+            strErr = "User login failed";
+        }
+        this->showMsgBox (strErr);
     }
     else
     {
@@ -659,6 +663,14 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
 
         // Save the users GV number returned by the login completion
         strSelfNumber = varList[varList.size()-1].toString ();
+
+        QString strOldUser, strOldPass;
+        dbMain.getUserPass (strOldUser, strOldPass);
+        if (strOldUser != strUser) {
+            // Cleanup cache
+            dbMain.blowAwayCache ();
+            dbMain.ensureCache ();
+        }
 
         // Prepare then contacts
         initContacts ();
@@ -713,6 +725,9 @@ MainWindow::doLogout ()
 
     OsDependent &osd = Singletons::getRef().getOSD ();
     osd.setLongWork (this, true);
+
+    oContacts.deinitModel ();
+    oInbox.deinitModel ();
 
 #if MOSQUITTO_CAPABLE
     mqThread.setQuit ();

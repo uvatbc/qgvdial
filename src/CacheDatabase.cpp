@@ -81,7 +81,6 @@ CacheDatabase::init ()
     QSqlQuery query(dbMain);
     query.setForwardOnly (true);
 
-    QStringList arrTables;
     bool bBlowAway = true;
     QString strVer = settings->value(GV_S_VAR_DB_VER).toString();
     if (strVer == GV_S_VALUE_DB_VER) {
@@ -98,26 +97,45 @@ CacheDatabase::init ()
         settings->setValue (GV_S_VAR_VER, GV_SETTINGS_VER);
     }
     if (bBlowAway) {
-        purge_temp_files ((quint64)-1);
-
-        // Drop all tables!
-        arrTables = dbMain.tables ();
-        foreach (QString strTable, arrTables) {
-            strTable.replace ("'", "''");
-            QString strQ = QString("DROP TABLE '%1'").arg(strTable);
-            query.exec (strQ);
-        }
-        query.exec ("VACUUM");
+        blowAwayCache ();
 
         // Insert the DB version number
         settings->setValue(GV_S_VAR_DB_VER, GV_S_VALUE_DB_VER);
-        settings->beginGroup (GV_UPDATES_TABLE);
-        settings->remove (GV_UP_CONTACTS);
-        settings->remove (GV_UP_INBOX);
-        settings->endGroup ();
     }
 
-    arrTables = dbMain.tables ();
+    ensureCache ();
+}//CacheDatabase::init
+
+void
+CacheDatabase::blowAwayCache()
+{
+    QSqlQuery query(dbMain);
+    query.setForwardOnly (true);
+
+    purge_temp_files ((quint64)-1);
+
+    // Drop all tables!
+    QStringList arrTables = dbMain.tables ();
+    foreach (QString strTable, arrTables) {
+        strTable.replace ("'", "''");
+        QString strQ = QString("DROP TABLE '%1'").arg(strTable);
+        query.exec (strQ);
+    }
+    query.exec ("VACUUM");
+
+    settings->beginGroup (GV_UPDATES_TABLE);
+    settings->remove (GV_UP_CONTACTS);
+    settings->remove (GV_UP_INBOX);
+    settings->endGroup ();
+}//CacheDatabase::blowAwayCache
+
+void
+CacheDatabase::ensureCache ()
+{
+    QSqlQuery query(dbMain);
+    query.setForwardOnly (true);
+
+    QStringList arrTables = dbMain.tables ();
     // Ensure that the contacts table is present. If not, create it.
     if (!arrTables.contains (GV_CONTACTS_TABLE))
     {
@@ -167,7 +185,7 @@ CacheDatabase::init ()
                         GV_TT_LINK  " varchar, "
                         GV_TT_PATH  " varchar)");
     }
-}//CacheDatabase::init
+}//CacheDatabase::ensureCache
 
 void
 CacheDatabase::setQuickAndDirty (bool bBeDirty)

@@ -181,7 +181,8 @@ bool
 GVWebPage::login ()
 {
     if (!this->isOnline ()) {
-        if (bEmitLog) qDebug ("Cannot login when offline");
+        strLastError = "Cannot login when offline";
+        if (bEmitLog) qDebug() << strLastError;
         completeCurrentWork (GVAW_login, false);
         return false;
     }
@@ -206,7 +207,8 @@ GVWebPage::loginStage1 (bool bOk)
         if (isLoadFailed (bOk))
         {
             bOk = false;
-            qWarning ("Main login page load failed");
+            strLastError = "Login page load failed";
+            qWarning() << strLastError;
             break;
         }
         bOk = false;
@@ -235,8 +237,7 @@ GVWebPage::loginStage1 (bool bOk)
         bOk = true;
     } while (0); // End cleanup block (not a loop)
 
-    if (!bOk)
-    {
+    if (!bOk) {
         completeCurrentWork (GVAW_login, false);
     }
 }//GVWebPage::loginStage1
@@ -251,7 +252,8 @@ GVWebPage::loginStage2 (bool bOk)
         if (isLoadFailed (bOk))
         {
             bOk = false;
-            qWarning ("Page load actual login failed");
+            strLastError = "Login failed";
+            qWarning() << strLastError;
             break;
         }
         bOk = false;
@@ -308,6 +310,8 @@ GVWebPage::loginStage3 (bool bOk)
             strSelfNumber = rx.cap (1);
         } else {
             qWarning ("Failed to get a google voice number!!");
+            strSelfNumber.clear ();
+            strLastError = "Account not configured";
             break;
         }
 
@@ -320,6 +324,7 @@ GVWebPage::loginStage3 (bool bOk)
             strRnr_se = rx.cap (1);
         } else {
             qWarning ("Could not find rnr_se");
+            strLastError = "Account not configured";
             break;
         }
 
