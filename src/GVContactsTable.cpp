@@ -196,6 +196,8 @@ GVContactsTable::loggedOut ()
     bLoggedIn = false;
 
     strGoogleAuth.clear ();
+    strUser.clear ();
+    strPass.clear ();
 }//GVContactsTable::loggedOut
 
 void
@@ -214,22 +216,16 @@ GVContactsTable::onLoginResponse (QNetworkReply *reply)
         foreach (QString strPair, arrParsed)
         {
             QStringList arrPair = strPair.split ('=');
-            if (arrPair[0] == "Auth")
-            {
+            if (arrPair[0] == "Auth") {
                 strGoogleAuth = arrPair[1];
-            }
-            else if (arrPair[0] == "CaptchaToken")
-            {
+            } else if (arrPair[0] == "CaptchaToken") {
                 strCaptchaToken = arrPair[1];
-            }
-            else if (arrPair[0] == "CaptchaUrl")
-            {
+            } else if (arrPair[0] == "CaptchaUrl") {
                 strCaptchaUrl = arrPair[1];
             }
         }
 
-        if (0 != strCaptchaUrl.size ())
-        {
+        if (0 != strCaptchaUrl.size ()) {
             strCaptchaUrl = "http://www.google.com/accounts/"
                           + strCaptchaUrl;
             qDebug ("Loading captcha");
@@ -240,8 +236,7 @@ GVContactsTable::onLoginResponse (QNetworkReply *reply)
             break;
         }
 
-        if (0 == strGoogleAuth.size ())
-        {
+        if (0 == strGoogleAuth.size ()) {
             qWarning ("Failed to login!!");
             break;
         }
@@ -373,10 +368,14 @@ GVContactsTable::onSearchQueryChanged (const QString &query)
 void
 GVContactsTable::onNoContactPhoto(const ContactInfo &contactInfo)
 {
+    if (!bLoggedIn) {
+        qWarning ("Not logged into contacts API.");
+        return;
+    }
+
     QNetworkRequest request = createRequest (contactInfo.hrefPhoto);
     QNetworkReply *reply = nwMgr.get (request);
-    PhotoReplyTracker *tracker =
-    new PhotoReplyTracker(contactInfo, reply, this);
+    PhotoReplyTracker *tracker = new PhotoReplyTracker(contactInfo, reply,this);
     connect (reply, SIGNAL(finished()), tracker, SLOT(onFinished()));
     connect (tracker, SIGNAL(gotOneContact(const ContactInfo &)),
              this   , SLOT  (gotOneContact(const ContactInfo &)));
