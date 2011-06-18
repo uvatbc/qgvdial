@@ -1,3 +1,2 @@
-  * Bubble up an error string for misconfigured or unconfigured user accounts.
-  * When a different user logs in, make sure that the old cached data is purged
+  * Don't get photos if you're not logged into the Contacts API 
 

@@ -330,6 +330,14 @@ GVI_XMLJsonHandler::parseJSON (const QDateTime &dtUpdate, bool &bGotOld, int &nN
                 continue;
             }
 
+            // Pick up the text from the parsed HTML
+            if (((GVIE_TextMessage == inboxEntry.Type) ||
+                 (GVIE_Voicemail == inboxEntry.Type)) &&
+                (mapTexts.contains (inboxEntry.id)))
+            {
+                inboxEntry.strText = mapTexts[inboxEntry.id];
+            }
+
             // Check to see if it is too old to show
             if (dtUpdate.isValid () && (dtUpdate >= inboxEntry.startTime))
             {
@@ -340,14 +348,6 @@ GVI_XMLJsonHandler::parseJSON (const QDateTime &dtUpdate, bool &bGotOld, int &nN
                 } else {
                     if (bEmitLog) qDebug ("Another old entry");
                 }
-            }
-
-            // Pick up the text from the parsed HTML
-            if (((GVIE_TextMessage == inboxEntry.Type) ||
-                 (GVIE_Voicemail == inboxEntry.Type)) &&
-                (mapTexts.contains (inboxEntry.id)))
-            {
-                inboxEntry.strText = mapTexts[inboxEntry.id];
             }
 
             // emit the inbox element
