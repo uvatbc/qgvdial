@@ -1,2 +1,2 @@
-  * Don't get photos if you're not logged into the Contacts API 
+  * DBus API to get and set registered phones.
 

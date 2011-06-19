@@ -57,6 +57,9 @@ signals:
     //! Emitted to complete a dial
     void dialCanFinish ();
 
+    //! Emitted when the registered phones changes.
+    void regPhoneChange(const QStringList &phones, int index);
+
 public slots:
     void log (const QString &strText, int level = 10);
     void setStatus (const QString &strText, int timeout = 3000);

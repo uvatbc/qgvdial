@@ -44,7 +44,7 @@ GVWebPage::GVWebPage(QObject *parent/* = NULL*/)
     webPage.setForwardUnsupportedContent (true);
 
     garbageTimer.setSingleShot (true);
-    garbageTimer.setInterval (1000 * 60 * 2);   // 2 minutes
+    garbageTimer.setInterval (1000 * 60 * 10);   // 10 minutes
 
     // For progress bars
     QObject::connect (&webPage, SIGNAL (loadStarted ()),

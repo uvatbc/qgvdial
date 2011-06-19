@@ -326,6 +326,9 @@ MainWindow::init ()
     osd.initTextServer (
         this, SLOT (sendSMS (const QStringList &, const QString &)),
         this, SLOT (onSendTextWithoutData (const QStringList &)));
+    osd.initSettingsServer (
+        this, SLOT(onRegPhoneSelectionChange(int)),
+        this, SIGNAL(regPhoneChange(const QStringList &,int)));
 
     // The GV access class signals these during the dialling protocol
     QObject::connect (&webPage    , SIGNAL (dialInProgress (const QString &)),
@@ -1296,7 +1299,7 @@ MainWindow::getDialSettings (bool                 &bDialout   ,
     do { // Begin cleanup block (not a loop)
         RegNumData data;
         if (!modelRegNumber.getAt (indRegPhone, data)) {
-            qDebug ("Invalid registered phone index");
+            qWarning ("Invalid registered phone index");
             break;
         }
 
@@ -1445,6 +1448,16 @@ MainWindow::onRegPhoneSelectionChange (int index)
 
     OsDependent &osd = Singletons::getRef().getOSD ();
     osd.setLongWork (this, false);
+
+    QStringList phones;
+    for (int i = 0; i < modelRegNumber.rowCount (); i++) {
+        if (!modelRegNumber.getAt (i, data)) {
+            phones += "<Unknown>";
+        } else {
+            phones += data.strName;
+        }
+    }
+    emit regPhoneChange(phones, index);
 }//MainWindow::onRegPhoneSelectionChange
 
 void

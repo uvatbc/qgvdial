@@ -99,6 +99,29 @@ OsDependent::initTextServer (QObject *r1, const char *m1,
 }//OsDependent::initDialServer
 
 void
+OsDependent::initSettingsServer(QObject *r1, const char *m1,
+                                QObject *r2, const char *m2)
+{
+#if TELEPATHY_CAPABLE
+    static QGVDbusSettingsServer *pServer = NULL;
+    if (NULL == pServer) {
+        pServer = new QGVDbusSettingsServer (this);
+        pServer->addSettingsReceiver (r1, m1, r2, m2);
+
+        QDBusConnection sessionBus = QDBusConnection::sessionBus();
+        if (!sessionBus.registerObject ("/org/QGVDial/SettingsServer", this) ||
+            !sessionBus.registerService("org.QGVDial.SettingsServer")) {
+            qWarning ("Failed to register Dbus Settings server. Aborting!");
+            qApp->quit ();
+        }
+    }
+#else
+    Q_UNUSED (r1);
+    Q_UNUSED (m1);
+#endif
+}
+
+void
 OsDependent::setDefaultWindowAttributes (QWidget *pWidget)
 {
 #ifdef Q_WS_MAEMO_5

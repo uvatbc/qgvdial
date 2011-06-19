@@ -53,6 +53,8 @@ public:
     void initDialServer (QObject *receiver, const char *method);
     void initTextServer (QObject *r1, const char *m1,
                          QObject *r2, const char *m2);
+    void initSettingsServer(QObject *r1, const char *m1,
+                            QObject *r2, const char *m2);
     void setDefaultWindowAttributes (QWidget *pWidget);
     void setLongWork (QWidget *window, bool bSet = false);
 

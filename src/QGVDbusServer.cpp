@@ -21,8 +21,10 @@ Contact: yuvraaj@gmail.com
 
 #include "QGVDbusServer.h"
 
-QGVDbusServerHelper::QGVDbusServerHelper (QObject *parent)
+QGVDbusServerHelper::QGVDbusServerHelper (QGVDbusSettingsServer *s,
+                                          QObject *parent)
 : QObject (parent)
+, settingsServer (s)
 {
 }//QGVDbusServerHelper::QGVDbusServerHelper
 
@@ -52,9 +54,25 @@ QGVDbusServerHelper::emitTextWithoutData (const QStringList &arrNumbers)
     emit sendTextWithoutData (arrNumbers);
 }//QGVDbusServerHelper::emitTextWithoutData
 
+void
+QGVDbusServerHelper::onPhoneChanges(const QStringList &phones, int index)
+{
+    if (NULL != settingsServer) {
+        settingsServer->callbacks = phones;
+        settingsServer->phoneIndex = index;
+        settingsServer->emitCallbacksChanged ();
+    }
+}//QGVDbusServerHelper::onPhoneChanges
+
+void
+QGVDbusServerHelper::emitPhoneIndexChange(int index)
+{
+    emit phoneIndexChange (index);
+}//QGVDbusServerHelper::emitPhoneIndexChange
+
 QGVDbusCallServer::QGVDbusCallServer (QObject *parent)
 : QDBusAbstractAdaptor(parent)
-, helper (this)
+, helper (NULL, this)
 {
 }//QGVDbusCallServer::QGVDbusServer
 
@@ -81,7 +99,7 @@ QGVDbusCallServer::delCallReceiver (QObject *receiver, const char *method)
 
 QGVDbusTextServer::QGVDbusTextServer (QObject *parent)
 : QDBusAbstractAdaptor(parent)
-, helper (this)
+, helper (NULL, this)
 {
 }//QGVDbusTextServer::QGVDbusServer
 
@@ -123,3 +141,44 @@ QGVDbusTextServer::delTextReceivers (QObject *r1, const char *m1,
         &helper, SIGNAL (sendTextWithoutData (const QStringList &)),
         r2, m2);
 }//QGVDbusTextServer::delTextReceiver
+
+QGVDbusSettingsServer::QGVDbusSettingsServer(QObject *parent)
+: QDBusAbstractAdaptor (parent)
+, helper (this, this)
+{
+}//QGVDbusSettingsServer::QGVDbusSettingsServer
+
+void
+QGVDbusSettingsServer::addSettingsReceiver (QObject *r1, const char *m1,
+                                            QObject *r2, const char *m2)
+{
+    connect (&helper, SIGNAL (phoneIndexChange(int )), r1, m1);
+    connect (r2, m2, &helper, SLOT(onPhoneChanges(const QStringList &,int)));
+}//QGVDbusSettingsServer::addSettingsReceiver
+
+void
+QGVDbusSettingsServer::emitCallbacksChanged ()
+{
+    emit CallbacksChanged();
+}//QGVDbusSettingsServer::emitCallbacksChanged
+
+QStringList
+QGVDbusSettingsServer::GetPhoneNames ()
+{
+    qDebug ("DBus request to get phone names");
+    return callbacks;
+}//QGVDbusSettingsServer::GetPhoneNames
+
+int
+QGVDbusSettingsServer::GetCurrentPhone ()
+{
+    qDebug ("DBus request to get current phone");
+    return phoneIndex;
+}//QGVDbusSettingsServer::GetCurrentPhone
+
+void
+QGVDbusSettingsServer::SetCurrentPhone (int index)
+{
+    qDebug ("DBus request to set current phone");
+    helper.emitPhoneIndexChange (index);
+}//QGVDbusSettingsServer::SetCurrentPhone

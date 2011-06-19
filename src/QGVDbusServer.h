@@ -25,22 +25,32 @@ Contact: yuvraaj@gmail.com
 #include "global.h"
 #include <QtDBus>
 
+class QGVDbusSettingsServer;
+
 class QGVDbusServerHelper : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit QGVDbusServerHelper (QObject *parent = 0);
+    QGVDbusServerHelper (QGVDbusSettingsServer *s, QObject *parent = 0);
     void emitDialNow (const QString &strNumber);
     void emitText (const QStringList &arrNumbers,
                    const QString     &strData);
     void emitTextWithoutData (const QStringList &arrNumbers);
+    void emitPhoneIndexChange(int index);
+
+public slots:
+    void onPhoneChanges(const QStringList &phones, int index);
 
 signals:
     void dialNow (const QString &strNumber);
     void sendText (const QStringList &arrNumbers,
                    const QString     &strData);
     void sendTextWithoutData (const QStringList &arrNumbers);
+    void phoneIndexChange(int index);
+
+private:
+    QGVDbusSettingsServer *settingsServer;
 };
 
 class QGVDbusCallServer : public QDBusAbstractAdaptor
@@ -93,6 +103,35 @@ protected:
     QGVDbusServerHelper helper;
 
     friend class OsDependent;
+};
+
+
+class QGVDbusSettingsServer : public QDBusAbstractAdaptor
+{
+    Q_OBJECT
+    Q_CLASSINFO("D-Bus Interface", "org.QGVDial.SettingsServer")
+
+protected:
+    explicit QGVDbusSettingsServer(QObject *parent = 0);
+    void addSettingsReceiver (QObject *r1, const char *m1,
+                              QObject *r2, const char *m2);
+    void emitCallbacksChanged ();
+
+signals:
+    void CallbacksChanged ();
+
+public slots:
+    QStringList GetPhoneNames ();
+    int GetCurrentPhone ();
+    Q_NOREPLY void SetCurrentPhone (int index);
+
+protected:
+    QGVDbusServerHelper helper;
+    QStringList callbacks;
+    int phoneIndex;
+
+    friend class OsDependent;
+    friend class QGVDbusServerHelper;
 };
 
 #include "OsDependent.h"

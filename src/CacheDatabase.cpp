@@ -327,13 +327,11 @@ CacheDatabase::putRegisteredNumbers (const GVRegisteredNumberArray &listNumbers)
     query.exec ("DELETE FROM " GV_REG_NUMS_TABLE);
 
     do { // Begin cleanup block (not a loop)
-        if (0 == listNumbers.size ())
-        {
+        if (0 == listNumbers.size ()) {
             break;
         }
 
-        foreach (GVRegisteredNumber num, listNumbers)
-        {
+        foreach (GVRegisteredNumber num, listNumbers) {
             // Must scrub single quotes
             num.strName.replace ("'", "''");
             num.strDescription.replace ("'", "''");
