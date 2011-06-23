@@ -664,9 +664,6 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
         CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
         setStatus ("User logged in");
 
-        // Save the users GV number returned by the login completion
-        strSelfNumber = varList[varList.size()-1].toString ();
-
         QString strOldUser, strOldPass;
         dbMain.getUserPass (strOldUser, strOldPass);
         if (strOldUser != strUser) {
@@ -695,15 +692,7 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
         ctx->setContextProperty ("g_bShowSettings", bTemp);
 
         // Fill up the combobox on the main page
-        if ((!dbMain.getRegisteredNumbers (arrNumbers)) ||
-            (0 == arrNumbers.size ()))
-        {
-            refreshRegisteredNumbers ();
-        }
-        else
-        {
-            onCallInitiatorsChange (false);
-        }
+        refreshRegisteredNumbers ();
 
         bool bMqEnabled;
         QString strMqHost, strMqTopic;
@@ -991,8 +980,7 @@ MainWindow::dialNow (const QString &strTarget)
 
         ctx->showMsgBox ();
 
-        if (bDialout)
-        {
+        if (bDialout) {
             ctx->ci = ci;
 
             l += ci->selfNumber ();
@@ -1004,10 +992,8 @@ MainWindow::dialNow (const QString &strTarget)
                 fallbackDialout (ctx);
                 break;
             }
-        }
-        else
-        {
-            l += gvRegNumber.strDescription;
+        } else {
+            l += gvRegNumber.strNumber;
             l += QString (gvRegNumber.chType);
             if (!webPage.enqueueWork (GVAW_dialCallback, l, this,
                     SLOT (dialComplete (bool, const QVariantList &))))
@@ -1150,7 +1136,9 @@ MainWindow::dialComplete (bool bOk, const QVariantList &params)
             fallbackDialout (ctx);
         } else {
             setStatus ("Dialing failed", 10*1000);
-            this->showMsgBox ("Dialing failed");
+            GVAccess &webPage = Singletons::getRef().getGVAccess ();
+            QString strErr = webPage.getLastErrorString ();
+            this->showMsgBox (strErr);
         }
     } else {
         setStatus (QString("Dial successful to %1.").arg(params[0].toString()));
@@ -1260,14 +1248,14 @@ MainWindow::gotRegisteredPhone (const GVRegisteredNumber &info)
 {
     QString msg = QString("\"%1\"=\"%2\"")
                     .arg (info.strName)
-                    .arg (info.strDescription);
+                    .arg (info.strNumber);
     qDebug () << msg;
 
     arrNumbers += info;
 }//MainWindow::gotRegisteredPhone
 
 void
-MainWindow::gotAllRegisteredPhones (bool bOk, const QVariantList &)
+MainWindow::gotAllRegisteredPhones (bool bOk, const QVariantList &params)
 {
     GVAccess &webPage = Singletons::getRef().getGVAccess ();
     QObject::disconnect(
@@ -1281,6 +1269,9 @@ MainWindow::gotAllRegisteredPhones (bool bOk, const QVariantList &)
             setStatus ("Failed to retrieve registered phones");
             break;
         }
+
+        // Save the users GV number returned by the login completion
+        strSelfNumber = params[params.size()-1].toString ();
 
         this->onCallInitiatorsChange (true);
 
@@ -1305,7 +1296,7 @@ MainWindow::getDialSettings (bool                 &bDialout   ,
 
         gvRegNumber.chType = data.chType;
         gvRegNumber.strName = data.strName;
-        gvRegNumber.strDescription = data.strDesc;
+        gvRegNumber.strNumber = data.strDesc;
         bDialout = (data.type == RNT_Callout);
         if (bDialout) {
             initiator = (CalloutInitiator *) data.pCtx;
@@ -1674,7 +1665,7 @@ MainWindow::onCallInitiatorsChange (bool bSave)
     {
         strCiName = "Dial back: " + arrNumbers[i].strName;
         modelRegNumber.insertRow (strCiName,
-                                  arrNumbers[i].strDescription,
+                                  arrNumbers[i].strNumber,
                                   arrNumbers[i].chType);
     }
 

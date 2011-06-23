@@ -6,6 +6,7 @@ using namespace std;
 
 MainWindow::MainWindow(QObject *parent /*= 0*/)
 : QObject(parent)
+, bIsLoggedIn (false)
 , oContacts (this)
 , oInbox (this)
 , checkCounter (0)
@@ -115,7 +116,7 @@ MainWindow::baseDir()
 void
 MainWindow::doWork ()
 {
-    if (strSelfNumber.isEmpty ()) {
+    if (!bIsLoggedIn) {
         doLogin ();
         return;
     }
@@ -403,7 +404,6 @@ MainWindow::doLogin ()
 void
 MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
 {
-    strSelfNumber.clear ();
     GVAccess &webPage = Singletons::getRef().getGVAccess ();
     webPage.setTimeout(20);
 
@@ -419,8 +419,7 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
     {
         qDebug ("User logged in");
 
-        // Save the users GV number returned by the login completion
-        strSelfNumber = varList[varList.size()-1].toString ();
+        bIsLoggedIn = true;
 
         oContacts.setUserPass (strUser, strPass);
         oContacts.loginSuccess ();
@@ -445,6 +444,8 @@ MainWindow::logoutCompleted (bool, const QVariantList &)
     // This clears out the table and the view as well
     oContacts.loggedOut ();
     oInbox.loggedOut ();
+    
+    bIsLoggedIn = false;
 }//MainWindow::logoutCompleted
 
 void

@@ -63,8 +63,8 @@ private slots:
     void onDataCallDone (QNetworkReply * reply);
     void onDataCallCanceled (QNetworkReply * reply);
 
-    //! Invoked when the registered phone list page is loaded
-    void phonesListLoaded (bool bOk);
+    //! Invoked when the registered phone list XML is retrieved.
+    void onGotPhonesListXML (QNetworkReply * reply);
 
     //! Invoked when GV responds with a inbox page.
     void onGotInboxXML (QNetworkReply *reply);
@@ -86,7 +86,6 @@ private slots:
     void onSocketXfer (qint64 bytesXfer, qint64 bytesTotal);
 
 private:
-    bool isLoggedIn ();
     bool isOnline ();
     void getHostAndQuery (QString &strHost, QString &strQuery);
     void loadUrlString (const QString &strUrl);
@@ -124,6 +123,10 @@ private:
     virtual void completeCurrentWork (GVAccess_Work whatwork, bool bOk);
     //! Starts the timeout timer for NW requests
     void startTimerForReply(QNetworkReply *reply);
+
+    bool parseInboxJson(const QDateTime &dtUpdate, const QString &strJson,
+                        const QString &strHtml, bool &bGotOld, int &nNew,
+                        qint32 &nUsableMsgs);
 
 private:
     //! The webkit page that does all our work

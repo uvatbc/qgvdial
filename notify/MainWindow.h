@@ -51,8 +51,8 @@ private:
     int m_mqPort;
     QString m_strMqTopic;
 
-    // Needed by GV webpage
-    QString strSelfNumber;
+    //! Are we logged in yet?
+    bool bIsLoggedIn;
 
     //! GV Contacts object
     GVContactsTable oContacts;

@@ -20,7 +20,7 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "GVWebPage.h"
-#include "GVI_XMLJsonHandler.h"
+#include "GvXMLParser.h"
 
 #define GV_DATA_BASE "https://www.google.com/voice"
 #define SYMBIAN_SIGNED 0
@@ -133,18 +133,6 @@ GVWebPage::postRequest (QString            strUrl  ,
                                   strUrl, arrPairs, strUA,
                                   receiver, method);
 }//GVWebPage::postRequest
-
-bool
-GVWebPage::isLoggedIn ()
-{
-    QString strHtml = webPage.mainFrame ()->toHtml ();
-    QRegExp rx("<input.*name\\s*=\\s*\"_rnr_se\"\\s*value\\s*=\\s*\"(.*)\"\\s*>");
-    rx.setMinimal (true);
-    if ((strHtml.contains (rx)) && (rx.numCaptures () == 1) && (strRnr_se == rx.cap (1))) {
-        return true;
-    }
-    return false;
-}//GVWebPage::isLoggedIn
 
 bool
 GVWebPage::isOnline ()
@@ -304,31 +292,16 @@ GVWebPage::loginStage3 (bool bOk)
         temp.close ();
 #endif
 
-        QRegExp rx("<b\\s*class\\s*=\\s*\"ms3\">(.*)</b>");
-        rx.setMinimal (true);
-        if ((strHtml.contains (rx)) && (1 == rx.numCaptures ())) {
-            strSelfNumber = rx.cap (1);
-        } else {
-            qWarning ("Failed to get a google voice number!!");
-            strSelfNumber.clear ();
-            strLastError = "Account not configured";
-            break;
-        }
-
-        simplify_number (strSelfNumber, false);
-        workCurrent.arrParams += QVariant (strSelfNumber);
-
-        rx.setPattern ("<input.*name\\s*=\\s*\"_rnr_se\"\\s*value\\s*=\\s*\"(.*)\"\\s*>");
+        QRegExp rx("name\\s*=\\s*\"_rnr_se\"\\s*value\\s*=\\s*\"(.*)\"\\s*>");
         rx.setMinimal (true);
         if ((strHtml.contains (rx)) && (rx.numCaptures () == 1)) {
             strRnr_se = rx.cap (1);
         } else {
             qWarning ("Could not find rnr_se");
             strLastError = "Account not configured";
-            break;
+//            break;
         }
 
-        bLoggedIn = true;
         bOk = true;
     } while (0); // End cleanup block (not a loop)
 
@@ -376,7 +349,8 @@ GVWebPage::dialCallback (bool bCallback)
 #endif
 
     if (!this->isOnline ()) {
-        if (bEmitLog) qDebug ("Cannot dial back when offline");
+        if (bEmitLog) qDebug ("Cannot dial when offline");
+        strLastError = "Cannot dial when offline";
         completeCurrentWork (bCallback?GVAW_dialCallback:GVAW_dialOut, false);
         return false;
     }
@@ -384,6 +358,14 @@ GVWebPage::dialCallback (bool bCallback)
     QMutexLocker locker(&mutex);
     if (!bLoggedIn)
     {
+        strLastError = "Not logged in. Cannot make calls.";
+        completeCurrentWork (bCallback?GVAW_dialCallback:GVAW_dialOut, false);
+        return (false);
+    }
+
+    if (strRnr_se.isEmpty () && bCallback) {
+        strLastError = "Account not configured. Cannot make calls.";
+        qWarning() << strLastError;
         completeCurrentWork (bCallback?GVAW_dialCallback:GVAW_dialOut, false);
         return (false);
     }
@@ -393,8 +375,7 @@ GVWebPage::dialCallback (bool bCallback)
     workCurrent.cancel = (WebPageCancel) &GVWebPage::cancelDataDial2;
     QNetworkReply *reply = NULL;
 
-    if (!bCallback)
-    {
+    if (!bCallback) {
         QString strUA = UA_IPHONE;
         QString strUrl = QString("https://www.google.com/voice/m/x"
                                  "?m=call"
@@ -452,9 +433,7 @@ GVWebPage::dialCallback (bool bCallback)
                           this, SLOT   (onDataCallDone (QNetworkReply *)));
         this->bIsCallback = false;
         reply = mgr->post (request, strContent.toAscii());
-    }
-    else
-    {
+    } else {
         arrPairs += QStringPair("outgoingNumber"  , arrParams[0].toString());
         arrPairs += QStringPair("forwardingNumber", arrParams[2].toString());
         arrPairs += QStringPair("subscriberNumber", strSelfNumber);
@@ -514,6 +493,7 @@ GVWebPage::onDataCallDone (QNetworkReply * reply)
         {
             qWarning() << "Failed to dial out. Response to dial out request ="
                        << msg;
+            strLastError = "Faild to dial out";
             completeCurrentWork(this->bIsCallback ? GVAW_dialCallback
                                                   : GVAW_dialOut,
                                 false);
@@ -540,6 +520,7 @@ GVWebPage::cancelDataDial2 ()
         if ((GVAW_dialCallback == workCurrent.whatwork) ||
             (GVAW_dialOut      == workCurrent.whatwork))
         {
+            strLastError = "Dial canceled";
             completeCurrentWork (workCurrent.whatwork, false);
         }
         return;
@@ -573,6 +554,7 @@ GVWebPage::onDataCallCanceled (QNetworkReply * reply)
     if ((GVAW_dialCallback == workCurrent.whatwork) ||
         (GVAW_dialOut      == workCurrent.whatwork))
     {
+        strLastError = "Dial canceled";
         completeCurrentWork (workCurrent.whatwork, false);
     }
 
@@ -584,100 +566,194 @@ GVWebPage::getRegisteredPhones ()
 {
     if (!this->isOnline ()) {
         if (bEmitLog) qDebug ("Cannot get registered phones when offline");
+        strLastError = "User is offline";
         completeCurrentWork (GVAW_getRegisteredPhones, false);
         return false;
     }
 
     QMutexLocker locker(&mutex);
-    if (!bLoggedIn)
-    {
+    if (!bLoggedIn) {
+        strLastError = "User not logged in";
         completeCurrentWork (GVAW_getRegisteredPhones, false);
         return (false);
     }
 
-    QString strGoto = GV_HTTPS_M "/selectphone";
-    QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
-                       this   , SLOT   (phonesListLoaded (bool)));
-    this->loadUrlString (strGoto);
+    QString strUA = UA_IPHONE;
+    QString strUrl = "https://www.google.com/voice/settings/tab/phones";
+
+    QNetworkRequest request(strUrl);
+    request.setRawHeader ("User-Agent", strUA.toAscii ());
+
+    QNetworkAccessManager *mgr = webPage.networkAccessManager ();
+    QNetworkCookieJar *jar = mgr->cookieJar();
+    QList<QNetworkCookie> cookies = jar->cookiesForUrl(webPage.mainFrame()->url());
+    QList<QNetworkCookie> sendCookies;
+    QString gvxVal;
+    foreach (QNetworkCookie cookie, cookies) {
+        if ((cookie.name() == "gv")   ||
+            (cookie.name() == "gvx")  ||
+            (cookie.name() == "PREF") ||
+            (cookie.name() == "S")    ||
+            (cookie.name() == "SID")  ||
+            (cookie.name() == "HSID") ||
+            (cookie.name() == "SSID"))
+        {
+            sendCookies += cookie;
+        }
+
+        if (cookie.name () == "gvx")
+        {
+            gvxVal = cookie.value ();
+        }
+    }
+
+    // Set up the cookies in the request
+    request.setHeader (QNetworkRequest::CookieHeader,
+                       QVariant::fromValue(sendCookies));
+
+    connect (mgr , SIGNAL (finished (QNetworkReply *)),
+             this, SLOT   (onGotPhonesListXML (QNetworkReply *)));
+    mgr->get (request);
 
     return (true);
 }//GVWebPage::getRegisteredPhones
 
 void
-GVWebPage::phonesListLoaded (bool bOk)
+GVWebPage::onGotPhonesListXML (QNetworkReply *reply)
 {
-    QObject::disconnect (&webPage, SIGNAL (loadFinished (bool)),
-                          this   , SLOT   (phonesListLoaded (bool)));
-    do // Begin cleanup block (not a loop)
-    {
-        if (isLoadFailed (bOk))
-        {
-            bOk = false;
-            qWarning ("Failed to load phones settings page");
+    QNetworkAccessManager *mgr = webPage.networkAccessManager ();
+    disconnect (mgr , SIGNAL (finished (QNetworkReply *)),
+                this, SLOT   (onGotPhonesListXML (QNetworkReply *)));
+
+    bool bOk = false;
+
+    do { // Begin cleanup block (not a loop)
+        if (QNetworkReply::NoError != reply->error ()) {
+            qWarning ("Error getting the phones list");
             break;
         }
 
-        QString strHtml = webPage.mainFrame ()->toHtml ();
-#if 0
-        QFile temp("dump.txt");
-        temp.open (QIODevice::ReadWrite);
-        temp.write (strHtml.toAscii ());
-        temp.close ();
-#endif
+        QString strReply = reply->readAll ();
+        QXmlInputSource inputSource;
+        QXmlSimpleReader simpleReader;
+        inputSource.setData (strReply);
+        GvXMLParser xmlHandler;
+        xmlHandler.setEmitLog (bEmitLog);
 
-        QRegExp rx("<input\\s*type\\s*=\\s*\"radio\"\\s*name\\s*=\\s*\"phone\""
-                   "\\s*value\\s*=\\s*\"(.*)<br>\\s*<\\/div>");
-        rx.setMinimal (true);
-        if ((!strHtml.contains (rx)) || (rx.numCaptures () <= 0)) {
-            qWarning ("No registered phones found for this account");
+        simpleReader.setContentHandler (&xmlHandler);
+        simpleReader.setErrorHandler (&xmlHandler);
+
+        qDebug ("Begin parsing");
+        simpleReader.parse (&inputSource, false);
+        qDebug ("End parsing");
+
+        QString strTemp;
+        QScriptEngine scriptEngine;
+        strTemp = "var topObj = " + xmlHandler.strJson;
+        scriptEngine.evaluate (strTemp);
+
+        strSelfNumber =
+        scriptEngine.evaluate("topObj[\"settings\"][\"primaryDid\"]").toString();
+        workCurrent.arrParams += QVariant (strSelfNumber);
+
+        if ("CLIENT_ONLY" == strSelfNumber) {
+            qWarning ("This account has not been configured. No phone calls possible.");
+        }
+
+        strTemp = "var phoneParams = []; "
+                  "var phoneList = []; "
+                  "for (var phoneId in topObj[\"phones\"]) { "
+                  "    phoneList.push(phoneId); "
+                  "}";
+        scriptEngine.evaluate (strTemp);
+        if (scriptEngine.hasUncaughtException ()) {
+            strTemp = QString ("Uncaught exception executing script : %1")
+                      .arg (scriptEngine.uncaughtException ().toString ());
+            qDebug() << strTemp;
             break;
         }
 
-        QString strRx1 = "<input\\s*type\\s*=\\s*\"radio\"\\s*name\\s*=\\s*\""
-                         "phone\"\\s*value\\s*=\\s*\"(.*)<br>";
-        QString strRx2 = "(.*)\\|(.).*>[\\s\\r\\n]*(.*)";
-        strHtml = rx.cap (0);
-        rx.setPattern (strRx1);
-        rx.setMinimal (true);
-        while (strHtml.contains (rx) && (rx.numCaptures () > 0)) {
-            QString strOneNum = rx.cap (1);
-            strHtml.remove (0, strHtml.indexOf (strOneNum) + strOneNum.length ());
+        qint32 nPhoneCount = scriptEngine.evaluate("phoneList.length;").toInt32 ();
+        qDebug() << "phone count =" << nPhoneCount;
 
-            if (bEmitLog) qDebug () << strOneNum;
-
-            rx.setPattern (strRx2);
-            rx.setMinimal (false);
-            if (strOneNum.contains (rx) && (rx.numCaptures () == 3)) {
-                GVRegisteredNumber regNumber;
-                QString strText = rx.cap (3);
-                strText = strText.simplified ();
-                QStringList arrSplit = strText.split (":");
-                if (arrSplit.length () == 2) {
-                    regNumber.strName = arrSplit[0].trimmed ();
-                    regNumber.strDescription = arrSplit[1].trimmed();
-                    // Make the actual number follow the form: +1aaabbbcccc
-                    regNumber.strDescription.remove (QRegExp("[ \t\n()-]"));
-                    simplify_number (regNumber.strDescription);
-                }
-
-                strText = rx.cap (1);
-                simplify_number (strText);
-                if (strText == regNumber.strDescription) {
-                    regNumber.chType = rx.cap (2)[0].toAscii ();
-                }
-
-                emit registeredPhone (regNumber);
+        for (qint32 i = 0; i < nPhoneCount; i++) {
+            strTemp = QString(
+                    "phoneParams = []; "
+                    "for (var params in topObj[\"phones\"][phoneList[%1]]) { "
+                    "    phoneParams.push(params); "
+                    "}").arg(i);
+            scriptEngine.evaluate (strTemp);
+            if (scriptEngine.hasUncaughtException ()) {
+                strTemp = QString ("Uncaught exception in message loop: %1")
+                          .arg (scriptEngine.uncaughtException ().toString ());
+                qDebug() << strTemp;
+                break;
             }
 
-            rx.setPattern (strRx1);
-            rx.setMinimal (true);
+            qint32 nParams =
+            scriptEngine.evaluate ("phoneParams.length;").toInt32 ();
+
+//            qDebug() << QString ("Phone %1 has %2 params").arg (i).arg (nParams);
+
+            GVRegisteredNumber regNumber;
+            for (qint32 j = 0; j < nParams; j++) {
+                strTemp = QString("phoneParams[%1];").arg (j);
+                QString strPName = scriptEngine.evaluate (strTemp).toString ();
+                strTemp = QString(
+                          "topObj[\"phones\"][phoneList[%1]][phoneParams[%2]];")
+                            .arg (i)
+                            .arg (j);
+                QString strVal = scriptEngine.evaluate (strTemp).toString ();
+
+                if (strPName == "id") {
+                    regNumber.strId = strVal;
+                } else if (strPName == "name") {
+                    regNumber.strName = strVal;
+                } else if (strPName == "phoneNumber") {
+                    regNumber.strNumber = strVal;
+                } else if (strPName == "type") {
+                    regNumber.chType = strVal[0].toAscii ();
+                } else if (strPName == "verified") {
+                } else if (strPName == "policyBitmask") {
+                } else if (strPName == "dEPRECATEDDisabled") {
+                } else if (strPName == "telephonyVerified") {
+                } else if (strPName == "smsEnabled") {
+                } else if (strPName == "incomingAccessNumber") {
+                } else if (strPName == "voicemailForwardingVerified") {
+                } else if (strPName == "behaviorOnRedirect") {
+                } else if (strPName == "carrier") {
+                } else if (strPName == "customOverrideState") {
+                } else if (strPName == "inVerification") {
+                } else if (strPName == "recentlyProvisionedOrDeprovisioned") {
+                } else if (strPName == "formattedNumber") {
+                } else if (strPName == "wd") {
+                } else if (strPName == "we") {
+                } else if (strPName == "scheduleSet") {
+                } else if (strPName == "weekdayAllDay") {
+                } else if (strPName == "weekdayTimes") {
+                } else if (strPName == "weekendAllDay") {
+                } else if (strPName == "weekendTimes") {
+                } else if (strPName == "redirectToVoicemail") {
+                } else if (strPName == "active") {
+                } else if (strPName == "enabledForOthers") {
+                } else {
+                    qDebug() << QString ("param = %1. value = %2")
+                                        .arg (strPName).arg (strVal);
+                }
+            }
+
+            qDebug() << "Name =" << regNumber.strName
+                     << " number =" << regNumber.strNumber
+                     << " type =" << regNumber.chType;
+            emit registeredPhone (regNumber);
         }
 
         bOk = true;
     } while (0); // End cleanup block (not a loop)
 
+    reply->deleteLater ();
     completeCurrentWork (GVAW_getRegisteredPhones, bOk);
-}//GVWebPage::phonesListLoaded
+}//GVWebPage::onGotPhonesListXML
 
 void
 GVWebPage::userCancel ()
@@ -691,6 +767,7 @@ GVWebPage::sendInboxRequest ()
 {
     if (!this->isOnline ()) {
         if (bEmitLog) qDebug ("Cannot send request for inbox when offline");
+        strLastError = "User is offline";
         completeCurrentWork (GVAW_getInbox, false);
         return false;
     }
@@ -698,6 +775,7 @@ GVWebPage::sendInboxRequest ()
     QMutexLocker locker(&mutex);
     if (!bLoggedIn)
     {
+        strLastError = "User not logged in";
         completeCurrentWork (GVAW_getInbox, false);
         return (false);
     }
@@ -757,6 +835,7 @@ GVWebPage::getInbox ()
 {
     if (!this->isOnline ()) {
         if (bEmitLog) qDebug ("Cannot get inbox when offline");
+        strLastError = "User is offline";
         completeCurrentWork (GVAW_getInbox, false);
         return false;
     }
@@ -764,6 +843,7 @@ GVWebPage::getInbox ()
     QMutexLocker locker(&mutex);
     if (!bLoggedIn)
     {
+        strLastError = "User is not logged in";
         completeCurrentWork (GVAW_getInbox, false);
         return (false);
     }
@@ -784,16 +864,12 @@ GVWebPage::onGotInboxXML (QNetworkReply *reply)
     QXmlInputSource inputSource;
     QXmlSimpleReader simpleReader;
     inputSource.setData (strReply);
-    GVI_XMLJsonHandler xmlHandler;
+    GvXMLParser xmlHandler;
     xmlHandler.setEmitLog (bEmitLog);
 
-    QObject::connect (
-        &xmlHandler, SIGNAL (oneElement (const GVInboxEntry &)),
-         this      , SIGNAL (oneInboxEntry (const GVInboxEntry &)));
-
     bool bOk = false;
-    do // Begin cleanup block (not a loop)
-    {
+    qint32 nUsableMsgs = 0;
+    do { // Begin cleanup block (not a loop)
         simpleReader.setContentHandler (&xmlHandler);
         simpleReader.setErrorHandler (&xmlHandler);
 
@@ -808,8 +884,8 @@ GVWebPage::onGotInboxXML (QNetworkReply *reply)
         QDateTime dtUpdate = workCurrent.arrParams[3].toDateTime ();
         bool bGotOld = false;
         int nNew;
-        if (!xmlHandler.parseJSON (dtUpdate, bGotOld, nNew))
-        {
+        if (!parseInboxJson (dtUpdate, xmlHandler.strJson, xmlHandler.strHtml,
+                             bGotOld, nNew, nUsableMsgs)) {
             qWarning ("Failed to parse GV Inbox JSON");
             break;
         }
@@ -828,7 +904,7 @@ GVWebPage::onGotInboxXML (QNetworkReply *reply)
         int count = workCurrent.arrParams[2].toString().toInt ();
         if (((nCurrent-nFirstPage) >= count) ||
             (bGotOld) ||
-            (0 == xmlHandler.getUsableMsgsCount ())) {
+            (0 == nUsableMsgs)) {
             completeCurrentWork (GVAW_getInbox, true);
             break;
         }
@@ -843,6 +919,298 @@ GVWebPage::onGotInboxXML (QNetworkReply *reply)
 
     reply->deleteLater ();
 }//GVWebPage::onGotInboxXML
+
+bool
+GVWebPage::parseInboxJson(const QDateTime &dtUpdate, const QString &strJson,
+                          const QString &strHtml, bool &bGotOld, int &nNew,
+                          qint32 &nUsableMsgs)
+{
+    bool rv = false;
+    QMap<QString,QString> mapTexts;
+
+    do { // Begin cleanup block (not a loop)
+        QDomNamedNodeMap attrs;
+        QDomDocument doc;
+        doc.setContent (strHtml);
+        if (1 != doc.elementsByTagName("html").size()) {
+            qWarning ("Unexpected number of html tags");
+            return false;
+        }
+
+        QDomNodeList mainDivs = doc.elementsByTagName("html").at(0).childNodes();
+        for (int i = 0; i < mainDivs.size (); i++) {
+            QDomNode oneDivNode = mainDivs.at (i);
+            if (!oneDivNode.isElement ()) {
+                continue;
+            }
+
+            QDomElement oneDivElement = oneDivNode.toElement ();
+            if (oneDivElement.tagName() != "div") {
+                continue;
+            }
+
+            if (!oneDivElement.hasAttribute ("id")) {
+                continue;
+            }
+
+            QString id = oneDivElement.attribute("id");
+            QString strSmsRow;
+            QDomNodeList subDivs = oneDivElement.elementsByTagName("div");
+            for (int j = 0; j < subDivs.size (); j++) {
+                if (!subDivs.at(j).isElement ()) {
+                    continue;
+                }
+
+                if (!subDivs.at(j).toElement().hasAttribute("class")) {
+                    continue;
+                }
+
+                bool bMessageDisplay = false;
+                attrs = subDivs.at(j).toElement().attributes();
+                for (int k = 0; k < attrs.size (); k++) {
+                    if (attrs.item(k).toAttr().value() == "gc-message-message-display") {
+                        bMessageDisplay = true;
+                        break;
+                    }
+                }
+                if (!bMessageDisplay) {
+                    continue;
+                }
+
+                // Children could be either SMS rows or vmail transcription
+                QDomNodeList childDivs = subDivs.at(j).toElement().childNodes();
+                for (int k = 0; k < childDivs.size (); k++) {
+                    if (!childDivs.at(k).isElement ()) {
+                        continue;
+                    }
+
+                    // Find out if it is a div and has the sms atttribute
+                    bool bInteresting = false;
+                    if (childDivs.at(k).toElement().tagName () == "div") {
+                        attrs = childDivs.at(k).toElement().attributes();
+                        for (int l = 0; l < attrs.size (); l++) {
+                            if (attrs.item(l).toAttr().value() == "gc-message-sms-row") {
+                                bInteresting = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (bInteresting) {
+                        QDomNodeList smsRow = childDivs.at(k).toElement().childNodes();
+                        for (int l = 0; l < smsRow.size (); l++) {
+                            if (!smsRow.at(l).isElement()) {
+                                continue;
+                            }
+
+                            QDomElement smsSpan = smsRow.at(l).toElement();
+                            if (smsSpan.tagName () != "span") {
+                                continue;
+                            }
+
+                            attrs = smsSpan.attributes();
+                            for (int m = 0; m < attrs.size (); m++) {
+                                QString strTemp = smsSpan.text ().simplified ();
+                                QDomAttr attr = attrs.item(m).toAttr();
+                                if (attr.value() == "gc-message-sms-from") {
+                                    strSmsRow += "<b>" + strTemp + "</b> ";
+                                } else if (attr.value() == "gc-message-sms-text") {
+                                    strSmsRow += strTemp;
+                                } else if (attr.value() == "gc-message-sms-time") {
+                                    strSmsRow += " <i>(" + strTemp + ")</i><br>";
+                                }
+                            }// loop thru the parts of a single sms
+                        }//loop through sms row
+                        // done with the sms. move to the next child of message display
+                        continue;
+                    }//if bSmsRow
+
+                    // Its not an SMS. Check to see if it's a vmail.
+                    if (childDivs.at(k).toElement().tagName () != "span") {
+                        // I don't care about anything other than the div and
+                        // span children of message-display
+                        continue;
+                    }
+
+                    bInteresting = false;
+                    QDomElement vmailSpan = childDivs.at(k).toElement();
+                    attrs = vmailSpan.attributes();
+                    for (int l = 0; l < attrs.size (); l++) {
+                        QDomAttr attr = attrs.item(l).toAttr();
+                        if (attr.name () != "class") {
+                            continue;
+                        }
+                        if (attr.value().startsWith ("gc-word-")) {
+                            bInteresting = true;
+                            break;
+                        }
+                    }// loop thru the attributes of a single span looking for something interesting
+                    if (!bInteresting) {
+                        continue;
+                    }
+
+                    if (!strSmsRow.isEmpty ()) {
+                        strSmsRow += ' ';
+                    }
+                    strSmsRow += vmailSpan.text ();
+                }//loop thru children of a messages-display div
+            }//loop thru sub-divs under the main divs in the document
+
+            if (!strSmsRow.isEmpty ()) {
+                mapTexts[id] = strSmsRow;
+            }
+        }//loop through the main divs just under the html tag
+    } while (0); // End cleanup block (not a loop)
+
+    do { // Begin cleanup block (not a loop)
+        QString strTemp;
+        QScriptEngine scriptEngine;
+        strTemp = "var topObj = " + strJson;
+        scriptEngine.evaluate (strTemp);
+
+        strTemp = "var msgParams = []; "
+                  "var msgList = []; "
+                  "for (var msgId in topObj[\"messages\"]) { "
+                  "    msgList.push(msgId); "
+                  "}";
+        scriptEngine.evaluate (strTemp);
+        if (scriptEngine.hasUncaughtException ()) {
+            strTemp = QString ("Uncaught exception executing script : %1")
+                      .arg (scriptEngine.uncaughtException ().toString ());
+            qWarning () << strTemp;
+            break;
+        }
+
+        qint32 nMsgCount = scriptEngine.evaluate("msgList.length;").toInt32 ();
+        if (bEmitLog) qDebug() << "message count =" << nMsgCount;
+
+        qint32 nOldMsgs = 0;
+
+        for (qint32 i = 0; i < nMsgCount; i++) {
+            strTemp = QString(
+                    "msgParams = []; "
+                    "for (var params in topObj[\"messages\"][msgList[%1]]) { "
+                    "    msgParams.push(params); "
+                    "}").arg(i);
+            scriptEngine.evaluate (strTemp);
+            if (scriptEngine.hasUncaughtException ()) {
+                strTemp = QString ("Uncaught exception in message loop: %1")
+                          .arg (scriptEngine.uncaughtException ().toString ());
+                qWarning () << strTemp;
+                break;
+            }
+
+            qint32 nParams =
+            scriptEngine.evaluate ("msgParams.length;").toInt32 ();
+
+            GVInboxEntry inboxEntry;
+            for (qint32 j = 0; j < nParams; j++) {
+                strTemp = QString("msgParams[%1];").arg (j);
+                QString strPName = scriptEngine.evaluate (strTemp).toString ();
+                strTemp = QString(
+                          "topObj[\"messages\"][msgList[%1]][msgParams[%2]];")
+                            .arg (i)
+                            .arg (j);
+                QString strVal = scriptEngine.evaluate (strTemp).toString ();
+
+                if (strPName == "id") {
+                    inboxEntry.id = strVal;
+                } else if (strPName == "phoneNumber") {
+                    inboxEntry.strPhoneNumber = strVal;
+                } else if (strPName == "displayNumber") {
+                    inboxEntry.strDisplayNumber = strVal;
+                } else if (strPName == "startTime") {
+                    bool bOk = false;
+                    quint64 iVal = strVal.toULongLong (&bOk) / 1000;
+                    if (bOk) {
+                        inboxEntry.startTime = QDateTime::fromTime_t (iVal);
+                    }
+                } else if (strPName == "isRead") {
+                    inboxEntry.bRead = (strVal == "true");
+                } else if (strPName == "isSpam") {
+                    inboxEntry.bSpam = (strVal == "true");
+                } else if (strPName == "isTrash") {
+                    inboxEntry.bTrash = (strVal == "true");
+                } else if (strPName == "star") {
+                    inboxEntry.bStar = (strVal == "true");
+                } else if (strPName == "labels") {
+                    if (strVal.contains ("placed")) {
+                        inboxEntry.Type = GVIE_Placed;
+                    } else if (strVal.contains ("received")) {
+                        inboxEntry.Type = GVIE_Received;
+                    } else if (strVal.contains ("missed")) {
+                        inboxEntry.Type = GVIE_Missed;
+                    } else if (strVal.contains ("voicemail")) {
+                        inboxEntry.Type = GVIE_Voicemail;
+                    } else if (strVal.contains ("sms")) {
+                        inboxEntry.Type = GVIE_TextMessage;
+                    } else {
+                        if (bEmitLog) qWarning () << "Unknown label" << strVal;
+                    }
+                } else if (strPName == "displayStartDateTime") {
+                } else if (strPName == "displayStartTime") {
+                } else if (strPName == "relativeStartTime") {
+                } else if (strPName == "note") {
+                    inboxEntry.strNote = strVal;
+                } else if (strPName == "type") {
+                } else if (strPName == "children") {
+                } else {
+                    if (bEmitLog)
+                        qDebug () << QString ("param = %1. value = %2")
+                                        .arg (strPName) .arg (strVal);
+                }
+            }
+
+            if (0 == inboxEntry.id.size()) {
+                qWarning ("Invalid ID");
+                continue;
+            }
+            if (0 == inboxEntry.strPhoneNumber.size()) {
+                qWarning ("Invalid Phone number");
+                inboxEntry.strPhoneNumber = "Unknown";
+            }
+            if (0 == inboxEntry.strDisplayNumber.size()) {
+                inboxEntry.strDisplayNumber = "Unknown";
+            }
+            if (!inboxEntry.startTime.isValid ()) {
+                qWarning ("Invalid start time");
+                continue;
+            }
+
+            // Pick up the text from the parsed HTML
+            if (((GVIE_TextMessage == inboxEntry.Type) ||
+                 (GVIE_Voicemail == inboxEntry.Type)) &&
+                (mapTexts.contains (inboxEntry.id)))
+            {
+                inboxEntry.strText = mapTexts[inboxEntry.id];
+            }
+
+            // Check to see if it is too old to show
+            if (dtUpdate.isValid () && (dtUpdate >= inboxEntry.startTime))
+            {
+                nOldMsgs++;
+                if (1 == nOldMsgs) {
+                    if (bEmitLog) qDebug ("Started getting old entries.");
+                    bGotOld = true;
+                } else {
+                    if (bEmitLog) qDebug ("Another old entry");
+                }
+            }
+
+            // emit the inbox element
+            emit oneInboxEntry (inboxEntry);
+            nUsableMsgs++;
+        }
+
+        nNew = nUsableMsgs - nOldMsgs;
+        if (bEmitLog)
+            qDebug () << QString ("Usable %1, old %2, new %3")
+                            .arg (nUsableMsgs).arg (nOldMsgs).arg (nNew);
+
+        rv = true;
+    } while (0); // End cleanup block (not a loop)
+
+    return (rv);
+}//GVWebPage::parseInboxJson
 
 void
 GVWebPage::garbageTimerTimeout ()
@@ -860,6 +1228,7 @@ GVWebPage::sendSMS ()
 {
     if (!this->isOnline ()) {
         if (bEmitLog) qDebug ("Cannot send SMS when offline");
+        strLastError = "User is offline";
         completeCurrentWork (GVAW_sendSMS, false);
         return false;
     }
@@ -868,6 +1237,7 @@ GVWebPage::sendSMS ()
     if (!bLoggedIn)
     {
         qWarning ("User not logged in when attempting to send an SMS");
+        strLastError = "User is not logged in";
         completeCurrentWork (GVAW_sendSMS, false);
         return (false);
     }
@@ -962,6 +1332,7 @@ GVWebPage::playVmail ()
 {
     if (!this->isOnline ()) {
         if (bEmitLog) qDebug ("Cannot download vmail when offline");
+        strLastError = "User is offline";
         completeCurrentWork (GVAW_playVmail, false);
         return false;
     }
@@ -969,6 +1340,7 @@ GVWebPage::playVmail ()
     QMutexLocker locker(&mutex);
     if (!bLoggedIn)
     {
+        strLastError = "User is not logged in";
         completeCurrentWork (GVAW_playVmail, false);
         return (false);
     }

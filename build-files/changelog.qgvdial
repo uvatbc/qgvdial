@@ -1,2 +1,4 @@
-  * DBus API to get and set registered phones.
+  * Code refactoring for the Inbox XML handling code.
+  * Registered numbers are retrieved by requesting an XML instead of loading a webpage.
+  * Removed the stringent requirements of havinf rnr_se. It will fails later, but at least it will login.
 

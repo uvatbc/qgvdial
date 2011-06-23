@@ -54,11 +54,18 @@ Contact: yuvraaj@gmail.com
 
 struct GVRegisteredNumber
 {
+    QString     strId;
     QString     strName;
-    QString     strDescription;
+    QString     strNumber;
     char        chType;
 
-    GVRegisteredNumber () {chType = 0;}
+    GVRegisteredNumber () {init();}
+    void init() {
+        chType = 0;
+        strId.clear ();
+        strName.clear ();
+        strNumber.clear ();
+    }
 };
 typedef QVector<GVRegisteredNumber> GVRegisteredNumberArray;
 

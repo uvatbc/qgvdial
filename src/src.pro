@@ -46,7 +46,7 @@ SOURCES  += ../src/main.cpp                 \
             ../src/CallInitiatorFactory.cpp \
             ../src/MobileWebPage.cpp        \
             ../src/InboxModel.cpp           \
-            ../src/GVI_XMLJsonHandler.cpp   \
+            ../src/GvXMLParser.cpp          \
             ../src/PhoneNumberValidator.cpp \
             ../src/GVContactsTable.cpp      \
             ../src/CaptchaWidget.cpp        \
@@ -80,7 +80,7 @@ HEADERS  += ../src/global.h                 \
             ../src/CallInitiatorFactory.h   \
             ../src/MobileWebPage.h          \
             ../src/InboxModel.h             \
-            ../src/GVI_XMLJsonHandler.h     \
+            ../src/GvXMLParser.h            \
             ../src/PhoneNumberValidator.h   \
             ../src/GVContactsTable.h        \
             ../src/CaptchaWidget.h          \
@@ -243,7 +243,7 @@ maemo5 {
 
     icon64.path = $$DATADIR/icons/hicolor/64x64/hildon
     icon64.files = ../icons/64/qgvdial.png
-    
+
     icon_scalable.path = $$DATADIR/icons/hicolor/scalable/hildon
     icon_scalable.files = qgvdial.png
 
