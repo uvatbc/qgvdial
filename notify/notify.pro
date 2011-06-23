@@ -43,7 +43,7 @@ SOURCES  += main.cpp                        \
             ../src/GVAccess.cpp             \
             ../src/GVWebPage.cpp            \
             ../src/MobileWebPage.cpp        \
-            ../src/GVI_XMLJsonHandler.cpp   \
+            ../src/GvXMLParser.cpp          \
             ../src/ContactsParserObject.cpp \
             ../src/ContactsXmlHandler.cpp
 
@@ -57,6 +57,6 @@ HEADERS  += ../src/global.h                 \
             ../src/GVAccess.h               \
             ../src/GVWebPage.h              \
             ../src/MobileWebPage.h          \
-            ../src/GVI_XMLJsonHandler.h     \
+            ../src/GvXMLParser.h            \
             ../src/ContactsParserObject.h   \
             ../src/ContactsXmlHandler.h
