@@ -44,7 +44,7 @@ class SMSDlg : public ChildWindowBase
     Q_OBJECT
 
 public:
-    SMSDlg (QWidget * parent = 0, Qt::WindowFlags f = 0);
+    SMSDlg (QWidget *parent = 0, Qt::WindowFlags f = 0);
     ~SMSDlg(void);
 
     bool addSMSEntry (const SMSEntry &entry);
@@ -56,6 +56,7 @@ private slots:
     void btnDelClicked (int index);
     void btnSendSMSClicked ();
     void smsTextChanged ();
+    void onDesktopResize();
 
 private:
     void delEntry (int index);

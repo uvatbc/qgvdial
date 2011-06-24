@@ -28,11 +28,13 @@ SMSDlg::SMSDlg(QWidget * parent/* = 0*/, Qt::WindowFlags f/* = 0*/)
 , btnSendSMS ("Send", this)
 {
     // btnSendSMS.clicked -> this.btnSendSMSClicked
-    QObject::connect (&btnSendSMS, SIGNAL (clicked ()),
-                       this      , SLOT   (btnSendSMSClicked ()));
+    connect (&btnSendSMS, SIGNAL(clicked()), this, SLOT(btnSendSMSClicked()));
     // edSMSText.textChanged -> this.smsTextChanged
-    QObject::connect (&edSMSText, SIGNAL (textChanged ()),
-                       this     , SLOT   (smsTextChanged ()));
+    connect (&edSMSText, SIGNAL(textChanged()), this, SLOT(smsTextChanged()));
+
+#if defined(Q_OS_SYMBIAN)
+    connect(qApp->desktop(), SIGNAL(resized(int)), this, SLOT(onDesktopResize()));
+#endif
 }//SMSDlg::SMSDlg
 
 SMSDlg::~SMSDlg(void)
@@ -83,8 +85,7 @@ SMSDlg::delEntry (int index)
 void
 SMSDlg::repopulateGrid ()
 {
-    if (NULL != this->layout ())
-    {
+    if (NULL != this->layout ()) {
         delete this->layout ();
     }
 
@@ -165,3 +166,10 @@ SMSDlg::smsTextChanged ()
 
     lblTextCount.setText (strLen);
 }//SMSDlg::smsTextChanged
+
+void
+SMSDlg::onDesktopResize ()
+{
+    QSize ds = qApp->desktop()->size ();
+    this->resize (ds);
+}//SMSDlg::onDesktopResize

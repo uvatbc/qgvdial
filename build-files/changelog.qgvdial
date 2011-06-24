@@ -1,4 +1,3 @@
-  * Code refactoring for the Inbox XML handling code.
-  * Registered numbers are retrieved by requesting an XML instead of loading a webpage.
-  * Removed the stringent requirements of havinf rnr_se. It will fails later, but at least it will login.
+  * Code cleanup and fix an uninitialized variable.
+  * Resize SMS dialog of rotation for Symbian
 

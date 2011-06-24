@@ -638,7 +638,7 @@ MainWindow::on_action_Login_triggered ()
 }//MainWindow::on_action_Login_triggered
 
 void
-MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
+MainWindow::loginCompleted (bool bOk, const QVariantList & /*varList*/)
 {
     strSelfNumber.clear ();
     GVAccess &webPage = Singletons::getRef().getGVAccess ();
@@ -928,6 +928,12 @@ MainWindow::dialNow (const QString &strTarget)
     {
         if (!bLoggedIn) {
             setStatus ("User is not logged in yet. Cannot make any calls.");
+            break;
+        }
+        if (strSelfNumber.isEmpty () || (strSelfNumber == "CLIENT_ONLY")) {
+            qWarning ("Self number is not valid. Dial canceled");
+            setStatus ("Account not configured");
+            showMsgBox ("Account not configured");
             break;
         }
 
@@ -1246,11 +1252,6 @@ MainWindow::refreshRegisteredNumbers ()
 void
 MainWindow::gotRegisteredPhone (const GVRegisteredNumber &info)
 {
-    QString msg = QString("\"%1\"=\"%2\"")
-                    .arg (info.strName)
-                    .arg (info.strNumber);
-    qDebug () << msg;
-
     arrNumbers += info;
 }//MainWindow::gotRegisteredPhone
 
@@ -1746,10 +1747,16 @@ MainWindow::fallbackDialout (DialContext *ctx)
         return;
     }
 
+    QString strFull = ctx->strMyNumber;
+    if (strFull.isEmpty() || (strFull == "CLIENT_ONLY")) {
+        qWarning("Fallback dialout not possible. Self number not configured.");
+        ctx->deleteLater ();
+        return;
+    }
+
     ctx->fallbackCi = cif.getFallbacks()[0];
     QObject::connect (ctx->fallbackCi, SIGNAL(callInitiated(bool,void*)),
                       this,            SLOT  (onFallbackDialout(bool,void*)));
-    QString strFull = ctx->strMyNumber;
     GVAccess::simplify_number (strFull);
     ctx->fallbackCi->initiateCall (strFull, ctx);
 }//MainWindow::fallbackDialout
@@ -1758,9 +1765,8 @@ void
 MainWindow::onFallbackDialout (bool bSuccess, void *v_ctx)
 {
     DialContext *ctx = (DialContext *) v_ctx;
-    QObject::disconnect (
-        ctx->fallbackCi, SIGNAL(callInitiated(bool,void*)),
-        this,            SLOT  (onFallbackDialout(bool,void*)));
+    disconnect (ctx->fallbackCi, SIGNAL(callInitiated(bool,void*)),
+                this,            SLOT  (onFallbackDialout(bool,void*)));
 
     if (!bSuccess) {
         this->showMsgBox ("Dialing failed");

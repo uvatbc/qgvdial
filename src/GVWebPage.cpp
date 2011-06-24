@@ -439,7 +439,9 @@ GVWebPage::dialCallback (bool bCallback)
         arrPairs += QStringPair("subscriberNumber", strSelfNumber);
         arrPairs += QStringPair("phoneType"       , arrParams[3].toString());
         arrPairs += QStringPair("remember"        , "1");
-        arrPairs += QStringPair("_rnr_se"         , strRnr_se);
+        if (!strRnr_se.isEmpty ()) {
+            arrPairs += QStringPair("_rnr_se"     , strRnr_se);
+        }
         this->bIsCallback = true;
         reply =
         postRequest (GV_DATA_BASE "/call/connect/", arrPairs, UA_IPHONE,
@@ -532,7 +534,9 @@ GVWebPage::cancelDataDial2 ()
     arrPairs += QStringPair("outgoingNumber"  , "undefined");
     arrPairs += QStringPair("forwardingNumber", strCurrentCallback);
     arrPairs += QStringPair("cancelType"      , "C2C");
-    arrPairs += QStringPair("_rnr_se"         , strRnr_se);
+    if (!strRnr_se.isEmpty ()) {
+        arrPairs += QStringPair("_rnr_se"     , strRnr_se);
+    }
 
     QNetworkReply *reply =
     postRequest (GV_DATA_BASE "/call/cancel/", arrPairs, QString (),
@@ -643,9 +647,7 @@ GVWebPage::onGotPhonesListXML (QNetworkReply *reply)
         simpleReader.setContentHandler (&xmlHandler);
         simpleReader.setErrorHandler (&xmlHandler);
 
-        qDebug ("Begin parsing");
         simpleReader.parse (&inputSource, false);
-        qDebug ("End parsing");
 
         QString strTemp;
         QScriptEngine scriptEngine;
@@ -669,12 +671,12 @@ GVWebPage::onGotPhonesListXML (QNetworkReply *reply)
         if (scriptEngine.hasUncaughtException ()) {
             strTemp = QString ("Uncaught exception executing script : %1")
                       .arg (scriptEngine.uncaughtException ().toString ());
-            qDebug() << strTemp;
+            if (bEmitLog) qDebug() << strTemp;
             break;
         }
 
         qint32 nPhoneCount = scriptEngine.evaluate("phoneList.length;").toInt32 ();
-        qDebug() << "phone count =" << nPhoneCount;
+        if (bEmitLog) qDebug() << "phone count =" << nPhoneCount;
 
         for (qint32 i = 0; i < nPhoneCount; i++) {
             strTemp = QString(
@@ -686,14 +688,12 @@ GVWebPage::onGotPhonesListXML (QNetworkReply *reply)
             if (scriptEngine.hasUncaughtException ()) {
                 strTemp = QString ("Uncaught exception in message loop: %1")
                           .arg (scriptEngine.uncaughtException ().toString ());
-                qDebug() << strTemp;
+                if (bEmitLog) qDebug() << strTemp;
                 break;
             }
 
             qint32 nParams =
             scriptEngine.evaluate ("phoneParams.length;").toInt32 ();
-
-//            qDebug() << QString ("Phone %1 has %2 params").arg (i).arg (nParams);
 
             GVRegisteredNumber regNumber;
             for (qint32 j = 0; j < nParams; j++) {
@@ -713,38 +713,42 @@ GVWebPage::onGotPhonesListXML (QNetworkReply *reply)
                     regNumber.strNumber = strVal;
                 } else if (strPName == "type") {
                     regNumber.chType = strVal[0].toAscii ();
-                } else if (strPName == "verified") {
-                } else if (strPName == "policyBitmask") {
-                } else if (strPName == "dEPRECATEDDisabled") {
-                } else if (strPName == "telephonyVerified") {
-                } else if (strPName == "smsEnabled") {
-                } else if (strPName == "incomingAccessNumber") {
-                } else if (strPName == "voicemailForwardingVerified") {
-                } else if (strPName == "behaviorOnRedirect") {
-                } else if (strPName == "carrier") {
-                } else if (strPName == "customOverrideState") {
-                } else if (strPName == "inVerification") {
-                } else if (strPName == "recentlyProvisionedOrDeprovisioned") {
-                } else if (strPName == "formattedNumber") {
-                } else if (strPName == "wd") {
-                } else if (strPName == "we") {
-                } else if (strPName == "scheduleSet") {
-                } else if (strPName == "weekdayAllDay") {
-                } else if (strPName == "weekdayTimes") {
-                } else if (strPName == "weekendAllDay") {
-                } else if (strPName == "weekendTimes") {
-                } else if (strPName == "redirectToVoicemail") {
-                } else if (strPName == "active") {
-                } else if (strPName == "enabledForOthers") {
+                } else if ((strPName == "verified") ||
+                           (strPName == "policyBitmask") ||
+                           (strPName == "dEPRECATEDDisabled") ||
+                           (strPName == "telephonyVerified") ||
+                           (strPName == "smsEnabled") ||
+                           (strPName == "incomingAccessNumber") ||
+                           (strPName == "voicemailForwardingVerified") ||
+                           (strPName == "behaviorOnRedirect") ||
+                           (strPName == "carrier") ||
+                           (strPName == "customOverrideState") ||
+                           (strPName == "inVerification") ||
+                           (strPName == "recentlyProvisionedOrDeprovisioned") ||
+                           (strPName == "formattedNumber") ||
+                           (strPName == "wd") ||
+                           (strPName == "we") ||
+                           (strPName == "scheduleSet") ||
+                           (strPName == "weekdayAllDay") ||
+                           (strPName == "weekdayTimes") ||
+                           (strPName == "weekendAllDay") ||
+                           (strPName == "weekendTimes") ||
+                           (strPName == "redirectToVoicemail") ||
+                           (strPName == "active") ||
+                           (strPName == "enabledForOthers")) {
                 } else {
-                    qDebug() << QString ("param = %1. value = %2")
+                    if (bEmitLog) {
+                        qDebug() << QString ("param = %1. value = %2")
                                         .arg (strPName).arg (strVal);
+                    }
                 }
             }
 
-            qDebug() << "Name =" << regNumber.strName
-                     << " number =" << regNumber.strNumber
-                     << " type =" << regNumber.chType;
+            if (bEmitLog) {
+                qDebug() << "Name =" << regNumber.strName
+                         << " number =" << regNumber.strNumber
+                         << " type =" << regNumber.chType;
+            }
             emit registeredPhone (regNumber);
         }
 
@@ -868,7 +872,6 @@ GVWebPage::onGotInboxXML (QNetworkReply *reply)
     xmlHandler.setEmitLog (bEmitLog);
 
     bool bOk = false;
-    qint32 nUsableMsgs = 0;
     do { // Begin cleanup block (not a loop)
         simpleReader.setContentHandler (&xmlHandler);
         simpleReader.setErrorHandler (&xmlHandler);
@@ -883,7 +886,8 @@ GVWebPage::onGotInboxXML (QNetworkReply *reply)
 
         QDateTime dtUpdate = workCurrent.arrParams[3].toDateTime ();
         bool bGotOld = false;
-        int nNew;
+        int nNew = 0;
+        qint32 nUsableMsgs = 0;
         if (!parseInboxJson (dtUpdate, xmlHandler.strJson, xmlHandler.strHtml,
                              bGotOld, nNew, nUsableMsgs)) {
             qWarning ("Failed to parse GV Inbox JSON");
