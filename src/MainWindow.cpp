@@ -33,6 +33,7 @@ MainWindow::MainWindow (QWidget *parent)
 , pSystray (NULL)
 , oContacts (this)
 , oInbox (this)
+, dlgSMS (this)
 , vmailPlayer (this)
 , statusTimer (this)
 #ifdef Q_WS_MAEMO_5

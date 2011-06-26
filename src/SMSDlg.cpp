@@ -170,6 +170,9 @@ SMSDlg::smsTextChanged ()
 void
 SMSDlg::onDesktopResize ()
 {
+    // This should be called ONLY for Symbian
     QSize ds = qApp->desktop()->size ();
+    ds.setHeight(ds.height() * 0.8);
+    ds.setWidth(ds.width() * 0.8);
     this->resize (ds);
 }//SMSDlg::onDesktopResize

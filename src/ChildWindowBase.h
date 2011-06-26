@@ -30,10 +30,8 @@ Contact: yuvraaj@gmail.com
 
 #ifdef Q_WS_MAEMO_5
 typedef QWidget ChildWindowBaseClass;
-#define ChildWindowBase_flags (Qt::Window)
 #else
 typedef QDialog ChildWindowBaseClass;
-#define ChildWindowBase_flags (0)
 #endif
 
 class ChildWindowBase : public ChildWindowBaseClass

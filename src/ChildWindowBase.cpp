@@ -27,4 +27,8 @@ ChildWindowBase::ChildWindowBase(QWidget *parent, Qt::WindowFlags  f)
 {
     OsDependent &osd = Singletons::getRef().getOSD ();
     osd.setDefaultWindowAttributes (this);
+
+#ifdef Q_WS_MAEMO_5
+    this->setWindowFlags (this->windowFlags() | Qt::Window);
+#endif
 }//ChildWindowBase::ChildWindowBase
