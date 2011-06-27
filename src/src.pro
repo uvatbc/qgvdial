@@ -123,6 +123,7 @@ OTHER_FILES  += ../src/winrsrc.rc           \
                 ../qml/RadioButton.qml      \
                 ../qml/Scrollbar.qml        \
                 ../qml/Settings.qml         \
+                ../qml/SmsView.qml          \
                 ../qml/Tab.qml              \
                 ../qml/TabbedUI.qml         \
                 readme.txt

@@ -42,6 +42,7 @@
         <file alias="RadioButton.qml">../qml/RadioButton.qml</file>
         <file alias="Scrollbar.qml">../qml/Scrollbar.qml</file>
         <file alias="Settings.qml">../qml/Settings.qml</file>
+        <file alias="SmsView.qml">../qml/SmsView.qml</file>
         <file alias="Tab.qml">../qml/Tab.qml</file>
         <file alias="TabbedUI.qml">../qml/TabbedUI.qml</file>
     </qresource>

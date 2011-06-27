@@ -77,3 +77,10 @@ WebWidget::keyPressEvent (QKeyEvent *event)
         QDeclarativeItem::keyPressEvent (event);
     }
 }//WebWidget::keyPressEvent
+
+void
+WebWidget::geometryChanged (const QRectF &newG, const QRectF &oldG)
+{
+    wv->resize (newG.width(), newG.height());
+    QDeclarativeItem::geometryChanged (newG, oldG);
+}//WebWidget::geometryChanged

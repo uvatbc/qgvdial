@@ -40,6 +40,7 @@ public:
 
 private:
     void keyPressEvent (QKeyEvent *event);
+    void geometryChanged (const QRectF &newG, const QRectF &oldG);
 
 private:
     QWebView *wv;

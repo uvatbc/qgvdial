@@ -31,22 +31,43 @@ Flickable {
     property alias notesText: notes.text
     property int suggestedPixelSize: 500
 
-    ListView {  // All phone numbers for this contact
-        id: listview
-        width: parent.width
+    Text {
+        id: notes
+        text: "some notes"
         anchors {
             top: parent.top
             left: parent.left
+        }
+
+        // Must have width if word wrap is to work.
+        width: parent.width
+        height: paintedHeight+2
+
+        wrapMode: Text.WordWrap
+
+        font.pixelSize: (parent.height + parent.width) / 40
+        color: "white"
+    }// Text (contact notes)
+
+    ListView {  // All phone numbers for this contact
+        id: listview
+        anchors {
+            top: notes.bottom
+            left: parent.left
+            right: parent.right
+            bottom: parent.bottom
             topMargin: 4
         }
-        height: (model ? ((container.suggestedPixelSize+3) * model.count * 2) : 1)
         spacing: 3
         clip: true
+
+        property real dHeight: (container.suggestedPixelSize * 2) + 4
+        property real lHeight: (dHeight + spacing) * (model ? model.count : 1)
 
         delegate: Item { // one phone number
             id: delegateItem
             width: parent.width
-            height: container.suggestedPixelSize * 2
+            height: listview.dHeight
 
             Text { // The phone number
                 id: textNumber
@@ -58,24 +79,26 @@ Flickable {
 
                 text: type + " : " + number
                 color: "white"
-                font.pixelSize: (parent.height/2) - 6
+                font.pixelSize: container.suggestedPixelSize
             }// Item (phone number)
 
             Row {
                 anchors {
                     top: textNumber.bottom
                     left: parent.left
+                    bottom: delegateItem.bottom
                 }
                 width: parent.width
-                height: parent.height / 2
+                height: container.suggestedPixelSize
                 spacing: 2
 
                 MyButton {
                     id: btnCall
                     mainText: "Call"
                     mainPixelSize: parent.height - 6
-                    width: parent.width / 2
+                    width: (parent.width / 2) - parent.spacing
                     height: parent.height
+                    anchors.verticalCenter: parent.verticalCenter
 
                     onClicked: container.sigCall(number)
                 }
@@ -84,28 +107,13 @@ Flickable {
                     id: btnText
                     mainText: "Text"
                     mainPixelSize: parent.height - 6
-                    width: parent.width / 2
+                    width: (parent.width / 2) - parent.spacing
                     height: parent.height
+                    anchors.verticalCenter: parent.verticalCenter
 
                     onClicked: container.sigText(number)
                 }
             }// Row (Call and Text buttons)
         }// delegate Item (one phone number)
     }//ListView (All phone numbers for this contact)
-
-    Text {
-        id: notes
-        text: "some notes"
-        width: parent.width
-        anchors {
-            top: listview.bottom
-            left: parent.left
-            bottom: parent.bottom
-        }
-
-        wrapMode: Text.WordWrap
-
-        font.pixelSize: (parent.height + parent.width) / 40
-        color: "white"
-    }// Text (contact notes)
 }//Flickable (container)

@@ -113,9 +113,9 @@ Rectangle {
                 top: detailTopRow.bottom
                 bottom: parent.bottom
                 left: parent.left
+                right: parent.right
                 topMargin: 5
             }
-            width:  parent.width
             suggestedPixelSize: (parent.width + parent.height) / 30
 
             onSigCall: container.sigCall(number)
@@ -238,27 +238,6 @@ Rectangle {
             }
         }//scroll bar for the contacts list
     }// Item (All contacts)
-
-    Rectangle {
-        opacity: contactsView.moving ? 0.5 : 0
-        anchors {
-            verticalCenter: parent.verticalCenter
-            right: parent.right
-        }
-
-        height: container.height/5
-        width: container.width/5
-        color: "black"
-        border.color: "green"
-
-        Text {
-            text: contactsView.currentSection
-            font.pixelSize: parent.height / 2
-            anchors.centerIn: parent
-
-            color: "white"
-        }
-    }// The first letter view
 
     states: [
         State {
