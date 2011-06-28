@@ -25,7 +25,6 @@ Contact: yuvraaj@gmail.com
 #include "global.h"
 #include "GVContactsTable.h"
 #include "GVInbox.h"
-#include "SMSDlg.h"
 #include "WebWidget.h"
 #include "RegNumberModel.h"
 #include "DialContext.h"
@@ -98,7 +97,7 @@ private slots:
     void dialNow (const QString &strTarget);
 
     //! Invoked from the QML to send a text message
-    void onSigText (const QString &strNumber);
+    void onSigText (const QString &strNumbers, const QString &strText);
 
     //! Invoked by the DBus Text server without any text data
     void onSendTextWithoutData (const QStringList &arrNumbers);
@@ -213,6 +212,8 @@ private:
     void setMqSettingsInQml(bool bEnable, const QString &host, int port,
                             const QString &topic);
 
+    void clearSmsDestinations();
+
 private:
     //! Logfile
     QFile           fLogfile;
@@ -224,8 +225,6 @@ private:
     GVContactsTable oContacts;
     //! GV Inbox object
     GVInbox         oInbox;
-    //! SMS Window
-    SMSDlg          dlgSMS;
 
     QMediaPlayer    vmailPlayer;
 

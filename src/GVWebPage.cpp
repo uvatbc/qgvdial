@@ -299,6 +299,7 @@ GVWebPage::loginStage3 (bool bOk)
         } else {
             qWarning ("Could not find rnr_se");
             strLastError = "Account not configured";
+            //@@UV: Not yet sure whether I want to ignore this.
 //            break;
         }
 

@@ -1,3 +1,2 @@
-  * Slightly smaller SMS dialog for symbian
-  * Child window base code cleanup
+  * Remove the SMS Dlg and embed it within the QML.
 

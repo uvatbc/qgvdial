@@ -33,7 +33,6 @@ MainWindow::MainWindow (QWidget *parent)
 , pSystray (NULL)
 , oContacts (this)
 , oInbox (this)
-, dlgSMS (this)
 , vmailPlayer (this)
 , statusTimer (this)
 #ifdef Q_WS_MAEMO_5
@@ -367,12 +366,6 @@ MainWindow::init ()
     QObject::connect (&cif , SIGNAL (status(const QString &, int)),
                        this, SLOT   (setStatus(const QString &, int)));
 
-    // The dialog box that we use to input text signals us to send an SMS.
-    // Connect it to the slot that does the job.
-    QObject::connect (
-        &dlgSMS, SIGNAL (sendSMS (const QStringList &, const QString &)),
-         this  , SLOT   (sendSMS (const QStringList &, const QString &)));
-
     // Status from contacts object
     QObject::connect (&oContacts, SIGNAL (status   (const QString &, int)),
                        this     , SLOT   (setStatus(const QString &, int)));
@@ -507,8 +500,9 @@ MainWindow::initQML ()
     // Connect all signals to slots in this class.
     QObject::connect (gObj, SIGNAL (sigCall (QString)),
                       this, SLOT   (dialNow (QString)));
-    QObject::connect (gObj, SIGNAL (sigText (QString)),
-                      this, SLOT   (onSigText (const QString &)));
+    QObject::connect (
+        gObj, SIGNAL (sigText (const QString &, const QString &)),
+        this, SLOT   (onSigText (const QString &, const QString &)));
     QObject::connect (gObj, SIGNAL (sigVoicemail (QString)),
                       this, SLOT   (retrieveVoicemail (const QString &)));
     QObject::connect (gObj, SIGNAL (sigVmailPlayback (int)),
@@ -553,6 +547,8 @@ MainWindow::initQML ()
     QObject::connect (
         gObj      , SIGNAL  (sigSearchContacts(const QString &)),
         &oContacts, SLOT (onSearchQueryChanged(const QString &)));
+
+    clearSmsDestinations();
 
 #if DESKTOP_OS
     this->setFixedSize (this->size ());
@@ -1015,27 +1011,11 @@ MainWindow::dialNow (const QString &strTarget)
 }//MainWindow::dialNow
 
 void
-MainWindow::onSigText (const QString &strNumber)
+MainWindow::onSigText (const QString &strNumbers, const QString &strText)
 {
-    ContactInfo info;
-
-    do { // Begin cleanup block (not a loop)
-        // Get info about this number
-        if (!findInfo (strNumber, info)) {
-            qWarning () << "Unable to find information for " << strNumber;
-            setStatus ("Unable to identify phone number");
-            break;
-        }
-
-        SMSEntry entry;
-        entry.strName = info.strTitle;
-        entry.sNumber = info.arrPhones[info.selected];
-
-        dlgSMS.addSMSEntry (entry);
-        if (dlgSMS.isHidden ()) {
-            dlgSMS.show ();
-        }
-    } while (0); // End cleanup block (not a loop)
+    QStringList arrNumbers;
+    arrNumbers = strNumbers.split (',');
+    sendSMS (arrNumbers, strText);
 }//MainWindow::onSigText
 
 //! Invoked by the DBus Text server
@@ -1049,31 +1029,41 @@ MainWindow::onSigText (const QString &strNumber)
 void
 MainWindow::onSendTextWithoutData (const QStringList &arrNumbers)
 {
-    foreach (QString strNumber, arrNumbers) {
-        if (strNumber.isEmpty ()) {
-            qWarning ("Cannot text empty number");
-            continue;
+    do { // Begin cleanup block (not a loop)
+        QObject *pRoot = this->rootObject ();
+        if (NULL == pRoot) {
+            qWarning ("Couldn't get root object in QML for SmsPage");
+            break;
         }
 
-        ContactInfo info;
-
-        // Get info about this number
-        if (!findInfo (strNumber, info)) {
-            qWarning () << "Unable to find information for " << strNumber;
-            continue;
+        QObject *pSmsView = pRoot->findChild <QObject*> ("SmsPage");
+        if (NULL == pSmsView) {
+            qWarning ("Could not get to SmsPage");
+            break;
         }
 
-        SMSEntry entry;
-        entry.strName = info.strTitle;
-        entry.sNumber = info.arrPhones[info.selected];
+        foreach (QString strNumber, arrNumbers) {
+            if (strNumber.isEmpty ()) {
+                qWarning ("Cannot text empty number");
+                continue;
+            }
 
-        dlgSMS.addSMSEntry (entry);
-    }
+            ContactInfo info;
 
-    if (dlgSMS.isHidden ())
-    {
-        dlgSMS.show ();
-    }
+            // Get info about this number
+            if (!findInfo (strNumber, info)) {
+                qWarning () << "Unable to find information for " << strNumber;
+                continue;
+            }
+
+            QMetaObject::invokeMethod (pSmsView, "addSmsDestination",
+                Q_ARG (QVariant, QVariant(info.strTitle)),
+                Q_ARG (QVariant, QVariant(info.arrPhones[info.selected].strNumber)));
+        }
+
+        // Show the SMS View
+        QMetaObject::invokeMethod (pRoot, "showSmsView");
+    } while (0); // End cleanup block (not a loop)
 }//MainWindow::onSendTextWithoutData
 
 void
@@ -1185,6 +1175,7 @@ MainWindow::sendSMS (const QStringList &arrNumbers, const QString &strText)
             qWarning () << msg;
             break;
         }
+        clearSmsDestinations ();
     } // loop through all the numbers
 
     if (0 != arrFailed.size ())
@@ -1823,3 +1814,23 @@ MainWindow::onSetContactsModel(QAbstractItemModel *model)
     QDeclarativeContext *ctx = this->rootContext();
     ctx->setContextProperty ("g_contactsModel", model);
 }//MainWindow::onSetContactsModel
+
+void
+MainWindow::clearSmsDestinations ()
+{
+    do { // Begin cleanup block (not a loop)
+        QObject *pRoot = this->rootObject ();
+        if (NULL == pRoot) {
+            qWarning ("Couldn't get root object in QML for SmsPage");
+            break;
+        }
+
+        QObject *pSmsView = pRoot->findChild <QObject*> ("SmsPage");
+        if (NULL == pSmsView) {
+            qWarning ("Could not get to SmsPage");
+            break;
+        }
+
+        QMetaObject::invokeMethod (pSmsView, "clearAllDestinations");
+    } while (0); // End cleanup block (not a loop)
+}//MainWindow::clearSmsDestinations

@@ -98,7 +98,7 @@ Item {
                 font.pixelSize: mainColumn.pixSize
                 opacity: (g_bIsLoggedIn == true ? 1 : 0)
             }
-        }//Row
+        }//Row (username)
 
         Row {
             width: parent.width

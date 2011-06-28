@@ -52,7 +52,6 @@ SOURCES  += ../src/main.cpp                 \
             ../src/CaptchaWidget.cpp        \
             ../src/ContactsXmlHandler.cpp   \
             ../src/SMSEntryDeleteButton.cpp \
-            ../src/SMSDlg.cpp               \
             ../src/ChildWindowBase.cpp      \
             ../src/GVInbox.cpp              \
             ../src/WebWidget.cpp            \
@@ -86,7 +85,6 @@ HEADERS  += ../src/global.h                 \
             ../src/CaptchaWidget.h          \
             ../src/ContactsXmlHandler.h     \
             ../src/SMSEntryDeleteButton.h   \
-            ../src/SMSDlg.h                 \
             ../src/ChildWindowBase.h        \
             ../src/GVInbox.h                \
             ../src/WebWidget.h              \

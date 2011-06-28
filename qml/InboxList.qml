@@ -28,7 +28,7 @@ Rectangle {
     color: "#202020"
 
     signal sigCall(string number)
-    signal sigText(string number)
+    signal sigText(string name, string number)
     signal sigVoicemail(string link)
     signal sigInboxSelect(string selection)
     signal sigVmailPlayback(int playState)
@@ -160,7 +160,7 @@ Rectangle {
                     width: parent.width / (playButton.opacity == 1 ? 3 : 2)
                     height: parent.height
                     mainPixelSize: height - 4
-                    onClicked: container.sigText(container.strNumber)
+                    onClicked: container.sigText(container.strDetailsName, container.strNumber)
                 }
                 MyButton {
                     id: playButton

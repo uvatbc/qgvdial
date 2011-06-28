@@ -23,60 +23,116 @@ import Qt 4.7
 
 Rectangle {
     id: container
+    objectName: "SmsPage"
 
-    height: 400
-    width: 250
+// Uncomment when testing
+//    height: 400
+//    width: 250
+
+    signal sigBack
+    signal sigText(string strNumbers, string strText)
 
     color: "black"
+
+    function addSmsDestination(name, number) {
+        modelDestinations.append({"name": name, "number": number});
+    }
+
+    function clearAllDestinations() {
+        smsText.text = '';
+        modelDestinations.clear();
+    }
+
+    ListModel {
+        id: modelDestinations
+        ListElement {
+            name: "John Doe"
+            number: "+1 111 222 3333"
+        }
+    }
+
+    Timer {
+        id: hackModelTimer
+        property int index: 0
+        interval: 100
+        repeat: false
+        onTriggered: {
+            modelDestinations.remove(index);
+            if (modelDestinations.count == 0) {
+                container.sigBack();
+            }
+        }
+    }
 
     Flickable {
         id: mainFlick
         anchors.fill: parent
 
-        contentHeight: smsText.height + ((__pixHeight+1) * modelDestinations.count) + btnRow.height + 2
+        contentHeight: smsLabel.height + smsTextRect.height + remainingCharsText.height +
+                       ((pixHeight+1) * modelDestinations.count) + btnRow.height + 8
         contentWidth: width
 
-        property real __pixHeight: 15
+        property alias pixHeight: smsLabel.font.pixelSize
 
-        onContentHeightChanged: {
-            console.debug("new content height = " + contentHeight)
-        }
-
-        TextEdit {
-            id: smsText
+        Text {
+            id: smsLabel
             anchors {
                 top: parent.top
                 left: parent.left
                 right: parent.right
             }
 
-            // Forcibly set width so that wrap mode can work
-            width: mainFlick.width
-            wrapMode: Text.WordWrap
-            textFormat: TextEdit.PlainText
-
-            height: font.pixelSize > paintedHeight ? font.pixelSize : paintedHeight
-
-            font.pixelSize: mainFlick.__pixHeight
+            text: "SMS Text:"
             color: "white"
         }
 
-        ListModel {
-            id: modelDestinations
-            ListElement {
-                name: "Yuvraaj"
-                number: "+1 408 905 9884"
+        Rectangle {
+            id: smsTextRect
+
+            anchors {
+                top: smsLabel.bottom
+                left: parent.left
+                right: parent.right
             }
-            ListElement {
-                name: "Yasho"
-                number: "+1 408 905 9883"
+            height: smsText.paintedHeight
+
+            border.color: smsText ? "orange" : "blue"
+            color: "slategray"
+
+            TextEdit {
+                id: smsText
+
+                anchors.fill: parent
+
+                // Forcibly set width so that wrap mode can work
+                width: parent.width
+                wrapMode: Text.WordWrap
+                textFormat: TextEdit.PlainText
+
+                height: font.pixelSize > paintedHeight ? font.pixelSize : paintedHeight
+
+                font.pixelSize: mainFlick.pixHeight
+                color: "white"
+            }
+        }//Rectangle (bounding the sms text edit)
+
+        Text {
+            id: remainingCharsText
+            text: "Remaining characters = " + (140 - smsText.text.length)
+            color: "white"
+
+            anchors {
+                top: smsTextRect.bottom
+                left: parent.left
+                right: parent.right
             }
         }
 
         Column {
             id: repeaterColumn
             anchors {
-                top: smsText.bottom
+                top: remainingCharsText.bottom
+                topMargin: 2
                 left: parent.left
                 right: parent.right
             }
@@ -88,7 +144,7 @@ Rectangle {
                 delegate: Item {
                     id: entryRepeater
 
-                    height: mainFlick.__pixHeight + 2
+                    height: mainFlick.pixHeight + 2
                     width: mainFlick.width
 
                     Text {
@@ -100,10 +156,12 @@ Rectangle {
 
                         id: entryText
                         text: name + " (" + number + ")"
-                        font.pixelSize: mainFlick.__pixHeight
+                        font.pixelSize: mainFlick.pixHeight
                         color: "white"
                     }//Text
-                    Image {
+
+                    Rectangle {
+                        id: imageRect
                         anchors {
                             right: parent.right
                             top: parent.top
@@ -112,17 +170,27 @@ Rectangle {
                         width: height
                         height: entryText.height
 
-                        source: "close.png"
-                        fillMode: Image.PreserveAspectFit
+                        color: "black"
 
-                        MouseArea {
+                        Image {
                             anchors.fill: parent
-                            onClicked: {
-                                console.debug ("index=" + index);
-                                modelDestinations.remove(index);
-                            }
-                        }//MouseArea
-                    }//Image
+
+                            source: "close.png"
+                            fillMode: Image.PreserveAspectFit
+
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: {
+                                    hackModelTimer.index = index;
+                                    hackModelTimer.start();
+                                }
+
+                                onPressed: imageRect.color = "orange"
+                                onReleased: imageRect.color = "black"
+                            }//MouseArea
+                        }//Image
+
+                    }//Rectangle (bordering the close image)
                 }//delegate (Rectangle)
             }//Repeater
         }//Column
@@ -132,39 +200,52 @@ Rectangle {
 
             anchors {
                 top: repeaterColumn.bottom
+                topMargin: 2
                 left: parent.left
+                right: parent.right
+                rightMargin: 1
             }
-            height: mainFlick.__pixHeight + 4
-            width: parent.width
+            height: mainFlick.pixHeight + 4
 
             MyButton {
                 id: btnBack
 
                 mainText: "Back"
-                mainPixelSize: mainFlick.__pixHeight
+                mainPixelSize: mainFlick.pixHeight
 
                 width: (parent.width / 2) - parent.spacing
                 height: parent.height
 
                 anchors.verticalCenter: parent.verticalCenter
 
-                onClicked: console.debug("Back");
-            }
+                onClicked: container.sigBack();
+            }// Back button
 
             MyButton {
                 id: btnSend
 
                 mainText: "Send"
-                mainPixelSize: mainFlick.__pixHeight
+                mainPixelSize: mainFlick.pixHeight
 
                 width: (parent.width / 2) - parent.spacing
                 height: parent.height
 
                 anchors.verticalCenter: parent.verticalCenter
 
-                onClicked: console.debug("Send");
-            }
-        }//Row (back and send
-    }//flickable (mainFlick)
+                onClicked: {
+                    var i = 0;
+                    var arrNumbers = Array();
+                    var strNumbers;
+
+                    for (i = 0; i < modelDestinations.count; i++) {
+                        arrNumbers[i] = modelDestinations.get(i).number;
+                    }
+                    strNumbers = arrNumbers.join(",");
+
+                    container.sigText(strNumbers, smsText.text)
+                }
+            }// Send button
+        }//Row (back and send buttons)
+    }//Flickable (mainFlick)
 }//Rectangle
 

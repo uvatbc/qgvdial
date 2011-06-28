@@ -34,7 +34,7 @@ Rectangle {
 
     // Signals from dialpad, contacts and inbox
     signal sigCall(string number)
-    signal sigText(string number)
+    signal sigText(string numbers, string smsText)
     // Signal from dialpad indicating change of callback / callout
     signal sigSelChanged(int index)
     // Signal from inbox to play a vmail
@@ -71,6 +71,10 @@ Rectangle {
     // Signals from the message box
     signal sigMsgBoxDone (bool ok)
 
+    function showSmsView() {
+        mainFlipView.flipped = true;
+    }
+
     onSigCall: console.debug("QML: Call " + number)
     onSigText: console.debug("QML: Text " + number)
 
@@ -104,10 +108,10 @@ Rectangle {
         console.debug ("QML: User requested close on message box. Ok = " + ok)
     }
 
-    Item {
-        id: mainColumn
-        property int centralHeight: mainColumn.height - barStatus.height
-        property int centralWidth: mainColumn.width
+    Flipable {
+        id: mainFlipView
+
+        property bool flipped: false
 
         anchors {
             top: parent.top
@@ -116,98 +120,144 @@ Rectangle {
             bottom: barStatus.top
         }
 
-        VisualItemModel {
-            id: tabsModel
-            Tab {
-                icon: "dialpad.svg"
+        front: Item {
+            id: mainColumn
 
-                MainView {
-                    id: dialPad
-                    anchors.fill: parent
+            anchors.fill: parent
+            property int centralHeight: mainColumn.height - barStatus.height
+            property int centralWidth: mainColumn.width
 
-                    onSigCall: main.sigCall (number)
-                    onSigText: main.sigText (number)
-                    onSigSelChanged: main.sigSelChanged(index)
+            VisualItemModel {
+                id: tabsModel
+                Tab {
+                    icon: "dialpad.svg"
+
+                    MainView {
+                        id: dialPad
+                        anchors.fill: parent
+
+                        onSigCall: main.sigCall (number)
+                        onSigSelChanged: main.sigSelChanged(index)
+                        onSigText: {
+                            mainFlipView.flipped = true;
+                            smsView.addSmsDestination(number, number);
+                        }
+                    }
+                }//Tab (Dialpad)
+                Tab {
+                    icon: "people.svg"
+
+                    ContactsList {
+                        id: contactsList
+
+                        anchors.fill: parent
+
+                        onSigCall: main.sigCall (number)
+                        onSigSearchContacts: main.sigSearchContacts(query)
+                        onSigText: {
+                            mainFlipView.flipped = true;
+                            smsView.addSmsDestination(name, number);
+                        }
+                    }
+                }//Tab (Contacts)
+                Tab {
+                    icon: "history.svg"
+
+                    InboxList {
+                        id: inboxList
+
+                        anchors.fill: parent
+
+                        onSigCall: main.sigCall (number)
+                        onSigInboxSelect: main.sigInboxSelect(selection)
+                        onSigVoicemail: main.sigVoicemail(link)
+                        onSigVmailPlayback: main.sigVmailPlayback(playState)
+                        onSigText: {
+                            mainFlipView.flipped = true;
+                            smsView.addSmsDestination(name, number);
+                        }
+                    }
+                }//Tab (Inbox)
+                Tab {
+                    icon: "settings.svg"
+                    color: "black"
+
+                    Settings {
+                        id: settingsView
+
+                        anchors.fill: parent
+
+                        onSigUserChanged: main.sigUserChanged(username)
+                        onSigPassChanged: main.sigPassChanged(password)
+                        onSigLogin: main.sigLogin()
+                        onSigLogout: main.sigLogout()
+                        onSigRefresh: main.sigRefresh()
+                        onSigRefreshAll: main.sigRefreshAll()
+                        onSigHide: main.sigHide()
+                        onSigQuit: main.sigQuit()
+
+                        onSigProxyChanges: main.sigProxyChanges(bEnable, bUseSystemProxy,
+                                                                host, port, bRequiresAuth,
+                                                                user, pass)
+                        onSigLinkActivated: main.sigLinkActivated(strLink)
+                        onSigMosquittoChanges: main.sigMosquittoChanges(bEnable, host, port, topic)
+                        onSigPinSettingChanges: main.sigPinSettingChanges(bEnable, pin)
+                    }
+                }//Tab (Settings)
+            }//VisualDataModel (contains the tabs)
+
+            TabbedUI {
+                id: tabbedUI
+
+                tabsHeight: (main.height + main.width) / 20
+                tabIndex: 3
+                tabsModel: tabsModel
+                anchors {
+                    top: parent.top
+                    topMargin: nMargins
+                    bottomMargin: nMargins
                 }
-            }//Tab (Dialpad)
-            Tab {
-                icon: "people.svg"
+                width: mainColumn.centralWidth
+                height: mainColumn.centralHeight
 
-                ContactsList {
-                    id: contactsList
-
-                    anchors.fill: parent
-
-                    onSigCall: main.sigCall (number)
-                    onSigText: main.sigText (number)
-                    onSigSearchContacts: main.sigSearchContacts(query)
-                }
-            }//Tab (Contacts)
-            Tab {
-                icon: "history.svg"
-
-                InboxList {
-                    id: inboxList
-
-                    anchors.fill: parent
-
-                    onSigCall: main.sigCall (number)
-                    onSigText: main.sigText (number)
-                    onSigInboxSelect: main.sigInboxSelect(selection)
-                    onSigVoicemail: main.sigVoicemail(link)
-                    onSigVmailPlayback: main.sigVmailPlayback(playState)
-                }
-            }//Tab (Inbox)
-            Tab {
-                icon: "settings.svg"
-                color: "black"
-
-                Settings {
-                    id: settingsView
-
-                    anchors.fill: parent
-
-                    onSigUserChanged: main.sigUserChanged(username)
-                    onSigPassChanged: main.sigPassChanged(password)
-                    onSigLogin: main.sigLogin()
-                    onSigLogout: main.sigLogout()
-                    onSigRefresh: main.sigRefresh()
-                    onSigRefreshAll: main.sigRefreshAll()
-                    onSigHide: main.sigHide()
-                    onSigQuit: main.sigQuit()
-
-                    onSigProxyChanges: main.sigProxyChanges(bEnable, bUseSystemProxy,
-                                                            host, port, bRequiresAuth,
-                                                            user, pass)
-                    onSigLinkActivated: main.sigLinkActivated(strLink)
-                    onSigMosquittoChanges: main.sigMosquittoChanges(bEnable, host, port, topic)
-                    onSigPinSettingChanges: main.sigPinSettingChanges(bEnable, pin)
-                }
-            }//Tab (Settings)
-        }//VisualDataModel (contains the tabs)
-
-        TabbedUI {
-            id: tabbedUI
-
-            tabsHeight: (main.height + main.width) / 20
-            tabIndex: 3
-            tabsModel: tabsModel
-            anchors {
-                top: parent.top
-                topMargin: nMargins
-                bottomMargin: nMargins
+                onSigHide: main.sigHide();
+                onSigClose: main.sigQuit();
             }
-            width: mainColumn.centralWidth
-            height: mainColumn.centralHeight
+        }//Item: Main column that has all the co-existent views
 
-            onSigHide: main.sigHide();
-            onSigClose: main.sigQuit();
+        back: SmsView {
+            id: smsView
+            anchors.fill: parent
+
+            onSigBack: mainFlipView.flipped = false;
+            onSigText: {
+                main.sigText(strNumbers, strText);
+                mainFlipView.flipped = false;
+            }
         }
-    }//Item: Main column that has all the co-existent views
+
+        transform: Rotation {
+            id: rotation
+            origin.x: mainFlipView.width/2
+            origin.y: mainFlipView.height/2
+            axis.x: 0; axis.y: 1; axis.z: 0     // set axis.y to 1 to rotate around y-axis
+            angle: 0    // the default angle
+        }
+
+        states: State {
+            name: "back"
+            PropertyChanges { target: rotation; angle: 180 }
+            when: mainFlipView.flipped
+        }
+
+        transitions: Transition {
+            NumberAnimation { target: rotation; property: "angle"; duration: 500 }
+        }
+    }//Flipable
 
     MsgBox {
         id: msgBox
-        opacity: ((g_bShowMsg == true) ? 1 : 0)
+        opacity: ((g_bShowMsg === true) ? 1 : 0)
         msgText: g_strMsgText
 
         width: main.width - 20

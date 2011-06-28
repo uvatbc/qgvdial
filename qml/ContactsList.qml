@@ -27,7 +27,7 @@ Rectangle {
     color: "black"
 
     signal sigCall(string number)
-    signal sigText(string number)
+    signal sigText(string name, string number)
     signal sigSearchContacts(string query)
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -119,7 +119,7 @@ Rectangle {
             suggestedPixelSize: (parent.width + parent.height) / 30
 
             onSigCall: container.sigCall(number)
-            onSigText: container.sigText(number)
+            onSigText: container.sigText(txtContactName.text, number)
         }
     }// Rectangle (Contact details)
 
