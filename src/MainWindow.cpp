@@ -425,6 +425,7 @@ MainWindow::init ()
                        this   , SLOT   (on_actionE_xit_triggered()));
 
     this->setWindowIcon (icoQgv);
+    clearSmsDestinations ();
 
 #if MOSQUITTO_CAPABLE
     // Connect the signals from the Mosquitto thread
@@ -547,8 +548,6 @@ MainWindow::initQML ()
     QObject::connect (
         gObj      , SIGNAL  (sigSearchContacts(const QString &)),
         &oContacts, SLOT (onSearchQueryChanged(const QString &)));
-
-    clearSmsDestinations();
 
 #if DESKTOP_OS
     this->setFixedSize (this->size ());

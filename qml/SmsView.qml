@@ -72,7 +72,7 @@ Rectangle {
                        ((pixHeight+1) * modelDestinations.count) + btnRow.height + 8
         contentWidth: width
 
-        property alias pixHeight: smsLabel.font.pixelSize
+        property real pixHeight: (parent.height + parent.width) / 44
 
         Text {
             id: smsLabel
@@ -84,6 +84,8 @@ Rectangle {
 
             text: "SMS Text:"
             color: "white"
+
+            font.pixelSize: mainFlick.pixHeight
         }
 
         Rectangle {
@@ -120,6 +122,7 @@ Rectangle {
             id: remainingCharsText
             text: "Remaining characters = " + (140 - smsText.text.length)
             color: "white"
+            font.pixelSize: mainFlick.pixHeight
 
             anchors {
                 top: smsTextRect.bottom
@@ -205,13 +208,13 @@ Rectangle {
                 right: parent.right
                 rightMargin: 1
             }
-            height: mainFlick.pixHeight + 4
+            height: (mainFlick.pixHeight*1.5) + 4
 
             MyButton {
                 id: btnBack
 
                 mainText: "Back"
-                mainPixelSize: mainFlick.pixHeight
+                mainPixelSize: (mainFlick.pixHeight * 1.5)
 
                 width: (parent.width / 2) - parent.spacing
                 height: parent.height
@@ -225,7 +228,7 @@ Rectangle {
                 id: btnSend
 
                 mainText: "Send"
-                mainPixelSize: mainFlick.pixHeight
+                mainPixelSize: (mainFlick.pixHeight * 1.5)
 
                 width: (parent.width / 2) - parent.spacing
                 height: parent.height
