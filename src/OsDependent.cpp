@@ -118,6 +118,8 @@ OsDependent::initSettingsServer(QObject *r1, const char *m1,
 #else
     Q_UNUSED (r1);
     Q_UNUSED (m1);
+    Q_UNUSED (r2);
+    Q_UNUSED (m2);
 #endif
 }
 

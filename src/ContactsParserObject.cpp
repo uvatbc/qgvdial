@@ -178,10 +178,10 @@ PhotoReplyTracker::onFinished()
             break;
         }
 
-        char sPng[] = {0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a};
-        QByteArray baPng(sPng, sizeof(sPng));
-        char sBmp[] = {'B', 'M'};
-        QByteArray baBmp(sBmp, sizeof(sBmp));
+        quint8 sPng[] = {0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a};
+        QByteArray baPng((char*)sPng, sizeof(sPng));
+        quint8 sBmp[] = {'B', 'M'};
+        QByteArray baBmp((char*)sBmp, sizeof(sBmp));
 
         QString extension = "jpg";
         if (ba.startsWith (baPng)) {
