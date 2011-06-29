@@ -550,7 +550,13 @@ MainWindow::initQML ()
         &oContacts, SLOT (onSearchQueryChanged(const QString &)));
 
 #if DESKTOP_OS
-    this->setFixedSize (this->size ());
+    Qt::WindowFlags flags = this->windowFlags ();
+    flags |= Qt::CustomizeWindowHint;
+    flags &= ~(Qt::WindowTitleHint | Qt::WindowSystemMenuHint |
+               Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint |
+               Qt::WindowCloseButtonHint);
+    this->setWindowFlags (flags);
+    this->setFixedSize(this->size());
 #endif
 }//MainWindow::initQML
 
