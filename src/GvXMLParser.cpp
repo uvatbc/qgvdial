@@ -56,7 +56,7 @@ GvXMLParser::endElement (const QString & /*namespaceURI*/,
     }
 
     if (localName == "html") {
-        strHtml = "<html>" + strChars + "</html>";
+        strHtml = "<html>" + strChars.trimmed ()+ "</html>";
         if (bEmitLog) qDebug ("Got html characters");
 
 #if 0
