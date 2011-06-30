@@ -24,6 +24,7 @@ Contact: yuvraaj@gmail.com
 
 #include "global.h"
 #include <QtWebKit>
+#include <QtXmlPatterns>
 #include "GVAccess.h"
 #include "MobileWebPage.h"
 
@@ -127,6 +128,7 @@ private:
     bool parseInboxJson(const QDateTime &dtUpdate, const QString &strJson,
                         const QString &strHtml, bool &bGotOld, int &nNew,
                         qint32 &nUsableMsgs);
+    bool parseMessageRow(QString &strRow, QString &strSmsRow);
 
 private:
     //! The webkit page that does all our work
@@ -157,6 +159,17 @@ private:
     bool                    bInDialCancel;
 
     friend class Singletons;
+};
+
+class MyXmlErrorHandler : public QAbstractMessageHandler
+{
+public:
+    MyXmlErrorHandler(QObject *parent = NULL);
+
+protected:
+    void handleMessage (QtMsgType type, const QString &description,
+                        const QUrl &identifier,
+                        const QSourceLocation &sourceLocation);
 };
 
 #endif //__GVWEBPAGE_H__
