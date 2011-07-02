@@ -68,8 +68,8 @@ extern "C" {
 #endif
 
 #define LIBMOSQUITTO_MAJOR 0
-#define LIBMOSQUITTO_MINOR 10
-#define LIBMOSQUITTO_REVISION 1
+#define LIBMOSQUITTO_MINOR 11
+#define LIBMOSQUITTO_REVISION 2
 #define LIBMOSQUITTO_VERSION_NUMBER (LIBMOSQUITTO_MAJOR*1000000+LIBMOSQUITTO_MINOR*1000+LIBMOSQUITTO_REVISION)
 
 /* Log destinations */
@@ -345,7 +345,8 @@ libmosq_EXPORT int mosquitto_disconnect(struct mosquitto *mosq);
  *              Note that although the MQTT protocol doesn't use message ids
  *              for messages with QoS=0, libmosquitto assigns them message ids
  *              so they can be tracked with this parameter.
- * 	topic -      the topic to publish the message on
+ * 	topic -      the topic to publish the message on. Must not contain the
+ *               wildcard characters + or #
  * 	payloadlen - the size of the payload (bytes). Valid values are between 0 and
  *               268,435,455.
  * 	payload -    pointer to the data to send. If payloadlen > 0 this must be a

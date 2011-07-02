@@ -49,12 +49,6 @@ POSSIBILITY OF SUCH DAMAGE.
 extern char *errStr;
 extern int iErr;
 
-#ifdef WIN32
-#  define COMPAT_CLOSE(a) closesocket(a)
-#else
-#  define COMPAT_CLOSE(a) close(a)
-#endif
-
 void _mosquitto_net_init(void)
 {
 #ifdef WIN32
@@ -137,7 +131,7 @@ int _mosquitto_socket_close(struct _mosquitto_core *core)
  */
 int _mosquitto_socket_connect(struct _mosquitto_core *core, const char *host, uint16_t port)
 {
-    int sock;
+    int sock = INVALID_SOCKET;
     int opt;
     struct addrinfo hints;
     struct addrinfo *ainfo, *rp;
@@ -180,10 +174,9 @@ int _mosquitto_socket_connect(struct _mosquitto_core *core, const char *host, ui
         errStr = "connect failed";
 
         COMPAT_CLOSE(sock);
-        return MOSQ_ERR_UNKNOWN;
     }
     if(!rp){
-        fprintf(stderr, "Error: %s", strerror(errno));
+        fprintf(stderr, "Error: %s\n", strerror(errno));
         errStr = strerror(errno);
         COMPAT_CLOSE(sock);
         return MOSQ_ERR_UNKNOWN;
@@ -361,9 +354,9 @@ ssize_t _mosquitto_net_read(struct _mosquitto_core *core, void *buf, size_t coun
 #endif
 
 #ifndef WIN32
-    return read(core->sock, buf, count);
+        return read(core->sock, buf, count);
 #else
-    return recv(core->sock, buf, count, 0);
+        return recv(core->sock, buf, count, 0);
 #endif
 
 #ifdef WITH_SSL
@@ -398,9 +391,9 @@ ssize_t _mosquitto_net_write(struct _mosquitto_core *core, void *buf, size_t cou
 #endif
 
 #ifndef WIN32
-    return write(core->sock, buf, count);
+        return write(core->sock, buf, count);
 #else
-    return send(core->sock, buf, count, 0);
+        return send(core->sock, buf, count, 0);
 #endif
 
 #ifdef WITH_SSL

@@ -54,17 +54,17 @@ int _mosquitto_handle_connack(struct mosquitto *mosq)
         mosq->on_connect(mosq->obj, result);
     }
     switch(result){
-        case 0:
-            mosq->core.state = mosq_cs_connected;
-            return MOSQ_ERR_SUCCESS;
-        case 1:
-        case 2:
-        case 3:
-        case 4:
-        case 5:
-            return MOSQ_ERR_CONN_REFUSED;
-        default:
-            return MOSQ_ERR_PROTOCOL;
+    case 0:
+        mosq->core.state = mosq_cs_connected;
+        return MOSQ_ERR_SUCCESS;
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+        return MOSQ_ERR_CONN_REFUSED;
+    default:
+        return MOSQ_ERR_PROTOCOL;
     }
 }
 

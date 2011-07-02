@@ -20,6 +20,7 @@ SOURCES  += $$PWD/logging_mosq.c        \
             $$PWD/net_mosq.c            \
             $$PWD/read_handle.c         \
             $$PWD/read_handle_client.c  \
+            $$PWD/send_base_mosq.c      \
             $$PWD/send_client_mosq.c    \
             $$PWD/send_mosq.c           \
             $$PWD/util_mosq.c

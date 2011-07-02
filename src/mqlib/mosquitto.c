@@ -34,6 +34,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <stdio.h>
 #include <string.h>
 #ifndef WIN32
+#include <sys/select.h>
 #include <unistd.h>
 #else
 #include <winsock2.h>
@@ -51,12 +52,12 @@ typedef int ssize_t;
 #include <send_mosq.h>
 #include <util_mosq.h>
 
-#if !defined(WIN32)
-#include <sys/select.h>
-#endif
-
 #ifndef ECONNRESET
 #define ECONNRESET 104
+#endif
+
+#if !defined(WIN32) && !defined(__SYMBIAN32__)
+#define HAVE_PSELECT
 #endif
 
 char *errStr = NULL;
@@ -225,8 +226,8 @@ void mosquitto_destroy(struct mosquitto *mosq)
     if(mosq->core.will){
         if(mosq->core.will->topic) _mosquitto_free(mosq->core.will->topic);
         if(mosq->core.will->payload) _mosquitto_free(mosq->core.will->payload);
+        _mosquitto_free(mosq->core.will);
     }
-    _mosquitto_free(mosq->core.will);
 #ifdef WITH_SSL
     if(mosq->core.ssl){
         if(mosq->core.ssl->ssl){
@@ -258,7 +259,7 @@ int mosquitto_connect(struct mosquitto *mosq, const char *host, int port, int ke
         return rc;
     }
 
-    return _mosquitto_send_connect(mosq, keepalive, clean_session);
+    return _mosquitto_send_connect(&mosq->core, keepalive, clean_session);
 }
 
 int mosquitto_disconnect(struct mosquitto *mosq)
@@ -268,7 +269,7 @@ int mosquitto_disconnect(struct mosquitto *mosq)
 
     mosq->core.state = mosq_cs_disconnecting;
 
-    return _mosquitto_send_disconnect(mosq);
+    return _mosquitto_send_disconnect(&mosq->core);
 }
 
 int mosquitto_publish(struct mosquitto *mosq, uint16_t *mid, const char *topic, uint32_t payloadlen, const uint8_t *payload, int qos, bool retain)
@@ -278,6 +279,10 @@ int mosquitto_publish(struct mosquitto *mosq, uint16_t *mid, const char *topic, 
 
     if(!mosq || !topic || qos<0 || qos>2) return MOSQ_ERR_INVAL;
     if(payloadlen > 268435455) return MOSQ_ERR_PAYLOAD_SIZE;
+
+    if(_mosquitto_wildcard_check(topic)){
+        return MOSQ_ERR_INVAL;
+    }
 
     local_mid = _mosquitto_mid_generate(&mosq->core);
     if(mid){
@@ -330,7 +335,7 @@ int mosquitto_subscribe(struct mosquitto *mosq, uint16_t *mid, const char *sub, 
     if(!mosq) return MOSQ_ERR_INVAL;
     if(mosq->core.sock == INVALID_SOCKET) return MOSQ_ERR_NO_CONN;
 
-    return _mosquitto_send_subscribe(mosq, mid, false, sub, qos);
+    return _mosquitto_send_subscribe(&mosq->core, mid, false, sub, qos);
 }
 
 int mosquitto_unsubscribe(struct mosquitto *mosq, uint16_t *mid, const char *sub)
@@ -338,7 +343,7 @@ int mosquitto_unsubscribe(struct mosquitto *mosq, uint16_t *mid, const char *sub
     if(!mosq) return MOSQ_ERR_INVAL;
     if(mosq->core.sock == INVALID_SOCKET) return MOSQ_ERR_NO_CONN;
 
-    return _mosquitto_send_unsubscribe(mosq, mid, false, sub);
+    return _mosquitto_send_unsubscribe(&mosq->core, mid, false, sub);
 }
 
 #if 0
@@ -364,7 +369,7 @@ int mosquitto_ssl_set(struct mosquitto *mosq, const char *pemfile, const char *p
 
 int mosquitto_loop(struct mosquitto *mosq, int timeout)
 {
-#if !defined(WIN32) && !IS_SYMBIAN
+#ifdef HAVE_PSELECT
     struct timespec local_timeout;
 #else
     struct timeval local_timeout;
@@ -388,21 +393,21 @@ int mosquitto_loop(struct mosquitto *mosq, int timeout)
     }
     if(timeout >= 0){
         local_timeout.tv_sec = timeout/1000;
-#if !defined(WIN32) && !IS_SYMBIAN
+#ifdef HAVE_PSELECT
         local_timeout.tv_nsec = (timeout-local_timeout.tv_sec*1000)*1e6;
 #else
         local_timeout.tv_usec = (timeout-local_timeout.tv_sec*1000)*1000;
 #endif
     }else{
         local_timeout.tv_sec = 1;
-#if !defined(WIN32) && !IS_SYMBIAN
+#ifdef HAVE_PSELECT
         local_timeout.tv_nsec = 0;
 #else
         local_timeout.tv_usec = 0;
 #endif
     }
 
-#if !defined(WIN32) && !IS_SYMBIAN
+#ifdef HAVE_PSELECT
     fdcount = pselect(mosq->core.sock+1, &readfds, &writefds, NULL, &local_timeout, NULL);
 #else
     fdcount = select(mosq->core.sock+1, &readfds, &writefds, NULL, &local_timeout);
@@ -415,13 +420,12 @@ int mosquitto_loop(struct mosquitto *mosq, int timeout)
             if(rc){
                 _mosquitto_socket_close(&mosq->core);
                 if(mosq->core.state == mosq_cs_disconnecting){
-                    if(mosq->on_disconnect){
-                        mosq->on_disconnect(mosq->obj);
-                    }
-                    return MOSQ_ERR_SUCCESS;
-                }else{
-                    return rc;
+                    rc = MOSQ_ERR_SUCCESS;
                 }
+                if(mosq->on_disconnect){
+                    mosq->on_disconnect(mosq->obj);
+                }
+                return rc;
             }
         }
         if(FD_ISSET(mosq->core.sock, &writefds)){
@@ -429,13 +433,12 @@ int mosquitto_loop(struct mosquitto *mosq, int timeout)
             if(rc){
                 _mosquitto_socket_close(&mosq->core);
                 if(mosq->core.state == mosq_cs_disconnecting){
-                    if(mosq->on_disconnect){
-                        mosq->on_disconnect(mosq->obj);
-                    }
-                    return MOSQ_ERR_SUCCESS;
-                }else{
-                    return rc;
+                    rc = MOSQ_ERR_SUCCESS;
                 }
+                if(mosq->on_disconnect){
+                    mosq->on_disconnect(mosq->obj);
+                }
+                return rc;
             }
         }
     }
@@ -495,10 +498,10 @@ int mosquitto_loop_read(struct mosquitto *mosq)
                 return MOSQ_ERR_SUCCESS;
             }else{
                 switch(errno){
-                    case ECONNRESET:
-                        return MOSQ_ERR_CONN_LOST;
-                    default:
-                        return MOSQ_ERR_UNKNOWN;
+                case ECONNRESET:
+                    return MOSQ_ERR_CONN_LOST;
+                default:
+                    return MOSQ_ERR_UNKNOWN;
                 }
             }
         }
@@ -529,10 +532,10 @@ int mosquitto_loop_read(struct mosquitto *mosq)
                     return MOSQ_ERR_SUCCESS;
                 }else{
                     switch(errno){
-                        case ECONNRESET:
-                            return MOSQ_ERR_CONN_LOST;
-                        default:
-                            return MOSQ_ERR_UNKNOWN;
+                    case ECONNRESET:
+                        return MOSQ_ERR_CONN_LOST;
+                    default:
+                        return MOSQ_ERR_UNKNOWN;
                     }
                 }
             }
@@ -559,10 +562,10 @@ int mosquitto_loop_read(struct mosquitto *mosq)
                 return MOSQ_ERR_SUCCESS;
             }else{
                 switch(errno){
-                    case ECONNRESET:
-                        return MOSQ_ERR_CONN_LOST;
-                    default:
-                        return MOSQ_ERR_UNKNOWN;
+                case ECONNRESET:
+                    return MOSQ_ERR_CONN_LOST;
+                default:
+                    return MOSQ_ERR_UNKNOWN;
                 }
             }
         }
@@ -604,10 +607,10 @@ int mosquitto_loop_write(struct mosquitto *mosq)
                     return MOSQ_ERR_SUCCESS;
                 }else{
                     switch(errno){
-                        case ECONNRESET:
-                            return MOSQ_ERR_CONN_LOST;
-                        default:
-                            return MOSQ_ERR_UNKNOWN;
+                    case ECONNRESET:
+                        return MOSQ_ERR_CONN_LOST;
+                    default:
+                        return MOSQ_ERR_UNKNOWN;
                     }
                 }
             }
