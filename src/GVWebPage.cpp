@@ -53,6 +53,8 @@ GVWebPage::GVWebPage(QObject *parent/* = NULL*/)
                        this   , SIGNAL (loadFinished (bool)));
     QObject::connect (&webPage, SIGNAL (loadProgress (int)),
                        this   , SIGNAL (loadProgress (int)));
+    QObject::connect (&webPage, SIGNAL (loadProgress (int)),
+                       this   , SLOT   (onPageProgress (int)));
 
     // Garbage timer
     QObject::connect (&garbageTimer, SIGNAL (timeout ()),
@@ -1531,7 +1533,7 @@ MyXmlErrorHandler::handleMessage (QtMsgType type, const QString &description,
     {
     case QtDebugMsg:
         qDebug() << msg;
-    	break;
+        break;
     case QtWarningMsg:
         qWarning() << msg;
         break;

@@ -41,7 +41,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <ws2tcpip.h>
 #endif
 
-#include <netinet\in.h>
+#include <netinet/in.h>
 
 #include <memory_mosq.h>
 #include <net_mosq.h>

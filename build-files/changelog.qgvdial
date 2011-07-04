@@ -1,2 +1,4 @@
-  * Fix SMS parsing - yet again
+  * Upgrade mqlib to 0.11.2
+  * Attempts at making the contacts list work faster on Symbian
+  * All this while, the page timeout timer wasn't actually working. Fixed now.
 

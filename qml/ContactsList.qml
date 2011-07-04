@@ -169,6 +169,7 @@ Rectangle {
             clip: true
             opacity: 1
             spacing: 2
+            cacheBuffer: (100 * (allContacts.height + allContacts.width))
 
             model: g_contactsModel
     //        model: testContactsModelData1
@@ -183,7 +184,7 @@ Rectangle {
                 border.color: "darkslategray"
                 radius: 5
 
-                width: allContacts.width - border.width
+                width:  (allContacts.width - border.width)
                 height: (allContacts.height + allContacts.width) / 20
 
                 Image {
