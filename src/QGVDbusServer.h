@@ -95,6 +95,9 @@ public slots:
                          const QString     &strData);
     Q_NOREPLY void TextWithoutData (const QStringList &arrNumbers);
 
+    QStringList getTextsByDate(const QString &strStart, const QString &strEnd);
+    QStringList getTextsByContact(const QString &strContact);
+
 signals:
 
 public slots:
@@ -104,7 +107,6 @@ protected:
 
     friend class OsDependent;
 };
-
 
 class QGVDbusSettingsServer : public QDBusAbstractAdaptor
 {

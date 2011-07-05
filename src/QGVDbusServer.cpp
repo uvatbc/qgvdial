@@ -20,6 +20,7 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "QGVDbusServer.h"
+#include "Singletons.h"
 
 QGVDbusServerHelper::QGVDbusServerHelper (QGVDbusSettingsServer *s,
                                           QObject *parent)
@@ -117,6 +118,43 @@ QGVDbusTextServer::TextWithoutData (const QStringList &arrNumbers)
     // Signal that a text is to be sent to this list of numbers
     helper.emitTextWithoutData (arrNumbers);
 }//QGVDbusTextServer::TextWithoutData
+
+QStringList
+QGVDbusTextServer::getTextsByDate(const QString &strStart, const QString &strEnd)
+{
+    QStringList rv;
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+
+    QDateTime dtStart = QDateTime::fromString(strStart, Qt::ISODate);
+    QDateTime dtEnd = QDateTime::fromString(strEnd, Qt::ISODate);
+
+    do { // Begin cleanup block (not a loop)
+        if (!dtStart.isValid () || !dtEnd.isValid ()) {
+            qWarning ("getTextsByDate: Invalid dates");
+            break;
+        }
+
+        // If reversed, fix it
+        if (dtStart > dtEnd) {
+            QDateTime dtTemp = dtEnd;
+            dtEnd = dtStart;
+            dtStart = dtTemp;
+        }
+
+        // Send request
+        rv = dbMain.getTextsByDate (dtStart, dtEnd);
+    } while(0); // End cleanup block (not a loop)
+
+    return rv;
+}//QGVDbusTextServer::getTextsByDate
+
+QStringList
+QGVDbusTextServer::getTextsByContact(const QString &strContact)
+{
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+
+    return dbMain.getTextsByContact(strContact);
+}//QGVDbusTextServer::getTextsByContact
 
 void
 QGVDbusTextServer::addTextReceivers (QObject *r1, const char *m1,

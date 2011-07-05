@@ -223,11 +223,11 @@ CacheDatabase::refreshContactsModel (ContactsModel *modelContacts,
 {
     QString strQ = "SELECT " GV_C_ID "," GV_C_NAME "," GV_C_NOTES ","
                              GV_C_PICLINK " "
-                   "FROM " GV_CONTACTS_TABLE " ";
+                   "FROM " GV_CONTACTS_TABLE;
     if (!query.isEmpty ()) {
         QString scrubQuery = query;
         scrubQuery.replace ("'", "''");
-        strQ += QString("WHERE " GV_C_NAME " LIKE '%%%1%%'").arg (scrubQuery);
+        strQ += QString(" WHERE " GV_C_NAME " LIKE '%%%1%%'").arg (scrubQuery);
     }
     strQ += " ORDER BY " GV_C_NAME;
 
@@ -841,6 +841,141 @@ CacheDatabase::insertInboxEntry (const GVInboxEntry &hEvent)
 
     return (rv);
 }//CacheDatabase::insertInboxEntry
+
+QStringList
+CacheDatabase::getTextsByDate(QDateTime dtStart, QDateTime dtEnd)
+{
+    QSqlQuery query(dbMain);
+    query.setForwardOnly (true);
+
+    QString strQ = QString("SELECT "
+            GV_IN_ATTIME ","
+            GV_IN_PHONE ","
+            GV_IN_SMSTEXT " "
+            "FROM " GV_INBOX_TABLE " "
+            "WHERE " GV_IN_ATTIME " >= %1 AND " GV_IN_ATTIME " <= %2 "
+            "AND " GV_IN_TYPE " == %3 "
+            "ORDER BY " GV_IN_ATTIME " DESC")
+            .arg (dtStart.toTime_t ())
+            .arg (dtEnd.toTime_t ())
+            .arg (GVIE_TextMessage);
+
+    QStringList rv;
+
+    query.exec (strQ);
+    while (query.next ()) {
+        QString oneLine;
+        bool bok;
+        uint iDtTime = query.value (0).toInt (&bok);
+        if (!bok) {
+            break;
+        }
+
+        QString strNum = query.value(1).toString();
+        GVAccess::simplify_number (strNum, false);
+        ContactInfo info;
+        getContactFromNumber (strNum, info);
+
+        // date,'name','num','text'
+        oneLine = QDateTime::fromTime_t(iDtTime).toString (Qt::ISODate);
+        oneLine += ",'";
+        oneLine += info.strTitle.replace("'", "''");
+        oneLine += "','";
+        oneLine += query.value(1).toString().replace("'", "''");
+        oneLine += "','";
+        oneLine += query.value(2).toString().replace("'", "''");
+        oneLine += "'";
+
+        rv += oneLine;
+    }
+
+    return rv;
+}//CacheDatabase::getTextsByDate
+
+QStringList
+CacheDatabase::getTextsByContact(const QString &strContact)
+{
+    QStringList arrNums;
+    QStringList rv;
+
+    // Search for the contact as if it were a number
+    ContactInfo info;
+    if (getContactFromNumber (strContact, info)) {
+        foreach (PhoneInfo phone, info.arrPhones) {
+            GVAccess::simplify_number (phone.strNumber, false);
+            arrNums += phone.strNumber.replace("'", "''");
+        }
+    }
+
+    // Search for the contact as if it were a name
+    QSqlQuery query(dbMain);
+    query.setForwardOnly (true);
+
+    QString scrubContact = strContact;
+    scrubContact.replace ("'", "''");
+    QString strQ = "SELECT " GV_C_ID " FROM " GV_CONTACTS_TABLE
+                 +  QString(" WHERE " GV_C_NAME " LIKE '%%%1%%' ")
+                            .arg (scrubContact)
+                 + "ORDER BY " GV_C_NAME;
+    query.exec (strQ);
+    while (query.next ()) {
+        info.init ();
+        info.strId = query.value(0).toString ();
+        if (getContactFromLink (info)) {
+            foreach (PhoneInfo phone, info.arrPhones) {
+                GVAccess::simplify_number (phone.strNumber, false);
+                arrNums += phone.strNumber.replace("'", "''");
+            }
+        }
+    }
+
+    // We have all the ID's to look for
+    if (arrNums.isEmpty ()) {
+        qWarning() << "Not a single ID matched the search string" << strContact;
+        return rv;
+    }
+
+    strQ = QString("SELECT "
+            GV_IN_ATTIME ","
+            GV_IN_DISPNUM ","
+            GV_IN_PHONE ","
+            GV_IN_SMSTEXT " "
+            "FROM " GV_INBOX_TABLE " "
+            "WHERE (" GV_IN_PHONE " LIKE '%%%1%%') "
+            "AND " GV_IN_TYPE " == %2 "
+            "ORDER BY " GV_IN_ATTIME " DESC")
+            .arg (arrNums.join ("%%' OR " GV_IN_PHONE " LIKE '%%"))
+            .arg (GVIE_TextMessage);
+
+    query.exec (strQ);
+    while (query.next ()) {
+        QString oneLine;
+        bool bok;
+        uint iDtTime = query.value (0).toInt (&bok);
+        if (!bok) {
+            break;
+        }
+
+        QString strNum = query.value(2).toString();
+        GVAccess::simplify_number (strNum, false);
+        ContactInfo info;
+        getContactFromNumber (strNum, info);
+
+        // date,'dispnum','num','text'
+        oneLine = QDateTime::fromTime_t(iDtTime).toString (Qt::ISODate);
+        oneLine += ",'";
+        oneLine += info.strTitle.replace("'", "''");
+        oneLine += "','";
+        oneLine += query.value(2).toString().replace("'", "''");
+        oneLine += "','";
+        oneLine += query.value(3).toString().replace("'", "''");
+        oneLine += "'";
+
+        rv += oneLine;
+    }
+
+    return rv;
+}//CacheDatabase::getTextsByContact
 
 bool
 CacheDatabase::setProxySettings (bool bEnable,

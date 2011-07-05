@@ -98,6 +98,10 @@ public:
     bool existsInboxEntry (const GVInboxEntry &hEvent);
     bool insertInboxEntry (const GVInboxEntry &hEvent);
 
+    // Collect multiple texts
+    QStringList getTextsByDate(QDateTime dtStart, QDateTime dtEnd);
+    QStringList getTextsByContact(const QString &strContact);
+
     // proxy settings get and set
     bool setProxySettings (bool bEnable,
                            bool bUseSystemProxy,
