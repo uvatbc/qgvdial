@@ -1,2 +1,2 @@
-  * Added dbus api to retrieve texts
+  * Delete the webview before shutting down.
 
