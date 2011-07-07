@@ -35,6 +35,8 @@ WebWidget::WebWidget(QDeclarativeItem *parent)
 
 WebWidget::~WebWidget()
 {
+    delete wv;
+    wv = NULL;
 }//WebWidget::~WebWidget
 
 void
