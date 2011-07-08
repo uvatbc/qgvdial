@@ -138,7 +138,8 @@ Connection::~Connection()
     delete(d);
 }
 
-bool Connection::registerObject()
+bool
+Connection::registerObject()
 {
     if (!QDBusConnection::sessionBus().registerService(serviceName()))
     {
@@ -155,28 +156,33 @@ bool Connection::registerObject()
     return true;
 }
 
-void Connection::unregisterObject()
+void
+Connection::unregisterObject()
 {
     qDebug() << "qgvtp: Unregistering Connection object from DBus";
     QDBusConnection::sessionBus().unregisterObject(objectPath().path());
     QDBusConnection::sessionBus().unregisterService(serviceName());
 }
 
-QString Connection::name() const
+QString
+Connection::name() const
 {
     return QString("qgvtp");
 }
 
 
-QString Connection::serviceName() const
+QString
+Connection::serviceName() const
 { return connection_service_name_prefix + name(); }
 
-QDBusObjectPath Connection::objectPath() const
+QDBusObjectPath
+Connection::objectPath() const
 { return QDBusObjectPath(connection_object_path_prefix + name()); }
 
 
 //org.freedesktop.Telepathy.Connection
-void Connection::Connect()
+void
+Connection::Connect()
 {
     /*
        Since this is not a "real" Telepathy Connection to a SIP, Chat server,
@@ -191,7 +197,8 @@ void Connection::Connect()
 
 }
 
-void Connection::Disconnect()
+void
+Connection::Disconnect()
 {
     qDebug() << "qgvtp: Changing status to Disconnected...";
     //We don't have any Handles to release here. So just change the status to Disconnected
@@ -205,7 +212,8 @@ void Connection::Disconnect()
     deleteLater();
 }
 
-QStringList Connection::GetInterfaces()
+QStringList
+Connection::GetInterfaces()
 {
     QStringList result;
     if (d->connection_status != Connected)
@@ -218,13 +226,16 @@ QStringList Connection::GetInterfaces()
     return result;
 }
 
-QString Connection::GetProtocol()
+QString
+Connection::GetProtocol()
 { return protocol_qgvtp; }
 
-uint Connection::GetStatus()
+uint
+Connection::GetStatus()
 { return static_cast<uint>(d->connection_status); }
 
-uint Connection::GetSelfHandle()
+uint
+Connection::GetSelfHandle()
 {
     qDebug() << "qgvtp: GetSelfHandle";
     if (d->connection_status != Connected)
@@ -241,8 +252,9 @@ uint Connection::GetSelfHandle()
     return handle;
 }
 
-QList<uint> Connection::RequestHandles(uint handle_type,
-                                       const QStringList & names)
+QList<uint>
+Connection::RequestHandles(uint handle_type,
+                           const QStringList & names)
 {
     Q_UNUSED(names);
     QList<uint> result;
@@ -265,7 +277,8 @@ QList<uint> Connection::RequestHandles(uint handle_type,
     return result;
 }
 
-void Connection::HoldHandles(const uint handle_type, const QList<uint> &handles)
+void
+Connection::HoldHandles(const uint handle_type, const QList<uint> &handles)
 {
     Q_UNUSED(handles);
     qDebug() << "qgvtp: HoldHandles.";
@@ -285,8 +298,9 @@ void Connection::HoldHandles(const uint handle_type, const QList<uint> &handles)
     //WARNING: Incomplete implementation
 }
 
-QStringList Connection::InspectHandles(const uint handle_type,
-                                       const QList<uint> &handles)
+QStringList
+Connection::InspectHandles(const uint handle_type,
+                           const QList<uint> &handles)
 {
     Q_UNUSED(handles);
     QStringList result;
@@ -309,7 +323,8 @@ QStringList Connection::InspectHandles(const uint handle_type,
     return result;
 }
 
-void Connection::ReleaseHandles(const uint handle_type, const QList<uint> &handles)
+void
+Connection::ReleaseHandles(const uint handle_type, const QList<uint> &handles)
 {
     Q_UNUSED(handles);
     if (d->connection_status != Connected)
@@ -330,7 +345,8 @@ void Connection::ReleaseHandles(const uint handle_type, const QList<uint> &handl
     //WARNING: Incomplete implementation
 }
 
-org::freedesktop::Telepathy::ChannelInfoList Connection::ListChannels()
+org::freedesktop::Telepathy::ChannelInfoList
+Connection::ListChannels()
 {
     org::freedesktop::Telepathy::ChannelInfoList result;
     if (d->connection_status != Connected)
@@ -346,9 +362,10 @@ org::freedesktop::Telepathy::ChannelInfoList Connection::ListChannels()
     return result;
 }
 
-QDBusObjectPath Connection::RequestChannel(const QString &type,
-                                           uint handle_type, uint handle,
-                                           bool suppress_handler)
+QDBusObjectPath
+Connection::RequestChannel(const QString &type,
+                                 uint handle_type, uint handle,
+                                 bool suppress_handler)
 {
     Q_UNUSED(handle);
     Q_UNUSED(suppress_handler);
@@ -383,13 +400,13 @@ QDBusObjectPath Connection::RequestChannel(const QString &type,
 }
 
 //org.freedesktop.Telepathy.Connection.Interface.Requests
-QDBusObjectPath Connection::CreateChannel(const QVariantMap &request,
-                                                           QVariantMap &channel_properties)
+QDBusObjectPath
+Connection::CreateChannel(const QVariantMap &request,
+                                QVariantMap &channel_properties)
 {
     Q_UNUSED(channel_properties);
     Q_ASSERT(!request.isEmpty());
-    qDebug() << "qgvtp: CreateChannel";
-    qDebug() << " Request details are: "<< request;
+    qDebug() << "qgvtp: CreateChannel Request details are: " << request;
 
      //Ideally we need to emit NewChannels signal here, but since we are not creating any channels we ignore it
 
@@ -399,14 +416,13 @@ QDBusObjectPath Connection::CreateChannel(const QVariantMap &request,
 }
 
 bool Connection::EnsureChannel(const QVariantMap &request,
-                                                QDBusObjectPath &channel_object,
-                                                QVariantMap &channel_properties)
+                                     QDBusObjectPath &channel_object,
+                                     QVariantMap &channel_properties)
 {
     Q_UNUSED(channel_object);
     Q_UNUSED(channel_properties);
     Q_ASSERT(!request.isEmpty());
-    qDebug() << "qgvtp: EnsureChannel";
-    qDebug() << " Request details are: "<< request;
+    qDebug() << "qgvtp: EnsureChannel Request details are:" << request;
 
     //WARNING: Incomplete implementation
     processChannel(request);
@@ -423,6 +439,7 @@ Connection::processChannel(const QVariantMap &request)
     if (!request.contains(TP_PATH_DOT ".Channel.TargetID")) {
         sendErrorReply(TP_PATH_DOT ".Error.InvalidArgument",
             "qgvtp - Invalid request. TargetID (Phone Number) not included.");
+        qWarning("qgvtp: Phone number not included");
         return channel_path;
     }
 
@@ -430,12 +447,14 @@ Connection::processChannel(const QVariantMap &request)
     if (!vNumber.isValid()){
         sendErrorReply(TP_PATH_DOT ".Error.InvalidArgument",
                        "qgvtp - Invalid request. Phone Number is not valid.");
+        qWarning("qgvtp: Phone number not valid");
         return channel_path;
     }
     QString strNumber = vNumber.toString();
     if (strNumber.isEmpty()){
         sendErrorReply(TP_PATH_DOT ".Error.InvalidArgument",
                        "qgvtp - Invalid request. Phone Number is empty.");
+        qWarning("qgvtp: Phone number is either empty or not a string");
         return channel_path;
     }
 
@@ -449,26 +468,50 @@ Connection::processChannel(const QVariantMap &request)
         Once it recieves the reply, the client does not bother what we return.
      */
 
-    sendErrorReply(TP_PATH_DOT ".Error.NotAvailable",
-        "qgvtp - Creating a new channel to " + strNumber + " via qgvdial.");
-
     // This is where we call QGVDIAL.
-    QDBusInterface iface("org.QGVDial.CallServer",
-                         "/org/QGVDial/CallServer",
-                         "",
-                         QDBusConnection::sessionBus());
-    if (!iface.isValid()) {
-        qDebug ("QGVDial interface is not ready");
-        return channel_path;
-    }
-
     if (strType == TP_STREAMEDMEDIA) {
+        QDBusInterface iface("org.QGVDial.CallServer",
+                             "/org/QGVDial/CallServer",
+                             "",
+                             QDBusConnection::sessionBus());
+        if (!iface.isValid()) {
+            sendErrorReply(TP_PATH_DOT ".Error.NotAvailable",
+                "qgvtp - QGVDial call interface is not ready");
+
+            qWarning ("QGVDial call interface is not ready");
+            return channel_path;
+        }
         iface.call("Call", strNumber);
+
+        qDebug("qgvtp: Call requested to qgvdial");
+
+        sendErrorReply(TP_PATH_DOT ".Error.Disconnected",
+            "qgvtp - Creating a new channel to " + strNumber + " via qgvdial.");
     } else if (strType == TP_TEXTMEDIA) {
-        iface.call("Text", strNumber);
+        QDBusInterface iface("org.QGVDial.TextServer",
+                             "/org/QGVDial/TextServer",
+                             "",
+                             QDBusConnection::sessionBus());
+        if (!iface.isValid()) {
+            sendErrorReply(TP_PATH_DOT ".Error.NotAvailable",
+                "qgvtp - QGVDial text interface is not ready");
+
+            qWarning ("QGVDial text interface is not ready");
+            return channel_path;
+        }
+        QStringList listNumbers;
+        listNumbers += strNumber;
+        iface.call("TextWithoutData", listNumbers);
+
+        qDebug("qgvtp: Text without data requested from qgvdial");
+
+        sendErrorReply(TP_PATH_DOT ".Error.NotImplemented",
+            "qgvtp - Creating a new text channel to " + strNumber + " via qgvdial.");
     } else {
         qDebug () << "Requested channel type = " << strType
                   << "does not require me to call qgvdial";
+        sendErrorReply(TP_PATH_DOT ".Error.NotImplemented",
+            "qgvtp - QGVDial call interface is not ready");
     }
 
     return channel_path;
@@ -476,15 +519,17 @@ Connection::processChannel(const QVariantMap &request)
 
 
 //org.freedesktop.Telepathy.Connection.Interface.Capabilities
-org::freedesktop::Telepathy::ContactCapabilitiesList Connection::GetCapabilities(const QList<uint> &Handles){
+org::freedesktop::Telepathy::ContactCapabilitiesList
+Connection::GetCapabilities(const QList<uint> &Handles){
     Q_UNUSED(Handles);
     org::freedesktop::Telepathy::ContactCapabilitiesList capabilities;
     return capabilities;
 
 }
 
-
-org::freedesktop::Telepathy::CapabilityPairList Connection::AdvertiseCapabilities(org::freedesktop::Telepathy::CapabilityPairList Add, const QStringList &Remove) {
+org::freedesktop::Telepathy::CapabilityPairList
+Connection::AdvertiseCapabilities(org::freedesktop::Telepathy::CapabilityPairList Add,
+                                  const QStringList &Remove) {
     Q_UNUSED(Add);
     Q_UNUSED(Remove);
     org::freedesktop::Telepathy::CapabilityPairList capabilities;

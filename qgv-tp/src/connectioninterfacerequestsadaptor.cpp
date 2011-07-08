@@ -34,20 +34,23 @@ ConnectionInterfaceRequestsAdaptor::~ConnectionInterfaceRequestsAdaptor()
     // destructor
 }
 
-org::freedesktop::Telepathy::RequestableChannelClassList ConnectionInterfaceRequestsAdaptor::requestableChannelClasses() const
+org::freedesktop::Telepathy::RequestableChannelClassList
+ConnectionInterfaceRequestsAdaptor::requestableChannelClasses() const
 {
     // get the value of property RequestableChannelClasses
     return qvariant_cast< org::freedesktop::Telepathy::RequestableChannelClassList >(parent()->property("RequestableChannelClasses"));
 }
 
 
-QDBusObjectPath ConnectionInterfaceRequestsAdaptor::CreateChannel(const QVariantMap &request, QVariantMap &channel_properties)
+QDBusObjectPath
+ConnectionInterfaceRequestsAdaptor::CreateChannel(const QVariantMap &request, QVariantMap &channel_properties)
 {
     // handle method call org.freedesktop.Telepathy.Connection.Interface.Requests.CreateChannel
     return static_cast<Connection *>(parent())->CreateChannel(request, channel_properties);
 }
 
-bool ConnectionInterfaceRequestsAdaptor::EnsureChannel(const QVariantMap &request, QDBusObjectPath &channel_object, QVariantMap &channel_properties)
+bool
+ConnectionInterfaceRequestsAdaptor::EnsureChannel(const QVariantMap &request, QDBusObjectPath &channel_object, QVariantMap &channel_properties)
 {
     // handle method call org.freedesktop.Telepathy.Connection.Interface.Requests.EnsureChannel
     return static_cast<Connection *>(parent())->EnsureChannel(request, channel_object, channel_properties);

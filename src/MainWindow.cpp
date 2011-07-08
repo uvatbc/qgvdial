@@ -1068,6 +1068,9 @@ MainWindow::onSendTextWithoutData (const QStringList &arrNumbers)
 
         // Show the SMS View
         QMetaObject::invokeMethod (pRoot, "showSmsView");
+
+        // Show myself (because I may be hidden)
+        this->show ();
     } while (0); // End cleanup block (not a loop)
 }//MainWindow::onSendTextWithoutData
 

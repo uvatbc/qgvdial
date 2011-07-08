@@ -42,14 +42,40 @@ Based on Telepathy-SNOM with copyright notice below.
 
 
 using namespace std;
-
 ofstream logfile;
+QSettings *settings = NULL;
+
+int logLevel = 0;
+
+QString
+getStoreDirectory ()
+{
+    QString strStoreDir = QDir::homePath ();
+    QDir dirHome(strStoreDir);
+    if (!strStoreDir.endsWith (QDir::separator ()))
+    {
+        strStoreDir += QDir::separator ();
+    }
+    strStoreDir += ".qgvdial";
+    if (!QFileInfo(strStoreDir).exists ()) {
+        dirHome.mkdir (".qgvdial");
+    }
+
+#if defined(Q_OS_SYMBIAN)
+    strStoreDir.replace (QChar('/'), "\\");
+#endif
+
+    return strStoreDir;
+}//getStoreDirectory
 
 void
 open_logfile ()
 {
     if (!logfile.is_open ()) {
-        logfile.open ("/home/user/.qgvdial/qgv-tp.log", ios::app);
+        QString strFile = getStoreDirectory()
+                        + QDir::separator ()
+                        + "qgv-tp.log";
+        logfile.open(strFile.toAscii(), ios::app);
     }
 }
 
@@ -77,8 +103,11 @@ void dbgHandler(QtMsgType type, const char *msg)
                      .arg(dt.toString ("yyyy-MM-dd hh:mm:ss.zzz"))
                      .arg(level)
                      .arg(msg);
-    open_logfile ();
-    logfile << strLog.toAscii().data() << endl;
+
+    if (level <= logLevel) {
+        open_logfile ();
+        logfile << strLog.toAscii().data() << endl;
+    }
     cout << strLog.toAscii().data() << endl;
 
     if (QtFatalMsg == type) {
@@ -86,11 +115,33 @@ void dbgHandler(QtMsgType type, const char *msg)
     }
 }
 
+void
+parseSettings()
+{
+    if (NULL == settings) {
+        QString strFile = getStoreDirectory()
+                        + QDir::separator ()
+                        + "qgv-tp.ini";
+        settings = new QSettings(strFile, QSettings::IniFormat);
+        cout << "Created settings at file " << strFile.toAscii().constData() << endl;
+    }
+
+    if (!settings->contains("LogLevel")) {
+        settings->setValue("LogLevel", int(1));
+        cout << "Set default log level" << endl;
+    }
+    logLevel = settings->value("LogLevel").toInt();
+
+    settings->sync();
+}
+
 int
 main(int argc, char ** argv)
 {
     QCoreApplication app(argc, argv);
     QString msg;
+
+    parseSettings();
 
     open_logfile ();
     qInstallMsgHandler(dbgHandler);
@@ -136,5 +187,9 @@ main(int argc, char ** argv)
     qDebug("Entering main loop.");
     int rv = app.exec();
     logfile.close();
+    if (settings != NULL) {
+        delete settings;
+        settings = NULL;
+    }
     return rv;
 }//main

@@ -1,2 +1,2 @@
-  * Delete the webview before shutting down.
+  * In case there is a TextWithoutData, then show the window
 
