@@ -104,7 +104,10 @@ Rectangle {
             TextEdit {
                 id: smsText
 
-                anchors.fill: parent
+                anchors {
+                    left: parent.left
+                    top: parent.top
+                }
 
                 // Forcibly set width so that wrap mode can work
                 width: parent.width
