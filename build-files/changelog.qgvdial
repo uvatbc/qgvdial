@@ -1,4 +1,2 @@
-  * Logs start off muted.
-  * Contact pics stored in temp file inside qgvdial folder.
-  * Bump up the required version of mosquitto to 0.11.2
+  * Fix binding loop in contacts
 

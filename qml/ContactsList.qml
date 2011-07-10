@@ -47,81 +47,16 @@ Rectangle {
 //    }
 ////////////////////////////////////////////////////////////////////////////////
 
-    Rectangle { // Contact details
-        id: detailsView
-
+    ContactDetails {
+        id: contactDetails
         anchors.fill: parent
-        color: "#202020"
-        border.color: "orange"
-        radius: 10
-
         opacity: 0
 
-        Column {
-            id: detailTopRow
+        onSigCall: container.sigCall(number)
+        onSigText: container.sigText(txtContactName.text, number)
 
-            anchors {
-                top: parent.top
-                left: parent.left
-                right: parent.right
-                leftMargin: 2
-                rightMargin: 2
-            }
-            spacing: 2
-
-            MyButton {
-                id: detailsCloseButton
-                mainText: "Close"
-                onClicked: container.state= ''
-                width: parent.width
-                height: txtContactName.height
-                mainPixelSize: height - 4
-            }
-
-            Item {
-                height: contactDetailImage.height
-                width: parent.width
-
-                Image {
-                    id: contactDetailImage
-                    anchors.left: parent.left
-                    height: (txtContactName.height * 2.5)
-                    width: (txtContactName.height * 2.5)
-
-                    fillMode: Image.PreserveAspectFit
-                }
-
-                Text {
-                    id: txtContactName
-
-                    anchors {
-                        left: contactDetailImage.right
-                        verticalCenter: parent.verticalCenter
-                    }
-                    width: parent.width - contactDetailImage.width
-
-                    text: "Contact name"
-                    color: "white"
-                    font.pixelSize: (detailsView.width + detailsView.height) / 30
-                }
-            }
-        }// Column (details top row)
-
-        ContactDetails {
-            id: detailsList
-            anchors {
-                top: detailTopRow.bottom
-                bottom: parent.bottom
-                left: parent.left
-                right: parent.right
-                topMargin: 5
-            }
-            suggestedPixelSize: (parent.width + parent.height) / 30
-
-            onSigCall: container.sigCall(number)
-            onSigText: container.sigText(txtContactName.text, number)
-        }
-    }// Rectangle (Contact details)
+        onSigClose: container.state= '';
+    }//ContactDetails
 
     Item { // All contacts
         id: allContacts
@@ -172,7 +107,7 @@ Rectangle {
             cacheBuffer: (100 * (allContacts.height + allContacts.width))
 
             model: g_contactsModel
-    //        model: testContactsModelData1
+//            model: testContactsModelData1
 
             section.property: "name"
             section.criteria: ViewSection.FirstCharacter
@@ -219,10 +154,10 @@ Rectangle {
                     anchors.fill: parent
 
                     onClicked: {
-                        detailsList.model = contacts;
-                        detailsList.notesText = notes;
-                        txtContactName.text = name;
-                        contactDetailImage.source = imagePath;
+                        contactDetails.model = contacts;
+                        contactDetails.notesText = notes;
+                        contactDetails.name = name;
+                        contactDetails.imageSource = imagePath;
                         container.state = "Details";
                     }
                 }
@@ -244,7 +179,7 @@ Rectangle {
         State {
             name: "Details"
             PropertyChanges { target: allContacts; opacity: 0 }
-            PropertyChanges { target: detailsView; opacity: 1 }
+            PropertyChanges { target: contactDetails; opacity: 1 }
         }
     ]
 
