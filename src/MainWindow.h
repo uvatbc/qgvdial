@@ -218,6 +218,9 @@ private:
     //! Logfile
     QFile           fLogfile;
 
+    //! Log level
+    int             logLevel;
+
     // Tray, icons, widgets
     QIcon           icoQgv;
     QSystemTrayIcon *pSystray;

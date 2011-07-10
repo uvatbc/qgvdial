@@ -21,6 +21,7 @@ Contact: yuvraaj@gmail.com
 
 #include "ContactsParserObject.h"
 #include "ContactsXmlHandler.h"
+#include "Singletons.h"
 
 ContactsParserObject::ContactsParserObject (QByteArray data,
                                             const QString strAuth,
@@ -156,6 +157,7 @@ PhotoReplyTracker::PhotoReplyTracker(const ContactInfo &ci,
 void
 PhotoReplyTracker::onFinished()
 {
+    OsDependent &osd = Singletons::getRef().getOSD ();
     responseTimeout.stop ();
     if (aborted) {
         qWarning ("Reply aborted!");
@@ -190,10 +192,16 @@ PhotoReplyTracker::onFinished()
             extension = "bmp";
         }
 
-        QString strTemplate = QDir::tempPath ()
-                            + QDir::separator ()
-                            + "qgv_XXXXXX.tmp."
-                            + extension;
+        QString strTemplate = osd.getAppDirectory();
+        QDir dirApp(strTemplate);
+        strTemplate += QDir::separator() + tr("temp");
+        if (!QFileInfo(strTemplate).exists ()) {
+            dirApp.mkdir ("temp");
+        }
+        strTemplate += QDir::separator()
+                    + tr("qgv_XXXXXX.tmp.")
+                    + extension;
+
         QTemporaryFile tempFile (strTemplate);
         if (!tempFile.open ()) {
             qWarning ("Failed to get a temp file name for the photo");

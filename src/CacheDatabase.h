@@ -49,6 +49,9 @@ public:
     // Toggle quick and dirty!
     void setQuickAndDirty(bool bBeDirty = true);
 
+    // Log level
+    int getLogLevel();
+
     // Contacts model
     ContactsModel *newContactsModel();
     void clearContacts ();

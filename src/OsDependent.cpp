@@ -164,7 +164,7 @@ OsDependent::getStartingSize ()
 }//OsDependent::getStartingSize
 
 QString
-OsDependent::getStoreDirectory ()
+OsDependent::getAppDirectory ()
 {
     QString strStoreDir = QDir::homePath ();
     QDir dirHome(strStoreDir);
@@ -182,7 +182,7 @@ OsDependent::getStoreDirectory ()
 #endif
 
     return strStoreDir;
-}//OsDependent::getStoreDirectory
+}//OsDependent::getAppDirectory
 
 bool
 OsDependent::cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt)

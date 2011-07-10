@@ -58,7 +58,7 @@ Contact: yuvraaj@gmail.com
 // SMS Text became rich text
 //#define GV_S_VALUE_DB_VER   "2011-05-27 14:14:40"
 // Photos in contacts
-#define GV_S_VALUE_DB_VER   "2011-06-16 14:10:53"
+#define GV_S_VALUE_DB_VER   "2011-07-09 18:58:53"
 ////////////////////////////////////////////////////////////////////////////////
 // Started using versioning for the settings
 #define GV_SETTINGS_VER     "2011-05-13 16:33:50"

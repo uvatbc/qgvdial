@@ -60,7 +60,7 @@ public:
 
     QRect getStartingSize ();
 
-    QString getStoreDirectory ();
+    QString getAppDirectory ();
 
     bool cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt);
 

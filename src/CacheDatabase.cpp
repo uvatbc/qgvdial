@@ -58,7 +58,7 @@ CacheDatabase::init ()
 {
     OsDependent &osd = Singletons::getRef().getOSD ();
     QString strDbFile, strIniFile;
-    strDbFile = osd.getStoreDirectory () + QDir::separator ();
+    strDbFile = osd.getAppDirectory () + QDir::separator ();
     strIniFile = strDbFile;
     strDbFile += QGVDIAL_DB_NAME;
     strIniFile += QGVDIAL_INI_NAME;
@@ -198,6 +198,15 @@ CacheDatabase::setQuickAndDirty (bool bBeDirty)
         query.exec ("PRAGMA synchronous=on");
     }
 }//CacheDatabase::setQuickAndDirty
+
+int
+CacheDatabase::getLogLevel()
+{
+    if (!settings->contains ("LogLevel")) {
+        settings->setValue ("LogLevel", 2);
+    }
+    return settings->value("LogLevel").toInt ();
+}//CacheDatabase::getLogLevel
 
 ContactsModel *
 CacheDatabase::newContactsModel()

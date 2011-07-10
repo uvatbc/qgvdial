@@ -29,6 +29,7 @@ using namespace std;
 MainWindow::MainWindow (QWidget *parent)
 : QDeclarativeView (parent)
 , fLogfile (this)
+, logLevel (5)
 , icoQgv (":/qgv.png")
 , pSystray (NULL)
 , oContacts (this)
@@ -109,7 +110,7 @@ MainWindow::initLogging ()
 {
     // Initialize logging
     OsDependent &osd = Singletons::getRef().getOSD ();
-    QString strLogfile = osd.getStoreDirectory ();
+    QString strLogfile = osd.getAppDirectory ();
     strLogfile += QDir::separator ();
     strLogfile += "qgvdial.log";
     fLogfile.setFileName (strLogfile);
@@ -152,16 +153,18 @@ MainWindow::log (const QString &strText, int level /*= 10*/)
     // Send to standard output
     cout << strLog.toStdString () << endl;
 
-    // Send to log file
-    if (fLogfile.isOpen ()) {
-        QTextStream streamLog(&fLogfile);
-        streamLog << strLog << endl;
-    }
+    if (level <= logLevel) {
+        // Send to log file
+        if (fLogfile.isOpen ()) {
+            QTextStream streamLog(&fLogfile);
+            streamLog << strLog << endl;
+        }
 
-    // Append it to the circular buffer
-    QMutexLocker locker(&logMutex);
-    arrLogMsgs.prepend (strLog);
-    bKickLocksTimer = true;
+        // Append it to the circular buffer
+        QMutexLocker locker(&logMutex);
+        arrLogMsgs.prepend (strLog);
+        bKickLocksTimer = true;
+    }
 }//MainWindow::log
 
 void
@@ -199,7 +202,7 @@ MainWindow::onCleanupLogsArray()
 void
 MainWindow::setStatus(const QString &strText, int timeout /* = 3000*/)
 {
-    qDebug () << strText;
+    qWarning () << strText;
 
 #ifdef Q_WS_MAEMO_5
     infoBox.hide ();
@@ -308,6 +311,9 @@ MainWindow::init ()
     // Initialize the database: This may create OR blowup and then re-create
     // the database.
     dbMain.init ();
+
+    // Get the loglevel
+    logLevel = dbMain.getLogLevel ();
 
     // Pick up proxy settings from the DB and apply to webpage.
     bool bProxyEnable = false, bUseSystemProxy = false;

@@ -1,2 +1,4 @@
-  * In case there is a TextWithoutData, then show the window
+  * Logs start off muted.
+  * Contact pics stored in temp file inside qgvdial folder.
+  * Bump up the required version of mosquitto to 0.11.2
 
