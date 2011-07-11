@@ -433,6 +433,15 @@ MainWindow::init ()
     this->setWindowIcon (icoQgv);
     clearSmsDestinations ();
 
+    // Save the temp store location for contact photos
+    QString strTempStore = osd.getAppDirectory();
+    QDir dirApp(strTempStore);
+    strTempStore += QDir::separator() + tr("temp");
+    if (!QFileInfo(strTempStore).exists ()) {
+        dirApp.mkdir ("temp");
+    }
+    oContacts.setTempStore(strTempStore);
+
 #if MOSQUITTO_CAPABLE
     // Connect the signals from the Mosquitto thread
     QObject::connect (&mqThread , SIGNAL(sigUpdateInbox()),

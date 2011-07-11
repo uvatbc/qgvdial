@@ -168,8 +168,7 @@ OsDependent::getAppDirectory ()
 {
     QString strStoreDir = QDir::homePath ();
     QDir dirHome(strStoreDir);
-    if (!strStoreDir.endsWith (QDir::separator ()))
-    {
+    if (!strStoreDir.endsWith (QDir::separator ())) {
         strStoreDir += QDir::separator ();
     }
     strStoreDir += ".qgvdial";

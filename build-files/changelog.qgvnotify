@@ -1,2 +1,3 @@
-  * Stop messing up the uninstall
+  * Changed the contacts parser code so that it gets the temp directory when it's constructed. This allows notify to compile.
+  * Stop notify from downloading contact photos. I don't care about actually downloading anything.
 

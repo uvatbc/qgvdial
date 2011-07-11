@@ -21,13 +21,14 @@ Contact: yuvraaj@gmail.com
 
 #include "ContactsParserObject.h"
 #include "ContactsXmlHandler.h"
-#include "Singletons.h"
 
 ContactsParserObject::ContactsParserObject (QByteArray data,
-                                            const QString strAuth,
+                                            const QString &strAuth,
+                                            const QString &strTemp,
                                             QObject *parent)
 : QObject(parent)
 , byData (data)
+, strTempStore (strTemp)
 , bEmitLog (true)
 , nwMgr (NULL)
 , strGoogleAuth (strAuth)
@@ -120,6 +121,11 @@ ContactsParserObject::onGotOneContact (const ContactInfo &contactInfo)
         return;
     }
 
+    if (strTempStore.isEmpty ()) {
+        onGotOnePhoto (contactInfo);
+        return;
+    }
+
     if (NULL == nwMgr) {
         nwMgr = new QNetworkAccessManager(this);
     }
@@ -127,7 +133,7 @@ ContactsParserObject::onGotOneContact (const ContactInfo &contactInfo)
     QNetworkRequest request = createRequest (contactInfo.hrefPhoto);
     QNetworkReply *reply = nwMgr->get (request);
     PhotoReplyTracker *tracker =
-    new PhotoReplyTracker(contactInfo, reply, this);
+    new PhotoReplyTracker(contactInfo, reply, strTempStore, this);
     connect (reply, SIGNAL(finished()), tracker, SLOT(onFinished()));
     connect (tracker, SIGNAL(gotOneContact(const ContactInfo &)),
              this   , SLOT  (onGotOnePhoto(const ContactInfo &)));
@@ -142,9 +148,11 @@ ContactsParserObject::onGotOnePhoto (const ContactInfo &contactInfo)
 
 PhotoReplyTracker::PhotoReplyTracker(const ContactInfo &ci,
                                            QNetworkReply *r,
+                                     const QString &strTemp,
                                            QObject *parent /*= NULL*/)
 : QObject(parent)
 , reply(r)
+, strTempStore (strTemp)
 , contactInfo(ci)
 , responseTimeout(this)
 , aborted (false)
@@ -157,7 +165,6 @@ PhotoReplyTracker::PhotoReplyTracker(const ContactInfo &ci,
 void
 PhotoReplyTracker::onFinished()
 {
-    OsDependent &osd = Singletons::getRef().getOSD ();
     responseTimeout.stop ();
     if (aborted) {
         qWarning ("Reply aborted!");
@@ -192,15 +199,8 @@ PhotoReplyTracker::onFinished()
             extension = "bmp";
         }
 
-        QString strTemplate = osd.getAppDirectory();
-        QDir dirApp(strTemplate);
-        strTemplate += QDir::separator() + tr("temp");
-        if (!QFileInfo(strTemplate).exists ()) {
-            dirApp.mkdir ("temp");
-        }
-        strTemplate += QDir::separator()
-                    + tr("qgv_XXXXXX.tmp.")
-                    + extension;
+        QString strTemplate = strTempStore + QDir::separator()
+                            + tr("qgv_XXXXXX.tmp.") + extension;
 
         QTemporaryFile tempFile (strTemplate);
         if (!tempFile.open ()) {

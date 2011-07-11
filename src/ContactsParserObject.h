@@ -34,7 +34,8 @@ class ContactsParserObject : public QObject
 
 public:
     ContactsParserObject(QByteArray data,
-                         const QString strAuth,
+                         const QString &strAuth,
+                         const QString &strTemp,
                          QObject *parent = 0);
     void setEmitLog (bool enable = true);
     ~ContactsParserObject();
@@ -61,6 +62,9 @@ private:
 private:
     QByteArray  byData;
 
+    //! This is the directory where I should store all contact photos.
+    QString     strTempStore;
+
     bool        bEmitLog;
 
     QNetworkAccessManager *nwMgr;
@@ -76,6 +80,7 @@ class PhotoReplyTracker : public QObject
 public:
     PhotoReplyTracker(const ContactInfo &ci,
                             QNetworkReply *r,
+                      const QString &strTemp,
                             QObject *parent = NULL);
 
 signals:
@@ -90,6 +95,7 @@ private slots:
 
 private:
     QNetworkReply  *reply;
+    QString         strTempStore;
     ContactInfo     contactInfo;
     QTimer          responseTimeout;
 

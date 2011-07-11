@@ -210,7 +210,8 @@ GVContactsTable::onGotContacts (QNetworkReply *reply)
         dtUpdate = QDateTime::currentDateTime().toUTC ();
 
         QThread *workerThread = new QThread(this);
-        ContactsParserObject *pObj = new ContactsParserObject(byData, strGoogleAuth);
+        ContactsParserObject *pObj =
+        new ContactsParserObject(byData, strGoogleAuth, QString());
         pObj->setEmitLog (false);
         pObj->moveToThread (workerThread);
         QObject::connect (workerThread, SIGNAL(started()),

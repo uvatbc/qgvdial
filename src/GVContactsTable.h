@@ -38,6 +38,8 @@ public:
     GVContactsTable (QObject *parent = 0);
     ~GVContactsTable ();
 
+    void setTempStore(const QString &strTemp);
+
     void deinitModel ();
     void initModel ();
 
@@ -96,6 +98,9 @@ private:
 
 private:
     ContactsModel *modelContacts;
+
+    //! Path to the temp directory to store all contact photos
+    QString         strTempStore;
 
     //! Username and password for google authentication
     QString         strUser, strPass;

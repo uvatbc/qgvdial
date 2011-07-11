@@ -44,6 +44,12 @@ GVContactsTable::~GVContactsTable ()
 }//GVContactsTable::~GVContactsTable
 
 void
+GVContactsTable::setTempStore(const QString &strTemp)
+{
+   strTempStore = strTemp;
+}//GVContactsTable::setTempStore
+
+void
 GVContactsTable::deinitModel ()
 {
     if (NULL != modelContacts) {
@@ -308,7 +314,7 @@ GVContactsTable::onGotContacts (QNetworkReply *reply)
 
         QThread *workerThread = new QThread(this);
         ContactsParserObject *pObj =
-        new ContactsParserObject(byData, strGoogleAuth);
+        new ContactsParserObject(byData, strGoogleAuth, strTempStore);
         pObj->moveToThread (workerThread);
         QObject::connect (workerThread, SIGNAL(started()),
                           pObj        , SLOT  (doWork()));
@@ -375,7 +381,8 @@ GVContactsTable::onNoContactPhoto(const ContactInfo &contactInfo)
 
     QNetworkRequest request = createRequest (contactInfo.hrefPhoto);
     QNetworkReply *reply = nwMgr.get (request);
-    PhotoReplyTracker *tracker = new PhotoReplyTracker(contactInfo, reply,this);
+    PhotoReplyTracker *tracker =
+    new PhotoReplyTracker(contactInfo, reply, strTempStore, this);
     connect (reply, SIGNAL(finished()), tracker, SLOT(onFinished()));
     connect (tracker, SIGNAL(gotOneContact(const ContactInfo &)),
              this   , SLOT  (gotOneContact(const ContactInfo &)));
