@@ -57,4 +57,4 @@ Rectangle {
             container.text = textEd.text
         }
     }
-}//Rectangle (around the email)
+}//Rectangle (around the text box)

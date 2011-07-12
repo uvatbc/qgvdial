@@ -20,7 +20,6 @@ Contact: yuvraaj@gmail.com
 */
 
 import Qt 4.7
-import "helper.js" as Code
 
 Rectangle {
     id: button
