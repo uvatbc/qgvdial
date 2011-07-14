@@ -120,6 +120,8 @@ MainWindow::initLogging ()
     logsTimer.start (3 * 1000);
     QObject::connect (&logsTimer, SIGNAL(timeout()),
                        this     , SLOT(onCleanupLogsArray()));
+
+    setStatus("Using qgvdial version __QGVDIAL_VERSION__");
 }//MainWindow::initLogging
 
 /** Log information to console and to log file

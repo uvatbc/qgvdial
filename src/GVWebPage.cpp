@@ -656,9 +656,22 @@ GVWebPage::onGotPhonesListXML (QNetworkReply *reply)
         QScriptEngine scriptEngine;
         strTemp = "var topObj = " + xmlHandler.strJson;
         scriptEngine.evaluate (strTemp);
+        if (scriptEngine.hasUncaughtException ()) {
+            strTemp = QString ("Could not assign json to topObj : %1")
+                      .arg (scriptEngine.uncaughtException().toString());
+            if (bEmitLog) qDebug() << strTemp;
+            break;
+        }
 
         strSelfNumber =
         scriptEngine.evaluate("topObj[\"settings\"][\"primaryDid\"]").toString();
+        if (scriptEngine.hasUncaughtException ()) {
+            strTemp = QString ("Could not parse primaryDid from topObj : %1")
+                      .arg (scriptEngine.uncaughtException().toString());
+            if (bEmitLog) qDebug() << strTemp;
+            break;
+        }
+
         workCurrent.arrParams += QVariant (strSelfNumber);
 
         if ("CLIENT_ONLY" == strSelfNumber) {
@@ -673,7 +686,7 @@ GVWebPage::onGotPhonesListXML (QNetworkReply *reply)
         scriptEngine.evaluate (strTemp);
         if (scriptEngine.hasUncaughtException ()) {
             strTemp = QString ("Uncaught exception executing script : %1")
-                      .arg (scriptEngine.uncaughtException ().toString ());
+                      .arg (scriptEngine.uncaughtException().toString());
             if (bEmitLog) qDebug() << strTemp;
             break;
         }
@@ -689,8 +702,8 @@ GVWebPage::onGotPhonesListXML (QNetworkReply *reply)
                     "}").arg(i);
             scriptEngine.evaluate (strTemp);
             if (scriptEngine.hasUncaughtException ()) {
-                strTemp = QString ("Uncaught exception in message loop: %1")
-                          .arg (scriptEngine.uncaughtException ().toString ());
+                strTemp = QString ("Uncaught exception in phone loop: %1")
+                          .arg (scriptEngine.uncaughtException().toString());
                 if (bEmitLog) qDebug() << strTemp;
                 break;
             }
@@ -707,6 +720,13 @@ GVWebPage::onGotPhonesListXML (QNetworkReply *reply)
                             .arg (i)
                             .arg (j);
                 QString strVal = scriptEngine.evaluate (strTemp).toString ();
+                if (scriptEngine.hasUncaughtException ()) {
+                    strTemp =
+                    QString ("Uncaught exception in phone params loop: %1")
+                            .arg (scriptEngine.uncaughtException().toString());
+                    if (bEmitLog) qDebug() << strTemp;
+                    break;
+                }
 
                 if (strPName == "id") {
                     regNumber.strId = strVal;
@@ -749,8 +769,8 @@ GVWebPage::onGotPhonesListXML (QNetworkReply *reply)
 
             if (bEmitLog) {
                 qDebug() << "Name =" << regNumber.strName
-                         << " number =" << regNumber.strNumber
-                         << " type =" << regNumber.chType;
+                         << "number =" << regNumber.strNumber
+                         << "type =" << regNumber.chType;
             }
             emit registeredPhone (regNumber);
         }
@@ -950,6 +970,12 @@ GVWebPage::parseInboxJson(const QDateTime &dtUpdate, const QString &strJson,
         QScriptEngine scriptEngine;
         strTemp = "var topObj = " + strJson;
         scriptEngine.evaluate (strTemp);
+        if (scriptEngine.hasUncaughtException ()) {
+            qWarning () << "Failed to assign JSon to topObj. error ="
+                        << scriptEngine.uncaughtException ().toString ()
+                        << "JSON =" << strJson;
+            break;
+        }
 
         strTemp = "var msgParams = []; "
                   "var msgList = []; "
@@ -958,9 +984,9 @@ GVWebPage::parseInboxJson(const QDateTime &dtUpdate, const QString &strJson,
                   "}";
         scriptEngine.evaluate (strTemp);
         if (scriptEngine.hasUncaughtException ()) {
-            strTemp = QString ("Uncaught exception executing script : %1")
-                      .arg (scriptEngine.uncaughtException ().toString ());
-            qWarning () << strTemp;
+            qWarning () << "Uncaught exception executing script :"
+                        << scriptEngine.uncaughtException().toString()
+                        << "JSON =" << strJson;
             break;
         }
 
@@ -977,9 +1003,9 @@ GVWebPage::parseInboxJson(const QDateTime &dtUpdate, const QString &strJson,
                     "}").arg(i);
             scriptEngine.evaluate (strTemp);
             if (scriptEngine.hasUncaughtException ()) {
-                strTemp = QString ("Uncaught exception in message loop: %1")
-                          .arg (scriptEngine.uncaughtException ().toString ());
-                qWarning () << strTemp;
+                qWarning () << "Uncaught exception message loop:"
+                            << scriptEngine.uncaughtException().toString()
+                            << "JSON =" << strJson;
                 break;
             }
 
