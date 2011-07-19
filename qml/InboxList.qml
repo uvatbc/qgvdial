@@ -195,14 +195,9 @@ Rectangle {
                 width: parent.width
                 height: parent.height - btnRow.bottom
 
-                contentHeight: {
-                    // Calculate the number of lines of text required
-                    // 1st bracket = total pixels required for the whole string
-                    var lines = (theSmsText.text.length * theSmsText.font.pixelSize) / width;
-                    if (lines < 1) lines = 1;
-                    // final computation = total height in pixels.
-                    return lines * theSmsText.font.pixelSize
-                }
+                property real pixHeight: (detailsView.height + detailsView.width) / 32
+
+                contentHeight: theSmsText.paintedHeight
                 contentWidth: width
 
                 clip: true
@@ -219,7 +214,7 @@ Rectangle {
                     clip: true
 
                     color: "white"
-                    font.pixelSize: (detailsView.height + detailsView.width) / 32
+                    font.pixelSize: parent.pixHeight
                 }// Text (sms text)
             }
         }//Item (Number, buttons and text)

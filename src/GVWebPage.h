@@ -134,6 +134,7 @@ private:
                         const QString &strHtml, bool &bGotOld, int &nNew,
                         qint32 &nUsableMsgs);
     bool parseMessageRow(QString &strRow, QString &strSmsRow);
+    bool execXQuery(const QString &strQuery, QString &result);
 
 private:
     //! The webkit page that does all our work
