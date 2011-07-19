@@ -7,6 +7,11 @@ MOBILITY *= multimedia
 
 include(qtsingleapplication/qtsingleapplication.pri)
 
+CONFIG(debug, debug|release) {
+    message(Debug)
+    DEFINES += QGV_DEBUG
+}
+
 win32 {
 CONFIG *= embed_manifest_exe
 }

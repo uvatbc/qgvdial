@@ -41,7 +41,8 @@ enum GVAccess_Work {
     GVAW_getRegisteredPhones,
     GVAW_getInbox,                  // type, start page, page count, last update
     GVAW_sendSMS,                   // Number, text
-    GVAW_playVmail,                 // Voicemail link
+    GVAW_playVmail,                 // Voicemail link, destination filename
+    GVAW_markAsRead                 // Message ID
 };
 
 struct GVAccess_WorkItem
@@ -178,6 +179,8 @@ protected:
     virtual bool sendSMS () = 0;
     //! Play a voicemail
     virtual bool playVmail () = 0;
+    //! Mark an inbox entry as read
+    virtual bool markAsRead () = 0;
 
 protected slots:
 

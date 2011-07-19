@@ -515,56 +515,80 @@ MainWindow::initQML ()
     // The root object changes when we reload the source. Pick it up again.
     QGraphicsObject *gObj = this->rootObject();
 
+    bool bOk;
     // Connect all signals to slots in this class.
-    QObject::connect (gObj, SIGNAL (sigCall (QString)),
-                      this, SLOT   (dialNow (QString)));
-    QObject::connect (
+    bOk = connect (gObj, SIGNAL (sigCall (QString)),
+                   this, SLOT   (dialNow (QString)));
+    Q_ASSERT(bOk);
+    bOk = connect (
         gObj, SIGNAL (sigText (const QString &, const QString &)),
         this, SLOT   (onSigText (const QString &, const QString &)));
-    QObject::connect (gObj, SIGNAL (sigVoicemail (QString)),
-                      this, SLOT   (retrieveVoicemail (const QString &)));
-    QObject::connect (gObj, SIGNAL (sigVmailPlayback (int)),
-                      this, SLOT   (onSigVmailPlayback (int)));
-    QObject::connect (gObj, SIGNAL (sigSelChanged (int)),
-                      this, SLOT   (onRegPhoneSelectionChange (int)));
-    QObject::connect (gObj   , SIGNAL (sigInboxSelect (QString)),
-                      &oInbox, SLOT   (onInboxSelected (const QString &)));
-    QObject::connect (gObj, SIGNAL (sigUserChanged (const QString &)),
-                      this, SLOT   (onUserTextChanged (const QString &)));
-    QObject::connect (gObj, SIGNAL (sigPassChanged (const QString &)),
-                      this, SLOT   (onPassTextChanged (const QString &)));
-    QObject::connect (gObj, SIGNAL (sigLogin ()),
-                      this, SLOT   (doLogin ()));
-    QObject::connect (gObj, SIGNAL (sigLogout ()),
-                      this, SLOT   (doLogout ()));
-    QObject::connect (gObj, SIGNAL (sigRefresh ()),
-                      this, SLOT   (onRefresh ()));
-    QObject::connect (gObj, SIGNAL (sigRefreshAll ()),
-                      this, SLOT   (onRefreshAll ()));
-    QObject::connect (gObj, SIGNAL (sigHide ()),
-                      this, SLOT   (onSigHide ()));
-    QObject::connect (gObj, SIGNAL (sigQuit ()),
-                      this, SLOT   (on_actionE_xit_triggered ()));
-    QObject::connect (gObj, SIGNAL (sigLinkActivated (const QString &)),
-                      this, SLOT   (onLinkActivated (const QString &)));
-    QObject::connect (
+    Q_ASSERT(bOk);
+    bOk = connect (gObj, SIGNAL (sigVoicemail (QString)),
+                   this, SLOT   (retrieveVoicemail (const QString &)));
+    Q_ASSERT(bOk);
+    bOk = connect (gObj, SIGNAL (sigVmailPlayback (int)),
+                   this, SLOT   (onSigVmailPlayback (int)));
+    Q_ASSERT(bOk);
+    bOk = connect (gObj, SIGNAL (sigSelChanged (int)),
+                   this, SLOT   (onRegPhoneSelectionChange (int)));
+    Q_ASSERT(bOk);
+    bOk = connect (gObj   , SIGNAL (sigInboxSelect (QString)),
+                   &oInbox, SLOT   (onInboxSelected (const QString &)));
+    Q_ASSERT(bOk);
+    bOk = connect (gObj   , SIGNAL (sigMarkAsRead (QString)),
+                   &oInbox, SLOT   (onSigMarkAsRead (const QString &)));
+    Q_ASSERT(bOk);
+    bOk = connect (gObj, SIGNAL (sigUserChanged (const QString &)),
+                   this, SLOT   (onUserTextChanged (const QString &)));
+    Q_ASSERT(bOk);
+    bOk = connect (gObj, SIGNAL (sigPassChanged (const QString &)),
+                   this, SLOT   (onPassTextChanged (const QString &)));
+    Q_ASSERT(bOk);
+    bOk = connect (gObj, SIGNAL (sigLogin ()),
+                   this, SLOT   (doLogin ()));
+    Q_ASSERT(bOk);
+    bOk = connect (gObj, SIGNAL (sigLogout ()),
+                   this, SLOT   (doLogout ()));
+    Q_ASSERT(bOk);
+    bOk = connect (gObj, SIGNAL (sigRefresh ()),
+                   this, SLOT   (onRefresh ()));
+    Q_ASSERT(bOk);
+    bOk = connect (gObj, SIGNAL (sigRefreshAll ()),
+                   this, SLOT   (onRefreshAll ()));
+    Q_ASSERT(bOk);
+    bOk = connect (gObj, SIGNAL (sigHide ()),
+                   this, SLOT   (onSigHide ()));
+    Q_ASSERT(bOk);
+    bOk = connect (gObj, SIGNAL (sigQuit ()),
+                   this, SLOT   (on_actionE_xit_triggered ()));
+    Q_ASSERT(bOk);
+    bOk = connect (gObj, SIGNAL (sigLinkActivated (const QString &)),
+                   this, SLOT   (onLinkActivated (const QString &)));
+    Q_ASSERT(bOk);
+    bOk = connect (
         gObj, SIGNAL (sigProxyChanges(bool, bool, const QString &, int,
                                       bool, const QString &, const QString &)),
         this, SLOT (onSigProxyChanges(bool, bool, const QString &, int,
                                       bool, const QString &, const QString &)));
-    QObject::connect (
+    Q_ASSERT(bOk);
+    bOk = connect (
         gObj, SIGNAL (sigMosquittoChanges(bool, const QString &, int,
                                           const QString &)),
         this, SLOT   (onSigMosquittoChanges(bool, const QString &, int,
                                             const QString &)));
-    QObject::connect (
+    Q_ASSERT(bOk);
+    bOk = connect (
         gObj, SIGNAL(sigPinSettingChanges  (bool, const QString &)),
         this, SLOT  (onSigPinSettingChanges(bool, const QString &)));
-    QObject::connect (gObj, SIGNAL (sigMsgBoxDone(bool)),
-                      this, SLOT (onSigMsgBoxDone(bool)));
-    QObject::connect (
+    Q_ASSERT(bOk);
+    bOk = connect (gObj, SIGNAL (sigMsgBoxDone(bool)),
+                   this, SLOT (onSigMsgBoxDone(bool)));
+    Q_ASSERT(bOk);
+    bOk = connect (
         gObj      , SIGNAL  (sigSearchContacts(const QString &)),
         &oContacts, SLOT (onSearchQueryChanged(const QString &)));
+    Q_ASSERT(bOk);
 
 #if DESKTOP_OS
     Qt::WindowFlags flags = this->windowFlags ();

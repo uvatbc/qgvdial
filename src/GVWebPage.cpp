@@ -380,7 +380,7 @@ GVWebPage::dialCallback (bool bCallback)
 
     if (!bCallback) {
         QString strUA = UA_IPHONE;
-        QString strUrl = QString("https://www.google.com/voice/m/x"
+        QString strUrl = QString(GV_DATA_BASE "/m/x"
                                  "?m=call"
                                  "&n=%1"
                                  "&f="
@@ -1569,3 +1569,39 @@ MyXmlErrorHandler::handleMessage (QtMsgType type, const QString &description,
         break;
     }
 }//MyXmlErrorHandler::handleMessage
+
+bool
+GVWebPage::markAsRead ()
+{
+    QVariantList &arrParams = workCurrent.arrParams;
+    QStringPairList arrPairs;
+    arrPairs += QStringPair("messages", arrParams[0].toString());
+    if (!strRnr_se.isEmpty ()) {
+        arrPairs += QStringPair("_rnr_se"     , strRnr_se);
+    }
+
+    QNetworkReply *reply =
+    postRequest (GV_DATA_BASE "/inbox/mark/", arrPairs, UA_IPHONE,
+                 this, SLOT (onInboxEntryMarked (QNetworkReply *)));
+    startTimerForReply (reply);
+
+    return (true);
+}//GVWebPage::markAsRead
+
+void
+GVWebPage::onInboxEntryMarked(QNetworkReply *reply)
+{
+    QNetworkAccessManager *mgr = webPage.networkAccessManager ();
+    QObject::disconnect (mgr , SIGNAL (finished (QNetworkReply *)),
+                         this, SLOT (onInboxEntryMarked (QNetworkReply *)));
+
+    QByteArray ba = reply->readAll ();
+    reply->deleteLater ();
+
+    bool rv = false;
+    if (ba.contains ("\"ok\":true")) {
+        rv = true;
+    }
+
+    completeCurrentWork (GVAW_markAsRead, rv);
+}//GVWebPage::onInboxEntryMarked

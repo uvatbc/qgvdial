@@ -73,9 +73,12 @@ public slots:
     void loginSuccess ();
     void loggedOut ();
 
+    void onSigMarkAsRead(const QString &msgId);
+
 private slots:
     void oneInboxEntry (const GVInboxEntry &hevent);
     void getInboxDone (bool bOk, const QVariantList &arrParams);
+    void onInboxEntryMarked (bool bOk, const QVariantList &params);
 
 private:
     void prepView ();

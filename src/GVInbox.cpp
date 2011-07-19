@@ -198,3 +198,25 @@ GVInbox::loggedOut ()
     QMutexLocker locker(&mutex);
     bLoggedIn = false;
 }//GVInbox::loggedOut
+
+void
+GVInbox::onSigMarkAsRead(const QString &msgId)
+{
+    GVAccess &webPage = Singletons::getRef().getGVAccess ();
+    QVariantList l;
+    l += msgId;
+    if (!webPage.enqueueWork (GVAW_markAsRead, l, this,
+            SLOT (onInboxEntryMarked (bool, const QVariantList &))))
+    {
+        onInboxEntryMarked(false, l);
+    }
+}//GVInbox::onSigMarkAsRead
+
+
+void
+GVInbox::onInboxEntryMarked (bool bOk, const QVariantList &params)
+{
+    if (!bOk) {
+        qWarning() << "Failed to mark read: ID =" << params[0].toString();
+    }
+}//GVInbox::onInboxEntryMarked

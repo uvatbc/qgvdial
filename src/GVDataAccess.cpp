@@ -280,6 +280,13 @@ GVDataAccess::playVmail ()
     return (false);
 }//GVDataAccess::playVmail
 
+bool
+GVDataAccess::markAsRead ()
+{
+    completeCurrentWork (GVAW_markAsRead, false);
+    return (false);
+}//GVDataAccess::markAsRead
+
 MyCookieJar::MyCookieJar(QObject *parent /*= 0*/)
 : QNetworkCookieJar(parent)
 {

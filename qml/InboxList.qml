@@ -32,6 +32,7 @@ Rectangle {
     signal sigVoicemail(string link)
     signal sigInboxSelect(string selection)
     signal sigVmailPlayback(int playState)
+    signal sigMarkAsRead(string msgId)
 
     property int vmailPlayState: g_vmailPlayerState  // 0=stopped 1=playing 2=paused
 
@@ -445,6 +446,7 @@ Rectangle {
                             container.isVoicemail = false;
                         }
 
+                        container.sigMarkAsRead(link);
                         container.state = "Details"
                     }
                 }

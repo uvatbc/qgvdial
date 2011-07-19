@@ -86,6 +86,9 @@ private slots:
     //! Invoked when the socket makes any transfers
     void onSocketXfer (qint64 bytesXfer, qint64 bytesTotal);
 
+    //! Invoked when the inbox entry has been marked
+    void onInboxEntryMarked(QNetworkReply *reply);
+
 private:
     bool isOnline ();
     void getHostAndQuery (QString &strHost, QString &strQuery);
@@ -117,6 +120,8 @@ private:
     bool sendSMS ();
     //! Play a voicemail
     bool playVmail ();
+    //! Mark an inbox entry as read
+    bool markAsRead ();
 
     void cancelDataDial2 ();
 

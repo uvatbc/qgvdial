@@ -205,7 +205,12 @@ CacheDatabase::getLogLevel()
     if (!settings->contains ("LogLevel")) {
         settings->setValue ("LogLevel", 2);
     }
+
+#ifdef QGV_DEBUG
+    return 5;
+#else
     return settings->value("LogLevel").toInt ();
+#endif
 }//CacheDatabase::getLogLevel
 
 ContactsModel *

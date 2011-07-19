@@ -43,6 +43,8 @@ Rectangle {
     signal sigVmailPlayback(int playState)
     // Signal from inbox to chose the type of inbox entries to show
     signal sigInboxSelect(string selection)
+    // Signal from the inbox that an entry has been opened and needs to be marked as read
+    signal sigMarkAsRead(string msgId)
     // Signals from the Settings page
     signal sigUserChanged(string username)
     signal sigPassChanged(string password)
@@ -102,7 +104,10 @@ Rectangle {
     }
 
     onSigMosquittoChanges: console.debug("QML: Mosquitto setings changed");
-    onSigLinkActivated: console.debug("QML: Link activated: " + strLink);
+    onSigLinkActivated: {
+//        Qt.openUrlExternally(strLink);
+        console.debug("QML: Link activated: " + strLink);
+    }
 
     onSigMsgBoxDone: {
         console.debug ("QML: User requested close on message box. Ok = " + ok)
@@ -176,6 +181,7 @@ Rectangle {
                             mainFlipView.flipped = true;
                             smsView.addSmsDestination(name, number);
                         }
+                        onSigMarkAsRead: main.sigMarkAsRead(msgId);
                     }
                 }//Tab (Inbox)
                 Tab {

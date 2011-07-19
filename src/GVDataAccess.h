@@ -66,6 +66,8 @@ private:
     bool sendSMS ();
     //! Play a voicemail
     bool playVmail ();
+    //! Mark an inbox entry as read
+    bool markAsRead ();
 ////////////////////////////////////////////////////////////////////////////////
 
     bool loginCaptcha (const QString &strToken, const QString &strCaptcha);

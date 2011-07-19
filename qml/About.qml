@@ -41,36 +41,24 @@ Item {
         Text {
             text: "Version: __QGVDIAL_VERSION__"
             width: parent.width
+            height: paintedHeight + 2
             font.pixelSize: mainColumn.pixSize
             color: "white"
         }//Text (version)
 
         Text {
-            text: "<a href=http://www.code.google.com/p/qgvdial>Project homepage</a>"
             width: parent.width
-            horizontalAlignment: Text.AlignHCenter
+            height: paintedHeight + 3
             font.pixelSize: mainColumn.pixSize
             color: "white"
-            onLinkActivated: container.sigLinkActivated(link)
-        }//Text (homepage)
 
-        Text {
-            text: "<a href=http://code.google.com/p/qgvdial/wiki/Changelog>Changelog</a>"
-            width: parent.width
-            horizontalAlignment: Text.AlignHCenter
-            font.pixelSize: mainColumn.pixSize
-            color: "white"
             onLinkActivated: container.sigLinkActivated(link)
-        }//Text (Changelog)
-
-        Text {
-            text: "<a href=http://code.google.com/p/qgvdial/w/list>Wiki</a>"
-            width: parent.width
-            horizontalAlignment: Text.AlignHCenter
-            font.pixelSize: mainColumn.pixSize
-            color: "white"
-            onLinkActivated: container.sigLinkActivated(link)
-        }//Text (wiki)
+            textFormat: Text.RichText
+            wrapMode: Text.WordWrap
+            text: "Project <a href=http://www.code.google.com/p/qgvdial>homepage</a>, " +
+                  "<a href=http://www.code.google.com/p/qgvdial/wiki/Changelog>Changelog</a> and " +
+                  "<a href=http://www.code.google.com/p/qgvdial/w/list>Wiki</a>"
+        }//Text (links)
 
         MyButton {
             mainText: "Back"

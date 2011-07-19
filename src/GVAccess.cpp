@@ -69,6 +69,9 @@ GVAccess::getNameForWork (GVAccess_Work whatwork)
     case GVAW_playVmail:
         func = "playVmail";
         break;
+    case GVAW_markAsRead:
+        func = "markAsRead";
+        break;
     default:
         func = "unknown";
         break;
@@ -96,46 +99,33 @@ GVAccess::enqueueWork (GVAccess_Work whatwork, const QVariantList &params,
     workItem.method   = method;
 
     bool bValid = true;
+    msg = "GVAccess: Invalid parameter count";
     switch (whatwork)
     {
     case GVAW_aboutBlank:
     case GVAW_logout:
     case GVAW_getRegisteredPhones:
         // No params needed here
-        if (0 != params.size ())
-        {
-            msg = "GVAccess: Invalid parameter count";
-            bValid = false;
-        }
+        if (0 != params.size ()) bValid = false;
         break;
 
-    // No enum values that need only one parameter!!
+    case GVAW_markAsRead:           // Message ID
+        if (1 != params.size ()) bValid = false;
+        break;
 
     case GVAW_login:                // user and password
     case GVAW_sendSMS:              // Number, text
     case GVAW_playVmail:            // Voicemail link, destination filename
-        if (2 != params.size ())
-        {
-            msg = "GVAccess: Invalid parameter count";
-            bValid = false;
-        }
+        if (2 != params.size ()) bValid = false;
         break;
 
     case GVAW_dialOut:              // Destination, context, callout
-        if (3 != params.size ())
-        {
-            msg = "GVAccess: Invalid parameter count";
-            bValid = false;
-        }
+        if (3 != params.size ()) bValid = false;
         break;
 
     case GVAW_dialCallback:         // Destination, context, callback and type
     case GVAW_getInbox:             // type, start page, page count, last update
-        if (4 != params.size ())
-        {
-            msg = "GVAccess: Invalid parameter count";
-            bValid = false;
-        }
+        if (4 != params.size ()) bValid = false;
         break;
 
     default:
@@ -217,6 +207,9 @@ GVAccess::doNextWork ()
             break;
         case GVAW_playVmail:
             playVmail ();
+            break;
+        case GVAW_markAsRead:
+            markAsRead ();
             break;
         default:
             qWarning ("Invalid work specified. Moving on to next work.");
