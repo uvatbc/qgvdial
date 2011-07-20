@@ -22,15 +22,16 @@ maemo5 {
     OTHER_FILES += ../build-files/qgvdial.desktop
 }
 
-# In Linux and maemo, add telepathy, libmosquitto and openssl
-unix:!symbian {
+# In Linux and maemo, add telepathy  and openssl
+unix:!symbian: {
     QT *= dbus
     INCLUDEPATH += $$QMAKESPEC/usr/include/telepathy-1.0/
-    LIBS += -ltelepathy-qt4 -lmosquitto -lssl
+    LIBS += -ltelepathy-qt4 -lssl
 }
-# In Windows, add the mosquitto dll and openssl
+
+# In Windows, add openssl
 win32 {
-    LIBS *= -lmosquitto -llibeay32
+    LIBS *= -llibeay32
 }
 
 PRECOMPILED_HEADER = ../src/global.h
@@ -172,6 +173,9 @@ win32 {
 exists(../src/mqlib-build) {
     message(Forcible inclusion of mqlib!)
     include(../src/mqlib/mqlib.pri)
+} else {
+    message(Forcible exclusion of mqlib!)
+    LIBS += -lmosquitto
 }
 #######################################################################
 
