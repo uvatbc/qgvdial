@@ -33,8 +33,9 @@ DialContext::DialContext (const QString &strMy, const QString &strT,
 , mainView (mV)
 {
     QObject *pRoot = mainView->rootObject ();
-    QObject::connect (pRoot, SIGNAL (sigMsgBoxDone(bool)),
-                      this , SLOT (onSigMsgBoxDone(bool)));
+    bool rv = connect (pRoot, SIGNAL (sigMsgBoxDone(bool)),
+                       this , SLOT (onSigMsgBoxDone(bool)));
+    Q_ASSERT(rv);
 }//DialContext::DialContext
 
 DialContext::~DialContext() {

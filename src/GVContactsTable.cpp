@@ -111,8 +111,9 @@ GVContactsTable::postRequest (QString         strUrl,
     QNetworkRequest request = createRequest (strUrl);
     QByteArray byPostData = strParams.toAscii ();
 
-    QObject::connect (&nwMgr   , SIGNAL (finished (QNetworkReply *)),
-                       receiver, method);
+    bool rv = connect (&nwMgr   , SIGNAL (finished (QNetworkReply *)),
+                        receiver, method);
+    Q_ASSERT(rv);
     QNetworkReply *reply = nwMgr.post (request, byPostData);
     return (reply);
 }//GVContactsTable::postRequest
@@ -123,8 +124,9 @@ GVContactsTable::getRequest (QString         strUrl,
                              const char     *method)
 {
     QNetworkRequest request = createRequest (strUrl);
-    QObject::connect (&nwMgr   , SIGNAL (finished (QNetworkReply *)),
-                       receiver, method);
+    bool rv = connect (&nwMgr   , SIGNAL (finished (QNetworkReply *)),
+                        receiver, method);
+    Q_ASSERT(rv);
     QNetworkReply *reply = nwMgr.get (request);
     return (reply);
 }//GVContactsTable::getRequest
@@ -209,8 +211,9 @@ GVContactsTable::loggedOut ()
 void
 GVContactsTable::onLoginResponse (QNetworkReply *reply)
 {
-    QObject::disconnect (&nwMgr, SIGNAL (finished (QNetworkReply *)),
+    bool rv = disconnect (&nwMgr, SIGNAL (finished (QNetworkReply *)),
                           this , SLOT   (onLoginResponse (QNetworkReply *)));
+    Q_ASSERT(rv);
 
     QString strReply = reply->readAll ();
     QString strCaptchaToken, strCaptchaUrl;
@@ -236,9 +239,10 @@ GVContactsTable::onLoginResponse (QNetworkReply *reply)
                           + strCaptchaUrl;
             qDebug ("Loading captcha");
             CaptchaWidget *captcha = new CaptchaWidget(strCaptchaUrl);
-            QObject::connect (
+            rv = connect (
                 captcha, SIGNAL (done (bool, const QString &)),
                 this   , SLOT   (onCaptchaDone (bool, const QString &)));
+            Q_ASSERT(rv);
             break;
         }
 
@@ -288,8 +292,9 @@ GVContactsTable::onCaptchaDone (bool bOk, const QString & /*strCaptcha*/)
 void
 GVContactsTable::onGotContacts (QNetworkReply *reply)
 {
-    QObject::disconnect (&nwMgr, SIGNAL (finished (QNetworkReply *)),
-                          this , SLOT   (onGotContacts (QNetworkReply *)));
+    bool rv = disconnect (&nwMgr, SIGNAL (finished (QNetworkReply *)),
+                           this , SLOT   (onGotContacts (QNetworkReply *)));
+    Q_ASSERT(rv);
     emit status ("Contacts retrieved, parsing", 0);
 
     do // Begin cleanup block (not a loop)
@@ -316,22 +321,29 @@ GVContactsTable::onGotContacts (QNetworkReply *reply)
         ContactsParserObject *pObj =
         new ContactsParserObject(byData, strGoogleAuth, strTempStore);
         pObj->moveToThread (workerThread);
-        QObject::connect (workerThread, SIGNAL(started()),
-                          pObj        , SLOT  (doWork()));
-        QObject::connect (pObj, SIGNAL(done(bool)),
-                          this, SLOT  (onContactsParsed(bool)));
-        QObject::connect (pObj, SIGNAL(done(bool)),
-                          pObj, SLOT  (deleteLater ()));
-        QObject::connect (pObj        , SIGNAL(done(bool)),
-                          workerThread, SLOT  (quit()));
-        QObject::connect (workerThread, SIGNAL(terminated()),
-                          pObj        , SLOT  (deleteLater()));
-        QObject::connect (workerThread, SIGNAL(terminated()),
-                          workerThread, SLOT  (deleteLater()));
-        QObject::connect (pObj, SIGNAL (status(const QString &, int)),
-                          this, SIGNAL (status(const QString &, int)));
-        QObject::connect (pObj, SIGNAL (gotOneContact (const ContactInfo &)),
-                          this, SLOT   (gotOneContact (const ContactInfo &)));
+        rv = connect (workerThread, SIGNAL(started()), pObj, SLOT(doWork()));
+        Q_ASSERT(rv);
+        rv = connect (pObj, SIGNAL(done(bool)),
+                      this, SLOT  (onContactsParsed(bool)));
+        Q_ASSERT(rv);
+        rv = connect (pObj, SIGNAL(done(bool)),
+                      pObj, SLOT  (deleteLater ()));
+        Q_ASSERT(rv);
+        rv = connect (pObj        , SIGNAL(done(bool)),
+                      workerThread, SLOT  (quit()));
+        Q_ASSERT(rv);
+        rv = connect (workerThread, SIGNAL(terminated()),
+                      pObj        , SLOT  (deleteLater()));
+        Q_ASSERT(rv);
+        rv = connect (workerThread, SIGNAL(terminated()),
+                      workerThread, SLOT  (deleteLater()));
+        Q_ASSERT(rv);
+        rv = connect (pObj, SIGNAL (status(const QString &, int)),
+                      this, SIGNAL (status(const QString &, int)));
+        Q_ASSERT(rv);
+        rv = connect (pObj, SIGNAL (gotOneContact (const ContactInfo &)),
+                      this, SLOT   (gotOneContact (const ContactInfo &)));
+        Q_ASSERT(rv);
         workerThread->start ();
     } while (0); // End cleanup block (not a loop)
 

@@ -585,10 +585,10 @@ GVWebPage::getRegisteredPhones ()
     }
 
     QString strUA = UA_IPHONE;
-    QString strUrl = "https://www.google.com/voice/settings/tab/phones";
+    QString strUrl = GV_DATA_BASE "/settings/tab/phones";
 
     QNetworkRequest request(strUrl);
-    request.setRawHeader ("User-Agent", strUA.toAscii ());
+    request.setRawHeader ("User-Agent", strUA.toAscii());
 
     QNetworkAccessManager *mgr = webPage.networkAccessManager ();
     QNetworkCookieJar *jar = mgr->cookieJar();
@@ -658,7 +658,7 @@ GVWebPage::onGotPhonesListXML (QNetworkReply *reply)
         if (scriptEngine.hasUncaughtException ()) {
             strTemp = QString ("Could not assign json to topObj : %1")
                       .arg (scriptEngine.uncaughtException().toString());
-            if (bEmitLog) qDebug() << strTemp;
+            if (bEmitLog) qDebug() << strTemp << "Data from GV:" << strReply;
             break;
         }
 
@@ -667,7 +667,7 @@ GVWebPage::onGotPhonesListXML (QNetworkReply *reply)
         if (scriptEngine.hasUncaughtException ()) {
             strTemp = QString ("Could not parse primaryDid from topObj : %1")
                       .arg (scriptEngine.uncaughtException().toString());
-            if (bEmitLog) qDebug() << strTemp;
+            if (bEmitLog) qDebug() << strTemp << "Data from GV:" << strReply;
             break;
         }
 
@@ -686,7 +686,7 @@ GVWebPage::onGotPhonesListXML (QNetworkReply *reply)
         if (scriptEngine.hasUncaughtException ()) {
             strTemp = QString ("Uncaught exception executing script : %1")
                       .arg (scriptEngine.uncaughtException().toString());
-            if (bEmitLog) qDebug() << strTemp;
+            if (bEmitLog) qDebug() << strTemp << "Data from GV:" << strReply;
             break;
         }
 
@@ -703,7 +703,7 @@ GVWebPage::onGotPhonesListXML (QNetworkReply *reply)
             if (scriptEngine.hasUncaughtException ()) {
                 strTemp = QString ("Uncaught exception in phone loop: %1")
                           .arg (scriptEngine.uncaughtException().toString());
-                if (bEmitLog) qDebug() << strTemp;
+                if (bEmitLog) qDebug() << strTemp << "Data from GV:" << strReply;
                 break;
             }
 
@@ -723,7 +723,7 @@ GVWebPage::onGotPhonesListXML (QNetworkReply *reply)
                     strTemp =
                     QString ("Uncaught exception in phone params loop: %1")
                             .arg (scriptEngine.uncaughtException().toString());
-                    if (bEmitLog) qDebug() << strTemp;
+                    if (bEmitLog) qDebug() << strTemp << "Data from GV:" << strReply;
                     break;
                 }
 

@@ -236,23 +236,26 @@ GVAccess::completeCurrentWork (GVAccess_Work whatwork, bool bOk)
 
     do // Begin cleanup block (not a loop)
     {
+        bool rv;
         if (GVAW_Nothing == workCurrent.whatwork)
         {
             qWarning ("GVAccess: Completing null work!");
             break;
         }
 
-        QObject::connect (
+        rv = connect (
             this, SIGNAL (workCompleted (bool, const QVariantList &)),
             workCurrent.receiver, workCurrent.method);
+        Q_ASSERT(rv);
 
         if (bEmitLog) qDebug() << "GVAccess: Invoking callback for work "
                                << getNameForWork(whatwork);
         emit workCompleted (bOk, workCurrent.arrParams);
 
-        QObject::disconnect (
+        rv = disconnect (
             this, SIGNAL (workCompleted (bool, const QVariantList &)),
             workCurrent.receiver, workCurrent.method);
+        Q_ASSERT(rv);
 
         if (bEmitLog) qDebug() << "GVAccess: Completed work "
                                << getNameForWork(whatwork);
@@ -447,8 +450,9 @@ GVAccess::postRequest (QNetworkAccessManager   *mgr     ,
         request.setRawHeader ("User-Agent", strUA.toAscii ());
     }
 
-    QObject::connect (mgr     , SIGNAL (finished (QNetworkReply *)),
+    bool rv = connect (mgr     , SIGNAL (finished (QNetworkReply *)),
                       receiver, method);
+    Q_ASSERT(rv);
     QNetworkReply *reply = mgr->post (request, byPostData);
     return (reply);
 }//GVAccess::postRequest

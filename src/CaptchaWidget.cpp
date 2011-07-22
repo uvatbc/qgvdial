@@ -33,8 +33,9 @@ CaptchaWidget::CaptchaWidget (const QString        &strLink,
     grid.addWidget (&edCaptcha  , 1,0);
     this->setLayout (&grid);
 
-    QObject::connect (&webCaptcha, SIGNAL (loadFinished (bool)),
-                       this      , SLOT   (captchaLoaded (bool)));
+    bool rv = connect (&webCaptcha, SIGNAL (loadFinished (bool)),
+                        this      , SLOT   (captchaLoaded (bool)));
+    Q_ASSERT(rv);
     webCaptcha.load (QUrl (strLink));
 
     this->hide ();
@@ -47,20 +48,21 @@ CaptchaWidget::~CaptchaWidget()
 void
 CaptchaWidget::captchaLoaded (bool bOk)
 {
-    QObject::disconnect (&webCaptcha, SIGNAL (loadFinished (bool)),
+    bool rv = disconnect (&webCaptcha, SIGNAL (loadFinished (bool)),
                           this      , SLOT   (captchaLoaded (bool)));
+    Q_ASSERT(rv);
 
     do { // Begin cleanup block (not a loop)
-    	if (!bOk)
-    	{
+        if (!bOk)
+        {
             emit done(false, QString());
             this->deleteLater ();
             break;
-    	}
+        }
 
-        QObject::connect (
-            &edCaptcha, SIGNAL (returnPressed ()),
-             this     , SLOT   (onEdEnter ()));
+        rv = connect (&edCaptcha, SIGNAL (returnPressed ()),
+                       this     , SLOT   (onEdEnter ()));
+        Q_ASSERT(rv);
         this->show ();
     } while (0); // End cleanup block (not a loop)
 }//CaptchaWidget::captchaLoaded

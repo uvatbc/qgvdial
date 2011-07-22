@@ -39,6 +39,7 @@ ContactsParserObject::ContactsParserObject (QByteArray data,
 void
 ContactsParserObject::doWork ()
 {
+    bool rv;
     QXmlInputSource inputSource;
     QXmlSimpleReader simpleReader;
     ContactsXmlHandler contactsHandler;
@@ -46,18 +47,19 @@ ContactsParserObject::doWork ()
 
     inputSource.setData (byData);
 
-    QObject::connect (&contactsHandler, SIGNAL (status(const QString &, int)),
+    rv = connect (&contactsHandler, SIGNAL (status(const QString &, int)),
                        this,            SIGNAL (status(const QString &, int)));
-
-    QObject::connect (
+    Q_ASSERT(rv);
+    rv = connect (
         &contactsHandler, SIGNAL   (oneContact (const ContactInfo &)),
          this,            SLOT(onGotOneContact (const ContactInfo &)));
+    Q_ASSERT(rv);
 
     simpleReader.setContentHandler (&contactsHandler);
     simpleReader.setErrorHandler (&contactsHandler);
 
     refCount.ref();
-    bool rv = simpleReader.parse (&inputSource, false);
+    rv = simpleReader.parse (&inputSource, false);
 
     if (!rv) {
         qDebug() << "Contacts parser failed to parse. Data =" << byData;

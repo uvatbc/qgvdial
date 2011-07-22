@@ -40,8 +40,10 @@ DesktopSkypeCallInitiator::attemptCreateSkypeClient ()
             qWarning ("Failed to create skype Client!");
             return;
         }
-        QObject::connect (skypeClient, SIGNAL(connectedChanged(bool)),
-                          this       , SIGNAL(changed()));
+
+        bool rv = connect (skypeClient, SIGNAL(connectedChanged(bool)),
+                           this       , SIGNAL(changed()));
+        Q_ASSERT(rv);
         emit changed ();
     }
 }//DesktopSkypeCallInitiator::attemptCreateSkypeClient

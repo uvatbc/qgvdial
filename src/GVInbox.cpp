@@ -212,7 +212,6 @@ GVInbox::onSigMarkAsRead(const QString &msgId)
     }
 }//GVInbox::onSigMarkAsRead
 
-
 void
 GVInbox::onInboxEntryMarked (bool bOk, const QVariantList &params)
 {

@@ -60,6 +60,7 @@ CallInitiatorFactory::getFallbacks ()
 void
 CallInitiatorFactory::init ()
 {
+    bool rv;
 #if LINUX_DESKTOP || defined (Q_WS_WIN32)
     CalloutInitiator *skype_initiator = new DesktopSkypeCallInitiator (this);
     listInitiators += skype_initiator;
@@ -67,9 +68,10 @@ CallInitiatorFactory::init ()
 #endif
 
 #if TELEPATHY_CAPABLE
-    QObject::connect (
+    rv = connect (
          actMgr->becomeReady (), SIGNAL (finished(Tp::PendingOperation*)),
          this, SLOT (onAccountManagerReady (Tp::PendingOperation *)));
+    Q_ASSERT(rv);
 #endif
 
 #if defined(Q_OS_SYMBIAN)
@@ -81,10 +83,11 @@ CallInitiatorFactory::init ()
 
     foreach (CalloutInitiator *i, listInitiators) {
         qDebug () << "Added initiator" << i->name();
-        QObject::connect (i   , SIGNAL (status(const QString &, int)),
-                          this, SIGNAL (status(const QString &, int)));
-        QObject::connect (i   , SIGNAL (changed()),
-                          this, SIGNAL (changed()));
+        rv = connect (i   , SIGNAL (status(const QString &, int)),
+                      this, SIGNAL (status(const QString &, int)));
+        Q_ASSERT(rv);
+        rv = connect (i, SIGNAL (changed()), this, SIGNAL (changed()));
+        Q_ASSERT(rv);
     }
 }//CallInitiatorFactory::init
 
@@ -99,14 +102,17 @@ CallInitiatorFactory::onAccountManagerReady (Tp::PendingOperation *op)
         return;
     }
 
+    bool rv;
+
     allAccounts = actMgr->allAccounts ();
     QMutexLocker locker (&mutex);
     nCounter = 1;
     foreach (Tp::AccountPtr acc, allAccounts) {
         nCounter++;
-        QObject::connect (
+        rv = connect (
             acc->becomeReady (), SIGNAL (finished(Tp::PendingOperation*)),
             this, SLOT (onAccountReady(Tp::PendingOperation *)));
+        Q_ASSERT(rv);
     }
     nCounter--;
     if (0 == nCounter) {
@@ -140,6 +146,7 @@ CallInitiatorFactory::onAllAccountsReady ()
     bAccountsReady = true;
     qDebug () << QString("%1 accounts ready").arg (allAccounts.size ());
 
+    bool rv;
     QString msg;
     foreach (Tp::AccountPtr act, allAccounts) {
         msg = QString ("Account cmName = %1\n").arg (act->cmName ());
@@ -160,10 +167,11 @@ CallInitiatorFactory::onAllAccountsReady ()
             listFallback += initiator;
         }
 
-        QObject::connect (initiator, SIGNAL (status(const QString &, int)),
-                          this     , SIGNAL (status(const QString &, int)));
-        QObject::connect (initiator, SIGNAL (changed()),
-                          this     , SIGNAL (changed()));
+        rv = connect (initiator, SIGNAL (status(const QString &, int)),
+                      this     , SIGNAL (status(const QString &, int)));
+        Q_ASSERT(rv);
+        rv = connect (initiator, SIGNAL (changed()), this, SIGNAL (changed()));
+        Q_ASSERT(rv);
 
         msg += "\tADDED!";
         qDebug () << msg;
