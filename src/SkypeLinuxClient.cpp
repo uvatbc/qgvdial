@@ -87,9 +87,10 @@ SkypeLinuxClient::ensureConnected ()
             skypeIface->connection().registerObject("/com/Skype/Client", this);
         }
 
-        QObject::connect (
+        rv = connect (
             this, SIGNAL (internalCompleted (int, const QString &)),
             this, SLOT   (nameResponse      (int, const QString &)));
+        Q_ASSERT(rv);
 
         // Send client name
         rv = invoke(QString("NAME %1").arg(strName));
@@ -113,11 +114,12 @@ SkypeLinuxClient::ensureConnected ()
 void
 SkypeLinuxClient::nameResponse (int status, const QString &strOutput)
 {
-    QObject::disconnect (
+    bool rv = disconnect (
         this, SIGNAL (internalCompleted (int, const QString &)),
         this, SLOT   (nameResponse      (int, const QString &)));
+    Q_ASSERT(rv);
 
-    bool rv = false;
+    rv = false;
     do // Begin cleanup block (not a loop)
     {
         if (0 != status)
@@ -134,9 +136,10 @@ SkypeLinuxClient::nameResponse (int status, const QString &strOutput)
         }
 
         // Send supported protocol
-        QObject::connect (
+        rv = connect (
             this, SIGNAL (internalCompleted (int, const QString &)),
             this, SLOT   (protocolResponse  (int, const QString &)));
+        Q_ASSERT(rv);
         // Send client name
         rv = invoke(SKYPE_PROTOCOL);
         if (!rv)
@@ -157,11 +160,12 @@ SkypeLinuxClient::nameResponse (int status, const QString &strOutput)
 void
 SkypeLinuxClient::protocolResponse (int status, const QString &strOutput)
 {
-    QObject::disconnect (
+    bool rv = disconnect (
         this, SIGNAL (internalCompleted (int, const QString &)),
         this, SLOT   (protocolResponse  (int, const QString &)));
+    Q_ASSERT(rv);
 
-    bool rv = false;
+    rv = false;
     do // Begin cleanup block (not a loop)
     {
         if (0 != status)
@@ -208,8 +212,9 @@ SkypeLinuxClient::invoke (const QString &strCommand)
 
     QDBusPendingCallWatcher *watcher =
             new QDBusPendingCallWatcher (pcall, this);
-    QObject::connect(watcher, SIGNAL (finished   (QDBusPendingCallWatcher*)),
+    bool rv = connect(watcher, SIGNAL (finished   (QDBusPendingCallWatcher*)),
                      this   , SLOT   (invokeDone (QDBusPendingCallWatcher*)));
+    Q_ASSERT(rv); Q_UNUSED(rv);
 */
 
     qDebug () << QString("Sending command %1").arg (strCommand);
@@ -236,9 +241,10 @@ SkypeLinuxClient::invoke (const QString &strCommand)
 void
 SkypeLinuxClient::invokeDone (QDBusPendingCallWatcher *self)
 {
-    QObject::disconnect(
+    bool rv = disconnect(
             self, SIGNAL (finished   (QDBusPendingCallWatcher*)),
             this, SLOT   (invokeDone (QDBusPendingCallWatcher*)));
+    Q_ASSERT(rv); Q_UNUSED(rv);
 
     QDBusPendingReply<QString, QByteArray> reply = *self;
     if (reply.isError())

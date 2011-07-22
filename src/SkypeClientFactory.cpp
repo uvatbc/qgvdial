@@ -77,9 +77,10 @@ SkypeClientFactory::ensureSkypeClient (const QString &name)
 
     if (NULL != client)
     {
-        QObject::connect (
+        bool rv = connect (
             client, SIGNAL (status (const QString &, int)),
             this  , SIGNAL (status (const QString &, int)));
+        Q_ASSERT(rv); Q_UNUSED(rv);
 
         mapClients[name] = client;
         client->start ();

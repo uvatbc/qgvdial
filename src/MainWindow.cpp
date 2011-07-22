@@ -67,6 +67,7 @@ MainWindow::MainWindow (QWidget *parent)
 
     initQML ();
 
+    bool rv;
     // A systray icon if the OS supports it
     if (QSystemTrayIcon::isSystemTrayAvailable ())
     {
@@ -74,19 +75,22 @@ MainWindow::MainWindow (QWidget *parent)
         pSystray->setIcon (icoQgv);
         pSystray->setToolTip ("Google Voice dialer");
         pSystray->setContextMenu (&menuFile);
-        QObject::connect (
+        rv = connect (
             pSystray,
             SIGNAL (activated (QSystemTrayIcon::ActivationReason)),
             this,
             SLOT (systray_activated (QSystemTrayIcon::ActivationReason)));
+        Q_ASSERT(rv);
         pSystray->show ();
     }
 
-    QObject::connect (qApp, SIGNAL (messageReceived (const QString &)),
-                      this, SLOT   (messageReceived (const QString &)));
+    rv = connect (qApp, SIGNAL (messageReceived (const QString &)),
+                       this, SLOT   (messageReceived (const QString &)));
+    Q_ASSERT(rv);
 
-    QObject::connect (&statusTimer, SIGNAL (timeout()),
-                       this       , SLOT   (onStatusTimerTick ()));
+    rv = connect (&statusTimer, SIGNAL (timeout()),
+                   this       , SLOT   (onStatusTimerTick ()));
+    Q_ASSERT(rv);
 
     // Schedule the init a bit later so that the app.exec() can begin executing
     QTimer::singleShot (100, this, SLOT (init()));
@@ -118,8 +122,9 @@ MainWindow::initLogging ()
 
     logsTimer.setSingleShot (true);
     logsTimer.start (3 * 1000);
-    QObject::connect (&logsTimer, SIGNAL(timeout()),
-                       this     , SLOT(onCleanupLogsArray()));
+    bool rv = connect (&logsTimer, SIGNAL(timeout()),
+                        this     , SLOT(onCleanupLogsArray()));
+    Q_ASSERT(rv); Q_UNUSED(rv);
 
     setStatus("Using qgvdial version __QGVDIAL_VERSION__");
 }//MainWindow::initLogging
@@ -307,6 +312,7 @@ MainWindow::init ()
     GVAccess &webPage = Singletons::getRef().getGVAccess ();
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     OsDependent &osd = Singletons::getRef().getOSD ();
+    bool rv;
 
     setStatus ("Initializing...");
 
@@ -339,62 +345,76 @@ MainWindow::init ()
         this, SIGNAL(regPhoneChange(const QStringList &,int)));
 
     // The GV access class signals these during the dialling protocol
-    QObject::connect (&webPage    , SIGNAL (dialInProgress (const QString &)),
+    rv = connect (&webPage    , SIGNAL (dialInProgress (const QString &)),
                        this       , SLOT   (dialInProgress (const QString &)));
-    QObject::connect ( this       , SIGNAL (dialCanFinish ()),
+    Q_ASSERT(rv);
+    rv = connect ( this       , SIGNAL (dialCanFinish ()),
                       &webPage    , SLOT   (dialCanFinish ()));
-    QObject::connect (
+    Q_ASSERT(rv);
+    rv = connect (
         &webPage, SIGNAL (dialAccessNumber (const QString &,
                                             const QVariant &)),
          this   , SLOT   (dialAccessNumber (const QString &,
                                             const QVariant &)));
+    Q_ASSERT(rv);
 
     // Skype client factory needs a main widget. Also, it needs a status sink.
     SkypeClientFactory &skypeFactory = Singletons::getRef().getSkypeFactory ();
     skypeFactory.setMainWidget (this);
-    QObject::connect (
+    rv = connect (
         &skypeFactory, SIGNAL (status(const QString &, int)),
          this        , SLOT   (setStatus(const QString &, int)));
+    Q_ASSERT(rv);
 
     // Telepathy Observer factory init and status
     ObserverFactory &obF = Singletons::getRef().getObserverFactory ();
     obF.init ();
-    QObject::connect (&obF , SIGNAL (status(const QString &, int)),
-                       this, SLOT   (setStatus(const QString &, int)));
+    rv = connect (&obF , SIGNAL (status(const QString &, int)),
+                   this, SLOT   (setStatus(const QString &, int)));
+    Q_ASSERT(rv);
 
     // webPage status
-    QObject::connect (&webPage, SIGNAL (status(const QString &, int)),
-                       this   , SLOT   (setStatus(const QString &, int)));
+    rv = connect (&webPage, SIGNAL (status(const QString &, int)),
+                   this   , SLOT   (setStatus(const QString &, int)));
+    Q_ASSERT(rv);
 
     // When the call initiators change, update us
     CallInitiatorFactory& cif = Singletons::getRef().getCIFactory ();
-    QObject::connect (&cif, SIGNAL(changed()),
-                      this, SLOT(onCallInitiatorsChange()));
+    rv = connect (&cif, SIGNAL(changed()),
+                   this, SLOT(onCallInitiatorsChange()));
+    Q_ASSERT(rv);
     // Call initiator status
-    QObject::connect (&cif , SIGNAL (status(const QString &, int)),
-                       this, SLOT   (setStatus(const QString &, int)));
+    rv = connect (&cif , SIGNAL (status(const QString &, int)),
+                   this, SLOT   (setStatus(const QString &, int)));
+    Q_ASSERT(rv);
 
     // Status from contacts object
-    QObject::connect (&oContacts, SIGNAL (status   (const QString &, int)),
-                       this     , SLOT   (setStatus(const QString &, int)));
+    rv = connect (&oContacts, SIGNAL (status   (const QString &, int)),
+                   this     , SLOT   (setStatus(const QString &, int)));
+    Q_ASSERT(rv);
     // oContacts.allContacts -> this.getContactsDone
-    QObject::connect (&oContacts, SIGNAL (allContacts (bool)),
-                      this      , SLOT   (getContactsDone (bool)));
+    rv = connect (&oContacts, SIGNAL (allContacts (bool)),
+                   this      , SLOT   (getContactsDone (bool)));
+    Q_ASSERT(rv);
     // Status from inbox object
-    QObject::connect (&oInbox, SIGNAL (status   (const QString &, int)),
-                       this  , SLOT   (setStatus(const QString &, int)));
+    rv = connect (&oInbox, SIGNAL (status   (const QString &, int)),
+                   this  , SLOT   (setStatus(const QString &, int)));
+    Q_ASSERT(rv);
 
     // Inbox Model creation
-    QObject::connect (&oInbox, SIGNAL (setInboxModel(QAbstractItemModel *)),
-                       this  , SLOT (onSetInboxModel(QAbstractItemModel *)));
+    rv = connect (&oInbox, SIGNAL (setInboxModel(QAbstractItemModel *)),
+                   this  , SLOT (onSetInboxModel(QAbstractItemModel *)));
+    Q_ASSERT(rv);
     // Inbox selector changes
-    QObject::connect (&oInbox, SIGNAL (setInboxSelector(const QString &)),
-                       this  , SLOT (onSetInboxSelector(const QString &)));
+    rv = connect (&oInbox, SIGNAL (setInboxSelector(const QString &)),
+                   this  , SLOT (onSetInboxSelector(const QString &)));
+    Q_ASSERT(rv);
 
     // Inbox Model creation
-    QObject::connect (
+    rv = connect (
         &oContacts, SIGNAL (setContactsModel(QAbstractItemModel *)),
          this     , SLOT (onSetContactsModel(QAbstractItemModel *)));
+    Q_ASSERT(rv);
 
     // Additional UI initializations:
     //@@UV: Need this for later
@@ -423,14 +443,18 @@ MainWindow::init ()
     this->addAction (&actRefresh);
     this->addAction (&actExit);
     // When the actions are triggered, do the corresponding work.
-    QObject::connect (&actLogin, SIGNAL (triggered()),
-                       this    , SLOT   (on_action_Login_triggered()));
-    QObject::connect (&actDismiss, SIGNAL (triggered()),
-                       this      , SLOT   (hide ()));
-    QObject::connect (&actRefresh, SIGNAL (triggered()),
-                       this      , SLOT   (onRefresh()));
-    QObject::connect (&actExit, SIGNAL (triggered()),
-                       this   , SLOT   (on_actionE_xit_triggered()));
+    rv = connect (&actLogin, SIGNAL (triggered()),
+                   this    , SLOT   (on_action_Login_triggered()));
+    Q_ASSERT(rv);
+    rv = connect (&actDismiss, SIGNAL (triggered()),
+                   this      , SLOT   (hide ()));
+    Q_ASSERT(rv);
+    rv = connect (&actRefresh, SIGNAL (triggered()),
+                   this      , SLOT   (onRefresh()));
+    Q_ASSERT(rv);
+    rv = connect (&actExit, SIGNAL (triggered()),
+                   this   , SLOT   (on_actionE_xit_triggered()));
+    Q_ASSERT(rv);
 
     this->setWindowIcon (icoQgv);
     clearSmsDestinations ();
@@ -446,19 +470,25 @@ MainWindow::init ()
 
 #if MOSQUITTO_CAPABLE
     // Connect the signals from the Mosquitto thread
-    QObject::connect (&mqThread , SIGNAL(sigUpdateInbox()),
-                      &oInbox   , SLOT  (refresh()));
-    QObject::connect (&mqThread , SIGNAL(sigUpdateContacts()),
-                      &oContacts, SLOT  (refreshContacts()));
-    QObject::connect (&mqThread , SIGNAL(status(QString,int)),
-                       this     , SLOT  (setStatus(QString,int)));
-    QObject::connect (&mqThread, SIGNAL(finished()),
-                       this    , SLOT(onMqThreadFinished()));
+    rv = connect (&mqThread , SIGNAL(sigUpdateInbox()),
+                  &oInbox   , SLOT  (refresh()));
+    Q_ASSERT(rv);
+    rv = connect (&mqThread , SIGNAL(sigUpdateContacts()),
+                  &oContacts, SLOT  (refreshContacts()));
+    Q_ASSERT(rv);
+    rv = connect (&mqThread , SIGNAL(status(QString,int)),
+                   this     , SLOT  (setStatus(QString,int)));
+    Q_ASSERT(rv);
+    rv = connect (&mqThread, SIGNAL(finished()),
+                   this    , SLOT(onMqThreadFinished()));
+    Q_ASSERT(rv);
 #endif
 
-    QObject::connect (
+   rv = connect (
         &vmailPlayer, SIGNAL(stateChanged(QMediaPlayer::State)),
          this       , SLOT(onVmailPlayerStateChanged(QMediaPlayer::State)));
+   Q_ASSERT(rv);
+   Q_ASSERT(rv); Q_UNUSED(rv);
 
     // If the cache has the username and password, begin login
     if (dbMain.getUserPass (strUser, strPass)) {
@@ -1013,8 +1043,9 @@ MainWindow::dialNow (const QString &strTarget)
             setStatus ("Failed to dial out because of allocation problem");
             break;
         }
-        QObject::connect (ctx , SIGNAL(sigDialComplete(DialContext*,bool)),
-                          this, SLOT(onSigDialComplete(DialContext*,bool)));
+        bool rv = connect (ctx , SIGNAL(sigDialComplete(DialContext*,bool)),
+                           this, SLOT(onSigDialComplete(DialContext*,bool)));
+        Q_ASSERT(rv); Q_UNUSED(rv);
 
         GVAccess &webPage = Singletons::getRef().getGVAccess ();
         QVariantList l;
@@ -1269,17 +1300,20 @@ MainWindow::refreshRegisteredNumbers ()
         arrNumbers.clear ();
 
         QVariantList l;
-        QObject::connect(
+        rv = connect(
             &webPage, SIGNAL (registeredPhone    (const GVRegisteredNumber &)),
              this   , SLOT   (gotRegisteredPhone (const GVRegisteredNumber &)));
+        Q_ASSERT(rv);
         if (!webPage.enqueueWork (GVAW_getRegisteredPhones, l, this,
                 SLOT (gotAllRegisteredPhones (bool, const QVariantList &))))
         {
-            QObject::disconnect(
+            rv = disconnect(
                 &webPage,
                     SIGNAL (registeredPhone    (const GVRegisteredNumber &)),
                  this   ,
                     SLOT   (gotRegisteredPhone (const GVRegisteredNumber &)));
+            Q_ASSERT(rv);
+            rv = false;
             qWarning ("Failed to retrieve registered contacts!!");
             break;
         }
@@ -1300,9 +1334,10 @@ void
 MainWindow::gotAllRegisteredPhones (bool bOk, const QVariantList &params)
 {
     GVAccess &webPage = Singletons::getRef().getGVAccess ();
-    QObject::disconnect(
+    bool rv = disconnect(
         &webPage, SIGNAL (registeredPhone    (const GVRegisteredNumber &)),
          this   , SLOT   (gotRegisteredPhone (const GVRegisteredNumber &)));
+    Q_ASSERT(rv); Q_UNUSED(rv);
 
     do { // Begin cleanup block (not a loop)
         if (!bOk)
@@ -1796,8 +1831,9 @@ MainWindow::fallbackDialout (DialContext *ctx)
     }
 
     ctx->fallbackCi = cif.getFallbacks()[0];
-    QObject::connect (ctx->fallbackCi, SIGNAL(callInitiated(bool,void*)),
+    bool rv = connect (ctx->fallbackCi, SIGNAL(callInitiated(bool,void*)),
                       this,            SLOT  (onFallbackDialout(bool,void*)));
+    Q_ASSERT(rv); Q_UNUSED(rv);
     GVAccess::simplify_number (strFull);
     ctx->fallbackCi->initiateCall (strFull, ctx);
 }//MainWindow::fallbackDialout

@@ -50,14 +50,15 @@ SkypeObserver::initClient ()
         return;
     }
 
-    QObject::connect (
+    bool rv = connect (
         skypeClient, SIGNAL (status (const QString &, int)),
         this       , SIGNAL (status (const QString &, int)));
+    Q_ASSERT(rv);
 
     QVariantList l;
-    bool bret = skypeClient->enqueueWork (SW_Connect, l,
-                                          this, SLOT (onInitSkype (bool, const QVariantList &)));
-    if (!bret)
+    rv = skypeClient->enqueueWork (SW_Connect, l,
+                   this, SLOT (onInitSkype (bool, const QVariantList &)));
+    if (!rv)
     {
         qWarning ("SkypeObserver: Failed to initiate skype client init!");
         skypeFactory.deleteClient (SKYPE_CLIENT_NAME);
@@ -82,9 +83,10 @@ SkypeObserver::onInitSkype (bool bSuccess, const QVariantList & /*params*/)
     {
         qDebug ("SkypeObserver: Skype initialized");
 
-        QObject::connect (
+        bool rv = connect (
             skypeClient, SIGNAL (callStatusChanged   (uint, const QString &)),
             this       , SLOT   (onCallStatusChanged (uint, const QString &)));
+        Q_ASSERT(rv); Q_UNUSED(rv);
     }
 }//SkypeObserver::onInitSkype
 

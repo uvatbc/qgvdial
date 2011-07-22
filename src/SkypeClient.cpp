@@ -194,15 +194,17 @@ SkypeClient::completeCurrentWork (Skype_Work whatwork, bool bOk)
             break;
         }
 
-        QObject::connect (
+        bool rv = connect (
             this, SIGNAL (workCompleted (bool, const QVariantList &)),
             workCurrent.receiver, workCurrent.method);
+        Q_ASSERT(rv);
 
         emit workCompleted (bOk, workCurrent.arrParams);
 
-        QObject::disconnect (
+        rv = disconnect (
             this, SIGNAL (workCompleted (bool, const QVariantList &)),
             workCurrent.receiver, workCurrent.method);
+        Q_ASSERT(rv);
 
         qDebug () << "SkypeClient: Completed work " << getNameForWork(whatwork);
     } while (0); // End cleanup block (not a loop)
@@ -250,7 +252,6 @@ bool
 SkypeClient::initiateCall (const QString &strTarget)
 {
     bool rv = false;
-
     do {
         if (!bConnected)
         {
@@ -258,17 +259,19 @@ SkypeClient::initiateCall (const QString &strTarget)
             break;
         }
 
-        QObject::connect (
+        rv = connect (
             this, SIGNAL (internalCompleted (int, const QString &)),
             this, SLOT   (callInitiated      (int, const QString &)));
+        Q_ASSERT(rv);
         workCurrent.arrParams.clear ();
         workCurrent.arrParams += strTarget;
         rv = invoke (QString("CALL %1").arg (strTarget));
         if (!rv)
         {
-            QObject::disconnect (
+            rv = disconnect (
                 this, SIGNAL (internalCompleted (int, const QString &)),
                 this, SLOT   (callInitiated      (int, const QString &)));
+            Q_ASSERT(rv);
             qWarning () << "SkypeClient: Failed to invoke a call to PSTN "
                         << strTarget;
             rv = false;
@@ -289,11 +292,12 @@ SkypeClient::initiateCall (const QString &strTarget)
 void
 SkypeClient::callInitiated (int status, const QString &strOutput)
 {
-    QObject::disconnect (
+    bool rv = disconnect (
         this, SIGNAL (internalCompleted (int, const QString &)),
         this, SLOT   (callInitiated      (int, const QString &)));
+    Q_ASSERT(rv);
 
-    bool rv = false;
+    rv = false;
     do { // Begin cleanup block (not a loop)
         if (0 != status)
         {
@@ -374,15 +378,17 @@ SkypeClient::getContacts ()
             break;
         }
 
-        QObject::connect (
+        rv = connect (
             this, SIGNAL (internalCompleted (int, const QString &)),
             this, SLOT   (onGotContacts     (int, const QString &)));
+        Q_ASSERT(rv);
         rv = invoke ("SEARCH FRIENDS");
         if (!rv)
         {
-            QObject::disconnect (
+            rv = disconnect (
                 this, SIGNAL (internalCompleted (int, const QString &)),
                 this, SLOT   (onGotContacts     (int, const QString &)));
+            Q_ASSERT(rv);
             qWarning ("SkypeClient: Failed to get contacts");
             rv = false;
             break;
@@ -400,11 +406,12 @@ SkypeClient::getContacts ()
 void
 SkypeClient::onGotContacts (int status, const QString &strOutput)
 {
-    QObject::disconnect (
+    bool rv = disconnect (
         this, SIGNAL (internalCompleted (int, const QString &)),
         this, SLOT   (onGotContacts     (int, const QString &)));
+    Q_ASSERT(rv);
 
-    bool rv = false;
+    rv = false;
     do { // Begin cleanup block (not a loop)
         if (0 != status)
         {
@@ -541,15 +548,17 @@ SkypeClient::getCallInfo ()
         }
 
         QString cmd = QString ("GET CALL %1 TYPE").arg (callId);
-        QObject::connect (
+        rv = connect (
             this, SIGNAL (callStatusChanged (uint, const QString &)),
             this, SLOT   (onCI_GetType      (uint, const QString &)));
+        Q_ASSERT(rv);
         rv = invoke (cmd);
         if (!rv)
         {
-            QObject::disconnect (
+            rv = disconnect (
                 this, SIGNAL (callStatusChanged (uint, const QString &)),
                 this, SLOT   (onCI_GetType      (uint, const QString &)));
+            Q_ASSERT(rv);
             qWarning ("SkypeClient: Failed to get contacts");
             rv = false;
             break;
@@ -567,12 +576,13 @@ void
 SkypeClient::onCI_GetType (uint incomingCallId, const QString &strOutput,
                            bool bNext /*= false*/)
 {
-    QObject::disconnect (
+    bool rv = disconnect (
         this, SIGNAL (callStatusChanged (uint, const QString &)),
         this, SLOT   (onCI_GetType      (uint, const QString &)));
+    Q_ASSERT(rv);
 
     ulong callId = workCurrent.arrParams[0].toULongLong ();
-    bool rv = false;
+    rv = false;
     do // Begin cleanup block (not a loop)
     {
         do // Begin cleanup block (not a loop)
@@ -589,9 +599,10 @@ SkypeClient::onCI_GetType (uint incomingCallId, const QString &strOutput,
                 (1 != rx.numCaptures ()))
             {
                 // Need to reconnect and get out
-                QObject::connect (
+                rv = connect (
                     this, SIGNAL (callStatusChanged (uint, const QString &)),
                     this, SLOT   (onCI_GetType      (uint, const QString &)));
+                Q_ASSERT(rv);
                 return;
             }
 
@@ -644,15 +655,17 @@ SkypeClient::onCI_GetType (uint incomingCallId, const QString &strOutput,
 
         // Invoke next command
         QString cmd = QString ("GET CALL %1 PARTNER_HANDLE").arg (callId);
-        QObject::connect (
+        rv = connect (
             this, SIGNAL (callStatusChanged (uint, const QString &)),
             this, SLOT   (onCI_GetPH        (uint, const QString &)));
+        Q_ASSERT(rv);
         rv = invoke (cmd);
         if (!rv)
         {
-            QObject::disconnect (
+            rv = disconnect (
                 this, SIGNAL (callStatusChanged (uint, const QString &)),
                 this, SLOT   (onCI_GetPH        (uint, const QString &)));
+            Q_ASSERT(rv);
             qWarning ("SkypeClient: Failed to get contacts");
             rv = false;
             break;
@@ -671,11 +684,12 @@ void
 SkypeClient::onCI_GetPH (uint incomingCallId, const QString &strOutput,
                          bool bNext /*= false*/)
 {
-    QObject::disconnect (
+    bool rv = disconnect (
         this, SIGNAL (callStatusChanged (uint, const QString &)),
         this, SLOT   (onCI_GetPH        (uint, const QString &)));
+    Q_ASSERT(rv);
 
-    bool rv = false;
+    rv = false;
     ulong callId = workCurrent.arrParams[0].toULongLong ();
     do // Begin cleanup block (not a loop)
     {
@@ -692,9 +706,10 @@ SkypeClient::onCI_GetPH (uint incomingCallId, const QString &strOutput,
                 (!strOutput.contains (rx)) || (1 != rx.numCaptures ()))
             {
                 // Need to reconnect and get out
-                QObject::connect (
+                rv = connect (
                     this, SIGNAL (callStatusChanged (uint, const QString &)),
                     this, SLOT   (onCI_GetPH        (uint, const QString &)));
+                Q_ASSERT(rv);
                 return;
             }
 
@@ -719,15 +734,17 @@ SkypeClient::onCI_GetPH (uint incomingCallId, const QString &strOutput,
 
         // Invoke next command
         QString cmd = QString ("GET CALL %1 PARTNER_DISPNAME").arg (callId);
-        QObject::connect (
+        rv = connect (
             this, SIGNAL (callStatusChanged (uint, const QString &)),
             this, SLOT   (onCI_GetPName     (uint, const QString &)));
+        Q_ASSERT(rv);
         rv = invoke (cmd);
         if (!rv)
         {
-            QObject::disconnect (
+            rv = disconnect (
                 this, SIGNAL (callStatusChanged (uint, const QString &)),
                 this, SLOT   (onCI_GetPName     (uint, const QString &)));
+            Q_ASSERT(rv);
             qWarning ("SkypeClient: Failed to get contacts");
             rv = false;
             break;
@@ -746,11 +763,12 @@ void
 SkypeClient::onCI_GetPName (uint incomingCallId, const QString &strOutput,
                             bool bNext /*= false*/)
 {
-    QObject::disconnect (
+    bool rv = disconnect (
         this, SIGNAL (callStatusChanged (uint, const QString &)),
         this, SLOT   (onCI_GetPName     (uint, const QString &)));
+    Q_ASSERT(rv);
 
-    bool rv = false;
+    rv = false;
     ulong callId = workCurrent.arrParams[0].toULongLong ();
     do // Begin cleanup block (not a loop)
     {
@@ -767,9 +785,10 @@ SkypeClient::onCI_GetPName (uint incomingCallId, const QString &strOutput,
                 (!strOutput.contains (rx)) || (2 != rx.numCaptures ()))
             {
                 // Need to reconnect and get out
-                QObject::connect (
+                rv = connect (
                     this, SIGNAL (callStatusChanged (uint, const QString &)),
                     this, SLOT   (onCI_GetPName     (uint, const QString &)));
+                Q_ASSERT(rv);
                 return;
             }
 
@@ -795,15 +814,17 @@ SkypeClient::onCI_GetPName (uint incomingCallId, const QString &strOutput,
 
         // Invoke next command
         QString cmd = QString ("GET CALL %1 TARGET_IDENTITY").arg (callId);
-        QObject::connect (
+        rv = connect (
             this, SIGNAL (callStatusChanged (uint, const QString &)),
             this, SLOT   (onCI_GetTarget    (uint, const QString &)));
+        Q_ASSERT(rv);
         rv = invoke (cmd);
         if (!rv)
         {
-            QObject::disconnect (
+            rv = disconnect (
                 this, SIGNAL (callStatusChanged (uint, const QString &)),
                 this, SLOT   (onCI_GetTarget    (uint, const QString &)));
+            Q_ASSERT(rv);
             qWarning ("SkypeClient: Failed to get contacts");
             rv = false;
             break;
@@ -822,11 +843,12 @@ void
 SkypeClient::onCI_GetTarget (uint incomingCallId, const QString &strOutput,
                              bool bNext /*= false*/)
 {
-    QObject::disconnect (
+    bool rv = disconnect (
         this, SIGNAL (callStatusChanged (uint, const QString &)),
         this, SLOT   (onCI_GetTarget    (uint, const QString &)));
+    Q_ASSERT(rv);
 
-    bool rv = false;
+    rv = false;
     do // Begin cleanup block (not a loop)
     {
         if (bNext)
@@ -842,9 +864,10 @@ SkypeClient::onCI_GetTarget (uint incomingCallId, const QString &strOutput,
             (!strOutput.contains (rx)) || (1 != rx.numCaptures ()))
         {
             // Need to reconnect and get out
-            QObject::connect (
+            rv = connect (
                 this, SIGNAL (callStatusChanged (uint, const QString &)),
                 this, SLOT   (onCI_GetTarget    (uint, const QString &)));
+            Q_ASSERT(rv);
             return;
         }
 

@@ -95,10 +95,9 @@ TpObserver::observeChannels(
                                                           channel,
                                                           strContact,
                                                           this);
-            bOk =
-            QObject::connect (
-                closer, SIGNAL (callStarted ()),
-                this  , SIGNAL (callStarted ()));
+            bOk = connect (closer, SIGNAL (callStarted ()),
+                           this  , SIGNAL (callStarted ()));
+            Q_ASSERT(bOk);
             closer->init ();
             break;
         }
@@ -151,8 +150,6 @@ ChannelAccepter::ChannelAccepter (
 bool
 ChannelAccepter::init ()
 {
-    bool bOk;
-
     PendingReady *pendingReady;
     QMutexLocker locker(&mutex);
 
@@ -160,34 +157,28 @@ ChannelAccepter::init ()
 
     nRefCount ++;
     pendingReady = connection->becomeReady ();
-    bOk =
-    QObject::connect (
+    bool bOk = connect (
         pendingReady, SIGNAL (finished (Tp::PendingOperation *)),
         this        , SLOT   (onConnectionReady (Tp::PendingOperation *)));
-    if (bOk)
-    {
+    if (bOk) {
         qDebug ("TpObserver: Waiting for connection to become ready");
     }
 
     nRefCount ++;
     pendingReady = account->becomeReady ();
-    bOk =
-    QObject::connect (
+    bOk = connect (
         pendingReady, SIGNAL (finished (Tp::PendingOperation *)),
         this        , SLOT   (onAccountReady (Tp::PendingOperation *)));
-    if (bOk)
-    {
+    if (bOk) {
         qDebug ("TpObserver: Waiting for account to become ready");
     }
 
     nRefCount ++;
     pendingReady = currentChannel->becomeReady ();
-    bOk =
-    QObject::connect (
+    bOk = connect (
         pendingReady, SIGNAL (finished (Tp::PendingOperation *)),
         this        , SLOT   (onChannelReady (Tp::PendingOperation *)));
-    if (bOk)
-    {
+    if (bOk) {
         qDebug ("TpObserver: Waiting for channel to become ready");
     }
 

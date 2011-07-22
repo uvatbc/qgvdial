@@ -31,10 +31,12 @@ mainwin(mainwidget),
 bInvokeInProgress(false)
 {
     MainApp *theApp = (MainApp *)qApp;
-    QObject::connect (theApp, SIGNAL (skypeAttachStatus (bool)),
+    bool rv = connect (theApp, SIGNAL (skypeAttachStatus (bool)),
                       this  , SLOT   (skypeAttachStatus (bool)));
-    QObject::connect (theApp, SIGNAL (skypeNotify (const QString &)),
+    Q_ASSERT(rv);
+    rv = connect (theApp, SIGNAL (skypeNotify (const QString &)),
                       this  , SLOT   (skypeNotify (const QString &)));
+    Q_ASSERT(rv);
 }//SkypeWinClient::SkypeWinClient
 
 void

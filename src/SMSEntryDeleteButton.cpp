@@ -26,8 +26,8 @@ QPushButton (parent),
 index(ind)
 {
     this->setText ("Delete");
-    QObject::connect (this, SIGNAL (clicked()),
-                      this, SLOT   (btnClicked ()));
+    bool rv = connect (this, SIGNAL (clicked()), this, SLOT (btnClicked ()));
+    Q_ASSERT(rv); Q_UNUSED(rv);
 }//SMSEntryDeleteButton::SMSEntryDeleteButton
 
 SMSEntryDeleteButton::~SMSEntryDeleteButton (void)

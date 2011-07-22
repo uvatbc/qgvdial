@@ -87,15 +87,17 @@ QGVDbusCallServer::Call (const QString &strNumber)
 void
 QGVDbusCallServer::addCallReceiver (QObject *receiver, const char *method)
 {
-    QObject::connect (&helper, SIGNAL (dialNow (const QString &)),
+    bool rv = connect (&helper, SIGNAL (dialNow (const QString &)),
                       receiver, method);
+    Q_ASSERT(rv); Q_UNUSED(rv);
 }//QGVDbusCallServer::addCallReceiver
 
 void
 QGVDbusCallServer::delCallReceiver (QObject *receiver, const char *method)
 {
-    QObject::disconnect (&helper, SIGNAL (dialNow (const QString &)),
+    bool rv = disconnect (&helper, SIGNAL (dialNow (const QString &)),
                           receiver, method);
+    Q_ASSERT(rv); Q_UNUSED(rv);
 }//QGVDbusCallServer::delCallReceiver
 
 QGVDbusTextServer::QGVDbusTextServer (QObject *parent)
@@ -160,24 +162,28 @@ void
 QGVDbusTextServer::addTextReceivers (QObject *r1, const char *m1,
                                      QObject *r2, const char *m2)
 {
-    QObject::connect (
+    bool rv = connect (
         &helper, SIGNAL (sendText (const QStringList &, const QString &)),
         r1, m1);
-    QObject::connect (
+    Q_ASSERT(rv);
+    rv = connect (
         &helper, SIGNAL (sendTextWithoutData (const QStringList &)),
         r2, m2);
+    Q_ASSERT(rv);
 }//QGVDbusTextServer::addTextReceiver
 
 void
 QGVDbusTextServer::delTextReceivers (QObject *r1, const char *m1,
                                      QObject *r2, const char *m2)
 {
-    QObject::disconnect (
+    bool rv = disconnect (
         &helper, SIGNAL (sendText (const QStringList &, const QString &)),
         r1, m1);
-    QObject::disconnect (
+    Q_ASSERT(rv);
+    rv = disconnect (
         &helper, SIGNAL (sendTextWithoutData (const QStringList &)),
         r2, m2);
+    Q_ASSERT(rv);
 }//QGVDbusTextServer::delTextReceiver
 
 QGVDbusSettingsServer::QGVDbusSettingsServer(QObject *parent)

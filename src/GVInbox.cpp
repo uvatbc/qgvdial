@@ -106,9 +106,10 @@ GVInbox::refresh ()
     l += "1";
     l += "30";
     l += dtUpdate;
-    QObject::connect (
+    bool rv = connect (
         &webPage, SIGNAL (oneInboxEntry (const GVInboxEntry &)),
          this   , SLOT   (oneInboxEntry (const GVInboxEntry &)));
+    Q_ASSERT(rv); Q_UNUSED(rv);
     emit status ("Retrieving Inbox...", 0);
     if (!webPage.enqueueWork (GVAW_getInbox, l, this,
             SLOT (getInboxDone (bool, const QVariantList &))))
@@ -154,9 +155,10 @@ GVInbox::getInboxDone (bool, const QVariantList &params)
     dbMain.setQuickAndDirty (false);
 
     GVAccess &webPage = Singletons::getRef().getGVAccess ();
-    QObject::disconnect (
+    bool rv = disconnect (
         &webPage, SIGNAL (oneInboxEntry (const GVInboxEntry &)),
          this   , SLOT   (oneInboxEntry (const GVInboxEntry &)));
+    Q_ASSERT(rv); Q_UNUSED(rv);
 
     prepView ();
 

@@ -83,9 +83,9 @@ ObserverFactory::init ()
     AbstractClientPtr appr = (AbstractClientPtr) myobserver;
     clientRegistrar->registerClient(appr, "QGVStreamObserver");
 
-    QObject::connect (
-            myobserver, SIGNAL (status(const QString &, int)),
-            this      , SIGNAL (status(const QString &, int)));
+    bool rv = connect (myobserver, SIGNAL (status(const QString &, int)),
+                       this      , SIGNAL (status(const QString &, int)));
+    Q_ASSERT(rv);
 
     listObservers += (IObserver*) myobserver;
 #endif
@@ -94,9 +94,9 @@ ObserverFactory::init ()
 #if LINUX_DESKTOP || defined(Q_WS_WIN32)
     SkypeObserver *skypeObs = new SkypeObserver ();
 
-    QObject::connect (
-        skypeObs, SIGNAL (status(const QString &, int)),
-        this    , SIGNAL (status(const QString &, int)));
+    rv = connect (skypeObs, SIGNAL (status(const QString &, int)),
+                  this    , SIGNAL (status(const QString &, int)));
+    Q_ASSERT(rv);
 
     listObservers += (IObserver*) skypeObs;
 #endif
@@ -109,10 +109,11 @@ ObserverFactory::startObservers (const QString &strContact,
                                        QObject *receiver  ,
                                  const char    *method    )
 {
+    bool rv;
     foreach (IObserver *observer, listObservers)
     {
-        QObject::connect (observer, SIGNAL (callStarted()),
-                          receiver, method);
+        rv = connect (observer, SIGNAL (callStarted()),
+                      receiver, method);
         observer->startMonitoring (strContact);
     }
 }//ObserverFactory::createObservers

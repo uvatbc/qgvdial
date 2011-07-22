@@ -47,23 +47,29 @@ GVWebPage::GVWebPage(QObject *parent/* = NULL*/)
     garbageTimer.setInterval (1000 * 60 * 10);   // 10 minutes
 
     // For progress bars
-    QObject::connect (&webPage, SIGNAL (loadStarted ()),
+    bool rv = connect (&webPage, SIGNAL (loadStarted ()),
                        this   , SIGNAL (loadStarted ()));
-    QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
-                       this   , SIGNAL (loadFinished (bool)));
-    QObject::connect (&webPage, SIGNAL (loadProgress (int)),
-                       this   , SIGNAL (loadProgress (int)));
-    QObject::connect (&webPage, SIGNAL (loadProgress (int)),
-                       this   , SLOT   (onPageProgress (int)));
+    Q_ASSERT(rv);
+    rv = connect (&webPage, SIGNAL (loadFinished (bool)),
+                   this   , SIGNAL (loadFinished (bool)));
+    Q_ASSERT(rv);
+    rv = connect (&webPage, SIGNAL (loadProgress (int)),
+                   this   , SIGNAL (loadProgress (int)));
+    Q_ASSERT(rv);
+    rv = connect (&webPage, SIGNAL (loadProgress (int)),
+                   this   , SLOT   (onPageProgress (int)));
+    Q_ASSERT(rv);
 
     // Garbage timer
-    QObject::connect (&garbageTimer, SIGNAL (timeout ()),
-                       this        , SLOT   (garbageTimerTimeout ()));
+    rv = connect (&garbageTimer, SIGNAL (timeout ()),
+                   this        , SLOT   (garbageTimerTimeout ()));
+    Q_ASSERT(rv);
     garbageTimer.start ();
 
     // Page timeout timer
-    QObject::connect (&pageTimeoutTimer, SIGNAL (timeout()),
-                       this            , SLOT   (onPageTimeout()));
+    rv = connect (&pageTimeoutTimer, SIGNAL (timeout()),
+                   this            , SLOT   (onPageTimeout()));
+    Q_ASSERT(rv);
 }//GVWebPage::GVWebPage
 
 GVWebPage::~GVWebPage(void)
@@ -151,8 +157,9 @@ GVWebPage::isOnline ()
 bool
 GVWebPage::aboutBlank ()
 {
-    QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
+    bool rv = connect (&webPage, SIGNAL (loadFinished (bool)),
                        this   , SLOT   (aboutBlankDone (bool)));
+    Q_ASSERT(rv); Q_UNUSED(rv);
     this->loadUrlString ("about:blank");
 
     return (true);
@@ -161,8 +168,9 @@ GVWebPage::aboutBlank ()
 void
 GVWebPage::aboutBlankDone (bool bOk)
 {
-    QObject::disconnect (&webPage, SIGNAL (loadFinished (bool)),
+    bool rv = disconnect (&webPage, SIGNAL (loadFinished (bool)),
                           this   , SLOT   (aboutBlankDone (bool)));
+    Q_ASSERT(rv); Q_UNUSED(rv);
 
     completeCurrentWork (GVAW_aboutBlank, bOk);
 }//GVWebPage::aboutBlankDone
@@ -180,8 +188,9 @@ GVWebPage::login ()
     webPage.setUA (true);
 
     // GV page load complete will begin the login process.
-    QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
+    bool rv = connect (&webPage, SIGNAL (loadFinished (bool)),
                        this   , SLOT   (loginStage1 (bool)));
+    Q_ASSERT(rv); Q_UNUSED(rv);
     this->loadUrlString (GV_HTTPS);
 
     return (true);
@@ -190,8 +199,9 @@ GVWebPage::login ()
 void
 GVWebPage::loginStage1 (bool bOk)
 {
-    QObject::disconnect (&webPage, SIGNAL (loadFinished (bool)),
+    bool rv = disconnect (&webPage, SIGNAL (loadFinished (bool)),
                           this   , SLOT   (loginStage1 (bool)));
+    Q_ASSERT(rv); Q_UNUSED(rv);
     do // Begin cleanup block (not a loop)
     {
         if (isLoadFailed (bOk))
@@ -205,8 +215,10 @@ GVWebPage::loginStage1 (bool bOk)
 
         if (bEmitLog) qDebug ("Login page loaded");
 
-        QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
+        bOk = connect (&webPage, SIGNAL (loadFinished (bool)),
                            this   , SLOT   (loginStage2 (bool)));
+        Q_ASSERT(bOk);
+        bOk = false;
 
         QString strScript = QString(
         "var f = null;"
@@ -235,8 +247,9 @@ GVWebPage::loginStage1 (bool bOk)
 void
 GVWebPage::loginStage2 (bool bOk)
 {
-    QObject::disconnect (&webPage, SIGNAL (loadFinished (bool)),
-                          this   , SLOT   (loginStage2 (bool)));
+    bool rv = disconnect (&webPage, SIGNAL (loadFinished (bool)),
+                           this   , SLOT   (loginStage2 (bool)));
+    Q_ASSERT(rv); Q_UNUSED(rv);
     do // Begin cleanup block (not a loop)
     {
         if (isLoadFailed (bOk))
@@ -260,8 +273,9 @@ GVWebPage::loginStage2 (bool bOk)
             }
         }
 
-        QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
+        bOk = connect (&webPage, SIGNAL (loadFinished (bool)),
                           this   , SLOT   (loginStage3 (bool)));
+        Q_ASSERT(bOk);
         this->loadUrlString (GV_HTTPS_M "/i/all");
         bOk = true;
     } while (0); // End cleanup block (not a loop)
@@ -274,8 +288,9 @@ GVWebPage::loginStage2 (bool bOk)
 void
 GVWebPage::loginStage3 (bool bOk)
 {
-    QObject::disconnect (&webPage, SIGNAL (loadFinished (bool)),
-                          this   , SLOT   (loginStage3 (bool)));
+    bool rv = disconnect (&webPage, SIGNAL (loadFinished (bool)),
+                           this   , SLOT   (loginStage3 (bool)));
+    Q_ASSERT(rv); Q_UNUSED(rv);
     do // Begin cleanup block (not a loop)
     {
         if (isLoadFailed (bOk))
@@ -319,8 +334,9 @@ GVWebPage::logout ()
         return false;
     }
 
-    QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
-                       this   , SLOT   (logoutDone (bool)));
+    bool rv = connect (&webPage, SIGNAL (loadFinished (bool)),
+                        this   , SLOT   (logoutDone (bool)));
+    Q_ASSERT(rv); Q_UNUSED(rv);
     this->loadUrlString (GV_HTTPS "/account/signout");
 
     return (true);
@@ -329,8 +345,9 @@ GVWebPage::logout ()
 void
 GVWebPage::logoutDone (bool bOk)
 {
-    QObject::disconnect (&webPage, SIGNAL (loadFinished (bool)),
-                          this   , SLOT   (logoutDone (bool)));
+    bool rv = disconnect (&webPage, SIGNAL (loadFinished (bool)),
+                           this   , SLOT   (logoutDone (bool)));
+    Q_ASSERT(rv); Q_UNUSED(rv);
 
     if (bOk)
     {
@@ -431,8 +448,9 @@ GVWebPage::dialCallback (bool bCallback)
         // This cookie needs to also be added as contect data
         QString strContent = QString("{\"gvx\":\"%1\"}").arg(gvxVal);
 
-        QObject::connect (mgr , SIGNAL (finished (QNetworkReply *)),
+        bool rv = connect (mgr , SIGNAL (finished (QNetworkReply *)),
                           this, SLOT   (onDataCallDone (QNetworkReply *)));
+        Q_ASSERT(rv); Q_UNUSED(rv);
         this->bIsCallback = false;
         reply = mgr->post (request, strContent.toAscii());
     } else {
@@ -459,12 +477,13 @@ void
 GVWebPage::onDataCallDone (QNetworkReply * reply)
 {
     QNetworkAccessManager *mgr = webPage.networkAccessManager ();
-    QObject::disconnect (mgr , SIGNAL (finished (QNetworkReply *)),
-                         this, SLOT (onDataCallDone (QNetworkReply *)));
+    bool bOk = disconnect (mgr , SIGNAL (finished (QNetworkReply *)),
+                          this, SLOT (onDataCallDone (QNetworkReply *)));
+    Q_ASSERT(bOk);
     QByteArray ba = reply->readAll ();
     QString msg = ba;
 
-    bool bOk = false;
+    bOk = false;
     do { // Begin cleanup block (not a loop)
         if (bEmitLog) qDebug () << msg;
         QRegExp rx("\"access_number\":\"([+\\d]*)\"");
@@ -551,10 +570,12 @@ GVWebPage::onDataCallCanceled (QNetworkReply * reply)
 {
     bInDialCancel = false;
     QNetworkAccessManager *mgr = webPage.networkAccessManager ();
-    QObject::disconnect (mgr , SIGNAL (finished (QNetworkReply *)),
-                         this, SLOT (onDataCallCanceled (QNetworkReply *)));
-    QByteArray ba = reply->readAll ();
-    QString msg = ba;
+    bool rv = disconnect (mgr , SIGNAL (finished (QNetworkReply *)),
+                          this, SLOT (onDataCallCanceled (QNetworkReply *)));
+    Q_ASSERT(rv); Q_UNUSED(rv);
+
+    QString ba = reply->readAll();
+    qDebug() << "Data call cancelled. Response =" << ba;
 
     QMutexLocker locker(&mutex);
     if ((GVAW_dialCallback == workCurrent.whatwork) ||
@@ -848,8 +869,9 @@ GVWebPage::sendInboxRequest ()
         request.setHeader (QNetworkRequest::CookieHeader,
                            QVariant::fromValue(sendCookies));
 
-        QObject::connect (mgr , SIGNAL (finished (QNetworkReply *)),
-                          this, SLOT   (onGotInboxXML (QNetworkReply *)));
+        bool rv = connect (mgr , SIGNAL (finished (QNetworkReply *)),
+                           this, SLOT   (onGotInboxXML (QNetworkReply *)));
+        Q_ASSERT(rv); Q_UNUSED(rv);
         mgr->get (request);
     } while (0); // End cleanup block (not a loop)
 
@@ -883,8 +905,9 @@ void
 GVWebPage::onGotInboxXML (QNetworkReply *reply)
 {
     QNetworkAccessManager *mgr = webPage.networkAccessManager ();
-    QObject::disconnect (mgr , SIGNAL (finished (QNetworkReply *)),
+    bool bOk = disconnect (mgr , SIGNAL (finished (QNetworkReply *)),
                          this, SLOT   (onGotInboxXML (QNetworkReply *)));
+    Q_ASSERT(bOk);
 
     QString strReply = reply->readAll ();
     QXmlInputSource inputSource;
@@ -893,7 +916,7 @@ GVWebPage::onGotInboxXML (QNetworkReply *reply)
     GvXMLParser xmlHandler;
     xmlHandler.setEmitLog (bEmitLog);
 
-    bool bOk = false;
+    bOk = false;
     do { // Begin cleanup block (not a loop)
         simpleReader.setContentHandler (&xmlHandler);
         simpleReader.setErrorHandler (&xmlHandler);
@@ -1336,8 +1359,9 @@ GVWebPage::sendSMS ()
         // This cookie needs to also be added as contect data
         QString strContent = QString("{\"gvx\":\"%1\"}").arg(gvxVal);
 
-        QObject::connect (mgr , SIGNAL (finished        (QNetworkReply *)),
-                          this, SLOT   (sendSMSResponse (QNetworkReply *)));
+        bool rv = connect (mgr , SIGNAL (finished        (QNetworkReply *)),
+                           this, SLOT   (sendSMSResponse (QNetworkReply *)));
+        Q_ASSERT(rv); Q_UNUSED(rv);
         QNetworkReply *reply = mgr->post (request, strContent.toAscii());
 
         startTimerForReply (reply);
@@ -1349,12 +1373,12 @@ void
 GVWebPage::sendSMSResponse (QNetworkReply *reply)
 {
     QNetworkAccessManager *mgr = webPage.networkAccessManager ();
-    QObject::disconnect (mgr , SIGNAL (finished        (QNetworkReply *)),
+    bool rv = disconnect (mgr , SIGNAL (finished        (QNetworkReply *)),
                          this, SLOT   (sendSMSResponse (QNetworkReply *)));
+    Q_ASSERT(rv);
     QByteArray ba = reply->readAll ();
-    QString msg = ba;
 
-    bool rv = false;
+    rv = false;
     if (ba.contains ("\"send_sms_response\":{\"status\":{\"status\":0}"))
     {
         rv = true;
@@ -1419,8 +1443,9 @@ GVWebPage::playVmail ()
                            QVariant::fromValue(sendCookies));
 
         emit status ("Starting vmail download");
-        QObject::connect (mgr , SIGNAL (finished          (QNetworkReply *)),
-                          this, SLOT   (onVmailDownloaded (QNetworkReply *)));
+        bool rv = connect (mgr , SIGNAL (finished          (QNetworkReply *)),
+                           this, SLOT   (onVmailDownloaded (QNetworkReply *)));
+        Q_ASSERT(rv); Q_UNUSED(rv);
         QNetworkReply *reply = mgr->get (request);
 
         startTimerForReply (reply);
@@ -1433,10 +1458,11 @@ void
 GVWebPage::onVmailDownloaded (QNetworkReply *reply)
 {
     QNetworkAccessManager *mgr = webPage.networkAccessManager ();
-    QObject::disconnect (mgr , SIGNAL (finished          (QNetworkReply *)),
+    bool rv = disconnect (mgr , SIGNAL (finished          (QNetworkReply *)),
                          this, SLOT   (onVmailDownloaded (QNetworkReply *)));
+    Q_ASSERT(rv);
 
-    bool rv = true;
+    rv = true;
     do // Begin cleanup block (not a loop)
     {
         QFile file(workCurrent.arrParams[1].toString());
@@ -1465,12 +1491,14 @@ GVWebPage::onPageTimeout ()
         qWarning ("Request has timed out. Aborting!!!");
         pCurrentReply->abort ();
 
-        QObject::disconnect (
+        bool rv = disconnect (
             pCurrentReply, SIGNAL(downloadProgress(qint64,qint64)),
             this         , SLOT(onSocketXfer(qint64,qint64)));
-        QObject::disconnect (
+        Q_ASSERT(rv);
+        rv = disconnect (
             pCurrentReply, SIGNAL(uploadProgress(qint64,qint64)),
             this         , SLOT(onSocketXfer(qint64,qint64)));
+        Q_ASSERT(rv);
         pCurrentReply = NULL;
 
         //@@UV: Test if this is required
@@ -1518,12 +1546,14 @@ GVWebPage::completeCurrentWork (GVAccess_Work whatwork, bool bOk)
 {
     pageTimeoutTimer.stop ();
     if (NULL != pCurrentReply) {
-        QObject::disconnect (
+        bool rv= disconnect (
             pCurrentReply, SIGNAL(downloadProgress(qint64,qint64)),
             this         , SLOT(onSocketXfer(qint64,qint64)));
-        QObject::disconnect (
+        Q_ASSERT(rv);
+        rv = disconnect (
             pCurrentReply, SIGNAL(uploadProgress(qint64,qint64)),
             this         , SLOT(onSocketXfer(qint64,qint64)));
+        Q_ASSERT(rv);
         pCurrentReply = NULL;
     }
 
@@ -1534,10 +1564,12 @@ void
 GVWebPage::startTimerForReply (QNetworkReply *reply)
 {
     pCurrentReply = reply;
-    QObject::connect (reply, SIGNAL(downloadProgress(qint64,qint64)),
-                      this , SLOT(onSocketXfer(qint64,qint64)));
-    QObject::connect (reply, SIGNAL(uploadProgress(qint64,qint64)),
-                      this , SLOT(onSocketXfer(qint64,qint64)));
+    bool rv = connect (reply, SIGNAL(downloadProgress(qint64,qint64)),
+                       this , SLOT(onSocketXfer(qint64,qint64)));
+    Q_ASSERT(rv);
+    rv = connect (reply, SIGNAL(uploadProgress(qint64,qint64)),
+                  this , SLOT(onSocketXfer(qint64,qint64)));
+    Q_ASSERT(rv);
     onSocketXfer (0,0);
 }//GVWebPage::startTimerForReply
 
@@ -1595,13 +1627,14 @@ void
 GVWebPage::onInboxEntryMarked(QNetworkReply *reply)
 {
     QNetworkAccessManager *mgr = webPage.networkAccessManager ();
-    QObject::disconnect (mgr , SIGNAL (finished (QNetworkReply *)),
+    bool rv = disconnect (mgr , SIGNAL (finished (QNetworkReply *)),
                          this, SLOT (onInboxEntryMarked (QNetworkReply *)));
+    Q_ASSERT(rv);
 
     QByteArray ba = reply->readAll ();
     reply->deleteLater ();
 
-    bool rv = false;
+    rv = false;
     if (ba.contains ("\"ok\":true")) {
         rv = true;
     }

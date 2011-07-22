@@ -36,16 +36,18 @@ TpCalloutInitiator::TpCalloutInitiator (Tp::AccountPtr act, QObject *parent)
 , strSelfNumber("undefined")
 , bIsSpirit (false)
 {
-    QObject::connect (
+    bool rv = connect (
         account.data (), SIGNAL(connectionChanged(const Tp::ConnectionPtr &)),
         this, SLOT(onConnectionChanged(const Tp::ConnectionPtr &)));
+    Q_ASSERT(rv);
 
-    QObject::connect (
+    rv = connect (
         account.data(),
         SIGNAL(connectionStatusChanged(Tp::ConnectionStatus,
                                        Tp::ConnectionStatusReason)),
         this, SLOT(onConnectionChanged(Tp::ConnectionStatus,
                                        Tp::ConnectionStatusReason)));
+    Q_ASSERT(rv);
 
     Tp::ConnectionPtr connection = account->connection();
     onConnectionChanged (connection);
@@ -63,10 +65,11 @@ TpCalloutInitiator::onConnectionChanged (const Tp::ConnectionPtr &connection)
 {
     if (!connection.isNull ())
     {
-        QObject::connect (connection->becomeReady (),
+        bool rv = connect (connection->becomeReady (),
                           SIGNAL (finished (Tp::PendingOperation *)),
                           this,
                           SLOT (onConnectionReady (Tp::PendingOperation *)));
+        Q_ASSERT(rv); Q_UNUSED(rv);
     }
 }//TpCalloutInitiator::onConnectionChanged
 
@@ -81,8 +84,9 @@ TpCalloutInitiator::onConnectionReady (Tp::PendingOperation *op)
         }
 
         // Whenever the account changes state, we change state.
-        QObject::connect (account.data (), SIGNAL(stateChanged(bool)),
+        bool rv = connect (account.data (), SIGNAL(stateChanged(bool)),
                           this           , SIGNAL(changed()));
+        Q_ASSERT(rv); Q_UNUSED(rv);
 
         Tp::ContactPtr contact = account->connection()->selfContact();
         if (!contact.isNull ())
@@ -162,9 +166,10 @@ TpCalloutInitiator::initiateCall (const QString &strDestination,
 
     Tp::PendingChannelRequest *pReq = account->ensureChannel(request);
 
-    QObject::connect (
+    bool rv = connect (
         pReq, SIGNAL (finished (Tp::PendingOperation*)),
         this, SLOT   (onChannelReady (Tp::PendingOperation*)));
+    Q_ASSERT(rv); Q_UNUSED(rv);
 }//TpCalloutInitiator::initiateCall
 
 void

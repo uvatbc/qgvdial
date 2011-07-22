@@ -92,10 +92,10 @@ GVDataAccess::login ()
 void
 GVDataAccess::onLoginResponse1 (QNetworkReply *reply)
 {
-    QObject::disconnect (&nwMgr, SIGNAL (finished (QNetworkReply *)),
-                          this , SLOT   (onLoginResponse1 (QNetworkReply *)));
+    bool bOk = disconnect (&nwMgr, SIGNAL (finished (QNetworkReply *)),
+                            this , SLOT   (onLoginResponse1 (QNetworkReply *)));
+    Q_ASSERT(bOk);
 
-    bool bOk;
     bool bError = (reply->error () != QNetworkReply::NoError);
     if (bError) {
         qWarning ("Error logging in");
@@ -146,10 +146,11 @@ GVDataAccess::loginCaptcha (const QString &strToken, const QString &strCaptcha)
 void
 GVDataAccess::onLoginResponse (QNetworkReply *reply)
 {
-    QObject::disconnect (&nwMgr, SIGNAL (finished (QNetworkReply *)),
-                          this , SLOT   (onLoginResponse (QNetworkReply *)));
+    bool bOk = disconnect (&nwMgr, SIGNAL (finished (QNetworkReply *)),
+                            this , SLOT   (onLoginResponse (QNetworkReply *)));
+    Q_ASSERT(bOk);
 
-    bool bOk = false;
+    bOk = false;
     bool bError = (reply->error () != QNetworkReply::NoError);
     Q_UNUSED (bError);
 
@@ -186,10 +187,13 @@ GVDataAccess::onLoginResponse (QNetworkReply *reply)
             strCaptchaUrl = "http://www.google.com/accounts/"
                           + strCaptchaUrl;
 
+            qWarning("GV asked us to load a captcha. Login will fail!");
+
             //TODO: Load captcha
-//             QObject::connect (
+//             bool rv = connect (
 //                 webView, SIGNAL (loadFinished (bool)),
 //                 this   , SLOT   (onCaptchaLoad (bool)));
+//             Q_ASSERT(rv); Q_UNUSED(rv);
 //             webPage.mainFrame()->load (QUrl(strCaptchaUrl));
 //             qDebug ("Loading captcha");
             break;
