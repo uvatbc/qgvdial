@@ -236,7 +236,7 @@ GVAccess::completeCurrentWork (GVAccess_Work whatwork, bool bOk)
 
     do // Begin cleanup block (not a loop)
     {
-        bool rv;
+        bool rv; Q_UNUSED(rv);
         if (GVAW_Nothing == workCurrent.whatwork)
         {
             qWarning ("GVAccess: Completing null work!");
@@ -452,7 +452,7 @@ GVAccess::postRequest (QNetworkAccessManager   *mgr     ,
 
     bool rv = connect (mgr     , SIGNAL (finished (QNetworkReply *)),
                       receiver, method);
-    Q_ASSERT(rv);
+    Q_ASSERT(rv); Q_UNUSED(rv);
     QNetworkReply *reply = mgr->post (request, byPostData);
     return (reply);
 }//GVAccess::postRequest

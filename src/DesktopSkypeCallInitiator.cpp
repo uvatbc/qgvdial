@@ -43,7 +43,7 @@ DesktopSkypeCallInitiator::attemptCreateSkypeClient ()
 
         bool rv = connect (skypeClient, SIGNAL(connectedChanged(bool)),
                            this       , SIGNAL(changed()));
-        Q_ASSERT(rv);
+        Q_ASSERT(rv); Q_UNUSED(rv);
         emit changed ();
     }
 }//DesktopSkypeCallInitiator::attemptCreateSkypeClient

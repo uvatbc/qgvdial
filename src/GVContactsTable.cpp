@@ -113,7 +113,7 @@ GVContactsTable::postRequest (QString         strUrl,
 
     bool rv = connect (&nwMgr   , SIGNAL (finished (QNetworkReply *)),
                         receiver, method);
-    Q_ASSERT(rv);
+    Q_ASSERT(rv); Q_UNUSED(rv);
     QNetworkReply *reply = nwMgr.post (request, byPostData);
     return (reply);
 }//GVContactsTable::postRequest
@@ -126,7 +126,7 @@ GVContactsTable::getRequest (QString         strUrl,
     QNetworkRequest request = createRequest (strUrl);
     bool rv = connect (&nwMgr   , SIGNAL (finished (QNetworkReply *)),
                         receiver, method);
-    Q_ASSERT(rv);
+    Q_ASSERT(rv); Q_UNUSED(rv);
     QNetworkReply *reply = nwMgr.get (request);
     return (reply);
 }//GVContactsTable::getRequest

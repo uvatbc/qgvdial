@@ -35,7 +35,7 @@ CaptchaWidget::CaptchaWidget (const QString        &strLink,
 
     bool rv = connect (&webCaptcha, SIGNAL (loadFinished (bool)),
                         this      , SLOT   (captchaLoaded (bool)));
-    Q_ASSERT(rv);
+    Q_ASSERT(rv); Q_UNUSED(rv);
     webCaptcha.load (QUrl (strLink));
 
     this->hide ();
