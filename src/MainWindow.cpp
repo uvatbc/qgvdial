@@ -488,7 +488,6 @@ MainWindow::init ()
         &vmailPlayer, SIGNAL(stateChanged(QMediaPlayer::State)),
          this       , SLOT(onVmailPlayerStateChanged(QMediaPlayer::State)));
    Q_ASSERT(rv);
-   Q_ASSERT(rv); Q_UNUSED(rv);
 
     // If the cache has the username and password, begin login
     if (dbMain.getUserPass (strUser, strPass)) {

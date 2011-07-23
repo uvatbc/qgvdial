@@ -45,8 +45,8 @@ Rectangle {
         Transition {
             PropertyAnimation {
                 target: container; property: "y"
-                easing.type: Easing.OutBounce
-                duration: 800
+                easing.type: Easing.OutQuad
+                duration: 300
             }
         }
     ]
