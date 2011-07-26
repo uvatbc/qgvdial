@@ -59,6 +59,8 @@ ObserverFactory::~ObserverFactory ()
 bool
 ObserverFactory::init ()
 {
+    bool rv;
+
     // Observer for Telepathy on desktop Linux and Maemo 5
 #if TELEPATHY_CAPABLE
     clientRegistrar = ClientRegistrar::create();
@@ -83,8 +85,8 @@ ObserverFactory::init ()
     AbstractClientPtr appr = (AbstractClientPtr) myobserver;
     clientRegistrar->registerClient(appr, "QGVStreamObserver");
 
-    bool rv = connect (myobserver, SIGNAL (status(const QString &, int)),
-                       this      , SIGNAL (status(const QString &, int)));
+    rv = connect (myobserver, SIGNAL (status(const QString &, int)),
+                  this      , SIGNAL (status(const QString &, int)));
     Q_ASSERT(rv);
 
     listObservers += (IObserver*) myobserver;

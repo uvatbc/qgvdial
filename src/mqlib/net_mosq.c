@@ -41,6 +41,12 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <ws2tcpip.h>
 #endif
 
+#ifdef __QNX__
+#ifndef AI_ADDRCONFIG
+#define AI_ADDRCONFIG 0
+#endif
+#include <net/netbyte.h>
+#endif
 #include <netinet/in.h>
 
 #include <memory_mosq.h>

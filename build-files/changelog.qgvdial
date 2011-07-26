@@ -1,2 +1,3 @@
-  * Bugfix: SMS and voicemail parsing logic
+  * mqlib 12.0
+  * Improvements to the mqlib inclusion logic in the pro file
 
