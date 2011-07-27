@@ -127,54 +127,104 @@ Rectangle { // Contact details
                 delegate: Item { // one phone number
                     id: delegateItem
                     width: contactNumbers.width
-                    height: textNumber.height + callTextButtons.height + 1
+                    height: phoneColumn.height + 1
 
-                    Text { // The phone number
-                        id: textNumber
+                    Column {
+                        id: phoneColumn
                         anchors {
                             top: parent.top
                             left: parent.left
+                            right: callTextButtons.left
                         }
-                        height: paintedHeight + 2
-                        width: parent.width
 
-                        text: type + " : " + number
-                        color: "white"
-                        font.pixelSize: container.suggestedPixelSize
-                    }// Item (phone number)
+                        Text { // The phone number
+                            id: textType
+                            height: paintedHeight + 2
+                            width: parent.width
+
+                            text: type
+                            color: "white"
+                            font.pixelSize: container.suggestedPixelSize
+                        }// Item (phone type)
+
+                        Text { // The phone number
+                            id: textNumber
+                            height: paintedHeight + 2
+                            width: parent.width
+
+                            text: number
+                            color: "white"
+                            font.pixelSize: container.suggestedPixelSize
+                        }// Item (phone number)
+                    }//Column (type and number)
 
                     Row {
                         id: callTextButtons
                         anchors {
-                            top: textNumber.bottom
-                            left: parent.left
-                            topMargin: 1
+                            top: parent.top
+                            right: parent.right
+                            rightMargin: 1
                         }
-                        height: btnCall.height + spacing
-                        width: parent.width
+
+                        height: phoneColumn.height
+                        width: btnCall.width + btnText.width + spacing - 1
                         spacing: 2
 
-                        MyButton {
+                        Rectangle {
                             id: btnCall
-                            mainText: "Call"
-                            mainPixelSize: container.suggestedPixelSize
-                            width: (parent.width / 2) - parent.spacing
-                            height: mainPixelSize + 2
-                            anchors.verticalCenter: parent.verticalCenter
 
-                            onClicked: container.sigCall(number)
-                        }
+                            height: parent.height
+                            width:  height
 
-                        MyButton {
+                            color: "black"
+                            border.color: "gray"
+                            radius: 10
+
+                            Image {
+                                source: "in_Placed.png"
+                                fillMode: Image.PreserveAspectFit
+                                anchors.centerIn: parent
+
+                                height: parent.height * 0.8
+                                width: height
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: container.sigCall(number)
+
+                                onPressed: btnCall.border.color = "orange"
+                                onReleased: btnCall.border.color = "gray"
+                            }
+                        }//Rectangle (btnCall)
+
+                        Rectangle {
                             id: btnText
-                            mainText: "Text"
-                            mainPixelSize: container.suggestedPixelSize
-                            width: (parent.width / 2) - parent.spacing
-                            height: mainPixelSize + 2
-                            anchors.verticalCenter: parent.verticalCenter
 
-                            onClicked: container.sigText(number)
-                        }
+                            height: parent.height
+                            width:  height
+
+                            color: "black"
+                            border.color: "gray"
+                            radius: 10
+
+                            Image {
+                                source: "in_Sms.png"
+                                fillMode: Image.PreserveAspectFit
+                                anchors.centerIn: parent
+
+                                height: parent.height * 0.8
+                                width: height
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: container.sigText(number)
+
+                                onPressed: btnText.border.color = "orange"
+                                onReleased: btnText.border.color = "gray"
+                            }
+                        }//Rectangle (btnText)
                     }// Row (Call and Text buttons)
                 }// delegate Item (one phone number)
             }//Repeater (All phone numbers for this contact)

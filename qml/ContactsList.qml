@@ -53,7 +53,7 @@ Rectangle {
         opacity: 0
 
         onSigCall: container.sigCall(number)
-        onSigText: container.sigText(txtContactName.text, number)
+        onSigText: container.sigText(name, number)
 
         onSigClose: container.state= '';
     }//ContactDetails

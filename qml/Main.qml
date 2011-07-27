@@ -104,14 +104,8 @@ Rectangle {
     }
 
     onSigMosquittoChanges: console.debug("QML: Mosquitto setings changed");
-    onSigLinkActivated: {
-//        Qt.openUrlExternally(strLink);
-        console.debug("QML: Link activated: " + strLink);
-    }
-
-    onSigMsgBoxDone: {
-        console.debug ("QML: User requested close on message box. Ok = " + ok)
-    }
+    onSigLinkActivated: console.debug("QML: Link activated: " + strLink);
+    onSigMsgBoxDone: console.debug ("QML: User requested close on message box. Ok = " + ok);
 
     Flipable {
         id: mainFlipView

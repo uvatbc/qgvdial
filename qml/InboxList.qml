@@ -143,48 +143,110 @@ Rectangle {
                 id: btnRow
                 anchors {
                     top: theNumber.bottom
-                    left: parent.left
+                    horizontalCenter: parent.horizontalCenter
                 }
-                height: (parent.height + parent.width) / 30
-                width: parent.width
 
-                MyButton {
+                height: (parent.height + parent.width) / 10
+                width: btnCall.width + btnText.width + (btnVmail.width * btnVmail.opacity)
+
+                Rectangle {
                     id: btnCall
-                    mainText: "Call"
-                    width: parent.width / (playButton.opacity == 1 ? 3 : 2)
+
                     height: parent.height
-                    mainPixelSize: height - 4
-                    onClicked: container.sigCall(container.strNumber)
-                }
-                MyButton {
-                    mainText: "Text"
-                    width: parent.width / (playButton.opacity == 1 ? 3 : 2)
-                    height: parent.height
-                    mainPixelSize: height - 4
-                    onClicked: container.sigText(container.strDetailsName, container.strNumber)
-                }
-                MyButton {
-                    id: playButton
-                    mainText: (container.vmailPlayState == 1) ? "Pause" : "Play"
-                    opacity: (detailsView.opacity & container.isVoicemail)
-                    width: parent.width / (playButton.opacity == 1 ? 3 : 2)
-                    height: parent.height
-                    mainPixelSize: height - 4
-                    onClicked: {
-                        if (mainText == "Play") {
-                            if (container.vmailPlayState == 2) {
-                                console.debug("QML: Resume vmail playback");
-                                container.sigVmailPlayback(1);
-                            } else {
-                                console.debug("QML: Request for vmail");
-                                container.sigVoicemail(container.strLink);
-                            }
-                        } else {
-                            console.debug("QML: Pause vmail playback");
-                            container.sigVmailPlayback(2);
-                        }
+                    width:  height
+
+                    color: "black"
+                    border.color: "gray"
+                    radius: 10
+
+                    Image {
+                        source: "in_Placed.png"
+                        fillMode: Image.PreserveAspectFit
+                        anchors.centerIn: parent
+
+                        height: parent.height * 0.8
+                        width: height
                     }
-                }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: container.sigCall(container.strNumber)
+
+                        onPressed: btnCall.border.color = "orange"
+                        onReleased: btnCall.border.color = "gray"
+                    }
+                }//Rectangle (btnCall)
+
+                Rectangle {
+                    id: btnText
+
+                    height: parent.height
+                    width:  height
+
+                    color: "black"
+                    border.color: "gray"
+                    radius: 10
+
+                    Image {
+                        source: "in_Sms.png"
+                        fillMode: Image.PreserveAspectFit
+                        anchors.centerIn: parent
+
+                        height: parent.height * 0.8
+                        width: height
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: container.sigText(container.strDetailsName, container.strNumber)
+
+                        onPressed: btnText.border.color = "orange"
+                        onReleased: btnText.border.color = "gray"
+                    }
+                }//Rectangle (btnText)
+
+                Rectangle {
+                    id: btnVmail
+
+                    opacity: (detailsView.opacity & container.isVoicemail)
+
+                    height: parent.height
+                    width:  height
+
+                    color: "black"
+                    border.color: "gray"
+                    radius: 10
+
+                    Image {
+                        source: (container.vmailPlayState == 1) ? "pause.svg" : "play.svg"
+                        fillMode: Image.PreserveAspectFit
+                        anchors.centerIn: parent
+
+                        height: parent.height * 0.8
+                        width: height
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            if (container.vmailPlayState == 1) {
+                                console.debug("QML: Pause vmail playback");
+                                container.sigVmailPlayback(2);
+                            } else {
+                                if (container.vmailPlayState == 2) {
+                                    console.debug("QML: Resume vmail playback");
+                                    container.sigVmailPlayback(1);
+                                } else {
+                                    console.debug("QML: Request for vmail");
+                                    container.sigVoicemail(container.strLink);
+                                }
+                            }
+                        }
+
+                        onPressed: btnVmail.border.color = "orange"
+                        onReleased: btnVmail.border.color = "gray"
+                    }
+                }//Rectangle (btnVmail)
             }// Row (call, text and play buttons)
 
             Flickable {
