@@ -19,9 +19,6 @@ if ($machine ne "arm") {
     if (`hostname` =~ m/win/) { # This is the only way I know to differentiate the build machine as windows
         $pathreplace = "$qtsdk/Maemo/4.6.2/sysroots/fremantle-arm-sysroot-20.2010.36-2-slim";
         $curdir =~ s/^\/c/C\:/i;
-        $curdir =~ s/\//\\\//g;
-    } else {
-        $curdir =~ s/\//\\\//g;
     }
 
     $mad = "mad"; 
@@ -30,6 +27,7 @@ if ($machine ne "arm") {
     $pathreplace = "/targets/FREMANTLE_ARMEL";
 }
 $pathreplace =~ s/\//\\\//g;
+$curdir =~ s/\//\\\//g;
 
 # Delete any existing version file
 system("rm ver.cfg");
