@@ -8,9 +8,15 @@ if (!defined $ARGV[1]) {
 
 my $srcsubst = $ARGV[0];
 my $qver = $ARGV[1];
-print("$srcsubst = $qver\n");
+my $startdir = $ARGV[2];
 
-if (list_dir(".") == 0)
+if ($startdir eq undef) {
+    $startdir = ".";
+}
+
+print("$srcsubst = $qver in dir $startdir\n");
+
+if (list_dir($startdir) == 0)
 {
     print $error_str;
 }
