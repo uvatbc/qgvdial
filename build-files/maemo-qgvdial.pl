@@ -1,22 +1,38 @@
-my $machine = `uname -m`;
-chomp $machine;
+use Cwd;
+
+my $machine = `uname -m`; chomp $machine;
 my $mad;
 my $asroot;
-if ($machine ne "arm") {
-    $mad = '/home/uv/apps/mad';
-} else {
-    $asroot = "fakeroot";
-}
-
+my $qtsdk;
 my $repo = "https://qgvdial.googlecode.com/svn/trunk";
 my $cmd;
 my $line;
+my $pathreplace;
+my $curdir = getcwd();
+
+if ($machine ne "arm") {
+    $qtsdk = $ENV{'QTSDK'};
+    if ($qtsdk eq undef) {
+        die "Need to specify QTSDK environment variable";
+    }
+    
+    if (`hostname` =~ m/win/) { # This is the only way I know to differentiate the build machine as windows
+        $pathreplace = "$qtsdk/Maemo/4.6.2/sysroots/fremantle-arm-sysroot-20.2010.36-2-slim";
+        $curdir =~ s/^\/c/C\:/i;
+        $curdir =~ s/\//\\\//g;
+    } else {
+        $curdir =~ s/\//\\\//g;
+    }
+
+    $mad = "mad"; 
+} else {
+    $asroot = "fakeroot";
+    $pathreplace = "/targets/FREMANTLE_ARMEL";
+}
+$pathreplace =~ s/\//\\\//g;
 
 # Delete any existing version file
-if (-f ver.cfg)
-{
-    unlink(ver.cfg);
-}
+system("rm ver.cfg");
 # Get the latest version file from the repository
 $cmd = "svn export $repo/build-files/ver.cfg";
 system($cmd);
@@ -36,10 +52,12 @@ $qver = "$qver.$svnver";
 my $basedir = "./qgvdial-$qver";
 
 # Delete any previous checkout directories
-system("rm -rf qgvdial* qgvtp*");
+system("rm -rf qgvdial*");
+system("rm -rf qgvtp*");
+
 $cmd = "svn export $repo $basedir";
 system($cmd);
-system("cp $basedir/icons/qgv64.png $basedir/src/qgvdial.png");
+system("cp $basedir/icons/qgv.png $basedir/src/qgvdial.png");
 
 # Append the version to the pro file
 open(PRO_FILE, ">>$basedir/src/src.pro") || die "Cannot open pro file";
@@ -47,20 +65,17 @@ print PRO_FILE "VERSION=__QGVDIAL_VERSION__\n";
 close PRO_FILE;
 
 # Version replacement
-$cmd = "cd $basedir ; perl ./build-files/version.pl __QGVDIAL_VERSION__ $qver";
-print "$cmd\n";
-system($cmd);
-
-# Fix the QML files
-$cmd = "cd qgvdial-$qver/src & echo something>mqlib-build";
-print "$cmd\n";
+$cmd = "perl $basedir/build-files/version.pl __QGVDIAL_VERSION__ $qver $basedir";
+print $cmd;
 system($cmd);
 
 # Copy the correct pro file
 system("cp $basedir/build-files/pro.qgvdial $basedir/qgvdial.pro");
 
+my $qmakecmd = "$mad qmake -r -spec default -unix -after \"OBJECTS_DIR=obj\" \"MOC_DIR=moc\" \"UI_DIR=ui\" \"RCC_DIR=rcc\"";
 # Do everything upto the preparation of the debian directory. Code is still not compiled.
-$cmd = "cd $basedir ; $mad qmake && echo y | $mad dh_make --createorig --single -e yuvraaj\@gmail.com -c lgpl && $mad qmake";
+$cmd = "cd $basedir && $qmakecmd && $mad dh_make --createorig --single -e yuvraaj\@gmail.com -c lgpl && $qmakecmd ";
+print "$cmd\n";
 system($cmd);
 
 # Add a post install file to add the executable bit after installation on the device
@@ -74,46 +89,35 @@ system("mv $basedir/build-files/qgvdial.Text.service.maemo $basedir/build-files/
 # Change the name of the desktop file so that it can be directly used in the compilation
 system("mv $basedir/build-files/qgvdial.desktop.maemo $basedir/build-files/qgvdial.desktop");
 
-system("head -1 $basedir/debian/changelog >dest.txt ; cat $basedir/build-files/changelog.qgvdial >>dest.txt ; tail -2 $basedir/debian/changelog | head -1 | sed 's/unknown/Yuvraaj Kelkar/g' >>dest.txt ; mv dest.txt $basedir/debian/changelog");
+system("head -1 $basedir/debian/changelog >dest.txt && cat $basedir/build-files/changelog.qgvdial >>dest.txt && tail -2 $basedir/debian/changelog | head -1 | sed 's/unknown/Yuvraaj Kelkar/g' >>dest.txt && mv dest.txt $basedir/debian/changelog");
 
-if ($machine eq "arm") {
-    # Make sure all make files are present before mucking with them.
-    system("cd $basedir ; make src/Makefile");
+# Make sure all make files are present before mucking with them.
+system("cd $basedir && make src/Makefile");
 
-    # Strip out "/targets/FREMANTLE_ARMEL/"
-    $cmd="sed 's/\\/targets\\/FREMANTLE_ARMEL//g' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/\\/targets\\/FREMANTLE_ARMEL//g' $basedir/src/Makefile >$basedir/src/Makefile1 ; mv $basedir/src/Makefile1 $basedir/src/Makefile";
-    print "$cmd\n";
-    system($cmd);
+# Strip out "/targets/FREMANTLE_ARMEL/" or "$qtsdk/Maemo/4.6.2/sysroots/fremantle-arm-sysroot-20.2010.36-2-slim"
+$cmd="sed \"s/$pathreplace//ig\" $basedir/Makefile >$basedir/Makefile1 && mv $basedir/Makefile1 $basedir/Makefile && sed \"s/$pathreplace//ig\" $basedir/src/Makefile >$basedir/src/Makefile1 && mv $basedir/src/Makefile1 $basedir/src/Makefile";
+print "$cmd\n";
+system($cmd);
 
-    $cmd=`pwd`;
-    chomp $cmd;
-    $cmd =~ s/\//\\\//g;
+# Replace hard coded current directory with relative directory.
+$cmd="sed 's/$curdir\\/qgvdial-$qver/../g' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/$curdir\\/qgvdial-$qver/../g' $basedir/src/Makefile >$basedir/src/Makefile1 ; mv $basedir/src/Makefile1 $basedir/src/Makefile";
+print "$cmd\n";
+system($cmd);
 
-    # Replace hard coded current directory with relative directory.
-    $cmd="sed 's/$cmd\\/qgvdial-$qver/../g' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/$cmd\\/qgvdial-$qver/../g' $basedir/src/Makefile >$basedir/src/Makefile1 ; mv $basedir/src/Makefile1 $basedir/src/Makefile";
-    print "$cmd\n";
-    system($cmd);
+# Remove the GLESv2 dependency
+$cmd="sed 's/ -lGLESv2//ig' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/ -lGLESv2//ig' $basedir/src/Makefile >$basedir/src/Makefile1 ; mv $basedir/src/Makefile1 $basedir/src/Makefile";
+print "$cmd\n";
+system($cmd);
 
-    # Remove the GLESv2 dependency
-    $cmd="sed 's/ -lGLESv2//g' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/ -lGLESv2//g' $basedir/src/Makefile >$basedir/src/Makefile1 ; mv $basedir/src/Makefile1 $basedir/src/Makefile";
-    print "$cmd\n";
-    system($cmd);
+# Reverse the order of these two lines for a complete build 
+$cmd = "cd $basedir && $mad dpkg-buildpackage";
+$cmd = "cd $basedir && $mad dpkg-buildpackage -sa -S";
 
-    # Reverse the order of these two lines for a complete build 
-    $cmd = "cd $basedir && dpkg-buildpackage -rfakeroot";
-    $cmd = "cd $basedir && dpkg-buildpackage -rfakeroot -sa -S";
-} else {
-    $cmd = "cd $basedir && $asroot $mad dpkg-buildpackage -rfakeroot";
-}
 # Execute the rest of the build command
 system($cmd);
 
-if ($machine ne "arm") {
-    $cmd = "dput -f fremantle-upload qgvdial*.changes";
-} else {
-    $cmd = "dput -f fremantle-extras-builder qgvdial*.changes";
-}
+$cmd = "dput -f fremantle-upload qgvdial*.changes";
 system($cmd);
 
-exit();
+exit(0);
 
