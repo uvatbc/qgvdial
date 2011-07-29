@@ -87,19 +87,28 @@ Rectangle { // Contact details
                     fillMode: Image.PreserveAspectFit
                 }
 
-                Text {
-                    id: txtContactName
-
+                Item {
                     anchors {
+                        top: parent.top
                         left: contactImage.right
                         verticalCenter: parent.verticalCenter
                     }
                     width: parent.width - contactImage.width
+                    height: parent.height
 
-                    text: "Contact name"
-                    color: "white"
-                    font.pixelSize: container.suggestedPixelSize
+                    Text {
+                        id: txtContactName
+                        anchors.centerIn: parent
+
+                        width: paintedWidth
+                        height: paintedHeight
+
+                        text: "Contact name"
+                        color: "white"
+                        font.pixelSize: container.suggestedPixelSize
+                    }
                 }
+
             }//Item (image and name)
 
             Text {
@@ -173,7 +182,7 @@ Rectangle { // Contact details
                         Rectangle {
                             id: btnCall
 
-                            height: parent.height
+                            height: parent.height * 0.8
                             width:  height
 
                             color: "black"
@@ -201,7 +210,7 @@ Rectangle { // Contact details
                         Rectangle {
                             id: btnText
 
-                            height: parent.height
+                            height: parent.height * 0.8
                             width:  height
 
                             color: "black"

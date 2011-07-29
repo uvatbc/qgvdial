@@ -45,6 +45,8 @@ Rectangle {
     signal sigInboxSelect(string selection)
     // Signal from the inbox that an entry has been opened and needs to be marked as read
     signal sigMarkAsRead(string msgId)
+    // Inbox vmail entry has asked to close the vmail
+    signal sigCloseVmail
     // Signals from the Settings page
     signal sigUserChanged(string username)
     signal sigPassChanged(string password)
@@ -176,6 +178,7 @@ Rectangle {
                             smsView.addSmsDestination(name, number);
                         }
                         onSigMarkAsRead: main.sigMarkAsRead(msgId);
+                        onSigCloseVmail: main.sigCloseVmail();
                     }
                 }//Tab (Inbox)
                 Tab {

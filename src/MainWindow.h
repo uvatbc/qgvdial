@@ -29,8 +29,8 @@ Contact: yuvraaj@gmail.com
 #include "RegNumberModel.h"
 #include "DialContext.h"
 
-#include <QMediaPlayer>
 #include <QtDeclarative>
+#include <phonon/MediaObject>
 
 #if MOSQUITTO_CAPABLE
 #include "MqClientThread.h"
@@ -127,7 +127,8 @@ private slots:
     //! Invoked by GVAccess when the voice mail download has completed
     void onVmailDownloaded (bool bOk, const QVariantList &arrParams);
     //! Invoked when the vmail player changes state
-    void onVmailPlayerStateChanged(QMediaPlayer::State state);
+    void onVmailPlayerStateChanged(Phonon::State newState,
+                                   Phonon::State oldState);
     //! Invoked when the QML sends us a vmail play/pause/stop signal
     void onSigVmailPlayback (int newstate);
 
@@ -177,6 +178,9 @@ private slots:
     //! Invoked when the contacts model is created
     void onSetContactsModel(QAbstractItemModel *model);
 
+    //! Invoked when the vmail is being shut off
+    void onSigCloseVmail();
+
 private:
     void initLogging ();
 
@@ -214,6 +218,8 @@ private:
 
     void clearSmsDestinations();
 
+    void createVmailPlayer();
+
 private:
     //! Logfile
     QFile           fLogfile;
@@ -229,7 +235,7 @@ private:
     //! GV Inbox object
     GVInbox         oInbox;
 
-    QMediaPlayer    vmailPlayer;
+    Phonon::MediaObject *vmailPlayer;
 
     //! Timer for status messages
     QTimer          statusTimer;

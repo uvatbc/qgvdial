@@ -33,6 +33,7 @@ Rectangle {
     signal sigInboxSelect(string selection)
     signal sigVmailPlayback(int playState)
     signal sigMarkAsRead(string msgId)
+    signal sigCloseVmail
 
     property int vmailPlayState: g_vmailPlayerState  // 0=stopped 1=playing 2=paused
 
@@ -83,6 +84,7 @@ Rectangle {
                 onClicked: {
                     container.state= ''
                     container.sigVmailPlayback(0);
+                    container.sigCloseVmail();
                 }
                 width: parent.width
                 height: (parent.height / 2)

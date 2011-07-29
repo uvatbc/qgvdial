@@ -22,6 +22,8 @@ Contact: yuvraaj@gmail.com
 #include "MainWindow.h"
 #include "PhoneNumberValidator.h"
 
+#include <phonon/AudioOutput>
+#include <phonon/AudioOutputDevice>
 #include <QDesktopServices>
 #include <iostream>
 using namespace std;
@@ -34,7 +36,7 @@ MainWindow::MainWindow (QWidget *parent)
 , pSystray (NULL)
 , oContacts (this)
 , oInbox (this)
-, vmailPlayer (this)
+, vmailPlayer (NULL)
 , statusTimer (this)
 #ifdef Q_WS_MAEMO_5
 , infoBox (this)
@@ -101,6 +103,11 @@ MainWindow::~MainWindow ()
 #if MOSQUITTO_CAPABLE
     mqThread.terminate ();
 #endif
+
+    if (NULL != vmailPlayer) {
+        delete vmailPlayer;
+        vmailPlayer = NULL;
+    }
 }//MainWindow::~MainWindow
 
 /** Initialize the log file name and timer.
@@ -484,11 +491,6 @@ MainWindow::init ()
     Q_ASSERT(rv);
 #endif
 
-   rv = connect (
-        &vmailPlayer, SIGNAL(stateChanged(QMediaPlayer::State)),
-         this       , SLOT(onVmailPlayerStateChanged(QMediaPlayer::State)));
-   Q_ASSERT(rv);
-
     // If the cache has the username and password, begin login
     if (dbMain.getUserPass (strUser, strPass)) {
         this->setUsername (strUser);
@@ -567,6 +569,9 @@ MainWindow::initQML ()
     Q_ASSERT(bOk);
     bOk = connect (gObj   , SIGNAL (sigMarkAsRead (QString)),
                    &oInbox, SLOT   (onSigMarkAsRead (const QString &)));
+    Q_ASSERT(bOk);
+    bOk = connect (gObj, SIGNAL (sigCloseVmail ()),
+                   this, SLOT   (onSigCloseVmail ()));
     Q_ASSERT(bOk);
     bOk = connect (gObj, SIGNAL (sigUserChanged (const QString &)),
                    this, SLOT   (onUserTextChanged (const QString &)));
@@ -683,7 +688,7 @@ MainWindow::onUserTextChanged (const QString &strUsername)
         strUser = strUsername;
         this->setUsername (strUser);
     }
-}//MainWindow::onUserPassTextChanged
+}//MainWindow::onUserTextChanged
 
 void
 MainWindow::onPassTextChanged (const QString &strPassword)
@@ -1460,36 +1465,60 @@ MainWindow::playVmail (const QString &strFile)
 
         qDebug() << "Play vmail file:" << strFile << "Url =" << url;
 
-        vmailPlayer.setMedia (QMediaContent(url));
-        vmailPlayer.setVolume (50);
-        vmailPlayer.play();
+        createVmailPlayer ();
+        vmailPlayer->setCurrentSource (Phonon::MediaSource(url));
+//        vmailPlayer->setVolume (50);
+        vmailPlayer->play();
     } while (0); // End cleanup block (not a loop)
 }//MainWindow::playVmail
 
 void
-MainWindow::onVmailPlayerStateChanged(QMediaPlayer::State state)
+MainWindow::onVmailPlayerStateChanged(Phonon::State newState,
+                                      Phonon::State /*oldState*/)
 {
-    int newstate = (int) state;
-    qDebug() << "Vmail player state changed to" << newstate;
+    int value = -1;
+    qDebug() << "Vmail player state changed to" << newState;
+
+    switch (newState) {
+    case Phonon::StoppedState:
+    case Phonon::ErrorState:
+        value = 0;
+        break;
+    case Phonon::PlayingState:
+        value = 1;
+        break;
+    case Phonon::PausedState:
+        value = 2;
+        break;
+    default:
+        qWarning ("Unknown state!");
+        return;
+    }
+
     QDeclarativeContext *ctx = this->rootContext();
-    ctx->setContextProperty ("g_vmailPlayerState", newstate);
+    ctx->setContextProperty ("g_vmailPlayerState", value);
 }//MainWindow::onVmailPlayerStateChanged
 
 void
 MainWindow::onSigVmailPlayback (int newstate)
 {
+    if (NULL == vmailPlayer) {
+        qDebug("Vmail object not available.");
+        return;
+    }
+
     switch(newstate) {
     case 0:
         qDebug ("QML asked us to stop vmail");
-        vmailPlayer.stop ();
+        vmailPlayer->stop ();
         break;
     case 1:
         qDebug ("QML asked us to play vmail");
-        vmailPlayer.play ();
+        vmailPlayer->play ();
         break;
     case 2:
         qDebug ("QML asked us to pause vmail");
-        vmailPlayer.pause ();
+        vmailPlayer->pause ();
         break;
     default:
         qDebug() << "Unknown newstate =" << newstate;
@@ -1918,3 +1947,28 @@ MainWindow::clearSmsDestinations ()
         QMetaObject::invokeMethod (pSmsView, "clearAllDestinations");
     } while (0); // End cleanup block (not a loop)
 }//MainWindow::clearSmsDestinations
+
+void
+MainWindow::createVmailPlayer()
+{
+    onSigCloseVmail ();
+
+    vmailPlayer = new Phonon::MediaObject(this);
+    Phonon::AudioOutput *audioOutput =
+                new Phonon::AudioOutput(Phonon::MusicCategory, vmailPlayer);
+    Phonon::createPath(vmailPlayer, audioOutput);
+
+    bool rv = connect (
+        vmailPlayer, SIGNAL(stateChanged (Phonon::State, Phonon::State)),
+        this, SLOT(onVmailPlayerStateChanged(Phonon::State, Phonon::State)));
+    Q_ASSERT(rv); Q_UNUSED(rv);
+}//MainWindow::createVmailPlayer
+
+void
+MainWindow::onSigCloseVmail()
+{
+    if (NULL != vmailPlayer) {
+        vmailPlayer->deleteLater ();
+        vmailPlayer = NULL;
+    }
+}//MainWindow::onSigCloseVmail

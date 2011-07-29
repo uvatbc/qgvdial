@@ -1,9 +1,8 @@
-QT      *= core gui webkit sql xml xmlpatterns script declarative
+QT      *= core gui webkit sql xml xmlpatterns script declarative phonon
 TARGET   = qgvdial
 TEMPLATE = app
 
-CONFIG  *= precompile_header mobility
-MOBILITY *= multimedia
+CONFIG  *= precompile_header
 
 include(qtsingleapplication/qtsingleapplication.pri)
 
