@@ -74,8 +74,7 @@ GVWebPage::GVWebPage(QObject *parent/* = NULL*/)
 
 GVWebPage::~GVWebPage(void)
 {
-    if (garbageTimer.isActive ())
-    {
+    if (garbageTimer.isActive ()) {
         garbageTimer.stop ();
     }
 }//GVWebPage::~GVWebPage
@@ -1641,3 +1640,9 @@ GVWebPage::onInboxEntryMarked(QNetworkReply *reply)
 
     completeCurrentWork (GVAW_markAsRead, rv);
 }//GVWebPage::onInboxEntryMarked
+
+QNetworkAccessManager *
+GVWebPage::nwAccessMgr()
+{
+    return webPage.networkAccessManager ();
+}//GVWebPage::nwAccessMgr

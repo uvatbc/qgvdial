@@ -42,6 +42,7 @@ private:
 
 public:
     void setView (QWidget *view);
+    QNetworkAccessManager *nwAccessMgr();
 
 public slots:
     //! Invoked when the user presses cancel

@@ -64,7 +64,8 @@ SOURCES  += ../src/main.cpp                 \
             ../src/ContactsModel.cpp        \
             ../src/ContactDetailsModel.cpp  \
             ../src/DialContext.cpp          \
-            ../src/ContactsParserObject.cpp
+            ../src/ContactsParserObject.cpp \
+            ../src/CookieJar.cpp
 
 HEADERS  += ../src/global.h                 \
             ../src/IObserver.h              \
@@ -97,7 +98,8 @@ HEADERS  += ../src/global.h                 \
             ../src/ContactsModel.h          \
             ../src/ContactDetailsModel.h    \
             ../src/DialContext.h            \
-            ../src/ContactsParserObject.h
+            ../src/ContactsParserObject.h   \
+            ../src/CookieJar.h
 
 RESOURCES += ../src/qgvdial.qrc
 

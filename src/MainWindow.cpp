@@ -366,6 +366,9 @@ MainWindow::init ()
         this, SLOT(onRegPhoneSelectionChange(int)),
         this, SIGNAL(regPhoneChange(const QStringList &,int)));
 
+    // Set up cookies
+    //@@UV: webPage.nwAccessMgr()->setCookieJar ();
+
     // The GV access class signals these during the dialling protocol
     rv = connect (&webPage    , SIGNAL (dialInProgress (const QString &)),
                        this       , SLOT   (dialInProgress (const QString &)));
@@ -447,7 +450,7 @@ MainWindow::init ()
 #ifdef Q_WS_MAEMO_5
     // Dismiss = Esc
     actDismiss.setShortcut (QKeySequence(Qt::CTRL + Qt::Key_W));
-#else
+#elif !MOBILE_OS
     // Dismiss = Esc
     actDismiss.setShortcut (QKeySequence(Qt::Key_Escape));
 #endif

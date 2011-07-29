@@ -291,6 +291,12 @@ GVDataAccess::markAsRead ()
     return (false);
 }//GVDataAccess::markAsRead
 
+QNetworkAccessManager *
+GVDataAccess::nwAccessMgr()
+{
+    return NULL;
+}//GVDataAccess::nwAccessMgr
+
 MyCookieJar::MyCookieJar(QObject *parent /*= 0*/)
 : QNetworkCookieJar(parent)
 {

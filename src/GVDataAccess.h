@@ -33,6 +33,9 @@ class GVDataAccess : public GVAccess
 {
     Q_OBJECT
 
+public:
+    QNetworkAccessManager *nwAccessMgr();
+
 public slots:
     //! Invoked when the user presses cancel
     void userCancel ();

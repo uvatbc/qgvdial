@@ -110,6 +110,7 @@ public:
     void setEmitLog (bool enable);
 
     QString getLastErrorString();
+    virtual QNetworkAccessManager *nwAccessMgr() = 0;
 
 signals:
     //! Status emitter
