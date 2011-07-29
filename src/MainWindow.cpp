@@ -108,6 +108,17 @@ MainWindow::~MainWindow ()
         delete vmailPlayer;
         vmailPlayer = NULL;
     }
+
+    // Dump the log one last time.
+    QMutexLocker locker(&logMutex);
+    for (int i = 0; i < arrLogTextStream.size(); i++) {
+        // Send to log file
+        if (fLogfile.isOpen ()) {
+            QTextStream streamLog(&fLogfile);
+            streamLog << arrLogTextStream[i] << endl;
+        }
+    }
+    arrLogTextStream.clear ();
 }//MainWindow::~MainWindow
 
 /** Initialize the log file name and timer.
@@ -168,15 +179,10 @@ MainWindow::log (const QString &strText, int level /*= 10*/)
     cout << strLog.toStdString () << endl;
 
     if (level <= logLevel) {
-        // Send to log file
-        if (fLogfile.isOpen ()) {
-            QTextStream streamLog(&fLogfile);
-            streamLog << strLog << endl;
-        }
-
         // Append it to the circular buffer
         QMutexLocker locker(&logMutex);
         arrLogMsgs.prepend (strLog);
+        arrLogTextStream.append (strLog);
         bKickLocksTimer = true;
     }
 }//MainWindow::log
@@ -192,6 +198,15 @@ MainWindow::onCleanupLogsArray()
         }
         bKickLocksTimer = false;
         timeout = 1 * 1000;
+
+        for (int i = 0; i < arrLogTextStream.size(); i++) {
+            // Send to log file
+            if (fLogfile.isOpen ()) {
+                QTextStream streamLog(&fLogfile);
+                streamLog << arrLogTextStream[i] << endl;
+            }
+        }
+        arrLogTextStream.clear ();
 
         while (arrLogMsgs.size () > 50) {
             arrLogMsgs.removeLast ();

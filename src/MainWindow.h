@@ -289,6 +289,8 @@ private:
     QMutex          logMutex;
     //! This holds a circular buffer of log messages that will be shown by QML
     QStringList     arrLogMsgs;
+    //! This holds the logs yet to be pushed to the textstream
+    QStringList     arrLogTextStream;
     //! Logs display timer
     QTimer          logsTimer;
     //! kick timer

@@ -63,12 +63,6 @@
             <Component Id="QtGui4.dll" Guid="774C1356-53CF-4F65-94BF-A6B4C4755E41">
                 <File Id="QtGui4.dll" Source="__QTDIR__\lib\QtGui4.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
-            <Component Id="QtMultimedia4.dll" Guid="6AA1354C-7BD7-4DED-B6A6-0143BB2429B8">
-                <File Id="QtMultimedia4.dll" Source="__QTDIR__\lib\QtMultimedia4.dll" KeyPath="yes" Checksum="yes"/>
-            </Component>
-            <Component Id="QtMultimediaKit1.dll" Guid="B7BB7BF7-D490-48D7-B967-D61B896FBD69">
-                <File Id="QtMultimediaKit1.dll" Source="__QTDIR__\lib\QtMultimediaKit1.dll" KeyPath="yes" Checksum="yes"/>
-            </Component>
             <Component Id="QtNetwork4.dll" Guid="5986CCCC-B1DD-462C-8866-0EF57136928B">
                 <File Id="QtNetwork4.dll" Source="__QTDIR__\lib\QtNetwork4.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
@@ -158,8 +152,6 @@
             <ComponentRef Id="QtCore4.dll" />
             <ComponentRef Id="QtDeclarative4.dll" />
             <ComponentRef Id="QtGui4.dll" />
-            <ComponentRef Id="QtMultimedia4.dll" />
-            <ComponentRef Id="QtMultimediaKit1.dll" />
             <ComponentRef Id="QtNetwork4.dll" />
             <ComponentRef Id="QtOpenGL4.dll" />
             <ComponentRef Id="QtScript4.dll" />
