@@ -70,9 +70,8 @@ system($cmd);
 # Copy the correct pro file
 system("cp $basedir/build-files/pro.qgvdial $basedir/qgvdial.pro");
 
-my $qmakecmd = "$mad qmake -r -spec default -unix -after \"OBJECTS_DIR=obj\" \"MOC_DIR=moc\" \"UI_DIR=ui\" \"RCC_DIR=rcc\"";
 # Do everything upto the preparation of the debian directory. Code is still not compiled.
-$cmd = "cd $basedir && $qmakecmd && $mad dh_make --createorig --single -e yuvraaj\@gmail.com -c lgpl && $qmakecmd ";
+$cmd = "cd $basedir && $mad qmake && $mad dh_make --createorig --single -e yuvraaj\@gmail.com -c lgpl";
 print "$cmd\n";
 system($cmd);
 
@@ -107,15 +106,19 @@ $cmd="sed 's/ -lGLESv2//ig' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/
 print "$cmd\n";
 system($cmd);
 
-# Reverse the order of these two lines for a complete build 
-$cmd = "cd $basedir && $mad dpkg-buildpackage";
-$cmd = "cd $basedir && $mad dpkg-buildpackage -sa -S";
-
+if ($machine eq "arm") {
+    # Reverse the order of these two lines for a complete build 
+    $cmd = "cd $basedir && $mad dpkg-buildpackage -rfakeroot";
+    $cmd = "cd $basedir && $mad dpkg-buildpackage -rfakeroot -sa -S -uc -us";
+} else {
+    # Reverse the order of these two lines for a complete build 
+    $cmd = "cd $basedir && $mad dpkg-buildpackage";
+    $cmd = "cd $basedir && $mad dpkg-buildpackage -sa -S -uc -us";
+}
 # Execute the rest of the build command
 system($cmd);
 
-$cmd = "dput -f fremantle-upload qgvdial*.changes";
+$cmd = "$mad dput -f fremantle-upload qgvdial*.changes";
 system($cmd);
 
 exit(0);
-
