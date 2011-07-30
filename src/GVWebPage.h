@@ -126,6 +126,8 @@ private:
 
     void cancelDataDial2 ();
 
+    void doLoginStage3();
+
     //! This aborts the timeout timer and calls the base completeWork
     virtual void completeCurrentWork (GVAccess_Work whatwork, bool bOk);
     //! Starts the timeout timer for NW requests

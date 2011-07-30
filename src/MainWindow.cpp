@@ -59,6 +59,7 @@ MainWindow::MainWindow (QWidget *parent)
 , mqThread (QString("qgvdial:%1").arg(QHostInfo::localHostName())
             .toLatin1().constData (), this)
 #endif
+, jar (NULL)
 {
     initLogging ();
 
@@ -107,6 +108,11 @@ MainWindow::~MainWindow ()
     if (NULL != vmailPlayer) {
         delete vmailPlayer;
         vmailPlayer = NULL;
+    }
+
+    if (NULL != jar) {
+        CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+        dbMain.saveCookies (jar);
     }
 
     // Dump the log one last time.
@@ -367,7 +373,9 @@ MainWindow::init ()
         this, SIGNAL(regPhoneChange(const QStringList &,int)));
 
     // Set up cookies
-    //@@UV: webPage.nwAccessMgr()->setCookieJar ();
+    jar = new CookieJar(this);
+    dbMain.loadCookies (jar);
+    webPage.nwAccessMgr()->setCookieJar (jar);
 
     // The GV access class signals these during the dialling protocol
     rv = connect (&webPage    , SIGNAL (dialInProgress (const QString &)),

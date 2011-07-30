@@ -301,6 +301,8 @@ private:
     MqClientThread  mqThread;
     bool            bRunMqThread;
 #endif
+
+    CookieJar      *jar;
 };
 
 #endif // MAINWINDOW_H

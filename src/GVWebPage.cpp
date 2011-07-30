@@ -201,6 +201,8 @@ GVWebPage::loginStage1 (bool bOk)
     bool rv = disconnect (&webPage, SIGNAL (loadFinished (bool)),
                           this   , SLOT   (loginStage1 (bool)));
     Q_ASSERT(rv); Q_UNUSED(rv);
+
+    QString strScript;
     do // Begin cleanup block (not a loop)
     {
         if (isLoadFailed (bOk))
@@ -214,12 +216,35 @@ GVWebPage::loginStage1 (bool bOk)
 
         if (bEmitLog) qDebug ("Login page loaded");
 
+        // We might be able to short circuit the login if we're able to use the
+        // cookies from the last session.
+        bool done = false;
+        QNetworkCookieJar *jar = webPage.networkAccessManager()->cookieJar();
+        QList<QNetworkCookie> cookies =
+                jar->cookiesForUrl (webPage.mainFrame()->url ());
+        foreach (QNetworkCookie cookie, cookies) {
+            if (cookie.name() == "gvx") {
+                done = true;
+                break;
+            }
+        }
+
+        if (done) {
+            qDebug("Yay! The cookies worked!! Login short circuited!!");
+
+            QMutexLocker locker(&mutex);
+            bLoggedIn = true;
+            doLoginStage3 ();
+            bOk = true;
+            break;
+        }
+
         bOk = connect (&webPage, SIGNAL (loadFinished (bool)),
                            this   , SLOT   (loginStage2 (bool)));
         Q_ASSERT(bOk);
         bOk = false;
 
-        QString strScript = QString(
+        strScript = QString(
         "var f = null;"
         "if (document.getElementById) {"
         "   f = document.getElementById(\"gaia_loginform\");"
@@ -251,8 +276,7 @@ GVWebPage::loginStage2 (bool bOk)
     Q_ASSERT(rv); Q_UNUSED(rv);
     do // Begin cleanup block (not a loop)
     {
-        if (isLoadFailed (bOk))
-        {
+        if (isLoadFailed (bOk)) {
             bOk = false;
             strLastError = "Login failed";
             qWarning() << strLastError;
@@ -266,16 +290,12 @@ GVWebPage::loginStage2 (bool bOk)
                 jar->cookiesForUrl (webPage.mainFrame()->url ());
         foreach (QNetworkCookie cookie, cookies)
         {
-            if (cookie.name() == "gvx")
-            {
+            if (cookie.name() == "gvx") {
                 bLoggedIn = true;
             }
         }
 
-        bOk = connect (&webPage, SIGNAL (loadFinished (bool)),
-                          this   , SLOT   (loginStage3 (bool)));
-        Q_ASSERT(bOk);
-        this->loadUrlString (GV_HTTPS_M "/i/all");
+        doLoginStage3 ();
         bOk = true;
     } while (0); // End cleanup block (not a loop)
 
@@ -283,6 +303,15 @@ GVWebPage::loginStage2 (bool bOk)
         completeCurrentWork (GVAW_login, false);
     }
 }//GVWebPage::loginStage2
+
+void
+GVWebPage::doLoginStage3()
+{
+    bool rv = connect (&webPage, SIGNAL (loadFinished (bool)),
+                        this   , SLOT   (loginStage3 (bool)));
+    Q_ASSERT(rv); Q_UNUSED(rv);
+    this->loadUrlString (GV_HTTPS_M "/i/all");
+}//GVWebPage::doLoginStage3
 
 void
 GVWebPage::loginStage3 (bool bOk)

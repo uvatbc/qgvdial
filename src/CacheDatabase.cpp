@@ -1305,9 +1305,50 @@ bool
 CacheDatabase::saveCookies(CookieJar *jar)
 {
     QList<QNetworkCookie> cookies = jar->getAllCookies ();
+    QSqlQuery query(dbMain);
+    query.setForwardOnly (true);
+
+    QString strQ, domain, path;
+    bool isHttpOnly, isSecure, isSession;
+    QByteArray name, value;
+    quint32 expiration;
+    bool rv;
 
     foreach(QNetworkCookie cookie, cookies) {
-        //TODO: Lots
+        domain = cookie.domain ();
+        path = cookie.path ();
+        isHttpOnly = cookie.isHttpOnly ();
+        isSecure = cookie.isSecure ();
+        isSession = cookie.isSessionCookie ();
+        name = cookie.name ();
+        value = cookie.value ();
+        expiration = cookie.expirationDate().toTime_t ();
+
+        domain.replace ("'", "''");
+        path.replace ("'", "''");
+
+        strQ = QString ("INSERT INTO " GV_COOKIEJAR_TABLE " ("
+                        GV_CJ_DOMAIN ","        // 1
+                        GV_CJ_EXPIRATION ","    // 2
+                        GV_CJ_HTTP_ONLY ","     // 3
+                        GV_CJ_IS_SECURE ","     // 4
+                        GV_CJ_IS_SESSION ","    // 5
+                        GV_CJ_NAME ","          // 6
+                        GV_CJ_PATH ","          // 7
+                        GV_CJ_VALUE ") "        // 8
+                        "VALUES ('%1', %2, %3, %4, %5, :name, '%6', :value)")
+                .arg (domain)
+                .arg (expiration)
+                .arg (isHttpOnly ? 1 : 0)
+                .arg (isSecure ? 1 : 0)
+                .arg (isSession ? 1 : 0)
+                .arg (path);
+        rv = query.prepare (strQ);
+        Q_ASSERT(rv);
+        query.bindValue (":name", name);
+        query.bindValue (":value", value);
+        rv = query.exec ();
+        Q_ASSERT(rv);
     }
 
     return (false);
@@ -1325,6 +1366,7 @@ CacheDatabase::loadCookies(CookieJar *jar)
     QByteArray name, value;
     quint32 expiration;
 
+    bool rv =
     query.exec ("SELECT " GV_CJ_DOMAIN ","
                           GV_CJ_EXPIRATION ","
                           GV_CJ_HTTP_ONLY ","
@@ -1334,6 +1376,7 @@ CacheDatabase::loadCookies(CookieJar *jar)
                           GV_CJ_PATH ","
                           GV_CJ_VALUE " "
                 "FROM " GV_COOKIEJAR_TABLE);
+    Q_ASSERT(rv); Q_UNUSED(rv);
     while (query.next ()) {
         domain      = query.value(0).toString ();
         expiration  = query.value(1).toUInt ();
