@@ -68,7 +68,6 @@ Contact: yuvraaj@gmail.com
 #define GV_C_NAME           "name"
 #define GV_C_NOTES          "notes"
 #define GV_C_PICLINK        "piclink"
-////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////// GV links table /////////////////////////////////
 #define GV_LINKS_TABLE      "gvlinks"
 #define GV_L_LINK           "link"
@@ -76,13 +75,11 @@ Contact: yuvraaj@gmail.com
 #define GV_L_DATA           "data"
 
 #define GV_L_TYPE_NUMBER    "contact number"
-////////////////////////////////////////////////////////////////////////////////
 ///////////////////////// GV registered numbers table //////////////////////////
 #define GV_REG_NUMS_TABLE   "gvregnumbers"
 #define GV_RN_NAME          "name"
 #define GV_RN_NUM           "number"
 #define GV_RN_TYPE          "type"
-////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////// GV inbox table ////////////////////////////////
 #define GV_INBOX_TABLE      "gvinbox"
 #define GV_IN_ID            "id"
@@ -93,7 +90,6 @@ Contact: yuvraaj@gmail.com
 #define GV_IN_FLAGS         "flags"         // read, starred, etc.
 #define GV_IN_SMSTEXT       "smstext"       // Full text of the SMS
 #define GV_IN_NOTE          "note"          // Note associated with this entry
-////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////// GV updates table ///////////////////////////////
 #define GV_UPDATES_TABLE    "gvupdates"
 #define GV_UP_WHAT          "update_what"
@@ -104,7 +100,6 @@ Contact: yuvraaj@gmail.com
 
 #define GV_UP_CONTACTS      "contacts"
 #define GV_UP_INBOX         "inbox"
-////////////////////////////////////////////////////////////////////////////////
 ////////////////////////// GV proxy information table //////////////////////////
 #define GV_PROXY_TABLE      "proxy_information"
 #define GV_P_FLAGS          "flags"
@@ -116,7 +111,6 @@ Contact: yuvraaj@gmail.com
 #define GV_P_F_ENABLE       (1<<0)
 #define GV_P_F_USE_SYSTEM   (1<<1)
 #define GV_P_F_NEEDS_AUTH   (1<<2)
-////////////////////////////////////////////////////////////////////////////////
 /////////////////////////// Mosquitto settings table ///////////////////////////
 #define GV_MQ_TABLE         "mosquitto_settings"
 #define GV_MQ_ENABLED       "enabled"
@@ -129,6 +123,16 @@ Contact: yuvraaj@gmail.com
 #define GV_TT_CTIME         "ctime"
 #define GV_TT_LINK          "link"
 #define GV_TT_PATH          "path"
+/////////////////////////////// Cookie Jar table ///////////////////////////////
+#define GV_COOKIEJAR_TABLE  "cookie_jar"
+#define GV_CJ_DOMAIN        "domain"
+#define GV_CJ_EXPIRATION    "expirationDate"
+#define GV_CJ_HTTP_ONLY     "isHttpOnly"
+#define GV_CJ_IS_SECURE     "isSecure"
+#define GV_CJ_IS_SESSION    "isSession"
+#define GV_CJ_NAME          "name"
+#define GV_CJ_PATH          "path"
+#define GV_CJ_VALUE         "value"
 ////////////////////////////////////////////////////////////////////////////////
 
 #endif //__CACHEDATABASE_INT_H__

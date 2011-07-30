@@ -9,6 +9,9 @@ class CookieJar : public QNetworkCookieJar
 public:
     explicit CookieJar(QObject *parent = 0);
 
+    QList<QNetworkCookie> getAllCookies() const;
+    void setNewCookies(const QList<QNetworkCookie> &cookies);
+
 signals:
 
 public slots:

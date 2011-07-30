@@ -185,6 +185,19 @@ CacheDatabase::ensureCache ()
                         GV_TT_LINK  " varchar, "
                         GV_TT_PATH  " varchar)");
     }
+
+    // Ensure that the cookie jar is present. If not, create it.
+    if (!arrTables.contains (GV_COOKIEJAR_TABLE)) {
+        query.exec ("CREATE TABLE " GV_COOKIEJAR_TABLE " "
+                    "(" GV_CJ_DOMAIN        " varchar, "
+                        GV_CJ_EXPIRATION    " varchar, "
+                        GV_CJ_HTTP_ONLY     " integer, "
+                        GV_CJ_IS_SECURE     " integer, "
+                        GV_CJ_IS_SESSION    " integer, "
+                        GV_CJ_NAME          " varchar, "
+                        GV_CJ_PATH          " varchar, "
+                        GV_CJ_VALUE         " varchar)");
+    }
 }//CacheDatabase::ensureCache
 
 void
@@ -1287,3 +1300,62 @@ CacheDatabase::getTempFile(const QString &strLink, QString &strPath)
 
     return (rv);
 }//CacheDatabase::getTempFile
+
+bool
+CacheDatabase::saveCookies(CookieJar *jar)
+{
+    QList<QNetworkCookie> cookies = jar->getAllCookies ();
+
+    foreach(QNetworkCookie cookie, cookies) {
+        //TODO: Lots
+    }
+
+    return (false);
+}//CacheDatabase::saveCookies
+
+bool
+CacheDatabase::loadCookies(CookieJar *jar)
+{
+    QSqlQuery query(dbMain);
+    query.setForwardOnly (true);
+
+    QList<QNetworkCookie> cookies;
+    QString domain, path;
+    bool isHttpOnly, isSecure, isSession;
+    QByteArray name, value;
+    quint32 expiration;
+
+    query.exec ("SELECT " GV_CJ_DOMAIN ","
+                          GV_CJ_EXPIRATION ","
+                          GV_CJ_HTTP_ONLY ","
+                          GV_CJ_IS_SECURE ","
+                          GV_CJ_IS_SESSION ","
+                          GV_CJ_NAME ","
+                          GV_CJ_PATH ","
+                          GV_CJ_VALUE " "
+                "FROM " GV_COOKIEJAR_TABLE);
+    while (query.next ()) {
+        domain      = query.value(0).toString ();
+        expiration  = query.value(1).toUInt ();
+        isHttpOnly  = query.value(2).toBool ();
+        isSecure    = query.value(3).toBool ();
+        isSession   = query.value(4).toBool ();
+        name        = query.value(5).toByteArray ();
+        path        = query.value(6).toString ();
+        value       = query.value(7).toByteArray ();
+
+        QNetworkCookie cookie(name, value);
+        cookie.setDomain (domain);
+        if (!isSession) {
+            cookie.setExpirationDate (QDateTime::fromTime_t (expiration));
+        }
+        cookie.setHttpOnly (isHttpOnly);
+        cookie.setSecure (isSecure);
+        cookie.setPath (path);
+
+        cookies.append (cookie);
+    }
+
+    jar->setNewCookies (cookies);
+    return (false);
+}//CacheDatabase::saveCookies

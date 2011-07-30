@@ -23,6 +23,7 @@ Contact: yuvraaj@gmail.com
 #define __CACHEDATABASE_H__
 
 #include "global.h"
+#include "CookieJar.h"
 
 // For some reason the symbian MOC doesn't like it if I don't include QObject
 // even though it is present in QtCore which is included in global.h
@@ -134,6 +135,10 @@ public:
     // Insert temp file and it's link
     bool putTempFile(const QString &strLink, const QString &strPath);
     bool getTempFile(const QString &strLink, QString &strPath);
+
+    // Serialize cookies in the cookie jar
+    bool saveCookies(CookieJar *jar);
+    bool loadCookies(CookieJar *jar);
 
 private:
     bool putContactInfo (const ContactInfo &info);
