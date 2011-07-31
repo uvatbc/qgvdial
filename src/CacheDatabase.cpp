@@ -46,8 +46,8 @@ CacheDatabase::deinit ()
         delete settings;
         settings = NULL;
     }
-    if (dbMain.isOpen ())
-    {
+
+    if (dbMain.isOpen ()) {
         dbMain.close ();
         dbMain = QSqlDatabase ();
     }
@@ -1307,6 +1307,8 @@ CacheDatabase::saveCookies(CookieJar *jar)
     QList<QNetworkCookie> cookies = jar->getAllCookies ();
     QSqlQuery query(dbMain);
     query.setForwardOnly (true);
+
+    query.exec ("DELETE FROM " GV_COOKIEJAR_TABLE);
 
     QString strQ, domain, path;
     bool isHttpOnly, isSecure, isSession;

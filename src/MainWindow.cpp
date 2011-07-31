@@ -113,6 +113,11 @@ MainWindow::~MainWindow ()
     if (NULL != jar) {
         CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
         dbMain.saveCookies (jar);
+
+        GVAccess &webPage = Singletons::getRef().getGVAccess ();
+        webPage.nwAccessMgr ()->setCookieJar (new CookieJar);
+        delete jar;
+        jar = NULL;
     }
 
     // Dump the log one last time.
@@ -376,6 +381,7 @@ MainWindow::init ()
     jar = new CookieJar(this);
     dbMain.loadCookies (jar);
     webPage.nwAccessMgr()->setCookieJar (jar);
+    jar->setParent (this);
 
     // The GV access class signals these during the dialling protocol
     rv = connect (&webPage    , SIGNAL (dialInProgress (const QString &)),
@@ -761,9 +767,9 @@ MainWindow::loginCompleted (bool bOk, const QVariantList & /*varList*/)
             strErr = "User login failed";
         }
         this->showMsgBox (strErr);
-    }
-    else
-    {
+
+        QTimer::singleShot (500, this, SLOT(onRecreateCookieJar()));
+    } else {
         CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
         setStatus ("User logged in");
 
@@ -1998,3 +2004,13 @@ MainWindow::onSigCloseVmail()
         vmailPlayer = NULL;
     }
 }//MainWindow::onSigCloseVmail
+
+void
+MainWindow::onRecreateCookieJar()
+{
+    GVAccess &webPage = Singletons::getRef().getGVAccess ();
+    jar->deleteLater ();
+    jar = new CookieJar(this);
+    webPage.nwAccessMgr()->setCookieJar (jar);
+    jar->setParent (this);
+}//MainWindow::onRecreateCookieJar

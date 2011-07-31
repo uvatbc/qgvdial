@@ -181,6 +181,9 @@ private slots:
     //! Invoked when the vmail is being shut off
     void onSigCloseVmail();
 
+    //! Created to delete the cookie jar and re-create it
+    void onRecreateCookieJar();
+
 private:
     void initLogging ();
 

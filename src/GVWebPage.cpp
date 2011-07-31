@@ -216,6 +216,13 @@ GVWebPage::loginStage1 (bool bOk)
 
         if (bEmitLog) qDebug ("Login page loaded");
 
+        QString strHtml = webPage.mainFrame()->toHtml();
+        if (strHtml.contains ("Error 413")) {
+            strLastError = "Internal error. Login again";
+            bOk = false;
+            break;
+        }
+
         // We might be able to short circuit the login if we're able to use the
         // cookies from the last session.
         bool done = false;

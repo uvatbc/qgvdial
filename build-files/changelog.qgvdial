@@ -1,2 +1,2 @@
-  * Serialize cookies and shorten the login time!
+  * Bugfix: Clear out the old cookies before saving the new ones.
 
