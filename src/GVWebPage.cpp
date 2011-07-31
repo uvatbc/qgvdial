@@ -247,7 +247,7 @@ GVWebPage::loginStage1 (bool bOk)
         }
 
         bOk = connect (&webPage, SIGNAL (loadFinished (bool)),
-                           this   , SLOT   (loginStage2 (bool)));
+                        this   , SLOT   (loginStage2 (bool)));
         Q_ASSERT(bOk);
         bOk = false;
 
