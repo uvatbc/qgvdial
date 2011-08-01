@@ -380,7 +380,9 @@ GVContactsTable::onContactsParsed (bool rv)
 void
 GVContactsTable::onSearchQueryChanged (const QString &query)
 {
-    modelContacts->refresh (query);
+    if (NULL != modelContacts) {
+        modelContacts->refresh (query);
+    }
 }//GVContactsTable::onSearchQuerychanged
 
 void

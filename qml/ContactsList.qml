@@ -70,24 +70,38 @@ Rectangle {
 
             Image {
                 id: imgSearch
-                source: (edSearch.text.length == 0 ? "search.png" : "close.png")
+                source: (imgSearch.selection ? "close.png" : "search.png")
                 height: searchRow.height
                 width: searchRow.height
                 fillMode: Image.PreserveAspectFit
 
+                property bool selection: false
+
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: edSearch.text = ""
+                    onClicked: {
+                        if (imgSearch.selection) {
+                            edSearch.text = "";
+                            imgSearch.selection = false;
+                        } else {
+                            imgSearch.selection = true;
+                        }
+                        container.sigSearchContacts(edSearch.text);
+                    }
                 }
-            }
+            }//Image (search or close button)
 
             MyTextEdit {
                 id: edSearch
                 width: parent.width - imgSearch.width - parent.spacing
                 pixelSize: searchRow.height - 6
                 text: ""
-                onSigTextChanged: container.sigSearchContacts(strText)
-            }
+                onTextChanged: {
+                    if (imgSearch.selection) {
+                        imgSearch.selection = false;
+                    }
+                }
+            }//MyTextEdit (search box text edit)
         }//Search box
 
         ListView {

@@ -1353,7 +1353,7 @@ CacheDatabase::saveCookies(CookieJar *jar)
         Q_ASSERT(rv);
     }
 
-    return (false);
+    return (true);
 }//CacheDatabase::saveCookies
 
 bool
@@ -1402,5 +1402,5 @@ CacheDatabase::loadCookies(CookieJar *jar)
     }
 
     jar->setNewCookies (cookies);
-    return (false);
+    return (true);
 }//CacheDatabase::saveCookies
