@@ -184,6 +184,9 @@ private slots:
     //! Created to delete the cookie jar and re-create it
     void onRecreateCookieJar();
 
+    //! When two step authentication happens
+    void onTwoStepAuthentication(QString &result);
+
 private:
     void initLogging ();
 

@@ -689,10 +689,18 @@ MainWindow::doLogin ()
 
         osd.setLongWork (this, true);
 
+        bool rv = connect(&webPage, SIGNAL(twoStepAuthentication(QString &)),
+                           this   , SLOT(onTwoStepAuthentication(QString &)));
+        Q_ASSERT(rv);
+
         // webPage.workCompleted -> this.loginCompleted
         if (!webPage.enqueueWork (GVAW_login, l, this,
                 SLOT (loginCompleted (bool, const QVariantList &))))
         {
+            rv = disconnect(&webPage, SIGNAL(twoStepAuthentication(QString &)),
+                             this   , SLOT(onTwoStepAuthentication(QString &)));
+            Q_ASSERT(rv);
+
             qWarning ("Login returned immediately with failure!");
             osd.setLongWork (this, false);
             break;
@@ -749,8 +757,12 @@ MainWindow::on_action_Login_triggered ()
 void
 MainWindow::loginCompleted (bool bOk, const QVariantList & /*varList*/)
 {
-    strSelfNumber.clear ();
     GVAccess &webPage = Singletons::getRef().getGVAccess ();
+    bool rv = disconnect(&webPage, SIGNAL(twoStepAuthentication(QString &)),
+                          this   , SLOT(onTwoStepAuthentication(QString &)));
+    Q_ASSERT(rv); Q_UNUSED(rv);
+
+    strSelfNumber.clear ();
     webPage.setTimeout(20);
 
     if (!bOk)
@@ -2014,3 +2026,10 @@ MainWindow::onRecreateCookieJar()
     webPage.nwAccessMgr()->setCookieJar (jar);
     jar->setParent (this);
 }//MainWindow::onRecreateCookieJar
+
+void
+MainWindow::onTwoStepAuthentication(QString &result)
+{
+    int rv = QInputDialog::getInt (this, "Enter security token", "Token: ", 0, 0);
+    result = QString("%1").arg (rv);
+}//MainWindow::onTwoStepAuthentication

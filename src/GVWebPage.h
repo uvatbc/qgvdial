@@ -36,6 +36,9 @@ class GVWebPage : public GVAccess
 {
     Q_OBJECT
 
+signals:
+    void twoStepAuthentication(QString &result);
+
 private:
     GVWebPage(QObject *parent = NULL);
     ~GVWebPage(void);

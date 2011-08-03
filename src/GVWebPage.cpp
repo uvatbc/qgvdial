@@ -265,7 +265,7 @@ GVWebPage::loginStage1 (bool bOk)
         "}")
         .arg (workCurrent.arrParams[0].toString())
         .arg (workCurrent.arrParams[1].toString());
-        webPage.mainFrame ()->evaluateJavaScript (strScript);
+        webPage.mainFrame()->evaluateJavaScript (strScript);
 
         bOk = true;
     } while (0); // End cleanup block (not a loop)
@@ -300,6 +300,37 @@ GVWebPage::loginStage2 (bool bOk)
             if (cookie.name() == "gvx") {
                 bLoggedIn = true;
             }
+        }
+
+        if (!bLoggedIn) {
+            QString strHtml = webPage.mainFrame()->toHtml();
+            if (!strHtml.contains ("secTok")) {
+                qWarning ("User login failed");
+                break;
+            }
+
+            QString strAuthcode;
+            emit twoStepAuthentication(strAuthcode);
+            if (strAuthcode.isEmpty ()) {
+                qWarning ("User canceled auth entry");
+                break;
+            }
+
+            QString strScript = QString(
+                    "var g = document.getElementById(\"smsUserPin\");"
+                    "if (g) {"
+                    "   g.value = \"%1\";"
+                    "   document.getElementById(\"PersistentCookie\").click();"
+                    "   document.getElementById(\"smsVerifyPin\").click();"
+                    "}").arg (strAuthcode);
+
+            rv = connect (&webPage, SIGNAL (loadFinished (bool)),
+                           this   , SLOT   (loginStage2 (bool)));
+            webPage.mainFrame()->evaluateJavaScript (strScript);
+
+            qWarning ("Still not logged in, but trying. Desperately.");
+            bOk = true;
+            break;
         }
 
         doLoginStage3 ();

@@ -1,2 +1,2 @@
-  * Bugfix: Don't crash if there's a contact search query before login
+  * Two step authentication
 
