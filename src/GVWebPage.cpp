@@ -217,7 +217,8 @@ GVWebPage::loginStage1 (bool bOk)
         if (bEmitLog) qDebug ("Login page loaded");
 
         QString strHtml = webPage.mainFrame()->toHtml();
-        if (strHtml.contains ("Error 413")) {
+        if ((strHtml.contains ("Error 413")) ||
+            (strHtml.contains ("We've detected a problem with your cookie settings."))) {
             strLastError = "Internal error. Login again";
             bOk = false;
             break;

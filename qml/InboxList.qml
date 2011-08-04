@@ -270,8 +270,12 @@ Rectangle {
                 Text { // sms text
                     id: theSmsText
 
-                    anchors.fill: parent
+                    anchors {
+                        top: parent.top
+                        left: parent.left
+                    }
                     width: parent.width
+                    height: paintedHeight
 
                     text: container.strSmsText
                     wrapMode: Text.Wrap
