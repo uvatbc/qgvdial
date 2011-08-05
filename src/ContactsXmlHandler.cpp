@@ -45,8 +45,7 @@ ContactsXmlHandler::startElement (const QString        & /*namespaceURI*/,
     {
         strCurrentChars.clear ();
 
-        if (localName == "entry")
-        {
+        if (localName == "entry") {
             bEntryStarted = true;
             countContacts++;
 
@@ -54,13 +53,11 @@ ContactsXmlHandler::startElement (const QString        & /*namespaceURI*/,
             break;
         }
 
-        if (!bEntryStarted)
-        {
+        if (!bEntryStarted) {
             break;
         }
 
-        if (localName == "phoneNumber")
-        {
+        if (localName == "phoneNumber") {
             currPhone.init ();
             QString rel = atts.value ("rel");
             if (rel.endsWith ("mobile"))
@@ -77,8 +74,7 @@ ContactsXmlHandler::startElement (const QString        & /*namespaceURI*/,
             }
         }
 
-        if (qName == "gd:deleted")
-        {
+        if (qName == "gd:deleted") {
             currInfo.bDeleted = true;
         }
 
@@ -115,6 +111,10 @@ ContactsXmlHandler::endElement (const QString & /*namespaceURI*/,
         if (localName == "content") {
             currInfo.strNotes = strCurrentChars;
             break;
+        }
+        if (localName == "updated") {
+            currInfo.dtUpdate = QDateTime::fromString(strCurrentChars,
+                                                      Qt::ISODate);
         }
 
         if (localName != "entry") break;

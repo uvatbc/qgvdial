@@ -1156,6 +1156,8 @@ GVWebPage::parseInboxJson(const QDateTime &dtUpdate, const QString &strJson,
                     inboxEntry.strNote = strVal;
                 } else if (strPName == "type") {
                 } else if (strPName == "children") {
+                } else if (strPName == "messageText") {
+                    inboxEntry.strText = strVal;
                 } else {
                     if (bEmitLog)
                         qDebug () << QString ("param = %1. value = %2")
@@ -1163,15 +1165,15 @@ GVWebPage::parseInboxJson(const QDateTime &dtUpdate, const QString &strJson,
                 }
             }
 
-            if (0 == inboxEntry.id.size()) {
+            if (inboxEntry.id.isEmpty()) {
                 qWarning ("Invalid ID");
                 continue;
             }
-            if (0 == inboxEntry.strPhoneNumber.size()) {
+            if (inboxEntry.strPhoneNumber.isEmpty()) {
                 qWarning ("Invalid Phone number");
                 inboxEntry.strPhoneNumber = "Unknown";
             }
-            if (0 == inboxEntry.strDisplayNumber.size()) {
+            if (inboxEntry.strDisplayNumber.isEmpty()) {
                 inboxEntry.strDisplayNumber = "Unknown";
             }
             if (!inboxEntry.startTime.isValid ()) {
@@ -1216,7 +1218,8 @@ GVWebPage::parseInboxJson(const QDateTime &dtUpdate, const QString &strJson,
                     bSms = true;
                 }
 
-                if (parseMessageRow (result, strSmsRow)) {
+                if ((parseMessageRow (result, strSmsRow)) &&
+                    (!strSmsRow.isEmpty ())) {
                     inboxEntry.strText = strSmsRow;
                 }
             }

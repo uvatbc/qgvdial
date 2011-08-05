@@ -64,7 +64,7 @@ signals:
 
 public slots:
     //! Invoked when the user requests a refresh
-    void refresh ();
+    void refresh (bool full = false);
     //! Invoked when the user requests a full inbox refresh
     void refreshFullInbox ();
 

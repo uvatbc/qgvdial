@@ -135,7 +135,7 @@ void
 GVContactsTable::refreshAllContacts ()
 {
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    dbMain.clearLastContactUpdate ();
+    dbMain.clearContacts ();
 
     refreshContacts ();
 }//GVContactsTable::refreshAllContacts
@@ -160,7 +160,7 @@ GVContactsTable::refreshContacts ()
 
     bRefreshIsUpdate = false;
     QDateTime dtUpdate;
-    if ((dbMain.getLastContactUpdate (dtUpdate)) && (dtUpdate.isValid ())) {
+    if ((dbMain.getLatestContact (dtUpdate)) && (dtUpdate.isValid ())) {
         QString strUpdate = dtUpdate.toString ("yyyy-MM-dd")
                           + "T"
                           + dtUpdate.toString ("hh:mm:ss");
@@ -312,10 +312,6 @@ GVContactsTable::onGotContacts (QNetworkReply *reply)
         temp.write (byData);
         temp.close ();
 #endif
-
-        QDateTime currDT = QDateTime::currentDateTime().toUTC ();
-        CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-        dbMain.setLastContactUpdate (currDT);
 
         QThread *workerThread = new QThread(this);
         ContactsParserObject *pObj =

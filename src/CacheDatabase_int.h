@@ -58,16 +58,21 @@ Contact: yuvraaj@gmail.com
 // SMS Text became rich text
 //#define GV_S_VALUE_DB_VER   "2011-05-27 14:14:40"
 // Photos in contacts
-#define GV_S_VALUE_DB_VER   "2011-07-09 18:58:53"
+//#define GV_S_VALUE_DB_VER   "2011-07-09 18:58:53"
+// Update date time in contacts
+#define GV_S_VALUE_DB_VER   "2011-08-05 12:05:58"
 ////////////////////////////////////////////////////////////////////////////////
 // Started using versioning for the settings
-#define GV_SETTINGS_VER     "2011-05-13 16:33:50"
+//#define GV_SETTINGS_VER     "2011-05-13 16:33:50"
+// There is no longer any need for an updates table.
+#define GV_SETTINGS_VER     "2011-08-05 12:34:02"
 ////////////////////////////// GV Contacts table ///////////////////////////////
 #define GV_CONTACTS_TABLE   "gvcontacts"
 #define GV_C_ID             "id"
 #define GV_C_NAME           "name"
 #define GV_C_NOTES          "notes"
 #define GV_C_PICLINK        "piclink"
+#define GV_C_UPDATED        "updated"
 /////////////////////////////// GV links table /////////////////////////////////
 #define GV_LINKS_TABLE      "gvlinks"
 #define GV_L_LINK           "link"
@@ -90,16 +95,6 @@ Contact: yuvraaj@gmail.com
 #define GV_IN_FLAGS         "flags"         // read, starred, etc.
 #define GV_IN_SMSTEXT       "smstext"       // Full text of the SMS
 #define GV_IN_NOTE          "note"          // Note associated with this entry
-/////////////////////////////// GV updates table ///////////////////////////////
-#define GV_UPDATES_TABLE    "gvupdates"
-#define GV_UP_WHAT          "update_what"
-#define GV_UP_WHEN          "updated_when"
-
-#define UPDATE_DATE_FORMAT "yyyy-MM-dd hh:mm:ss"
-#define UPDATE_DATE_REGEXP "(\\d{4})-(\\d{2})-(\\d{2}) (\\d{2}):(\\d{2}):(\\d{2})"
-
-#define GV_UP_CONTACTS      "contacts"
-#define GV_UP_INBOX         "inbox"
 ////////////////////////// GV proxy information table //////////////////////////
 #define GV_PROXY_TABLE      "proxy_information"
 #define GV_P_FLAGS          "flags"

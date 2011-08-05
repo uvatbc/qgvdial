@@ -81,11 +81,6 @@ public:
     bool getContactFromLink (ContactInfo &info);
     bool getContactFromNumber (const QString &strNumber, ContactInfo &info);
 
-    // Last update of contacts
-    void clearLastContactUpdate ();
-    bool setLastContactUpdate (const QDateTime &dateTime);
-    bool getLastContactUpdate (QDateTime &dateTime);
-
     // Inbox model
     InboxModel *newInboxModel();
     void clearInbox ();
@@ -93,9 +88,8 @@ public:
                             const QString &strType);
     quint32 getInboxCount (GVI_Entry_Type Type);
 
-    // Last update of inbox
-    bool setLastInboxUpdate (const QDateTime &dateTime);
-    bool getLastInboxUpdate (QDateTime &dateTime);
+    // Last update of contacts and inbox
+    bool getLatestContact (QDateTime &dateTime);
     bool getLatestInboxEntry (QDateTime &dateTime);
 
     // Single inbox entry

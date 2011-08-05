@@ -87,7 +87,7 @@ GVInbox::prepView ()
 }//GVInbox::prepView
 
 void
-GVInbox::refresh ()
+GVInbox::refresh (bool full /*= false*/)
 {
     QMutexLocker locker(&mutex);
     if (!bLoggedIn)
@@ -97,7 +97,9 @@ GVInbox::refresh ()
 
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     QDateTime dtUpdate;
-    dbMain.getLastInboxUpdate (dtUpdate);
+    if (!full) {
+        dbMain.getLatestInboxEntry (dtUpdate);
+    }
 
     GVAccess &webPage = Singletons::getRef().getGVAccess ();
     QVariantList l;
@@ -121,10 +123,7 @@ GVInbox::refresh ()
 void
 GVInbox::refreshFullInbox ()
 {
-    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    dbMain.setLastInboxUpdate (QDateTime::fromString ("2000-01-01",
-                                                      "yyyy-MM-dd"));
-    refresh ();
+    refresh (true);
 }//GVInbox::refreshFullInbox
 
 void
@@ -161,14 +160,6 @@ GVInbox::getInboxDone (bool, const QVariantList &params)
     Q_ASSERT(rv); Q_UNUSED(rv);
 
     prepView ();
-
-    QDateTime dtUpdate;
-    if (dbMain.getLatestInboxEntry (dtUpdate))
-    {
-        qDebug () << QString ("Latest inbox entry is : %1")
-                            .arg (dtUpdate.toString ());
-        dbMain.setLastInboxUpdate (dtUpdate);
-    }
 
     emit status (QString("Inbox ready. %1 %2 retrieved.")
                  .arg(nNew).arg (nNew == 1?"entry":"entries"));

@@ -402,21 +402,18 @@ MainWindow::doLogin ()
 }//MainWindow::doLogin
 
 void
-MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
+MainWindow::loginCompleted (bool bOk, const QVariantList & /*varList*/)
 {
     GVAccess &webPage = Singletons::getRef().getGVAccess ();
     webPage.setTimeout(20);
 
-    if (!bOk)
-    {
+    if (!bOk) {
         QVariantList l;
         logoutCompleted (true, l);
 
         qCritical ("User login failed");
         qApp->quit ();
-    }
-    else
-    {
+    } else {
         qDebug ("User logged in");
 
         bIsLoggedIn = true;
@@ -444,7 +441,7 @@ MainWindow::logoutCompleted (bool, const QVariantList &)
     // This clears out the table and the view as well
     oContacts.loggedOut ();
     oInbox.loggedOut ();
-    
+
     bIsLoggedIn = false;
 }//MainWindow::logoutCompleted
 

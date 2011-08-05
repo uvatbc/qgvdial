@@ -122,11 +122,6 @@ CacheDatabase::blowAwayCache()
         query.exec (strQ);
     }
     query.exec ("VACUUM");
-
-    settings->beginGroup (GV_UPDATES_TABLE);
-    settings->remove (GV_UP_CONTACTS);
-    settings->remove (GV_UP_INBOX);
-    settings->endGroup ();
 }//CacheDatabase::blowAwayCache
 
 void
@@ -143,7 +138,8 @@ CacheDatabase::ensureCache ()
                     "(" GV_C_NAME    " varchar, "
                         GV_C_ID      " varchar, "
                         GV_C_NOTES   " varchar, "
-                        GV_C_PICLINK " varchar)");
+                        GV_C_PICLINK " varchar, "
+                        GV_C_UPDATED " integer)");
     }
 
     // Ensure that the cached links table is present. If not, create it.
@@ -249,7 +245,7 @@ CacheDatabase::refreshContactsModel (ContactsModel *modelContacts,
                                      const QString &query)
 {
     QString strQ = "SELECT " GV_C_ID "," GV_C_NAME "," GV_C_NOTES ","
-                             GV_C_PICLINK " "
+                             GV_C_PICLINK "," GV_C_UPDATED " "
                    "FROM " GV_CONTACTS_TABLE;
     if (!query.isEmpty ()) {
         QString scrubQuery = query;
@@ -432,11 +428,13 @@ CacheDatabase::insertContact (const ContactInfo &info)
                                 "," GV_C_NAME
                                 "," GV_C_NOTES
                                 "," GV_C_PICLINK
-                                ") VALUES ('%1', '%2', '%3', '%4')")
+                                "," GV_C_UPDATED
+                                ") VALUES ('%1', '%2', '%3', '%4', %5)")
                         .arg (scrubInfo.strId)
                         .arg (scrubInfo.strTitle)
                         .arg (scrubInfo.strNotes)
-                        .arg (scrubInfo.hrefPhoto);
+                        .arg (scrubInfo.hrefPhoto)
+                        .arg (scrubInfo.dtUpdate.toTime_t());
         rv = query.exec (strQ);
         if (!rv) {
             qWarning () << "Failed to insert row into contacts table. ID:["
@@ -565,7 +563,8 @@ CacheDatabase::getContactFromLink (ContactInfo &info)
     scrubId.replace ("'", "''");
 
     QString strQ;
-    strQ = QString ("SELECT " GV_C_NAME ", " GV_C_NOTES ", " GV_C_PICLINK " "
+    strQ = QString ("SELECT " GV_C_NAME ", " GV_C_NOTES ", " GV_C_PICLINK
+                              ", " GV_C_UPDATED " "
                     "FROM " GV_CONTACTS_TABLE " WHERE " GV_C_ID "='%1'")
            .arg (scrubId);
     query.exec (strQ);
@@ -577,6 +576,7 @@ CacheDatabase::getContactFromLink (ContactInfo &info)
     info.strTitle  = query.value(0).toString ();
     info.strNotes  = query.value(1).toString ();
     info.hrefPhoto = query.value(2).toString ();
+    info.dtUpdate  = QDateTime::fromTime_t (query.value(3).toInt());
 
     getTempFile (info.hrefPhoto, info.strPhotoPath);
 
@@ -636,36 +636,38 @@ CacheDatabase::getContactFromNumber (const QString &strNumber,
     return (rv);
 }//CacheDatabase::getContactFromNumber
 
-void
-CacheDatabase::clearLastContactUpdate ()
-{
-    settings->beginGroup (GV_UPDATES_TABLE);
-    settings->remove (GV_UP_CONTACTS);
-    settings->endGroup ();
-}//CacheDatabase::clearLastContactUpdate
-
 bool
-CacheDatabase::setLastContactUpdate (const QDateTime &dateTime)
+CacheDatabase::getLatestContact (QDateTime &dateTime)
 {
-    settings->beginGroup (GV_UPDATES_TABLE);
-    settings->setValue (GV_UP_CONTACTS, dateTime);
-    settings->endGroup ();
-    return true;
-}//CacheDatabase::setLastContactUpdate
+    QSqlQuery query(dbMain);
+    query.setForwardOnly (true);
 
-bool
-CacheDatabase::getLastContactUpdate (QDateTime &dateTime)
-{
-    bool rv = false;
     dateTime = QDateTime();
-    settings->beginGroup (GV_UPDATES_TABLE);
-    if (settings->contains (GV_UP_CONTACTS)) {
-        dateTime = settings->value (GV_UP_CONTACTS).toDateTime ();
+
+    bool rv = false;
+    query.exec ("SELECT "   GV_C_UPDATED " FROM " GV_CONTACTS_TABLE " "
+                "ORDER BY " GV_C_UPDATED " DESC");
+    do { // Begin cleanup block (not a loop)
+        if (!query.next ()) {
+            qWarning ("Couldn't get the latest contact");
+            break;
+        }
+
+        // Convert to date time
+        bool bOk = false;
+        quint64 dtVal = query.value(0).toULongLong (&bOk);
+        if (!bOk) {
+            qWarning ("Could not convert datetime for latest contact");
+            break;
+        }
+
+        dateTime = QDateTime::fromTime_t (dtVal);
+
         rv = true;
-    }
-    settings->endGroup ();
+    } while (0); // End cleanup block (not a loop)
+
     return (rv);
-}//CacheDatabase::getLastContactUpdate
+}//CacheDatabase::getLatestContact
 
 InboxModel *
 CacheDatabase::newInboxModel()
@@ -732,29 +734,6 @@ CacheDatabase::getInboxCount (GVI_Entry_Type Type)
 
     return (nCountInbox);
 }//CacheDatabase::getInboxCount
-
-bool
-CacheDatabase::setLastInboxUpdate (const QDateTime &dateTime)
-{
-    settings->beginGroup (GV_UPDATES_TABLE);
-    settings->setValue (GV_UP_INBOX, dateTime);
-    settings->endGroup ();
-    return true;
-}//CacheDatabase::setLastInboxUpdate
-
-bool
-CacheDatabase::getLastInboxUpdate (QDateTime &dateTime)
-{
-    bool rv = false;
-    dateTime = QDateTime();
-    settings->beginGroup (GV_UPDATES_TABLE);
-    if (settings->contains (GV_UP_INBOX)) {
-        dateTime = settings->value (GV_UP_INBOX).toDateTime ();
-        rv = true;
-    }
-    settings->endGroup ();
-    return (rv);
-}//CacheDatabase::getLastInboxUpdate
 
 bool
 CacheDatabase::getLatestInboxEntry (QDateTime &dateTime)

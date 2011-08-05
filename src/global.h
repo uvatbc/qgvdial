@@ -209,6 +209,9 @@ struct ContactInfo
     //! Path to the temp file that has this contacts photo
     QString         strPhotoPath;
 
+    //! When was this contact last updated
+    QDateTime       dtUpdate;
+
     //! Is this contact deleted?
     bool            bDeleted;
 
@@ -223,6 +226,7 @@ struct ContactInfo
         strPhotoPath.clear();
         bDeleted = false;
         selected = 0;
+        dtUpdate = QDateTime();
     }
 };
 Q_DECLARE_METATYPE(ContactInfo)
