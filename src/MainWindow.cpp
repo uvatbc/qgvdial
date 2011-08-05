@@ -546,8 +546,7 @@ MainWindow::init ()
 void
 MainWindow::initQML ()
 {
-    OsDependent &osd = Singletons::getRef().getOSD ();
-    QRect rect = osd.getStartingSize ();
+    onDesktopResized ();
 
     qmlRegisterType<WebWidget>("org.qgvdial.WebWidget", 1, 0, "MyWebWidget");
 
@@ -556,8 +555,6 @@ MainWindow::initQML ()
 
     // Prepare the glabally accessible variants for QML.
     QDeclarativeContext *ctx = this->rootContext();
-    ctx->setContextProperty ("g_MainWidth", rect.width ());
-    ctx->setContextProperty ("g_MainHeight", rect.height ());
     ctx->setContextProperty ("g_bShowMsg", bTempFalse);
     ctx->setContextProperty ("g_registeredPhonesModel", &modelRegNumber);
     ctx->setContextProperty ("g_bIsLoggedIn", bTempFalse);
@@ -570,7 +567,7 @@ MainWindow::initQML ()
 
     // Initialize the QML view
     this->setSource (QUrl ("qrc:/Main.qml"));
-    this->setResizeMode (QDeclarativeView::SizeRootObjectToView);
+//    this->setResizeMode (QDeclarativeView::SizeRootObjectToView);
 
     this->setUsername ("example@gmail.com");
     this->setPassword ("hunter2 :p");
@@ -656,6 +653,12 @@ MainWindow::initQML ()
         &oContacts, SLOT (onSearchQueryChanged(const QString &)));
     Q_ASSERT(bOk);
 
+#if MOBILE_OS
+    bOk = connect(qApp->desktop(), SIGNAL(resized(int)),
+                  this           , SLOT(onDesktopResized()));
+    Q_ASSERT(bOk);
+#endif
+
 #if DESKTOP_OS
     Qt::WindowFlags flags = this->windowFlags ();
     flags |= Qt::CustomizeWindowHint;
@@ -665,6 +668,7 @@ MainWindow::initQML ()
     this->setWindowFlags (flags);
     this->setFixedSize(this->size());
 #endif
+
 }//MainWindow::initQML
 
 /** Invoked to begin the login process.
@@ -2033,3 +2037,14 @@ MainWindow::onTwoStepAuthentication(QString &result)
     int rv = QInputDialog::getInt (this, "Enter security token", "Token: ", 0, 0);
     result = QString("%1").arg (rv);
 }//MainWindow::onTwoStepAuthentication
+
+void
+MainWindow::onDesktopResized()
+{
+    OsDependent &osd = Singletons::getRef().getOSD ();
+    QRect rect = osd.getStartingSize ();
+
+    QDeclarativeContext *ctx = this->rootContext();
+    ctx->setContextProperty ("g_MainWidth", rect.width ());
+    ctx->setContextProperty ("g_MainHeight", rect.height ());
+}//MainWindow::onDesktopResized

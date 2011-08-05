@@ -39,7 +39,6 @@ Item {
 
     Column {
         anchors.fill: parent
-        anchors.topMargin: 2
         spacing: 2
 
         RadioButton {

@@ -56,7 +56,6 @@ Item {
     Column { // user, pass and all buttons
         id: mainColumn
         anchors.fill: parent
-        anchors.topMargin: 2
         spacing: 2
         opacity: 1
 

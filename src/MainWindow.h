@@ -187,6 +187,9 @@ private slots:
     //! When two step authentication happens
     void onTwoStepAuthentication(QString &result);
 
+    //! Invoked when the desktop is resized (useful only on mobile platforms)
+    void onDesktopResized();
+
 private:
     void initLogging ();
 

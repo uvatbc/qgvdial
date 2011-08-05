@@ -157,7 +157,7 @@ OsDependent::getStartingSize ()
     rect.setWidth (250);
     rect.setHeight (400);
 #else
-    rect = qApp->desktop ()->screenGeometry ();
+    rect = qApp->desktop()->screenGeometry ();
 #endif
 
     return rect;

@@ -29,7 +29,6 @@ Item {
     Column {
         id: mainColumn
         anchors.fill: parent
-        anchors.topMargin: 2
         spacing: 1
 
         property int pixDiv: 15
