@@ -64,7 +64,9 @@ signals:
 
 public slots:
     //! Invoked when the user requests a refresh
-    void refresh (bool full = false);
+    void refresh (const QDateTime &dtUpdate);
+    //! Invoked when the user requests a refresh
+    void refresh ();
     //! Invoked when the user requests a full inbox refresh
     void refreshFullInbox ();
 

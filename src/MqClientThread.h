@@ -51,8 +51,8 @@ public:
     void on_error();
 
 signals:
-    void sigUpdateInbox();
-    void sigUpdateContacts();
+    void sigUpdateInbox(const QDateTime &dtUpdate);
+    void sigUpdateContacts(const QDateTime &dtUpdate);
     void status (const QString &strText, int timeout = 3000);
 
 private:

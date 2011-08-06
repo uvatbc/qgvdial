@@ -509,11 +509,11 @@ MainWindow::init ()
 
 #if MOSQUITTO_CAPABLE
     // Connect the signals from the Mosquitto thread
-    rv = connect (&mqThread , SIGNAL(sigUpdateInbox()),
-                  &oInbox   , SLOT  (refresh()));
+    rv = connect (&mqThread , SIGNAL(sigUpdateInbox(const QDateTime &)),
+                  &oInbox   , SLOT  (refresh(const QDateTime &)));
     Q_ASSERT(rv);
-    rv = connect (&mqThread , SIGNAL(sigUpdateContacts()),
-                  &oContacts, SLOT  (refreshContacts()));
+    rv = connect (&mqThread , SIGNAL(sigUpdateContacts(const QDateTime &)),
+                  &oContacts, SLOT  (refreshContacts(const QDateTime &)));
     Q_ASSERT(rv);
     rv = connect (&mqThread , SIGNAL(status(QString,int)),
                    this     , SLOT  (setStatus(QString,int)));

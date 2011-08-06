@@ -87,18 +87,11 @@ GVInbox::prepView ()
 }//GVInbox::prepView
 
 void
-GVInbox::refresh (bool full /*= false*/)
+GVInbox::refresh (const QDateTime &dtUpdate)
 {
     QMutexLocker locker(&mutex);
-    if (!bLoggedIn)
-    {
+    if (!bLoggedIn) {
         return;
-    }
-
-    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    QDateTime dtUpdate;
-    if (!full) {
-        dbMain.getLatestInboxEntry (dtUpdate);
     }
 
     GVAccess &webPage = Singletons::getRef().getGVAccess ();
@@ -121,9 +114,20 @@ GVInbox::refresh (bool full /*= false*/)
 }//GVInbox::refresh
 
 void
+GVInbox::refresh ()
+{
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    QDateTime dtUpdate;
+    dbMain.getLatestInboxEntry (dtUpdate);
+
+    refresh(dtUpdate);
+}//GVInbox::refresh
+
+void
 GVInbox::refreshFullInbox ()
 {
-    refresh (true);
+    QDateTime dtUpdate;
+    refresh(dtUpdate);
 }//GVInbox::refreshFullInbox
 
 void

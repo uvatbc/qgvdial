@@ -132,35 +132,19 @@ GVContactsTable::getRequest (QString         strUrl,
 }//GVContactsTable::getRequest
 
 void
-GVContactsTable::refreshAllContacts ()
-{
-    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    dbMain.clearContacts ();
-
-    refreshContacts ();
-}//GVContactsTable::refreshAllContacts
-
-void
-GVContactsTable::refreshContacts ()
+GVContactsTable::refreshContacts (const QDateTime &dtUpdate)
 {
     QMutexLocker locker(&mutex);
-    if (!bLoggedIn)
-    {
+    if (!bLoggedIn) {
         bRefreshRequested = true;
         return;
     }
     bRefreshRequested = false;
 
-    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    QString strUrl;
-
-    strUrl = QString ("http://www.google.com/m8/feeds/contacts/%1/full"
-                      "?max-results=10000")
+    QString strUrl = QString ("http://www.google.com/m8/feeds/contacts/%1/full"
+                              "?max-results=10000")
                         .arg (strUser);
-
-    bRefreshIsUpdate = false;
-    QDateTime dtUpdate;
-    if ((dbMain.getLatestContact (dtUpdate)) && (dtUpdate.isValid ())) {
+    if (dtUpdate.isValid ()) {
         QString strUpdate = dtUpdate.toString ("yyyy-MM-dd")
                           + "T"
                           + dtUpdate.toString ("hh:mm:ss");
@@ -173,6 +157,24 @@ GVContactsTable::refreshContacts ()
     emit status ("Retrieving contacts", 0);
     getRequest (strUrl, this , SLOT (onGotContacts (QNetworkReply *)));
 }//GVContactsTable::refreshContacts
+
+void
+GVContactsTable::refreshContacts ()
+{
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+
+    bRefreshIsUpdate = false;
+    QDateTime dtUpdate;
+    dbMain.getLatestContact (dtUpdate);
+    refreshContacts (dtUpdate);
+}//GVContactsTable::refreshContacts
+
+void
+GVContactsTable::refreshAllContacts ()
+{
+    QDateTime dtUpdate;
+    refreshContacts (dtUpdate);
+}//GVContactsTable::refreshAllContacts
 
 void
 GVContactsTable::setUserPass (const QString &strU, const QString &strP)

@@ -1,2 +1,2 @@
   * Recompile to match qgvdial codebase
-
+  * Retain messages. Appended a time_t string.

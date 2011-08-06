@@ -83,7 +83,7 @@ MqPublisher::on_mqConnected (int result)
                       m_strTopic.toLatin1 ().data (),
                       m_byPayload.length (),
                       (const uint8_t *)m_byPayload.constData (),
-                      2, false);
+                      2, true);
 }//MqPublisher::on_mqConnected
 
 void

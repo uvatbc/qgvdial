@@ -128,13 +128,28 @@ MqClientThread::on_message (const struct mosquitto_message *message)
     qDebug() << "Mosquitto: topic = " << message->topic
              << ". message = " << strPayload;
 
-    if (strPayload.startsWith ("inbox")) {
-        emit status ("Mosquitto: New inbox entry");
-        emit sigUpdateInbox();
+    QStringList arrPayload = strPayload.split (' ');
+    if (arrPayload.length () < 1) {
+        qWarning ("Invalid payload");
+        return;
     }
-    if (strPayload.startsWith ("contact")) {
+
+    QDateTime dtUpdate = QDateTime::currentDateTime().toUTC();
+    if (arrPayload.length () > 1) {
+        quint64 inTime_t = arrPayload[1].toInt();
+        if (0 != inTime_t) {
+            dtUpdate = QDateTime::fromTime_t(inTime_t);
+        }
+    }
+    dtUpdate = dtUpdate.toLocalTime();
+
+    if (arrPayload[0].contains ("inbox")) {
+        emit status ("Mosquitto: New inbox entry");
+        emit sigUpdateInbox(dtUpdate);
+    }
+    if (arrPayload[0].contains ("contact")) {
         emit status ("Mosquitto: Contact changes");
-        emit sigUpdateContacts ();
+        emit sigUpdateContacts (dtUpdate);
     }
 }//MqClientThread::on_message
 

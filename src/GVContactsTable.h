@@ -62,8 +62,9 @@ signals:
     void setContactsModel(QAbstractItemModel *model);
 
 public slots:
-    void refreshAllContacts ();
+    void refreshContacts (const QDateTime &dtUpdate);
     void refreshContacts ();
+    void refreshAllContacts ();
     void onSearchQueryChanged (const QString &query);
 
 private slots:

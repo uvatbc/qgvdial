@@ -454,7 +454,9 @@ MainWindow::getContactsDone (bool bChanges, bool bOK)
         MqPublisher pub(QString("qgvnotify:%1").arg(QHostInfo::localHostName()),
                         m_strMqServer, m_mqPort, m_strMqTopic,
                         this);
-        pub.publish ("contact");
+        pub.publish(QString("contact %1")
+                    .arg(QDateTime::currentDateTime().toUTC().toTime_t())
+                    .toAscii());
     }
 
     startTimer ();
@@ -468,7 +470,9 @@ MainWindow::inboxChanged ()
     MqPublisher pub(QString("qgvnotify:%1").arg(QHostInfo::localHostName()),
                     m_strMqServer, m_mqPort, m_strMqTopic,
                     this);
-    pub.publish ("inbox");
+    pub.publish(QString("inbox %1")
+                .arg(QDateTime::currentDateTime().toUTC().toTime_t())
+                .toAscii());
 
     startTimer ();
 }//MainWindow::inboxChanged
