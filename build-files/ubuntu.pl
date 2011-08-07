@@ -73,7 +73,7 @@ system("cd $basedir && make src/Makefile");
 # Replace hard coded current directory with relative directory.
 
 # Execute the rest of the build command
-$cmd = "cd $basedir && $mad dpkg-buildpackage && $mad remote -r org.maemo.qgvdial send ../qgvdial_$qver-1_$machine.deb && $mad remote -r org.maemo.qgvdial install qgvdial_$qver-1_$machine.deb";
+$cmd = "cd $basedir && $mad dpkg-buildpackage";
 system($cmd);
 
 exit();
