@@ -109,6 +109,9 @@ GVInbox::refresh (const QDateTime &dtUpdate)
     if (!webPage.enqueueWork (GVAW_getInbox, l, this,
             SLOT (getInboxDone (bool, const QVariantList &))))
     {
+        // Connect just so that the disconnect succeeds.
+        connect (&webPage, SIGNAL (oneInboxEntry (const GVInboxEntry &)),
+                  this   , SLOT   (oneInboxEntry (const GVInboxEntry &)));
         getInboxDone (false, l);
     }
 }//GVInbox::refresh
