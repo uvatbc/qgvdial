@@ -161,10 +161,9 @@ GVInbox::getInboxDone (bool, const QVariantList &params)
     dbMain.setQuickAndDirty (false);
 
     GVAccess &webPage = Singletons::getRef().getGVAccess ();
-    bool rv = disconnect (
+    disconnect (
         &webPage, SIGNAL (oneInboxEntry (const GVInboxEntry &)),
          this   , SLOT   (oneInboxEntry (const GVInboxEntry &)));
-    Q_ASSERT(rv); Q_UNUSED(rv);
 
     prepView ();
 
@@ -176,8 +175,7 @@ void
 GVInbox::onInboxSelected (const QString &strSelection)
 {
     QMutexLocker locker(&mutex);
-    if (!bLoggedIn)
-    {
+    if (!bLoggedIn) {
         return;
     }
 

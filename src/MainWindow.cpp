@@ -567,7 +567,6 @@ MainWindow::initQML ()
 
     // Initialize the QML view
     this->setSource (QUrl ("qrc:/Main.qml"));
-//    this->setResizeMode (QDeclarativeView::SizeRootObjectToView);
 
     this->setUsername ("example@gmail.com");
     this->setPassword ("hunter2 :p");

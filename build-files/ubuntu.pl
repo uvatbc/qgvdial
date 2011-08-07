@@ -6,10 +6,8 @@ my $line;
 my $qtdir = $ENV{'QTDIR'};
 
 # Delete any existing version file
-if (-f ver.cfg)
-{
-    unlink(ver.cfg);
-}
+# Delete any existing version file
+system("rm ver.cfg");
 # Get the latest version file from the repository
 $cmd = "svn export $repo/build-files/ver.cfg";
 system($cmd);
@@ -29,7 +27,8 @@ $qver = "$qver.$svnver";
 my $basedir = "./qgvdial-$qver";
 
 # Delete any previous checkout directories
-system("rm -rf qgvdial*");
+system("rm -rf qgvdial* qgvtp*");
+
 $cmd = "svn export $repo $basedir";
 system($cmd);
 system("cp $basedir/icons/qgv64.png $basedir/src/qgvdial.png");
@@ -40,12 +39,16 @@ print PRO_FILE "VERSION=__QGVDIAL_VERSION__\n";
 close PRO_FILE;
 
 # Version replacement
-$cmd = "cd $basedir ; perl ./build-files/version.pl __QGVDIAL_VERSION__ $qver";
+$cmd = "perl $basedir/build-files/version.pl __QGVDIAL_VERSION__ $qver $basedir";
 print "$cmd\n";
 system($cmd);
 
+# Copy the correct pro file
+system("cp $basedir/build-files/pro.qgvdial $basedir/qgvdial.pro");
+
 # Do everything upto the preparation of the debian directory. Code is still not compiled.
-$cmd = "cd $basedir ; $mad qmake && echo y | $mad dh_make --createorig --single -e yuvraaj\@gmail.com -c lgpl && $mad qmake";
+$cmd = "cd $basedir && $mad qmake && $mad dh_make --createorig --single -e yuvraaj\@gmail.com -c lgpl";
+print "$cmd\n";
 system($cmd);
 
 # Add a post install file to add the executable bit after installation on the device
@@ -58,25 +61,16 @@ system("mv $basedir/build-files/qgvdial.Call.service.linux $basedir/build-files/
 system("mv $basedir/build-files/qgvdial.Text.service.linux $basedir/build-files/qgvdial.Text.service");
 system("mv $basedir/qgv-tp/data/org.freedesktop.Telepathy.ConnectionManager.qgvtp.service.linux $basedir/qgv-tp/data/org.freedesktop.Telepathy.ConnectionManager.qgvtp.service");
 
-system("head -1 $basedir/debian/changelog >dest.txt ; cat $basedir/build-files/changelog >>dest.txt ; tail -2 $basedir/debian/changelog | head -1 | sed 's/unknown/Yuvraaj Kelkar/g' >>dest.txt ; mv dest.txt $basedir/debian/changelog");
+# Fix the changelog and put it into the correct location
+system("head -1 $basedir/debian/changelog >dest.txt && cat $basedir/build-files/changelog.qgvdial >>dest.txt && tail -2 $basedir/debian/changelog | head -1 | sed 's/unknown/Yuvraaj Kelkar/g' >>dest.txt && mv dest.txt $basedir/debian/changelog");
 
-my $qt_target = "$basedir/debian/qgvdial/usr/share/qgvdial/qt-4.7.1";
-# Copy the relevent Qt shared libraries
-system("mkdir -p $qt_target");
-system("cp $qtdir/lib/libQtMultimediaKit.so.1 $qt_target");
-system("cp $qtdir/lib/libQtDeclarative.so.4 $qt_target");
-system("cp $qtdir/lib/libQtSvg.so.4 $qt_target");
-system("cp $qtdir/lib/libQtWebKit.so.4 $qt_target");
-system("cp $qtdir/lib/libQtDBus.so.4 $qt_target");
-system("cp $qtdir/lib/libQtScript.so.4 $qt_target");
-system("cp $qtdir/lib/libQtSql.so.4 $qt_target");
-system("cp $qtdir/lib/libQtXmlPatterns.so.4 $qt_target");
-system("cp $qtdir/lib/libQtXml.so.4 $qt_target");
-system("cp $qtdir/lib/libQtOpenGL.so.4 $qt_target");
-system("cp $qtdir/lib/libQtGui.so.4 $qt_target");
-system("cp $qtdir/lib/libQtNetwork.so.4 $qt_target");
-system("cp $qtdir/lib/libQtCore.so.4 $qt_target");
-system("cp $qtdir/lib/libphonon.so.4 $qt_target");
+# Make sure all make files are present before mucking with them.
+system("cd $basedir && make src/Makefile");
+
+# Replace hard coded current directory with relative directory.
+$cmd="sed 's/$curdir\\/qgvdial-$qver/../g' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/$curdir\\/qgvdial-$qver/../g' $basedir/src/Makefile >$basedir/src/Makefile1 ; mv $basedir/src/Makefile1 $basedir/src/Makefile";
+print "$cmd\n";
+system($cmd);
 
 # Execute the rest of the build command
 $cmd = "cd $basedir && $mad dpkg-buildpackage && $mad remote -r org.maemo.qgvdial send ../qgvdial_$qver-1_$machine.deb && $mad remote -r org.maemo.qgvdial install qgvdial_$qver-1_$machine.deb";

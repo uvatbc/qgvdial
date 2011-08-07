@@ -64,7 +64,7 @@ close PRO_FILE;
 
 # Version replacement
 $cmd = "perl $basedir/build-files/version.pl __QGVDIAL_VERSION__ $qver $basedir";
-print $cmd;
+print "$cmd\n";
 system($cmd);
 
 # Copy the correct pro file
@@ -86,6 +86,7 @@ system("mv $basedir/build-files/qgvdial.Text.service.maemo $basedir/build-files/
 # Change the name of the desktop file so that it can be directly used in the compilation
 system("mv $basedir/build-files/qgvdial.desktop.maemo $basedir/build-files/qgvdial.desktop");
 
+# Fix the changelog and put it into the correct location
 system("head -1 $basedir/debian/changelog >dest.txt && cat $basedir/build-files/changelog.qgvdial >>dest.txt && tail -2 $basedir/debian/changelog | head -1 | sed 's/unknown/Yuvraaj Kelkar/g' >>dest.txt && mv dest.txt $basedir/debian/changelog");
 
 # Make sure all make files are present before mucking with them.
