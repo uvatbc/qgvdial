@@ -62,15 +62,15 @@ system("mv $basedir/build-files/qgvdial.Text.service.linux $basedir/build-files/
 system("mv $basedir/qgv-tp/data/org.freedesktop.Telepathy.ConnectionManager.qgvtp.service.linux $basedir/qgv-tp/data/org.freedesktop.Telepathy.ConnectionManager.qgvtp.service");
 
 # Fix the changelog and put it into the correct location
-system("head -1 $basedir/debian/changelog >dest.txt && cat $basedir/build-files/changelog.qgvdial >>dest.txt && tail -2 $basedir/debian/changelog | head -1 | sed 's/unknown/Yuvraaj Kelkar/g' >>dest.txt && mv dest.txt $basedir/debian/changelog");
+system("cp $basedir/debian/changelog ./saved-changelog");
+$cmd = "head -1 $basedir/debian/changelog >dest.txt && cat $basedir/build-files/changelog.qgvdial >>dest.txt && tail -2 $basedir/debian/changelog >>dest.txt && mv dest.txt $basedir/debian/changelog";
+print("$cmd\n");
+system($cmd);
 
 # Make sure all make files are present before mucking with them.
 system("cd $basedir && make src/Makefile");
 
 # Replace hard coded current directory with relative directory.
-$cmd="sed 's/$curdir\\/qgvdial-$qver/../g' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/$curdir\\/qgvdial-$qver/../g' $basedir/src/Makefile >$basedir/src/Makefile1 ; mv $basedir/src/Makefile1 $basedir/src/Makefile";
-print "$cmd\n";
-system($cmd);
 
 # Execute the rest of the build command
 $cmd = "cd $basedir && $mad dpkg-buildpackage && $mad remote -r org.maemo.qgvdial send ../qgvdial_$qver-1_$machine.deb && $mad remote -r org.maemo.qgvdial install qgvdial_$qver-1_$machine.deb";
