@@ -113,6 +113,7 @@ OTHER_FILES  += ../src/winrsrc.rc           \
                 ../qml/DbgWebWidget.qml     \
                 ../qml/DialDisp.qml         \
                 ../qml/DigitButton.qml      \
+                ../qml/ExpandView.qml       \
                 ../qml/helper.js            \
                 ../qml/InboxList.qml        \
                 ../qml/Keypad.qml           \

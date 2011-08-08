@@ -40,8 +40,11 @@ Item {
                            string host, int port,
                            bool bRequiresAuth,
                            string user, string pass)
+    signal sigProxyRefresh
     signal sigMosquittoChanges(bool bEnable, string host, int port, string topic)
     signal sigPinSettingChanges(bool bEnable, string pin)
+
+    property real pixHeight: (height + width) / 30
 
     function setUsername (strU) {
         textUsername.text = strU;
@@ -155,10 +158,6 @@ Item {
                     newState: ""
                 }//ListElement (login/logout)
                 ListElement {
-                    text: "Proxy settings"
-                    newState: "Proxy"
-                }//ListElement (proxy settings)
-                ListElement {
                     text: "Mosquitto settings"
                     newState: "Mosquitto"
                 }//ListElement (mosquitto settings)
@@ -215,17 +214,40 @@ Item {
         }//ListView
     }// Column (user, pass and all buttons)
 
-    Proxy {
-        id: proxySettings
-        anchors.fill: parent
-        anchors.topMargin: 2
-        opacity: 0
+    ExpandView {
+        id: expandProxySettings
+        anchors {
+            top: parent.top
+            left: parent.left
+        }
 
-        onSigDone: container.state = ''
-        onSigProxyChanges: container.sigProxyChanges(bEnable, bUseSystemProxy,
-                                                     host, port, bRequiresAuth,
-                                                     user, pass)
-    }//Proxy
+        width: parent.width
+        contentHeight: proxySettings.height;
+
+        mainTitle: "Proxy Settings"
+        mainTitlePixHeight: container.pixHeight
+
+        Proxy {
+            id: proxySettings
+            y: expandProxySettings.startY
+
+            width: parent.width - 1
+            pixHeight: container.pixHeight
+
+            opacity: expandProxySettings.containedOpacity
+
+            onSigProxyChanges: container.sigProxyChanges(bEnable, bUseSystemProxy,
+                                                         host, port,
+                                                         bRequiresAuth,
+                                                         user, pass);
+            onSigDone: {
+                if (!bSave) {
+                    container.sigProxyRefresh();
+                }
+                expandProxySettings.isExpanded = false;
+            }
+        }
+    }//ExpandView (proxy)
 
     Mosquitto {
         id: mqSettings
@@ -274,18 +296,7 @@ Item {
 
     states: [
         State {
-            name: "Proxy"
-            PropertyChanges { target: proxySettings; opacity: 1 }
-            PropertyChanges { target: mqSettings; opacity: 0 }
-            PropertyChanges { target: pinSettings; opacity: 0 }
-            PropertyChanges { target: myWebWidget; opacity: 0 }
-            PropertyChanges { target: logView; opacity: 0 }
-            PropertyChanges { target: aboutWin; opacity: 0 }
-            PropertyChanges { target: mainColumn; opacity: 0 }
-        },//Proxy
-        State {
             name: "Mosquitto"
-            PropertyChanges { target: proxySettings; opacity: 0 }
             PropertyChanges { target: mqSettings; opacity: 1 }
             PropertyChanges { target: pinSettings; opacity: 0 }
             PropertyChanges { target: myWebWidget; opacity: 0 }
@@ -295,7 +306,6 @@ Item {
         },//Mosquitto
         State {
             name: "PinSettings"
-            PropertyChanges { target: proxySettings; opacity: 0 }
             PropertyChanges { target: mqSettings; opacity: 0 }
             PropertyChanges { target: pinSettings; opacity: 1 }
             PropertyChanges { target: myWebWidget; opacity: 0 }
@@ -305,7 +315,6 @@ Item {
         },//Pin settings
         State {
             name: "WebPage"
-            PropertyChanges { target: proxySettings; opacity: 0 }
             PropertyChanges { target: mqSettings; opacity: 0 }
             PropertyChanges { target: pinSettings; opacity: 0 }
             PropertyChanges { target: myWebWidget; opacity: 1 }
@@ -315,7 +324,6 @@ Item {
         },//WebPage
         State {
             name: "ViewLog"
-            PropertyChanges { target: proxySettings; opacity: 0 }
             PropertyChanges { target: mqSettings; opacity: 0 }
             PropertyChanges { target: pinSettings; opacity: 0 }
             PropertyChanges { target: myWebWidget; opacity: 0 }
@@ -325,7 +333,6 @@ Item {
         },//View Log
         State {
             name: "About"
-            PropertyChanges { target: proxySettings; opacity: 0 }
             PropertyChanges { target: mqSettings; opacity: 0 }
             PropertyChanges { target: pinSettings; opacity: 0 }
             PropertyChanges { target: myWebWidget; opacity: 0 }

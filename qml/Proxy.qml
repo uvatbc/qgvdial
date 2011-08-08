@@ -20,11 +20,14 @@ Contact: yuvraaj@gmail.com
 */
 
 import Qt 4.7
-import "helper.js" as Code
 
 Item {
     id: container
     objectName: "ProxySettingsPage"
+
+    height: mainColumn.height
+
+    property real pixHeight: 500
 
     function setValues(bEnable, bUseSystemProxy, host, port,
                        bRequiresAuth, user, pass) {
@@ -50,13 +53,37 @@ Item {
     property bool bProxyUserPass: proxyUserPassRequired.check
 
     Column {
-        anchors.fill: parent
+        id: mainColumn
+
+        anchors {
+            top: parent.top
+            left: parent.left
+        }
         spacing: 2
+
+        width: parent.width
+        height: {
+            var rv = 2 + proxySupport.height + 2 +
+                         rowSaveCancel.height + 6;
+            if (bEnableProxy) {
+                rv += proxySystem.height + 2;
+                if (!bSystemProxy) {
+                    rv += rowUserProxyHost.height + 2 +
+                          rowUserProxyPort.height + 2 +
+                            proxyUserPassRequired.height + 2;
+                    if (bProxyUserPass) {
+                        rv += rowProxyUsername.height + 2 +
+                              rowProxyPassword.height + 2;
+                    }
+                }
+            }
+            return rv;
+        }
 
         RadioButton {
             id: proxySupport
             width: parent.width
-            pixelSize: (container.height + container.width) / 30
+            pixelSize: pixHeight
 
             text: "Enable proxy support"
         }// RadioButton (proxySupport)
@@ -65,14 +92,18 @@ Item {
             id: proxySystem
             width: parent.width
             opacity: (bEnableProxy? 1 : 0)
-            pixelSize: (container.height + container.width) / 30
+            pixelSize: pixHeight
 
             text: "Use system proxy settings"
         }// RadioButton (proxySystem)
 
         Row {
+            id: rowUserProxyHost
+
+            height: pixHeight + 2
             width: parent.width
             spacing: 2
+
             opacity: (bEnableProxy && !bSystemProxy ? 1 : 0)
 
             Text {
@@ -80,7 +111,7 @@ Item {
                 text: "Host:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: (container.height + container.width) / 30
+                font.pixelSize: parent.height - 2
             }
 
             MyTextEdit {
@@ -88,13 +119,16 @@ Item {
                 width: parent.width - lblHost.width
                 anchors.verticalCenter: parent.verticalCenter
                 text: "proxy.example.com"
-                pixelSize: (container.height + container.width) / 30
+                pixelSize: parent.height - 2
                 KeyNavigation.tab: textUserProxyPort
                 KeyNavigation.backtab: (bEnableProxy && !bSystemProxy && bProxyUserPass ? textUserProxyPass : textUserProxyPort)
             }
         }// Row (user proxy host)
 
         Row {
+            id: rowUserProxyPort
+
+            height: pixHeight + 2
             width: parent.width
             spacing: 2
 
@@ -105,7 +139,7 @@ Item {
                 text: "Port:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: (container.height + container.width) / 30
+                font.pixelSize: parent.height - 2
             }
 
             MyTextEdit {
@@ -114,7 +148,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 text: "80"
                 validator: IntValidator { bottom: 0; top: 65535 }
-                pixelSize: (container.height + container.width) / 30
+                pixelSize: parent.height - 2
                 KeyNavigation.tab: (bEnableProxy && !bSystemProxy && bProxyUserPass ? textUserProxyUser : textUserProxyHost)
                 KeyNavigation.backtab: textUserProxyHost
             }
@@ -124,14 +158,18 @@ Item {
             id: proxyUserPassRequired
             width: parent.width
             opacity: (bEnableProxy && !bSystemProxy ? 1 : 0)
-            pixelSize: (container.height + container.width) / 30
+            pixelSize: pixHeight
 
             text: "Requires username and password"
         }// RadioButton (proxyUserPassRequired)
 
         Row {
+            id: rowProxyUsername
+
+            height: pixHeight + 2
             width: parent.width
             spacing: 2
+
             opacity: (bEnableProxy && !bSystemProxy && bProxyUserPass ? 1 : 0)
 
             Text {
@@ -139,7 +177,7 @@ Item {
                 text: "Proxy user:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: (container.height + container.width) / 30
+                font.pixelSize: parent.height - 2
             }
 
             MyTextEdit {
@@ -147,15 +185,19 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 width: parent.width - lblProxyUser.width
                 text: "exampleuser"
-                pixelSize: (container.height + container.width) / 30
+                pixelSize: parent.height - 2
                 KeyNavigation.tab: textUserProxyPass
                 KeyNavigation.backtab: textUserProxyPort
             }
         }// Row (user proxy user name)
 
         Row {
+            id: rowProxyPassword
+
+            height: pixHeight + 2
             width: parent.width
             spacing: 2
+
             opacity: (bEnableProxy && !bSystemProxy && bProxyUserPass ? 1 : 0)
 
             Text {
@@ -163,7 +205,7 @@ Item {
                 text: "Proxy password:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: (container.height + container.width) / 30
+                font.pixelSize: parent.height - 2
             }
 
             MyTextEdit {
@@ -172,20 +214,23 @@ Item {
                 width: parent.width - lblProxyPass.width
                 text: "hunter2 :P"
                 echoMode: TextInput.Password
-                pixelSize: (container.height + container.width) / 30
+                pixelSize: parent.height - 2
                 KeyNavigation.tab: textUserProxyHost
                 KeyNavigation.backtab: textUserProxyUser
             }
         }// Row (user proxy password)
 
         Row {
+            id: rowSaveCancel
+
+            height: pixHeight + 2
             width: parent.width
             spacing: 1
 
             MyButton {
                 mainText: "Save"
                 width: (parent.width / 2) - parent.spacing
-                mainPixelSize: (container.height + container.width) / 30
+                mainPixelSize: parent.height - 2
 
                 onClicked: {
                     container.sigProxyChanges (bEnableProxy,
@@ -203,7 +248,7 @@ Item {
             MyButton {
                 mainText: "Cancel"
                 width: (parent.width / 2) - parent.spacing
-                mainPixelSize: (container.height + container.width) / 30
+                mainPixelSize: parent.height - 2
 
                 onClicked: container.sigDone(false);
             }//MyButton (Cancel)

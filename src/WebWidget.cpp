@@ -26,11 +26,18 @@ WebWidget::WebWidget(QDeclarativeItem *parent)
 : QDeclarativeItem(parent)
 , wv (new QWebView)
 , proxy (new QGraphicsProxyWidget(this))
+, selectStopper (NULL)
 {
     proxy->setWidget(wv);
 
     GVAccess &webPage = Singletons::getRef().getGVAccess ();
     webPage.setView (wv);
+
+#ifdef Q_WS_MAEMO_5
+    selectStopper = new WebViewSelectSuppressor(wv);
+    selectStopper->enable();
+    wv->property("kineticScroller").value<QAbstractKineticScroller *>()->setEnabled(true);
+#endif
 }//WebWidget::WebWidget
 
 WebWidget::~WebWidget()
@@ -86,3 +93,33 @@ WebWidget::geometryChanged (const QRectF &newG, const QRectF &oldG)
     wv->resize (newG.width(), newG.height());
     QDeclarativeItem::geometryChanged (newG, oldG);
 }//WebWidget::geometryChanged
+
+WebViewSelectSuppressor::WebViewSelectSuppressor(QWebView *wv)
+: QObject(wv)
+, view(wv)
+, enabled(false)
+, mousePressed(false)
+{
+}//WebViewSelectSuppressor::WebViewSelectSuppressor
+
+bool
+WebViewSelectSuppressor::eventFilter(QObject *, QEvent *e)
+{
+    switch (e->type()) {
+    case QEvent::MouseButtonPress:
+        if (static_cast<QMouseEvent *>(e)->button() == Qt::LeftButton)
+            mousePressed = true;
+        break;
+    case QEvent::MouseButtonRelease:
+        if (static_cast<QMouseEvent *>(e)->button() == Qt::LeftButton)
+            mousePressed = false;
+        break;
+    case QEvent::MouseMove:
+        if (mousePressed)
+            return true;
+        break;
+    default:
+        break;
+    }
+    return false;
+}//WebViewSelectSuppressor::eventFilter

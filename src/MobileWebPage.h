@@ -42,6 +42,11 @@ public slots:
 protected:
     QString userAgentForUrl (const QUrl & url) const;
 
+    bool acceptNavigationRequest (QWebFrame *frame,
+                                  const QNetworkRequest &request,
+                                  QWebPage::NavigationType type);
+    QWebPage *createWindow (QWebPage::WebWindowType type);
+
 protected:
     bool bUAIsIphone;
 };

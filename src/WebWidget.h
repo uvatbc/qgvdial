@@ -30,6 +30,8 @@ Contact: yuvraaj@gmail.com
 // even though it is present in QtCore which is included in global.h
 #include <QObject>
 
+class WebViewSelectSuppressor;
+
 class WebWidget : public QDeclarativeItem
 {
     Q_OBJECT
@@ -45,6 +47,37 @@ private:
 private:
     QWebView *wv;
     QGraphicsProxyWidget *proxy;
+    WebViewSelectSuppressor *selectStopper;
+};
+
+class WebViewSelectSuppressor : public QObject
+{
+    Q_OBJECT
+
+public:
+    WebViewSelectSuppressor(QWebView *wv);
+
+    inline void enable() {
+        if (enabled) return;
+        view->installEventFilter(this);
+        enabled = true;
+    }
+
+    inline void disable() {
+        if (!enabled) return;
+        view->removeEventFilter(this);
+        enabled = false;
+    }
+
+    inline bool isEnabled() const { return enabled; }
+
+protected:
+    bool eventFilter(QObject *, QEvent *e);
+
+private:
+    QWebView *view;
+    bool enabled;
+    bool mousePressed;
 };
 
 #endif // WEBWIDGET_H

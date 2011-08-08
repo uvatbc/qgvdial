@@ -146,6 +146,9 @@ private slots:
     void onSigProxyChanges(bool bEnable, bool bUseSystemProxy,
                            const QString &host, int port, bool bRequiresAuth,
                            const QString &user, const QString &pass);
+    //! Activated when the user clicks cancel on proxy changes
+    void onSigProxyRefresh(bool bSet = false);
+
     //! Activated when a link is clicked in the QML
     void onLinkActivated (const QString &strLink);
 

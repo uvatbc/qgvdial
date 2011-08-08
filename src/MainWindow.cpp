@@ -357,15 +357,7 @@ MainWindow::init ()
     logLevel = dbMain.getLogLevel ();
 
     // Pick up proxy settings from the DB and apply to webpage.
-    bool bProxyEnable = false, bUseSystemProxy = false;
-    bool bProxyAuthRequired = false;
-    QString strProxyHost, strProxyUser, strProxyPass;
-    int proxy_port = 0;
-    dbMain.getProxySettings (bProxyEnable, bUseSystemProxy,
-                             strProxyHost, proxy_port,
-                             bProxyAuthRequired, strProxyUser, strProxyPass);
-    onSigProxyChanges (bProxyEnable, bUseSystemProxy, strProxyHost, proxy_port,
-                       bProxyAuthRequired, strProxyUser, strProxyPass);
+    onSigProxyRefresh (true);
 
     // Initialize the DBUS interface to allow other applications (and qgv-tp) to
     // initiate calls and send texts through us.
@@ -567,6 +559,7 @@ MainWindow::initQML ()
 
     // Initialize the QML view
     this->setSource (QUrl ("qrc:/Main.qml"));
+    this->setResizeMode (QDeclarativeView::SizeRootObjectToView);
 
     this->setUsername ("example@gmail.com");
     this->setPassword ("hunter2 :p");
@@ -633,6 +626,8 @@ MainWindow::initQML ()
                                       bool, const QString &, const QString &)),
         this, SLOT (onSigProxyChanges(bool, bool, const QString &, int,
                                       bool, const QString &, const QString &)));
+    bOk = connect (gObj, SIGNAL (sigProxyRefresh()),
+                   this, SLOT (onSigProxyRefresh()));
     Q_ASSERT(bOk);
     bOk = connect (
         gObj, SIGNAL (sigMosquittoChanges(bool, const QString &, int,
@@ -1048,8 +1043,7 @@ MainWindow::dialNow (const QString &strTarget)
 {
     CalloutInitiator *ci;
 
-    do // Begin cleanup block (not a loop)
-    {
+    do { // Begin cleanup block (not a loop)
         if (!bLoggedIn) {
             setStatus ("User is not logged in yet. Cannot make any calls.");
             break;
@@ -1068,8 +1062,7 @@ MainWindow::dialNow (const QString &strTarget)
         }
 
         GVRegisteredNumber gvRegNumber;
-        if (!getDialSettings (bDialout, gvRegNumber, ci))
-        {
+        if (!getDialSettings (bDialout, gvRegNumber, ci)) {
             setStatus ("Unable to dial because settings are not valid.");
             break;
         }
@@ -1636,9 +1629,25 @@ MainWindow::onSigProxyChanges(bool bEnable, bool bUseSystemProxy,
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     dbMain.setProxySettings (bEnable, bUseSystemProxy, host, port,
                              bRequiresAuth, user, pass);
+}//MainWindow::onSigProxyChanges
 
-    do // Begin cleanup block (not a loop)
-    {
+void
+MainWindow::onSigProxyRefresh(bool bSet)
+{
+    bool bEnable, bUseSystemProxy, bRequiresAuth;
+    int port;
+    QString host, user, pass;
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain();
+
+    dbMain.getProxySettings (bEnable, bUseSystemProxy, host, port,
+                             bRequiresAuth, user, pass);
+
+    if (bSet) {
+        onSigProxyChanges (bEnable, bUseSystemProxy, host, port,
+                           bRequiresAuth, user, pass);
+    }
+
+    do { // Begin cleanup block (not a loop)
         QObject *pRoot = this->rootObject ();
         if (NULL == pRoot) {
             qWarning ("Couldn't get root object in QML for ProxySettingsPage");
@@ -1646,7 +1655,7 @@ MainWindow::onSigProxyChanges(bool bEnable, bool bUseSystemProxy,
         }
 
         QObject *pProxySettings = pRoot->findChild <QObject*>
-                                                  ("ProxySettingsPage");
+                ("ProxySettingsPage");
         if (NULL == pProxySettings) {
             qWarning ("Could not get to ProxySettingsPage");
             break;
@@ -1661,7 +1670,7 @@ MainWindow::onSigProxyChanges(bool bEnable, bool bUseSystemProxy,
                                    Q_ARG (QVariant, QVariant(user)),
                                    Q_ARG (QVariant, QVariant(pass)));
     } while (0); // End cleanup block (not a loop)
-}//MainWindow::onSigProxyChanges
+}//MainWindow::onSigProxyRefresh
 
 void
 MainWindow::onLinkActivated (const QString &strLink)

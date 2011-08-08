@@ -65,6 +65,7 @@ Rectangle {
                            string host, int port,
                            bool bRequiresAuth,
                            string user, string pass)
+    signal sigProxyRefresh
 
     signal sigMosquittoChanges(bool bEnable, string host, int port, string topic)
     signal sigPinSettingChanges(bool bEnable, string pin)
