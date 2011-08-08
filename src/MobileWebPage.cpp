@@ -43,17 +43,8 @@ MobileWebPage::setUA (bool bSetIphone /*= false*/)
     bUAIsIphone = bSetIphone;
 }//MobileWebPage::setUA
 
-bool
-MobileWebPage::acceptNavigationRequest (QWebFrame *frame,
-                                        const QNetworkRequest & /*request*/,
-                                        QWebPage::NavigationType /*type*/)
-{
-    qWarning() << "acceptNavigationRequest frame = %1" << (void *)frame;
-    return true;
-}//MobileWebPage::acceptNavigationRequest
-
 QWebPage *
-MobileWebPage::createWindow (QWebPage::WebWindowType type)
+MobileWebPage::createWindow (QWebPage::WebWindowType /*type*/)
 {
     qWarning("Webpage requested a new page");
     return NULL;

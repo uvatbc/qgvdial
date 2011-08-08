@@ -25,7 +25,7 @@ Item {
     id: container
     objectName: "ProxySettingsPage"
 
-    height: mainColumn.height
+    height: mainColumn.height + 2
 
     property real pixHeight: 500
 
@@ -60,25 +60,7 @@ Item {
             left: parent.left
         }
         spacing: 2
-
         width: parent.width
-        height: {
-            var rv = 2 + proxySupport.height + 2 +
-                         rowSaveCancel.height + 6;
-            if (bEnableProxy) {
-                rv += proxySystem.height + 2;
-                if (!bSystemProxy) {
-                    rv += rowUserProxyHost.height + 2 +
-                          rowUserProxyPort.height + 2 +
-                            proxyUserPassRequired.height + 2;
-                    if (bProxyUserPass) {
-                        rv += rowProxyUsername.height + 2 +
-                              rowProxyPassword.height + 2;
-                    }
-                }
-            }
-            return rv;
-        }
 
         RadioButton {
             id: proxySupport
@@ -223,14 +205,20 @@ Item {
         Row {
             id: rowSaveCancel
 
-            height: pixHeight + 2
+            height: btnSave.height
+            anchors {
+                left: parent.left
+                leftMargin: 1
+            }
             width: parent.width
-            spacing: 1
+            spacing: 2
 
             MyButton {
+                id: btnSave
                 mainText: "Save"
                 width: (parent.width / 2) - parent.spacing
-                mainPixelSize: parent.height - 2
+                mainPixelSize: container.pixHeight
+                height: mainPixelSize * 3 / 2
 
                 onClicked: {
                     container.sigProxyChanges (bEnableProxy,
@@ -248,10 +236,11 @@ Item {
             MyButton {
                 mainText: "Cancel"
                 width: (parent.width / 2) - parent.spacing
-                mainPixelSize: parent.height - 2
+                mainPixelSize: container.pixHeight
+                height: mainPixelSize * 3 / 2
 
                 onClicked: container.sigDone(false);
             }//MyButton (Cancel)
-        }
+        }//Row (save and cancel buttons)
     }// Column
 }// Item (top level)

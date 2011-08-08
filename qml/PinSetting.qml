@@ -26,6 +26,9 @@ Item {
     id: container
     objectName: "PinSettingsPage"
 
+    height: mainColumn.height
+    property real pixHeight: 500
+
     function setValues(bEnable, pin) {
         console.debug ("QML: Setting Pin settings")
         pinSupport.check = bEnable;
@@ -38,13 +41,18 @@ Item {
     property bool bEnable: pinSupport.check
 
     Column {
-        anchors.fill: parent
+        id: mainColumn
+        anchors {
+            top: parent.top
+            left: parent.left
+        }
         spacing: 2
+        width: parent.width
 
         RadioButton {
             id: pinSupport
             width: parent.width
-            pixelSize: (container.height + container.width) / 30
+            pixelSize: container.pixHeight
 
             text: "Use PIN for GV dial"
         }// RadioButton (pinSupport)
@@ -60,7 +68,8 @@ Item {
                 text: "Pin:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: (container.height + container.width) / 30
+                font.pixelSize: container.pixHeight
+                height: paintedHeight + 2
             }
 
             MyTextEdit {
@@ -69,18 +78,27 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 text: "0000"
                 validator: IntValidator { bottom: 0; top: 9999 }
-                pixelSize: (container.height + container.width) / 30
+                pixelSize: container.pixHeight
+                height: lblPin.height
             }
-        }// Row (Mq port)
+        }// Row (pin)
 
         Row {
-            width: parent.width
-            spacing: 1
+            id: rowSaveCancel
+
+            height: btnSave.height
+            anchors {
+                left: parent.left
+                leftMargin: 1
+            }
+            width: parent.width - 2
+            spacing: 2
 
             MyButton {
                 mainText: "Save"
                 width: (parent.width / 2) - parent.spacing
-                mainPixelSize: (container.height + container.width) / 30
+                mainPixelSize: container.pixHeight
+                height: mainPixelSize * 3 / 2
 
                 onClicked: {
                     container.sigPinSettingChanges (bEnable, textPin.text);
@@ -91,7 +109,8 @@ Item {
             MyButton {
                 mainText: "Cancel"
                 width: (parent.width / 2) - parent.spacing
-                mainPixelSize: (container.height + container.width) / 30
+                mainPixelSize: container.pixHeight
+                height: mainPixelSize * 3 / 2
 
                 onClicked: container.sigDone(false);
             }//MyButton (Cancel)

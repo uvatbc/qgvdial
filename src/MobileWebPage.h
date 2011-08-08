@@ -42,9 +42,11 @@ public slots:
 protected:
     QString userAgentForUrl (const QUrl & url) const;
 
-    bool acceptNavigationRequest (QWebFrame *frame,
-                                  const QNetworkRequest &request,
-                                  QWebPage::NavigationType type);
+    inline bool acceptNavigationRequest (QWebFrame * /*frame*/,
+                                         const QNetworkRequest & /*request*/,
+                                         QWebPage::NavigationType /*type*/)
+    { return true; }
+
     QWebPage *createWindow (QWebPage::WebWindowType type);
 
 protected:

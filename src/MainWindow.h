@@ -155,9 +155,11 @@ private slots:
     //! Activated when the user saves the mosquitto settings
     void onSigMosquittoChanges(bool bEnable, const QString &host, int port,
                                const QString &topic);
+    void refreshMqSettings(bool bForceShut = false);
 
     //! Activated when the user saves the GV pin
     void onSigPinSettingChanges(bool bEnable, const QString &pin);
+    void refreshPinSettings();
 
     void onMqThreadFinished();
 
@@ -224,9 +226,6 @@ private:
     void setPassword(const QString &strPassword);
 
     void fallbackDialout (DialContext *ctx);
-
-    void setMqSettingsInQml(bool bEnable, const QString &host, int port,
-                            const QString &topic);
 
     void clearSmsDestinations();
 

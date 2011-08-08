@@ -26,6 +26,9 @@ Item {
     id: container
     objectName: "MosquittoPage"
 
+    height: mainColumn.height + 2
+    property real pixHeight: 500
+
     function setValues(bEnable, host, port, topic) {
         console.debug ("QML: Setting Mq settings")
         mqSupport.check = bEnable;
@@ -40,19 +43,25 @@ Item {
     property bool bEnable: mqSupport.check
 
     Column {
-        anchors.fill: parent
+        id: mainColumn
+        anchors {
+            top: parent.top
+            left: parent.left
+        }
         spacing: 2
+        width: parent.width
 
         RadioButton {
             id: mqSupport
             width: parent.width
-            pixelSize: (container.height + container.width) / 30
+            pixelSize: container.pixHeight
 
-            text: "Enable mosquitto support"
+            text: "Enable mosquitto"
         }// RadioButton (mqSupport)
 
         Row {
             width: parent.width
+            height: lblHost.height
             spacing: 2
             opacity: (bEnable ? 1 : 0)
 
@@ -61,15 +70,17 @@ Item {
                 text: "Host:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: (container.height + container.width) / 30
+                font.pixelSize: container.pixHeight
+                height: paintedHeight + 2
             }
 
             MyTextEdit {
                 id: textMqServer
                 width: parent.width - lblHost.width
+                height: lblHost.height
                 anchors.verticalCenter: parent.verticalCenter
                 text: "mosquitto.example.com"
-                pixelSize: (container.height + container.width) / 30
+                pixelSize: container.pixHeight
                 KeyNavigation.tab: textMqPort
                 KeyNavigation.backtab: textMqTopic
             }
@@ -77,6 +88,7 @@ Item {
 
         Row {
             width: parent.width
+            height: lblPort.height
             spacing: 2
 
             opacity: (bEnable ? 1 : 0)
@@ -86,16 +98,18 @@ Item {
                 text: "Port:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: (container.height + container.width) / 30
+                font.pixelSize: container.pixHeight
+                height: paintedHeight + 2
             }
 
             MyTextEdit {
                 id: textMqPort
                 width: parent.width - lblPort.width
+                height: lblPort.height
                 anchors.verticalCenter: parent.verticalCenter
                 text: "1883"
                 validator: IntValidator { bottom: 0; top: 65535 }
-                pixelSize: (container.height + container.width) / 30
+                pixelSize: container.pixHeight
                 KeyNavigation.tab: textMqTopic
                 KeyNavigation.backtab: textMqServer
             }
@@ -103,6 +117,7 @@ Item {
 
         Row {
             width: parent.width
+            height: lblTopic.height
             spacing: 2
             opacity: (bEnable ? 1 : 0)
 
@@ -111,28 +126,37 @@ Item {
                 text: "Topic to sub:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: (container.height + container.width) / 30
+                font.pixelSize: container.pixHeight
+                height: paintedHeight + 2
             }
 
             MyTextEdit {
                 id: textMqTopic
                 width: parent.width - lblTopic.width
+                height: lblTopic.height
                 anchors.verticalCenter: parent.verticalCenter
                 text: "gv_notify"
-                pixelSize: (container.height + container.width) / 30
+                pixelSize: container.pixHeight
                 KeyNavigation.tab: textMqServer
                 KeyNavigation.backtab: textMqPort
             }
         }// Row (Mq topic to subscribe to)
 
         Row {
-            width: parent.width
-            spacing: 1
+            height: btnSave.height
+            anchors {
+                left: parent.left
+                leftMargin: 1
+            }
+            width: parent.width - 2
+            spacing: 2
 
             MyButton {
+                id: btnSave
                 mainText: "Save"
                 width: (parent.width / 2) - parent.spacing
-                mainPixelSize: (container.height + container.width) / 30
+                mainPixelSize: container.pixHeight
+                height: mainPixelSize * 3 / 2
 
                 onClicked: {
                     container.sigMosquittoChanges (bEnable,
@@ -147,7 +171,8 @@ Item {
             MyButton {
                 mainText: "Cancel"
                 width: (parent.width / 2) - parent.spacing
-                mainPixelSize: (container.height + container.width) / 30
+                mainPixelSize: container.pixHeight
+                height: mainPixelSize * 3 / 2
 
                 onClicked: container.sigDone(false);
             }//MyButton (Cancel)

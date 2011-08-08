@@ -33,13 +33,12 @@ Rectangle {
     property real contentHeight: 50
     property real startY: titleText.height + 1
     property real containedOpacity: 0
+    property bool isExpanded: false
 
     height: titleText.paintedHeight + 1
 
     Text {
         id: titleText
-
-        property bool isExpanded: false
 
         text: container.mainTitle
         color: "white"
@@ -58,14 +57,14 @@ Rectangle {
         MouseArea {
             anchors.fill: parent
 
-            onClicked: titleText.isExpanded = (titleText.isExpanded == true ? false : true);
+            onClicked: container.isExpanded = (container.isExpanded == true ? false : true);
         }//MouseArea (over the main Title)
     }
 
     states: [
         State {
             name: "visible"
-            when: (titleText.isExpanded == true)
+            when: (container.isExpanded == true)
             PropertyChanges {
                 target: container
                 height: container.contentHeight + titleText.height + 1

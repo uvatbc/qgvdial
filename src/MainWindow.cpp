@@ -635,9 +635,15 @@ MainWindow::initQML ()
         this, SLOT   (onSigMosquittoChanges(bool, const QString &, int,
                                             const QString &)));
     Q_ASSERT(bOk);
+    bOk = connect (gObj, SIGNAL (sigMosquittoRefresh()),
+                   this, SLOT   (refreshMqSettings()));
+    Q_ASSERT(bOk);
     bOk = connect (
         gObj, SIGNAL(sigPinSettingChanges  (bool, const QString &)),
         this, SLOT  (onSigPinSettingChanges(bool, const QString &)));
+    Q_ASSERT(bOk);
+    bOk = connect (gObj, SIGNAL(sigPinRefresh()),
+                   this, SLOT  (refreshPinSettings()));
     Q_ASSERT(bOk);
     bOk = connect (gObj, SIGNAL (sigMsgBoxDone(bool)),
                    this, SLOT (onSigMsgBoxDone(bool)));
@@ -763,8 +769,7 @@ MainWindow::loginCompleted (bool bOk, const QVariantList & /*varList*/)
     strSelfNumber.clear ();
     webPage.setTimeout(20);
 
-    if (!bOk)
-    {
+    if (!bOk) {
         QVariantList l;
         logoutCompleted (true, l);
 
@@ -813,16 +818,11 @@ MainWindow::loginCompleted (bool bOk, const QVariantList & /*varList*/)
         // Fill up the combobox on the main page
         refreshRegisteredNumbers ();
 
-        bool bMqEnabled;
-        QString strMqHost, strMqTopic;
-        int mqPort;
-        if (dbMain.getMqSettings (bMqEnabled, strMqHost, mqPort, strMqTopic)) {
-            onSigMosquittoChanges (bMqEnabled, strMqHost, mqPort, strMqTopic);
-        }
+        // Fill up the mq settings
+        refreshMqSettings ();
 
-        if (dbMain.getGvPin (bMqEnabled, strMqHost)) {
-            onSigPinSettingChanges (bMqEnabled, strMqHost);
-        }
+        // Fill up the pin settings
+        refreshPinSettings ();
     }
 }//MainWindow::loginCompleted
 
@@ -1686,8 +1686,6 @@ MainWindow::onSigMosquittoChanges (bool bEnable, const QString &host, int port,
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     dbMain.setMqSettings (bEnable, host, port, topic);
 
-    setMqSettingsInQml (bEnable, host, port, topic);
-
 #if MOSQUITTO_CAPABLE
     mqThread.setSettings (bEnable, host, port);
     bRunMqThread = bEnable;
@@ -1700,19 +1698,27 @@ MainWindow::onSigMosquittoChanges (bool bEnable, const QString &host, int port,
 }//MainWindow::onSigMosquittoChanges
 
 void
-MainWindow::setMqSettingsInQml (bool bEnable, const QString &host, int port,
-                                const QString &topic)
+MainWindow::refreshMqSettings (bool bForceShut /*= false*/)
 {
-    do // Begin cleanup block (not a loop)
-    {
+    bool bEnable = bForceShut;
+    QString host, topic;
+    int port;
+
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    if (!bForceShut) {
+        if (!dbMain.getMqSettings (bEnable, host, port, topic)) {
+            return;
+        }
+    }
+
+    do { // Begin cleanup block (not a loop)
         QObject *pRoot = this->rootObject ();
         if (NULL == pRoot) {
             qWarning ("Couldn't get root object in QML for MosquittoPage");
             break;
         }
 
-        QObject *pMqSettings = pRoot->findChild <QObject*>
-                                                  ("MosquittoPage");
+        QObject *pMqSettings = pRoot->findChild <QObject*> ("MosquittoPage");
         if (NULL == pMqSettings) {
             qWarning ("Could not get to MosquittoPage");
             break;
@@ -1738,7 +1744,7 @@ MainWindow::setMqSettingsInQml (bool bEnable, const QString &host, int port,
                                    Q_ARG (QVariant, QVariant(port)),
                                    Q_ARG (QVariant, QVariant(strTopic)));
     } while (0); // End cleanup block (not a loop)
-}//MainWindow::setMqSettingsInQml
+}//MainWindow::refreshMqSettings
 
 void
 MainWindow::onSigPinSettingChanges(bool bEnable, const QString &pin)
@@ -1747,17 +1753,29 @@ MainWindow::onSigPinSettingChanges(bool bEnable, const QString &pin)
 
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     dbMain.setGvPin (bEnable, strPin);
+}//MainWindow::onSigPinSettingChanges
+
+void
+MainWindow::refreshPinSettings()
+{
+    bool bEnable;
+    QString strPin;
+
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    if (!dbMain.getGvPin (bEnable, strPin)) {
+        return;
+    }
+
     if (bEnable) {
         strGvPin = strPin;
     } else {
-        strGvPin.clear ();
+        strGvPin = "0000";
     }
 
-    do // Begin cleanup block (not a loop)
-    {
+    do { // Begin cleanup block (not a loop)
         QObject *pRoot = this->rootObject ();
         if (NULL == pRoot) {
-            qWarning ("Couldn't get root object in QML for MosquittoPage");
+            qWarning ("Couldn't get root object in QML for PinSettingsPage");
             break;
         }
 
@@ -1771,7 +1789,7 @@ MainWindow::onSigPinSettingChanges(bool bEnable, const QString &pin)
                                    Q_ARG (QVariant, QVariant(bEnable)),
                                    Q_ARG (QVariant, QVariant(strPin)));
     } while (0); // End cleanup block (not a loop)
-}//MainWindow::onSigPinSettingChanges
+}//MainWindow::refreshPinSettings
 
 void
 MainWindow::onMqThreadFinished ()
@@ -1785,13 +1803,7 @@ MainWindow::onMqThreadFinished ()
         qDebug ("Finished waiting for Mq thread. Not restarting");
 
         // Just send a command to turn off mosquitto enable
-        CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-        bool bEnable;
-        QString host, topic;
-        int port;
-        dbMain.getMqSettings (bEnable, host, port, topic);
-        bEnable = false;
-        setMqSettingsInQml (bEnable, host, port, topic);
+        refreshMqSettings (true);
     }
 #endif
 }//MainWindow::onMqThreadFinished

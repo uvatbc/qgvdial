@@ -68,7 +68,9 @@ Rectangle {
     signal sigProxyRefresh
 
     signal sigMosquittoChanges(bool bEnable, string host, int port, string topic)
+    signal sigMosquittoRefresh
     signal sigPinSettingChanges(bool bEnable, string pin)
+    signal sigPinRefresh
 
     // Contacts search query changes
     signal sigSearchContacts(string query)
@@ -203,9 +205,12 @@ Rectangle {
                         onSigProxyChanges: main.sigProxyChanges(bEnable, bUseSystemProxy,
                                                                 host, port, bRequiresAuth,
                                                                 user, pass)
+                        onSigProxyRefresh: main.sigProxyRefresh
                         onSigLinkActivated: main.sigLinkActivated(strLink)
                         onSigMosquittoChanges: main.sigMosquittoChanges(bEnable, host, port, topic)
+                        onSigMosquittoRefresh: main.sigMosquittoRefresh()
                         onSigPinSettingChanges: main.sigPinSettingChanges(bEnable, pin)
+                        onSigPinRefresh: main.sigPinRefresh()
                     }
                 }//Tab (Settings)
             }//VisualDataModel (contains the tabs)

@@ -21,7 +21,7 @@ Contact: yuvraaj@gmail.com
 
 import Qt 4.7
 
-Item {
+Flickable {
     id: container
     objectName: "SettingsPage"
 
@@ -42,189 +42,62 @@ Item {
                            string user, string pass)
     signal sigProxyRefresh
     signal sigMosquittoChanges(bool bEnable, string host, int port, string topic)
+    signal sigMosquittoRefresh
     signal sigPinSettingChanges(bool bEnable, string pin)
+    signal sigPinRefresh
 
     property real pixHeight: (height + width) / 30
 
+    contentHeight: expandLoginDetails.height + expandProxySettings.height +
+                   expandMqSettings.height + expandPinSettings.height
+    contentWidth: width
+
     function setUsername (strU) {
-        textUsername.text = strU;
-        lblUsername.text = strU;
+        loginDetails.username = strU;
     }
     function setPassword (strP) {
-        var strStars = Array(strP.length+1).join("*")
-        textPassword.text = strP;
-        lblPassword.text = strStars;
+        loginDetails.password = strP;
     }
 
-    Column { // user, pass and all buttons
-        id: mainColumn
-        anchors.fill: parent
-        spacing: 2
-        opacity: 1
-
-        property int pixDiv: 10
-        property int pixHeight: (container.height + container.width) / 2
-        property int outerHeight: pixHeight / (pixDiv + 2)
-        property int pixSize: outerHeight * 2 / 3
-
-        Row {
-            width: parent.width
-            spacing: 2
-
-            Text {
-                id: lblEmail
-                text: "Email:"
-                color: "white"
-                anchors.verticalCenter: parent.verticalCenter
-                height: mainColumn.outerHeight
-                font.pixelSize: mainColumn.pixSize
-            }
-
-            MyTextEdit {
-                id: textUsername
-                height: mainColumn.outerHeight - 2
-                width: parent.width - lblEmail.width - (parent.spacing * 2)
-                opacity: (g_bIsLoggedIn == true ? 0 : 1)
-                pixelSize: mainColumn.pixSize
-
-                Keys.onReturnPressed: listButtons.login_logout_function();
-                KeyNavigation.tab: textPassword
-                onSigTextChanged: container.sigUserChanged(strText);
-            }
-
-            Text {
-                id: lblUsername
-                anchors.verticalCenter: parent.verticalCenter
-                color: "white"
-                height: mainColumn.outerHeight
-                font.pixelSize: mainColumn.pixSize
-                opacity: (g_bIsLoggedIn == true ? 1 : 0)
-            }
-        }//Row (username)
-
-        Row {
-            width: parent.width
-            spacing: 2
-
-            Text {
-                id: lblPass
-                text: "Password:"
-                color: "white"
-                anchors.verticalCenter: parent.verticalCenter
-                height: mainColumn.outerHeight
-                font.pixelSize: mainColumn.pixSize
-            }
-
-            MyTextEdit {
-                id: textPassword
-                height: mainColumn.outerHeight - 2
-                width: parent.width - lblPass.width - (parent.spacing * 2)
-                opacity: (g_bIsLoggedIn == true ? 0 : 1)
-                echoMode: TextInput.Password
-                pixelSize: mainColumn.pixSize
-
-                Keys.onReturnPressed: listButtons.login_logout_function();
-                KeyNavigation.tab: textUsername
-                onSigTextChanged: container.sigPassChanged(strText);
-            }
-
-            Text {
-                id: lblPassword
-                anchors.verticalCenter: parent.verticalCenter
-                color: "white"
-                height: mainColumn.outerHeight
-                font.pixelSize: mainColumn.pixSize
-                opacity: (g_bIsLoggedIn == true ? 1 : 0)
-            }
-        }//Row (password)
-
-        ListView {
-            id: listButtons
-            width: parent.width
-            height: parent.height - (textUsername.height * 2)
-            clip: true
-
-            function login_logout_function() {
-                if (g_bIsLoggedIn) {
-                    container.sigLogout();
-                } else {
-                    container.sigLogin();
-                }
-            }
-
-            model: ListModel {
-                ListElement {
-                    text: "Login"
-                    newState: ""
-                }//ListElement (login/logout)
-                ListElement {
-                    text: "Mosquitto settings"
-                    newState: "Mosquitto"
-                }//ListElement (mosquitto settings)
-                ListElement {
-                    text: "Pin settings"
-                    newState: "PinSettings"
-                }//ListElement (Pin settings)
-                ListElement {
-                    text: "Web Page (debug)"
-                    newState: "WebPage"
-                }//ListElement (Web Page (debug))
-                ListElement {
-                    text: "View Log (debug)"
-                    newState: "ViewLog"
-                }//ListElement (View Log (debug))
-                ListElement {
-                    text: "Refresh"
-                    newState: ""
-                }//ListElement (Refresh)
-                ListElement {
-                    text: "About"
-                    newState: "About"
-                }//ListElement (About)
-            }
-
-            delegate: MyButton {
-                mainText: (text == "Login" ? (g_bIsLoggedIn == true ? "Logout" : "Login") : text)
-                width: listButtons.width - 1
-                height: mainColumn.pixHeight / mainColumn.pixDiv
-                mainPixelSize: height * 2 / 3
-
-                onClicked: {
-                    if (newState != "") {
-                        container.state = newState
-                    }
-
-                    if (text == "Login") {
-                        if (g_bIsLoggedIn) {
-                            container.sigLogout();
-                        } else {
-                            container.sigLogin();
-                        }
-                    } else if (text == "Refresh") {
-                        container.sigRefresh();
-                    }
-                }//onClicked
-
-                onPressHold: {
-                    if (text == "Refresh") {
-                        container.sigRefreshAll();
-                    }
-                }
-            }//delegate (MyButton)
-        }//ListView
-    }// Column (user, pass and all buttons)
-
     ExpandView {
-        id: expandProxySettings
+        id: expandLoginDetails
         anchors {
             top: parent.top
             left: parent.left
         }
 
         width: parent.width
+        contentHeight: loginDetails.height;
+
+        mainTitle: "Login details"
+        mainTitlePixHeight: container.pixHeight
+
+        LoginDetails {
+            id: loginDetails
+            y: expandLoginDetails.startY
+
+            width: parent.width - 1
+            pixHeight: container.pixHeight
+            opacity: expandLoginDetails.containedOpacity
+
+            onSigUserChanged: container.sigUserChanged(user);
+            onSigPassChanged: container.sigPassChanged(pass);
+            onSigLogin: container.sigLogin();
+            onSigLogout: container.sigLogout();
+        }
+    }//ExpandView (login/logout)
+
+    ExpandView {
+        id: expandProxySettings
+        anchors {
+            top: expandLoginDetails.bottom
+            left: parent.left
+        }
+
+        width: parent.width
         contentHeight: proxySettings.height;
 
-        mainTitle: "Proxy Settings"
+        mainTitle: "Proxy"
         mainTitlePixHeight: container.pixHeight
 
         Proxy {
@@ -249,25 +122,118 @@ Item {
         }
     }//ExpandView (proxy)
 
-    Mosquitto {
-        id: mqSettings
-        anchors.fill: parent
-        anchors.topMargin: 2
-        opacity: 0
+    ExpandView {
+        id: expandMqSettings
+        anchors {
+            top: expandProxySettings.bottom
+            left: parent.left
+        }
 
-        onSigDone: container.state = ''
-        onSigMosquittoChanges: container.sigMosquittoChanges(bEnable, host, port, topic)
-    }//Mosquitto
+        width: parent.width
+        contentHeight: mqSettings.height;
 
-    PinSetting {
-        id: pinSettings
-        anchors.fill: parent
-        anchors.topMargin: 2
-        opacity: 0
+        mainTitle: "Mosquitto"
+        mainTitlePixHeight: container.pixHeight
 
-        onSigDone: container.state = ''
-        onSigPinSettingChanges: container.sigPinSettingChanges(bEnable, pin)
-    }//Pin settings
+        Mosquitto {
+            id: mqSettings
+            y: expandMqSettings.startY
+
+            width: parent.width - 1
+            pixHeight: container.pixHeight
+
+            opacity: expandMqSettings.containedOpacity
+
+            onSigDone: {
+                if (!bSave) {
+                    container.sigMosquittoRefresh();
+                }
+                expandMqSettings.isExpanded = false;
+            }
+            onSigMosquittoChanges: container.sigMosquittoChanges(bEnable, host, port, topic)
+        }//Mosquitto
+    }//ExpandView (mosquitto)
+
+    ExpandView {
+        id: expandPinSettings
+        anchors {
+            top: expandMqSettings.bottom
+            left: parent.left
+        }
+
+        width: parent.width
+        contentHeight: pinSettings.height;
+
+        mainTitle: "Pin"
+        mainTitlePixHeight: container.pixHeight
+
+        PinSetting {
+            id: pinSettings
+            y: expandPinSettings.startY
+
+            width: parent.width - 1
+            pixHeight: container.pixHeight
+
+            opacity: expandPinSettings.containedOpacity
+
+            onSigDone: {
+                if (!bSave) {
+                    container.sigPinRefresh();
+                }
+                expandPinSettings.isExpanded = false;
+            }
+            onSigPinSettingChanges: container.sigPinSettingChanges(bEnable, pin)
+        }//Pin settings
+    }//ExpandView (pin settings)
+
+//    ListView {
+//        id: listButtons
+//        width: parent.width
+//        height: parent.height - (textUsername.height * 2)
+//        clip: true
+
+//        model: ListModel {
+//            ListElement {
+//                text: "Web Page (debug)"
+//                newState: "WebPage"
+//            }//ListElement (Web Page (debug))
+//            ListElement {
+//                text: "View Log (debug)"
+//                newState: "ViewLog"
+//            }//ListElement (View Log (debug))
+//            ListElement {
+//                text: "Refresh"
+//                newState: ""
+//            }//ListElement (Refresh)
+//            ListElement {
+//                text: "About"
+//                newState: "About"
+//            }//ListElement (About)
+//        }
+
+//        delegate: MyButton {
+//            mainText: text)
+//            width: listButtons.width - 1
+//            height: mainColumn.pixHeight / mainColumn.pixDiv
+//            mainPixelSize: height * 2 / 3
+
+//            onClicked: {
+//                if (newState != "") {
+//                    container.state = newState
+//                }
+
+//                if (text == "Refresh") {
+//                    container.sigRefresh();
+//                }
+//            }//onClicked
+
+//            onPressHold: {
+//                if (text == "Refresh") {
+//                    container.sigRefreshAll();
+//                }
+//            }
+//        }//delegate (MyButton)
+//    }//ListView
 
     DbgWebWidget {
         id: myWebWidget
