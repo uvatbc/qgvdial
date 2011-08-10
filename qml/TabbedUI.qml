@@ -30,10 +30,8 @@ Rectangle {
 
     // height of the tab bar
     property int tabsHeight : 50
-
     // index of the active tab
     property int tabIndex : 0
-
     // the model used to build the tabs
     property VisualItemModel tabsModel
 

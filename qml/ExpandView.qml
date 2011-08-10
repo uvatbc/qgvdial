@@ -26,16 +26,15 @@ Rectangle {
 
     color: "black"
     border.color: "blue"
+    height: titleText.paintedHeight + 1
 
     property string mainTitle: "Main title"
-    property real mainTitlePixHeight: 200   // Make sure you set this
+    property real mainTitlePixHeight: 2000   // Make sure you set this
 
     property real contentHeight: 50
     property real startY: titleText.height + 1
     property real containedOpacity: 0
     property bool isExpanded: false
-
-    height: titleText.paintedHeight + 1
 
     Text {
         id: titleText

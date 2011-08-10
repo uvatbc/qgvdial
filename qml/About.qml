@@ -20,36 +20,39 @@ Contact: yuvraaj@gmail.com
 */
 
 import Qt 4.7
-import "helper.js" as Code
 
 Item {
     id: container
 
-    signal sigBack()
     signal sigLinkActivated(string strLink)
+
+    height: mainColumn.height
+    property real pixHeight: 500
 
     Column {
         id: mainColumn
-        anchors.fill: parent
-        anchors.topMargin: 2
+        anchors {
+            top: parent.top
+            left: parent.left
+        }
         spacing: 2
+        width: parent.width
 
         property int pixDiv: 15
-        property int pixHeight: (container.height + container.width) / 2
         property int pixSize: pixHeight / pixDiv
 
         Text {
             text: "Version: __QGVDIAL_VERSION__"
             width: parent.width
             height: paintedHeight + 2
-            font.pixelSize: mainColumn.pixSize
+            font.pixelSize: pixHeight
             color: "white"
         }//Text (version)
 
         Text {
             width: parent.width
             height: paintedHeight + 3
-            font.pixelSize: mainColumn.pixSize
+            font.pixelSize: pixHeight
             color: "white"
 
             onLinkActivated: container.sigLinkActivated(link)
@@ -59,14 +62,6 @@ Item {
                   "<a href=http://www.code.google.com/p/qgvdial/wiki/Changelog>Changelog</a> and " +
                   "<a href=http://www.code.google.com/p/qgvdial/w/list>Wiki</a>"
         }//Text (links)
-
-        MyButton {
-            mainText: "Back"
-            width: parent.width
-            mainPixelSize: mainColumn.pixSize
-
-            onClicked: container.sigBack();
-        }//MyButton (Back)
     }//Column
 
 }//Item(container)

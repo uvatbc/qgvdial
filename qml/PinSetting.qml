@@ -26,7 +26,7 @@ Item {
     id: container
     objectName: "PinSettingsPage"
 
-    height: mainColumn.height
+    height: mainColumn.height + 2
     property real pixHeight: 500
 
     function setValues(bEnable, pin) {

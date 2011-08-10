@@ -47,9 +47,11 @@ Flickable {
     signal sigPinRefresh
 
     property real pixHeight: (height + width) / 30
+    property real textItemHeight: pixHeight + 4
 
     contentHeight: expandLoginDetails.height + expandProxySettings.height +
-                   expandMqSettings.height + expandPinSettings.height
+                   expandMqSettings.height + expandPinSettings.height +
+                   expandDbgWebWidget.height + expandLogView.height
     contentWidth: width
 
     function setUsername (strU) {
@@ -74,11 +76,11 @@ Flickable {
 
         LoginDetails {
             id: loginDetails
-            y: expandLoginDetails.startY
+            y: parent.startY
 
             width: parent.width - 1
             pixHeight: container.pixHeight
-            opacity: expandLoginDetails.containedOpacity
+            opacity: parent.containedOpacity
 
             onSigUserChanged: container.sigUserChanged(user);
             onSigPassChanged: container.sigPassChanged(pass);
@@ -102,12 +104,12 @@ Flickable {
 
         Proxy {
             id: proxySettings
-            y: expandProxySettings.startY
+            y: parent.startY
 
             width: parent.width - 1
             pixHeight: container.pixHeight
 
-            opacity: expandProxySettings.containedOpacity
+            opacity: parent.containedOpacity
 
             onSigProxyChanges: container.sigProxyChanges(bEnable, bUseSystemProxy,
                                                          host, port,
@@ -117,7 +119,7 @@ Flickable {
                 if (!bSave) {
                     container.sigProxyRefresh();
                 }
-                expandProxySettings.isExpanded = false;
+                parent.isExpanded = false;
             }
         }
     }//ExpandView (proxy)
@@ -137,18 +139,18 @@ Flickable {
 
         Mosquitto {
             id: mqSettings
-            y: expandMqSettings.startY
+            y: parent.startY
 
             width: parent.width - 1
             pixHeight: container.pixHeight
 
-            opacity: expandMqSettings.containedOpacity
+            opacity: parent.containedOpacity
 
             onSigDone: {
                 if (!bSave) {
                     container.sigMosquittoRefresh();
                 }
-                expandMqSettings.isExpanded = false;
+                parent.isExpanded = false;
             }
             onSigMosquittoChanges: container.sigMosquittoChanges(bEnable, host, port, topic)
         }//Mosquitto
@@ -169,22 +171,97 @@ Flickable {
 
         PinSetting {
             id: pinSettings
-            y: expandPinSettings.startY
+            y: parent.startY
 
             width: parent.width - 1
             pixHeight: container.pixHeight
 
-            opacity: expandPinSettings.containedOpacity
+            opacity: parent.containedOpacity
 
             onSigDone: {
                 if (!bSave) {
                     container.sigPinRefresh();
                 }
-                expandPinSettings.isExpanded = false;
+                parent.isExpanded = false;
             }
             onSigPinSettingChanges: container.sigPinSettingChanges(bEnable, pin)
         }//Pin settings
     }//ExpandView (pin settings)
+
+    ExpandView {
+        id: expandDbgWebWidget
+        anchors {
+            top: expandPinSettings.bottom
+            left: parent.left
+        }
+
+        width: parent.width
+        contentHeight: myWebWidget.height;
+
+        mainTitle: "Debug Web View"
+        mainTitlePixHeight: container.pixHeight
+
+        DbgWebWidget {
+            id: myWebWidget
+            y: parent.startY
+
+            height: container.height
+            width: parent.width - 1
+
+            opacity: parent.containedOpacity
+            onSigBack: parent.isExpanded = false;
+        }
+    }//ExpandView (Debug Web View)
+
+    ExpandView {
+        id: expandLogView
+        anchors {
+            top: expandDbgWebWidget.bottom
+            left: parent.left
+        }
+
+        width: parent.width
+        contentHeight: logView.height;
+
+        mainTitle: "Logs"
+        mainTitlePixHeight: container.pixHeight
+
+        LogView {
+            id: logView
+
+            width: parent.width - 1
+            height: container.height
+            y: parent.startY
+
+            opacity: parent.containedOpacity
+            onSigBack: parent.isExpanded = false;
+        }
+    }//ExpandView (log view)
+
+    ExpandView {
+        id: expandAbout
+        anchors {
+            top: expandLogView.bottom
+            left: parent.left
+        }
+
+        width: parent.width
+        contentHeight: aboutWin.height;
+
+        mainTitle: "About"
+        mainTitlePixHeight: container.pixHeight
+
+        About {
+            id: aboutWin
+
+            width: parent.width - 1
+            y: parent.startY
+            pixHeight: container.pixHeight
+            opacity: parent.containedOpacity
+
+            onSigLinkActivated: container.sigLinkActivated(strLink)
+        }//About
+    }//ExpandView (About)
 
 //    ListView {
 //        id: listButtons
@@ -194,21 +271,9 @@ Flickable {
 
 //        model: ListModel {
 //            ListElement {
-//                text: "Web Page (debug)"
-//                newState: "WebPage"
-//            }//ListElement (Web Page (debug))
-//            ListElement {
-//                text: "View Log (debug)"
-//                newState: "ViewLog"
-//            }//ListElement (View Log (debug))
-//            ListElement {
 //                text: "Refresh"
 //                newState: ""
 //            }//ListElement (Refresh)
-//            ListElement {
-//                text: "About"
-//                newState: "About"
-//            }//ListElement (About)
 //        }
 
 //        delegate: MyButton {
@@ -235,76 +300,4 @@ Flickable {
 //        }//delegate (MyButton)
 //    }//ListView
 
-    DbgWebWidget {
-        id: myWebWidget
-        anchors.fill: parent
-        anchors.topMargin: 2
-        opacity: 0
-        onSigBack: container.state = ''
-    }
-
-    LogView {
-        id: logView
-        anchors.fill: parent
-        anchors.topMargin: 2
-        opacity: 0
-        onSigBack: container.state = ''
-    }
-
-    About {
-        id: aboutWin
-        anchors.fill: parent
-        anchors.topMargin: 2
-        opacity: 0
-        onSigBack: container.state = ''
-        onSigLinkActivated: container.sigLinkActivated(strLink)
-    }//About
-
-    states: [
-        State {
-            name: "Mosquitto"
-            PropertyChanges { target: mqSettings; opacity: 1 }
-            PropertyChanges { target: pinSettings; opacity: 0 }
-            PropertyChanges { target: myWebWidget; opacity: 0 }
-            PropertyChanges { target: logView; opacity: 0 }
-            PropertyChanges { target: aboutWin; opacity: 0 }
-            PropertyChanges { target: mainColumn; opacity: 0 }
-        },//Mosquitto
-        State {
-            name: "PinSettings"
-            PropertyChanges { target: mqSettings; opacity: 0 }
-            PropertyChanges { target: pinSettings; opacity: 1 }
-            PropertyChanges { target: myWebWidget; opacity: 0 }
-            PropertyChanges { target: logView; opacity: 0 }
-            PropertyChanges { target: aboutWin; opacity: 0 }
-            PropertyChanges { target: mainColumn; opacity: 0 }
-        },//Pin settings
-        State {
-            name: "WebPage"
-            PropertyChanges { target: mqSettings; opacity: 0 }
-            PropertyChanges { target: pinSettings; opacity: 0 }
-            PropertyChanges { target: myWebWidget; opacity: 1 }
-            PropertyChanges { target: logView; opacity: 0 }
-            PropertyChanges { target: aboutWin; opacity: 0 }
-            PropertyChanges { target: mainColumn; opacity: 0 }
-        },//WebPage
-        State {
-            name: "ViewLog"
-            PropertyChanges { target: mqSettings; opacity: 0 }
-            PropertyChanges { target: pinSettings; opacity: 0 }
-            PropertyChanges { target: myWebWidget; opacity: 0 }
-            PropertyChanges { target: logView; opacity: 1 }
-            PropertyChanges { target: aboutWin; opacity: 0 }
-            PropertyChanges { target: mainColumn; opacity: 0 }
-        },//View Log
-        State {
-            name: "About"
-            PropertyChanges { target: mqSettings; opacity: 0 }
-            PropertyChanges { target: pinSettings; opacity: 0 }
-            PropertyChanges { target: myWebWidget; opacity: 0 }
-            PropertyChanges { target: logView; opacity: 0 }
-            PropertyChanges { target: aboutWin; opacity: 1 }
-            PropertyChanges { target: mainColumn; opacity: 0 }
-        }//About
-    ]
 }// Item (container)
