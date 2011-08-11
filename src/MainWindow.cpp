@@ -612,6 +612,12 @@ MainWindow::initQML ()
     bOk = connect (gObj, SIGNAL (sigRefreshAll ()),
                    this, SLOT   (onRefreshAll ()));
     Q_ASSERT(bOk);
+    bOk = connect (gObj, SIGNAL (sigRefreshInbox ()),
+                   this, SLOT   (onSigRefreshInbox ()));
+    Q_ASSERT(bOk);
+    bOk = connect (gObj, SIGNAL (sigRefreshContacts ()),
+                   this, SLOT   (onSigRefreshContacts ()));
+    Q_ASSERT(bOk);
     bOk = connect (gObj, SIGNAL (sigHide ()),
                    this, SLOT   (onSigHide ()));
     Q_ASSERT(bOk);
@@ -1615,6 +1621,22 @@ MainWindow::onRefreshAll ()
     oInbox.refreshFullInbox ();
     oContacts.refreshAllContacts ();
 }//MainWindow::onRefreshAll
+
+void
+MainWindow::onSigRefreshContacts()
+{
+    qDebug ("Refresh Contacts requested.");
+
+    oContacts.refreshContacts ();
+}//MainWindow::onSigRefreshContacts
+
+void
+MainWindow::onSigRefreshInbox()
+{
+    qDebug ("Refresh inbox requested.");
+
+    oInbox.refresh ();
+}//MainWindow::onSigRefreshInbox
 
 void
 MainWindow::onSigProxyChanges(bool bEnable, bool bUseSystemProxy,

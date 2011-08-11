@@ -44,6 +44,7 @@
         <file alias="PinSetting.qml">../qml/PinSetting.qml</file>
         <file alias="Proxy.qml">../qml/Proxy.qml</file>
         <file alias="RadioButton.qml">../qml/RadioButton.qml</file>
+        <file alias="RefreshButtons.qml">../qml/RefreshButtons.qml</file>
         <file alias="Scrollbar.qml">../qml/Scrollbar.qml</file>
         <file alias="Settings.qml">../qml/Settings.qml</file>
         <file alias="SmsView.qml">../qml/SmsView.qml</file>

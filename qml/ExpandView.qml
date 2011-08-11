@@ -25,8 +25,8 @@ Rectangle {
     id: container
 
     color: "black"
-    border.color: "blue"
-    height: titleText.paintedHeight + 1
+    border.color: "dimgray"
+    height: titleText.height + 1
 
     property string mainTitle: "Main title"
     property real mainTitlePixHeight: 2000   // Make sure you set this
@@ -36,29 +36,52 @@ Rectangle {
     property real containedOpacity: 0
     property bool isExpanded: false
 
-    Text {
-        id: titleText
-
-        text: container.mainTitle
-        color: "white"
-
+    Row {
         anchors {
             top: parent.top
             left: parent.left
             leftMargin: 3
         }
-
-        font.pixelSize: mainTitlePixHeight
-
         width: parent.width
-        height: paintedHeight
+        height: titleText.height
+        spacing: 2
 
-        MouseArea {
-            anchors.fill: parent
+        Image {
+            id: imgArrow
+            source: "play.svg"
 
-            onClicked: container.isExpanded = (container.isExpanded == true ? false : true);
-        }//MouseArea (over the main Title)
-    }
+            height: titleText.height
+            width: height
+
+            transform: Rotation {
+                id: arrowRotation
+                origin {
+                    x: imgArrow.height / 2
+                    y: imgArrow.width / 2
+                }
+                angle: 0
+            }
+        }//Image
+
+        Text {
+            id: titleText
+
+            text: container.mainTitle
+            color: "white"
+
+            font.pixelSize: mainTitlePixHeight
+
+            width: parent.width - imgArrow.width - parent.spacing
+            height: paintedHeight
+
+            MouseArea {
+                anchors.fill: parent
+
+                onClicked: container.isExpanded = (container.isExpanded == true ? false : true);
+            }//MouseArea (over the main Title)
+        }
+    }//Row (arrow and text)
+
 
     states: [
         State {
@@ -72,6 +95,10 @@ Rectangle {
                 target: container
                 containedOpacity: 1
             }
+            PropertyChanges {
+                target: arrowRotation
+                angle: 90
+            }
         }
     ]//states
 
@@ -83,6 +110,10 @@ Rectangle {
             }
             PropertyAnimation {
                 target: container; property: "containedOpacity"
+                easing.type: Easing.InOutCubic
+            }
+            PropertyAnimation {
+                target: arrowRotation; property: "angle"
                 easing.type: Easing.InOutCubic
             }
         }

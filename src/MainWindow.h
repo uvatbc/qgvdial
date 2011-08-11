@@ -138,6 +138,8 @@ private slots:
     //! Invoked when user invokes refresh
     void onRefresh ();
     void onRefreshAll ();
+    void onSigRefreshContacts();
+    void onSigRefreshInbox();
 
     //! Status messages timeout
     void onStatusTimerTick ();

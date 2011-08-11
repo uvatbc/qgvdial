@@ -52,10 +52,13 @@ Rectangle {
     signal sigPassChanged(string password)
     signal sigLogin
     signal sigLogout
-    signal sigRefresh
-    signal sigRefreshAll
     signal sigHide
     signal sigQuit
+
+    signal sigRefresh
+    signal sigRefreshAll
+    signal sigRefreshInbox
+    signal sigRefreshContacts
 
     // If there is any link that is activated from anywhere
     signal sigLinkActivated(string strLink)
@@ -88,8 +91,10 @@ Rectangle {
     onSigLogin: console.debug("QML: Login")
     onSigLogout: console.debug("QML: Logout")
 
-    onSigRefresh: console.debug("QML: Refresh requested")
-    onSigRefreshAll: console.debug("QML: Refresh All requested")
+    onSigRefresh: console.debug("QML: Refresh requested");
+    onSigRefreshAll: console.debug("QML: Refresh All requested");
+    onSigRefreshContacts: console.debug("QML: Refresh Contacts requested");
+    onSigRefreshInbox: console.debug("QML: Refresh inbox requested");
 
     onSigHide: console.debug("QML: Dismiss requested");
     onSigQuit: console.debug("QML: Quit requested");
@@ -197,8 +202,6 @@ Rectangle {
                         onSigPassChanged: main.sigPassChanged(password)
                         onSigLogin: main.sigLogin()
                         onSigLogout: main.sigLogout()
-                        onSigRefresh: main.sigRefresh()
-                        onSigRefreshAll: main.sigRefreshAll()
                         onSigHide: main.sigHide()
                         onSigQuit: main.sigQuit()
 
@@ -211,6 +214,11 @@ Rectangle {
                         onSigMosquittoRefresh: main.sigMosquittoRefresh()
                         onSigPinSettingChanges: main.sigPinSettingChanges(bEnable, pin)
                         onSigPinRefresh: main.sigPinRefresh()
+
+                        onSigRefresh: main.sigRefresh()
+                        onSigRefreshAll: main.sigRefreshAll()
+                        onSigRefreshContacts: main.sigRefreshContacts();
+                        onSigRefreshInbox: main.sigRefreshInbox();
                     }
                 }//Tab (Settings)
             }//VisualDataModel (contains the tabs)

@@ -29,8 +29,6 @@ Flickable {
     signal sigPassChanged(string password)
     signal sigLogin
     signal sigLogout
-    signal sigRefresh
-    signal sigRefreshAll
     signal sigHide
     signal sigQuit
     signal sigLinkActivated(string strLink)
@@ -45,6 +43,11 @@ Flickable {
     signal sigMosquittoRefresh
     signal sigPinSettingChanges(bool bEnable, string pin)
     signal sigPinRefresh
+
+    signal sigRefresh
+    signal sigRefreshAll
+    signal sigRefreshInbox
+    signal sigRefreshContacts
 
     property real pixHeight: (height + width) / 30
     property real textItemHeight: pixHeight + 4
@@ -189,9 +192,38 @@ Flickable {
     }//ExpandView (pin settings)
 
     ExpandView {
-        id: expandDbgWebWidget
+        id: expandRefresh
         anchors {
             top: expandPinSettings.bottom
+            left: parent.left
+        }
+
+        width: parent.width
+        contentHeight: refreshButtons.height;
+
+        mainTitle: "Refresh"
+        mainTitlePixHeight: container.pixHeight
+
+        RefreshButtons {
+            id: refreshButtons
+            y: parent.startY
+
+            width: parent.width - 1
+            pixHeight: container.pixHeight
+
+            opacity: parent.containedOpacity
+
+            onSigRefreshContacts: container.sigRefreshContacts();
+            onSigRefreshInbox: container.sigRefreshInbox();
+            onSigRefresh: container.sigRefresh();
+            onSigRefreshAll: container.sigRefreshAll();
+        }
+    }//ExpandView (refresh buttons)
+
+    ExpandView {
+        id: expandDbgWebWidget
+        anchors {
+            top: expandRefresh.bottom
             left: parent.left
         }
 
