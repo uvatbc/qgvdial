@@ -189,8 +189,12 @@ GVWebPage::login ()
     // GV page load complete will begin the login process.
     bool rv = connect (&webPage, SIGNAL (loadFinished (bool)),
                        this   , SLOT   (loginStage1 (bool)));
-    Q_ASSERT(rv); Q_UNUSED(rv);
+    Q_ASSERT(rv);
     this->loadUrlString (GV_HTTPS);
+
+    rv = connect(&webPage, SIGNAL(loadProgress(int)),
+                  this   , SLOT(loginProgress(int)));
+    Q_ASSERT(rv);
 
     return (true);
 }//GVWebPage::login
@@ -200,7 +204,7 @@ GVWebPage::loginStage1 (bool bOk)
 {
     bool rv = disconnect (&webPage, SIGNAL (loadFinished (bool)),
                           this   , SLOT   (loginStage1 (bool)));
-    Q_ASSERT(rv); Q_UNUSED(rv);
+    Q_ASSERT(rv);
 
     QString strScript;
     do // Begin cleanup block (not a loop)
@@ -272,6 +276,10 @@ GVWebPage::loginStage1 (bool bOk)
     } while (0); // End cleanup block (not a loop)
 
     if (!bOk) {
+        rv = disconnect(&webPage, SIGNAL(loadProgress(int)),
+                         this   , SLOT(loginProgress(int)));
+        Q_ASSERT(rv);
+
         completeCurrentWork (GVAW_login, false);
     }
 }//GVWebPage::loginStage1
@@ -281,7 +289,7 @@ GVWebPage::loginStage2 (bool bOk)
 {
     bool rv = disconnect (&webPage, SIGNAL (loadFinished (bool)),
                            this   , SLOT   (loginStage2 (bool)));
-    Q_ASSERT(rv); Q_UNUSED(rv);
+    Q_ASSERT(rv);
     do // Begin cleanup block (not a loop)
     {
         if (isLoadFailed (bOk)) {
@@ -339,6 +347,10 @@ GVWebPage::loginStage2 (bool bOk)
     } while (0); // End cleanup block (not a loop)
 
     if (!bOk) {
+        rv = disconnect(&webPage, SIGNAL(loadProgress(int)),
+                         this   , SLOT(loginProgress(int)));
+        Q_ASSERT(rv);
+
         completeCurrentWork (GVAW_login, false);
     }
 }//GVWebPage::loginStage2
@@ -357,7 +369,10 @@ GVWebPage::loginStage3 (bool bOk)
 {
     bool rv = disconnect (&webPage, SIGNAL (loadFinished (bool)),
                            this   , SLOT   (loginStage3 (bool)));
-    Q_ASSERT(rv); Q_UNUSED(rv);
+    Q_ASSERT(rv);
+    rv = disconnect(&webPage, SIGNAL(loadProgress(int)),
+                     this   , SLOT(loginProgress(int)));
+    Q_ASSERT(rv);
     do // Begin cleanup block (not a loop)
     {
         if (isLoadFailed (bOk))
@@ -391,6 +406,12 @@ GVWebPage::loginStage3 (bool bOk)
 
     completeCurrentWork (GVAW_login, bOk);
 }//GVWebPage::loginStage3
+
+void
+GVWebPage::loginProgress(int progress)
+{
+    emit status (QString("Logging in %1%").arg (progress), 0);
+}//GVWebPage::loginProgress
 
 bool
 GVWebPage::logout ()

@@ -62,6 +62,9 @@ private slots:
     //! Invoked when we look at the inbox page for the rnr_se
     void loginStage3 (bool bOk);
 
+    //! Webpage progress during login
+    void loginProgress(int progress);
+
     //! Invoked when the logout page has loaded
     void logoutDone (bool bOk);
 

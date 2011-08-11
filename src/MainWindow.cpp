@@ -114,6 +114,11 @@ MainWindow::~MainWindow ()
         CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
         dbMain.saveCookies (jar);
 
+        // The jar that I just deleted was a child of this class. That jar is
+        // now gone. I cannot set NULL as the new cookie jar - that causes a
+        // NULL deref in the Qt code. So, create a new cookie jar just for the
+        // web page so that it can substitute the old pointer with the new one
+        // and be happy.
         GVAccess &webPage = Singletons::getRef().getGVAccess ();
         webPage.nwAccessMgr ()->setCookieJar (new CookieJar);
         delete jar;
