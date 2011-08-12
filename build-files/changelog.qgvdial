@@ -1,1 +1,1 @@
-  * Login load progress
+  * Fix the Settings page layout: The heights of some ExpandViews were not taken into account.

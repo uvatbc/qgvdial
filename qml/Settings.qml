@@ -54,7 +54,8 @@ Flickable {
 
     contentHeight: expandLoginDetails.height + expandProxySettings.height +
                    expandMqSettings.height + expandPinSettings.height +
-                   expandDbgWebWidget.height + expandLogView.height
+                   expandRefresh.height + expandDbgWebWidget.height +
+                   expandLogView.height + expandAbout.height
     contentWidth: width
 
     function setUsername (strU) {
@@ -294,42 +295,4 @@ Flickable {
             onSigLinkActivated: container.sigLinkActivated(strLink)
         }//About
     }//ExpandView (About)
-
-//    ListView {
-//        id: listButtons
-//        width: parent.width
-//        height: parent.height - (textUsername.height * 2)
-//        clip: true
-
-//        model: ListModel {
-//            ListElement {
-//                text: "Refresh"
-//                newState: ""
-//            }//ListElement (Refresh)
-//        }
-
-//        delegate: MyButton {
-//            mainText: text)
-//            width: listButtons.width - 1
-//            height: mainColumn.pixHeight / mainColumn.pixDiv
-//            mainPixelSize: height * 2 / 3
-
-//            onClicked: {
-//                if (newState != "") {
-//                    container.state = newState
-//                }
-
-//                if (text == "Refresh") {
-//                    container.sigRefresh();
-//                }
-//            }//onClicked
-
-//            onPressHold: {
-//                if (text == "Refresh") {
-//                    container.sigRefreshAll();
-//                }
-//            }
-//        }//delegate (MyButton)
-//    }//ListView
-
 }// Item (container)

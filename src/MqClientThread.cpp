@@ -284,7 +284,7 @@ void
 MqClientThread::setQuit (bool set)
 {
     bQuit = set;
-    qDebug() << "Mosquitto: Request for quit =" << (bQuit?"True":"False");
+    qDebug() << "Mosquitto: Request for quit =" << (set ? "True" : "False");
 }//MqClientThread::setQuit
 
 int
