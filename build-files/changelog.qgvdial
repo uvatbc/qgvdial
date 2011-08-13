@@ -1,1 +1,1 @@
-  * Fix the Settings page layout: The heights of some ExpandViews were not taken into account.
+  * Bugfix: Opening inbox items should mark them as read.

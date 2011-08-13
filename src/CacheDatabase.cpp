@@ -24,6 +24,7 @@ Contact: yuvraaj@gmail.com
 #include "ContactsModel.h"
 #include "InboxModel.h"
 #include "Singletons.h"
+#include "CookieJar.h"
 
 #include "CacheDatabase_int.h"
 

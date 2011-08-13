@@ -22,7 +22,6 @@ Contact: yuvraaj@gmail.com
 #include "GVWebPage.h"
 #include "GvXMLParser.h"
 
-#define GV_DATA_BASE "https://www.google.com/voice"
 #define SYMBIAN_SIGNED 0
 
 // Used ONLY for debug purposes - specifically to test fallback method.
@@ -304,8 +303,7 @@ GVWebPage::loginStage2 (bool bOk)
         QNetworkCookieJar *jar = webPage.networkAccessManager()->cookieJar();
         QList<QNetworkCookie> cookies =
                 jar->cookiesForUrl (webPage.mainFrame()->url ());
-        foreach (QNetworkCookie cookie, cookies)
-        {
+        foreach (QNetworkCookie cookie, cookies) {
             if (cookie.name() == "gvx") {
                 bLoggedIn = true;
             }
@@ -375,8 +373,7 @@ GVWebPage::loginStage3 (bool bOk)
     Q_ASSERT(rv);
     do // Begin cleanup block (not a loop)
     {
-        if (isLoadFailed (bOk))
-        {
+        if (isLoadFailed (bOk)) {
             bOk = false;
             qWarning ("Page load actual login failed");
             break;
@@ -484,7 +481,7 @@ GVWebPage::dialCallback (bool bCallback)
 
     if (!bCallback) {
         QString strUA = UA_IPHONE;
-        QString strUrl = QString(GV_DATA_BASE "/m/x"
+        QString strUrl = QString(GV_HTTPS_M "/x"
                                  "?m=call"
                                  "&n=%1"
                                  "&f="
@@ -533,7 +530,7 @@ GVWebPage::dialCallback (bool bCallback)
         request.setHeader (QNetworkRequest::CookieHeader,
                            QVariant::fromValue(sendCookies));
 
-        // This cookie needs to also be added as contect data
+        // This cookie needs to also be added as content data
         QString strContent = QString("{\"gvx\":\"%1\"}").arg(gvxVal);
 
         bool rv = connect (mgr , SIGNAL (finished (QNetworkReply *)),
@@ -552,7 +549,7 @@ GVWebPage::dialCallback (bool bCallback)
         }
         this->bIsCallback = true;
         reply =
-        postRequest (GV_DATA_BASE "/call/connect/", arrPairs, UA_IPHONE,
+        postRequest (GV_HTTPS "/call/connect/", arrPairs, UA_IPHONE,
                      this, SLOT (onDataCallDone (QNetworkReply *)));
     }
 
@@ -648,7 +645,7 @@ GVWebPage::cancelDataDial2 ()
     }
 
     QNetworkReply *reply =
-    postRequest (GV_DATA_BASE "/call/cancel/", arrPairs, QString (),
+    postRequest (GV_HTTPS "/call/cancel/", arrPairs, QString (),
                  this, SLOT (onDataCallCanceled (QNetworkReply *)));
     startTimerForReply (reply);
 }//GVWebPage::cancelDataDial2
@@ -694,7 +691,7 @@ GVWebPage::getRegisteredPhones ()
     }
 
     QString strUA = UA_IPHONE;
-    QString strUrl = GV_DATA_BASE "/settings/tab/phones";
+    QString strUrl = GV_HTTPS "/settings/tab/phones";
 
     QNetworkRequest request(strUrl);
     request.setRawHeader ("User-Agent", strUA.toAscii());
@@ -1447,7 +1444,7 @@ GVWebPage::sendSMS ()
         request.setHeader (QNetworkRequest::CookieHeader,
                            QVariant::fromValue(sendCookies));
 
-        // This cookie needs to also be added as contect data
+        // This cookie needs to also be added as content data
         QString strContent = QString("{\"gvx\":\"%1\"}").arg(gvxVal);
 
         bool rv = connect (mgr , SIGNAL (finished        (QNetworkReply *)),
@@ -1700,15 +1697,20 @@ bool
 GVWebPage::markAsRead ()
 {
     QVariantList &arrParams = workCurrent.arrParams;
-    QStringPairList arrPairs;
-    arrPairs += QStringPair("messages", arrParams[0].toString());
-    if (!strRnr_se.isEmpty ()) {
-        arrPairs += QStringPair("_rnr_se", strRnr_se);
-    }
+    QNetworkAccessManager *mgr = webPage.networkAccessManager ();
 
-    QNetworkReply *reply =
-    postRequest (GV_DATA_BASE "/inbox/mark/", arrPairs, UA_IPHONE,
-                 this, SLOT (onInboxEntryMarked (QNetworkReply *)));
+    // This method call needs to also be added as content data
+    QString strContent = QString("messages=%1&read=1&_rnr_se=%2")
+                            .arg(arrParams[0].toString()).arg(strRnr_se);
+
+    QNetworkRequest request(QString(GV_HTTPS "/inbox/mark"));
+    request.setRawHeader ("User-Agent", UA_DESKTOP);
+
+    bool rv = connect (mgr , SIGNAL (finished(QNetworkReply *)),
+                       this, SLOT   (onInboxEntryMarked(QNetworkReply *)));
+    Q_ASSERT(rv); Q_UNUSED(rv);
+
+    QNetworkReply *reply = mgr->post (request, strContent.toAscii());
     startTimerForReply (reply);
 
     return (true);
@@ -1723,7 +1725,6 @@ GVWebPage::onInboxEntryMarked(QNetworkReply *reply)
     Q_ASSERT(rv);
 
     QByteArray ba = reply->readAll ();
-    reply->deleteLater ();
 
     rv = false;
     if (ba.contains ("\"ok\":true")) {
@@ -1731,6 +1732,7 @@ GVWebPage::onInboxEntryMarked(QNetworkReply *reply)
     }
 
     completeCurrentWork (GVAW_markAsRead, rv);
+    reply->deleteLater ();
 }//GVWebPage::onInboxEntryMarked
 
 QNetworkAccessManager *

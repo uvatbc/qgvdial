@@ -23,7 +23,6 @@ Contact: yuvraaj@gmail.com
 #define __CACHEDATABASE_H__
 
 #include "global.h"
-#include "CookieJar.h"
 
 // For some reason the symbian MOC doesn't like it if I don't include QObject
 // even though it is present in QtCore which is included in global.h
@@ -31,6 +30,7 @@ Contact: yuvraaj@gmail.com
 
 class ContactsModel;
 class InboxModel;
+class CookieJar;
 
 class CacheDatabase : public QObject
 {
@@ -150,5 +150,7 @@ private:
 
     friend class Singletons;
 };
+
+#include "CookieJar.h"
 
 #endif //__CACHEDATABASE_H__
