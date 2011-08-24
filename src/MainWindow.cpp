@@ -2089,7 +2089,7 @@ void
 MainWindow::onDesktopResized()
 {
     OsDependent &osd = Singletons::getRef().getOSD ();
-    QRect rect = osd.getStartingSize ();
+    QRect rect = osd.getStartingSize (this);
 
     QDeclarativeContext *ctx = this->rootContext();
     ctx->setContextProperty ("g_MainWidth", rect.width ());

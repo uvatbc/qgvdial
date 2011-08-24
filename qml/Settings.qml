@@ -57,6 +57,7 @@ Flickable {
                    expandRefresh.height + expandDbgWebWidget.height +
                    expandLogView.height + expandAbout.height
     contentWidth: width
+    clip: true
 
     function setUsername (strU) {
         loginDetails.username = strU;

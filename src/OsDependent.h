@@ -58,7 +58,7 @@ public:
     void setDefaultWindowAttributes (QWidget *pWidget);
     void setLongWork (QWidget *window, bool bSet = false);
 
-    QRect getStartingSize ();
+    QRect getStartingSize (QWidget *w);
 
     QString getAppDirectory ();
 

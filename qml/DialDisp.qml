@@ -82,6 +82,8 @@ Rectangle {
                 bold: true
             }
 
+            onActiveFocusChanged: txtNum.closeSoftwareInputPanel();
+
             onTextChanged: wDisp.sigNumChanged(txtNum.text);
         }// TextEdit
 

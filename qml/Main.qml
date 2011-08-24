@@ -20,7 +20,6 @@ Contact: yuvraaj@gmail.com
 */
 
 import Qt 4.7
-import "helper.js" as Code
 
 Rectangle {
 // Uncomment when using qmlviewer
@@ -254,7 +253,7 @@ Rectangle {
         }
 
         transform: Rotation {
-            id: rotation
+            id: flipRotation
             origin.x: mainFlipView.width/2
             origin.y: mainFlipView.height/2
             axis.x: 0; axis.y: 1; axis.z: 0     // set axis.y to 1 to rotate around y-axis
@@ -263,12 +262,12 @@ Rectangle {
 
         states: State {
             name: "back"
-            PropertyChanges { target: rotation; angle: 180 }
+            PropertyChanges { target: flipRotation; angle: 180 }
             when: mainFlipView.flipped
         }
 
         transitions: Transition {
-            NumberAnimation { target: rotation; property: "angle"; duration: 500 }
+            NumberAnimation { target: flipRotation; property: "angle"; duration: 500 }
         }
     }//Flipable
 
