@@ -25,7 +25,7 @@ Contact: yuvraaj@gmail.com
 #include "TpObserver.h"
 #include <TelepathyQt4/ClientRegistrar>
 
-#if LINUX_DESKTOP
+#if LINUX_DESKTOP || defined(MEEGO_HARMATTAN)
 #include <TelepathyQt4/ChannelClassSpecList>
 #endif
 
@@ -65,7 +65,7 @@ ObserverFactory::init ()
 #if TELEPATHY_CAPABLE
     clientRegistrar = ClientRegistrar::create();
 
-#if DESKTOP_OS
+#if DESKTOP_OS || defined(MEEGO_HARMATTAN)
     ChannelClassSpecList filters;
     filters.append (Tp::ChannelClassSpec(
                     TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAMED_MEDIA,

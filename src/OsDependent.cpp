@@ -154,9 +154,11 @@ OsDependent::getStartingSize ()
 {
     QRect rect;
 #if DESKTOP_OS
+    qDebug("Using desktop settings.");
     rect.setWidth (250);
     rect.setHeight (400);
 #else
+    qDebug("Using mobile settings.");
     rect = qApp->desktop()->screenGeometry ();
 #endif
 

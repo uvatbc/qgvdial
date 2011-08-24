@@ -239,7 +239,7 @@ Q_DECLARE_METATYPE(ContactInfo)
 #define DIABLO_OS 0
 #endif
 
-#if defined(Q_WS_X11) && !defined(Q_WS_MAEMO_5)
+#if defined(Q_WS_X11) && !defined(Q_WS_MAEMO_5) && !defined(MEEGO_HARMATTAN)
 #define LINUX_DESKTOP 1
 #else
 #define LINUX_DESKTOP 0
@@ -251,7 +251,7 @@ Q_DECLARE_METATYPE(ContactInfo)
 #define DESKTOP_OS 0
 #endif
 
-#if defined(Q_OS_SYMBIAN) || defined(Q_WS_MAEMO_5) || DIABLO_OS
+#if defined(Q_OS_SYMBIAN) || defined(Q_WS_MAEMO_5) || DIABLO_OS || defined(MEEGO_HARMATTAN)
 #define MOBILE_OS 1
 #else
 #define MOBILE_OS 0

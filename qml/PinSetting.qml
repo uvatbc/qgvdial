@@ -94,6 +94,7 @@ Item {
             spacing: 2
 
             MyButton {
+                id: btnSave
                 mainText: "Save"
                 width: (parent.width / 2) - parent.spacing
                 mainPixelSize: container.pixHeight

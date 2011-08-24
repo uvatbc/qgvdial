@@ -21,7 +21,7 @@ Contact: yuvraaj@gmail.com
 
 #include "TpObserver.h"
 
-#if DESKTOP_OS
+#if DESKTOP_OS || defined(MEEGO_HARMATTAN)
 TpObserver::TpObserver (const ChannelClassSpecList &channelFilter,
                               QObject              *parent       )
 #else
@@ -104,7 +104,7 @@ TpObserver::observeChannels(
     }
 }//TpObserver::observeChannels
 
-#if DESKTOP_OS
+#if DESKTOP_OS || defined(MEEGO_HARMATTAN)
 void
 TpObserver::observeChannels(
         const MethodInvocationContextPtr<>  &context,

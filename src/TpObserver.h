@@ -45,7 +45,7 @@ class TpObserver : public IObserver, public AbstractClientObserver
     Q_OBJECT
 
 public:
-#if DESKTOP_OS
+#if DESKTOP_OS || defined(MEEGO_HARMATTAN)
     TpObserver (const ChannelClassSpecList &channelFilter,
                       QObject              *parent = NULL);
 #else
@@ -70,8 +70,8 @@ protected:
             const QList <ChannelRequestPtr>     &requestsSatisfied,
             const QVariantMap                   &observerInfo);
 
-#if DESKTOP_OS
-    // Linux has moved on to newer telepathy.
+#if DESKTOP_OS || defined(MEEGO_HARMATTAN)
+    // Linux and Meego have moved on to newer telepathy.
     void observeChannels(
             const MethodInvocationContextPtr<>  &context,
             const AccountPtr                    &account,
