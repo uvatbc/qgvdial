@@ -258,10 +258,6 @@ Rectangle {
 
                 anchors.fill: parent
 
-                onHeightChanged: {
-                    console.debug("Text h = " + height);
-                }
-
                 text: container.strSmsText
                 wrapMode: Text.Wrap
                 clip: true

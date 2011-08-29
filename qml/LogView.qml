@@ -51,6 +51,7 @@ Item {
                     color: "white"
                     width: parent.width
                     wrapMode: Text.Wrap
+                    font.pixelSize: mainColumn.pixSize / 2.5
                 }
             }
         }
