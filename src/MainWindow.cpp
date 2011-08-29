@@ -1411,8 +1411,7 @@ MainWindow::gotAllRegisteredPhones (bool bOk, const QVariantList &params)
     Q_ASSERT(rv); Q_UNUSED(rv);
 
     do { // Begin cleanup block (not a loop)
-        if (!bOk)
-        {
+        if (!bOk) {
             this->showMsgBox ("Failed to retrieve registered phones");
             setStatus ("Failed to retrieve registered phones");
             break;
@@ -1461,10 +1460,8 @@ MainWindow::retrieveVoicemail (const QString &strVmailLink)
 {
     GVAccess &webPage = Singletons::getRef().getGVAccess ();
 
-    do // Begin cleanup block (not a loop)
-    {
-        if (mapVmail.contains (strVmailLink))
-        {
+    do { // Begin cleanup block (not a loop)
+        if (mapVmail.contains (strVmailLink)) {
             setStatus ("Playing cached vmail");
             playVmail (mapVmail[strVmailLink]);
             break;
@@ -1474,8 +1471,7 @@ MainWindow::retrieveVoicemail (const QString &strVmailLink)
                             + QDir::separator ()
                             + "qgv_XXXXXX.tmp.mp3";
         QTemporaryFile tempFile (strTemplate);
-        if (!tempFile.open ())
-        {
+        if (!tempFile.open ()) {
             qWarning ("Failed to get a temp file name");
             break;
         }
@@ -1498,8 +1494,7 @@ void
 MainWindow::onVmailDownloaded (bool bOk, const QVariantList &arrParams)
 {
     QString strFilename = arrParams[1].toString ();
-    if (bOk)
-    {
+    if (bOk) {
         QString strVmailLink = arrParams[0].toString ();
         if (!mapVmail.contains (strVmailLink))
         {
@@ -1515,9 +1510,7 @@ MainWindow::onVmailDownloaded (bool bOk, const QVariantList &arrParams)
         }
 
         playVmail (mapVmail[strVmailLink]);
-    }
-    else
-    {
+    } else {
         QFile::remove (strFilename);
     }
 }//MainWindow::onVmailDownloaded
@@ -1525,8 +1518,7 @@ MainWindow::onVmailDownloaded (bool bOk, const QVariantList &arrParams)
 void
 MainWindow::playVmail (const QString &strFile)
 {
-    do // Begin cleanup block (not a loop)
-    {
+    do { // Begin cleanup block (not a loop)
         // Convert it into a file:// url
         QUrl url = QUrl::fromLocalFile(strFile).toString ();
 

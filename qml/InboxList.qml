@@ -248,7 +248,7 @@ Rectangle {
             width: parent.width
             height: parent.height - detailAllButText.height
 
-            contentHeight: theSmsText.paintedHeight
+            contentHeight: theSmsText.height
             contentWidth: width
 
             clip: true
@@ -256,7 +256,15 @@ Rectangle {
             Text { // sms text
                 id: theSmsText
 
-                anchors.fill: parent
+                anchors {
+                    left: parent.left
+                    top: parent.top
+                }
+
+                // Must set the width so that the wrap mode is activated
+                width: parent.width
+                // Must set width to prevent a binding loop
+                height: paintedHeight + 2
 
                 text: container.strSmsText
                 wrapMode: Text.Wrap
