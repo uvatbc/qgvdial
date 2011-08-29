@@ -22,13 +22,12 @@ Contact: yuvraaj@gmail.com
 import Qt 4.7
 
 Rectangle {
-// Uncomment when using qmlviewer
-//    property int g_MainWidth: 250
-//    property int g_MainHeight: 400
-
     id: main
-    width: g_MainWidth
-    height: g_MainHeight
+    objectName: "MainPage"
+
+    width: 250
+    height: 400
+
     color: "black"
 
     // Signals from dialpad, contacts and inbox

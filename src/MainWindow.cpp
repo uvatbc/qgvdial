@@ -543,8 +543,6 @@ MainWindow::init ()
 void
 MainWindow::initQML ()
 {
-    onDesktopResized ();
-
     qmlRegisterType<WebWidget>("org.qgvdial.WebWidget", 1, 0, "MyWebWidget");
 
     bool bTempFalse = false;
@@ -563,7 +561,14 @@ MainWindow::initQML ()
     ctx->setContextProperty ("g_logModel", QVariant::fromValue(arrLogMsgs));
 
     // Initialize the QML view
+#if defined(MEEGO_HARMATTAN)
+    this->setSource (QUrl ("qrc:/HMain.qml"));
+#else
     this->setSource (QUrl ("qrc:/Main.qml"));
+#endif
+
+    onDesktopResized ();
+
 #if 0 && defined(MEEGO_HARMATTAN)
     // Do rotate
     QMetaObject::invokeMethod (this->rootObject(), "doRotate",
@@ -576,7 +581,12 @@ MainWindow::initQML ()
     this->setPassword ("hunter2 :p");
 
     // The root object changes when we reload the source. Pick it up again.
-    QGraphicsObject *gObj = this->rootObject();
+    QObject *gObj = this->getMainPage();
+    if (NULL == gObj) {
+        qWarning ("Could not get to MainPage");
+        qApp->quit();
+        return;
+    }
 
     bool bOk;
     // Connect all signals to slots in this class.
@@ -1868,6 +1878,7 @@ MainWindow::refreshPinSettings()
                                    Q_ARG (QVariant, QVariant(strPin)));
     } while (0); // End cleanup block (not a loop)
 }//MainWindow::refreshPinSettings
+
 void
 MainWindow::showMsgBox (const QString &strMessage)
 {
@@ -2124,7 +2135,41 @@ MainWindow::onDesktopResized()
     OsDependent &osd = Singletons::getRef().getOSD ();
     QRect rect = osd.getStartingSize (this);
 
-    QDeclarativeContext *ctx = this->rootContext();
-    ctx->setContextProperty ("g_MainWidth", rect.width ());
-    ctx->setContextProperty ("g_MainHeight", rect.height ());
+    do { // Begin cleanup block (not a loop)
+        QObject *pMain = this->rootObject ();
+        if (NULL == pMain) {
+            qWarning ("Could not get to MainPage for resize");
+            break;
+        }
+
+        pMain->setProperty("height", rect.height());
+        pMain->setProperty("width", rect.width());
+    } while (0); // End cleanup block (not a loop)
 }//MainWindow::onDesktopResized
+
+QObject *
+MainWindow::getMainPage()
+{
+    QObject *pMain = NULL;
+    do { // Begin cleanup block (not a loop)
+        QObject *pRoot = this->rootObject ();
+        if (NULL == pRoot) {
+            qWarning ("Couldn't get root object in QML for MainPage");
+            break;
+        }
+
+        if (pRoot->objectName() == "MainPage") {
+            pMain = pRoot;
+            break;
+        }
+
+        pMain = pRoot->findChild <QObject*> ("MainPage");
+        if (NULL == pMain) {
+            qWarning ("Could not get to MainPage");
+            break;
+        }
+    } while (0); // End cleanup block (not a loop)
+
+    return (pMain);
+}//MainWindow::getMainPage
+

@@ -115,6 +115,7 @@ OTHER_FILES  += ../src/winrsrc.rc           \
                 ../qml/DigitButton.qml      \
                 ../qml/ExpandView.qml       \
                 ../qml/helper.js            \
+                ../qml/HMain.qml            \
                 ../qml/InboxList.qml        \
                 ../qml/Keypad.qml           \
                 ../qml/LoginDetails.qml     \

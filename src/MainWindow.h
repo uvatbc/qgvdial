@@ -235,6 +235,8 @@ private:
 
     void initMq();
 
+    QObject * getMainPage();
+
 private:
     //! Logfile
     QFile           fLogfile;
