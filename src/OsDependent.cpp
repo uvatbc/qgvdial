@@ -133,7 +133,6 @@ OsDependent::setDefaultWindowAttributes (QWidget *pWidget)
 #ifdef Q_WS_MAEMO_5
     pWidget->setAttribute (Qt::WA_Maemo5StackedWindow);
     pWidget->setAttribute (Qt::WA_Maemo5AutoOrientation);
-#else
     Q_UNUSED (pWidget);
 #endif
 }//OsDependent::setDefaultWindowAttributes
@@ -156,6 +155,8 @@ OsDependent::setLongWork (QWidget *window, bool bSet /*= false*/)
 QRect
 OsDependent::getStartingSize (QWidget *w)
 {
+    Q_UNUSED(w);
+
     QRect rect;
 #if DESKTOP_OS
     rect.setWidth (250);
@@ -164,17 +165,17 @@ OsDependent::getStartingSize (QWidget *w)
 #else
     rect = qApp->desktop()->screenGeometry ();
 
-//#if defined(MEEGO_HARMATTAN)
-//    if (NULL != w) {
+#if defined(MEEGO_HARMATTAN)
+    if (NULL != w) {
 //        QDeclarativeView *view = (QDeclarativeView *) w;
 //        view->rotate(-90.0);
 //        view->translate(0, -rect.height());
-
+//
 //        QRect r(rect);
 //        rect.setWidth(r.height());
 //        rect.setHeight(r.width());
-//    }
-//#endif
+    }
+#endif
 
     qDebug() << "Using mobile settings." << rect;
 #endif

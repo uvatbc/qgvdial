@@ -1,1 +1,1 @@
-  * Bugfix: Opening inbox items should mark them as read.
+  * Bugfix: Mq never started without user intervention

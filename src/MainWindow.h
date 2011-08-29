@@ -233,6 +233,8 @@ private:
 
     void createVmailPlayer();
 
+    void initMq();
+
 private:
     //! Logfile
     QFile           fLogfile;

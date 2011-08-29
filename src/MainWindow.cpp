@@ -564,7 +564,13 @@ MainWindow::initQML ()
 
     // Initialize the QML view
     this->setSource (QUrl ("qrc:/Main.qml"));
+#if 0 && defined(MEEGO_HARMATTAN)
+    // Do rotate
+    QMetaObject::invokeMethod (this->rootObject(), "doRotate",
+                        Q_ARG (QVariant, QVariant(-90.0)));
+#else
     this->setResizeMode (QDeclarativeView::SizeRootObjectToView);
+#endif
 
     this->setUsername ("example@gmail.com");
     this->setPassword ("hunter2 :p");
@@ -830,7 +836,7 @@ MainWindow::loginCompleted (bool bOk, const QVariantList & /*varList*/)
         refreshRegisteredNumbers ();
 
         // Fill up the mq settings
-        refreshMqSettings ();
+        initMq ();
 
         // Fill up the pin settings
         refreshPinSettings ();
@@ -1732,10 +1738,12 @@ MainWindow::refreshMqSettings (bool bForceShut /*= false*/)
     int port;
 
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    if (!bForceShut) {
-        if (!dbMain.getMqSettings (bEnable, host, port, topic)) {
-            return;
-        }
+    if (!dbMain.getMqSettings (bEnable, host, port, topic)) {
+        return;
+    }
+
+    if (bForceShut) {
+        bEnable = false;
     }
 
     do { // Begin cleanup block (not a loop)
@@ -1771,7 +1779,50 @@ MainWindow::refreshMqSettings (bool bForceShut /*= false*/)
                                    Q_ARG (QVariant, QVariant(port)),
                                    Q_ARG (QVariant, QVariant(strTopic)));
     } while (0); // End cleanup block (not a loop)
+
 }//MainWindow::refreshMqSettings
+
+void
+MainWindow::initMq()
+{
+    bool bEnable = false;
+    QString host, topic;
+    int port;
+
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    if (!dbMain.getMqSettings (bEnable, host, port, topic)) {
+        return;
+    }
+
+    refreshMqSettings ();
+
+    qDebug() << "Initially Mq is" << (bEnable ? "enabled" : "disabled");
+
+#if MOSQUITTO_CAPABLE
+    if (bEnable) {
+        qDebug ("Start Mq thread.");
+        mqThread.setSettings (bEnable, host, port);
+        mqThread.start();
+    }
+#endif
+}//MainWindow::initMq
+
+void
+MainWindow::onMqThreadFinished ()
+{
+    if (bRunMqThread) {
+        bRunMqThread = false;
+#if MOSQUITTO_CAPABLE
+        qDebug ("Finished waiting for Mq thread, restarting thread.");
+        mqThread.start();
+#endif
+    } else {
+        qDebug ("Finished waiting for Mq thread. Not restarting");
+
+        // Just send a command to turn off mosquitto enable
+        refreshMqSettings (true);
+    }
+}//MainWindow::onMqThreadFinished
 
 void
 MainWindow::onSigPinSettingChanges(bool bEnable, const QString &pin)
@@ -1817,24 +1868,6 @@ MainWindow::refreshPinSettings()
                                    Q_ARG (QVariant, QVariant(strPin)));
     } while (0); // End cleanup block (not a loop)
 }//MainWindow::refreshPinSettings
-
-void
-MainWindow::onMqThreadFinished ()
-{
-#if MOSQUITTO_CAPABLE
-    if (bRunMqThread) {
-        bRunMqThread = false;
-        qDebug ("Finished waiting for Mq thread, restarting thread.");
-        mqThread.start();
-    } else {
-        qDebug ("Finished waiting for Mq thread. Not restarting");
-
-        // Just send a command to turn off mosquitto enable
-        refreshMqSettings (true);
-    }
-#endif
-}//MainWindow::onMqThreadFinished
-
 void
 MainWindow::showMsgBox (const QString &strMessage)
 {

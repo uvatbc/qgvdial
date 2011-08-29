@@ -80,6 +80,12 @@ Rectangle {
     // Signals from the message box
     signal sigMsgBoxDone (bool ok)
 
+    function doRotate(rot) {
+        console.debug("Rotate by " + rot);
+        main.rotation = rot;
+        console.debug("Rotated by " + main.rotation);
+    }
+
     function showSmsView() {
         mainFlipView.flipped = true;
     }
