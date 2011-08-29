@@ -29,23 +29,25 @@ Item {
     signal sigRefresh
     signal sigRefreshAll
 
-    height: mainColumn.height + 2
+    height: mainRow.height + 2
     property real pixHeight: 500
 
-    Column {
-        id: mainColumn
+    Row {
+        id: mainRow
         anchors {
             top: parent.top
             left: parent.left
         }
         spacing: 2
         width: parent.width
+        height: btnInbox.height
 
         MyButton {
             id: btnInbox
 
             mainText: "Inbox"
-            width: parent.width
+            width: (parent.width / 2) - parent.spacing
+            height: mainPixelSize + 2
             mainPixelSize: pixHeight
 
             onClicked: container.sigRefreshInbox();
@@ -56,11 +58,12 @@ Item {
             id: btnContacts
 
             mainText: "Contacts"
-            width: parent.width
+            width: (parent.width / 2) - parent.spacing
+            height: mainPixelSize + 2
             mainPixelSize: pixHeight
 
             onClicked: container.sigRefreshContacts();
             onPressHold: container.sigRefreshAll();
         }//MyButton (refresh Inbox)
-    }//Column (mainColumn)
+    }//Column (mainRow)
 }//Item (container)

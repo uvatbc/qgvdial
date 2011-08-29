@@ -51,10 +51,10 @@ Item {
                     color: "white"
                     width: parent.width
                     wrapMode: Text.Wrap
-                    font.pixelSize: mainColumn.pixSize / 2.5
+                    font.pixelSize: mainColumn.pixSize / 1.8
                 }
             }
-        }
+        }//ListView (rotating logs)
 
         MyButton {
             id: btnBack
