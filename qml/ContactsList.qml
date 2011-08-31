@@ -20,7 +20,6 @@ Contact: yuvraaj@gmail.com
 */
 
 import Qt 4.7
-import "helper.js" as Code
 
 Rectangle {
     id: container
@@ -84,7 +83,9 @@ Rectangle {
                             edSearch.text = "";
                             imgSearch.selection = false;
                         } else {
-                            imgSearch.selection = true;
+                            if (edSearch.text != "") {
+                                imgSearch.selection = true;
+                            }
                         }
                         container.sigSearchContacts(edSearch.text);
                     }

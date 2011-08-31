@@ -95,6 +95,8 @@ Rectangle {
     onSigLogin: console.debug("QML: Login")
     onSigLogout: console.debug("QML: Logout")
 
+    onSigSearchContacts: console.debug("QML: Search for contacts: " + query)
+
     onSigRefresh: console.debug("QML: Refresh requested");
     onSigRefreshAll: console.debug("QML: Refresh All requested");
     onSigRefreshContacts: console.debug("QML: Refresh Contacts requested");

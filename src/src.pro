@@ -130,6 +130,7 @@ OTHER_FILES  += ../src/winrsrc.rc           \
                 ../qml/Proxy.qml            \
                 ../qml/RadioButton.qml      \
                 ../qml/RefreshButtons.qml   \
+                ../qml/SaveCancel.qml       \
                 ../qml/Scrollbar.qml        \
                 ../qml/Settings.qml         \
                 ../qml/SmsView.qml          \

@@ -56,5 +56,7 @@ Rectangle {
             container.sigTextChanged(text);
             container.text = textEd.text
         }
-    }
+
+        inputMethodHints: Qt.ImhNoAutoUppercase + Qt.ImhNoPredictiveText
+    }//TextInput
 }//Rectangle (around the text box)

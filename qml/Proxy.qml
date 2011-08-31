@@ -202,45 +202,26 @@ Item {
             }
         }// Row (user proxy password)
 
-        Row {
-            id: rowSaveCancel
-
-            height: btnSave.height
+        SaveCancel {
             anchors {
                 left: parent.left
                 leftMargin: 1
             }
-            width: parent.width
-            spacing: 2
+            width: parent.width - 1
+            pixHeight: container.pixHeight
 
-            MyButton {
-                id: btnSave
-                mainText: "Save"
-                width: (parent.width / 2) - parent.spacing
-                mainPixelSize: container.pixHeight
-                height: mainPixelSize * 3 / 2
+            onSigSave: {
+                container.sigProxyChanges (bEnableProxy,
+                                           bSystemProxy,
+                                           textUserProxyHost.text,
+                                           textUserProxyPort.text,
+                                           bProxyUserPass,
+                                           textUserProxyUser.text,
+                                           textUserProxyPass.text);
+                container.sigDone(true);
+            }
 
-                onClicked: {
-                    container.sigProxyChanges (bEnableProxy,
-                                               bSystemProxy,
-                                               textUserProxyHost.text,
-                                               textUserProxyPort.text,
-                                               bProxyUserPass,
-                                               textUserProxyUser.text,
-                                               textUserProxyPass.text);
-                    container.sigDone(true);
-                }
-
-            }//MyButton (Save)
-
-            MyButton {
-                mainText: "Cancel"
-                width: (parent.width / 2) - parent.spacing
-                mainPixelSize: container.pixHeight
-                height: mainPixelSize * 3 / 2
-
-                onClicked: container.sigDone(false);
-            }//MyButton (Cancel)
-        }//Row (save and cancel buttons)
+            onSigCancel: container.sigDone(false);
+        }// Save and cancel buttons
     }// Column
 }// Item (top level)

@@ -1,1 +1,3 @@
-  * QML fixes. Harmattan rotation works.
+  * QML fixes for the search box
+  * Save and cancel buttons put into a separate qml file
+  * Added input method hints for MyTextEdit
