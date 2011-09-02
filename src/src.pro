@@ -298,3 +298,4 @@ unix:!symbian:!maemo5 {
     dbusservice.files += ../build-files/qgvdial.Call.service
     dbusservice.files += ../build-files/qgvdial.Text.service
 }
+
