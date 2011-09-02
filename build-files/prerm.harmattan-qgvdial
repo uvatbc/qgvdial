@@ -1,0 +1,3 @@
+#!/bin/sh
+/opt/qgvdial/bin/qgvdial quit &
+killall qgvdial

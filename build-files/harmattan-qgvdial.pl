@@ -81,15 +81,15 @@ print "$cmd\n";
 system($cmd);
 
 # Add a post install file to add the executable bit after installation on the device
-system("mv $basedir/build-files/postinst.maemo-qgvdial $basedir/debian/postinst");
-system("mv $basedir/build-files/prerm.maemo-qgvdial $basedir/debian/prerm");
-# Fix the control file
+system("mv $basedir/build-files/postinst.harmattan-qgvdial $basedir/debian/postinst");
+system("mv $basedir/build-files/prerm.harmattan-qgvdial $basedir/debian/prerm");
+# Fix the control file This can be the same as the maemo file.
 system("mv $basedir/build-files/control.maemo-qgvdial $basedir/debian/control");
-# Fix the dbus service file name
+# Fix the dbus service file name. The same files as maemo can be used
 system("mv $basedir/build-files/qgvdial.Call.service.maemo $basedir/build-files/qgvdial.Call.service");
 system("mv $basedir/build-files/qgvdial.Text.service.maemo $basedir/build-files/qgvdial.Text.service");
 # Change the name of the desktop file so that it can be directly used in the compilation
-system("mv $basedir/build-files/qgvdial.desktop.maemo $basedir/build-files/qgvdial.desktop");
+system("mv $basedir/build-files/qgvdial.desktop.harmattan $basedir/build-files/qgvdial.desktop");
 
 # Fix the changelog and put it into the correct location
 system("head -1 $basedir/debian/changelog >dest.txt && cat $basedir/build-files/changelog.qgvdial >>dest.txt && tail -2 $basedir/debian/changelog | head -1 | sed 's/unknown/Yuvraaj Kelkar/g' >>dest.txt && mv dest.txt $basedir/debian/changelog");
