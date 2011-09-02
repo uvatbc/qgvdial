@@ -24,13 +24,15 @@ import Qt 4.7
 FocusScope {
     id:  container
 
-    height: textEd.height
+    signal sigTextChanged(string strText)
+    signal sigEnter
 
     property string text: "You should have changed this text"
     property alias echoMode: textEd.echoMode
     property int pixelSize: 5000
     property alias validator: textEd.validator
-    signal sigTextChanged(string strText)
+
+    height: textEd.height
 
     Rectangle {
         border.color: textEd.activeFocus ? "orange" : "blue"
@@ -48,6 +50,12 @@ FocusScope {
             font.pixelSize: container.pixelSize
 
             focus: true;
+            onActiveFocusChanged: {
+                if (activeFocus == false) {
+                    console.debug("Close the SIP dammit!");
+                    closeSoftwareInputPanel ();
+                }
+            }
 
             onTextChanged: {
                 container.sigTextChanged(text);
@@ -55,6 +63,13 @@ FocusScope {
             }
 
             inputMethodHints: Qt.ImhNoAutoUppercase + Qt.ImhNoPredictiveText
+
+            Keys.onReturnPressed: {
+                closeSoftwareInputPanel ();
+                event.accepted = true;
+                container.sigEnter();
+            }
         }//TextInput
     }//Rectangle (around the text box)
 }//FocusScope
+
