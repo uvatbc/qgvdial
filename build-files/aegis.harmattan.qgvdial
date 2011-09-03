@@ -3,4 +3,8 @@
         <credential name="Cellular" />
         <for path="/opt/qgvdial/bin/qgvdial" />
     </request>
+    <request context="INSTALL">
+        <credential name="CAP::kill" />
+        <credential name="CAP::fowner" />
+    </request>
 </aegis>

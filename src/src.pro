@@ -282,6 +282,16 @@ maemo5|contains(MEEGO_EDITION,harmattan) {
 # Harmattan specific install section
 contains(MEEGO_EDITION,harmattan) {
     desktop.path = $$DATADIR/applications
+
+    icon48.path = $$DATADIR/icons/hicolor/48x48/apps
+
+    icon64.path = $$DATADIR/icons/hicolor/64x64/apps
+
+    icon80.path = $$DATADIR/icons/hicolor/80x80/apps
+    icon80.files = ../icons/80/qgv-harmattan.png
+
+    icon_scalable.path = $$DATADIR/icons/hicolor/scalable/apps
+    icon_scalable.files = qgv-harmattan.png
 }
 
 # Installation for Linux
