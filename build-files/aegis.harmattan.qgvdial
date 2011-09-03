@@ -1,0 +1,6 @@
+<aegis>
+    <request>
+        <credential name="Cellular" />
+        <for path="/opt/qgvdial/bin/qgvdial" />
+    </request>
+</aegis>
