@@ -87,7 +87,7 @@ system("mv $basedir/build-files/qgvdial.Text.service.maemo $basedir/build-files/
 system("mv $basedir/build-files/qgvdial.desktop.maemo $basedir/build-files/qgvdial.desktop");
 
 # Fix the changelog and put it into the correct location
-system("head -1 $basedir/debian/changelog >dest.txt && cat $basedir/build-files/changelog.qgvdial >>dest.txt && tail -2 $basedir/debian/changelog | head -1 | sed 's/unknown/Yuvraaj Kelkar/g' >>dest.txt && mv dest.txt $basedir/debian/changelog");
+system("head -1 $basedir/debian/changelog >dest.txt && cat $basedir/build-files/changelog.qgvdial >>dest.txt && tail -2 $basedir/debian/changelog | sed 's/unknown/Yuvraaj Kelkar/g' >>dest.txt && mv dest.txt $basedir/debian/changelog");
 
 # Make sure all make files are present before mucking with them.
 system("cd $basedir && make src/Makefile");
