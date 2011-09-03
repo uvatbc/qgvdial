@@ -4,8 +4,7 @@ Version=__QGVDIAL_VERSION__
 Type=Application
 Name=qgvdial
 Exec=/opt/qgvdial/bin/qgvdial
-Icon=qgv-harmattan
+Icon=/usr/share/icons/hicolor/80x80/apps/qgvdial.png
 X-HildonDesk-ShowInToolbar=true
 X-Osso-Type=application/x-executable
 Maemo-Flags=visible
-

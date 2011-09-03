@@ -290,10 +290,10 @@ contains(MEEGO_EDITION,harmattan) {
     icon64.path = $$DATADIR/icons/hicolor/64x64/apps
 
     icon80.path = $$DATADIR/icons/hicolor/80x80/apps
-    icon80.files = ../icons/80/qgv-harmattan.png
+    icon80.files = ../icons/80/qgvdial.png
 
     icon_scalable.path = $$DATADIR/icons/hicolor/scalable/apps
-    icon_scalable.files = qgv-harmattan.png
+    icon_scalable.files = qgvdial.png
 }
 
 # Installation for Linux
