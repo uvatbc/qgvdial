@@ -232,8 +232,8 @@ contains(MEEGO_EDITION,harmattan) {
 # Installation related line go here
 ###############################################################
 
-# Installation for maemo
-maemo5 {
+# Installation for Maemo and Harmattan
+maemo5|contains(MEEGO_EDITION,harmattan) {
     exists(../../buildit.sh) {
         PREFIX = ../debian/qgvdial/usr
         message(Built using my scripts... probably inside scratchbox)

@@ -85,6 +85,9 @@ system("mv $basedir/build-files/postinst.harmattan-qgvdial $basedir/debian/posti
 system("mv $basedir/build-files/prerm.harmattan-qgvdial $basedir/debian/prerm");
 # Fix the control file This can be the same as the maemo file.
 system("mv $basedir/build-files/control.maemo-qgvdial $basedir/debian/control");
+# Add the Aegis manifest file
+system("mv $basedir/build-files/aegis.harmattan.qgvdial $basedir/debian/qgvdial.aegis");
+
 # Fix the dbus service file name. The same files as maemo can be used
 system("mv $basedir/build-files/qgvdial.Call.service.maemo $basedir/build-files/qgvdial.Call.service");
 system("mv $basedir/build-files/qgvdial.Text.service.maemo $basedir/build-files/qgvdial.Text.service");
@@ -113,13 +116,13 @@ print "$cmd\n";
 system($cmd);
 
 if ($machine eq "arm") {
-    # Reverse the order of these two lines for a complete build 
-    $cmd = "cd $basedir && $mad dpkg-buildpackage -rfakeroot";
+    # Reverse the order of these two lines for a source build 
     $cmd = "cd $basedir && $mad dpkg-buildpackage -rfakeroot -sa -S -uc -us";
+    $cmd = "cd $basedir && $mad dpkg-buildpackage -rfakeroot";
 } else {
-    # Reverse the order of these two lines for a complete build 
-    $cmd = "cd $basedir && $mad dpkg-buildpackage";
+    # Reverse the order of these two lines for a source build 
     $cmd = "cd $basedir && $mad dpkg-buildpackage -sa -S -uc -us";
+    $cmd = "cd $basedir && $mad dpkg-buildpackage";
 }
 # Execute the rest of the build command
 system($cmd);
