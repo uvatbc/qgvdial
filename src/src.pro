@@ -281,6 +281,8 @@ maemo5|contains(MEEGO_EDITION,harmattan) {
 
 # Harmattan specific install section
 contains(MEEGO_EDITION,harmattan) {
+    INSTALLS += icon80
+
     desktop.path = $$DATADIR/applications
 
     icon48.path = $$DATADIR/icons/hicolor/48x48/apps
