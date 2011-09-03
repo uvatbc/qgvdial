@@ -105,8 +105,13 @@ $cmd="sed \"s/$pathreplace//ig\" $basedir/Makefile >$basedir/Makefile1 && mv $ba
 print "$cmd\n";
 system($cmd);
 
-# Replace hard coded current directory with relative directory.
+# Replace hard coded current directory with relative directory - pass #1.
 $cmd="sed 's/$curdir\\/qgvdial-$qver\\/src/\\/../g' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/$curdir\\/qgvdial-$qver\\/src/\\/../g' $basedir/src/Makefile >$basedir/src/Makefile1 ; mv $basedir/src/Makefile1 $basedir/src/Makefile";
+print "$cmd\n";
+system($cmd);
+
+# Replace hard coded current directory with relative directory - pass #2.
+$cmd="sed 's/$curdir\\/qgvdial-$qver/\\/..\\/../g' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/$curdir\\/qgvdial-$qver/\\/..\\/../g' $basedir/src/Makefile >$basedir/src/Makefile1 ; mv $basedir/src/Makefile1 $basedir/src/Makefile";
 print "$cmd\n";
 system($cmd);
 
