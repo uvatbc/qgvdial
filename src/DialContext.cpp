@@ -32,8 +32,27 @@ DialContext::DialContext (const QString &strMy, const QString &strT,
 , fallbackCi (NULL)
 , mainView (mV)
 {
-    QObject *pRoot = mainView->rootObject ();
-    bool rv = connect (pRoot, SIGNAL (sigMsgBoxDone(bool)),
+    QObject *pMain = NULL;
+    do { // Begin cleanup block (not a loop)
+        QObject *pRoot = mainView->rootObject ();
+        if (NULL == pRoot) {
+            qWarning ("Couldn't get root object in QML for MainPage");
+            break;
+        }
+
+        if (pRoot->objectName() == "MainPage") {
+            pMain = pRoot;
+            break;
+        }
+
+        pMain = pRoot->findChild <QObject*> ("MainPage");
+        if (NULL == pMain) {
+            qWarning ("Could not get to MainPage");
+            break;
+        }
+    } while (0); // End cleanup block (not a loop)
+
+    bool rv = connect (pMain, SIGNAL (sigMsgBoxDone(bool)),
                        this , SLOT (onSigMsgBoxDone(bool)));
     Q_ASSERT(rv); Q_UNUSED(rv);
 }//DialContext::DialContext
