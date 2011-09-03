@@ -279,6 +279,11 @@ maemo5|contains(MEEGO_EDITION,harmattan) {
     dbusservice.files += ../build-files/qgvdial.Text.service
 }
 
+# Harmattan specific install section
+contains(MEEGO_EDITION,harmattan) {
+    desktop.path = $$DATADIR/applications
+}
+
 # Installation for Linux
 unix:!symbian:!maemo5:!contains(MEEGO_EDITION,harmattan) {
     BINDIR  = $$PREFIX/bin/qgvdial
