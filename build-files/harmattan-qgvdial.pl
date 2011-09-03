@@ -106,7 +106,7 @@ print "$cmd\n";
 system($cmd);
 
 # Replace hard coded current directory with relative directory.
-$cmd="sed 's/$curdir\\/qgvdial-$qver\\/src//g' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/$curdir\\/qgvdial-$qver\\/src//g' $basedir/src/Makefile >$basedir/src/Makefile1 ; mv $basedir/src/Makefile1 $basedir/src/Makefile";
+$cmd="sed 's/$curdir\\/qgvdial-$qver\\/src/\\/..\\/../g' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/$curdir\\/qgvdial-$qver\\/src/\\/..\\/../g' $basedir/src/Makefile >$basedir/src/Makefile1 ; mv $basedir/src/Makefile1 $basedir/src/Makefile";
 print "$cmd\n";
 system($cmd);
 
