@@ -283,7 +283,7 @@ maemo5|contains(MEEGO_EDITION,harmattan) {
 unix:!symbian:!maemo5:!contains(MEEGO_EDITION,harmattan) {
     BINDIR  = $$PREFIX/bin/qgvdial
     DATADIR = $$PREFIX/share
-    message($$BINDIR)
+    message($$BINDIR is regular Linux install)
 
     DEFINES += DATADIR=\"$$DATADIR\" PKGDATADIR=\"$$PKGDATADIR\"
 
