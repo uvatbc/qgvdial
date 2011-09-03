@@ -280,7 +280,7 @@ maemo5|contains(MEEGO_EDITION,harmattan) {
 }
 
 # Installation for Linux
-unix:!symbian:!maemo5 {
+unix:!symbian:!maemo5:!contains(MEEGO_EDITION,harmattan) {
     BINDIR  = $$PREFIX/bin/qgvdial
     DATADIR = $$PREFIX/share
     message($$BINDIR)
