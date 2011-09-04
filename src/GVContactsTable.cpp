@@ -316,18 +316,17 @@ GVContactsTable::onGotContacts (QNetworkReply *reply)
 #endif
 
         QThread *workerThread = new QThread(this);
-        ContactsParserObject *pObj =
-        new ContactsParserObject(byData, strGoogleAuth, strTempStore);
+        ContactsParserObject *pObj = new ContactsParserObject(byData);
         pObj->moveToThread (workerThread);
         rv = connect (workerThread, SIGNAL(started()), pObj, SLOT(doWork()));
         Q_ASSERT(rv);
-        rv = connect (pObj, SIGNAL(done(bool)),
-                      this, SLOT  (onContactsParsed(bool)));
+        rv = connect (pObj, SIGNAL(done(bool, quint32, quint32)),
+                      this, SLOT  (onContactsParsed(bool, quint32, quint32)));
         Q_ASSERT(rv);
-        rv = connect (pObj, SIGNAL(done(bool)),
+        rv = connect (pObj, SIGNAL(done(bool, quint32, quint32)),
                       pObj, SLOT  (deleteLater ()));
         Q_ASSERT(rv);
-        rv = connect (pObj        , SIGNAL(done(bool)),
+        rv = connect (pObj        , SIGNAL(done(bool, quint32, quint32)),
                       workerThread, SLOT  (quit()));
         Q_ASSERT(rv);
         rv = connect (workerThread, SIGNAL(terminated()),
@@ -342,6 +341,9 @@ GVContactsTable::onGotContacts (QNetworkReply *reply)
         rv = connect (pObj, SIGNAL (gotOneContact (const ContactInfo &)),
                       this, SLOT   (gotOneContact (const ContactInfo &)));
         Q_ASSERT(rv);
+
+        refCount = 1;
+        bBeginDrain = false;
         workerThread->start ();
     } while (0); // End cleanup block (not a loop)
 
@@ -351,28 +353,24 @@ GVContactsTable::onGotContacts (QNetworkReply *reply)
 void
 GVContactsTable::gotOneContact (const ContactInfo &contactInfo)
 {
-    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    dbMain.setQuickAndDirty();
-
-    QMutexLocker locker(&mutex);
-    if (contactInfo.bDeleted) {
-        qDebug() << "Delete contact " << contactInfo.strTitle;
-        modelContacts->deleteContact (contactInfo);
-    } else {   // add or modify
-        qDebug() << "Insert contact " << contactInfo.strTitle;
-        modelContacts->insertContact (contactInfo);
-    }
-
+    QNetworkRequest request = createRequest (contactInfo.hrefPhoto);
+    QNetworkReply *reply = nwMgr.get (request);
+    PhotoReplyTracker *tracker =
+    new PhotoReplyTracker(contactInfo, reply, strTempStore, this);
+    connect (reply, SIGNAL(finished()), tracker, SLOT(onFinished()));
+    connect (tracker, SIGNAL(gotOneContact(const ContactInfo &)),
+             this   , SLOT  (onGotOnePhoto(const ContactInfo &)));
 }//GVContactsTable::gotOneContact
 
 void
-GVContactsTable::onContactsParsed (bool rv)
+GVContactsTable::onContactsParsed (bool rv, quint32 /*total*/, quint32 usable)
 {
-    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    dbMain.setQuickAndDirty(false);
-    // Tell the contacts model to refresh all.
-    modelContacts->refresh ();
-    emit allContacts (rv);
+    while (usable--) {
+        refCount.ref ();
+    }
+
+    bBeginDrain = true;
+    this->decRef (rv);
 }//GVContactsTable::onContactsParsed
 
 void
@@ -399,3 +397,35 @@ GVContactsTable::onNoContactPhoto(const ContactInfo &contactInfo)
     connect (tracker, SIGNAL(gotOneContact(const ContactInfo &)),
              this   , SLOT  (gotOneContact(const ContactInfo &)));
 }//GVContactsTable::onNoContactPhoto
+
+void
+GVContactsTable::decRef (bool rv /*= true*/)
+{
+    if (!refCount.deref () && bBeginDrain) {
+        qDebug("Ref = 0. All contacts and photos downloaded.");
+
+        CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+        dbMain.setQuickAndDirty(false);
+        // Tell the contacts model to refresh all.
+        modelContacts->refresh ();
+        emit allContacts (rv);
+    }
+}//GVContactsTable::decRef
+
+void
+GVContactsTable::onGotOnePhoto (const ContactInfo &contactInfo)
+{
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    dbMain.setQuickAndDirty();
+
+    QMutexLocker locker(&mutex);
+    if (contactInfo.bDeleted) {
+        qDebug() << "Delete contact " << contactInfo.strTitle;
+        modelContacts->deleteContact (contactInfo);
+    } else {   // add or modify
+        qDebug() << "Insert contact " << contactInfo.strTitle;
+        modelContacts->insertContact (contactInfo);
+    }
+
+    this->decRef ();
+}//GVContactsTable::onGotOnePhoto

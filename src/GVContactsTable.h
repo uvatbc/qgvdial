@@ -78,10 +78,13 @@ private slots:
     // Invoked when one contact is parsed out of the XML
     void gotOneContact (const ContactInfo &contactInfo);
     //! Invoked when all the contacts are parsed
-    void onContactsParsed(bool rv);
+    void onContactsParsed(bool rv, quint32 total, quint32 usable);
 
     //! Invoked when the contact model tells us that the photo is not present
     void onNoContactPhoto(const ContactInfo &contactInfo);
+
+    //! Invoked when the photo tracker gets a photo
+    void onGotOnePhoto (const ContactInfo &contactInfo);
 
 private:
     QNetworkRequest createRequest(QString strUrl);
@@ -96,6 +99,7 @@ private:
                 QObject        *receiver,
                 const char     *method);
 
+    void decRef (bool rv = true);
 
 private:
     ContactsModel *modelContacts;
@@ -122,6 +126,11 @@ private:
 
     //! Is the contacts refresh an update process?
     bool            bRefreshIsUpdate;
+
+    //! Refcount for in-flight network requests
+    QAtomicInt      refCount;
+
+    bool            bBeginDrain;
 };
 
 #endif // __GVCONTACTSTABLE_H__

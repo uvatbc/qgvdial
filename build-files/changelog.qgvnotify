@@ -1,2 +1,1 @@
-  * Recompile to match qgvdial codebase
-  * Retain messages. Appended a time_t string.
+  * There's no need to fetch photos at all now

@@ -33,10 +33,7 @@ class ContactsParserObject : public QObject
     Q_OBJECT
 
 public:
-    ContactsParserObject(QByteArray data,
-                         const QString &strAuth,
-                         const QString &strTemp,
-                         QObject *parent = 0);
+    ContactsParserObject(QByteArray data, QObject *parent = 0);
     void setEmitLog (bool enable = true);
     ~ContactsParserObject();
 
@@ -46,31 +43,15 @@ signals:
     // Emitted when one contact is parsed out of the XML
     void gotOneContact (const ContactInfo &contactInfo);
     // Emitted when work is done
-    void done(bool rv);
+    void done(bool rv, quint32 total, quint32 usable);
 
 public slots:
     void doWork ();
 
-private slots:
-    void onGotOneContact (const ContactInfo &contactInfo);
-    void onGotOnePhoto (const ContactInfo &contactInfo);
-
-private:
-    QNetworkRequest createRequest(QString strUrl);
-    void decRef (bool rv = true);
-
 private:
     QByteArray  byData;
 
-    //! This is the directory where I should store all contact photos.
-    QString     strTempStore;
-
     bool        bEmitLog;
-
-    QNetworkAccessManager *nwMgr;
-    QString               strGoogleAuth;
-
-    QAtomicInt  refCount;
 };
 
 class PhotoReplyTracker : public QObject

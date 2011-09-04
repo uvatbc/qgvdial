@@ -23,16 +23,10 @@ Contact: yuvraaj@gmail.com
 #include "ContactsXmlHandler.h"
 
 ContactsParserObject::ContactsParserObject (QByteArray data,
-                                            const QString &strAuth,
-                                            const QString &strTemp,
-                                            QObject *parent)
+                                            QObject *parent /*= 0*/)
 : QObject(parent)
 , byData (data)
-, strTempStore (strTemp)
 , bEmitLog (true)
-, nwMgr (NULL)
-, strGoogleAuth (strAuth)
-, refCount (0)
 {
 }//ContactsParserObject::ContactsParserObject
 
@@ -52,44 +46,31 @@ ContactsParserObject::doWork ()
     Q_ASSERT(rv);
     rv = connect (
         &contactsHandler, SIGNAL   (oneContact (const ContactInfo &)),
-         this,            SLOT(onGotOneContact (const ContactInfo &)));
+         this,            SIGNAL(gotOneContact (const ContactInfo &)));
     Q_ASSERT(rv);
 
     simpleReader.setContentHandler (&contactsHandler);
     simpleReader.setErrorHandler (&contactsHandler);
 
-    refCount.ref();
     rv = simpleReader.parse (&inputSource, false);
 
     if (!rv) {
-        qDebug() << "Contacts parser failed to parse. Data =" << byData;
+        qWarning() << "Contacts parser failed to parse. Data =" << byData;
     }
 
-    QString msg = QString("Total contacts: %1. Usable: %2")
-            .arg (contactsHandler.getTotalContacts ())
-            .arg (contactsHandler.getUsableContacts ());
+    quint32 total = contactsHandler.getTotalContacts ();
+    quint32 usable = contactsHandler.getUsableContacts ();
+    emit done(rv, total, usable);
+
     if (bEmitLog || (contactsHandler.getUsableContacts () != 0)) {
+        QString msg = QString("Total contacts: %1. Usable: %2")
+                .arg (total).arg (usable);
         emit status(msg);
     }
-
-    this->decRef (rv);
 }//ContactsParserObject::doWork
-
-void
-ContactsParserObject::decRef (bool rv /*= true*/)
-{
-    if (!refCount.deref ()) {
-        if (bEmitLog) qDebug("All contacts and photos downloaded.");
-        emit done(rv);
-    }
-}//ContactsParserObject::decRef
 
 ContactsParserObject::~ContactsParserObject()
 {
-    if (NULL != nwMgr) {
-        delete nwMgr;
-        nwMgr = NULL;
-    }
 }//ContactsParserObject::~ContactsParserObject
 
 void
@@ -97,56 +78,6 @@ ContactsParserObject::setEmitLog (bool enable /*= true*/)
 {
     bEmitLog = enable;
 }//ContactsParserObject::setEmitLog
-
-
-QNetworkRequest
-ContactsParserObject::createRequest(QString strUrl)
-{
-    QUrl url (strUrl);
-    QNetworkRequest request(url);
-    request.setHeader (QNetworkRequest::ContentTypeHeader,
-                       "application/x-www-form-urlencoded");
-    QByteArray byAuth = QString("GoogleLogin auth=%1")
-                                .arg(strGoogleAuth).toAscii ();
-    request.setRawHeader ("Authorization", byAuth);
-
-    return request;
-}//ContactsParserObject::createRequest
-
-void
-ContactsParserObject::onGotOneContact (const ContactInfo &contactInfo)
-{
-    refCount.ref ();
-
-    if (contactInfo.bDeleted) {
-        onGotOnePhoto (contactInfo);
-        return;
-    }
-
-    if (strTempStore.isEmpty ()) {
-        onGotOnePhoto (contactInfo);
-        return;
-    }
-
-    if (NULL == nwMgr) {
-        nwMgr = new QNetworkAccessManager(this);
-    }
-
-    QNetworkRequest request = createRequest (contactInfo.hrefPhoto);
-    QNetworkReply *reply = nwMgr->get (request);
-    PhotoReplyTracker *tracker =
-    new PhotoReplyTracker(contactInfo, reply, strTempStore, this);
-    connect (reply, SIGNAL(finished()), tracker, SLOT(onFinished()));
-    connect (tracker, SIGNAL(gotOneContact(const ContactInfo &)),
-             this   , SLOT  (onGotOnePhoto(const ContactInfo &)));
-}//ContactsParserObject::onGotOneContact
-
-void
-ContactsParserObject::onGotOnePhoto (const ContactInfo &contactInfo)
-{
-    emit gotOneContact (contactInfo);
-    this->decRef ();
-}//ContactsParserObject::onGotOnePhoto
 
 PhotoReplyTracker::PhotoReplyTracker(const ContactInfo &ci,
                                            QNetworkReply *r,
@@ -168,13 +99,14 @@ void
 PhotoReplyTracker::onFinished()
 {
     responseTimeout.stop ();
-    if (aborted) {
-        qWarning ("Reply aborted!");
-        return;
-    }
-
-    QByteArray ba = reply->readAll ();
     do { // Begin cleanup block (not a loop)
+        if (aborted) {
+            qWarning ("Reply aborted!");
+            break;
+        }
+
+        QByteArray ba = reply->readAll ();
+
         QNetworkReply::NetworkError err = reply->error ();
         if (QNetworkReply::ContentNotFoundError == err) {
             break;
@@ -225,10 +157,5 @@ void
 PhotoReplyTracker::onResponseTimeout()
 {
     aborted = true;
-
-    emit gotOneContact (contactInfo);
-
-    reply->abort ();
-    reply->deleteLater ();
-    this->deleteLater ();
+    onFinished ();
 }//PhotoReplyTracker::onResponseTimeout

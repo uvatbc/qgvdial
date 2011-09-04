@@ -68,211 +68,214 @@ Rectangle {
 
         opacity: 0
 
-        Column { // Column of all details
-            id: detailAllButText
-
+        Flickable { // text / voicemail
             anchors {
                 top: parent.top
                 left: parent.left
-            }
-            width: parent.width
-            spacing: 3
-
-            MyButton {
-                id: btnDetailsClose
-                mainText: "Close"
-                onClicked: {
-                    container.state= ''
-                    container.sigVmailPlayback(0);
-                    container.sigCloseVmail();
-                }
-                width: parent.width
-                height: suggestedPixelSize + 2
-
-                mainPixelSize: suggestedPixelSize
+                right: parent.right
+                bottom: backButton.top
             }
 
-            Text {
-                id: detailName
-                text: container.strDetailsName
-                color: "white"
-                width: parent.width
-                height: paintedHeight + 2
-                font.pixelSize: suggestedPixelSize
-            }
-
-            Text { // the time
-                id: theTime
-
-                width: parent.width
-                height: paintedHeight + 2
-                color: "white"
-                font.pixelSize: suggestedPixelSize
-                wrapMode: Text.Wrap
-
-                text: strDetailsTime
-            }// Text (the time)
-
-            Text { // the number
-                id: theNumber
-
-                width: parent.width
-                height: paintedHeight + 2
-                color: "white"
-                font.pixelSize: suggestedPixelSize
-                wrapMode: Text.Wrap
-
-                text: container.strNumber
-            }// Text (the number)
-
-            Item {
-                id: btnRow
-                height: suggestedPixelSize * 2.5
-                width: parent.width
-
-                Row { // call, text and play buttons
-                    anchors.horizontalCenter: parent.horizontalCenter
-
-                    height: parent.height
-                    width: btnCall.width + btnText.width + (btnVmail.width * btnVmail.opacity)
-
-                    Rectangle {
-                        id: btnCall
-
-                        height: parent.height
-                        width:  height
-
-                        color: "black"
-                        border.color: "gray"
-                        radius: 10
-
-                        Image {
-                            source: "in_Placed.png"
-                            fillMode: Image.PreserveAspectFit
-                            anchors.centerIn: parent
-
-                            height: parent.height * 0.8
-                            width: height
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: container.sigCall(container.strNumber)
-
-                            onPressed: btnCall.border.color = "orange"
-                            onReleased: btnCall.border.color = "gray"
-                        }
-                    }//Rectangle (btnCall)
-
-                    Rectangle {
-                        id: btnText
-
-                        height: parent.height
-                        width:  height
-
-                        color: "black"
-                        border.color: "gray"
-                        radius: 10
-
-                        Image {
-                            source: "in_Sms.png"
-                            fillMode: Image.PreserveAspectFit
-                            anchors.centerIn: parent
-
-                            height: parent.height * 0.8
-                            width: height
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: container.sigText(container.strDetailsName, container.strNumber)
-
-                            onPressed: btnText.border.color = "orange"
-                            onReleased: btnText.border.color = "gray"
-                        }
-                    }//Rectangle (btnText)
-
-                    Rectangle {
-                        id: btnVmail
-
-                        opacity: (detailsView.opacity & container.isVoicemail)
-
-                        height: parent.height
-                        width:  height
-
-                        color: "black"
-                        border.color: "gray"
-                        radius: 10
-
-                        Image {
-                            source: (container.vmailPlayState == 1) ? "pause.svg" : "play.svg"
-                            fillMode: Image.PreserveAspectFit
-                            anchors.centerIn: parent
-
-                            height: parent.height * 0.8
-                            width: height
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: {
-                                if (container.vmailPlayState == 1) {
-                                    console.debug("QML: Pause vmail playback");
-                                    container.sigVmailPlayback(2);
-                                } else {
-                                    if (container.vmailPlayState == 2) {
-                                        console.debug("QML: Resume vmail playback");
-                                        container.sigVmailPlayback(1);
-                                    } else {
-                                        console.debug("QML: Request for vmail");
-                                        container.sigVoicemail(container.strLink);
-                                    }
-                                }
-                            }
-
-                            onPressed: btnVmail.border.color = "orange"
-                            onReleased: btnVmail.border.color = "gray"
-                        }
-                    }//Rectangle (btnVmail)
-                }// Row (call, text and play buttons)
-            }// Item (to contain the row in horiz centre)
-        }//Column of all details except the text
-
-        Flickable { // text / voicemail
-            anchors {
-                left: parent.left
-                top: detailAllButText.bottom
-            }
-
-            width: parent.width
-            height: parent.height - detailAllButText.height
-
-            contentHeight: theSmsText.height
+            contentHeight: detailColumn.height
             contentWidth: width
 
             clip: true
 
-            Text { // sms text
-                id: theSmsText
+            Column { // Column of all details
+                id: detailColumn
 
                 anchors {
-                    left: parent.left
                     top: parent.top
+                    left: parent.left
+                }
+                width: parent.width
+                spacing: 3
+
+                height: detailName.height + theTime.height + theNumber.height +
+                        btnRow.height + theSmsText.height + (spacing * 6)
+
+                Text {
+                    id: detailName
+                    text: container.strDetailsName
+                    color: "white"
+                    width: parent.width
+                    height: paintedHeight + 2
+                    font.pixelSize: suggestedPixelSize
                 }
 
-                // Must set the width so that the wrap mode is activated
-                width: parent.width
-                // Must set width to prevent a binding loop
-                height: paintedHeight + 2
+                Text { // the time
+                    id: theTime
 
-                text: container.strSmsText
-                wrapMode: Text.Wrap
-                clip: true
+                    width: parent.width
+                    height: paintedHeight + 2
+                    color: "white"
+                    font.pixelSize: suggestedPixelSize
+                    wrapMode: Text.Wrap
 
-                color: "white"
-                font.pixelSize: suggestedPixelSize
-            }// Text (sms text)
+                    text: strDetailsTime
+                }// Text (the time)
+
+                Text { // the number
+                    id: theNumber
+
+                    width: parent.width
+                    height: paintedHeight + 2
+                    color: "white"
+                    font.pixelSize: suggestedPixelSize
+                    wrapMode: Text.Wrap
+
+                    text: container.strNumber
+                }// Text (the number)
+
+                Item {
+                    id: btnRow
+                    height: suggestedPixelSize * 2.5
+                    width: parent.width
+
+                    Row { // call, text and play buttons
+                        anchors.horizontalCenter: parent.horizontalCenter
+
+                        height: parent.height
+                        width: btnCall.width + btnText.width + (btnVmail.width * btnVmail.opacity)
+
+                        Rectangle {
+                            id: btnCall
+
+                            height: parent.height
+                            width:  height
+
+                            color: "black"
+                            border.color: "gray"
+                            radius: 10
+
+                            Image {
+                                source: "in_Placed.png"
+                                fillMode: Image.PreserveAspectFit
+                                anchors.centerIn: parent
+
+                                height: parent.height * 0.8
+                                width: height
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: container.sigCall(container.strNumber)
+
+                                onPressed: btnCall.border.color = "orange"
+                                onReleased: btnCall.border.color = "gray"
+                            }
+                        }//Rectangle (btnCall)
+
+                        Rectangle {
+                            id: btnText
+
+                            height: parent.height
+                            width:  height
+
+                            color: "black"
+                            border.color: "gray"
+                            radius: 10
+
+                            Image {
+                                source: "in_Sms.png"
+                                fillMode: Image.PreserveAspectFit
+                                anchors.centerIn: parent
+
+                                height: parent.height * 0.8
+                                width: height
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: container.sigText(container.strDetailsName, container.strNumber)
+
+                                onPressed: btnText.border.color = "orange"
+                                onReleased: btnText.border.color = "gray"
+                            }
+                        }//Rectangle (btnText)
+
+                        Rectangle {
+                            id: btnVmail
+
+                            opacity: (detailsView.opacity & container.isVoicemail)
+
+                            height: parent.height
+                            width:  height
+
+                            color: "black"
+                            border.color: "gray"
+                            radius: 10
+
+                            Image {
+                                source: (container.vmailPlayState == 1) ? "pause.svg" : "play.svg"
+                                fillMode: Image.PreserveAspectFit
+                                anchors.centerIn: parent
+
+                                height: parent.height * 0.8
+                                width: height
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: {
+                                    if (container.vmailPlayState == 1) {
+                                        console.debug("QML: Pause vmail playback");
+                                        container.sigVmailPlayback(2);
+                                    } else {
+                                        if (container.vmailPlayState == 2) {
+                                            console.debug("QML: Resume vmail playback");
+                                            container.sigVmailPlayback(1);
+                                        } else {
+                                            console.debug("QML: Request for vmail");
+                                            container.sigVoicemail(container.strLink);
+                                        }
+                                    }
+                                }
+
+                                onPressed: btnVmail.border.color = "orange"
+                                onReleased: btnVmail.border.color = "gray"
+                            }
+                        }//Rectangle (btnVmail)
+                    }// Row (call, text and play buttons)
+                }// Item (to contain the row in horiz centre)
+
+                Text { // sms text
+                    id: theSmsText
+
+                    // Must set the width so that the wrap mode is activated
+                    width: parent.width
+                    // Must set width to prevent a binding loop
+                    height: paintedHeight + 2
+
+                    text: container.strSmsText
+                    wrapMode: Text.Wrap
+                    clip: true
+
+                    color: "white"
+                    font.pixelSize: suggestedPixelSize
+                }// Text (sms text)
+            }//Column of all details
         }//Flickable (text / voicemail)
+
+        MyButton {
+            id: backButton
+            mainText: "Back"
+            onClicked: {
+                container.state= ''
+                container.sigVmailPlayback(0);
+                container.sigCloseVmail();
+            }
+            width: parent.width
+            height: suggestedPixelSize + 4
+
+            mainPixelSize: suggestedPixelSize
+
+            anchors {
+                bottom: parent.bottom
+                left: parent.left
+                right: parent.right
+            }
+        }
     }//Rectangle (details)
 
     Item { //  The combined inbox list and selector list

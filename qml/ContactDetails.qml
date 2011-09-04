@@ -20,6 +20,7 @@ Contact: yuvraaj@gmail.com
 */
 
 import Qt 4.7
+import Qt.labs.gestures 1.0
 
 Rectangle { // Contact details
     id: container
@@ -37,23 +38,14 @@ Rectangle { // Contact details
     border.color: "orange"
     radius: 10
 
-    MyButton {
-        id: closeButton
-        mainText: "Close"
-        onClicked: container.sigClose();
-        width: parent.width
-        height: mainPixelSize + 4
-        mainPixelSize: suggestedPixelSize
-    }//MyButton (close details window)
-
     Flickable {
         id: mainFlick
 
         anchors {
-            top: closeButton.bottom
-            bottom: container.bottom
-            left: container.left
-            right: container.right
+            top: parent.top
+            left: parent.left
+            right: parent.right
+            bottom: backButton.top
         }
 
         contentHeight: mainColumn.height + 3
@@ -69,7 +61,6 @@ Rectangle { // Contact details
                 right: parent.right
             }
             spacing: 1
-
             height: imageName.height + notes.height + contactNumbers.height + (spacing * 5)
 
             Item {
@@ -84,7 +75,7 @@ Rectangle { // Contact details
                     width: (txtContactName.height * 2.5)
 
                     fillMode: Image.PreserveAspectFit
-                }
+                }//Image
 
                 Item {
                     anchors {
@@ -106,8 +97,7 @@ Rectangle { // Contact details
                         color: "white"
                         font.pixelSize: container.suggestedPixelSize
                     }
-                }
-
+                }//Item (name)
             }//Item (image and name)
 
             Text {
@@ -238,4 +228,19 @@ Rectangle { // Contact details
             }//Repeater (All phone numbers for this contact)
         }// Column (all the details in one column)
     }//Flickable (mainFlick)
+
+    MyButton {
+        id: backButton
+        mainText: "Back"
+        onClicked: container.sigClose();
+        width: parent.width
+        height: mainPixelSize + 4
+        mainPixelSize: suggestedPixelSize
+
+        anchors {
+            bottom: parent.bottom
+            left: parent.left
+            right: parent.right
+        }
+    }//MyButton (close details window)
 }// Rectangle (Contact details)
