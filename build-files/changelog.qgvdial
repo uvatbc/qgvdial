@@ -1,2 +1,3 @@
   * Many many fixes for the Harmattan build
   * Fix the contacts parser. Photos are now downloaded in the main thread. This fixes a hang as well as various Qt errors.
+
