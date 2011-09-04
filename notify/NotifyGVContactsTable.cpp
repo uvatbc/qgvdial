@@ -215,9 +215,9 @@ GVContactsTable::onGotContacts (QNetworkReply *reply)
         pObj->moveToThread (workerThread);
         QObject::connect (workerThread, SIGNAL(started()),
                           pObj        , SLOT  (doWork()));
-        QObject::connect (pObj, SIGNAL(done(bool)),
+        QObject::connect (pObj, SIGNAL(done(bool, quint32, quint32)),
                           this, SLOT  (onContactsParsed(bool)));
-        QObject::connect (pObj        , SIGNAL(done(bool)),
+        QObject::connect (pObj        , SIGNAL(done(bool, quint32, quint32)),
                           workerThread, SLOT  (quit()));
         QObject::connect (workerThread, SIGNAL(terminated()),
                           pObj        , SLOT  (deleteLater()));
