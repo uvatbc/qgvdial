@@ -20,7 +20,6 @@ Contact: yuvraaj@gmail.com
 */
 
 import Qt 4.7
-import Qt.labs.gestures 1.0
 
 Rectangle { // Contact details
     id: container
@@ -63,14 +62,13 @@ Rectangle { // Contact details
             spacing: 1
             height: imageName.height + notes.height + contactNumbers.height + (spacing * 5)
 
-            Item {
+            Row {
                 id: imageName
                 height: contactImage.height
                 width: parent.width
 
                 Image {
                     id: contactImage
-                    anchors.left: parent.left
                     height: (txtContactName.height * 2.5)
                     width: (txtContactName.height * 2.5)
 
@@ -79,8 +77,6 @@ Rectangle { // Contact details
 
                 Item {
                     anchors {
-                        top: parent.top
-                        left: contactImage.right
                         verticalCenter: parent.verticalCenter
                     }
                     width: parent.width - contactImage.width
@@ -98,7 +94,7 @@ Rectangle { // Contact details
                         font.pixelSize: container.suggestedPixelSize
                     }
                 }//Item (name)
-            }//Item (image and name)
+            }//Row (image and name)
 
             Text {
                 id: notes
@@ -134,6 +130,8 @@ Rectangle { // Contact details
                             left: parent.left
                             right: callTextButtons.left
                         }
+
+                        spacing: 0
 
                         Text { // The phone number
                             id: textType

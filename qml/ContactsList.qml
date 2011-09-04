@@ -67,6 +67,19 @@ Rectangle {
             width: parent.width
             spacing: 1
 
+            property string lastSearchValue: ""
+            function doSearch() {
+                if (searchRow.lastSearchValue != edSearch.text) {
+                    container.sigSearchContacts(edSearch.text);
+                    searchRow.lastSearchValue = edSearch.text;
+                }
+                if (edSearch.text != "") {
+                    imgSearch.selection = true;
+                } else {
+                    imgSearch.selection = false;
+                }
+            }
+
             Image {
                 id: imgSearch
                 source: (imgSearch.selection ? "close.png" : "search.png")
@@ -81,13 +94,8 @@ Rectangle {
                     onClicked: {
                         if (imgSearch.selection) {
                             edSearch.text = "";
-                            imgSearch.selection = false;
-                        } else {
-                            if (edSearch.text != "") {
-                                imgSearch.selection = true;
-                            }
                         }
-                        container.sigSearchContacts(edSearch.text);
+                        searchRow.doSearch();
                     }
                 }
             }//Image (search or close button)
@@ -101,6 +109,10 @@ Rectangle {
                     if (imgSearch.selection) {
                         imgSearch.selection = false;
                     }
+                }
+
+                onSigEnter: {
+                    searchRow.doSearch();
                 }
             }//MyTextEdit (search box text edit)
         }//Search box
@@ -188,7 +200,7 @@ Rectangle {
                 bottom: parent.bottom
             }
         }//scroll bar for the contacts list
-    }// Item (All contacts)
+    }// Item (Search box, all contacts and the scroll bar)
 
     states: [
         State {

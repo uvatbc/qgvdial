@@ -101,9 +101,9 @@ Rectangle {
                     width: parent.width
                     height: paintedHeight + 2
                     font.pixelSize: suggestedPixelSize
-                }
+                }// Text (name)
 
-                Text { // the time
+                Text {
                     id: theTime
 
                     width: parent.width
@@ -115,7 +115,7 @@ Rectangle {
                     text: strDetailsTime
                 }// Text (the time)
 
-                Text { // the number
+                Text {
                     id: theNumber
 
                     width: parent.width
@@ -237,9 +237,9 @@ Rectangle {
                             }
                         }//Rectangle (btnVmail)
                     }// Row (call, text and play buttons)
-                }// Item (to contain the row in horiz centre)
+                }// Item (the row of buttons in horiz centre)
 
-                Text { // sms text
+                Text {
                     id: theSmsText
 
                     // Must set the width so that the wrap mode is activated
