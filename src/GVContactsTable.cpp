@@ -145,9 +145,7 @@ GVContactsTable::refreshContacts (const QDateTime &dtUpdate)
                               "?max-results=10000")
                         .arg (strUser);
     if (dtUpdate.isValid ()) {
-        QString strUpdate = dtUpdate.toString ("yyyy-MM-dd")
-                          + "T"
-                          + dtUpdate.toString ("hh:mm:ss");
+        QString strUpdate = dtUpdate.toUTC().toString (Qt::ISODate);
         strUrl += QString ("&updated-min=%1&showdeleted=true").arg (strUpdate);
         bRefreshIsUpdate = true;
     } else {
@@ -183,7 +181,6 @@ GVContactsTable::mqUpdateContacts(const QDateTime &dtUpdate)
     QDateTime dtLatest;
     dbMain.getLatestContact (dtLatest);
     if (dtLatest <= dtUpdate) {
-        dtLatest.addSecs (1);
         refreshContacts (dtLatest);
     }
 }//GVContactsTable::mqUpdateContacts
