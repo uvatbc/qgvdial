@@ -2115,19 +2115,16 @@ MainWindow::onTwoStepAuthentication(QString &result)
 void
 MainWindow::onDesktopResized()
 {
+    QObject *pMain = this->rootObject ();
+    if (NULL == pMain) {
+        qWarning ("Could not get to MainPage for resize");
+        return;
+    }
+    
     OsDependent &osd = Singletons::getRef().getOSD ();
     QRect rect = osd.getStartingSize ();
-
-    do { // Begin cleanup block (not a loop)
-        QObject *pMain = this->rootObject ();
-        if (NULL == pMain) {
-            qWarning ("Could not get to MainPage for resize");
-            break;
-        }
-
-        pMain->setProperty("height", rect.height());
-        pMain->setProperty("width", rect.width());
-    } while (0); // End cleanup block (not a loop)
+    pMain->setProperty("height", rect.height());
+    pMain->setProperty("width", rect.width());
 }//MainWindow::onDesktopResized
 
 QObject *
