@@ -451,16 +451,11 @@ MainWindow::getContactsDone (bool bChanges, bool bOK)
     if (bOK && bChanges) {
         qDebug ("Contacts changed, update mosquitto");
 
-        // Add 2 seconds to the reported time. This probably isn't good enough
-        // to prevent the repeat changes, but it's a start
-        QDateTime dtUpdate = QDateTime::currentDateTime();
-        dtUpdate.addSecs (2);
-
         MqPublisher pub(QString("qgvnotify:%1").arg(QHostInfo::localHostName()),
                         m_strMqServer, m_mqPort, m_strMqTopic,
                         this);
         pub.publish(QString("contact %1")
-                    .arg(dtUpdate.toUTC().toTime_t())
+                    .arg(QDateTime::currentDateTime().toUTC().toTime_t())
                     .toAscii());
     }
 
