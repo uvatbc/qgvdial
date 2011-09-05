@@ -63,9 +63,9 @@ Item {
             opacity: (g_bIsLoggedIn == true ? 0 : 1)
             pixelSize: container.pixHeight
 
-            Keys.onReturnPressed: listButtons.login_logout_function();
             KeyNavigation.tab: textPassword
             onSigTextChanged: container.sigUserChanged(strText);
+            onSigEnter: btnLogin.doClick();
         }
 
         Text {
@@ -110,9 +110,9 @@ Item {
             echoMode: TextInput.Password
             pixelSize: container.pixHeight
 
-            Keys.onReturnPressed: listButtons.login_logout_function();
             KeyNavigation.tab: textUsername
             onSigTextChanged: container.sigPassChanged(strText);
+            onSigEnter: btnLogin.doClick();
         }
 
         Text {
@@ -142,12 +142,14 @@ Item {
         height: container.pixHeight * 3 / 2
         mainPixelSize: container.pixHeight
 
-        onClicked: {
+        function doClick() {
             if (g_bIsLoggedIn) {
                 container.sigLogout();
             } else {
                 container.sigLogin();
             }
-        }//onClicked
+        }
+
+        onClicked: btnLogin.doClick();
     }//MyButton (login/logout)
 }//Item (container)

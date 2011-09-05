@@ -185,6 +185,16 @@ OsDependent::getAppDirectory ()
     return strStoreDir;
 }//OsDependent::getAppDirectory
 
+QString
+OsDependent::getMainQML ()
+{
+    return "qrc:/"
+#if defined(MEEGO_HARMATTAN)
+    "H"
+#endif
+    "Main.qml";
+}//OsDependent::getMainQML
+
 bool
 OsDependent::cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt)
 {

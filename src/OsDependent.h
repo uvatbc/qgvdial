@@ -59,8 +59,8 @@ public:
     void setLongWork (QWidget *window, bool bSet = false);
 
     QRect getStartingSize ();
-
     QString getAppDirectory ();
+    QString getMainQML();
 
     bool cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt);
 

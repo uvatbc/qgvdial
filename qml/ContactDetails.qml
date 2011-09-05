@@ -42,7 +42,9 @@ Rectangle { // Contact details
 
         anchors {
             top: parent.top
+            topMargin: 1
             left: parent.left
+            leftMargin: 1
             right: parent.right
             bottom: backButton.top
         }

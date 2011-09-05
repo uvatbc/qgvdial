@@ -545,6 +545,7 @@ MainWindow::initQML ()
 {
     qmlRegisterType<WebWidget>("org.qgvdial.WebWidget", 1, 0, "MyWebWidget");
 
+    OsDependent &osd = Singletons::getRef().getOSD ();
     bool bTempFalse = false;
     int iTempZero = 0;
 
@@ -561,21 +562,10 @@ MainWindow::initQML ()
     ctx->setContextProperty ("g_logModel", QVariant::fromValue(arrLogMsgs));
 
     // Initialize the QML view
-#if defined(MEEGO_HARMATTAN)
-    this->setSource (QUrl ("qrc:/HMain.qml"));
-#else
-    this->setSource (QUrl ("qrc:/Main.qml"));
-#endif
+    this->setSource (QUrl(osd.getMainQML()));
 
     onDesktopResized ();
-
-#if 0 && defined(MEEGO_HARMATTAN)
-    // Do rotate
-    QMetaObject::invokeMethod (this->rootObject(), "doRotate",
-                        Q_ARG (QVariant, QVariant(-90.0)));
-#else
     this->setResizeMode (QDeclarativeView::SizeRootObjectToView);
-#endif
 
     this->setUsername ("example@gmail.com");
     this->setPassword ("hunter2 :p");
@@ -928,6 +918,7 @@ MainWindow::on_actionE_xit_triggered ()
 #if MOSQUITTO_CAPABLE
     mqThread.setQuit ();
 #endif
+
     qApp->quit ();
 }//MainWindow::on_actionE_xit_triggered
 
