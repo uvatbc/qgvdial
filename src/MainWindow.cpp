@@ -510,7 +510,7 @@ MainWindow::init ()
                   &oInbox   , SLOT  (refresh(const QDateTime &)));
     Q_ASSERT(rv);
     rv = connect (&mqThread , SIGNAL(sigUpdateContacts(const QDateTime &)),
-                  &oContacts, SLOT  (refreshContacts(const QDateTime &)));
+                  &oContacts, SLOT  (mqUpdateContacts(const QDateTime &)));
     Q_ASSERT(rv);
     rv = connect (&mqThread , SIGNAL(status(QString,int)),
                    this     , SLOT  (setStatus(QString,int)));
@@ -2120,7 +2120,7 @@ MainWindow::onDesktopResized()
         qWarning ("Could not get to MainPage for resize");
         return;
     }
-    
+
     OsDependent &osd = Singletons::getRef().getOSD ();
     QRect rect = osd.getStartingSize ();
     pMain->setProperty("height", rect.height());

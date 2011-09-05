@@ -177,6 +177,18 @@ GVContactsTable::refreshAllContacts ()
 }//GVContactsTable::refreshAllContacts
 
 void
+GVContactsTable::mqUpdateContacts(const QDateTime &dtUpdate)
+{
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    QDateTime dtLatest;
+    dbMain.getLatestContact (dtLatest);
+    if (dtLatest <= dtUpdate) {
+        dtLatest.addSecs (1);
+        refreshContacts (dtLatest);
+    }
+}//GVContactsTable::mqUpdateContacts
+
+void
 GVContactsTable::setUserPass (const QString &strU, const QString &strP)
 {
     QMutexLocker locker(&mutex);

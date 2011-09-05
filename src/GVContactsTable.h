@@ -66,6 +66,7 @@ public slots:
     void refreshContacts ();
     void refreshAllContacts ();
     void onSearchQueryChanged (const QString &query);
+    void mqUpdateContacts(const QDateTime &dtUpdate);
 
 private slots:
     //! Invoked on response to login to contacts API
