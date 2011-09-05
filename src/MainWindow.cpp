@@ -2125,7 +2125,7 @@ void
 MainWindow::onDesktopResized()
 {
     OsDependent &osd = Singletons::getRef().getOSD ();
-    QRect rect = osd.getStartingSize (this);
+    QRect rect = osd.getStartingSize ();
 
     do { // Begin cleanup block (not a loop)
         QObject *pMain = this->rootObject ();

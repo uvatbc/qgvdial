@@ -25,10 +25,6 @@ Contact: yuvraaj@gmail.com
 #include "QGVDbusServer.h"
 #endif
 
-#if MEEGO_HARMATTAN
-#include <QDeclarativeView>
-#endif
-
 OsDependent::OsDependent(QObject *parent) : QObject(parent)
 {
 }//OsDependent::OsDependent
@@ -154,10 +150,8 @@ OsDependent::setLongWork (QWidget *window, bool bSet /*= false*/)
 
 //! Initial height and width for different OSes.
 QRect
-OsDependent::getStartingSize (QWidget *w)
+OsDependent::getStartingSize ()
 {
-    Q_UNUSED(w);
-
     QRect rect;
 #if DESKTOP_OS
     rect.setWidth (250);
@@ -165,19 +159,6 @@ OsDependent::getStartingSize (QWidget *w)
     qDebug() << "Using desktop settings." << rect;
 #else
     rect = qApp->desktop()->screenGeometry ();
-
-#if defined(MEEGO_HARMATTAN)
-    if (NULL != w) {
-//        QDeclarativeView *view = (QDeclarativeView *) w;
-//        view->rotate(-90.0);
-//        view->translate(0, -rect.height());
-//
-//        QRect r(rect);
-//        rect.setWidth(r.height());
-//        rect.setHeight(r.width());
-    }
-#endif
-
     qDebug() << "Using mobile settings." << rect;
 #endif
 
