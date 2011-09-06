@@ -1,3 +1,2 @@
-  * Bugfix: Contacts update last date was not UTC.
-  * Shifted some of the plaform specific code to the OsDependent class
+  * Bugfix: Registerd numbers need to be picked up from a different URL
 

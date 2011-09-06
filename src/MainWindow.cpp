@@ -1376,7 +1376,7 @@ MainWindow::refreshRegisteredNumbers ()
                     SLOT   (gotRegisteredPhone (const GVRegisteredNumber &)));
             Q_ASSERT(rv);
             rv = false;
-            qWarning ("Failed to retrieve registered contacts!!");
+            qWarning ("Get registered numbers failed at the start!!!");
             break;
         }
 
