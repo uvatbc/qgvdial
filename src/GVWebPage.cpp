@@ -741,7 +741,7 @@ GVWebPage::onGotPhonesListXML (QNetworkReply *reply)
 
     do { // Begin cleanup block (not a loop)
         if (QNetworkReply::NoError != reply->error ()) {
-            qWarning ("Error getting the phones list");
+            qWarning() << "Error getting the phones list:" << (int)reply->error();
             break;
         }
 
@@ -999,22 +999,26 @@ GVWebPage::onGotInboxXML (QNetworkReply *reply)
                          this, SLOT   (onGotInboxXML (QNetworkReply *)));
     Q_ASSERT(bOk);
 
-    QString strReply = reply->readAll ();
-    QXmlInputSource inputSource;
-    QXmlSimpleReader simpleReader;
-    inputSource.setData (strReply);
-    GvXMLParser xmlHandler;
-    xmlHandler.setEmitLog (bEmitLog);
-
     bOk = false;
     do { // Begin cleanup block (not a loop)
+        if (QNetworkReply::NoError != reply->error()) {
+            qWarning() << "Error getting the inbox XML:" << (int)reply->error();
+            break;
+        }
+
+        QString strReply = reply->readAll ();
+        QXmlInputSource inputSource;
+        QXmlSimpleReader simpleReader;
+        inputSource.setData (strReply);
+        GvXMLParser xmlHandler;
+        xmlHandler.setEmitLog (bEmitLog);
+
         simpleReader.setContentHandler (&xmlHandler);
         simpleReader.setErrorHandler (&xmlHandler);
 
         if (bEmitLog) qDebug ("Begin parsing");
-        if (!simpleReader.parse (&inputSource, false))
-        {
-            qWarning ("Failed to parse XML");
+        if (!simpleReader.parse (&inputSource, false)) {
+            qWarning() << "Failed to parse GV Inbox XML. Data =" << strReply;
             break;
         }
         if (bEmitLog) qDebug ("End parsing");
@@ -1024,8 +1028,9 @@ GVWebPage::onGotInboxXML (QNetworkReply *reply)
         int nNew = 0;
         qint32 nUsableMsgs = 0;
         if (!parseInboxJson (dtUpdate, xmlHandler.strJson, xmlHandler.strHtml,
-                             bGotOld, nNew, nUsableMsgs)) {
-            qWarning ("Failed to parse GV Inbox JSON");
+                             bGotOld, nNew, nUsableMsgs))
+        {
+            qWarning() << "Failed to parse GV Inbox JSON. Data =" << strReply;
             break;
         }
         if (workCurrent.arrParams.count() < 5) {
@@ -1051,8 +1056,7 @@ GVWebPage::onGotInboxXML (QNetworkReply *reply)
         sendInboxRequest ();
     } while (0); // End cleanup block (not a loop)
 
-    if (!bOk)
-    {
+    if (!bOk) {
         completeCurrentWork (GVAW_getInbox, false);
     }
 
