@@ -52,8 +52,7 @@ Rectangle {
         }
     }// Tab Content
 
-    Component.onCompleted:
-    {
+    Component.onCompleted: {
         // select the default tab index
         tabClicked(tabIndex);
     }
@@ -87,17 +86,17 @@ Rectangle {
 
             Image {
                 source: tabsModel.children[index].icon
-                anchors {
-                    fill: parent
-                    centerIn: parent
-                }
+                anchors.centerIn: parent
                 fillMode: Image.PreserveAspectFit
-            }
+
+                height: parent.height * 0.8
+                width: height
+            }//Image (image on the tab)
 
             MouseArea {
                 anchors.fill: parent
                 onClicked: tabClicked(index);
-            }
+            }//MouseArea (
         }
     }//Component (tabBarItem)
 
