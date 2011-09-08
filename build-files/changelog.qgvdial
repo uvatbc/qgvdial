@@ -1,3 +1,2 @@
-  * Bugfix: Voicemail needs to be picked up from a different URL
-  * Bugfix: Marking an inbox entry as read also needs to be done at a different URL.
+  * Bugfix: Voicemail could not be restarted after it finished playing (n900 only)
 

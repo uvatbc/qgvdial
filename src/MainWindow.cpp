@@ -2083,8 +2083,18 @@ MainWindow::createVmailPlayer()
     bool rv = connect (
         vmailPlayer, SIGNAL(stateChanged (Phonon::State, Phonon::State)),
         this, SLOT(onVmailPlayerStateChanged(Phonon::State, Phonon::State)));
-    Q_ASSERT(rv); Q_UNUSED(rv);
+    Q_ASSERT(rv);
+    rv = connect (vmailPlayer, SIGNAL(finished ()),
+                  this, SLOT(onVmailPlayerFinished()));
+    Q_ASSERT(rv);
 }//MainWindow::createVmailPlayer
+
+void
+MainWindow::onVmailPlayerFinished()
+{
+    qDebug("Force stop vmail on finished");
+    vmailPlayer->stop ();
+}//MainWindow::onVmailPlayerFinished
 
 void
 MainWindow::onSigCloseVmail()

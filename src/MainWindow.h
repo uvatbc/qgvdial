@@ -187,6 +187,8 @@ private slots:
 
     //! Invoked when the vmail is being shut off
     void onSigCloseVmail();
+    //! Invoked when the vmail player has finished playing
+    void onVmailPlayerFinished();
 
     //! Created to delete the cookie jar and re-create it
     void onRecreateCookieJar();
