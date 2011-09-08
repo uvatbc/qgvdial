@@ -1505,7 +1505,7 @@ GVWebPage::playVmail ()
     {
         QString strWhich = workCurrent.arrParams[0].toString();
 
-        QString strLink = QString (GV_HTTPS "/media/send_voicemail/%1")
+        QString strLink = QString (GV_HTTPS "/b/0/media/send_voicemail/%1")
                             .arg(workCurrent.arrParams[0].toString());
         QNetworkRequest request(strLink);
         request.setRawHeader ("User-Agent", UA_IPHONE);
@@ -1712,7 +1712,7 @@ GVWebPage::markAsRead ()
     QString strContent = QString("messages=%1&read=1&_rnr_se=%2")
                             .arg(arrParams[0].toString()).arg(strRnr_se);
 
-    QNetworkRequest request(QString(GV_HTTPS "/inbox/mark"));
+    QNetworkRequest request(QString(GV_HTTPS "/b/0/inbox/mark"));
     request.setRawHeader ("User-Agent", UA_DESKTOP);
 
     bool rv = connect (mgr , SIGNAL (finished(QNetworkReply *)),
