@@ -925,7 +925,7 @@ GVWebPage::sendInboxRequest ()
             emit status (QString("Getting inbox page %1...").arg(nCurrent), 0);
         }
 
-        QString strLink = QString (GV_HTTPS "/inbox/recent/%1?page=p%2")
+        QString strLink = QString (GV_HTTPS "/b/0/inbox/recent/%1?page=p%2")
                             .arg(strWhich).arg(nCurrent);
         QNetworkRequest request(strLink);
         request.setRawHeader ("User-Agent", UA_IPHONE);
