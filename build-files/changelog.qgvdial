@@ -1,2 +1,2 @@
-  * Remove scalable icon. Desktop file will refer to the 48 or 60 pixel icon
+  * Revert previous change. Scalable icon is required. Change it to the 64 bit one.
 
