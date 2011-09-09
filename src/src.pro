@@ -255,7 +255,7 @@ maemo5|contains(MEEGO_EDITION,harmattan) {
 
     DEFINES += DATADIR=\"$$DATADIR\" PKGDATADIR=\"$$PKGDATADIR\"
 
-    INSTALLS += target desktop icon icon48 icon64 icon_scalable dbusservice
+    INSTALLS += target desktop icon icon48 icon64 dbusservice
 
     target.path =$$BINDIR
 
@@ -270,9 +270,6 @@ maemo5|contains(MEEGO_EDITION,harmattan) {
 
     icon64.path = $$DATADIR/icons/hicolor/64x64/hildon
     icon64.files = ../icons/64/qgvdial.png
-
-    icon_scalable.path = $$DATADIR/icons/hicolor/scalable/hildon
-    icon_scalable.files = qgvdial.png
 
     dbusservice.path = $$DATADIR/dbus-1/services
     dbusservice.files += ../build-files/qgvdial.Call.service
