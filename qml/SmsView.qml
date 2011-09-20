@@ -85,15 +85,17 @@ Rectangle {
         }
 
         FocusScope {
+            anchors {
+                top: smsLabel.bottom
+                left: parent.left
+            }
+            height: smsText.paintedHeight
+            width: parent.width - 1
+
             Rectangle {
                 id: smsTextRect
 
-                anchors {
-                    top: smsLabel.bottom
-                    left: parent.left
-                }
-                height: smsText.paintedHeight
-                width: parent.width - 1
+                anchors.fill: parent
 
                 border.color: smsText ? "orange" : "blue"
                 color: "slategray"
