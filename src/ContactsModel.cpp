@@ -77,6 +77,7 @@ ContactsModel::data (const QModelIndex &index, int role) const
         }
 
         if (CT_ImagePathRole == role) {
+            retVar.clear ();
             if ((!info.strPhotoPath.isEmpty ()) &&
                 (QFileInfo(info.strPhotoPath).exists ())) {
                 retVar = QUrl::fromLocalFile (info.strPhotoPath);
@@ -84,7 +85,6 @@ ContactsModel::data (const QModelIndex &index, int role) const
                 if (!info.strPhotoPath.isEmpty ()) {
                     emit noContactPhoto(info);
                 }
-                retVar = QUrl("qrc:/unknown_contact.png");
             }
             break;
         }

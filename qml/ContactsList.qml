@@ -159,7 +159,7 @@ Rectangle {
                     height: parent.height
                     width: parent.height
 
-                    source: imagePath
+                    source: imagePath ? imagePath : "unknown_contact.png"
                     fillMode: Image.PreserveAspectFit
                 }
 

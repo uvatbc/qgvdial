@@ -36,6 +36,7 @@ InboxModel::InboxModel (QObject * parent)
     roles[IN_Link]      = "link";
     roles[IN_TimeDetail]= "time_detail";
     roles[IN_SmsText]   = "smstext";
+    roles[IN_ReadFlag]  = "is_read";
     setRoleNames(roles);
 }//InboxModel::InboxModel
 
@@ -76,6 +77,9 @@ InboxModel::data (const QModelIndex &index,
             break;
         case IN_NumberRole:
             column = 4;
+            break;
+        case IN_ReadFlag:
+            column = 5;
             break;
         case IN_SmsText:
             column = 6;
@@ -189,6 +193,14 @@ InboxModel::data (const QModelIndex &index,
 
             GVAccess::beautify_number (strNum);
             var = strNum;
+        }
+        else if (5 == column)   // GV_IN_FLAGS
+        {
+            if (IN_ReadFlag == role) {
+                var = QVariant(bool(var.toInt() & (1 << 0) ? true : false));
+            } else {
+                var.clear ();
+            }
         }
         else if (6 == column)   // GV_IN_SMSTEXT
         {

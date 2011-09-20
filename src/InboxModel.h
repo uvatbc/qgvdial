@@ -39,6 +39,7 @@ public:
         IN_Link,
         IN_TimeDetail,
         IN_SmsText,
+        IN_ReadFlag
     };
 
     InboxModel (QObject * parent = 0);

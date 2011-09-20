@@ -693,15 +693,15 @@ CacheDatabase::refreshInboxModel (InboxModel *modelInbox,
 {
     GVI_Entry_Type Type = modelInbox->string_to_type (strType);
     QString strQ = "SELECT "
-                   GV_IN_ID ","
-                   GV_IN_TYPE ","
-                   GV_IN_ATTIME ","
-                   GV_IN_DISPNUM ","
-                   GV_IN_PHONE ","
-                   GV_IN_FLAGS ","
-                   GV_IN_SMSTEXT ","
-                   GV_IN_NOTE " "
-                   "FROM " GV_INBOX_TABLE;
+                            GV_IN_ID      ","
+                            GV_IN_TYPE    ","
+                            GV_IN_ATTIME  ","
+                            GV_IN_DISPNUM ","
+                            GV_IN_PHONE   ","
+                            GV_IN_FLAGS   ","
+                            GV_IN_SMSTEXT ","
+                            GV_IN_NOTE    " "
+                   "FROM "  GV_INBOX_TABLE;
     if (GVIE_Unknown != Type) {
         strQ += QString (" WHERE " GV_IN_TYPE "=%1 ").arg (Type);
     }
