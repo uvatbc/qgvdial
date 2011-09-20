@@ -84,52 +84,54 @@ Rectangle {
             font.pixelSize: mainFlick.pixHeight
         }
 
-        Rectangle {
-            id: smsTextRect
-
-            anchors {
-                top: smsLabel.bottom
-                left: parent.left
-            }
-            height: smsText.paintedHeight
-            width: parent.width - 1
-
-            border.color: smsText ? "orange" : "blue"
-            color: "slategray"
-
-            TextEdit {
-                id: smsText
+        FocusScope {
+            Rectangle {
+                id: smsTextRect
 
                 anchors {
+                    top: smsLabel.bottom
                     left: parent.left
-                    top: parent.top
                 }
+                height: smsText.paintedHeight
+                width: parent.width - 1
 
-                // Forcibly set width so that wrap mode can work
-                width: parent.width
-                wrapMode: Text.WordWrap
-                textFormat: TextEdit.PlainText
+                border.color: smsText ? "orange" : "blue"
+                color: "slategray"
 
-                height: font.pixelSize > paintedHeight ? font.pixelSize : paintedHeight
+                TextEdit {
+                    id: smsText
 
-                font.pixelSize: mainFlick.pixHeight
-                color: "white"
-
-                activeFocusOnPress: false
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        if (!textInput.activeFocus) {
-                            textInput.forceActiveFocus();
-                            textInput.openSoftwareInputPanel();
-                        } else {
-                            textInput.focus = false;
-                            textInput.closeSoftwareInputPanel();
-                        }
+                    anchors {
+                        left: parent.left
+                        top: parent.top
                     }
-                }//MouseArea
-            }//TextEdit
-        }//Rectangle (bounding the sms text edit)
+
+                    // Forcibly set width so that wrap mode can work
+                    width: parent.width
+                    wrapMode: Text.WordWrap
+                    textFormat: TextEdit.PlainText
+
+                    height: font.pixelSize > paintedHeight ? font.pixelSize : paintedHeight
+
+                    font.pixelSize: mainFlick.pixHeight
+                    color: "white"
+
+                    activeFocusOnPress: false
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            if (!textInput.activeFocus) {
+                                textInput.forceActiveFocus();
+                                textInput.openSoftwareInputPanel();
+                            } else {
+                                textInput.focus = false;
+                                textInput.closeSoftwareInputPanel();
+                            }
+                        }
+                    }//MouseArea
+                }//TextEdit
+            }//Rectangle (bounding the sms text edit)
+        }//FocusScope
 
         Text {
             id: remainingCharsText
