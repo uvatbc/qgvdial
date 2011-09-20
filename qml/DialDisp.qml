@@ -81,7 +81,17 @@ Rectangle {
                 bold: true
             }
 
-            onActiveFocusChanged: txtNum.closeSoftwareInputPanel();
+            activeFocusOnPress: false
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    if (!txtNum.activeFocus) {
+                        txtNum.forceActiveFocus();
+                    } else {
+                        txtNum.focus = false;
+                    }
+                }
+            }//MouseArea
 
             onTextChanged: wDisp.sigNumChanged(txtNum.text);
         }// TextEdit

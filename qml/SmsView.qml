@@ -25,10 +25,6 @@ Rectangle {
     id: container
     objectName: "SmsPage"
 
-// Uncomment when testing
-//    height: 400
-//    width: 250
-
     signal sigBack
     signal sigText(string strNumbers, string strText)
 
@@ -72,7 +68,7 @@ Rectangle {
                        ((pixHeight+1) * modelDestinations.count) + btnRow.height + 8
         contentWidth: width
 
-        property real pixHeight: (parent.height + parent.width) / 44
+        property real pixHeight: (parent.height + parent.width) / 35
 
         Text {
             id: smsLabel
@@ -94,9 +90,9 @@ Rectangle {
             anchors {
                 top: smsLabel.bottom
                 left: parent.left
-                right: parent.right
             }
             height: smsText.paintedHeight
+            width: parent.width - 1
 
             border.color: smsText ? "orange" : "blue"
             color: "slategray"
@@ -118,7 +114,21 @@ Rectangle {
 
                 font.pixelSize: mainFlick.pixHeight
                 color: "white"
-            }
+
+                activeFocusOnPress: false
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        if (!textInput.activeFocus) {
+                            textInput.forceActiveFocus();
+                            textInput.openSoftwareInputPanel();
+                        } else {
+                            textInput.focus = false;
+                            textInput.closeSoftwareInputPanel();
+                        }
+                    }
+                }//MouseArea
+            }//TextEdit
         }//Rectangle (bounding the sms text edit)
 
         Text {
@@ -162,7 +172,7 @@ Rectangle {
 
                         id: entryText
                         text: name + " (" + number + ")"
-                        font.pixelSize: mainFlick.pixHeight
+                        font.pixelSize: mainFlick.pixHeight / 1.2
                         color: "white"
                     }//Text
 
@@ -174,7 +184,7 @@ Rectangle {
                             bottom: parent.bottom
                         }
                         width: height
-                        height: entryText.height
+                        height: entryRepeater.height - 1
 
                         color: "black"
 
@@ -204,9 +214,11 @@ Rectangle {
         Row {
             id: btnRow
 
+            spacing: 2
+
             anchors {
                 top: repeaterColumn.bottom
-                topMargin: 2
+                topMargin: 10
                 left: parent.left
                 right: parent.right
                 rightMargin: 1
@@ -217,7 +229,7 @@ Rectangle {
                 id: btnBack
 
                 mainText: "Back"
-                mainPixelSize: (mainFlick.pixHeight * 1.5)
+                mainPixelSize: (mainFlick.pixHeight * 1.1)
 
                 width: (parent.width / 2) - parent.spacing
                 height: parent.height
@@ -231,7 +243,7 @@ Rectangle {
                 id: btnSend
 
                 mainText: "Send"
-                mainPixelSize: (mainFlick.pixHeight * 1.5)
+                mainPixelSize: (mainFlick.pixHeight * 1.1)
 
                 width: (parent.width / 2) - parent.spacing
                 height: parent.height
@@ -254,4 +266,3 @@ Rectangle {
         }//Row (back and send buttons)
     }//Flickable (mainFlick)
 }//Rectangle
-

@@ -49,26 +49,7 @@ FocusScope {
             width: container.width
             font.pixelSize: container.pixelSize
 
-            focus: true;
-            onActiveFocusChanged: {
-                if (activeFocus == false) {
-                    console.debug("Close the SIP dammit!");
-                    closeSoftwareInputPanel ();
-                }
-            }
-
-            onTextChanged: {
-                container.sigTextChanged(text);
-                container.text = textEd.text
-            }
-
             inputMethodHints: Qt.ImhNoAutoUppercase + Qt.ImhNoPredictiveText
-
-            Keys.onReturnPressed: {
-                closeSoftwareInputPanel ();
-                event.accepted = true;
-                container.sigEnter();
-            }
         }//TextInput
     }//Rectangle (around the text box)
 }//FocusScope
