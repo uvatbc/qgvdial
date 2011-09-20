@@ -81,6 +81,7 @@ Rectangle {
                 bold: true
             }
 
+            onFocusChanged: txtNum.closeSoftwareInputPanel();
             activeFocusOnPress: false
             MouseArea {
                 anchors.fill: parent

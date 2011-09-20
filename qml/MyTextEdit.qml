@@ -50,6 +50,17 @@ FocusScope {
             font.pixelSize: container.pixelSize
 
             inputMethodHints: Qt.ImhNoAutoUppercase + Qt.ImhNoPredictiveText
+
+            onTextChanged: {
+                container.sigTextChanged(text);
+                container.text = textEd.text;
+            }
+
+            Keys.onReturnPressed: {
+                closeSoftwareInputPanel ();
+                event.accepted = true;
+                container.sigEnter();
+            }
         }//TextInput
     }//Rectangle (around the text box)
 }//FocusScope
