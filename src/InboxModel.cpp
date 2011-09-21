@@ -329,3 +329,20 @@ InboxModel::insertEntry (const GVInboxEntry &hEvent)
 
     return (true);
 }//InboxModel::insertEntry
+
+bool
+InboxModel::markAsRead (const QString &msgId)
+{
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    if (!dbMain.markAsRead (msgId)) {
+        qWarning ("Failed to mark read.");
+        return (false);
+    }
+
+    QVariant val = msgId;
+    QModelIndexList indexList = match(QModelIndex(), Qt::EditRole, val);
+
+    //TODO: Use this match list to emit dataChanged ();
+
+    return (true);
+}//InboxModel::markAsRead

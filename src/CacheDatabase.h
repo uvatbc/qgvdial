@@ -95,6 +95,7 @@ public:
     // Single inbox entry
     bool existsInboxEntry (const GVInboxEntry &hEvent);
     bool insertInboxEntry (const GVInboxEntry &hEvent);
+    bool markAsRead (const QString &msgId);
 
     // Collect multiple texts
     QStringList getTextsByDate(QDateTime dtStart, QDateTime dtEnd);

@@ -122,12 +122,12 @@ Rectangle {
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
-                            if (!textInput.activeFocus) {
-                                textInput.forceActiveFocus();
-                                textInput.openSoftwareInputPanel();
+                            if (!smsText.activeFocus) {
+                                smsText.forceActiveFocus();
+                                smsText.openSoftwareInputPanel();
                             } else {
-                                textInput.focus = false;
-                                textInput.closeSoftwareInputPanel();
+                                smsText.focus = false;
+                                smsText.closeSoftwareInputPanel();
                             }
                         }
                     }//MouseArea

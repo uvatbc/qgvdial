@@ -54,6 +54,7 @@ public:
     bool refresh ();
 
     bool insertEntry (const GVInboxEntry &hEvent);
+    bool markAsRead (const QString &msgId);
 
 private:
     int rowCount(const QModelIndex &parent = QModelIndex()) const;

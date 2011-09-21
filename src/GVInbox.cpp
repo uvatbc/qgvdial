@@ -215,5 +215,7 @@ GVInbox::onInboxEntryMarked (bool bOk, const QVariantList &params)
 {
     if (!bOk) {
         qWarning() << "Failed to mark read: ID =" << params[0].toString();
+    } else {
+        modelInbox->markAsRead (params[0].toString());
     }
 }//GVInbox::onInboxEntryMarked

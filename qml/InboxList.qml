@@ -382,7 +382,7 @@ Rectangle {
                 id: listDelegate
 
                 color: "#202020"
-                border.color: "darkslategray"
+                border.color: is_read ? "darkslategray" : "yellow"
                 radius: 2
 
                 width: listInbox.width - border.width

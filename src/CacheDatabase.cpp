@@ -849,6 +849,48 @@ CacheDatabase::insertInboxEntry (const GVInboxEntry &hEvent)
     return (rv);
 }//CacheDatabase::insertInboxEntry
 
+bool
+CacheDatabase::markAsRead (const QString &msgId)
+{
+    QString scrubId = msgId;
+    scrubId.replace ("'", "''");
+
+    QSqlQuery query(dbMain);
+    query.setForwardOnly (true);
+
+    bool rv = false;
+    do { // Begin cleanup block (not a loop)
+        rv = query.exec (QString("SELECT " GV_IN_FLAGS " FROM " GV_INBOX_TABLE
+                                 " WHERE " GV_IN_ID "='%1'").arg (scrubId));
+        if (!rv || !query.next ()) {
+            rv = false;
+            qWarning ("Failed to get the inbox entry to mark as read");
+            break;
+        }
+
+        quint32 flags = query.value (0).toInt (&rv);
+        if (!rv) {
+            qWarning ("Failed to convert flags result into integer");
+            break;
+        }
+
+        flags &= (~(1 << 0));
+
+        rv = query.exec (QString("UPDATE " GV_INBOX_TABLE " "
+                                 "SET " GV_IN_FLAGS "=%1 "
+                                 "WHERE " GV_IN_ID "='%2'")
+                         .arg(flags).arg (scrubId));
+        if (!rv) {
+            qWarning ("Failed to update inbox table with a flag marked read");
+            break;
+        }
+
+        rv = true;
+    } while (0); // End cleanup block (not a loop)
+
+    return (rv);
+}//CacheDatabase::markAsRead
+
 QStringList
 CacheDatabase::getTextsByDate(QDateTime dtStart, QDateTime dtEnd)
 {
