@@ -10,4 +10,4 @@ Package: qgvdial
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Multi-platform Google Voice Dialer
- Multi-platform Google Voice Dialer written in QT. Works so far in Windows, Linux, Maemo5-fremantle and MacOSX Snow Leopard.
+ Google Voice Dialer written in QT. Works so far in Windows, Linux, Maemo5, Symbian, Meego, Harmattan and MacOSX Snow Leopard.

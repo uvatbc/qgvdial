@@ -11,4 +11,4 @@ Package: qgvnotify
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, libmosquitto (>= 0.9.3), libssl0.9.8
 Description: Multi-platform Google Voice Dialer
- Multi-platform Google Voice Dialer written in QT. Works so far in Windows, Linux, Maemo5-fremantle and MacOSX Snow Leopard.
+ Poll Google Voice and Contacts for changes and publish results to a mosquitto server. This is primarily used in conjunction with qgvdial
