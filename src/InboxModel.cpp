@@ -339,10 +339,19 @@ InboxModel::markAsRead (const QString &msgId)
         return (false);
     }
 
-    QVariant val = msgId;
-    QModelIndexList indexList = match(QModelIndex(), Qt::EditRole, val);
+/*@@Uv : This works for a single change, but for whatever reason does not get
+         the data through the underlying SQL query. Cached data - that still has
+         the unread flag - is returned.
 
-    //TODO: Use this match list to emit dataChanged ();
+    QVariant val = msgId;
+    QModelIndexList indexList = match(index(0,0), Qt::EditRole, val);
+
+    foreach (QModelIndex mi, indexList) {
+        emit dataChanged (mi.sibling(mi.row (), 5), mi.sibling(mi.row (), 5));
+    }
+*/
+
+    dbMain.refreshInboxModel (this, strSelectType);
 
     return (true);
 }//InboxModel::markAsRead

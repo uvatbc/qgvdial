@@ -874,7 +874,13 @@ CacheDatabase::markAsRead (const QString &msgId)
             break;
         }
 
-        flags &= (~(1 << 0));
+        if (flags & (1 << 0)) {
+            qDebug("Entry was already read. no need to re-mark.");
+            rv = false;
+            break;
+        }
+
+        flags |= (1 << 0);
 
         rv = query.exec (QString("UPDATE " GV_INBOX_TABLE " "
                                  "SET " GV_IN_FLAGS "=%1 "
