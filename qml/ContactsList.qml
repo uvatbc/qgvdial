@@ -184,7 +184,7 @@ Rectangle {
                         contactDetails.model = contacts;
                         contactDetails.notesText = notes;
                         contactDetails.name = name;
-                        contactDetails.imageSource = imagePath;
+                        contactDetails.imageSource = (imagePath ? imagePath : "unknown_contact.png");
                         container.state = "Details";
                     }
                 }
