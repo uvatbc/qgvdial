@@ -67,7 +67,9 @@ Rectangle {
         id: mainFlick
         anchors.fill: parent
 
-        contentHeight: smsLabel.height + smsTextRect.height + remainingCharsText.height +
+        contentHeight: smsLabel.height + smsLabel.anchors.topMargin +
+                       smsTextRect.height + smsTextRect.anchors.topMargin +
+                       remainingCharsText.height + remainingCharsText.anchors.topMargin +
                        ((pixHeight+1) * modelDestinations.count) + btnRow.height + 8
         contentWidth: width
 
@@ -77,11 +79,11 @@ Rectangle {
             id: smsLabel
             anchors {
                 top: parent.top
-                left: parent.left
-                right: parent.right
+                topMargin: 5
+                horizontalCenter: parent.horizontalCenter
             }
 
-            text: "SMS Text:"
+            text: "SMS Text"
             color: "white"
 
             font.pixelSize: mainFlick.pixHeight
@@ -92,6 +94,7 @@ Rectangle {
 
             anchors {
                 top: smsLabel.bottom
+                topMargin: 2
                 left: parent.left
             }
             height: smsText.paintedHeight
@@ -146,6 +149,7 @@ Rectangle {
 
             anchors {
                 top: smsTextRect.bottom
+                topMargin: 5
                 left: parent.left
                 right: parent.right
             }

@@ -66,8 +66,15 @@ Rectangle { // Contact details
 
             Row {
                 id: imageName
-                height: contactImage.height
-                width: parent.width
+                height: contactImage.height + anchors.topMargin
+
+                anchors {
+                    top: parent.top
+                    left: parent.left
+                    right: parent.right
+                    topMargin: 5
+                    leftMargin: 5
+                }
 
                 Image {
                     id: contactImage
