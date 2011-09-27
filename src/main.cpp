@@ -23,13 +23,18 @@ Contact: yuvraaj@gmail.com
 #include "MainWindow.h"
 #include "Singletons.h"
 
-QtMsgHandler pOldHandler = NULL;
-MainWindow *pw = NULL;
+#include <iostream>
+using namespace std;
+
+QtMsgHandler    pOldHandler = NULL;
+MainWindow     *pw = NULL;
+
+QFile fLogfile;       //! Logfile
+int   logLevel = 5;   //! Log level
 
 void
 myMessageOutput(QtMsgType type, const char *msg)
 {
-    QString strMsg = msg;
     int level = -1;
     switch (type) {
     case QtDebugMsg:
@@ -45,23 +50,70 @@ myMessageOutput(QtMsgType type, const char *msg)
         level = 0;
     }
 
-    if (NULL != pw) {
-        pw->log (strMsg, level);
+    QDateTime dt = QDateTime::currentDateTime ();
+    QString strLog = QString("%1 : %2 : %3")
+                     .arg(dt.toString ("yyyy-MM-dd hh:mm:ss.zzz"))
+                     .arg(level)
+                     .arg(msg);
+
+    // Send to standard output
+    cout << strLog.toStdString () << endl;
+
+    QRegExp regex("^\"(.*)\"\\s*");
+    if (strLog.indexOf (regex) != -1) {
+        strLog = regex.cap (1);
+    }
+
+    if (strLog.contains ("password", Qt::CaseInsensitive)) {
+        strLog = QString("%1 : %2 : %3")
+                    .arg(dt.toString ("yyyy-MM-dd hh:mm:ss.zzz"))
+                    .arg(level)
+                    .arg("Log message with password blocked");
+    }
+
+    if ((level <= logLevel) && (NULL != pw)) {
+        pw->log (strLog);
+    }
+
+    strLog += '\n';
+    if (level <= logLevel) {
+        // Append it to the file
+        fLogfile.write(strLog.toLatin1 ());
     }
 
     if (NULL == pOldHandler) {
         if (NULL == pw) {
-            strMsg += "\n";
-            fwrite (strMsg.toLatin1 (), strMsg.size (), 1, stderr);
+            fwrite (strLog.toLatin1 (), strLog.size (), 1, stderr);
         }
 
         if (QtFatalMsg == type) {
             abort();
         }
     } else {
-        pOldHandler (type, strMsg.toLatin1 ());
+        pOldHandler (type, strLog.toLatin1 ());
     }
 }//myMessageOutput
+
+static void
+initLogging ()
+{
+    OsDependent &osd = Singletons::getRef().getOSD ();
+    QString strLogfile = osd.getAppDirectory ();
+    strLogfile += QDir::separator ();
+    strLogfile += "qgvdial.log";
+
+    fLogfile.setFileName (strLogfile);
+    fLogfile.open (QIODevice::WriteOnly | QIODevice::Append);
+    fLogfile.seek (fLogfile.size ());
+
+    pOldHandler = qInstallMsgHandler(myMessageOutput);
+}//initLogging
+
+static void
+deinitLogging ()
+{
+    pw = NULL;
+}//deinitLogging
 
 int
 main (int argc, char *argv[])
@@ -70,7 +122,7 @@ main (int argc, char *argv[])
     MainApp::setAttribute (Qt::AA_S60DontConstructApplicationPanes);
 #endif
 
-    pOldHandler = qInstallMsgHandler(myMessageOutput);
+    initLogging ();
 
     MainApp app(argc, argv);
     bool bQuit = false;
@@ -109,6 +161,6 @@ main (int argc, char *argv[])
 #endif
 
     int rv = app.exec();
-    pw = NULL;
+    deinitLogging ();
     return (rv);
 }//main

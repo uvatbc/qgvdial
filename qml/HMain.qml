@@ -36,8 +36,11 @@ PageStackWindow {
         id: mainPage
         anchors.fill: parent
 
-        Main {
+        FocusScope {
             anchors.fill: parent
+            Main {
+                anchors.fill: parent
+            }
         }
     }//Page
 }//PageStackWindow (main)

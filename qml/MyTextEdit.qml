@@ -51,15 +51,29 @@ FocusScope {
 
             inputMethodHints: Qt.ImhNoAutoUppercase + Qt.ImhNoPredictiveText
 
-            onTextChanged: {
-                container.sigTextChanged(text);
-                container.text = textEd.text;
-            }
+            activeFocusOnPress: false
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    if (!textEd.activeFocus) {
+                        textEd.forceActiveFocus();
+                    } else {
+                        textEd.focus = false;
+                    }
+                }
+            }//MouseArea
 
             Keys.onReturnPressed: {
                 closeSoftwareInputPanel ();
                 event.accepted = true;
                 container.sigEnter();
+                textEd.focus = false;
+                container.focus = false;
+            }
+
+            onTextChanged: {
+                container.sigTextChanged(text);
+                container.text = textEd.text;
             }
         }//TextInput
     }//Rectangle (around the text box)

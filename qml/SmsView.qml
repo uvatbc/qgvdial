@@ -25,10 +25,13 @@ Rectangle {
     id: container
     objectName: "SmsPage"
 
+    color: "black"
+
     signal sigBack
     signal sigText(string strNumbers, string strText)
 
-    color: "black"
+    onSigBack: smsText.closeSoftwareInputPanel()
+    onSigText: smsText.closeSoftwareInputPanel()
 
     function addSmsDestination(name, number) {
         modelDestinations.append({"name": name, "number": number});

@@ -1,3 +1,4 @@
-  * Inbox list unread messages are shown differently
-  * Fixed a bug in the contact details display
+  * Change the logging method. Do most of it in main.cpp
+  * There's no need for a debug logging level.
+  * FocusScope and more trying to make SIP go away.
 

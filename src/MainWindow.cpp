@@ -30,8 +30,6 @@ using namespace std;
 
 MainWindow::MainWindow (QWidget *parent)
 : QDeclarativeView (parent)
-, fLogfile (this)
-, logLevel (5)
 , icoQgv (":/qgv.png")
 , pSystray (NULL)
 , oContacts (this)
@@ -124,17 +122,6 @@ MainWindow::~MainWindow ()
         delete jar;
         jar = NULL;
     }
-
-    // Dump the log one last time.
-    QMutexLocker locker(&logMutex);
-    for (int i = 0; i < arrLogTextStream.size(); i++) {
-        // Send to log file
-        if (fLogfile.isOpen ()) {
-            QTextStream streamLog(&fLogfile);
-            streamLog << arrLogTextStream[i] << endl;
-        }
-    }
-    arrLogTextStream.clear ();
 }//MainWindow::~MainWindow
 
 /** Initialize the log file name and timer.
@@ -147,13 +134,6 @@ void
 MainWindow::initLogging ()
 {
     // Initialize logging
-    OsDependent &osd = Singletons::getRef().getOSD ();
-    QString strLogfile = osd.getAppDirectory ();
-    strLogfile += QDir::separator ();
-    strLogfile += "qgvdial.log";
-    fLogfile.setFileName (strLogfile);
-    fLogfile.open (QIODevice::WriteOnly | QIODevice::Append);
-
     logsTimer.setSingleShot (true);
     logsTimer.start (3 * 1000);
     bool rv = connect (&logsTimer, SIGNAL(timeout()),
@@ -169,38 +149,12 @@ MainWindow::initLogging ()
  * @param level Log level
  */
 void
-MainWindow::log (const QString &strText, int level /*= 10*/)
+MainWindow::log (const QString &strText)
 {
-    QString strDisp;
-    QRegExp regex("^\"(.*)\"\\s*");
-    if (strText.indexOf (regex) != -1) {
-        strDisp = regex.cap (1);
-    } else {
-        strDisp = strText;
-    }
-
-    if ((strDisp.contains ("password", Qt::CaseInsensitive)) ||
-        ((!strPass.isEmpty ()) &&
-         (strDisp.contains (strPass, Qt::CaseInsensitive)))) {
-        strDisp = "Log message with password blocked";
-    }
-
-    QDateTime dt = QDateTime::currentDateTime ();
-    QString strLog = QString("%1 : %2 : %3")
-                     .arg(dt.toString ("yyyy-MM-dd hh:mm:ss.zzz"))
-                     .arg(level)
-                     .arg(strDisp);
-
-    // Send to standard output
-    cout << strLog.toStdString () << endl;
-
-    if (level <= logLevel) {
-        // Append it to the circular buffer
-        QMutexLocker locker(&logMutex);
-        arrLogMsgs.prepend (strLog);
-        arrLogTextStream.append (strLog);
-        bKickLocksTimer = true;
-    }
+    // Append it to the circular buffer
+    QMutexLocker locker(&logMutex);
+    arrLogMsgs.prepend (strText);
+    bKickLocksTimer = true;
 }//MainWindow::log
 
 void
@@ -214,15 +168,6 @@ MainWindow::onCleanupLogsArray()
         }
         bKickLocksTimer = false;
         timeout = 1 * 1000;
-
-        for (int i = 0; i < arrLogTextStream.size(); i++) {
-            // Send to log file
-            if (fLogfile.isOpen ()) {
-                QTextStream streamLog(&fLogfile);
-                streamLog << arrLogTextStream[i] << endl;
-            }
-        }
-        arrLogTextStream.clear ();
 
         while (arrLogMsgs.size () > 50) {
             arrLogMsgs.removeLast ();

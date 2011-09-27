@@ -233,6 +233,10 @@ struct ContactInfo
 Q_DECLARE_METATYPE(ContactInfo)
 ////////////////////////////////////////////////////////////////////////////////
 
+extern QFile fLogfile;   //! Logfile
+extern int   logLevel;   //! Log level
+
+
 #if defined(Q_WS_HILDON) && !defined(Q_WS_MAEMO_5)
 #define DIABLO_OS 1
 #else

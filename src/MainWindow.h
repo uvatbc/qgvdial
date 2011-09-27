@@ -60,7 +60,7 @@ signals:
     void regPhoneChange(const QStringList &phones, int index);
 
 public slots:
-    void log (const QString &strText, int level = 10);
+    void log (const QString &strText);
     void setStatus (const QString &strText, int timeout = 3000);
 
 private slots:
@@ -240,12 +240,6 @@ private:
     QObject * getMainPage();
 
 private:
-    //! Logfile
-    QFile           fLogfile;
-
-    //! Log level
-    int             logLevel;
-
     // Tray, icons, widgets
     QIcon           icoQgv;
     QSystemTrayIcon *pSystray;
@@ -308,8 +302,6 @@ private:
     QMutex          logMutex;
     //! This holds a circular buffer of log messages that will be shown by QML
     QStringList     arrLogMsgs;
-    //! This holds the logs yet to be pushed to the textstream
-    QStringList     arrLogTextStream;
     //! Logs display timer
     QTimer          logsTimer;
     //! kick timer
