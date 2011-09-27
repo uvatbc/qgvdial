@@ -31,6 +31,7 @@ MainWindow     *pw = NULL;
 
 QFile fLogfile;       //! Logfile
 int   logLevel = 5;   //! Log level
+int   logCounter = 0; //! Number of log entries since the last log flush
 
 void
 myMessageOutput(QtMsgType type, const char *msg)
@@ -77,8 +78,16 @@ myMessageOutput(QtMsgType type, const char *msg)
 
     strLog += '\n';
     if (level <= logLevel) {
-        // Append it to the file
-        fLogfile.write(strLog.toLatin1 ());
+        if (fLogfile.isOpen ()) {
+            // Append it to the file
+            fLogfile.write(strLog.toLatin1 ());
+
+            ++logCounter;
+            if (logCounter > 100) {
+                logCounter = 0;
+                fLogfile.flush ();
+            }
+        }
     }
 
     if (NULL == pOldHandler) {
@@ -113,6 +122,7 @@ static void
 deinitLogging ()
 {
     pw = NULL;
+    fLogfile.close ();
 }//deinitLogging
 
 int
