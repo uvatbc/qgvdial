@@ -1,4 +1,4 @@
-  * Change the logging method. Do most of it in main.cpp
-  * There's no need for a debug logging level.
-  * FocusScope and more trying to make SIP go away.
+  * software input panel closes on second click in the text box
+  * Made it possible for the SMS view to also close the sip.
+  * This should pass the Ovi Store QA.
 

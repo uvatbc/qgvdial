@@ -216,11 +216,11 @@ exists($$QMAKE_INCDIR_QT"/../qmsystem2/qmkeys.h"):!contains(MEEGO_EDITION,harmat
   MEEGO_VERSION_MINOR     = 2
   MEEGO_VERSION_PATCH     = 0
   MEEGO_EDITION           = harmattan
-  DEFINES += MEEGO_HARMATTAN
 }
 
 contains(MEEGO_EDITION,harmattan) {
- message(Meego!)
+  message(Meego!)
+  DEFINES += MEEGO_HARMATTAN
 }
 
 ###############################################################
@@ -229,15 +229,10 @@ contains(MEEGO_EDITION,harmattan) {
 
 # Installation for Maemo and Harmattan
 maemo5|contains(MEEGO_EDITION,harmattan) {
-    exists(../../buildit.sh) {
+    exists(../../buildit.sh) || exists(../../buildit.pl) || exists(.svn) {
         PREFIX = ../debian/qgvdial/usr
         message(Built using my scripts... probably inside scratchbox)
-    }
-    exists(../../buildit.pl) {
-        PREFIX = ../debian/qgvdial/usr
-        message(Built using my scripts)
-    }
-    !exists(../../buildit.pl):!exists(../../buildit.sh) {
+    } else {
         PREFIX = ../maemo/debian/qgvdial/usr
         message(Build using qtcreator)
     }

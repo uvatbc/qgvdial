@@ -52,17 +52,6 @@ FocusScope {
             inputMethodHints: Qt.ImhNoAutoUppercase + Qt.ImhNoPredictiveText
 
             activeFocusOnPress: false
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    if (!textEd.activeFocus) {
-                        textEd.forceActiveFocus();
-                    } else {
-                        textEd.focus = false;
-                    }
-                }
-            }//MouseArea
-
             Keys.onReturnPressed: {
                 closeSoftwareInputPanel ();
                 event.accepted = true;
@@ -76,6 +65,19 @@ FocusScope {
                 container.text = textEd.text;
             }
         }//TextInput
-    }//Rectangle (around the text box)
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                if (!textEd.activeFocus) {
+                    textEd.forceActiveFocus();
+                    textEd.openSoftwareInputPanel();
+                } else {
+                    textEd.closeSoftwareInputPanel();
+                    textEd.focus = false;
+                }
+            }
+        }//MouseArea
+   }//Rectangle (around the text box)
 }//FocusScope
 

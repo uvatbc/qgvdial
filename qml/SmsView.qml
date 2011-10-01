@@ -132,8 +132,8 @@ Rectangle {
                                 smsText.forceActiveFocus();
                                 smsText.openSoftwareInputPanel();
                             } else {
-                                smsText.focus = false;
                                 smsText.closeSoftwareInputPanel();
+                                smsText.focus = false;
                             }
                         }
                     }//MouseArea

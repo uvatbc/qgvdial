@@ -118,11 +118,11 @@ system($cmd);
 if ($machine eq "arm") {
     # Reverse the order of these two lines for a source build 
     $cmd = "cd $basedir && $mad dpkg-buildpackage -rfakeroot -sa -S -uc -us";
-    $cmd = "cd $basedir && $mad dpkg-buildpackage -rfakeroot -nc";
+    $cmd = "cd $basedir && $mad dpkg-buildpackage -rfakeroot -nc -uc -us";
 } else {
     # Reverse the order of these two lines for a source build 
     $cmd = "cd $basedir && $mad dpkg-buildpackage -sa -S -uc -us";
-    $cmd = "cd $basedir && $mad dpkg-buildpackage -nc";
+    $cmd = "cd $basedir && $mad dpkg-buildpackage -nc -uc -us";
 }
 # Execute the rest of the build command
 system($cmd);
