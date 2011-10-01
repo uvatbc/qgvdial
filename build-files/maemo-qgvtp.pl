@@ -13,8 +13,7 @@ my $cmd;
 my $line;
 
 # Delete any existing version file
-if (-f ver.cfg)
-{
+if (-f ver.cfg) {
     unlink(ver.cfg);
 }
 # Get the latest version file from the repository
@@ -25,6 +24,7 @@ system($cmd);
 open(QVARFILE, "ver.cfg") or die;
 my $qver = <QVARFILE>;
 close QVARFILE;
+chomp $qver;
 
 # Get the subversion checkin version
 my $svnver = `svn log $repo --limit=1 | grep \"^r\"`;

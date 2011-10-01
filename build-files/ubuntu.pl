@@ -16,6 +16,7 @@ system($cmd);
 open(QVARFILE, "ver.cfg") or die;
 my $qver = <QVARFILE>;
 close QVARFILE;
+chomp $qver;
 
 # Get the subversion checkin version
 my $svnver = `svn log $repo --limit=1 | grep \"^r\"`;
