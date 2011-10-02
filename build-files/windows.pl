@@ -12,6 +12,7 @@ system("svn export $repo/build-files/ver.cfg");
 open(QVARFILE, "ver.cfg") or die;
 my $qver = <QVARFILE>;
 close QVARFILE;
+chomp $qver;
 
 # Get the subversion checkin version
 system("svn log $repo --limit=1 | grep \"^r\" > svnlog.txt");
@@ -49,8 +50,8 @@ system($cmd);
 $cmd = "cd qgvdial-$qver & qmake & make release";
 system($cmd);
 
-# this is required for the old
-$cmd = "copy qgvdial-$qver\\src\\release\\qgvdial.exe I:\\Uv\\releases\\qgvdial\\win-install\\qgvdial\\bin";
+# this is required for the old installer
+$cmd = "copy qgvdial-$qver\\src\\release\\qgvdial.exe J:\\releases\\qgvdial\\win-install\\qgvdial\\bin";
 system($cmd);
 
 # New setup: Create MSI.

@@ -76,5 +76,3 @@ system("cd $basedir && make src/Makefile");
 # Execute the rest of the build command
 $cmd = "cd $basedir && $mad dpkg-buildpackage";
 system($cmd);
-
-exit();

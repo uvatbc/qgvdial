@@ -7,7 +7,7 @@ my ($sec,$min,$hour,$day,$month,$yr19,@rest) = localtime(time);
 $yr19 += 1900;
 $month++;
 my $suffix = sprintf("%04d%02d%02d", $yr19, $month, $day);
-$dest = sprintf("I:/Uv/releases/qgvdial/%04d-%02d-%02d", $yr19, $month, $day);
+$dest = sprintf("J:/releases/qgvdial/%04d-%02d-%02d", $yr19, $month, $day);
 if ((!(-e $dest)) or (!(-d $dest))) {
     $cmd = "powershell mkdir $dest";
     print("$cmd\n");
@@ -27,6 +27,7 @@ system($cmd);
 open(QVARFILE, "ver.cfg") or die;
 my $qver = <QVARFILE>;
 close QVARFILE;
+chomp $qver;
 
 # Get the subversion checkin version
 system("svn log $repo --limit=1 | grep \"^r\" > svnlog.txt");
