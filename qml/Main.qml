@@ -105,7 +105,6 @@ Rectangle {
     onSigHide: console.debug("QML: Dismiss requested");
     onSigQuit: console.debug("QML: Quit requested");
 
-    property int nMargins: 1
 
     property bool bShowSettings: g_bShowSettings
     onBShowSettingsChanged: {
@@ -236,11 +235,11 @@ Rectangle {
                 tabsModel: tabsModel
                 anchors {
                     top: parent.top
-                    topMargin: nMargins
-                    bottomMargin: nMargins
+                    topMargin: 1
+                    bottomMargin: 1
                 }
-                width: mainColumn.centralWidth
-                height: mainColumn.centralHeight
+                width: mainColumn.centralWidth - 1
+                height: mainColumn.centralHeight - 1
 
                 onSigHide: main.sigHide();
                 onSigClose: main.sigQuit();

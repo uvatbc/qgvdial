@@ -37,21 +37,6 @@ Rectangle {
 
     anchors.fill: parent
 
-    // will contain the tab views
-    Rectangle {
-        id: tabViewContainer
-        width: parent.width
-        color: "black"
-
-        anchors.top: tabBar.bottom
-        anchors.bottom: parent.bottom
-
-        // build all the tab views
-        Repeater {
-            model: tabsModel
-        }
-    }// Tab Content
-
     Component.onCompleted: {
         // select the default tab index
         tabClicked(tabIndex);
@@ -152,14 +137,14 @@ Rectangle {
 
         // place all the tabs in a row
         Row {
+            id: tabs
+
             anchors {
                 left: tabBar.left
                 right: rectX.left
                 top: parent.top
                 bottom: parent.bottom
             }
-
-            id: tabs
 
             Repeater {
                 model: tabsModel.count
@@ -168,4 +153,21 @@ Rectangle {
             }
         }// Row of tabs
     }// Rectangle (tab bar)
+
+    // will contain the tab views
+    Rectangle {
+        id: tabViewContainer
+        width: parent.width
+        color: "black"
+
+        anchors {
+            top: tabBar.bottom
+            bottom: parent.bottom
+        }
+
+        // build all the tab views
+        Repeater {
+            model: tabsModel
+        }
+    }// Tab Content
 }

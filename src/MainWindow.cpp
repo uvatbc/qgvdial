@@ -2037,6 +2037,7 @@ MainWindow::createVmailPlayer()
 void
 MainWindow::onVmailPlayerFinished()
 {
+    // Required to make phonon on Maemo work as expected.
     qDebug("Force stop vmail on finished");
     vmailPlayer->stop ();
 }//MainWindow::onVmailPlayerFinished
