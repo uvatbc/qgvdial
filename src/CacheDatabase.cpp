@@ -1083,6 +1083,9 @@ CacheDatabase::getProxySettings (bool &bEnable,
             pass = settings->value (GV_P_PASS).toString ();
         }
 
+        // Everything after this is proxy related. So if the proxy flags are
+        // not present there's no point doing the rest of the code. If there
+        // are other settings, this method will need to change.
         bEnable = bUseSystemProxy = bRequiresAuth = false;
         if (!settings->contains (GV_P_FLAGS)) {
             qWarning ("Failed to pull the proxy flags from the DB");
@@ -1374,7 +1377,10 @@ CacheDatabase::saveCookies(CookieJar *jar)
         query.bindValue (":name", name);
         query.bindValue (":value", value);
         rv = query.exec ();
-        Q_ASSERT(rv);
+        if (!rv) {
+            qWarning() << "Failed to insert cookie into DB" << query.lastError();
+            Q_ASSERT(rv);
+        }
     }
 
     return (true);

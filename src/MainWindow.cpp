@@ -1178,7 +1178,6 @@ void
 MainWindow::dialAccessNumber (const QString  &strAccessNumber,
                               const QVariant &context        )
 {
-    bool bSuccess = false;
     DialContext *ctx = (DialContext *) context.value<void *>();
     do // Begin cleanup block (not a loop)
     {
@@ -1198,7 +1197,6 @@ MainWindow::dialAccessNumber (const QString  &strAccessNumber,
 
         ctx->ci->initiateCall (strAccessNumber);
         setStatus ("Callout in progress");
-        bSuccess = true;
     } while (0); // End cleanup block (not a loop)
 }//MainWindow::dialAccessNumber
 

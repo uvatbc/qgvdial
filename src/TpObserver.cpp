@@ -120,6 +120,12 @@ TpObserver::observeChannels(
 }//TpObserver::observeChannels
 #endif
 
+QString
+TpObserver::name()
+{
+    return "TpObserver";
+}//TpObserver::name
+
 ChannelAccepter::ChannelAccepter (
     const MethodInvocationContextPtr<> & ctx,
     const AccountPtr                   & act,

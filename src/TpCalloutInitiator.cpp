@@ -39,6 +39,7 @@ TpCalloutInitiator::TpCalloutInitiator (Tp::AccountPtr act, QObject *parent)
     bool rv = connect (
         account.data (), SIGNAL(connectionChanged(const Tp::ConnectionPtr &)),
         this, SLOT(onConnectionChanged(const Tp::ConnectionPtr &)));
+    qWarning("Failed to connect connectionChanged on Callout initiator");
 //    Q_ASSERT(rv);
 
     rv = connect (
@@ -47,6 +48,7 @@ TpCalloutInitiator::TpCalloutInitiator (Tp::AccountPtr act, QObject *parent)
                                        Tp::ConnectionStatusReason)),
         this, SLOT(onConnectionChanged(Tp::ConnectionStatus,
                                        Tp::ConnectionStatusReason)));
+    qWarning("Failed to connect connectionStatusChanged on Callout initiator");
 //    Q_ASSERT(rv);
 
     Tp::ConnectionPtr connection = account->connection();

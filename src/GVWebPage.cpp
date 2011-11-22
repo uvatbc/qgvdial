@@ -189,7 +189,8 @@ GVWebPage::login ()
     bool rv = connect (&webPage, SIGNAL (loadFinished (bool)),
                        this   , SLOT   (loginStage1 (bool)));
     Q_ASSERT(rv);
-    this->loadUrlString (GV_HTTPS);
+//    this->loadUrlString (GV_HTTPS);
+    this->loadUrlString ("https://www.google.com/accounts/ServiceLogin?nui=5&service=grandcentral&ltmpl=mobile&btmpl=mobile&passive=true&continue=https://www.google.com/voice/m");
 
     rv = connect(&webPage, SIGNAL(loadProgress(int)),
                   this   , SLOT(loginProgress(int)));
@@ -1239,10 +1240,8 @@ GVWebPage::parseInboxJson(const QDateTime &dtUpdate, const QString &strJson,
                 resultSms = resultSms.trimmed ();
 
                 QString strSmsRow;
-                bool bSms = false;
                 if (!resultSms.isEmpty ()) {
                     result = "<div>" + resultSms + "</div>";
-                    bSms = true;
                 }
 
                 if ((parseMessageRow (result, strSmsRow)) &&

@@ -53,6 +53,7 @@ public:
                       QObject          *parent = NULL);
 #endif
     void setId (int i);
+    QString name();
 
 protected:
     void startMonitoring (const QString &strC);

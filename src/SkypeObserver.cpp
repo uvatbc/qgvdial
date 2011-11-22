@@ -194,3 +194,9 @@ SkypeObserver::onCallInfoDone (bool bOk, const QVariantList &params)
         emit callStarted ();
     } while (0); // End cleanup block (not a loop)
 }//SkypeObserver::onCallInfoDone
+
+QString
+SkypeObserver::name()
+{
+    return "SkypeObserver";
+}//SkypeObserver::name

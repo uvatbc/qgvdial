@@ -116,6 +116,9 @@ ObserverFactory::startObservers (const QString &strContact,
     {
         rv = connect (observer, SIGNAL (callStarted()),
                       receiver, method);
+        if (!rv) {
+            qWarning() << "Failed to connect observer" << observer->name();
+        }
         observer->startMonitoring (strContact);
     }
 }//ObserverFactory::createObservers

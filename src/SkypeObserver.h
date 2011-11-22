@@ -33,6 +33,9 @@ class SkypeObserver : public IObserver
 {
     Q_OBJECT
 
+public:
+    QString name();
+
 protected:
     SkypeObserver (QObject *parent = NULL);
     virtual ~SkypeObserver(void);

@@ -16,11 +16,11 @@ maemo5 {
     OTHER_FILES += ../build-files/qgvdial.desktop
 }
 
-# In Linux and maemo, add telepathy  and openssl
+# In Linux and maemo, add telepathy and openssl
 unix:!symbian: {
     QT *= dbus
     INCLUDEPATH += $$QMAKESPEC/usr/include/telepathy-1.0/
-    LIBS += -ltelepathy-qt4 -lssl
+    LIBS += -ltelepathy-qt4 -lssl -lcrypto
 }
 
 # In Windows, add openssl

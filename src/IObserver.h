@@ -32,6 +32,9 @@ class IObserver : public QObject
 {
     Q_OBJECT
 
+public:
+    virtual QString name() = 0;
+
 protected:
     IObserver (QObject *parent = NULL) : QObject(parent) {}
 
