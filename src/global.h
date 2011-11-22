@@ -51,6 +51,9 @@ Contact: yuvraaj@gmail.com
 #define GV_HTTPS        "https://www.google.com/voice"
 #define GV_HTTPS_M      "https://www.google.com/voice/m"
 
+#define GOOGLE_SERVICELOGIN "https://www.google.com/accounts/ServiceLogin"
+#define GV_SERVICELOGIN_PARAMS "?nui=5&service=grandcentral&ltmpl=mobile&btmpl=mobile&passive=true&continue="
+
 #define GV_CLIENTLOGIN "https://www.google.com/accounts/ClientLogin"
 
 struct GVRegisteredNumber

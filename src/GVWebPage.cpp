@@ -189,8 +189,7 @@ GVWebPage::login ()
     bool rv = connect (&webPage, SIGNAL (loadFinished (bool)),
                        this   , SLOT   (loginStage1 (bool)));
     Q_ASSERT(rv);
-//    this->loadUrlString (GV_HTTPS);
-    this->loadUrlString ("https://www.google.com/accounts/ServiceLogin?nui=5&service=grandcentral&ltmpl=mobile&btmpl=mobile&passive=true&continue=https://www.google.com/voice/m");
+    this->loadUrlString (GOOGLE_SERVICELOGIN GV_SERVICELOGIN_PARAMS GV_HTTPS_M);
 
     rv = connect(&webPage, SIGNAL(loadProgress(int)),
                   this   , SLOT(loginProgress(int)));
@@ -221,8 +220,9 @@ GVWebPage::loginStage1 (bool bOk)
         if (bEmitLog) qDebug ("Login page loaded");
 
         QString strHtml = webPage.mainFrame()->toHtml();
-        if ((strHtml.contains ("Error 413")) ||
-            (strHtml.contains ("We've detected a problem with your cookie settings."))) {
+        if ((strHtml.contains("Error 413")) ||
+            (strHtml.contains("We've detected a problem with your cookie settings.")))
+        {
             strLastError = "Internal error. Login again";
             bOk = false;
             break;
