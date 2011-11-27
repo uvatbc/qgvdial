@@ -86,12 +86,14 @@ MainWindow::MainWindow (QWidget *parent)
     }
 
     rv = connect (qApp, SIGNAL (messageReceived (const QString &)),
-                       this, SLOT   (messageReceived (const QString &)));
+                  this, SLOT   (messageReceived (const QString &)));
     Q_ASSERT(rv);
+    if (!rv) { exit(1); }
 
     rv = connect (&statusTimer, SIGNAL (timeout()),
                    this       , SLOT   (onStatusTimerTick ()));
     Q_ASSERT(rv);
+    if (!rv) { exit(1); }
 
     // Schedule the init a bit later so that the app.exec() can begin executing
     QTimer::singleShot (100, this, SLOT (init()));
@@ -329,15 +331,18 @@ MainWindow::init ()
     rv = connect (&webPage    , SIGNAL (dialInProgress (const QString &)),
                        this       , SLOT   (dialInProgress (const QString &)));
     Q_ASSERT(rv);
+    if (!rv) { exit(1); }
     rv = connect ( this       , SIGNAL (dialCanFinish ()),
                       &webPage    , SLOT   (dialCanFinish ()));
     Q_ASSERT(rv);
+    if (!rv) { exit(1); }
     rv = connect (
         &webPage, SIGNAL (dialAccessNumber (const QString &,
                                             const QVariant &)),
          this   , SLOT   (dialAccessNumber (const QString &,
                                             const QVariant &)));
     Q_ASSERT(rv);
+    if (!rv) { exit(1); }
 
     // Skype client factory needs a main widget. Also, it needs a status sink.
     SkypeClientFactory &skypeFactory = Singletons::getRef().getSkypeFactory ();
@@ -346,6 +351,7 @@ MainWindow::init ()
         &skypeFactory, SIGNAL (status(const QString &, int)),
          this        , SLOT   (setStatus(const QString &, int)));
     Q_ASSERT(rv);
+    if (!rv) { exit(1); }
 
     // Telepathy Observer factory init and status
     ObserverFactory &obF = Singletons::getRef().getObserverFactory ();
@@ -353,49 +359,59 @@ MainWindow::init ()
     rv = connect (&obF , SIGNAL (status(const QString &, int)),
                    this, SLOT   (setStatus(const QString &, int)));
     Q_ASSERT(rv);
+    if (!rv) { exit(1); }
 
     // webPage status
     rv = connect (&webPage, SIGNAL (status(const QString &, int)),
                    this   , SLOT   (setStatus(const QString &, int)));
     Q_ASSERT(rv);
+    if (!rv) { exit(1); }
 
     // When the call initiators change, update us
     CallInitiatorFactory& cif = Singletons::getRef().getCIFactory ();
     rv = connect (&cif, SIGNAL(changed()),
                    this, SLOT(onCallInitiatorsChange()));
     Q_ASSERT(rv);
+    if (!rv) { exit(1); }
     // Call initiator status
     rv = connect (&cif , SIGNAL (status(const QString &, int)),
                    this, SLOT   (setStatus(const QString &, int)));
     Q_ASSERT(rv);
+    if (!rv) { exit(1); }
 
     // Status from contacts object
     rv = connect (&oContacts, SIGNAL (status   (const QString &, int)),
                    this     , SLOT   (setStatus(const QString &, int)));
     Q_ASSERT(rv);
+    if (!rv) { exit(1); }
     // oContacts.allContacts -> this.getContactsDone
     rv = connect (&oContacts, SIGNAL (allContacts (bool)),
                    this      , SLOT   (getContactsDone (bool)));
     Q_ASSERT(rv);
+    if (!rv) { exit(1); }
     // Status from inbox object
     rv = connect (&oInbox, SIGNAL (status   (const QString &, int)),
                    this  , SLOT   (setStatus(const QString &, int)));
     Q_ASSERT(rv);
+    if (!rv) { exit(1); }
 
     // Inbox Model creation
     rv = connect (&oInbox, SIGNAL (setInboxModel(QAbstractItemModel *)),
                    this  , SLOT (onSetInboxModel(QAbstractItemModel *)));
     Q_ASSERT(rv);
+    if (!rv) { exit(1); }
     // Inbox selector changes
     rv = connect (&oInbox, SIGNAL (setInboxSelector(const QString &)),
                    this  , SLOT (onSetInboxSelector(const QString &)));
     Q_ASSERT(rv);
+    if (!rv) { exit(1); }
 
     // Inbox Model creation
     rv = connect (
         &oContacts, SIGNAL (setContactsModel(QAbstractItemModel *)),
          this     , SLOT (onSetContactsModel(QAbstractItemModel *)));
     Q_ASSERT(rv);
+    if (!rv) { exit(1); }
 
     // Additional UI initializations:
     //@@UV: Need this for later
@@ -427,15 +443,19 @@ MainWindow::init ()
     rv = connect (&actLogin, SIGNAL (triggered()),
                    this    , SLOT   (on_action_Login_triggered()));
     Q_ASSERT(rv);
+    if (!rv) { exit(1); }
     rv = connect (&actDismiss, SIGNAL (triggered()),
                    this      , SLOT   (hide ()));
     Q_ASSERT(rv);
+    if (!rv) { exit(1); }
     rv = connect (&actRefresh, SIGNAL (triggered()),
                    this      , SLOT   (onRefresh()));
     Q_ASSERT(rv);
+    if (!rv) { exit(1); }
     rv = connect (&actExit, SIGNAL (triggered()),
                    this   , SLOT   (on_actionE_xit_triggered()));
     Q_ASSERT(rv);
+    if (!rv) { exit(1); }
 
     this->setWindowIcon (icoQgv);
     clearSmsDestinations ();
@@ -454,15 +474,19 @@ MainWindow::init ()
     rv = connect (&mqThread , SIGNAL(sigUpdateInbox(const QDateTime &)),
                   &oInbox   , SLOT  (refresh(const QDateTime &)));
     Q_ASSERT(rv);
+    if (!rv) { exit(1); }
     rv = connect (&mqThread , SIGNAL(sigUpdateContacts(const QDateTime &)),
                   &oContacts, SLOT  (mqUpdateContacts(const QDateTime &)));
     Q_ASSERT(rv);
+    if (!rv) { exit(1); }
     rv = connect (&mqThread , SIGNAL(status(QString,int)),
                    this     , SLOT  (setStatus(QString,int)));
     Q_ASSERT(rv);
+    if (!rv) { exit(1); }
     rv = connect (&mqThread, SIGNAL(finished()),
                    this    , SLOT(onMqThreadFinished()));
     Q_ASSERT(rv);
+    if (!rv) { exit(1); }
 #endif
 
     // If the cache has the username and password, begin login
@@ -528,61 +552,80 @@ MainWindow::initQML ()
     bOk = connect (gObj, SIGNAL (sigCall (QString)),
                    this, SLOT   (dialNow (QString)));
     Q_ASSERT(bOk);
+    if (!bOk) { exit(1); }
     bOk = connect (
         gObj, SIGNAL (sigText (const QString &, const QString &)),
         this, SLOT   (onSigText (const QString &, const QString &)));
     Q_ASSERT(bOk);
+    if (!bOk) { exit(1); }
     bOk = connect (gObj, SIGNAL (sigVoicemail (QString)),
                    this, SLOT   (retrieveVoicemail (const QString &)));
     Q_ASSERT(bOk);
+    if (!bOk) { exit(1); }
     bOk = connect (gObj, SIGNAL (sigVmailPlayback (int)),
                    this, SLOT   (onSigVmailPlayback (int)));
     Q_ASSERT(bOk);
+    if (!bOk) { exit(1); }
     bOk = connect (gObj, SIGNAL (sigSelChanged (int)),
                    this, SLOT   (onRegPhoneSelectionChange (int)));
     Q_ASSERT(bOk);
+    if (!bOk) { exit(1); }
     bOk = connect (gObj   , SIGNAL (sigInboxSelect (QString)),
                    &oInbox, SLOT   (onInboxSelected (const QString &)));
     Q_ASSERT(bOk);
+    if (!bOk) { exit(1); }
     bOk = connect (gObj   , SIGNAL (sigMarkAsRead (QString)),
                    &oInbox, SLOT   (onSigMarkAsRead (const QString &)));
     Q_ASSERT(bOk);
+    if (!bOk) { exit(1); }
     bOk = connect (gObj, SIGNAL (sigCloseVmail ()),
                    this, SLOT   (onSigCloseVmail ()));
     Q_ASSERT(bOk);
+    if (!bOk) { exit(1); }
     bOk = connect (gObj, SIGNAL (sigUserChanged (const QString &)),
                    this, SLOT   (onUserTextChanged (const QString &)));
     Q_ASSERT(bOk);
+    if (!bOk) { exit(1); }
     bOk = connect (gObj, SIGNAL (sigPassChanged (const QString &)),
                    this, SLOT   (onPassTextChanged (const QString &)));
     Q_ASSERT(bOk);
+    if (!bOk) { exit(1); }
     bOk = connect (gObj, SIGNAL (sigLogin ()),
                    this, SLOT   (doLogin ()));
     Q_ASSERT(bOk);
+    if (!bOk) { exit(1); }
     bOk = connect (gObj, SIGNAL (sigLogout ()),
                    this, SLOT   (doLogout ()));
     Q_ASSERT(bOk);
+    if (!bOk) { exit(1); }
     bOk = connect (gObj, SIGNAL (sigRefresh ()),
                    this, SLOT   (onRefresh ()));
     Q_ASSERT(bOk);
+    if (!bOk) { exit(1); }
     bOk = connect (gObj, SIGNAL (sigRefreshAll ()),
                    this, SLOT   (onRefreshAll ()));
     Q_ASSERT(bOk);
+    if (!bOk) { exit(1); }
     bOk = connect (gObj, SIGNAL (sigRefreshInbox ()),
                    this, SLOT   (onSigRefreshInbox ()));
     Q_ASSERT(bOk);
+    if (!bOk) { exit(1); }
     bOk = connect (gObj, SIGNAL (sigRefreshContacts ()),
                    this, SLOT   (onSigRefreshContacts ()));
     Q_ASSERT(bOk);
+    if (!bOk) { exit(1); }
     bOk = connect (gObj, SIGNAL (sigHide ()),
                    this, SLOT   (onSigHide ()));
     Q_ASSERT(bOk);
+    if (!bOk) { exit(1); }
     bOk = connect (gObj, SIGNAL (sigQuit ()),
                    this, SLOT   (on_actionE_xit_triggered ()));
     Q_ASSERT(bOk);
+    if (!bOk) { exit(1); }
     bOk = connect (gObj, SIGNAL (sigLinkActivated (const QString &)),
                    this, SLOT   (onLinkActivated (const QString &)));
     Q_ASSERT(bOk);
+    if (!bOk) { exit(1); }
     bOk = connect (
         gObj, SIGNAL (sigProxyChanges(bool, bool, const QString &, int,
                                       bool, const QString &, const QString &)),
@@ -591,34 +634,42 @@ MainWindow::initQML ()
     bOk = connect (gObj, SIGNAL (sigProxyRefresh()),
                    this, SLOT (onSigProxyRefresh()));
     Q_ASSERT(bOk);
+    if (!bOk) { exit(1); }
     bOk = connect (
         gObj, SIGNAL (sigMosquittoChanges(bool, const QString &, int,
                                           const QString &)),
         this, SLOT   (onSigMosquittoChanges(bool, const QString &, int,
                                             const QString &)));
     Q_ASSERT(bOk);
+    if (!bOk) { exit(1); }
     bOk = connect (gObj, SIGNAL (sigMosquittoRefresh()),
                    this, SLOT   (refreshMqSettings()));
     Q_ASSERT(bOk);
+    if (!bOk) { exit(1); }
     bOk = connect (
         gObj, SIGNAL(sigPinSettingChanges  (bool, const QString &)),
         this, SLOT  (onSigPinSettingChanges(bool, const QString &)));
     Q_ASSERT(bOk);
+    if (!bOk) { exit(1); }
     bOk = connect (gObj, SIGNAL(sigPinRefresh()),
                    this, SLOT  (refreshPinSettings()));
     Q_ASSERT(bOk);
+    if (!bOk) { exit(1); }
     bOk = connect (gObj, SIGNAL (sigMsgBoxDone(bool)),
                    this, SLOT (onSigMsgBoxDone(bool)));
     Q_ASSERT(bOk);
+    if (!bOk) { exit(1); }
     bOk = connect (
         gObj      , SIGNAL  (sigSearchContacts(const QString &)),
         &oContacts, SLOT (onSearchQueryChanged(const QString &)));
     Q_ASSERT(bOk);
+    if (!bOk) { exit(1); }
 
 #if MOBILE_OS
     bOk = connect(qApp->desktop(), SIGNAL(resized(int)),
                   this           , SLOT(onDesktopResized()));
     Q_ASSERT(bOk);
+    if (!bOk) { exit(1); }
 #endif
 
 #if DESKTOP_OS
@@ -658,6 +709,7 @@ MainWindow::doLogin ()
         bool rv = connect(&webPage, SIGNAL(twoStepAuthentication(QString &)),
                            this   , SLOT(onTwoStepAuthentication(QString &)));
         Q_ASSERT(rv);
+        if (!rv) { exit(1); }
 
         // webPage.workCompleted -> this.loginCompleted
         if (!webPage.enqueueWork (GVAW_login, l, this,
@@ -2027,9 +2079,11 @@ MainWindow::createVmailPlayer()
         vmailPlayer, SIGNAL(stateChanged (Phonon::State, Phonon::State)),
         this, SLOT(onVmailPlayerStateChanged(Phonon::State, Phonon::State)));
     Q_ASSERT(rv);
+    if (!rv) { exit(1); }
     rv = connect (vmailPlayer, SIGNAL(finished ()),
                   this, SLOT(onVmailPlayerFinished()));
     Q_ASSERT(rv);
+    if (!rv) { exit(1); }
 }//MainWindow::createVmailPlayer
 
 void

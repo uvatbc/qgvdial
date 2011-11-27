@@ -39,8 +39,9 @@ TpCalloutInitiator::TpCalloutInitiator (Tp::AccountPtr act, QObject *parent)
     bool rv = connect (
         account.data (), SIGNAL(connectionChanged(const Tp::ConnectionPtr &)),
         this, SLOT(onConnectionChanged(const Tp::ConnectionPtr &)));
-    qWarning("Failed to connect connectionChanged on Callout initiator");
-//    Q_ASSERT(rv);
+    if (!rv) {
+        qWarning("Failed to connect connectionChanged on Callout initiator");
+    }
 
     rv = connect (
         account.data(),
@@ -48,8 +49,9 @@ TpCalloutInitiator::TpCalloutInitiator (Tp::AccountPtr act, QObject *parent)
                                        Tp::ConnectionStatusReason)),
         this, SLOT(onConnectionChanged(Tp::ConnectionStatus,
                                        Tp::ConnectionStatusReason)));
-    qWarning("Failed to connect connectionStatusChanged on Callout initiator");
-//    Q_ASSERT(rv);
+    if (!rv) {
+        qWarning("Failed to connect connectionStatusChanged on Callout initiator");
+    }
 
     Tp::ConnectionPtr connection = account->connection();
     onConnectionChanged (connection);
@@ -233,6 +235,8 @@ TpCalloutInitiator::sendDTMF (const QString &strTones)
         }
         return rv;
     }
+#else
+    Q_UNUSED(strTones);
 #endif
 
     //@@UV: Add DTMF to Telepathy
