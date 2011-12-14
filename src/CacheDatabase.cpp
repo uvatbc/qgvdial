@@ -621,7 +621,7 @@ CacheDatabase::getContactFromNumber (const QString &strNumber,
     scrubNumber.replace ("'", "''");
     strQ = QString ("SELECT " GV_L_LINK " FROM " GV_LINKS_TABLE " "
                     "WHERE " GV_L_TYPE "='" GV_L_TYPE_NUMBER "' "
-                    "AND " GV_L_DATA " LIKE '%%%1'")
+                    "AND " GV_L_DATA " LIKE '%%%1%%'")
                     .arg (scrubNumber);
     query.exec (strQ);
 

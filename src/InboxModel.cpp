@@ -164,11 +164,13 @@ InboxModel::data (const QModelIndex &index,
                 break;
             }
 
+            QString strSimplified = strNum;
+            GVAccess::simplify_number (strSimplified, false);
             GVAccess::simplify_number (strNum);
 
             CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
             ContactInfo info;
-            if (dbMain.getContactFromNumber (strNum, info)) {
+            if (dbMain.getContactFromNumber (strSimplified, info)) {
                 var = info.strTitle;
             } else {
                 var = strNum;

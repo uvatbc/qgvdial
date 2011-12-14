@@ -96,20 +96,20 @@ ContactsXmlHandler::endElement (const QString & /*namespaceURI*/,
     do // Begin cleanup block (not a loop)
     {
         if (localName == "id") {
-            currInfo.strId = strCurrentChars;
+            currInfo.strId = strCurrentChars.trimmed ();
             break;
         }
         if (localName == "title") {
-            currInfo.strTitle = strCurrentChars;
+            currInfo.strTitle = strCurrentChars.trimmed ();
             break;
         }
         if (localName == "phoneNumber") {
-            currPhone.strNumber = strCurrentChars;
+            currPhone.strNumber = strCurrentChars.trimmed ();
             currInfo.arrPhones += currPhone;
             break;
         }
         if (localName == "content") {
-            currInfo.strNotes = strCurrentChars;
+            currInfo.strNotes = strCurrentChars.trimmed ();
             break;
         }
         if (localName == "updated") {
