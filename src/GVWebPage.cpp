@@ -1008,6 +1008,13 @@ GVWebPage::onGotInboxXML (QNetworkReply *reply)
         }
 
         QString strReply = reply->readAll ();
+
+        QRegExp rx(".TITLE.Moved.Temporarily..TITLE.");
+        if (strReply.contains (rx)) {
+            qWarning() << "Inbox location has MOVED!! Response = " << strReply;
+            break;
+        }
+
         QXmlInputSource inputSource;
         QXmlSimpleReader simpleReader;
         inputSource.setData (strReply);
