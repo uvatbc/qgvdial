@@ -58,7 +58,7 @@ $cmd = "cd qgvdial-$qver & perl ./build-files/version.pl __QGVDIAL_VERSION__ $qv
 print("$cmd\n");
 system($cmd);
 
-# # Fix the QML files
+# Mosquitto is merged straight into the build
 $cmd = "cd qgvdial-$qver/src & echo something>mqlib-build";
 print "$cmd\n";
 system($cmd);
