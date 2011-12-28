@@ -20,7 +20,7 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "CacheDatabase.h"
-#include "GVAccess.h"
+#include "GVApi.h"
 #include "ContactsModel.h"
 #include "InboxModel.h"
 #include "Singletons.h"
@@ -530,8 +530,8 @@ CacheDatabase::putContactInfo (const ContactInfo &info)
     foreach (PhoneInfo entry, info.arrPhones)
     {
         QString strNum = entry.strNumber;
-        if (GVAccess::isNumberValid (strNum)) {
-            GVAccess::simplify_number (strNum);
+        if (GVApi::isNumberValid (strNum)) {
+            GVApi::simplify_number (strNum);
         }
         strNum = PhoneInfo::typeToChar(entry.Type) + strNum;
         strNum.replace ("'", "''");
@@ -923,7 +923,7 @@ CacheDatabase::getTextsByDate(QDateTime dtStart, QDateTime dtEnd)
         }
 
         QString strNum = query.value(1).toString();
-        GVAccess::simplify_number (strNum, false);
+        GVApi::simplify_number (strNum, false);
         ContactInfo info;
         getContactFromNumber (strNum, info);
 
@@ -953,7 +953,7 @@ CacheDatabase::getTextsByContact(const QString &strContact)
     ContactInfo info;
     if (getContactFromNumber (strContact, info)) {
         foreach (PhoneInfo phone, info.arrPhones) {
-            GVAccess::simplify_number (phone.strNumber, false);
+            GVApi::simplify_number (phone.strNumber, false);
             arrNums += phone.strNumber.replace("'", "''");
         }
     }
@@ -974,7 +974,7 @@ CacheDatabase::getTextsByContact(const QString &strContact)
         info.strId = query.value(0).toString ();
         if (getContactFromLink (info)) {
             foreach (PhoneInfo phone, info.arrPhones) {
-                GVAccess::simplify_number (phone.strNumber, false);
+                GVApi::simplify_number (phone.strNumber, false);
                 arrNums += phone.strNumber.replace("'", "''");
             }
         }
@@ -1008,7 +1008,7 @@ CacheDatabase::getTextsByContact(const QString &strContact)
         }
 
         QString strNum = query.value(2).toString();
-        GVAccess::simplify_number (strNum, false);
+        GVApi::simplify_number (strNum, false);
         ContactInfo info;
         getContactFromNumber (strNum, info);
 

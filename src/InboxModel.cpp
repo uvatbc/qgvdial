@@ -21,7 +21,7 @@ Contact: yuvraaj@gmail.com
 
 #include "InboxModel.h"
 #include "Singletons.h"
-#include "GVAccess.h"
+#include "GVApi.h"
 
 InboxModel::InboxModel (QObject * parent)
 : QSqlQueryModel (parent)
@@ -157,7 +157,7 @@ InboxModel::data (const QModelIndex &index,
                 break;
             }
 
-            if (!GVAccess::isNumberValid (strNum)) {
+            if (!GVApi::isNumberValid (strNum)) {
                 qWarning () << "Inbox: Display phone number is invalid : "
                             << strNum;
                 var = "Unknown";
@@ -165,8 +165,8 @@ InboxModel::data (const QModelIndex &index,
             }
 
             QString strSimplified = strNum;
-            GVAccess::simplify_number (strSimplified, false);
-            GVAccess::simplify_number (strNum);
+            GVApi::simplify_number (strSimplified, false);
+            GVApi::simplify_number (strNum);
 
             CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
             ContactInfo info;
@@ -187,13 +187,13 @@ InboxModel::data (const QModelIndex &index,
             if (strNum.startsWith ("Unknown")) {
                 var = "Unknown";
             }
-            if (!GVAccess::isNumberValid (strNum)) {
+            if (!GVApi::isNumberValid (strNum)) {
                 qWarning () << "Inbox: Actual phone number is invalid : "
                             << strNum;
                 break;
             }
 
-            GVAccess::beautify_number (strNum);
+            GVApi::beautify_number (strNum);
             var = strNum;
         }
         else if (5 == column)   // GV_IN_FLAGS

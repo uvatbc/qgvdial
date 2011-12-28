@@ -46,6 +46,11 @@ public:
 
     void cancel(AsyncTaskToken *token);
 
+    static void
+    simplify_number (QString &strNumber, bool bAddIntPrefix = true);
+    static bool isNumberValid (const QString &strNumber);
+    static void beautify_number (QString &strNumber);
+
 ////////////////////////////////////////////////////////////////////////////////
 // GV API:
     bool login(AsyncTaskToken *token);

@@ -24,7 +24,6 @@ Contact: yuvraaj@gmail.com
 
 #include "global.h"
 
-class GVAccess;
 class OsDependent;
 class CacheDatabase;
 class SkypeClientFactory;
@@ -51,11 +50,9 @@ private:
     virtual ~Singletons ();
 
 private:
-    GVAccess        *pGVAccess;
     CacheDatabase   *dbMain;
 };
 
-#include "GVWebPage.h"
 #include "GVDataAccess.h"
 #include "OsDependent.h"
 #include "CacheDatabase.h"

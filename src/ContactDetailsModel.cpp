@@ -20,7 +20,7 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "ContactDetailsModel.h"
-#include "GVAccess.h"
+#include "GVApi.h"
 
 static quint32 nChildren = 0;
 
@@ -72,7 +72,7 @@ ContactDetailsModel::data (const QModelIndex &index, int role) const
         }
 
         if (CD_NumberRole == role) {
-            GVAccess::beautify_number (data.strNumber);
+            GVApi::beautify_number (data.strNumber);
             var = data.strNumber;
             break;
         }

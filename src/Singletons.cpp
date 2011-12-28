@@ -23,7 +23,6 @@ Contact: yuvraaj@gmail.com
 
 Singletons::Singletons (QObject *parent/* = 0*/)
 : QObject (parent)
-, pGVAccess (NULL)
 , dbMain (NULL)
 {
 }//Singletons::Singletons

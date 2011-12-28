@@ -122,7 +122,7 @@ private slots:
 
     //! Invoked by the inbox page when a voice mail is to be downloaded
     void retrieveVoicemail (const QString &strVmailLink);
-    //! Invoked by GVAccess when the voice mail download has completed
+    //! Invoked by GVApi when the voice mail download has completed
     void onVmailDownloaded (AsyncTaskToken *token);
     //! Invoked when the vmail player changes state
     void onVmailPlayerStateChanged(Phonon::State newState,

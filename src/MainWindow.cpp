@@ -982,8 +982,8 @@ MainWindow::getInfoFrom (const QString &strNumber,
             QString lhs = strNumber;
             QString rhs = info.arrPhones[i].strNumber;
 
-            GVAccess::simplify_number (lhs);
-            GVAccess::simplify_number (rhs);
+            GVApi::simplify_number (lhs);
+            GVApi::simplify_number (rhs);
             if (lhs == rhs)
             {
                 info.selected = i;
@@ -1011,7 +1011,7 @@ MainWindow::findInfo (const QString &strNumber, ContactInfo &info)
     info.init ();
 
     QString strTrunc = strNumber;
-    GVAccess::simplify_number (strTrunc, false);
+    GVApi::simplify_number (strTrunc, false);
     strTrunc.remove(' ').remove('+');
 
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
@@ -1028,7 +1028,7 @@ MainWindow::findInfo (const QString &strNumber, ContactInfo &info)
         info.selected = 0;
         foreach (PhoneInfo num, info.arrPhones) {
             QString strNum = num.strNumber;
-            GVAccess::simplify_number (strNum, false);
+            GVApi::simplify_number (strNum, false);
             strNum.remove(' ').remove('+');
 
             if (-1 != strNum.indexOf (strTrunc)) {
@@ -1994,7 +1994,7 @@ MainWindow::fallbackDialout (DialContext *ctx)
     bool rv = connect (ctx->fallbackCi, SIGNAL(callInitiated(bool,void*)),
                       this,            SLOT  (onFallbackDialout(bool,void*)));
     Q_ASSERT(rv); Q_UNUSED(rv);
-    GVAccess::simplify_number (strFull);
+    GVApi::simplify_number (strFull);
     ctx->fallbackCi->initiateCall (strFull, ctx);
 }//MainWindow::fallbackDialout
 

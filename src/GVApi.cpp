@@ -128,6 +128,74 @@ GVApi::getSystemProxies (QNetworkProxy &http, QNetworkProxy &https)
     return (true);
 }//GVApi::getSystemProxies
 
+void
+GVApi::simplify_number (QString &strNumber, bool bAddIntPrefix /*= true*/)
+{
+    strNumber.remove(QChar (' ')).remove(QChar ('(')).remove(QChar (')'));
+    strNumber.remove(QChar ('-'));
+
+    do // Begin cleanup block (not a loop)
+    {
+        if (!bAddIntPrefix) {
+            break;
+        }
+
+        if (strNumber.startsWith ("+")) {
+            break;
+        }
+
+        if (strNumber.length () < 10) {
+            break;
+        }
+
+        if (!strNumber.contains (QRegExp("^\\d*$"))) {
+            // Not numbers. Dont touch it! (anymore!!)
+            break;
+        }
+
+        if ((strNumber.length () == 11) && (strNumber.startsWith ('1'))) {
+            strNumber = "+" + strNumber;
+            break;
+        }
+
+        strNumber = "+1" + strNumber;
+    } while (0); // End cleanup block (not a loop)
+}//GVApi::simplify_number
+
+bool
+GVApi::isNumberValid (const QString &strNumber)
+{
+    QString strTemp = strNumber;
+    simplify_number (strTemp);
+    strTemp.remove ('+');
+    strTemp.remove (QRegExp ("\\d"));
+
+    return (strTemp.size () == 0);
+}//GVApi::isNumberValid
+
+void
+GVApi::beautify_number (QString &strNumber)
+{
+    do { // Begin cleanup block (not a loop)
+        if (!GVApi::isNumberValid (strNumber))   break;
+
+        QString strTemp = strNumber;
+        GVApi::simplify_number (strTemp);
+
+        if (!strTemp.startsWith ("+1"))   break;
+        if (strTemp.size () < 10)         break;
+
+        // +1aaabbbcccc -> +1 aaa bbb cccc
+        // 012345678901
+        strNumber = "+1 "
+                  + strTemp.mid (2, 3)
+                  + " "
+                  + strTemp.mid (5, 3)
+                  + " "
+                  + strTemp.mid (8);
+    } while (0); // End cleanup block (not a loop)
+}//GVApi::beautify_number
+
 bool
 GVApi::doGet(QUrl url, void *ctx, QObject *receiver, const char *method)
 {

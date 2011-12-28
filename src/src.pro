@@ -1,4 +1,4 @@
-QT      *= core gui webkit sql xml xmlpatterns script declarative phonon
+QT      *= core gui sql xml xmlpatterns script declarative phonon webkit
 TARGET   = qgvdial
 TEMPLATE = app
 
@@ -39,12 +39,8 @@ SOURCES  += ../src/main.cpp                 \
             ../src/SkypeClientFactory.cpp   \
             ../src/SkypeClient.cpp          \
             ../src/ObserverFactory.cpp      \
-            ../src/GVWebPage.cpp            \
-            ../src/GVDataAccess.cpp         \
-            ../src/GVAccess.cpp             \
             ../src/CalloutInitiator.cpp     \
             ../src/CallInitiatorFactory.cpp \
-            ../src/MobileWebPage.cpp        \
             ../src/InboxModel.cpp           \
             ../src/GvXMLParser.cpp          \
             ../src/PhoneNumberValidator.cpp \
@@ -76,12 +72,8 @@ HEADERS  += ../src/global.h                 \
             ../src/SkypeClientFactory.h     \
             ../src/SkypeClient.h            \
             ../src/ObserverFactory.h        \
-            ../src/GVWebPage.h              \
-            ../src/GVDataAccess.h           \
-            ../src/GVAccess.h               \
             ../src/CalloutInitiator.h       \
             ../src/CallInitiatorFactory.h   \
-            ../src/MobileWebPage.h          \
             ../src/InboxModel.h             \
             ../src/GvXMLParser.h            \
             ../src/PhoneNumberValidator.h   \
