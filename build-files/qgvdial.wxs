@@ -14,7 +14,7 @@
                         <Directory Id="pluginsdir" Name="plugins">
                             <Directory Id="plugins_bearer" Name="bearer" />
                             <Directory Id="plugins_imageformats" Name="imageformats" />
-                            <Directory Id="plugins_mediaservice" Name="mediaservice" />
+                            <Directory Id="phonon_backend" Name="phonon_backend" />
                             <Directory Id="plugins_playlistformats" Name="playlistformats" />
                             <Directory Id="plugins_sqldrivers" Name="sqldrivers" />
                         </Directory>
@@ -119,12 +119,9 @@
             </Component>
         </DirectoryRef>
 
-        <DirectoryRef Id="plugins_mediaservice">
-            <Component Id="dsengine.dll" Guid="7A25690B-7466-48A2-B11A-7FAA73CFB1E0">
-                <File Id="dsengine.dll" Source="__QTDIR__\plugins\mediaservice\dsengine.dll" KeyPath="yes" Checksum="yes"/>
-            </Component>
-            <Component Id="qtmedia_audioengine.dll" Guid="1DD7E0A9-026B-464C-9C06-016A856B04C7">
-                <File Id="qtmedia_audioengine.dll" Source="__QTDIR__\plugins\mediaservice\qtmedia_audioengine.dll" KeyPath="yes" Checksum="yes"/>
+        <DirectoryRef Id="phonon_backend">
+            <Component Id="phonon_ds94.dll" Guid="1DD7E0A9-026B-464C-9C06-016A856B04C7">
+                <File Id="phonon_ds94.dll" Source="__QTDIR__\plugins\phonon_backend\phonon_ds94.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
         </DirectoryRef>
 
@@ -168,8 +165,7 @@
             <ComponentRef Id="qmng4.dll" />
             <ComponentRef Id="qsvg4.dll" />
             <ComponentRef Id="qtiff4.dll" />
-            <ComponentRef Id="dsengine.dll" />
-            <ComponentRef Id="qtmedia_audioengine.dll" />
+            <ComponentRef Id="phonon_ds94.dll" />
             <ComponentRef Id="qtmultimediakit_m3u.dll" />
             <ComponentRef Id="qsqlite4.dll" />
             
