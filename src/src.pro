@@ -54,13 +54,16 @@ SOURCES  += ../src/main.cpp                 \
             ../src/SMSEntryDeleteButton.cpp \
             ../src/ChildWindowBase.cpp      \
             ../src/GVInbox.cpp              \
-            ../src/WebWidget.cpp            \
             ../src/RegNumberModel.cpp       \
             ../src/ContactsModel.cpp        \
             ../src/ContactDetailsModel.cpp  \
             ../src/DialContext.cpp          \
             ../src/ContactsParserObject.cpp \
-            ../src/CookieJar.cpp
+            ../src/CookieJar.cpp            \
+            ../src/NwReqTracker.cpp         \
+            ../src/AsyncTaskToken.cpp       \
+            ../src/GVApi.cpp                \
+            ../src/MyXmlErrorHandler.cpp
 
 HEADERS  += ../src/global.h                 \
             ../src/IObserver.h              \
@@ -88,13 +91,16 @@ HEADERS  += ../src/global.h                 \
             ../src/SMSEntryDeleteButton.h   \
             ../src/ChildWindowBase.h        \
             ../src/GVInbox.h                \
-            ../src/WebWidget.h              \
             ../src/RegNumberModel.h         \
             ../src/ContactsModel.h          \
             ../src/ContactDetailsModel.h    \
             ../src/DialContext.h            \
             ../src/ContactsParserObject.h   \
-            ../src/CookieJar.h
+            ../src/CookieJar.h              \
+            ../src/NwReqTracker.h           \
+            ../src/AsyncTaskToken.h         \
+            ../src/GVApi.h                  \
+            ../src/MyXmlErrorHandler.h
 
 RESOURCES += ../src/qgvdial.qrc
 
@@ -105,7 +111,6 @@ OTHER_FILES  += ../src/winrsrc.rc           \
                 ../qml/ComboBoxPhones.qml   \
                 ../qml/ContactDetails.qml   \
                 ../qml/ContactsList.qml     \
-                ../qml/DbgWebWidget.qml     \
                 ../qml/DialDisp.qml         \
                 ../qml/DigitButton.qml      \
                 ../qml/ExpandView.qml       \
@@ -305,4 +310,3 @@ unix:!symbian:!maemo5:!contains(MEEGO_EDITION,harmattan) {
     dbusservice.files += ../build-files/qgvdial.Call.service
     dbusservice.files += ../build-files/qgvdial.Text.service
 }
-

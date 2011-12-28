@@ -23,9 +23,7 @@ Contact: yuvraaj@gmail.com
 #define __GVINBOX_H__
 
 #include "global.h"
-
-// For some reason the symbian MOC doesn't like it if I don't include QObject
-// even though it is present in QtCore which is included in global.h
+#include "GVApi.h"
 #include <QObject>
 
 class InboxModel;
@@ -35,7 +33,7 @@ class GVInbox : public QObject
     Q_OBJECT
 
 public:
-    GVInbox (QObject *parent = 0);
+    GVInbox (GVApi &gref, QObject *parent = 0);
     ~GVInbox(void);
 
     void deinitModel ();
@@ -79,13 +77,18 @@ public slots:
 
 private slots:
     void oneInboxEntry (const GVInboxEntry &hevent);
-    void getInboxDone (bool bOk, const QVariantList &arrParams);
-    void onInboxEntryMarked (bool bOk, const QVariantList &params);
+    void getInboxDone (AsyncTaskToken *token);
+    void onInboxEntryMarked (AsyncTaskToken *token);
 
 private:
     void prepView ();
 
 private:
+    GVApi          &gvApi;
+
+    QDateTime       dateWaterLevel;
+    bool            passedWaterLevel;
+
     //! Mutex for the following variables
     QMutex          mutex;
 

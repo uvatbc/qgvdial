@@ -54,8 +54,7 @@ Flickable {
 
     contentHeight: expandLoginDetails.height + expandProxySettings.height +
                    expandMqSettings.height + expandPinSettings.height +
-                   expandRefresh.height + expandDbgWebWidget.height +
-                   expandLogView.height + expandAbout.height
+                   expandRefresh.height + expandLogView.height + expandAbout.height
     contentWidth: width
     clip: true
 
@@ -223,34 +222,9 @@ Flickable {
     }//ExpandView (refresh buttons)
 
     ExpandView {
-        id: expandDbgWebWidget
-        anchors {
-            top: expandRefresh.bottom
-            left: parent.left
-        }
-
-        width: parent.width
-        contentHeight: myWebWidget.height;
-
-        mainTitle: "Debug Web View"
-        mainTitlePixHeight: container.pixHeight
-
-        DbgWebWidget {
-            id: myWebWidget
-            y: parent.startY
-
-            height: container.height
-            width: parent.width - 1
-
-            opacity: parent.containedOpacity
-            onSigBack: parent.isExpanded = false;
-        }
-    }//ExpandView (Debug Web View)
-
-    ExpandView {
         id: expandLogView
         anchors {
-            top: expandDbgWebWidget.bottom
+            top: expandRefresh.bottom
             left: parent.left
         }
 

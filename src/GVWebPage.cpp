@@ -21,6 +21,7 @@ Contact: yuvraaj@gmail.com
 
 #include "GVWebPage.h"
 #include "GvXMLParser.h"
+#include "MyXmlErrorHandler.h"
 
 #define SYMBIAN_SIGNED 0
 
@@ -461,8 +462,7 @@ GVWebPage::dialCallback (bool bCallback)
     }
 
     QMutexLocker locker(&mutex);
-    if (!bLoggedIn)
-    {
+    if (!bLoggedIn) {
         strLastError = "Not logged in. Cannot make calls.";
         completeCurrentWork (bCallback?GVAW_dialCallback:GVAW_dialOut, false);
         return (false);
@@ -1675,38 +1675,6 @@ GVWebPage::startTimerForReply (QNetworkReply *reply)
     Q_ASSERT(rv);
     onSocketXfer (0,0);
 }//GVWebPage::startTimerForReply
-
-MyXmlErrorHandler::MyXmlErrorHandler(QObject *parent)
-: QAbstractMessageHandler(parent)
-{
-}//MyXmlErrorHandler::MyXmlErrorHandler
-
-void
-MyXmlErrorHandler::handleMessage (QtMsgType type, const QString &description,
-                                  const QUrl & /*identifier*/,
-                                  const QSourceLocation &sourceLocation)
-{
-    QString msg = QString("XML message: %1, at uri= %2 "
-                          "line %3 column %4")
-                .arg(description)
-                .arg(sourceLocation.uri ().toString ())
-                .arg(sourceLocation.line ())
-                .arg(sourceLocation.column ());
-
-    switch (type)
-    {
-    case QtDebugMsg:
-        qDebug() << msg;
-        break;
-    case QtWarningMsg:
-        qWarning() << msg;
-        break;
-    case QtCriticalMsg:
-    case QtFatalMsg:
-        qCritical() << msg;
-        break;
-    }
-}//MyXmlErrorHandler::handleMessage
 
 bool
 GVWebPage::markAsRead ()

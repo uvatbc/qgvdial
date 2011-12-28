@@ -24,12 +24,18 @@ Contact: yuvraaj@gmail.com
 #include "Singletons.h"
 #include "InboxModel.h"
 
-GVInbox::GVInbox (QObject *parent)
+GVInbox::GVInbox (GVApi &gref, QObject *parent)
 : QObject (parent)
+, gvApi(gref)
 , mutex (QMutex::Recursive)
 , bLoggedIn (false)
 , modelInbox (NULL)
 {
+    bool rv = connect (
+        &gvApi, SIGNAL (oneInboxEntry (const GVInboxEntry &)),
+         this , SLOT   (oneInboxEntry (const GVInboxEntry &)));
+    Q_ASSERT(rv); Q_UNUSED(rv);
+
     // Initially, all are to be selected
     strSelectedMessages = "all";
 }//GVInbox::GVInbox
@@ -94,25 +100,20 @@ GVInbox::refresh (const QDateTime &dtUpdate)
         return;
     }
 
-    GVAccess &webPage = Singletons::getRef().getGVAccess ();
-    QVariantList l;
-//    l += strSelectedMessages;
-    l += "all";
-    l += "1";
-    l += "30";
-    l += dtUpdate;
-    bool rv = connect (
-        &webPage, SIGNAL (oneInboxEntry (const GVInboxEntry &)),
-         this   , SLOT   (oneInboxEntry (const GVInboxEntry &)));
+    int page = 1;
+    AsyncTaskToken *token = new AsyncTaskToken(this);
+    token->inParams["type"] = "all";
+    token->inParams["page"] = page;
+    dateWaterLevel = dtUpdate;
+    passedWaterLevel = false;
+
+    bool rv = connect(token, SIGNAL(completed(AsyncTaskToken*)),
+                      this, SLOT(getInboxDone(AsyncTaskToken*)));
     Q_ASSERT(rv); Q_UNUSED(rv);
-    emit status ("Retrieving Inbox...", 0);
-    if (!webPage.enqueueWork (GVAW_getInbox, l, this,
-            SLOT (getInboxDone (bool, const QVariantList &))))
-    {
-        // Connect just so that the disconnect succeeds.
-        connect (&webPage, SIGNAL (oneInboxEntry (const GVInboxEntry &)),
-                  this   , SLOT   (oneInboxEntry (const GVInboxEntry &)));
-        getInboxDone (false, l);
+
+    if (!gvApi.getInbox (token)) {
+        getInboxDone (NULL);
+        delete token;
     }
 }//GVInbox::refresh
 
@@ -136,10 +137,14 @@ GVInbox::refreshFullInbox ()
 void
 GVInbox::oneInboxEntry (const GVInboxEntry &hevent)
 {
-    if (GVIE_Unknown == hevent.Type)
-    {
-        qWarning () << "Invalid inbox entry type:" << (int)hevent.Type;
+    if (GVIE_Unknown == hevent.Type) {
+        Q_WARN("Invalid inbox entry type:")
+                << QString("%1").arg((int)hevent.Type);
         return;
+    }
+
+    if (hevent.startTime >= dateWaterLevel) {
+        passedWaterLevel = true;
     }
 
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
@@ -149,21 +154,62 @@ GVInbox::oneInboxEntry (const GVInboxEntry &hevent)
 }//GVInbox::oneInboxEntry
 
 void
-GVInbox::getInboxDone (bool, const QVariantList &params)
+GVInbox::getInboxDone (AsyncTaskToken *token)
 {
+    bool nextpage = false;
+    do { // Begin cleanup block (not a loop)
+        if (!token) {
+            Q_WARN("No token provided. Failure!!");
+            break;
+        }
+
+        if (ATTS_SUCCESS != token->status) {
+            Q_WARN("Inbox fetch failed for page")
+                << token->inParams["page"].toString();
+            break;
+        }
+
+        if (passedWaterLevel) {
+            Q_DEBUG("Started getting old entries");
+            break;
+        }
+
+        bool ok;
+        int page = token->inParams["page"].toInt(&ok);
+        if (!ok) {
+            Q_WARN("Invalid page number");
+            break;
+        }
+        if (page >= 30) {
+            Q_DEBUG("Page limit reached");
+            break;
+        }
+
+        page++;
+
+        token->inParams["page"] = page;
+        if (!gvApi.getInbox (token)) {
+            Q_WARN("Failed to get inbox!");
+            break;
+        }
+
+        nextpage = true;
+    } while (0); // End cleanup block (not a loop)
+
+    if (nextpage) {
+        return;
+    }
+
     emit status ("Inbox retrieved. Sorting...", 0);
-    int nNew = 0;
-    if (params.count() > 4) {
-        nNew = params[4].toInt();
+    int nNew = token->outParams["message_count"].toInt();
+
+    if (token) {
+        delete token;
+        token = NULL;
     }
 
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     dbMain.setQuickAndDirty (false);
-
-    GVAccess &webPage = Singletons::getRef().getGVAccess ();
-    disconnect (
-        &webPage, SIGNAL (oneInboxEntry (const GVInboxEntry &)),
-         this   , SLOT   (oneInboxEntry (const GVInboxEntry &)));
 
     prepView ();
 
@@ -200,22 +246,29 @@ GVInbox::loggedOut ()
 void
 GVInbox::onSigMarkAsRead(const QString &msgId)
 {
-    GVAccess &webPage = Singletons::getRef().getGVAccess ();
-    QVariantList l;
-    l += msgId;
-    if (!webPage.enqueueWork (GVAW_markAsRead, l, this,
-            SLOT (onInboxEntryMarked (bool, const QVariantList &))))
-    {
-        onInboxEntryMarked(false, l);
+    AsyncTaskToken *token = new AsyncTaskToken(this);
+    token->inParams["id"] = msgId;
+
+    bool rv = connect (token, SIGNAL(completed(AsyncTaskToken*)),
+                       this , SLOT(onInboxEntryMarked(AsyncTaskToken*)));
+    Q_ASSERT(rv); Q_UNUSED(rv);
+
+    if (!gvApi.markInboxEntryAsRead (token)) {
+        token->status = ATTS_FAILURE;
+        onInboxEntryMarked(token);
     }
 }//GVInbox::onSigMarkAsRead
 
 void
-GVInbox::onInboxEntryMarked (bool bOk, const QVariantList &params)
+GVInbox::onInboxEntryMarked (AsyncTaskToken *token)
 {
-    if (!bOk) {
-        qWarning() << "Failed to mark read: ID =" << params[0].toString();
+    QString id = token->inParams["id"].toString();
+
+    if (ATTS_SUCCESS != token->status) {
+        Q_WARN("Failed to mark read: ID =") << id;
     } else {
-        modelInbox->markAsRead (params[0].toString());
+        modelInbox->markAsRead (id);
     }
+
+    delete token;
 }//GVInbox::onInboxEntryMarked

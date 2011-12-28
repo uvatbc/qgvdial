@@ -39,20 +39,6 @@ Singletons::getRef ()
     return (singleton);
 }//Singletons::getRef
 
-GVAccess &
-Singletons::getGVAccess ()
-{
-    // The parent is purposefully NULL. Otherwise the app crashes on exit.
-    // Allocation is purposely dynamic for the same reason.
-    if (NULL == pGVAccess)
-    {
-        pGVAccess = new GVWebPage;
-//        pGVAccess = new GVDataAccess;
-    }
-
-    return (*pGVAccess);
-}//Singletons::getGVAccess
-
 OsDependent &
 Singletons::getOSD ()
 {

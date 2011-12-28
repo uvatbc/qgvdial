@@ -110,6 +110,28 @@ initLogging ()
     QString strLogfile = osd.getAppDirectory ();
     strLogfile += QDir::separator ();
     strLogfile += "qgvdial.log";
+    QString strLog0 = strLogfile + ".0";
+    QString strLog1 = strLogfile + ".1";
+    QString strLog2 = strLogfile + ".2";
+    QString strLog3 = strLogfile + ".3";
+    QString strLog4 = strLogfile + ".4";
+
+    QFile::remove (strLog4);
+    if (QFile::exists (strLog3)) {
+        QFile::rename (strLog3, strLog4);
+    }
+    if (QFile::exists (strLog2)) {
+        QFile::rename (strLog2, strLog3);
+    }
+    if (QFile::exists (strLog1)) {
+        QFile::rename (strLog1, strLog2);
+    }
+    if (QFile::exists (strLog0)) {
+        QFile::rename (strLog0, strLog1);
+    }
+    if (QFile::exists (strLogfile)) {
+        QFile::rename (strLogfile, strLog0);
+    }
 
     fLogfile.setFileName (strLogfile);
     fLogfile.open (QIODevice::WriteOnly | QIODevice::Append);
@@ -169,6 +191,8 @@ main (int argc, char *argv[])
 #else
     w.show();
 #endif
+
+    app.setApplicationName ("qgvdial");
 
     int rv = app.exec();
     deinitLogging ();

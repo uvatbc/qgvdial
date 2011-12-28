@@ -132,8 +132,8 @@ public:
     bool getTempFile(const QString &strLink, QString &strPath);
 
     // Serialize cookies in the cookie jar
-    bool saveCookies(CookieJar *jar);
-    bool loadCookies(CookieJar *jar);
+    bool saveCookies(QList<QNetworkCookie> cookies);
+    bool loadCookies(QList<QNetworkCookie> &cookies);
 
 private:
     bool putContactInfo (const ContactInfo &info);

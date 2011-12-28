@@ -30,6 +30,7 @@ DialContext::DialContext (const QString &strMy, const QString &strT,
 , strMyNumber (strMy)
 , strTarget (strT)
 , fallbackCi (NULL)
+, token(NULL)
 , mainView (mV)
 {
     QObject *pMain = NULL;

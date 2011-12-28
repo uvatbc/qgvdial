@@ -31,6 +31,8 @@ Contact: yuvraaj@gmail.com
 #include <QtXml>
 #include <QtScript>
 
+#include "NwReqTracker.h"
+
 #ifdef QT_NO_DEBUG
 #define NO_DBGINFO      1
 #else
@@ -53,10 +55,17 @@ Contact: yuvraaj@gmail.com
 #define GV_HTTPS        "https://www.google.com/voice"
 #define GV_HTTPS_M      "https://www.google.com/voice/m"
 
+#define GOOGLE_ACCOUNTS         "https://accounts.google.com"
+#define GV_ACCOUNT_SERVICELOGIN GOOGLE_ACCOUNTS "/ServiceLogin"
+#define GV_ACCOUNT_SMSAUTH      GOOGLE_ACCOUNTS "/SmsAuth"
+
 #define GOOGLE_SERVICELOGIN "https://www.google.com/accounts/ServiceLogin"
 #define GV_SERVICELOGIN_PARAMS "?nui=5&service=grandcentral&ltmpl=mobile&btmpl=mobile&passive=true&continue="
 
 #define GV_CLIENTLOGIN "https://www.google.com/accounts/ClientLogin"
+
+#define Q_DEBUG(_s) qDebug() << QString("%1(%2): %3").arg(__FUNCTION__).arg(__LINE__).arg(_s)
+#define Q_WARN(_s) qWarning() << QString("%1(%2): %3").arg(__FUNCTION__).arg(__LINE__).arg(_s)
 
 struct GVRegisteredNumber
 {
@@ -84,6 +93,18 @@ enum GVI_Entry_Type {
     GVIE_TextMessage,
 };
 
+struct ConversationEntry {
+    QString from;
+    QString time;
+    QString text;
+
+    void init() {
+        from.clear ();
+        time.clear ();
+        text.clear ();
+    }
+};
+
 struct GVInboxEntry
 {
     QString         id;
@@ -93,6 +114,8 @@ struct GVInboxEntry
     QString         strDisplayNumber;
     QString         strPhoneNumber;
     QString         strText;
+
+    QVector<ConversationEntry> conversation;
 
     QString         strNote;
 
@@ -112,6 +135,7 @@ struct GVInboxEntry
         strDisplayNumber.clear ();
         strPhoneNumber.clear ();
         strText.clear ();
+        conversation.clear ();
         strNote.clear ();
 
         bRead = bSpam = bTrash = bStar = false;
@@ -283,6 +307,8 @@ extern int   logLevel;   //! Log level
 #else
 #define MOBILITY_PRESENT 1
 #endif
+
+#include "AsyncTaskToken.h"
 
 #endif //__cplusplus
 #endif //__GLOBAL_H__

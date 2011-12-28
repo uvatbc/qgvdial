@@ -30,10 +30,11 @@ using namespace std;
 
 MainWindow::MainWindow (QWidget *parent)
 : QDeclarativeView (parent)
+, gvApi (true, this)
 , icoQgv (":/qgv.png")
 , pSystray (NULL)
 , oContacts (this)
-, oInbox (this)
+, oInbox (gvApi, this)
 , vmailPlayer (NULL)
 , statusTimer (this)
 #ifdef Q_WS_MAEMO_5
@@ -57,7 +58,6 @@ MainWindow::MainWindow (QWidget *parent)
 , mqThread (QString("qgvdial:%1").arg(QHostInfo::localHostName())
             .toLatin1().constData (), this)
 #endif
-, jar (NULL)
 {
     initLogging ();
 
@@ -110,20 +110,9 @@ MainWindow::~MainWindow ()
         vmailPlayer = NULL;
     }
 
-    if (NULL != jar) {
-        CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-        dbMain.saveCookies (jar);
-
-        // The jar that I just deleted was a child of this class. That jar is
-        // now gone. I cannot set NULL as the new cookie jar - that causes a
-        // NULL deref in the Qt code. So, create a new cookie jar just for the
-        // web page so that it can substitute the old pointer with the new one
-        // and be happy.
-        GVAccess &webPage = Singletons::getRef().getGVAccess ();
-        webPage.nwAccessMgr ()->setCookieJar (new CookieJar);
-        delete jar;
-        jar = NULL;
-    }
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    QList<QNetworkCookie> cookies = gvApi.getAllCookies ();
+    dbMain.saveCookies (cookies);
 }//MainWindow::~MainWindow
 
 /** Initialize the log file name and timer.
@@ -294,7 +283,6 @@ MainWindow::onSigHide ()
 void
 MainWindow::init ()
 {
-    GVAccess &webPage = Singletons::getRef().getGVAccess ();
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     OsDependent &osd = Singletons::getRef().getOSD ();
     bool rv;
@@ -322,13 +310,22 @@ MainWindow::init ()
         this, SIGNAL(regPhoneChange(const QStringList &,int)));
 
     // Set up cookies
-    jar = new CookieJar(this);
-    dbMain.loadCookies (jar);
-    webPage.nwAccessMgr()->setCookieJar (jar);
-    jar->setParent (this);
+    QList<QNetworkCookie> cookies;
+    dbMain.loadCookies (cookies);
+    gvApi.setAllCookies (cookies);
 
     // The GV access class signals these during the dialling protocol
-    rv = connect (&webPage    , SIGNAL (dialInProgress (const QString &)),
+    rv = connect(&gvApi, SIGNAL(twoStepAuthentication(AsyncTaskToken *)),
+                  this , SLOT(onTwoStepAuthentication(AsyncTaskToken *)));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+    rv =
+    connect(&gvApi, SIGNAL (registeredPhone    (const GVRegisteredNumber &)),
+             this , SLOT   (gotRegisteredPhone (const GVRegisteredNumber &)));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+
+/*    rv = connect (&webPage    , SIGNAL (dialInProgress (const QString &)),
                        this       , SLOT   (dialInProgress (const QString &)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
@@ -343,6 +340,7 @@ MainWindow::init ()
                                             const QVariant &)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
+*/
 
     // Skype client factory needs a main widget. Also, it needs a status sink.
     SkypeClientFactory &skypeFactory = Singletons::getRef().getSkypeFactory ();
@@ -358,12 +356,6 @@ MainWindow::init ()
     obF.init ();
     rv = connect (&obF , SIGNAL (status(const QString &, int)),
                    this, SLOT   (setStatus(const QString &, int)));
-    Q_ASSERT(rv);
-    if (!rv) { exit(1); }
-
-    // webPage status
-    rv = connect (&webPage, SIGNAL (status(const QString &, int)),
-                   this   , SLOT   (setStatus(const QString &, int)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
 
@@ -494,8 +486,7 @@ MainWindow::init ()
         this->setUsername (strUser);
         this->setPassword (strPass);
 
-        QVariantList l;
-        logoutCompleted (true, l);
+        logoutCompleted (NULL);
         // Login without popping up the "enter user/pass" dialog
         doLogin ();
     } else {
@@ -512,8 +503,6 @@ MainWindow::init ()
 void
 MainWindow::initQML ()
 {
-    qmlRegisterType<WebWidget>("org.qgvdial.WebWidget", 1, 0, "MyWebWidget");
-
     OsDependent &osd = Singletons::getRef().getOSD ();
     bool bTempFalse = false;
     int iTempZero = 0;
@@ -692,34 +681,27 @@ void
 MainWindow::doLogin ()
 {
     OsDependent &osd = Singletons::getRef().getOSD ();
-    GVAccess &webPage = Singletons::getRef().getGVAccess ();
-    QVariantList l;
-
+    AsyncTaskToken *token = new AsyncTaskToken(this);
     bool bOk = false;
-    do { // Begin cleanup block (not a loop)
-        webPage.setTimeout(60);
 
-        l += strUser;
-        l += strPass;
+    do { // Begin cleanup block (not a loop)
+        if (!token) {
+            Q_WARN("Failed to allocate token");
+            break;
+        }
+
+        bOk = connect(token, SIGNAL(completed(AsyncTaskToken*)),
+                      this , SLOT(loginCompleted(AsyncTaskToken*)));
+
+        token->inParams["user"] = strUser;
+        token->inParams["pass"] = strPass;
 
         setStatus ("Logging in...", 0);
 
         osd.setLongWork (this, true);
 
-        bool rv = connect(&webPage, SIGNAL(twoStepAuthentication(QString &)),
-                           this   , SLOT(onTwoStepAuthentication(QString &)));
-        Q_ASSERT(rv);
-        if (!rv) { exit(1); }
-
-        // webPage.workCompleted -> this.loginCompleted
-        if (!webPage.enqueueWork (GVAW_login, l, this,
-                SLOT (loginCompleted (bool, const QVariantList &))))
-        {
-            rv = disconnect(&webPage, SIGNAL(twoStepAuthentication(QString &)),
-                             this   , SLOT(onTwoStepAuthentication(QString &)));
-            Q_ASSERT(rv);
-
-            qWarning ("Login returned immediately with failure!");
+        if (!gvApi.login (token)) {
+            Q_WARN("Login returned immediately with failure!");
             osd.setLongWork (this, false);
             break;
         }
@@ -727,15 +709,17 @@ MainWindow::doLogin ()
         bOk = true;
     } while (0); // End cleanup block (not a loop)
 
-    if (!bOk)
-    {
-        webPage.setTimeout(20);
+    if (!bOk) {
+        if (token) {
+            token->deleteLater ();
+            token = NULL;
+        }
+
         // Cleanup if any
         strUser.clear ();
         strPass.clear ();
 
-        l.clear ();
-        logoutCompleted (true, l);
+        logoutCompleted (NULL);
     }
 }//MainWindow::doLogin
 
@@ -773,25 +757,16 @@ MainWindow::on_action_Login_triggered ()
 }//MainWindow::on_action_Login_triggered
 
 void
-MainWindow::loginCompleted (bool bOk, const QVariantList & /*varList*/)
+MainWindow::loginCompleted (AsyncTaskToken *token)
 {
-    GVAccess &webPage = Singletons::getRef().getGVAccess ();
-    bool rv = disconnect(&webPage, SIGNAL(twoStepAuthentication(QString &)),
-                          this   , SLOT(onTwoStepAuthentication(QString &)));
-    Q_ASSERT(rv); Q_UNUSED(rv);
-
-    strSelfNumber.clear ();
-    webPage.setTimeout(20);
-
-    if (!bOk) {
-        QVariantList l;
-        logoutCompleted (true, l);
+    if (token->status != ATTS_SUCCESS) {
+        logoutCompleted (NULL);
 
         OsDependent &osd = Singletons::getRef().getOSD ();
         osd.setLongWork (this, false);
 
         setStatus ("User login failed", 30*1000);
-        QString strErr = webPage.getLastErrorString ();
+        QString strErr = gvApi.getLastErrorString ();
         if (strErr.isEmpty ()) {
             strErr = "User login failed";
         }
@@ -838,15 +813,21 @@ MainWindow::loginCompleted (bool bOk, const QVariantList & /*varList*/)
         // Fill up the pin settings
         refreshPinSettings ();
     }
+
+    token->deleteLater ();
 }//MainWindow::loginCompleted
 
 void
 MainWindow::doLogout ()
 {
-    GVAccess &webPage = Singletons::getRef().getGVAccess ();
-    QVariantList l;
-    webPage.enqueueWork (GVAW_logout, l, this,
-                         SLOT (logoutCompleted (bool, const QVariantList &)));
+    AsyncTaskToken *token = new AsyncTaskToken(this);
+    connect (token, SIGNAL(completed(AsyncTaskToken*)),
+             this, SLOT(logoutCompleted(AsyncTaskToken*)));
+
+    if (!gvApi.logout (token)) {
+        token->deleteLater ();
+        return;
+    }
 
     OsDependent &osd = Singletons::getRef().getOSD ();
     osd.setLongWork (this, true);
@@ -860,7 +841,7 @@ MainWindow::doLogout ()
 }//MainWindow::doLogout
 
 void
-MainWindow::logoutCompleted (bool, const QVariantList &)
+MainWindow::logoutCompleted (AsyncTaskToken *token)
 {
     // This clears out the table and the view as well
     deinitContacts ();
@@ -878,6 +859,10 @@ MainWindow::logoutCompleted (bool, const QVariantList &)
     setStatus ("Logout complete");
     OsDependent &osd = Singletons::getRef().getOSD ();
     osd.setLongWork (this, false);
+
+    if (token) {
+        token->deleteLater ();
+    }
 }//MainWindow::logoutCompleted
 
 void
@@ -917,7 +902,15 @@ MainWindow::on_actionE_xit_triggered ()
 #endif
 
     qApp->quit ();
+
+    QTimer::singleShot (300, this, SLOT(dieNow()));
 }//MainWindow::on_actionE_xit_triggered
+
+void
+MainWindow::dieNow()
+{
+    exit(0);
+}//MainWindow::dieNow
 
 void
 MainWindow::getContactsDone (bool bOk)
@@ -1057,14 +1050,19 @@ void
 MainWindow::dialNow (const QString &strTarget)
 {
     CalloutInitiator *ci;
+    bool success = false;
+    DialContext *ctx = NULL;
+    AsyncTaskToken *token = NULL;
 
     do { // Begin cleanup block (not a loop)
         if (!bLoggedIn) {
             setStatus ("User is not logged in yet. Cannot make any calls.");
             break;
         }
-        if (strSelfNumber.isEmpty () || (strSelfNumber == "CLIENT_ONLY")) {
-            qWarning ("Self number is not valid. Dial canceled");
+        if (gvApi.getSelfNumber().isEmpty () ||
+           (gvApi.getSelfNumber() == "CLIENT_ONLY"))
+        {
+            Q_WARN("Self number is not valid. Dial canceled");
             setStatus ("Account not configured");
             showMsgBox ("Account not configured");
             break;
@@ -1097,19 +1095,28 @@ MainWindow::dialNow (const QString &strTarget)
             break;
         }
 
-        DialContext *ctx = new DialContext(strSelfNumber, strTarget, this);
+        ctx = new DialContext(gvApi.getSelfNumber(), strTarget, this);
         if (NULL == ctx) {
             setStatus ("Failed to dial out because of allocation problem");
             break;
         }
-        bool rv = connect (ctx , SIGNAL(sigDialComplete(DialContext*,bool)),
-                           this, SLOT(onSigDialComplete(DialContext*,bool)));
-        Q_ASSERT(rv); Q_UNUSED(rv);
+        token = new AsyncTaskToken(this);
+        if (NULL == token) {
+            setStatus ("Failed to dial out because of allocation problem");
+            break;
+        }
 
-        GVAccess &webPage = Singletons::getRef().getGVAccess ();
-        QVariantList l;
-        l += strTarget;     // The destination number is common between the two
-        l += QVariant::fromValue<void*>(ctx);
+        ctx->token = token;
+        token->callerCtx = ctx;
+
+        success = connect (ctx , SIGNAL(sigDialComplete(DialContext*,bool)),
+                           this, SLOT(onSigDialComplete(DialContext*,bool)));
+        Q_ASSERT(success);
+        success = connect (token, SIGNAL(completed(AsyncTaskToken*)),
+                           this , SLOT(dialComplete(AsyncTaskToken*)));
+        Q_ASSERT(success);
+
+        token->inParams["destination"] = strTarget;
 
         OsDependent &osd = Singletons::getRef().getOSD ();
         osd.setLongWork (this, true);
@@ -1122,28 +1129,25 @@ MainWindow::dialNow (const QString &strTarget)
         if (bDialout) {
             ctx->ci = ci;
 
-            l += ci->selfNumber ();
-            if (!webPage.enqueueWork (GVAW_dialOut, l, this,
-                    SLOT (dialComplete (bool, const QVariantList &))))
-            {
-                setStatus ("Dialing failed instantly");
-                bCallInProgress = bDialCancelled = false;
-                fallbackDialout (ctx);
-                break;
-            }
+            token->inParams["source"] = ci->selfNumber ();
+            success = gvApi.callOut (token);
         } else {
-            l += gvRegNumber.strNumber;
-            l += QString (gvRegNumber.chType);
-            if (!webPage.enqueueWork (GVAW_dialCallback, l, this,
-                    SLOT (dialComplete (bool, const QVariantList &))))
-            {
-                setStatus ("Dialing failed instantly");
-                bCallInProgress = bDialCancelled = false;
-                fallbackDialout (ctx);
-                break;
-            }
+            token->inParams["source"] = gvRegNumber.strNumber;
+            token->inParams["sourceType"] = QString(gvRegNumber.chType);
+            success = gvApi.callBack (token);
         }
     } while (0); // End cleanup block (not a loop)
+
+    if (success) {
+        return;
+    }
+
+    if (ctx) {
+        ctx->deleteLater ();
+    }
+    if (token) {
+        token->deleteLater ();
+    }
 }//MainWindow::dialNow
 
 void
@@ -1215,9 +1219,7 @@ MainWindow::onSigDialComplete (DialContext *ctx, bool ok)
             emit dialCanFinish ();
         }
     } else {
-        GVAccess &webPage = Singletons::getRef().getGVAccess ();
-        bDialCancelled = true;
-        webPage.cancelWork (ctx->bDialOut ? GVAW_dialOut : GVAW_dialCallback);
+        gvApi.cancel (ctx->token);
     }
 }//MainWindow::onSigDialComplete
 
@@ -1227,24 +1229,25 @@ MainWindow::dialInProgress (const QString & /*strNumber*/)
 }//MainWindow::dialInProgress
 
 void
-MainWindow::dialAccessNumber (const QString  &strAccessNumber,
-                              const QVariant &context        )
+MainWindow::dialAccessNumber (AsyncTaskToken *token)
 {
-    DialContext *ctx = (DialContext *) context.value<void *>();
-    do // Begin cleanup block (not a loop)
-    {
-        if (NULL == ctx)
-        {
-            setStatus ("Invalid call out context", 3);
+    DialContext *ctx = (DialContext *) token->callerCtx;
+    do { // Begin cleanup block (not a loop)
+        if (NULL == ctx) {
+            Q_WARN("Invalid call out context");
             setStatus ("Callout failed");
             break;
         }
 
-        if (NULL == ctx->ci)
-        {
-            qWarning ("Invalid call out initiator");
+        if (NULL == ctx->ci) {
+            Q_WARN("Invalid call out initiator");
             setStatus ("Callout failed");
             break;
+        }
+
+        QString strAccessNumber = token->outParams["access_number"].toString();
+        if (strAccessNumber.isEmpty ()) {
+            Q_WARN("Invalid access number");
         }
 
         ctx->ci->initiateCall (strAccessNumber);
@@ -1253,29 +1256,32 @@ MainWindow::dialAccessNumber (const QString  &strAccessNumber,
 }//MainWindow::dialAccessNumber
 
 void
-MainWindow::dialComplete (bool bOk, const QVariantList &params)
+MainWindow::dialComplete (AsyncTaskToken *token)
 {
     QMutexLocker locker (&mtxDial);
-    DialContext *ctx = (DialContext *) params[1].value <void*> ();
+    DialContext *ctx = (DialContext *) token->callerCtx;
     bool bReleaseContext = true;
 
-    if (!bOk) {
+    if (ATTS_SUCCESS != token->status) {
         if (bDialCancelled) {
             setStatus ("Cancelled dial out");
         } else if (NULL == ctx->fallbackCi) {
             // Not currently in fallback modem and there was a problem
             // ... so start fallback mode
-            qDebug ("Attempting fallback dial");
+            Q_DEBUG("Attempting fallback dial");
             bReleaseContext = false;
             fallbackDialout (ctx);
         } else {
             setStatus ("Dialing failed", 10*1000);
-            GVAccess &webPage = Singletons::getRef().getGVAccess ();
-            QString strErr = webPage.getLastErrorString ();
-            this->showMsgBox (strErr);
+            this->showMsgBox (gvApi.getLastErrorString ());
         }
     } else {
-        setStatus (QString("Dial successful to %1.").arg(params[0].toString()));
+        if (bDialout) {
+            dialAccessNumber (token);
+        }
+
+        setStatus (QString("Dial successful to %1.")
+                   .arg(token->inParams["destination"].toString()));
     }
     bCallInProgress = false;
 
@@ -1285,14 +1291,16 @@ MainWindow::dialComplete (bool bOk, const QVariantList &params)
     if (bReleaseContext) {
         ctx->deleteLater ();
     }
+
+    token->deleteLater ();
 }//MainWindow::dialComplete
 
 void
 MainWindow::sendSMS (const QStringList &arrNumbers, const QString &strText)
 {
-    GVAccess &webPage = Singletons::getRef().getGVAccess ();
     QStringList arrFailed;
     QString msg;
+    AsyncTaskToken *token;
 
     for (int i = 0; i < arrNumbers.size (); i++)
     {
@@ -1301,17 +1309,22 @@ MainWindow::sendSMS (const QStringList &arrNumbers, const QString &strText)
             continue;
         }
 
-        QVariantList l;
-        l += arrNumbers[i];
-        l += strText;
-        if (!webPage.enqueueWork (GVAW_sendSMS, l, this,
-                SLOT (sendSMSDone (bool, const QVariantList &))))
-        {
-            arrFailed += arrNumbers[i];
-            msg = QString ("Failed to send an SMS to %1").arg (arrNumbers[i]);
-            qWarning () << msg;
+        token = new AsyncTaskToken(this);
+        if (!token) {
+            Q_WARN("Allocation failure");
             break;
         }
+
+        token->inParams["destination"] = arrNumbers[i];
+        token->inParams["text"] = strText;
+
+        if (!gvApi.sendSms (token)) {
+            arrFailed += arrNumbers[i];
+            msg = QString ("Failed to send an SMS to %1").arg (arrNumbers[i]);
+            Q_WARN(msg);
+            break;
+        }
+
         clearSmsDestinations ();
     } // loop through all the numbers
 
@@ -1344,39 +1357,39 @@ MainWindow::sendSMSDone (bool bOk, const QVariantList &params)
 bool
 MainWindow::refreshRegisteredNumbers ()
 {
-    GVAccess &webPage = Singletons::getRef().getGVAccess ();
+    AsyncTaskToken *token = NULL;
 
     bool rv = false;
     do { // Begin cleanup block (not a loop)
-        if (!bLoggedIn)
-        {
-            qWarning ("Not logged in. Will not refresh registered numbers.");
+        if (!bLoggedIn) {
+            Q_WARN("Not logged in. Will not refresh registered numbers.");
             break;
         }
 
         arrNumbers.clear ();
 
-        QVariantList l;
-        rv = connect(
-            &webPage, SIGNAL (registeredPhone    (const GVRegisteredNumber &)),
-             this   , SLOT   (gotRegisteredPhone (const GVRegisteredNumber &)));
-        Q_ASSERT(rv);
-        if (!webPage.enqueueWork (GVAW_getRegisteredPhones, l, this,
-                SLOT (gotAllRegisteredPhones (bool, const QVariantList &))))
-        {
-            rv = disconnect(
-                &webPage,
-                    SIGNAL (registeredPhone    (const GVRegisteredNumber &)),
-                 this   ,
-                    SLOT   (gotRegisteredPhone (const GVRegisteredNumber &)));
-            Q_ASSERT(rv);
-            rv = false;
-            qWarning ("Get registered numbers failed at the start!!!");
+        token = new AsyncTaskToken(this);
+        if (!token) {
+            Q_WARN("Allocation failure");
             break;
         }
 
-        rv = true;
+        rv = connect (token, SIGNAL(completed(AsyncTaskToken*)),
+                      this, SLOT(gotAllRegisteredPhones(AsyncTaskToken*)));
+        Q_ASSERT(rv);
+
+        rv = gvApi.getPhones (token);
+        if (!rv) {
+            Q_WARN("Get registered numbers failed at the start!!!");
+            break;
+        }
     } while (0); // End cleanup block (not a loop)
+
+    if (!rv) {
+        if (token) {
+            delete token;
+        }
+    }
 
     return (rv);
 }//MainWindow::refreshRegisteredNumbers
@@ -1388,28 +1401,21 @@ MainWindow::gotRegisteredPhone (const GVRegisteredNumber &info)
 }//MainWindow::gotRegisteredPhone
 
 void
-MainWindow::gotAllRegisteredPhones (bool bOk, const QVariantList &params)
+MainWindow::gotAllRegisteredPhones (AsyncTaskToken *token)
 {
-    GVAccess &webPage = Singletons::getRef().getGVAccess ();
-    bool rv = disconnect(
-        &webPage, SIGNAL (registeredPhone    (const GVRegisteredNumber &)),
-         this   , SLOT   (gotRegisteredPhone (const GVRegisteredNumber &)));
-    Q_ASSERT(rv); Q_UNUSED(rv);
-
     do { // Begin cleanup block (not a loop)
-        if (!bOk) {
+        if (ATTS_SUCCESS != token->status) {
             this->showMsgBox ("Failed to retrieve registered phones");
             setStatus ("Failed to retrieve registered phones");
             break;
         }
 
-        // Save the users GV number returned by the login completion
-        strSelfNumber = params[params.size()-1].toString ();
-
         this->onCallInitiatorsChange (true);
 
         setStatus ("GV callbacks retrieved.");
     } while (0); // End cleanup block (not a loop)
+
+    token->deleteLater ();
 }//MainWindow::gotAllRegisteredPhones
 
 bool
@@ -1444,12 +1450,14 @@ MainWindow::getDialSettings (bool                 &bDialout   ,
 void
 MainWindow::retrieveVoicemail (const QString &strVmailLink)
 {
-    GVAccess &webPage = Singletons::getRef().getGVAccess ();
+    AsyncTaskToken *token = NULL;
+    bool rv = false;
 
     do { // Begin cleanup block (not a loop)
         if (mapVmail.contains (strVmailLink)) {
             setStatus ("Playing cached vmail");
             playVmail (mapVmail[strVmailLink]);
+            rv = true;
             break;
         }
 
@@ -1458,37 +1466,46 @@ MainWindow::retrieveVoicemail (const QString &strVmailLink)
                             + "qgv_XXXXXX.tmp.mp3";
         QTemporaryFile tempFile (strTemplate);
         if (!tempFile.open ()) {
-            qWarning ("Failed to get a temp file name");
+            Q_WARN("Failed to get a temp file name");
             break;
         }
         QString strTemp = QFileInfo (tempFile.fileName ()).absoluteFilePath ();
         tempFile.close ();
 
-        QVariantList l;
-        l += strVmailLink;
-        l += strTemp;
-        if (!webPage.enqueueWork (GVAW_playVmail, l, this,
-                SLOT (onVmailDownloaded (bool, const QVariantList &))))
-        {
-            qWarning ("Failed to play Voice mail");
+        token = new AsyncTaskToken(this);
+        if (!token) {
+            Q_WARN("Allocation failure");
+            break;
+        }
+
+        rv = connect (token, SIGNAL(completed(AsyncTaskToken*)),
+                      this , SLOT(onVmailDownloaded(AsyncTaskToken*)));
+
+        token->inParams["vmail_link"] = strVmailLink;
+        token->inParams["file_location"] = strTemp;
+        if (!gvApi.getVoicemail (token)) {
+            Q_WARN ("Failed to play Voice mail");
             break;
         }
     } while (0); // End cleanup block (not a loop)
+
+    if (!rv) {
+        if (token) {
+            delete token;
+        }
+    }
 }//MainWindow::retrieveVoicemail
 
 void
-MainWindow::onVmailDownloaded (bool bOk, const QVariantList &arrParams)
+MainWindow::onVmailDownloaded (AsyncTaskToken *token)
 {
-    QString strFilename = arrParams[1].toString ();
-    if (bOk) {
-        QString strVmailLink = arrParams[0].toString ();
-        if (!mapVmail.contains (strVmailLink))
-        {
+    QString strFilename = token->inParams["file_location"].toString();
+    if (ATTS_SUCCESS == token->status) {
+        QString strVmailLink = token->inParams["vmail_link"].toString();
+        if (!mapVmail.contains (strVmailLink)) {
             mapVmail[strVmailLink] = strFilename;
             setStatus ("Voicemail downloaded");
-        }
-        else
-        {
+        } else {
             setStatus ("Voicemail already existed. Using cached vmail");
             if (strFilename != mapVmail[strVmailLink]) {
                 QFile::remove (strFilename);
@@ -1642,10 +1659,8 @@ MainWindow::onSigProxyChanges(bool bEnable, bool bUseSystemProxy,
                               const QString &host, int port, bool bRequiresAuth,
                               const QString &user, const QString &pass)
 {
-    // Send to WebPage.
-    GVAccess &webPage = Singletons::getRef().getGVAccess ();
-    webPage.setProxySettings (bEnable, bUseSystemProxy, host, port,
-                              bRequiresAuth, user, pass);
+    gvApi.setProxySettings (bEnable, bUseSystemProxy, host, port, bRequiresAuth,
+                            user, pass);
 
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     dbMain.setProxySettings (bEnable, bUseSystemProxy, host, port,
@@ -2106,18 +2121,15 @@ MainWindow::onSigCloseVmail()
 void
 MainWindow::onRecreateCookieJar()
 {
-    GVAccess &webPage = Singletons::getRef().getGVAccess ();
-    jar->deleteLater ();
-    jar = new CookieJar(this);
-    webPage.nwAccessMgr()->setCookieJar (jar);
-    jar->setParent (this);
+    QList<QNetworkCookie> empty;
+    gvApi.setAllCookies (empty);
 }//MainWindow::onRecreateCookieJar
 
 void
-MainWindow::onTwoStepAuthentication(QString &result)
+MainWindow::onTwoStepAuthentication(AsyncTaskToken *token)
 {
     int rv = QInputDialog::getInt (this, "Enter security token", "Token: ", 0, 0);
-    result = QString("%1").arg (rv);
+    token->inParams["user_pin"] = QString("%1").arg (rv);
 }//MainWindow::onTwoStepAuthentication
 
 void

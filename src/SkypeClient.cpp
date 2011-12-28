@@ -766,7 +766,6 @@ SkypeClient::onCI_GetPName (uint incomingCallId, const QString &strOutput,
     bool rv = disconnect (
         this, SIGNAL (callStatusChanged (uint, const QString &)),
         this, SLOT   (onCI_GetPName     (uint, const QString &)));
-    Q_ASSERT(rv);
 
     rv = false;
     ulong callId = workCurrent.arrParams[0].toULongLong ();

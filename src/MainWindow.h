@@ -25,9 +25,9 @@ Contact: yuvraaj@gmail.com
 #include "global.h"
 #include "GVContactsTable.h"
 #include "GVInbox.h"
-#include "WebWidget.h"
 #include "RegNumberModel.h"
 #include "DialContext.h"
+#include "GVApi.h"
 
 #include <QtDeclarative>
 #include <phonon/MediaObject>
@@ -69,6 +69,7 @@ private slots:
 
     //! Invoked when the application is supposed to exit
     void on_actionE_xit_triggered();
+    void dieNow();
     //! The Singleton Application class invokes this function
     void messageReceived (const QString &message);
     void onSigHide ();
@@ -81,12 +82,12 @@ private slots:
     //! Invoked when the user clicks the login button on QML.
     void doLogin ();
     //! Called when the web component completes login - with success or failure
-    void loginCompleted (bool bOk, const QVariantList &arrParams);
+    void loginCompleted (AsyncTaskToken *token);
 
     //! Called when the logout button is clicked
     void doLogout ();
     //! Called when the web component completes logoff - with success or failure
-    void logoutCompleted (bool bOk, const QVariantList &arrParams);
+    void logoutCompleted (AsyncTaskToken *token);
     //! Invoked when the system ray is clicked
     void systray_activated (QSystemTrayIcon::ActivationReason reason);
 
@@ -106,11 +107,8 @@ private slots:
     void onSigDialComplete (DialContext *ctx, bool ok);
     //! Invoked when dialing has started
     void dialInProgress (const QString &strNumber);
-    //! Invoked to perform a dial
-    void dialAccessNumber (const QString  &strAccessNumber,
-                           const QVariant &context        );
     //! Invoked when a number dial is completed.
-    void dialComplete (bool bOk, const QVariantList &params);
+    void dialComplete (AsyncTaskToken *token);
 
     //! Invoked when the user finally clicks on the send SMS button
     void sendSMS (const QStringList &arrNumbers, const QString &strText);
@@ -120,12 +118,12 @@ private slots:
     //! Invoked every time a new registered phone is retrieved
     void gotRegisteredPhone (const GVRegisteredNumber &info);
     //! Invoked every time a new registered phone is retrieved
-    void gotAllRegisteredPhones (bool bOk, const QVariantList &arrParams);
+    void gotAllRegisteredPhones (AsyncTaskToken *token);
 
     //! Invoked by the inbox page when a voice mail is to be downloaded
     void retrieveVoicemail (const QString &strVmailLink);
     //! Invoked by GVAccess when the voice mail download has completed
-    void onVmailDownloaded (bool bOk, const QVariantList &arrParams);
+    void onVmailDownloaded (AsyncTaskToken *token);
     //! Invoked when the vmail player changes state
     void onVmailPlayerStateChanged(Phonon::State newState,
                                    Phonon::State oldState);
@@ -194,7 +192,7 @@ private slots:
     void onRecreateCookieJar();
 
     //! When two step authentication happens
-    void onTwoStepAuthentication(QString &result);
+    void onTwoStepAuthentication(AsyncTaskToken *token);
 
     //! Invoked when the desktop is resized (useful only on mobile platforms)
     void onDesktopResized();
@@ -229,6 +227,8 @@ private:
     void setUsername(const QString &strUsername);
     void setPassword(const QString &strPassword);
 
+    //! Invoked to perform a dial
+    void dialAccessNumber (AsyncTaskToken *token);
     void fallbackDialout (DialContext *ctx);
 
     void clearSmsDestinations();
@@ -240,6 +240,8 @@ private:
     QObject * getMainPage();
 
 private:
+    GVApi           gvApi;
+
     // Tray, icons, widgets
     QIcon           icoQgv;
     QSystemTrayIcon *pSystray;
@@ -270,8 +272,6 @@ private:
     QString         strUser;
     //! Password
     QString         strPass;
-    //! Our own GV phone number
-    QString         strSelfNumber;
 
     //! Model for registered phone numbers
     RegNumberModel  modelRegNumber;
@@ -312,8 +312,6 @@ private:
     MqClientThread  mqThread;
     bool            bRunMqThread;
 #endif
-
-    CookieJar      *jar;
 };
 
 #endif // MAINWINDOW_H

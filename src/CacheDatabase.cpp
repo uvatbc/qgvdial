@@ -1329,9 +1329,8 @@ CacheDatabase::getTempFile(const QString &strLink, QString &strPath)
 }//CacheDatabase::getTempFile
 
 bool
-CacheDatabase::saveCookies(CookieJar *jar)
+CacheDatabase::saveCookies(QList<QNetworkCookie> cookies)
 {
-    QList<QNetworkCookie> cookies = jar->getAllCookies ();
     QSqlQuery query(dbMain);
     query.setForwardOnly (true);
 
@@ -1387,12 +1386,12 @@ CacheDatabase::saveCookies(CookieJar *jar)
 }//CacheDatabase::saveCookies
 
 bool
-CacheDatabase::loadCookies(CookieJar *jar)
+CacheDatabase::loadCookies(QList<QNetworkCookie> &cookies)
 {
     QSqlQuery query(dbMain);
     query.setForwardOnly (true);
 
-    QList<QNetworkCookie> cookies;
+    cookies.clear ();
     QString domain, path;
     bool isHttpOnly, isSecure, isSession;
     QByteArray name, value;
@@ -1431,6 +1430,5 @@ CacheDatabase::loadCookies(CookieJar *jar)
         cookies.append (cookie);
     }
 
-    jar->setNewCookies (cookies);
     return (true);
 }//CacheDatabase::saveCookies

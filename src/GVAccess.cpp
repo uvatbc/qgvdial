@@ -445,12 +445,11 @@ GVAccess::postRequest (QNetworkAccessManager   *mgr     ,
 {
     QByteArray byPostData;
     QNetworkRequest request = createRequest (strUrl, arrPairs, byPostData);
-    if (0 != strUA.size ())
-    {
+    if (0 != strUA.size ()) {
         request.setRawHeader ("User-Agent", strUA.toAscii ());
     }
 
-    bool rv = connect (mgr     , SIGNAL (finished (QNetworkReply *)),
+    bool rv = connect (mgr    , SIGNAL (finished (QNetworkReply *)),
                       receiver, method);
     Q_ASSERT(rv); Q_UNUSED(rv);
     QNetworkReply *reply = mgr->post (request, byPostData);

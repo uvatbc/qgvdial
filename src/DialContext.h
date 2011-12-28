@@ -53,6 +53,7 @@ public:
     QString strTarget;
 
     CalloutInitiator *fallbackCi;
+    AsyncTaskToken   *token;
 
 private slots:
     //! Invoked by call observers
