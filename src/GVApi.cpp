@@ -1599,7 +1599,7 @@ GVApi::callBack(AsyncTaskToken *token)
                          SLOT(onCallback(bool,QByteArray,void*)));
     Q_ASSERT(rv);
 
-    return true;
+    return (rv);
 }//GVApi::callBack
 
 void
