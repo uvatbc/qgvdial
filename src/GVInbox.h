@@ -98,6 +98,9 @@ private:
     //! Are we logged in?
     bool            bLoggedIn;
 
+    //! Refresh in progress
+    bool            bRefreshInProgress;
+
     //! The inbox model
     InboxModel     *modelInbox;
 };

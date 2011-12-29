@@ -60,7 +60,9 @@ Contact: yuvraaj@gmail.com
 // Photos in contacts
 //#define GV_S_VALUE_DB_VER   "2011-07-09 18:58:53"
 // Update date time in contacts
-#define GV_S_VALUE_DB_VER   "2011-08-05 12:05:58"
+//#define GV_S_VALUE_DB_VER   "2011-08-05 12:05:58"
+// Stopped using webkit for almost everything
+#define GV_S_VALUE_DB_VER   "2011-12-28 23:50:30"
 ////////////////////////////////////////////////////////////////////////////////
 // Started using versioning for the settings
 //#define GV_SETTINGS_VER     "2011-05-13 16:33:50"

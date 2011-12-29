@@ -858,6 +858,12 @@ GVApi::logout(AsyncTaskToken *token)
         return false;
     }
 
+    if (!loggedIn) {
+        token->status = ATTS_NOT_LOGGED_IN;
+        token->emitCompleted ();
+        return true;
+    }
+
     bool rv = doGet(GV_HTTPS "/account/signout", token, this,
                     SLOT (onLogout(bool, const QByteArray&, void*)));
     Q_ASSERT(rv);
@@ -869,8 +875,11 @@ void
 GVApi::onLogout(bool /*success*/, const QByteArray & /*response*/, void *ctx)
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
+
+    loggedIn = false;
+
     token->status = ATTS_SUCCESS;
-    token->emitCompleted ();;
+    token->emitCompleted ();
 }//GVApi::onLogout
 
 bool
@@ -879,6 +888,12 @@ GVApi::getPhones(AsyncTaskToken *token)
     Q_ASSERT(token);
     if (!token) {
         return false;
+    }
+
+    if (!loggedIn) {
+        token->status = ATTS_NOT_LOGGED_IN;
+        token->emitCompleted ();
+        return true;
     }
 
     bool rv = doGet (GV_HTTPS "/b/0/settings/tab/phones", token, this,
@@ -1087,6 +1102,12 @@ GVApi::getInbox(AsyncTaskToken *token)
         !token->inParams.contains ("page"))
     {
         token->status = ATTS_INVALID_PARAMS;
+        token->emitCompleted ();
+        return true;
+    }
+
+    if (!loggedIn) {
+        token->status = ATTS_NOT_LOGGED_IN;
         token->emitCompleted ();
         return true;
     }
@@ -1478,6 +1499,12 @@ GVApi::callOut(AsyncTaskToken *token)
         return true;
     }
 
+    if (!loggedIn) {
+        token->status = ATTS_NOT_LOGGED_IN;
+        token->emitCompleted ();
+        return true;
+    }
+
     QUrl url(GV_HTTPS_M "/x");
     url.addQueryItem("m" , "call");
     url.addQueryItem("n" , token->inParams["destination"].toString());
@@ -1574,6 +1601,12 @@ GVApi::callBack(AsyncTaskToken *token)
     if (!token->inParams.contains ("destination"))
     {
         token->status = ATTS_INVALID_PARAMS;
+        token->emitCompleted ();
+        return true;
+    }
+
+    if (!loggedIn) {
+        token->status = ATTS_NOT_LOGGED_IN;
         token->emitCompleted ();
         return true;
     }
@@ -1677,8 +1710,13 @@ GVApi::sendSms(AsyncTaskToken *token)
         return true;
     }
 
-    QUrl url(GV_HTTPS_M "/x");
+    if (!loggedIn) {
+        token->status = ATTS_NOT_LOGGED_IN;
+        token->emitCompleted ();
+        return true;
+    }
 
+    QUrl url(GV_HTTPS_M "/x");
     url.addQueryItem("m" , "sms");
     url.addQueryItem("n" , token->inParams["destination"].toString());
     url.addQueryItem("f" , "");
@@ -1789,6 +1827,12 @@ GVApi::getVoicemail(AsyncTaskToken *token)
         return true;
     }
 
+    if (!loggedIn) {
+        token->status = ATTS_NOT_LOGGED_IN;
+        token->emitCompleted ();
+        return true;
+    }
+
     QString strLink = QString (GV_HTTPS "/b/0/media/send_voicemail/%1")
                         .arg(token->inParams["vmail_link"].toString());
     return doGet(strLink, token, this, SLOT(onVmail(bool, QByteArray, void*)));
@@ -1853,6 +1897,12 @@ GVApi::markInboxEntryAsRead(AsyncTaskToken *token)
     if (!token->inParams.contains ("id"))
     {
         token->status = ATTS_INVALID_PARAMS;
+        token->emitCompleted ();
+        return true;
+    }
+
+    if (!loggedIn) {
+        token->status = ATTS_NOT_LOGGED_IN;
         token->emitCompleted ();
         return true;
     }

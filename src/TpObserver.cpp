@@ -21,13 +21,8 @@ Contact: yuvraaj@gmail.com
 
 #include "TpObserver.h"
 
-#if USE_OLD_QT_TP4
-TpObserver::TpObserver (const ChannelClassList &channelFilter,
-                              QObject          *parent       )
-#else
 TpObserver::TpObserver (const ChannelClassSpecList &channelFilter,
                               QObject              *parent       )
-#endif
 : IObserver (parent)
 , AbstractClientObserver(channelFilter)
 , id(1) // Always ignore
@@ -54,59 +49,6 @@ TpObserver::stopMonitoring ()
     strContact.clear ();
 }//TpObserver::stopMonitoring
 
-#if USE_OLD_QT_TP4
-void
-TpObserver::observeChannels(
-        const MethodInvocationContextPtr<> & context,
-        const AccountPtr                   & account,
-        const ConnectionPtr                & connection,
-        const QList <ChannelPtr>           & channels,
-        const ChannelDispatchOperationPtr  & dispatchOperation,
-        const QList <ChannelRequestPtr>    & requestsSatisfied,
-        const QVariantMap                  & observerInfo)
-{
-    bool bOk;
-    QString msg;
-    qDebug ("TpObserver: Observer got something!");
-
-    if (strContact.isEmpty ())
-    {
-        context->setFinished ();
-        qDebug ("TpObserver: But we weren't asked to notify anything, so go away");
-        return;
-    }
-
-    msg = QString("TpObserver: There are %1 channels in channels list")
-          .arg (channels.size ());
-    qDebug () << msg;
-
-    foreach (ChannelPtr channel, channels)
-    {
-        if (!channel->isReady ())
-        {
-            qDebug ("TpObserver: Channel is not ready");
-
-            ChannelAccepter *closer = new ChannelAccepter(context,
-                                                          account,
-                                                          connection,
-                                                          channels,
-                                                          dispatchOperation,
-                                                          requestsSatisfied,
-                                                          observerInfo,
-                                                          channel,
-                                                          strContact,
-                                                          this);
-            bOk = connect (closer, SIGNAL (callStarted ()),
-                           this  , SIGNAL (callStarted ()));
-            Q_ASSERT(bOk);
-            closer->init ();
-            break;
-        }
-    }
-}//TpObserver::observeChannels
-
-#else
-
 void
 TpObserver::observeChannels(
         const MethodInvocationContextPtr<>  &context,
@@ -120,7 +62,6 @@ TpObserver::observeChannels(
     observeChannels (context, account, connection, channels, dispatchOperation,
                      requestsSatisfied, observerInfo.allInfo ());
 }//TpObserver::observeChannels
-#endif
 
 QString
 TpObserver::name()

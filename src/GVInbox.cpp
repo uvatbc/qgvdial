@@ -29,6 +29,7 @@ GVInbox::GVInbox (GVApi &gref, QObject *parent)
 , gvApi(gref)
 , mutex (QMutex::Recursive)
 , bLoggedIn (false)
+, bRefreshInProgress (false)
 , modelInbox (NULL)
 {
     bool rv = connect (
@@ -100,6 +101,11 @@ GVInbox::refresh (const QDateTime &dtUpdate)
         return;
     }
 
+    if (bRefreshInProgress) {
+        Q_WARN("Refresh in progress. Ignore this one.");
+        return;
+    }
+
     int page = 1;
     AsyncTaskToken *token = new AsyncTaskToken(this);
     token->inParams["type"] = "all";
@@ -110,6 +116,8 @@ GVInbox::refresh (const QDateTime &dtUpdate)
     bool rv = connect(token, SIGNAL(completed(AsyncTaskToken*)),
                       this, SLOT(getInboxDone(AsyncTaskToken*)));
     Q_ASSERT(rv); Q_UNUSED(rv);
+
+    bRefreshInProgress = true;
 
     if (!gvApi.getInbox (token)) {
         getInboxDone (NULL);
@@ -143,7 +151,9 @@ GVInbox::oneInboxEntry (const GVInboxEntry &hevent)
         return;
     }
 
-    if (hevent.startTime >= dateWaterLevel) {
+    if (dateWaterLevel.isValid () && (hevent.startTime >= dateWaterLevel)) {
+        Q_DEBUG("Water level was =") << dateWaterLevel.toString()
+                << "current entry =" << hevent.startTime.toString();
         passedWaterLevel = true;
     }
 
@@ -215,6 +225,9 @@ GVInbox::getInboxDone (AsyncTaskToken *token)
 
     emit status (QString("Inbox ready. %1 %2 retrieved.")
                  .arg(nNew).arg (nNew == 1?"entry":"entries"));
+
+    QMutexLocker locker(&mutex);
+    bRefreshInProgress = false;
 }//GVInbox::getInboxDone
 
 void

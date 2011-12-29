@@ -61,22 +61,10 @@ ObserverFactory::init ()
 #if TELEPATHY_CAPABLE
     clientRegistrar = ClientRegistrar::create();
 
-#if USE_OLD_QT_TP4
-    ChannelClassList filters;
-    QMap<QString, QDBusVariant> filter;
-    filter.insert(
-            QLatin1String(TELEPATHY_INTERFACE_CHANNEL ".ChannelType"),
-            QDBusVariant(TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAMED_MEDIA));
-    filter.insert(
-            QLatin1String(TELEPATHY_INTERFACE_CHANNEL ".TargetHandleType"),
-            QDBusVariant((uint) Tp::HandleTypeContact));
-    filters.append(filter);
-#else
     ChannelClassSpecList filters;
     filters.append (Tp::ChannelClassSpec(
                     TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAMED_MEDIA,
                     Tp::HandleTypeContact));
-#endif
     TpObserver *myobserver = new TpObserver(filters, this);
     AbstractClientPtr appr = (AbstractClientPtr) myobserver;
     clientRegistrar->registerClient(appr, "QGVStreamObserver");

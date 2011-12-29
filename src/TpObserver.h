@@ -22,8 +22,6 @@ Contact: yuvraaj@gmail.com
 #ifndef TPOBSERVER_H
 #define TPOBSERVER_H
 
-#define USE_OLD_QT_TP4 0
-
 #include "global.h"
 #include <QtDBus>
 #include <TelepathyQt4/Types>
@@ -38,10 +36,7 @@ Contact: yuvraaj@gmail.com
 #include <TelepathyQt4/Channel>
 #include <TelepathyQt4/ChannelDispatchOperation>
 #include <TelepathyQt4/ChannelRequest>
-
-#if !USE_OLD_QT_TP4
 #include <TelepathyQt4/ChannelClassSpecList>
-#endif
 
 using namespace Tp;
 
@@ -53,13 +48,8 @@ class TpObserver : public IObserver, public AbstractClientObserver
     Q_OBJECT
 
 public:
-#if USE_OLD_QT_TP4
-    TpObserver (const ChannelClassList &channelFilter,
-                      QObject          *parent = NULL);
-#else
     TpObserver (const ChannelClassSpecList &channelFilter,
                       QObject              *parent = NULL);
-#endif
     void setId (int i);
     QString name();
 
@@ -70,17 +60,6 @@ protected:
 private slots:
 
 protected:
-#if USE_OLD_QT_TP4
-    void observeChannels(
-            const MethodInvocationContextPtr<>  &context,
-            const AccountPtr                    &account,
-            const ConnectionPtr                 &connection,
-            const QList <ChannelPtr>            &channels,
-            const ChannelDispatchOperationPtr   &dispatchOperation,
-            const QList <ChannelRequestPtr>     &requestsSatisfied,
-            const QVariantMap                   &observerInfo);
-
-#else    // Linux and Meego have moved on to newer telepathy.
     void observeChannels(
             const MethodInvocationContextPtr<>  &context,
             const AccountPtr                    &account,
@@ -89,7 +68,6 @@ protected:
             const ChannelDispatchOperationPtr   &dispatchOperation,
             const QList<ChannelRequestPtr>      &requestsSatisfied,
             const ObserverInfo                  &observerInfo);
-#endif
 
 private:
     int     id;
