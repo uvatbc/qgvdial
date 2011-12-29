@@ -21,12 +21,12 @@ Contact: yuvraaj@gmail.com
 
 #include "TpObserver.h"
 
-#if DESKTOP_OS || defined(MEEGO_HARMATTAN)
-TpObserver::TpObserver (const ChannelClassSpecList &channelFilter,
-                              QObject              *parent       )
-#else
+#if USE_OLD_QT_TP4
 TpObserver::TpObserver (const ChannelClassList &channelFilter,
                               QObject          *parent       )
+#else
+TpObserver::TpObserver (const ChannelClassSpecList &channelFilter,
+                              QObject              *parent       )
 #endif
 : IObserver (parent)
 , AbstractClientObserver(channelFilter)
@@ -54,6 +54,7 @@ TpObserver::stopMonitoring ()
     strContact.clear ();
 }//TpObserver::stopMonitoring
 
+#if USE_OLD_QT_TP4
 void
 TpObserver::observeChannels(
         const MethodInvocationContextPtr<> & context,
@@ -104,7 +105,8 @@ TpObserver::observeChannels(
     }
 }//TpObserver::observeChannels
 
-#if DESKTOP_OS || defined(MEEGO_HARMATTAN)
+#else
+
 void
 TpObserver::observeChannels(
         const MethodInvocationContextPtr<>  &context,

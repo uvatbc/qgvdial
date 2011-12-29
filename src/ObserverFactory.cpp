@@ -21,13 +21,9 @@ Contact: yuvraaj@gmail.com
 
 #include "ObserverFactory.h"
 
-#if defined (Q_OS_UNIX) && !defined (Q_OS_SYMBIAN)
+#if TELEPATHY_CAPABLE
 #include "TpObserver.h"
 #include <TelepathyQt4/ClientRegistrar>
-
-#if LINUX_DESKTOP || defined(MEEGO_HARMATTAN)
-#include <TelepathyQt4/ChannelClassSpecList>
-#endif
 
 ClientRegistrarPtr  clientRegistrar;
 
@@ -44,7 +40,7 @@ ObserverFactory::ObserverFactory(QObject *parent)
 
 ObserverFactory::~ObserverFactory ()
 {
-#if defined (Q_OS_UNIX) && !defined (Q_OS_SYMBIAN)
+#if TELEPATHY_CAPABLE
     if (!clientRegistrar.isNull ())
     {
         // Don't know why deleting this object causes a segfault
@@ -65,12 +61,7 @@ ObserverFactory::init ()
 #if TELEPATHY_CAPABLE
     clientRegistrar = ClientRegistrar::create();
 
-#if DESKTOP_OS || defined(MEEGO_HARMATTAN)
-    ChannelClassSpecList filters;
-    filters.append (Tp::ChannelClassSpec(
-                    TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAMED_MEDIA,
-                    Tp::HandleTypeContact));
-#else
+#if USE_OLD_QT_TP4
     ChannelClassList filters;
     QMap<QString, QDBusVariant> filter;
     filter.insert(
@@ -80,6 +71,11 @@ ObserverFactory::init ()
             QLatin1String(TELEPATHY_INTERFACE_CHANNEL ".TargetHandleType"),
             QDBusVariant((uint) Tp::HandleTypeContact));
     filters.append(filter);
+#else
+    ChannelClassSpecList filters;
+    filters.append (Tp::ChannelClassSpec(
+                    TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAMED_MEDIA,
+                    Tp::HandleTypeContact));
 #endif
     TpObserver *myobserver = new TpObserver(filters, this);
     AbstractClientPtr appr = (AbstractClientPtr) myobserver;
