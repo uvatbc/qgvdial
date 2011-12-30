@@ -33,7 +33,19 @@ GVInbox::refresh ()
 
     bool rv = connect(token, SIGNAL(completed(AsyncTaskToken*)),
                       this, SLOT(getInboxDone(AsyncTaskToken*)));
-    Q_ASSERT(rv); Q_UNUSED(rv);
+    Q_ASSERT(rv);
+    if (!rv) {
+        qApp->quit ();
+        return;
+    }
+
+    rv = connect(&gvApi, SIGNAL(oneInboxEntry(const GVInboxEntry &)),
+                  this , SLOT  (oneInboxEntry(const GVInboxEntry &)));
+    Q_ASSERT(rv);
+    if (!rv) {
+        qApp->quit ();
+        return;
+    }
 
     bRefreshInProgress = true;
 
@@ -46,15 +58,14 @@ GVInbox::refresh ()
 void
 GVInbox::oneInboxEntry (const GVInboxEntry &hevent)
 {
-    if (hevent.startTime > dtUpdate) {
-        dtUpdate = hevent.startTime;
+    if (!dtLatest.isValid() || (hevent.startTime > dtLatest)) {
+        dtLatest = hevent.startTime;
     }
 }//GVInbox::oneInboxEntry
 
 void
 GVInbox::getInboxDone (AsyncTaskToken *token)
 {
-    int nNew = 0;
     do { // Begin cleanup block (not a loop)
         if (!token) {
             Q_WARN("No token provided. Failure!!");
@@ -67,15 +78,25 @@ GVInbox::getInboxDone (AsyncTaskToken *token)
             break;
         }
 
-        nNew = token->outParams["message_count"].toInt();
-
         delete token;
         token = NULL;
 
-        if (nNew) {
+        if (!dtLatest.isValid ()) {
+            Q_DEBUG("Invalid latest date");
+            dtLatest = QDateTime::currentDateTime ();
+        }
+        if (!dtPrevLatest.isValid ()) {
+            dtPrevLatest = dtLatest.addDays (-1);
+        }
+
+        if (dtLatest > dtPrevLatest) {
+            dtPrevLatest = dtLatest;
             emit inboxChanged ();
         }
     } while (0); // End cleanup block (not a loop)
+
+    QMutexLocker locker(&mutex);
+    bRefreshInProgress = false;
 }//GVInbox::getInboxDone
 
 void

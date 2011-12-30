@@ -41,7 +41,8 @@ private:
     bool            bRefreshInProgress;
 
     //! Date time of latest update
-    QDateTime       dtUpdate;
+    QDateTime       dtLatest;
+    QDateTime       dtPrevLatest;
 };
 
 #endif // NOTIFYGVINBOX_H
