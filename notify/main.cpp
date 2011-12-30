@@ -45,7 +45,7 @@ main (int argc, char **argv)
 {
     pOldHandler = qInstallMsgHandler(myMessageOutput);
 
-    QApplication app(argc, argv);
+    QCoreApplication app(argc, argv);
     MainWindow w;
     pw = &w;
 
