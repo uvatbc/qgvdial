@@ -237,7 +237,7 @@ private:
 
     void initMq();
 
-    QObject * getMainPage();
+    QObject * getQMLObject(const char *pageName);
 
 private:
     GVApi           gvApi;

@@ -183,7 +183,7 @@ MainWindow::onCleanupLogsArray()
 void
 MainWindow::setStatus(const QString &strText, int timeout /* = 3000*/)
 {
-    qWarning () << strText;
+    Q_WARN(strText);
 
 #ifdef Q_WS_MAEMO_5
     infoBox.hide ();
@@ -524,9 +524,9 @@ MainWindow::initQML ()
     this->setPassword ("hunter2 :p");
 
     // The root object changes when we reload the source. Pick it up again.
-    QObject *gObj = this->getMainPage();
+    QObject *gObj = this->getQMLObject ("MainPage");
     if (NULL == gObj) {
-        qWarning ("Could not get to MainPage");
+        Q_WARN("Could not get to MainPage");
         qApp->quit();
         return;
     }
@@ -1167,21 +1167,21 @@ void
 MainWindow::onSendTextWithoutData (const QStringList &arrNumbers)
 {
     do { // Begin cleanup block (not a loop)
-        QObject *pRoot = this->rootObject ();
-        if (NULL == pRoot) {
-            qWarning ("Couldn't get root object in QML for SmsPage");
+        QObject *pMainPage = this->getQMLObject ("MainPage");
+        if (NULL == pMainPage) {
+            Q_WARN("Could not get to MainPage");
             break;
         }
 
-        QObject *pSmsView = pRoot->findChild <QObject*> ("SmsPage");
+        QObject *pSmsView = this->getQMLObject ("SmsPage");
         if (NULL == pSmsView) {
-            qWarning ("Could not get to SmsPage");
+            Q_WARN("Could not get to SmsPage");
             break;
         }
 
         foreach (QString strNumber, arrNumbers) {
             if (strNumber.isEmpty ()) {
-                qWarning ("Cannot text empty number");
+                Q_WARN("Cannot text empty number");
                 continue;
             }
 
@@ -1189,7 +1189,7 @@ MainWindow::onSendTextWithoutData (const QStringList &arrNumbers)
 
             // Get info about this number
             if (!findInfo (strNumber, info)) {
-                qWarning () << "Unable to find information for " << strNumber;
+                Q_WARN("Unable to find information for ") << strNumber;
                 continue;
             }
 
@@ -1199,7 +1199,7 @@ MainWindow::onSendTextWithoutData (const QStringList &arrNumbers)
         }
 
         // Show the SMS View
-        QMetaObject::invokeMethod (pRoot, "showSmsView");
+        QMetaObject::invokeMethod (pMainPage, "showSmsView");
 
         // Show myself (because I may be hidden)
         this->show ();
@@ -1298,7 +1298,7 @@ MainWindow::sendSMS (const QStringList &arrNumbers, const QString &strText)
     for (int i = 0; i < arrNumbers.size (); i++)
     {
         if (arrNumbers[i].isEmpty ()) {
-            qWarning ("Cannot text empty number");
+            Q_WARN("Cannot text empty number");
             continue;
         }
 
@@ -1422,7 +1422,7 @@ MainWindow::getDialSettings (bool                 &bDialout   ,
     do { // Begin cleanup block (not a loop)
         RegNumData data;
         if (!modelRegNumber.getAt (indRegPhone, data)) {
-            qWarning ("Invalid registered phone index");
+            Q_WARN("Invalid registered phone index");
             break;
         }
 
@@ -1546,7 +1546,7 @@ MainWindow::onVmailPlayerStateChanged(Phonon::State newState,
         value = 2;
         break;
     default:
-        qWarning ("Unknown state!");
+        Q_WARN("Unknown state!");
         return;
     }
 
@@ -1677,16 +1677,9 @@ MainWindow::onSigProxyRefresh(bool bSet)
     }
 
     do { // Begin cleanup block (not a loop)
-        QObject *pRoot = this->rootObject ();
-        if (NULL == pRoot) {
-            qWarning ("Couldn't get root object in QML for ProxySettingsPage");
-            break;
-        }
-
-        QObject *pProxySettings = pRoot->findChild <QObject*>
-                ("ProxySettingsPage");
+        QObject *pProxySettings = getQMLObject ("ProxySettingsPage");
         if (NULL == pProxySettings) {
-            qWarning ("Could not get to ProxySettingsPage");
+            Q_WARN("Could not get to ProxySettingsPage");
             break;
         }
 
@@ -1743,15 +1736,9 @@ MainWindow::refreshMqSettings (bool bForceShut /*= false*/)
     }
 
     do { // Begin cleanup block (not a loop)
-        QObject *pRoot = this->rootObject ();
-        if (NULL == pRoot) {
-            qWarning ("Couldn't get root object in QML for MosquittoPage");
-            break;
-        }
-
-        QObject *pMqSettings = pRoot->findChild <QObject*> ("MosquittoPage");
+        QObject *pMqSettings = getQMLObject ("MosquittoPage");
         if (NULL == pMqSettings) {
-            qWarning ("Could not get to MosquittoPage");
+            Q_WARN("Could not get to MosquittoPage");
             break;
         }
 
@@ -1847,15 +1834,9 @@ MainWindow::refreshPinSettings()
     }
 
     do { // Begin cleanup block (not a loop)
-        QObject *pRoot = this->rootObject ();
-        if (NULL == pRoot) {
-            qWarning ("Couldn't get root object in QML for PinSettingsPage");
-            break;
-        }
-
-        QObject *pPinSettings = pRoot->findChild <QObject*> ("PinSettingsPage");
+        QObject *pPinSettings = getQMLObject ("PinSettingsPage");
         if (NULL == pPinSettings) {
-            qWarning ("Could not get to PinSettingsPage");
+            Q_WARN("Could not get to PinSettingsPage");
             break;
         }
 
@@ -1926,15 +1907,9 @@ MainWindow::setUsername(const QString &strU)
 {
     do // Begin cleanup block (not a loop)
     {
-        QObject *pRoot = this->rootObject ();
-        if (NULL == pRoot) {
-            qWarning ("Couldn't get QML root object for setUsername");
-            break;
-        }
-
-        QObject *pSettingsPage = pRoot->findChild <QObject*>("SettingsPage");
+        QObject *pSettingsPage = getQMLObject ("SettingsPage");
         if (NULL == pSettingsPage) {
-            qWarning ("Could not get to SettingsPage for setUsername");
+            Q_WARN("Could not get to SettingsPage for setUsername");
             break;
         }
 
@@ -1948,15 +1923,9 @@ MainWindow::setPassword(const QString &strP)
 {
     do // Begin cleanup block (not a loop)
     {
-        QObject *pRoot = this->rootObject ();
-        if (NULL == pRoot) {
-            qWarning ("Couldn't get QML root object for setPassword");
-            break;
-        }
-
-        QObject *pSettingsPage = pRoot->findChild <QObject*>("SettingsPage");
+        QObject *pSettingsPage = getQMLObject ("SettingsPage");
         if (NULL == pSettingsPage) {
-            qWarning ("Could not get to SettingsPage for setPassword");
+            Q_WARN("Could not get to SettingsPage for setPassword");
             break;
         }
 
@@ -1978,7 +1947,7 @@ MainWindow::fallbackDialout (DialContext *ctx)
 
     QString strFull = ctx->strMyNumber;
     if (strFull.isEmpty() || (strFull == "CLIENT_ONLY")) {
-        qWarning("Fallback dialout not possible. Self number not configured.");
+        Q_WARN("Fallback dialout not possible. Self number not configured.");
         ctx->deleteLater ();
         return;
     }
@@ -2000,7 +1969,7 @@ MainWindow::onFallbackDialout (bool bSuccess, void *v_ctx)
 
     if (!bSuccess) {
         this->showMsgBox ("Dialing failed");
-        qWarning ("Fallback dial failed. Aborting DTMF");
+        Q_WARN("Fallback dial failed. Aborting DTMF");
         setStatus ("Fallback dial failed", 10*1000);
         return;
     }
@@ -2029,15 +1998,9 @@ void
 MainWindow::onSetInboxSelector(const QString &strSelector)
 {
     do { // Begin cleanup block (not a loop)
-        QObject *pRoot = this->rootObject ();
-        if (NULL == pRoot) {
-            qWarning ("Couldn't get root object in QML for InboxPage");
-            break;
-        }
-
-        QObject *pInbox = pRoot->findChild <QObject*> ("InboxPage");
+        QObject *pInbox = getQMLObject ("InboxPage");
         if (NULL == pInbox) {
-            qWarning ("Could not get to InboxPage");
+            Q_WARN("Could not get to InboxPage");
             break;
         }
 
@@ -2057,15 +2020,9 @@ void
 MainWindow::clearSmsDestinations ()
 {
     do { // Begin cleanup block (not a loop)
-        QObject *pRoot = this->rootObject ();
-        if (NULL == pRoot) {
-            qWarning ("Couldn't get root object in QML for SmsPage");
-            break;
-        }
-
-        QObject *pSmsView = pRoot->findChild <QObject*> ("SmsPage");
+        QObject *pSmsView = getQMLObject ("SmsPage");
         if (NULL == pSmsView) {
-            qWarning ("Could not get to SmsPage");
+            Q_WARN("Could not get to SmsPage");
             break;
         }
 
@@ -2130,7 +2087,7 @@ MainWindow::onDesktopResized()
 {
     QObject *pMain = this->rootObject ();
     if (NULL == pMain) {
-        qWarning ("Could not get to MainPage for resize");
+        Q_WARN("Could not get to MainPage for resize");
         return;
     }
 
@@ -2141,30 +2098,30 @@ MainWindow::onDesktopResized()
 }//MainWindow::onDesktopResized
 
 QObject *
-MainWindow::getMainPage()
+MainWindow::getQMLObject(const char *pageName)
 {
-    QObject *pMain = NULL;
+    QObject *pObj = NULL;
     do { // Begin cleanup block (not a loop)
         QObject *pRoot = this->rootObject ();
         if (NULL == pRoot) {
-            qWarning ("Couldn't get root object in QML for MainPage");
+            Q_WARN("Couldn't get root object in QML for ") << pageName;
             break;
         }
 
-        if (pRoot->objectName() == "MainPage") {
-            pMain = pRoot;
+        if (pRoot->objectName() == pageName) {
+            pObj = pRoot;
             break;
         }
 
-        pMain = pRoot->findChild <QObject*> ("MainPage");
-        if (NULL == pMain) {
-            qWarning ("Could not get to MainPage");
+        pObj = pRoot->findChild <QObject*> (pageName);
+        if (NULL == pObj) {
+            Q_WARN("Could not get to ") << pageName;
             break;
         }
     } while (0); // End cleanup block (not a loop)
 
-    return (pMain);
-}//MainWindow::getMainPage
+    return (pObj);
+}//MainWindow::getQMLObject
 
 void
 MainWindow::onSigGvApiProgress(double percent)
