@@ -69,16 +69,15 @@ NwReqTracker::onReplyFinished()
     QByteArray response;
     do { // Begin cleanup block (not a loop)
         if (aborted) {
-            qDebug() << "Reply was aborted";
+            Q_WARN("Reply was aborted");
             break;
         }
 
         if (QNetworkReply::NoError != reply->error ()) {
-            qWarning() << "Response error: " << reply->errorString ();
+            Q_WARN("Response error: ") << reply->errorString ();
             break;
         }
 
-        qDebug() << "Finished re baba!" << (void *) reply;
         response = reply->readAll ();
         rv = true;
     } while (0); // End cleanup block (not a loop)
@@ -101,7 +100,7 @@ void
 NwReqTracker::abort()
 {
     aborted = true;
-    qDebug() << "Abort!!" << (void *) reply;
+    Q_DEBUG("Abort!!");
 
     reply->abort ();
 
@@ -140,12 +139,19 @@ NwReqTracker::onXferProgress(qint64 bytesReceived, qint64 bytesTotal)
 
     replyTimer.stop ();
 
-    double percent = 50.0;
-    if (bytesTotal != -1) {
-        percent = (double)bytesReceived / bytesTotal;
+    if (bytesTotal == -1) {
+        // Force to 50%
+        bytesTotal = bytesReceived << 1;
+    }
+
+    double percent = 0.0;
+    if (bytesTotal != 0) {
+        percent = (100.0 * bytesReceived) / bytesTotal;
     }
 
     emit sigProgress (percent);
 
-    replyTimer.start ();
+    if (bytesReceived != bytesTotal) {
+        replyTimer.start ();
+    }
 }//NwReqTracker::onXferProgress

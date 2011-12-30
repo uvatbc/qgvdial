@@ -35,7 +35,7 @@ DesktopSkypeCallInitiator::attemptCreateSkypeClient ()
 {
     if (NULL == skypeClient) {
         skypeClient = Singletons::getRef().getSkypeFactory()
-                        .ensureSkypeClient (SKYPE_CLIENT_NAME);
+                        .ensureSkypeClient (APPLICATION_NAME);
         if (NULL == skypeClient) {
             qWarning ("Failed to create skype Client!");
             return;

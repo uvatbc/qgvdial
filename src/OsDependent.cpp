@@ -34,7 +34,7 @@ OsDependent::init ()
 {
 #if TELEPATHY_CAPABLE
     Tp::registerTypes();
-#if !NO_DBGINFO
+#ifdef DBG_TP_VERBOSE
     Tp::enableDebug(true);
     Tp::enableWarnings(true);
 #endif

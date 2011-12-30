@@ -192,7 +192,8 @@ main (int argc, char *argv[])
     w.show();
 #endif
 
-    app.setApplicationName ("qgvdial");
+    // Phonon needs the name of the application
+    app.setApplicationName (APPLICATION_NAME);
 
     int rv = app.exec();
     deinitLogging ();

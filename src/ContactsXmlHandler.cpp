@@ -143,7 +143,7 @@ ContactsXmlHandler::endElement (const QString & /*namespaceURI*/,
                          << currInfo.strTitle;
         }
 
-#if !NO_DBGINFO
+#ifdef DBG_VERBOSE
         // For debug
         if (currInfo.strTitle.contains ("Jamie", Qt::CaseInsensitive)) {
             if (bEmitLog) qDebug ("It's Jamie");

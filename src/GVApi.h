@@ -72,6 +72,9 @@ signals:
     //! Emitted for every inbox entry
     void oneInboxEntry (const GVInboxEntry &hevent);
 
+    //! Emitted by the nw class to give updates about the current progress
+    void sigProgress(double percent);
+
 private slots:
 
     // Login and two factor

@@ -43,7 +43,7 @@ SkypeObserver::initClient ()
     }
 
     SkypeClientFactory &skypeFactory = Singletons::getRef().getSkypeFactory ();
-    skypeClient = skypeFactory.ensureSkypeClient (SKYPE_CLIENT_NAME);
+    skypeClient = skypeFactory.ensureSkypeClient (APPLICATION_NAME);
     if (NULL == skypeClient)
     {
         qWarning ("SkypeObserver: Failed to create skype client");
@@ -61,7 +61,7 @@ SkypeObserver::initClient ()
     if (!rv)
     {
         qWarning ("SkypeObserver: Failed to initiate skype client init!");
-        skypeFactory.deleteClient (SKYPE_CLIENT_NAME);
+        skypeFactory.deleteClient (APPLICATION_NAME);
         skypeClient = NULL;
     }
 }//SkypeObserver::initClient
@@ -76,7 +76,7 @@ SkypeObserver::onInitSkype (bool bSuccess, const QVariantList & /*params*/)
         SkypeClientFactory &skypeFactory =
         Singletons::getRef().getSkypeFactory ();
 
-        skypeFactory.deleteClient (SKYPE_CLIENT_NAME);
+        skypeFactory.deleteClient (APPLICATION_NAME);
         skypeClient = NULL;
     }
     else

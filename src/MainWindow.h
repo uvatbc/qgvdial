@@ -74,6 +74,9 @@ private slots:
     void messageReceived (const QString &message);
     void onSigHide ();
 
+    //! The GV Api will update us on the current progress of the NW api
+    void onSigGvApiProgress(double percent);
+
     //! Invoked when the QML says that the username and/or password has changed.
     void onUserTextChanged (const QString &strUsername);
     void onPassTextChanged (const QString &strPassword);
@@ -105,8 +108,6 @@ private slots:
 
     //! Invoked by the context when either observers or the user says.
     void onSigDialComplete (DialContext *ctx, bool ok);
-    //! Invoked when dialing has started
-    void dialInProgress (const QString &strNumber);
     //! Invoked when a number dial is completed.
     void dialComplete (AsyncTaskToken *token);
 
@@ -228,7 +229,6 @@ private:
     void setPassword(const QString &strPassword);
 
     //! Invoked to perform a dial
-    void dialAccessNumber (AsyncTaskToken *token);
     void fallbackDialout (DialContext *ctx);
 
     void clearSmsDestinations();

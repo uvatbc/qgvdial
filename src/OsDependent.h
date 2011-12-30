@@ -27,7 +27,7 @@ Contact: yuvraaj@gmail.com
 #if TELEPATHY_CAPABLE
 #include <TelepathyQt4/Constants>
 #include <TelepathyQt4/Types>
-#if !NO_DBGINFO
+#ifdef DBG_TP_VERBOSE
 #include <TelepathyQt4/Debug>
 #endif
 #endif

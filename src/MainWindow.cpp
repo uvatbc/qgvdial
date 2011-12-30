@@ -325,19 +325,14 @@ MainWindow::init ()
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
 
-/*    rv = connect (&webPage    , SIGNAL (dialInProgress (const QString &)),
-                       this       , SLOT   (dialInProgress (const QString &)));
+    rv =
+    connect(&gvApi, SIGNAL(sigProgress(double)),
+             this , SLOT(onSigGvApiProgress(double)));
     Q_ASSERT(rv);
-    if (!rv) { exit(1); }
+
+/*
     rv = connect ( this       , SIGNAL (dialCanFinish ()),
                       &webPage    , SLOT   (dialCanFinish ()));
-    Q_ASSERT(rv);
-    if (!rv) { exit(1); }
-    rv = connect (
-        &webPage, SIGNAL (dialAccessNumber (const QString &,
-                                            const QVariant &)),
-         this   , SLOT   (dialAccessNumber (const QString &,
-                                            const QVariant &)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
 */
@@ -1214,7 +1209,6 @@ MainWindow::onSendTextWithoutData (const QStringList &arrNumbers)
 void
 MainWindow::onSigDialComplete (DialContext *ctx, bool ok)
 {
-    // Disconnecting this
     QMutexLocker locker (&mtxDial);
     if (ok) {
         if (!ctx->bDialOut) {
@@ -1224,38 +1218,6 @@ MainWindow::onSigDialComplete (DialContext *ctx, bool ok)
         gvApi.cancel (ctx->token);
     }
 }//MainWindow::onSigDialComplete
-
-void
-MainWindow::dialInProgress (const QString & /*strNumber*/)
-{
-}//MainWindow::dialInProgress
-
-void
-MainWindow::dialAccessNumber (AsyncTaskToken *token)
-{
-    DialContext *ctx = (DialContext *) token->callerCtx;
-    do { // Begin cleanup block (not a loop)
-        if (NULL == ctx) {
-            Q_WARN("Invalid call out context");
-            setStatus ("Callout failed");
-            break;
-        }
-
-        if (NULL == ctx->ci) {
-            Q_WARN("Invalid call out initiator");
-            setStatus ("Callout failed");
-            break;
-        }
-
-        QString strAccessNumber = token->outParams["access_number"].toString();
-        if (strAccessNumber.isEmpty ()) {
-            Q_WARN("Invalid access number");
-        }
-
-        ctx->ci->initiateCall (strAccessNumber);
-        setStatus ("Callout in progress");
-    } while (0); // End cleanup block (not a loop)
-}//MainWindow::dialAccessNumber
 
 void
 MainWindow::dialComplete (AsyncTaskToken *token)
@@ -1278,12 +1240,41 @@ MainWindow::dialComplete (AsyncTaskToken *token)
             this->showMsgBox (gvApi.getLastErrorString ());
         }
     } else {
-        if (bDialout) {
-            dialAccessNumber (token);
-        }
+        bool success = false;
+        do { // Begin cleanup block (not a loop)
+            if (!bDialout) {
+                success = true;
+                break;
+            }
 
-        setStatus (QString("Dial successful to %1.")
-                   .arg(token->inParams["destination"].toString()));
+            if (NULL == ctx) {
+                Q_WARN("Invalid call out context");
+                break;
+            }
+
+            if (NULL == ctx->ci) {
+                Q_WARN("Invalid call out initiator");
+                break;
+            }
+
+            QString accessNumber = token->outParams["access_number"].toString();
+            if (accessNumber.isEmpty ()) {
+                Q_WARN("Invalid access number");
+                break;
+            }
+
+            ctx->ci->initiateCall (accessNumber);
+            setStatus ("Callout in progress");
+
+            success = true;
+        } while (0); // End cleanup block (not a loop)
+
+        if (success) {
+            setStatus (QString("Dial successful to %1.")
+                       .arg(token->inParams["destination"].toString()));
+        } else {
+            setStatus ("Callout failed");
+        }
     }
     bCallInProgress = false;
 
@@ -2175,3 +2166,9 @@ MainWindow::getMainPage()
     return (pMain);
 }//MainWindow::getMainPage
 
+void
+MainWindow::onSigGvApiProgress(double percent)
+{
+    QString msg = QString("Progress : %1%").arg (percent);
+    setStatus (msg);
+}//MainWindow::onSigGvApiProgress

@@ -1,5 +1,9 @@
 DEFINES += NO_CONTACTS_CAPTCHA
 
+# For verbose debugging
+#DEFINES += DBG_TP_VERBOSE
+#DEFINES += DBG_VERBOSE
+
 QT      *= core gui sql xml xmlpatterns script declarative phonon
 TARGET   = qgvdial
 TEMPLATE = app

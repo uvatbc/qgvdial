@@ -207,12 +207,15 @@ GVApi::doGet(QUrl url, void *ctx, QObject *receiver, const char *method)
     NwReqTracker *tracker = new NwReqTracker(nwMgr.get(req), ctx,
                                              NW_REPLY_TIMEOUT, emitLog, true,
                                              this);
-    token->apiCtx = tracker;
-
     bool rv =
     connect(tracker, SIGNAL (sigDone(bool, const QByteArray&, void*)),
             receiver, method);
     Q_ASSERT(rv);
+    rv = connect(tracker, SIGNAL(sigProgress(double)),
+                    this, SIGNAL(sigProgress(double)));
+    Q_ASSERT(rv);
+
+    token->apiCtx = tracker;
 
     return rv;
 }//GVApi::doGet
@@ -239,10 +242,14 @@ GVApi::doPost(QUrl url, QByteArray postData, const char *contentType,
     QNetworkReply *reply = nwMgr.post(req, postData);
     NwReqTracker *tracker = new NwReqTracker(reply, ctx, NW_REPLY_TIMEOUT,
                                              emitLog, this);
-    token->apiCtx = ctx;
     bool rv = connect(tracker, SIGNAL(sigDone(bool,const QByteArray &,void *)),
                       receiver, method);
     Q_ASSERT(rv);
+    rv = connect(tracker, SIGNAL(sigProgress(double)),
+                    this, SIGNAL(sigProgress(double)));
+    Q_ASSERT(rv);
+
+    token->apiCtx = ctx;
 
     return (rv);
 }//GVApi::doPost
