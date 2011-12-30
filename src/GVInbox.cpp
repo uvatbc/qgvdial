@@ -167,6 +167,7 @@ void
 GVInbox::getInboxDone (AsyncTaskToken *token)
 {
     bool nextpage = false;
+    bool ok = false;
     do { // Begin cleanup block (not a loop)
         if (!token) {
             Q_WARN("No token provided. Failure!!");
@@ -181,10 +182,10 @@ GVInbox::getInboxDone (AsyncTaskToken *token)
 
         if (passedWaterLevel) {
             Q_DEBUG("Started getting old entries");
+            ok = true;
             break;
         }
 
-        bool ok;
         int page = token->inParams["page"].toInt(&ok);
         if (!ok) {
             Q_WARN("Invalid page number");
@@ -210,10 +211,11 @@ GVInbox::getInboxDone (AsyncTaskToken *token)
         return;
     }
 
-    emit status ("Inbox retrieved. Sorting...", 0);
-    int nNew = token->outParams["message_count"].toInt();
-
+    int nNew = 0;
     if (token) {
+        emit status ("Inbox retrieved. Sorting...", 0);
+        nNew = token->outParams["message_count"].toInt();
+
         delete token;
         token = NULL;
     }

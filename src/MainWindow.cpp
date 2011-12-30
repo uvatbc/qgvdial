@@ -759,7 +759,7 @@ MainWindow::on_action_Login_triggered ()
 void
 MainWindow::loginCompleted (AsyncTaskToken *token)
 {
-    if (token->status != ATTS_SUCCESS) {
+    if (!token || (token->status != ATTS_SUCCESS)) {
         logoutCompleted (NULL);
 
         OsDependent &osd = Singletons::getRef().getOSD ();
@@ -814,7 +814,9 @@ MainWindow::loginCompleted (AsyncTaskToken *token)
         refreshPinSettings ();
     }
 
-    token->deleteLater ();
+    if (token) {
+        delete token;
+    }
 }//MainWindow::loginCompleted
 
 void

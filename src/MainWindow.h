@@ -81,12 +81,12 @@ private slots:
     void on_action_Login_triggered();
     //! Invoked when the user clicks the login button on QML.
     void doLogin ();
-    //! Called when the web component completes login - with success or failure
+    //! Called when the GV Api completes login - with success or failure
     void loginCompleted (AsyncTaskToken *token);
 
     //! Called when the logout button is clicked
     void doLogout ();
-    //! Called when the web component completes logoff - with success or failure
+    //! Called when the GV Api completes logoff - with success or failure
     void logoutCompleted (AsyncTaskToken *token);
     //! Invoked when the system ray is clicked
     void systray_activated (QSystemTrayIcon::ActivationReason reason);

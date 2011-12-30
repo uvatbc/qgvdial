@@ -1,24 +1,20 @@
 #include "MainWindow.h"
-#include "NotifySingletons.h"
 #include "MqPublisher.h"
 #include <iostream>
 using namespace std;
 
 MainWindow::MainWindow(QObject *parent /*= 0*/)
 : QObject(parent)
+, gvApi (false, this)
 , bIsLoggedIn (false)
 , oContacts (this)
-, oInbox (this)
+, oInbox (gvApi, this)
 , checkCounter (0)
 {
     initLogging ();
 
     qRegisterMetaType<ContactInfo>("ContactInfo");
 
-    GVAccess &webPage = Singletons::getRef().getGVAccess ();
-    // webPage status
-    QObject::connect (&webPage, SIGNAL (status(const QString &, int)),
-                       this   , SLOT   (setStatus(const QString &, int)));
     // Status from contacts object
     QObject::connect (&oContacts, SIGNAL (status   (const QString &, int)),
                        this     , SLOT   (setStatus(const QString &, int)));
@@ -33,8 +29,6 @@ MainWindow::MainWindow(QObject *parent /*= 0*/)
                        this  , SLOT   (inboxChanged ()));
     // Timer tick
     QObject::connect (&mainTimer, SIGNAL(timeout()), this, SLOT(doWork()));
-
-    webPage.setEmitLog (false);
 
     if (!checkParams ()) {
         qApp->quit();
@@ -292,11 +286,10 @@ MainWindow::checkParams ()
         }
 
         if (bUseProxy) {
-            GVAccess &webPage = Singletons::getRef().getGVAccess ();
-            webPage.setProxySettings (bUseProxy, bUseSystemProxy,
-                                      strProxy, proxyport,
-                                      bProxyAuth,
-                                      strProxyUser, strProxyPass);
+            gvApi.setProxySettings (bUseProxy, bUseSystemProxy,
+                                    strProxy, proxyport,
+                                    bProxyAuth,
+                                    strProxyUser, strProxyPass);
         }
         rv = true;
     } while (0); // End cleanup block (not a loop)
@@ -364,57 +357,56 @@ MainWindow::cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt)
 void
 MainWindow::doLogin ()
 {
-    GVAccess &webPage = Singletons::getRef().getGVAccess ();
-    QVariantList l;
-
     bool bOk = false;
+    AsyncTaskToken *token = new AsyncTaskToken(this);
     do { // Begin cleanup block (not a loop)
-        webPage.setTimeout(60);
+        if (!token) {
+            Q_WARN("Failed to allocate token");
+            break;
+        }
 
-        l += strUser;
-        l += strPass;
+        bOk = connect(token, SIGNAL(completed(AsyncTaskToken*)),
+                      this , SLOT(loginCompleted(AsyncTaskToken*)));
 
-        qDebug ("Logging in...");
+        token->inParams["user"] = strUser;
+        token->inParams["pass"] = strPass;
+
+        Q_DEBUG("Logging in...");
 
         // webPage.workCompleted -> this.loginCompleted
-        if (!webPage.enqueueWork (GVAW_login, l, this,
-                SLOT (loginCompleted (bool, const QVariantList &))))
-        {
-            qCritical ("Login returned immediately with failure!");
+        if (!gvApi.login (token)) {
+            Q_CRIT("Login returned immediately with failure!");
             break;
         }
 
         bOk = true;
     } while (0); // End cleanup block (not a loop)
 
-    if (!bOk)
-    {
-        webPage.setTimeout(20);
+    if (!bOk) {
+        if (token) {
+            token->deleteLater ();
+            token = NULL;
+        }
+
         // Cleanup if any
         strUser.clear ();
         strPass.clear ();
 
-        l.clear ();
-        logoutCompleted (true, l);
-
+        logoutCompleted (NULL);
         qApp->quit ();
     }
 }//MainWindow::doLogin
 
 void
-MainWindow::loginCompleted (bool bOk, const QVariantList & /*varList*/)
+MainWindow::loginCompleted (AsyncTaskToken *token)
 {
-    GVAccess &webPage = Singletons::getRef().getGVAccess ();
-    webPage.setTimeout(20);
+    if (!token || (token->status != ATTS_SUCCESS)) {
+        logoutCompleted (NULL);
 
-    if (!bOk) {
-        QVariantList l;
-        logoutCompleted (true, l);
-
-        qCritical ("User login failed");
+        Q_CRIT("User login failed");
         qApp->quit ();
     } else {
-        qDebug ("User logged in");
+        Q_DEBUG("User logged in");
 
         bIsLoggedIn = true;
 
@@ -424,25 +416,37 @@ MainWindow::loginCompleted (bool bOk, const QVariantList & /*varList*/)
 
         QTimer::singleShot (100, this, SLOT(doWork ()));
     }
+
+    if (token) {
+        delete token;
+    }
 }//MainWindow::loginCompleted
 
 void
 MainWindow::doLogout ()
 {
-    GVAccess &webPage = Singletons::getRef().getGVAccess ();
-    QVariantList l;
-    webPage.enqueueWork (GVAW_logout, l, this,
-                         SLOT (logoutCompleted (bool, const QVariantList &)));
+    AsyncTaskToken *token = new AsyncTaskToken(this);
+    connect (token, SIGNAL(completed(AsyncTaskToken*)),
+             this, SLOT(logoutCompleted(AsyncTaskToken*)));
+
+    if (!gvApi.logout (token)) {
+        token->deleteLater ();
+        return;
+    }
 }//MainWindow::doLogout
 
 void
-MainWindow::logoutCompleted (bool, const QVariantList &)
+MainWindow::logoutCompleted (AsyncTaskToken *token)
 {
     // This clears out the table and the view as well
     oContacts.loggedOut ();
     oInbox.loggedOut ();
 
     bIsLoggedIn = false;
+
+    if (token) {
+        delete token;
+    }
 }//MainWindow::logoutCompleted
 
 void

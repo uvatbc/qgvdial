@@ -21,7 +21,10 @@ Contact: yuvraaj@gmail.com
 
 #include "global.h"
 #include "GVContactsTable.h"
+
+#ifndef NO_CONTACTS_CAPTCHA
 #include "CaptchaWidget.h"
+#endif
 
 #include "Singletons.h"
 #include "ContactsXmlHandler.h"
@@ -248,17 +251,21 @@ GVContactsTable::onLoginResponse (QNetworkReply *reply)
         if (0 != strCaptchaUrl.size ()) {
             strCaptchaUrl = "http://www.google.com/accounts/"
                           + strCaptchaUrl;
-            qDebug ("Loading captcha");
+#ifdef NO_CONTACTS_CAPTCHA
+            Q_WARN("Google requested captcha. Failed to login!!");
+#else
+            Q_DEBUG("Loading captcha");
             CaptchaWidget *captcha = new CaptchaWidget(strCaptchaUrl);
             rv = connect (
                 captcha, SIGNAL (done (bool, const QString &)),
                 this   , SLOT   (onCaptchaDone (bool, const QString &)));
             Q_ASSERT(rv);
+#endif
             break;
         }
 
         if (0 == strGoogleAuth.size ()) {
-            qWarning ("Failed to login!!");
+            Q_WARN("Failed to login!!");
             break;
         }
 

@@ -1,11 +1,12 @@
 #include "global.h"
 #include "NotifyGVInbox.h"
-#include "NotifySingletons.h"
 
-GVInbox::GVInbox (QObject *parent)
+GVInbox::GVInbox (GVApi &gref, QObject *parent)
 : QObject (parent)
+, gvApi(gref)
 , mutex (QMutex::Recursive)
 , bLoggedIn (false)
+, bRefreshInProgress (false)
 {
 }//GVInbox::GVInbox
 
@@ -17,24 +18,28 @@ void
 GVInbox::refresh ()
 {
     QMutexLocker locker(&mutex);
-    if (!bLoggedIn)
-    {
+    if (!bLoggedIn) {
+        return;
+    }
+    if (bRefreshInProgress) {
+        Q_WARN("Refresh in progress. Ignore this one.");
         return;
     }
 
-    GVAccess &webPage = Singletons::getRef().getGVAccess ();
-    QVariantList l;
-    l += "all";
-    l += "1";
-    l += "1";
-    l += dtUpdate;
-    QObject::connect (
-        &webPage, SIGNAL (oneInboxEntry (const GVInboxEntry &)),
-         this   , SLOT   (oneInboxEntry (const GVInboxEntry &)));
-    if (!webPage.enqueueWork (GVAW_getInbox, l, this,
-            SLOT (getInboxDone (bool, const QVariantList &))))
-    {
-        getInboxDone (false, l);
+    int page = 1;
+    AsyncTaskToken *token = new AsyncTaskToken(this);
+    token->inParams["type"] = "all";
+    token->inParams["page"] = page;
+
+    bool rv = connect(token, SIGNAL(completed(AsyncTaskToken*)),
+                      this, SLOT(getInboxDone(AsyncTaskToken*)));
+    Q_ASSERT(rv); Q_UNUSED(rv);
+
+    bRefreshInProgress = true;
+
+    if (!gvApi.getInbox (token)) {
+        getInboxDone (NULL);
+        delete token;
     }
 }//GVInbox::refresh
 
@@ -47,21 +52,30 @@ GVInbox::oneInboxEntry (const GVInboxEntry &hevent)
 }//GVInbox::oneInboxEntry
 
 void
-GVInbox::getInboxDone (bool, const QVariantList &params)
+GVInbox::getInboxDone (AsyncTaskToken *token)
 {
     int nNew = 0;
-    if (params.count() > 4) {
-        nNew = params[4].toInt();
-    }
+    do { // Begin cleanup block (not a loop)
+        if (!token) {
+            Q_WARN("No token provided. Failure!!");
+            break;
+        }
 
-    GVAccess &webPage = Singletons::getRef().getGVAccess ();
-    QObject::disconnect (
-        &webPage, SIGNAL (oneInboxEntry (const GVInboxEntry &)),
-         this   , SLOT   (oneInboxEntry (const GVInboxEntry &)));
+        if (ATTS_SUCCESS != token->status) {
+            Q_WARN("Inbox fetch failed for page")
+                << token->inParams["page"].toString();
+            break;
+        }
 
-    if (nNew) {
-        emit inboxChanged ();
-    }
+        nNew = token->outParams["message_count"].toInt();
+
+        delete token;
+        token = NULL;
+
+        if (nNew) {
+            emit inboxChanged ();
+        }
+    } while (0); // End cleanup block (not a loop)
 }//GVInbox::getInboxDone
 
 void

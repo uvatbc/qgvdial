@@ -4,7 +4,8 @@
 #include "global.h"
 #include <openssl/aes.h>
 #include <openssl/evp.h>
-#include "GVWebPage.h"
+
+#include "GVApi.h"
 #include "NotifyGVContactsTable.h"
 #include "NotifyGVInbox.h"
 
@@ -19,8 +20,8 @@ public:
 private slots:
     void doWork ();
     void setStatus(const QString &strText, int timeout  = 3000);
-    void loginCompleted (bool bOk, const QVariantList &varList);
-    void logoutCompleted (bool bOk, const QVariantList &);
+    void loginCompleted (AsyncTaskToken *token);
+    void logoutCompleted (AsyncTaskToken *token);
     void getContactsDone (bool bChanges, bool bOK);
     void inboxChanged ();
     void dailyTimeout();
@@ -36,6 +37,9 @@ private:
     bool cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt);
 
 private:
+    //! THE API
+    GVApi           gvApi;
+
     //! Logfile
     QFile           fLogfile;
 

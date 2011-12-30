@@ -1,4 +1,6 @@
-QT      *= core gui sql xml xmlpatterns script declarative phonon webkit
+DEFINES += NO_CONTACTS_CAPTCHA
+
+QT      *= core gui sql xml xmlpatterns script declarative phonon
 TARGET   = qgvdial
 TEMPLATE = app
 
@@ -45,7 +47,6 @@ SOURCES  += ../src/main.cpp                 \
             ../src/GvXMLParser.cpp          \
             ../src/PhoneNumberValidator.cpp \
             ../src/GVContactsTable.cpp      \
-            ../src/CaptchaWidget.cpp        \
             ../src/ContactsXmlHandler.cpp   \
             ../src/SMSEntryDeleteButton.cpp \
             ../src/ChildWindowBase.cpp      \
@@ -78,7 +79,6 @@ HEADERS  += ../src/global.h                 \
             ../src/GvXMLParser.h            \
             ../src/PhoneNumberValidator.h   \
             ../src/GVContactsTable.h        \
-            ../src/CaptchaWidget.h          \
             ../src/ContactsXmlHandler.h     \
             ../src/SMSEntryDeleteButton.h   \
             ../src/ChildWindowBase.h        \
@@ -93,6 +93,12 @@ HEADERS  += ../src/global.h                 \
             ../src/AsyncTaskToken.h         \
             ../src/GVApi.h                  \
             ../src/MyXmlErrorHandler.h
+
+!contains (DEFINES, NO_CONTACTS_CAPTCHA) {
+QT *= webkit
+SOURCES +=  ../src/CaptchaWidget.cpp
+HEADERS +=  ../src/CaptchaWidget.h
+}
 
 RESOURCES += ../src/qgvdial.qrc
 

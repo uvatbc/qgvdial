@@ -38,7 +38,7 @@ NwReqTracker::NwReqTracker(QNetworkReply *r, void *c, quint32 timeout,
     replyTimer.setInterval (timeout);
 
     rv = connect (&replyTimer, SIGNAL(timeout()), this, SLOT(onTimedOut()));
-    Q_ASSERT(rv);
+    Q_ASSERT(rv); Q_UNUSED(rv);
 
     replyTimer.start ();
 }//NwReqTracker::NwReqTracker
