@@ -1,2 +1,2 @@
-  * Bugfix: Voicemail needs to be picked up from a different URL
-  * Bugfix: Marking an inbox entry as read also needs to be done at a different URL.
+  * Change qgvnotify to use the new API class from qgvdial
+  * Removed webkit dependency. This should allow qgvnotify to work in a no-X non UI environment.

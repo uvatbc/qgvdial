@@ -1,4 +1,5 @@
-  * software input panel closes on second click in the text box
-  * Made it possible for the SMS view to also close the sip.
-  * This should pass the Ovi Store QA.
+  * The main qgvdial code no longer uses webkit to log in or make calls or anything. There's now a coalasced API class that uses QNAM classes for HTTP GET and POST.
+  * This class is capable of multiple simultaneous requests - it does not serialize access to Google Voice.
+  * It should pave the way for a cleaner and more robust application.
+  * No more webkit in qgvdial
 
