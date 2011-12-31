@@ -375,12 +375,7 @@ GVApi::getLastErrorString()
 QUrl
 GVApi::hasMoved(QNetworkReply *reply)
 {
-    QVariant var =
-    reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
-    QUrl rv = var.toUrl();
-
-    qDebug() << rv;
-    return rv;
+    return reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
 }//GVApi::hasMoved
 
 void

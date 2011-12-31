@@ -100,6 +100,10 @@ private:
 
     void decRef (bool rv = true);
 
+    QUrl hasMoved(QNetworkReply *reply);
+
+    bool startLogin(QUrl url);
+    bool getContactsFeed(QUrl url);
     void updateModelWithContact(const ContactInfo &contactInfo);
 
 private:

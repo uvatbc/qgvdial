@@ -155,11 +155,6 @@ GVContactsTable::doPost(QUrl url, QByteArray postData, const char *contentType,
 void
 GVContactsTable::refreshContacts (const QDateTime &dtUpdate)
 {
-    AsyncTaskToken *token = new AsyncTaskToken(this);
-    if (!token) {
-        return;
-    }
-
     QMutexLocker locker(&mutex);
     if (!bLoggedIn) {
         bRefreshRequested = true;
@@ -170,7 +165,6 @@ GVContactsTable::refreshContacts (const QDateTime &dtUpdate)
     QString strUrl = QString ("http://www.google.com/m8/feeds/contacts/%1/full")
                         .arg (strUser);
     QUrl url(strUrl);
-    url.addQueryItem ("max-results", "10000");
 
     if (dtUpdate.isValid ()) {
         QString strUpdate = dtUpdate.toUTC().toString (Qt::ISODate);
@@ -183,10 +177,29 @@ GVContactsTable::refreshContacts (const QDateTime &dtUpdate)
 
     emit status ("Retrieving contacts", 0);
 
-    doGet (url, token, this,
-           SLOT (onGotContactsFeed(bool, const QByteArray &, QNetworkReply *,
-                                   void *)));
+    getContactsFeed (url);
 }//GVContactsTable::refreshContacts
+
+bool
+GVContactsTable::getContactsFeed(QUrl url)
+{
+    AsyncTaskToken *token = new AsyncTaskToken(this);
+    if (!token) {
+        Q_WARN("Failed to allocate token");
+        return false;
+    }
+
+    url.addQueryItem ("max-results", "10000");
+
+    emit status ("Retrieving contacts", 0);
+
+    bool rv = doGet (url, token, this,
+                     SLOT (onGotContactsFeed(bool, const QByteArray &,
+                                             QNetworkReply *, void *)));
+    Q_ASSERT(rv);
+
+    return (rv);
+}//GVContactsTable::getContactsFeed
 
 void
 GVContactsTable::refreshContacts ()
@@ -228,27 +241,44 @@ GVContactsTable::setUserPass (const QString &strU, const QString &strP)
 void
 GVContactsTable::loginSuccess ()
 {
-    AsyncTaskToken *token = new AsyncTaskToken(this);
-    if (!token) {
-        return;
-    }
-
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     dbMain.setQuickAndDirty ();
 
     QMutexLocker locker(&mutex);
 
     QUrl url(GV_CLIENTLOGIN);
+    startLogin (url);
+}//GVContactsTable::loginSuccess
+
+bool
+GVContactsTable::startLogin(QUrl url)
+{
+    AsyncTaskToken *token = new AsyncTaskToken(this);
+    if (!token) {
+        Q_WARN("Failed to allocate token");
+        return false;
+    }
+
     url.addQueryItem ("accountType" , "GOOGLE");
     url.addQueryItem ("Email"       , strUser);
     url.addQueryItem ("Passwd"      , strPass);
     url.addQueryItem ("service"     , "cp"); // name for contacts service
     url.addQueryItem ("source"      , "MyCompany-qgvdial-ver01");
 
-    doPost (url, url.encodedQuery(), "application/x-www-form-urlencoded",
-            token, this, SLOT(onLoginResponse(bool, QByteArray, QNetworkReply *,
-                                              void *)));
-}//GVContactsTable::loginSuccess
+    bool rv = doPost (url, url.encodedQuery(),
+                      "application/x-www-form-urlencoded", token, this,
+                      SLOT(onLoginResponse(bool, QByteArray, QNetworkReply *,
+                                           void *)));
+    Q_ASSERT(rv);
+
+    return (rv);
+}//GVContactsTable::startLogin
+
+QUrl
+GVContactsTable::hasMoved(QNetworkReply *reply)
+{
+    return reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
+}//GVContactsTable::hasMoved
 
 void
 GVContactsTable::loggedOut ()
@@ -272,6 +302,12 @@ GVContactsTable::onLoginResponse(bool success, const QByteArray &response,
     strGoogleAuth.clear ();
     do { // Begin cleanup block (not a loop)
         if (!success) {
+            break;
+        }
+
+        QUrl urlMoved = hasMoved(reply);
+        if (!urlMoved.isEmpty ()) {
+            startLogin (urlMoved);
             break;
         }
 
@@ -315,8 +351,7 @@ GVContactsTable::onLoginResponse(bool success, const QByteArray &response,
 
         Q_DEBUG("Login success");
 
-        if (bRefreshRequested)
-        {
+        if (bRefreshRequested) {
             refreshContacts ();
         }
     } while (0); // End cleanup block (not a loop)
@@ -358,6 +393,12 @@ GVContactsTable::onGotContactsFeed(bool success, const QByteArray &response,
 
     do { // Begin cleanup block (not a loop)
         if (!success) {
+            break;
+        }
+
+        QUrl urlMoved = hasMoved (reply);
+        if (!urlMoved.isEmpty ()) {
+            getContactsFeed (urlMoved);
             break;
         }
 
