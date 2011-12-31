@@ -87,9 +87,6 @@ private slots:
     //! Invoked when the contact model tells us that the photo is not present
     void onNoContactPhoto(const ContactInfo &contactInfo);
 
-    //! Invoked when the photo tracker gets a photo
-    void onGotOnePhoto (const ContactInfo &contactInfo);
-
     //! Finished getting the photo
     void onGotPhoto(bool success, const QByteArray &response, void *ctx);
 
@@ -99,6 +96,8 @@ private:
                 void *ctx, QObject *receiver, const char *method);
 
     void decRef (bool rv = true);
+
+    void updateModelWithContact(const ContactInfo &contactInfo);
 
 private:
     ContactsModel *modelContacts;
@@ -110,6 +109,9 @@ private:
     QString         strUser, strPass;
     //! The authentication string returned by the contacts API
     QString         strGoogleAuth;
+
+    //! Refcount for in-flight network requests
+    QAtomicInt      refCount;
 
     //! The network manager for contacts API
     QNetworkAccessManager nwMgr;
@@ -125,9 +127,6 @@ private:
 
     //! Is the contacts refresh an update process?
     bool            bRefreshIsUpdate;
-
-    //! Refcount for in-flight network requests
-    QAtomicInt      refCount;
 
     bool            bBeginDrain;
 };

@@ -230,6 +230,9 @@ GVContactsTable::loginSuccess ()
         return;
     }
 
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    dbMain.setQuickAndDirty ();
+
     QMutexLocker locker(&mutex);
 
     QUrl url(GV_CLIENTLOGIN);
@@ -415,23 +418,57 @@ GVContactsTable::onGotContactsFeed(bool success, const QByteArray &response,
 void
 GVContactsTable::gotOneContact (const ContactInfo &contactInfo)
 {
-    AsyncTaskToken *token = new AsyncTaskToken(this);
-    if (!token) {
-        return;
+    AsyncTaskToken *token = NULL;
+    ContactInfo *cInfo = NULL;
+    bool ok = false;
+
+    do { // Begin cleanup block (not a loop)
+        token = new AsyncTaskToken(this);
+        if (!token) {
+            break;
+        }
+
+        cInfo = new ContactInfo;
+        if (!cInfo) {
+            delete token;
+            return;
+        }
+
+        *cInfo = contactInfo;
+        token->callerCtx = cInfo;
+
+        QUrl url(contactInfo.hrefPhoto);
+        ok = doGet (url, token, this,
+                    SLOT(onGotPhoto(bool, QByteArray, void *)));
+    } while (0); // End cleanup block (not a loop)
+
+    if (!ok) {
+        if (token) {
+            delete token;
+        }
+
+        if (cInfo) {
+            updateModelWithContact (*cInfo);
+            delete cInfo;
+        }
     }
-
-    ContactInfo *cInfo = new ContactInfo;
-    if (!cInfo) {
-        delete token;
-        return;
-    }
-
-    *cInfo = contactInfo;
-    token->callerCtx = cInfo;
-
-    QUrl url(contactInfo.hrefPhoto);
-    doGet (url, token, this, SLOT(onGotPhoto(bool, QByteArray, void *)));
 }//GVContactsTable::gotOneContact
+
+void
+GVContactsTable::updateModelWithContact(const ContactInfo &contactInfo)
+{
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    dbMain.setQuickAndDirty ();
+
+    QMutexLocker locker(&mutex);
+    if (contactInfo.bDeleted) {
+        qDebug() << "Delete contact " << contactInfo.strTitle;
+        modelContacts->deleteContact (contactInfo);
+    } else {   // add or modify
+        qDebug() << "Insert contact " << contactInfo.strTitle;
+        modelContacts->insertContact (contactInfo);
+    }
+}//GVContactsTable::updateModelWithContact
 
 void
 GVContactsTable::onGotPhoto(bool success, const QByteArray &response, void *ctx)
@@ -491,17 +528,7 @@ GVContactsTable::onGotPhoto(bool success, const QByteArray &response, void *ctx)
     }
 
     if (cInfo) {
-        CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-        dbMain.setQuickAndDirty();
-
-        QMutexLocker locker(&mutex);
-        if (cInfo->bDeleted) {
-            qDebug() << "Delete contact " << cInfo->strTitle;
-            modelContacts->deleteContact (*cInfo);
-        } else {   // add or modify
-            qDebug() << "Insert contact " << cInfo->strTitle;
-            modelContacts->insertContact (*cInfo);
-        }
+        updateModelWithContact (*cInfo);
 
         delete cInfo;
     }
@@ -547,31 +574,16 @@ GVContactsTable::onNoContactPhoto(const ContactInfo &contactInfo)
 void
 GVContactsTable::decRef (bool rv /*= true*/)
 {
-    if (!refCount.deref () && bBeginDrain) {
+    bool isZero = !refCount.deref ();
+
+    if (isZero && bBeginDrain) {
         qDebug("Ref = 0. All contacts and photos downloaded.");
 
         CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-        dbMain.setQuickAndDirty(false);
+        dbMain.setQuickAndDirty (false);
+
         // Tell the contacts model to refresh all.
         modelContacts->refresh ();
         emit allContacts (rv);
     }
 }//GVContactsTable::decRef
-
-void
-GVContactsTable::onGotOnePhoto (const ContactInfo &contactInfo)
-{
-    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    dbMain.setQuickAndDirty();
-
-    QMutexLocker locker(&mutex);
-    if (contactInfo.bDeleted) {
-        qDebug() << "Delete contact " << contactInfo.strTitle;
-        modelContacts->deleteContact (contactInfo);
-    } else {   // add or modify
-        qDebug() << "Insert contact " << contactInfo.strTitle;
-        modelContacts->insertContact (contactInfo);
-    }
-
-    this->decRef ();
-}//GVContactsTable::onGotOnePhoto
