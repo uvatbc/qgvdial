@@ -200,13 +200,28 @@ bool
 GVApi::doGet(QUrl url, void *ctx, QObject *receiver, const char *method)
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
+    if (!token) {
+        return false;
+    }
 
     QNetworkRequest req(url);
     req.setRawHeader("User-Agent", UA_IPHONE4);
 
-    NwReqTracker *tracker = new NwReqTracker(nwMgr.get(req), ctx,
-                                             NW_REPLY_TIMEOUT, emitLog, true,
-                                             this);
+    QNetworkReply *reply = nwMgr.get(req);
+    if (!reply) {
+        return false;
+    }
+
+    NwReqTracker *tracker = new NwReqTracker(reply, ctx, NW_REPLY_TIMEOUT,
+                                             emitLog, true, this);
+    if (!tracker) {
+        reply->abort ();
+        reply->deleteLater ();
+        return false;
+    }
+
+    token->apiCtx = tracker;
+
     bool rv =
     connect(tracker, SIGNAL (sigDone(bool, const QByteArray&, void*)),
             receiver, method);
@@ -214,8 +229,6 @@ GVApi::doGet(QUrl url, void *ctx, QObject *receiver, const char *method)
     rv = connect(tracker, SIGNAL(sigProgress(double)),
                     this, SIGNAL(sigProgress(double)));
     Q_ASSERT(rv);
-
-    token->apiCtx = tracker;
 
     return rv;
 }//GVApi::doGet
@@ -232,6 +245,10 @@ GVApi::doPost(QUrl url, QByteArray postData, const char *contentType,
               const char *ua, void *ctx, QObject *receiver, const char *method)
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
+    if (!token) {
+        return false;
+    }
+
     QNetworkRequest req(url);
     req.setRawHeader("User-Agent", ua);
     req.setHeader (QNetworkRequest::ContentTypeHeader, contentType);
@@ -240,16 +257,26 @@ GVApi::doPost(QUrl url, QByteArray postData, const char *contentType,
                    QVariant::fromValue(jar->getAllCookies ()));
 
     QNetworkReply *reply = nwMgr.post(req, postData);
+    if (!reply) {
+        return false;
+    }
+
     NwReqTracker *tracker = new NwReqTracker(reply, ctx, NW_REPLY_TIMEOUT,
                                              emitLog, this);
+    if (!tracker) {
+        reply->abort ();
+        reply->deleteLater ();
+        return false;
+    }
+
+    token->apiCtx = ctx;
+
     bool rv = connect(tracker, SIGNAL(sigDone(bool,const QByteArray &,void *)),
                       receiver, method);
     Q_ASSERT(rv);
     rv = connect(tracker, SIGNAL(sigProgress(double)),
                     this, SIGNAL(sigProgress(double)));
     Q_ASSERT(rv);
-
-    token->apiCtx = ctx;
 
     return (rv);
 }//GVApi::doPost

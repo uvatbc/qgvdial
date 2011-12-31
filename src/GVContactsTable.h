@@ -70,12 +70,15 @@ public slots:
 
 private slots:
     //! Invoked on response to login to contacts API
-    void onLoginResponse (QNetworkReply *reply);
+    void onLoginResponse(bool success, const QByteArray &response, void *ctx);
+
+#ifndef NO_CONTACTS_CAPTCHA
     //! Invoked when the captcha is done
     void onCaptchaDone (bool bOk, const QString &strCaptcha);
+#endif
 
     // Invoked when the google contacts API responds with the contacts
-    void onGotContacts (QNetworkReply *reply);
+    void onGotContactsFeed(bool success, const QByteArray &response, void *ctx);
     // Invoked when one contact is parsed out of the XML
     void gotOneContact (const ContactInfo &contactInfo);
     //! Invoked when all the contacts are parsed
@@ -87,18 +90,13 @@ private slots:
     //! Invoked when the photo tracker gets a photo
     void onGotOnePhoto (const ContactInfo &contactInfo);
 
-private:
-    QNetworkRequest createRequest(QString strUrl);
+    //! Finished getting the photo
+    void onGotPhoto(bool success, const QByteArray &response, void *ctx);
 
-    QNetworkReply *
-    postRequest (QString         strUrl,
-                 QStringPairList arrPairs,
-                 QObject        *receiver,
-                 const char     *method);
-    QNetworkReply *
-    getRequest (QString         strUrl,
-                QObject        *receiver,
-                const char     *method);
+private:
+    bool doGet(QUrl url, void *ctx, QObject *obj, const char *method);
+    bool doPost(QUrl url, QByteArray postData, const char *contentType,
+                void *ctx, QObject *receiver, const char *method);
 
     void decRef (bool rv = true);
 

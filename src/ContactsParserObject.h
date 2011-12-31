@@ -54,33 +54,4 @@ private:
     bool        bEmitLog;
 };
 
-class PhotoReplyTracker : public QObject
-{
-    Q_OBJECT
-
-public:
-    PhotoReplyTracker(const ContactInfo &ci,
-                            QNetworkReply *r,
-                      const QString &strTemp,
-                            QObject *parent = NULL);
-
-signals:
-    // Emitted when the photo is retrieved from the contact
-    void gotOneContact (const ContactInfo &contactInfo);
-
-public slots:
-    void onFinished();
-
-private slots:
-    void onResponseTimeout();
-
-private:
-    QNetworkReply  *reply;
-    QString         strTempStore;
-    ContactInfo     contactInfo;
-    QTimer          responseTimeout;
-
-    bool            aborted;
-};
-
 #endif // CONTACTSPARSEROBJECT_H

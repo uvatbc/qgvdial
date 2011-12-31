@@ -197,7 +197,7 @@ SkypeClient::completeCurrentWork (Skype_Work whatwork, bool bOk)
         bool rv = connect (
             this, SIGNAL (workCompleted (bool, const QVariantList &)),
             workCurrent.receiver, workCurrent.method);
-        Q_ASSERT(rv);
+        Q_ASSERT(rv); Q_UNUSED(rv);
 
         emit workCompleted (bOk, workCurrent.arrParams);
 

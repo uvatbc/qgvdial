@@ -55,7 +55,7 @@ ObserverFactory::~ObserverFactory ()
 bool
 ObserverFactory::init ()
 {
-    bool rv;
+    bool rv; Q_UNUSED(rv);
 
     // Observer for Telepathy on desktop Linux and Maemo 5
 #if TELEPATHY_CAPABLE

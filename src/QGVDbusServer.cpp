@@ -162,7 +162,8 @@ void
 QGVDbusTextServer::addTextReceivers (QObject *r1, const char *m1,
                                      QObject *r2, const char *m2)
 {
-    bool rv = connect (
+    bool rv; Q_UNUSED(rv);
+    rv = connect (
         &helper, SIGNAL (sendText (const QStringList &, const QString &)),
         r1, m1);
     Q_ASSERT(rv);
@@ -176,7 +177,8 @@ void
 QGVDbusTextServer::delTextReceivers (QObject *r1, const char *m1,
                                      QObject *r2, const char *m2)
 {
-    bool rv = disconnect (
+    bool rv; Q_UNUSED(rv);
+    rv = disconnect (
         &helper, SIGNAL (sendText (const QStringList &, const QString &)),
         r1, m1);
     Q_ASSERT(rv);

@@ -79,64 +79,85 @@ GVContactsTable::initModel ()
     }
 }//GVContactsTable::initModel
 
-QNetworkRequest
-GVContactsTable::createRequest(QString strUrl)
+bool
+GVContactsTable::doGet(QUrl url, void *ctx, QObject *obj, const char *method)
 {
-    QUrl url (strUrl);
-    QNetworkRequest request(url);
-    request.setHeader (QNetworkRequest::ContentTypeHeader,
-                       "application/x-www-form-urlencoded");
-    if (0 != strGoogleAuth.size ())
-    {
-        QByteArray byAuth = QString("GoogleLogin auth=%1")
-                                    .arg(strGoogleAuth).toAscii ();
-        request.setRawHeader ("Authorization", byAuth);
+    AsyncTaskToken *token = (AsyncTaskToken *)ctx;
+    if (!token) {
+        return false;
     }
 
-    return request;
-}//GVContactsTable::createRequest
+    QNetworkRequest req(url);
 
-QNetworkReply *
-GVContactsTable::postRequest (QString         strUrl,
-                              QStringPairList arrPairs,
-                              QObject        *receiver,
-                              const char     *method)
-{
-    QStringList arrParams;
-    foreach (QStringPair pairParam, arrPairs)
-    {
-        arrParams += QString("%1=%2")
-                        .arg(pairParam.first)
-                        .arg(pairParam.second);
+    QByteArray byAuth = QString("GoogleLogin auth=%1")
+                                .arg(strGoogleAuth).toAscii ();
+    req.setRawHeader ("Authorization", byAuth);
+
+    QNetworkReply *reply = nwMgr.get(req);
+    if (!reply) {
+        return false;
     }
-    QString strParams = arrParams.join ("&");
 
-    QNetworkRequest request = createRequest (strUrl);
-    QByteArray byPostData = strParams.toAscii ();
+    NwReqTracker *tracker =
+    new NwReqTracker(reply, ctx, NW_REPLY_TIMEOUT, false, true, this);
+    if (!tracker) {
+        reply->abort ();
+        reply->deleteLater ();
+        return false;
+    }
 
-    bool rv = connect (&nwMgr   , SIGNAL (finished (QNetworkReply *)),
-                        receiver, method);
-    Q_ASSERT(rv); Q_UNUSED(rv);
-    QNetworkReply *reply = nwMgr.post (request, byPostData);
-    return (reply);
-}//GVContactsTable::postRequest
+    token->apiCtx = tracker;
 
-QNetworkReply *
-GVContactsTable::getRequest (QString         strUrl,
-                             QObject        *receiver,
-                             const char     *method)
+    bool rv =
+    connect(tracker, SIGNAL (sigDone(bool, const QByteArray&, void*)),
+            obj, method);
+    Q_ASSERT(rv);
+
+    return rv;
+}//GVContactsTable::doGet
+
+bool
+GVContactsTable::doPost(QUrl url, QByteArray postData, const char *contentType,
+                        void *ctx, QObject *receiver, const char *method)
 {
-    QNetworkRequest request = createRequest (strUrl);
-    bool rv = connect (&nwMgr   , SIGNAL (finished (QNetworkReply *)),
-                        receiver, method);
-    Q_ASSERT(rv); Q_UNUSED(rv);
-    QNetworkReply *reply = nwMgr.get (request);
-    return (reply);
-}//GVContactsTable::getRequest
+    AsyncTaskToken *token = (AsyncTaskToken *)ctx;
+    if (!token) {
+        return false;
+    }
+
+    QNetworkRequest req(url);
+    req.setHeader (QNetworkRequest::ContentTypeHeader, contentType);
+
+    QNetworkReply *reply = nwMgr.post(req, postData);
+    if (!reply) {
+        return false;
+    }
+
+    NwReqTracker *tracker =
+    new NwReqTracker(reply, ctx, NW_REPLY_TIMEOUT, false, this);
+    if (!tracker) {
+        reply->abort ();
+        reply->deleteLater ();
+        return false;
+    }
+
+    token->apiCtx = ctx;
+
+    bool rv = connect(tracker, SIGNAL(sigDone(bool,const QByteArray &,void *)),
+                      receiver, method);
+    Q_ASSERT(rv);
+
+    return (rv);
+}//GVContactsTable::doPost
 
 void
 GVContactsTable::refreshContacts (const QDateTime &dtUpdate)
 {
+    AsyncTaskToken *token = new AsyncTaskToken(this);
+    if (!token) {
+        return;
+    }
+
     QMutexLocker locker(&mutex);
     if (!bLoggedIn) {
         bRefreshRequested = true;
@@ -144,19 +165,24 @@ GVContactsTable::refreshContacts (const QDateTime &dtUpdate)
     }
     bRefreshRequested = false;
 
-    QString strUrl = QString ("http://www.google.com/m8/feeds/contacts/%1/full"
-                              "?max-results=10000")
+    QString strUrl = QString ("http://www.google.com/m8/feeds/contacts/%1/full")
                         .arg (strUser);
+    QUrl url(strUrl);
+    url.addQueryItem ("max-results", "10000");
+
     if (dtUpdate.isValid ()) {
         QString strUpdate = dtUpdate.toUTC().toString (Qt::ISODate);
-        strUrl += QString ("&updated-min=%1&showdeleted=true").arg (strUpdate);
+        url.addQueryItem ("updated-min", strUpdate);
+        url.addQueryItem ("showdeleted", "true");
         bRefreshIsUpdate = true;
     } else {
         modelContacts->clearAll ();
     }
 
     emit status ("Retrieving contacts", 0);
-    getRequest (strUrl, this , SLOT (onGotContacts (QNetworkReply *)));
+
+    doGet (url, token, this,
+           SLOT (onGotContactsFeed(bool, const QByteArray &, void *)));
 }//GVContactsTable::refreshContacts
 
 void
@@ -199,16 +225,22 @@ GVContactsTable::setUserPass (const QString &strU, const QString &strP)
 void
 GVContactsTable::loginSuccess ()
 {
+    AsyncTaskToken *token = new AsyncTaskToken(this);
+    if (!token) {
+        return;
+    }
+
     QMutexLocker locker(&mutex);
 
-    QStringPairList arrPairs;
-    arrPairs += QStringPair("accountType", "GOOGLE");
-    arrPairs += QStringPair("Email"      , strUser);
-    arrPairs += QStringPair("Passwd"     , strPass);
-    arrPairs += QStringPair("service"    , "cp"); // name for contacts service
-    arrPairs += QStringPair("source"     , "MyCompany-qgvdial-ver01");
-    postRequest (GV_CLIENTLOGIN, arrPairs,
-                 this , SLOT (onLoginResponse (QNetworkReply *)));
+    QUrl url(GV_CLIENTLOGIN);
+    url.addQueryItem ("accountType" , "GOOGLE");
+    url.addQueryItem ("Email"       , strUser);
+    url.addQueryItem ("Passwd"      , strPass);
+    url.addQueryItem ("service"     , "cp"); // name for contacts service
+    url.addQueryItem ("source"      , "MyCompany-qgvdial-ver01");
+
+    doPost (url, url.encodedQuery(), "application/x-www-form-urlencoded",
+            token, this, SLOT(onLoginResponse(bool,QByteArray,void*)));
 }//GVContactsTable::loginSuccess
 
 void
@@ -223,21 +255,21 @@ GVContactsTable::loggedOut ()
 }//GVContactsTable::loggedOut
 
 void
-GVContactsTable::onLoginResponse (QNetworkReply *reply)
+GVContactsTable::onLoginResponse(bool success, const QByteArray &response,
+                                 void *ctx)
 {
-    bool rv = disconnect (&nwMgr, SIGNAL (finished (QNetworkReply *)),
-                          this , SLOT   (onLoginResponse (QNetworkReply *)));
-    Q_ASSERT(rv);
-
-    QString strReply = reply->readAll ();
+    AsyncTaskToken *token = (AsyncTaskToken *) ctx;
+    QString strReply = response;
     QString strCaptchaToken, strCaptchaUrl;
 
     strGoogleAuth.clear ();
-    do // Begin cleanup block (not a loop)
-    {
+    do { // Begin cleanup block (not a loop)
+        if (!success) {
+            break;
+        }
+
         QStringList arrParsed = strReply.split ('\n');
-        foreach (QString strPair, arrParsed)
-        {
+        foreach (QString strPair, arrParsed) {
             QStringList arrPair = strPair.split ('=');
             if (arrPair[0] == "Auth") {
                 strGoogleAuth = arrPair[1];
@@ -248,9 +280,10 @@ GVContactsTable::onLoginResponse (QNetworkReply *reply)
             }
         }
 
-        if (0 != strCaptchaUrl.size ()) {
+        if (!strCaptchaUrl.isEmpty ()) {
             strCaptchaUrl = "http://www.google.com/accounts/"
                           + strCaptchaUrl;
+
 #ifdef NO_CONTACTS_CAPTCHA
             Q_WARN("Google requested captcha. Failed to login!!");
 #else
@@ -261,10 +294,11 @@ GVContactsTable::onLoginResponse (QNetworkReply *reply)
                 this   , SLOT   (onCaptchaDone (bool, const QString &)));
             Q_ASSERT(rv);
 #endif
+
             break;
         }
 
-        if (0 == strGoogleAuth.size ()) {
+        if (strGoogleAuth.isEmpty ()) {
             Q_WARN("Failed to login!!");
             break;
         }
@@ -272,54 +306,56 @@ GVContactsTable::onLoginResponse (QNetworkReply *reply)
         QMutexLocker locker (&mutex);
         bLoggedIn = true;
 
-        qDebug ("Login success");
+        Q_DEBUG("Login success");
 
         if (bRefreshRequested)
         {
             refreshContacts ();
         }
     } while (0); // End cleanup block (not a loop)
-    reply->deleteLater ();
+
+    if (token) {
+        delete token;
+    }
 }//GVContactsTable::onLoginResponse
 
+#ifndef NO_CONTACTS_CAPTCHA
 void
 GVContactsTable::onCaptchaDone (bool bOk, const QString & /*strCaptcha*/)
 {
-    // No point disconnecting anything because the widget is going to delete
-    // itself anyway.
-
     do { // Begin cleanup block (not a loop)
-        if (!bOk)
-        {
+        if (!bOk) {
             qWarning ("Captcha failed");
             break;
         }
 
-        QStringPairList arrPairs;
-        arrPairs += QStringPair("accountType", "GOOGLE");
-        arrPairs += QStringPair("Email"      , strUser);
-        arrPairs += QStringPair("Passwd"     , strPass);
-        arrPairs += QStringPair("service"    , "grandcentral");
-        arrPairs += QStringPair("source"     , "MyCompany-testapp16-ver01");
+        QUrl url;
+        url.addQueryItem ("accountType" , "GOOGLE");
+        url.addQueryItem ("Email"       , strUser);
+        url.addQueryItem ("Passwd"      , strPass);
+        url.addQueryItem ("service"     , "cp"); // name for contacts service
+        url.addQueryItem ("source"      , "MyCompany-qgvdial-ver01");
         //TODO: add captcha params
-        postRequest (GV_CLIENTLOGIN, arrPairs,
-                     this , SLOT (onLoginResponse (QNetworkReply *)));
+        doPost (url, url.encodedQuery(), "application/x-www-form-urlencoded",
+                this, SLOT(onLoginResponse(bool,QByteArray,void*)));
     } while (0); // End cleanup block (not a loop)
 }//GVContactsTable::onCaptchaDone
+#endif
 
 void
-GVContactsTable::onGotContacts (QNetworkReply *reply)
+GVContactsTable::onGotContactsFeed(bool success, const QByteArray &response,
+                               void *ctx)
 {
-    bool rv = disconnect (&nwMgr, SIGNAL (finished (QNetworkReply *)),
-                           this , SLOT   (onGotContacts (QNetworkReply *)));
-    Q_ASSERT(rv);
-    emit status ("Contacts retrieved, parsing", 0);
+    AsyncTaskToken *token = (AsyncTaskToken *) ctx;
 
-    do // Begin cleanup block (not a loop)
-    {
-        QByteArray byData = reply->readAll ();
-        if (byData.contains ("Authorization required"))
-        {
+    do { // Begin cleanup block (not a loop)
+        if (!success) {
+            break;
+        }
+
+        emit status ("Contacts retrieved, parsing", 0);
+
+        if (response.contains ("Authorization required")) {
             emit status("Authorization failed.");
             break;
         }
@@ -327,56 +363,156 @@ GVContactsTable::onGotContacts (QNetworkReply *reply)
 #if 0
         QFile temp("contacts.txt");
         temp.open (QIODevice::ReadWrite);
-        temp.write (byData);
+        temp.write (response);
         temp.close ();
 #endif
 
         QThread *workerThread = new QThread(this);
-        ContactsParserObject *pObj = new ContactsParserObject(byData);
+        ContactsParserObject *pObj = new ContactsParserObject(response);
         pObj->moveToThread (workerThread);
-        rv = connect (workerThread, SIGNAL(started()), pObj, SLOT(doWork()));
-        Q_ASSERT(rv);
-        rv = connect (pObj, SIGNAL(done(bool, quint32, quint32)),
-                      this, SLOT  (onContactsParsed(bool, quint32, quint32)));
-        Q_ASSERT(rv);
-        rv = connect (pObj, SIGNAL(done(bool, quint32, quint32)),
-                      pObj, SLOT  (deleteLater ()));
-        Q_ASSERT(rv);
-        rv = connect (pObj        , SIGNAL(done(bool, quint32, quint32)),
-                      workerThread, SLOT  (quit()));
-        Q_ASSERT(rv);
-        rv = connect (workerThread, SIGNAL(terminated()),
-                      pObj        , SLOT  (deleteLater()));
-        Q_ASSERT(rv);
-        rv = connect (workerThread, SIGNAL(terminated()),
-                      workerThread, SLOT  (deleteLater()));
-        Q_ASSERT(rv);
-        rv = connect (pObj, SIGNAL (status(const QString &, int)),
-                      this, SIGNAL (status(const QString &, int)));
-        Q_ASSERT(rv);
-        rv = connect (pObj, SIGNAL (gotOneContact (const ContactInfo &)),
-                      this, SLOT   (gotOneContact (const ContactInfo &)));
-        Q_ASSERT(rv);
+        success =
+        connect (workerThread, SIGNAL(started()), pObj, SLOT(doWork()));
+        Q_ASSERT(success);
+        success =
+        connect (pObj, SIGNAL(done(bool, quint32, quint32)),
+                 this, SLOT  (onContactsParsed(bool, quint32, quint32)));
+        Q_ASSERT(success);
+        success =
+        connect (pObj, SIGNAL(done(bool, quint32, quint32)),
+                 pObj, SLOT  (deleteLater ()));
+        Q_ASSERT(success);
+        success =
+        connect (pObj        , SIGNAL(done(bool, quint32, quint32)),
+                 workerThread, SLOT  (quit()));
+        Q_ASSERT(success);
+        success =
+        connect (workerThread, SIGNAL(terminated()),
+                 pObj        , SLOT  (deleteLater()));
+        Q_ASSERT(success);
+        success =
+        connect (workerThread, SIGNAL(terminated()),
+                 workerThread, SLOT  (deleteLater()));
+        Q_ASSERT(success);
+        success =
+        connect (pObj, SIGNAL (status(const QString &, int)),
+                 this, SIGNAL (status(const QString &, int)));
+        Q_ASSERT(success);
+        success =
+        connect (pObj, SIGNAL (gotOneContact (const ContactInfo &)),
+                 this, SLOT   (gotOneContact (const ContactInfo &)));
+        Q_ASSERT(success);
 
         refCount = 1;
         bBeginDrain = false;
         workerThread->start ();
     } while (0); // End cleanup block (not a loop)
 
-    reply->deleteLater ();
-}//GVContactsTable::onGotContacts
+    if (token) {
+        delete token;
+    }
+}//GVContactsTable::onGotContactsFeed
 
 void
 GVContactsTable::gotOneContact (const ContactInfo &contactInfo)
 {
-    QNetworkRequest request = createRequest (contactInfo.hrefPhoto);
-    QNetworkReply *reply = nwMgr.get (request);
-    PhotoReplyTracker *tracker =
-    new PhotoReplyTracker(contactInfo, reply, strTempStore, this);
-    connect (reply, SIGNAL(finished()), tracker, SLOT(onFinished()));
-    connect (tracker, SIGNAL(gotOneContact(const ContactInfo &)),
-             this   , SLOT  (onGotOnePhoto(const ContactInfo &)));
+    AsyncTaskToken *token = new AsyncTaskToken(this);
+    if (!token) {
+        return;
+    }
+
+    ContactInfo *cInfo = new ContactInfo;
+    if (!cInfo) {
+        delete token;
+        return;
+    }
+
+    *cInfo = contactInfo;
+    token->callerCtx = cInfo;
+
+    QUrl url(contactInfo.hrefPhoto);
+    doGet (url, token, this, SLOT(onGotPhoto(bool, QByteArray, void *)));
 }//GVContactsTable::gotOneContact
+
+void
+GVContactsTable::onGotPhoto(bool success, const QByteArray &response, void *ctx)
+{
+    AsyncTaskToken *token = (AsyncTaskToken *) ctx;
+    ContactInfo *cInfo = NULL;
+
+    do { // Begin cleanup block (not a loop)
+        if (!token) {
+            success = false;
+            break;
+        }
+
+        cInfo = (ContactInfo *) token->callerCtx;
+
+        if (!success || !cInfo) {
+            success = false;
+            break;
+        }
+
+        if (response.isEmpty ()) {
+            Q_WARN("Zero length response for photo");
+            break;
+        }
+
+        quint8 sPng[] = {0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a};
+        QByteArray baPng((char*)sPng, sizeof(sPng));
+        quint8 sBmp[] = {'B', 'M'};
+        QByteArray baBmp((char*)sBmp, sizeof(sBmp));
+
+        QString extension = "jpg";
+        if (response.startsWith (baPng)) {
+            extension = "png";
+        } else if (response.startsWith (baBmp)) {
+            extension = "bmp";
+        }
+
+        QString strTemplate = strTempStore + QDir::separator()
+                            + tr("qgv_XXXXXX.tmp.") + extension;
+
+        QTemporaryFile tempFile (strTemplate);
+        if (!tempFile.open ()) {
+            Q_WARN("Failed to get a temp file name for the photo");
+            break;
+        }
+
+        tempFile.setAutoRemove (false);
+        tempFile.write (response);
+
+        cInfo->strPhotoPath = tempFile.fileName ();
+    } while (0); // End cleanup block (not a loop)
+
+    if (!success) {
+        if (cInfo) {
+            Q_WARN("Failed to get photo for contact ") << cInfo->strTitle;
+        }
+    }
+
+    if (cInfo) {
+        CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+        dbMain.setQuickAndDirty();
+
+        QMutexLocker locker(&mutex);
+        if (cInfo->bDeleted) {
+            qDebug() << "Delete contact " << cInfo->strTitle;
+            modelContacts->deleteContact (*cInfo);
+        } else {   // add or modify
+            qDebug() << "Insert contact " << cInfo->strTitle;
+            modelContacts->insertContact (*cInfo);
+        }
+
+        delete cInfo;
+    }
+
+    if (token) {
+        delete token;
+    }
+
+    // Success or failure, decrement the reference
+    this->decRef ();
+}//GVContactsTable::onGotPhoto
 
 void
 GVContactsTable::onContactsParsed (bool rv, quint32 /*total*/, quint32 usable)
@@ -405,13 +541,7 @@ GVContactsTable::onNoContactPhoto(const ContactInfo &contactInfo)
         return;
     }
 
-    QNetworkRequest request = createRequest (contactInfo.hrefPhoto);
-    QNetworkReply *reply = nwMgr.get (request);
-    PhotoReplyTracker *tracker =
-    new PhotoReplyTracker(contactInfo, reply, strTempStore, this);
-    connect (reply, SIGNAL(finished()), tracker, SLOT(onFinished()));
-    connect (tracker, SIGNAL(gotOneContact(const ContactInfo &)),
-             this   , SLOT  (gotOneContact(const ContactInfo &)));
+    gotOneContact (contactInfo);
 }//GVContactsTable::onNoContactPhoto
 
 void

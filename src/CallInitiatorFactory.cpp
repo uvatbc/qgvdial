@@ -60,7 +60,7 @@ CallInitiatorFactory::getFallbacks ()
 void
 CallInitiatorFactory::init ()
 {
-    bool rv;
+    bool rv; Q_UNUSED(rv);
 #if LINUX_DESKTOP || defined (Q_WS_WIN32)
     CalloutInitiator *skype_initiator = new DesktopSkypeCallInitiator (this);
     listInitiators += skype_initiator;
@@ -102,7 +102,7 @@ CallInitiatorFactory::onAccountManagerReady (Tp::PendingOperation *op)
         return;
     }
 
-    bool rv;
+    bool rv; Q_UNUSED(rv);
 
     allAccounts = actMgr->allAccounts ();
     QMutexLocker locker (&mutex);
@@ -146,7 +146,7 @@ CallInitiatorFactory::onAllAccountsReady ()
     bAccountsReady = true;
     qDebug () << QString("%1 accounts ready").arg (allAccounts.size ());
 
-    bool rv;
+    bool rv; Q_UNUSED(rv);
     QString msg;
     foreach (Tp::AccountPtr act, allAccounts) {
         msg = QString ("Account cmName = %1\n").arg (act->cmName ());

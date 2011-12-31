@@ -49,10 +49,11 @@ Contact: yuvraaj@gmail.com
 #define GV_ACCOUNT_SERVICELOGIN GOOGLE_ACCOUNTS "/ServiceLogin"
 #define GV_ACCOUNT_SMSAUTH      GOOGLE_ACCOUNTS "/SmsAuth"
 
+#define GV_CLIENTLOGIN          GOOGLE_ACCOUNTS "/ClientLogin"
+//#define GV_CLIENTLOGIN "https://www.google.com/accounts/ClientLogin"
+
 #define GOOGLE_SERVICELOGIN "https://www.google.com/accounts/ServiceLogin"
 #define GV_SERVICELOGIN_PARAMS "?nui=5&service=grandcentral&ltmpl=mobile&btmpl=mobile&passive=true&continue="
-
-#define GV_CLIENTLOGIN "https://www.google.com/accounts/ClientLogin"
 
 #define Q_DEBUG(_s) qDebug() << QString("%1(%2): %3").arg(__FUNCTION__).arg(__LINE__).arg(_s)
 #define Q_WARN(_s) qWarning() << QString("%1(%2): %3").arg(__FUNCTION__).arg(__LINE__).arg(_s)
