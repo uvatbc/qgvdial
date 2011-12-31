@@ -109,7 +109,8 @@ GVContactsTable::doGet(QUrl url, void *ctx, QObject *obj, const char *method)
     token->apiCtx = tracker;
 
     bool rv =
-    connect(tracker, SIGNAL (sigDone(bool, const QByteArray&, void*)),
+    connect(tracker, SIGNAL (sigDone(bool, const QByteArray &,
+                                     QNetworkReply *, void*)),
             obj, method);
     Q_ASSERT(rv);
 
@@ -143,7 +144,8 @@ GVContactsTable::doPost(QUrl url, QByteArray postData, const char *contentType,
 
     token->apiCtx = ctx;
 
-    bool rv = connect(tracker, SIGNAL(sigDone(bool,const QByteArray &,void *)),
+    bool rv = connect(tracker,
+                      SIGNAL(sigDone(bool,QByteArray,QNetworkReply*,void*)),
                       receiver, method);
     Q_ASSERT(rv);
 
@@ -182,7 +184,8 @@ GVContactsTable::refreshContacts (const QDateTime &dtUpdate)
     emit status ("Retrieving contacts", 0);
 
     doGet (url, token, this,
-           SLOT (onGotContactsFeed(bool, const QByteArray &, void *)));
+           SLOT (onGotContactsFeed(bool, const QByteArray &, QNetworkReply *,
+                                   void *)));
 }//GVContactsTable::refreshContacts
 
 void
@@ -243,7 +246,8 @@ GVContactsTable::loginSuccess ()
     url.addQueryItem ("source"      , "MyCompany-qgvdial-ver01");
 
     doPost (url, url.encodedQuery(), "application/x-www-form-urlencoded",
-            token, this, SLOT(onLoginResponse(bool,QByteArray,void*)));
+            token, this, SLOT(onLoginResponse(bool, QByteArray, QNetworkReply *,
+                                              void *)));
 }//GVContactsTable::loginSuccess
 
 void
@@ -259,7 +263,7 @@ GVContactsTable::loggedOut ()
 
 void
 GVContactsTable::onLoginResponse(bool success, const QByteArray &response,
-                                 void *ctx)
+                                 QNetworkReply *reply, void *ctx)
 {
     AsyncTaskToken *token = (AsyncTaskToken *) ctx;
     QString strReply = response;
@@ -340,14 +344,15 @@ GVContactsTable::onCaptchaDone (bool bOk, const QString & /*strCaptcha*/)
         url.addQueryItem ("source"      , "MyCompany-qgvdial-ver01");
         //TODO: add captcha params
         doPost (url, url.encodedQuery(), "application/x-www-form-urlencoded",
-                this, SLOT(onLoginResponse(bool,QByteArray,void*)));
+                this, SLOT(onLoginResponse(bool, QByteArray, QNetworkReply *,
+                                           void *)));
     } while (0); // End cleanup block (not a loop)
 }//GVContactsTable::onCaptchaDone
 #endif
 
 void
 GVContactsTable::onGotContactsFeed(bool success, const QByteArray &response,
-                               void *ctx)
+                                   QNetworkReply *reply, void *ctx)
 {
     AsyncTaskToken *token = (AsyncTaskToken *) ctx;
 
@@ -438,8 +443,9 @@ GVContactsTable::gotOneContact (const ContactInfo &contactInfo)
         token->callerCtx = cInfo;
 
         QUrl url(contactInfo.hrefPhoto);
-        ok = doGet (url, token, this,
-                    SLOT(onGotPhoto(bool, QByteArray, void *)));
+        ok =
+        doGet (url, token, this,
+               SLOT(onGotPhoto(bool, QByteArray, QNetworkReply *, void *)));
     } while (0); // End cleanup block (not a loop)
 
     if (!ok) {
@@ -471,7 +477,8 @@ GVContactsTable::updateModelWithContact(const ContactInfo &contactInfo)
 }//GVContactsTable::updateModelWithContact
 
 void
-GVContactsTable::onGotPhoto(bool success, const QByteArray &response, void *ctx)
+GVContactsTable::onGotPhoto(bool success, const QByteArray &response,
+                            QNetworkReply *reply, void *ctx)
 {
     AsyncTaskToken *token = (AsyncTaskToken *) ctx;
     ContactInfo *cInfo = NULL;

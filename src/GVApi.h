@@ -78,36 +78,49 @@ signals:
 private slots:
 
     // Login and two factor
-    void onLogin1(bool success, const QByteArray &response, void *ctx);
-    void onLogin2(bool success, const QByteArray &response, void *ctx);
-    void onTwoFactorLogin(bool success, const QByteArray &response, void *ctx);
-    void onTFAAutoPost(bool success, const QByteArray &response, void *ctx);
-    void onGotRnr(bool success, const QByteArray &response, void *ctx);
+    void onLogin1(bool success, const QByteArray &response,
+                  QNetworkReply *reply, void *ctx);
+    void onLogin2(bool success, const QByteArray &response,
+                  QNetworkReply *reply, void *ctx);
+    void onTwoFactorLogin(bool success, const QByteArray &response,
+                          QNetworkReply *reply, void *ctx);
+    void onTFAAutoPost(bool success, const QByteArray &response,
+                       QNetworkReply *reply, void *ctx);
+    void onGotRnr(bool success, const QByteArray &response,
+                  QNetworkReply *reply, void *ctx);
 
     // Logout
-    void onLogout(bool success, const QByteArray &response, void *ctx);
+    void onLogout(bool success, const QByteArray &response,
+                  QNetworkReply *reply, void *ctx);
 
     // Get phones
-    void onGetPhones(bool success, const QByteArray &response, void *ctx);
+    void onGetPhones(bool success, const QByteArray &response,
+                     QNetworkReply *reply, void *ctx);
 
     // Get inbox (one page at a time)
-    void onGetInbox(bool success, const QByteArray &response, void *ctx);
+    void onGetInbox(bool success, const QByteArray &response,
+                    QNetworkReply *reply, void *ctx);
 
     // Dialing
-    void onCallback(bool success, const QByteArray &response, void *ctx);
-    void onCallout(bool success, const QByteArray &response, void *ctx);
+    void onCallback(bool success, const QByteArray &response,
+                    QNetworkReply *reply, void *ctx);
+    void onCallout(bool success, const QByteArray &response,
+                   QNetworkReply *reply, void *ctx);
 
     // Send sms
-    void onSendSms(bool success, const QByteArray &response, void *ctx);
+    void onSendSms(bool success, const QByteArray &response,
+                   QNetworkReply *reply, void *ctx);
 
     // Mark inbox entry as "read"
-    void onMarkAsRead(bool success, const QByteArray &response, void *ctx);
+    void onMarkAsRead(bool success, const QByteArray &response,
+                      QNetworkReply *reply, void *ctx);
 
     // Get voicemail
-    void onVmail(bool success, const QByteArray &response, void *ctx);
+    void onVmail(bool success, const QByteArray &response, QNetworkReply *reply,
+                 void *ctx);
 
 private:
-    QString hasMoved(const QString &strResponse);
+    QUrl hasMoved(QNetworkReply *reply);
     bool getSystemProxies (QNetworkProxy &http, QNetworkProxy &https);
 
     bool doGet(QUrl url, void *ctx, QObject *receiver, const char *method);
@@ -125,10 +138,10 @@ private:
                     QObject *receiver, const char *method);
 
     // Login and two factor
-    bool doLogin1(QString strUrl, AsyncTaskToken *token);
-    bool postLogin(QString strUrl, void *ctx);
+    bool doLogin1(QUrl url, AsyncTaskToken *token);
+    bool postLogin(QUrl url, void *ctx);
     bool parseHiddenLoginFields(const QString &strResponse, QVariantMap &ret);
-    bool beginTwoFactorAuth(const QString &strUrl, void *ctx);
+    bool beginTwoFactorAuth(QUrl url, void *ctx);
     bool doTwoFactorAuth(const QString &strResponse, void *ctx);
     bool getRnr(void *ctx);
 

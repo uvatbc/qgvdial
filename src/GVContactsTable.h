@@ -70,7 +70,8 @@ public slots:
 
 private slots:
     //! Invoked on response to login to contacts API
-    void onLoginResponse(bool success, const QByteArray &response, void *ctx);
+    void onLoginResponse(bool success, const QByteArray &response,
+                         QNetworkReply *reply, void *ctx);
 
 #ifndef NO_CONTACTS_CAPTCHA
     //! Invoked when the captcha is done
@@ -78,7 +79,8 @@ private slots:
 #endif
 
     // Invoked when the google contacts API responds with the contacts
-    void onGotContactsFeed(bool success, const QByteArray &response, void *ctx);
+    void onGotContactsFeed(bool success, const QByteArray &response,
+                           QNetworkReply *reply, void *ctx);
     // Invoked when one contact is parsed out of the XML
     void gotOneContact (const ContactInfo &contactInfo);
     //! Invoked when all the contacts are parsed
@@ -88,7 +90,8 @@ private slots:
     void onNoContactPhoto(const ContactInfo &contactInfo);
 
     //! Finished getting the photo
-    void onGotPhoto(bool success, const QByteArray &response, void *ctx);
+    void onGotPhoto(bool success, const QByteArray &response,
+                    QNetworkReply *reply, void *ctx);
 
 private:
     bool doGet(QUrl url, void *ctx, QObject *obj, const char *method);

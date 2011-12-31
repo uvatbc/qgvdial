@@ -17,7 +17,7 @@ public:
     void setTimeout(quint32 timeout);
 
 signals:
-    void sigDone(bool success, QByteArray response, void *ctx);
+    void sigDone(bool success, QByteArray response, QNetworkReply *r, void *ctx);
     void sigProgress(double percent);
 
 protected slots:

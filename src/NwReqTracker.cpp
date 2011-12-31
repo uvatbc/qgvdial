@@ -82,9 +82,9 @@ NwReqTracker::onReplyFinished()
         rv = true;
     } while (0); // End cleanup block (not a loop)
 
-    reply->deleteLater ();
-    emit sigDone (rv, response, ctx);
+    emit sigDone (rv, response, reply, ctx);
 
+    reply->deleteLater ();
     if (autoDelete) {
         this->deleteLater ();
     }
