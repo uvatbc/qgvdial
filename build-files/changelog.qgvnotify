@@ -1,2 +1,1 @@
-  * Change qgvnotify to use the new API class from qgvdial
-  * Removed webkit dependency. This should allow qgvnotify to work in a no-X non UI environment.
+  * Change qgvnotify to use the new API class from qgvdial (2012-01-01)

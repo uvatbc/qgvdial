@@ -182,7 +182,8 @@ private slots:
     void onSetInboxSelector(const QString &strSelector);
 
     //! Invoked when the contacts model is created
-    void onSetContactsModel(QAbstractItemModel *model);
+    void onSetContactsModel(QAbstractItemModel *model,
+                            QAbstractItemModel *searchModel);
 
     //! Invoked when the vmail is being shut off
     void onSigCloseVmail();

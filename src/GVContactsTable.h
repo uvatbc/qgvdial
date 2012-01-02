@@ -55,14 +55,12 @@ signals:
     //! Status emitter for status bar
     void status(const QString &strText, int timeout = 2000);
 
-    //! Emitted with the details of a single contact
-    void oneContact(const QVariantMap &contact);
-
     //! Emitted when all contacts are done
     void allContacts (bool bOk);
 
     //! Emitted when the contacts model is created
-    void setContactsModel(QAbstractItemModel *model);
+    void setContactsModel(QAbstractItemModel *model,
+                          QAbstractItemModel *searchModel);
 
 public slots:
     void refreshContacts (const QDateTime &dtUpdate);
@@ -111,6 +109,7 @@ private:
 
 private:
     ContactsModel *modelContacts;
+    ContactsModel *modelSearchContacts;
 
     //! Path to the temp directory to store all contact photos
     QString         strTempStore;

@@ -195,6 +195,8 @@ CacheDatabase::ensureCache ()
                         GV_CJ_PATH          " varchar, "
                         GV_CJ_VALUE         " varchar)");
     }
+
+    query.exec ("VACUUM");
 }//CacheDatabase::ensureCache
 
 void
@@ -1247,6 +1249,8 @@ CacheDatabase::purge_temp_files(quint64 howmany)
     QSqlQuery query(dbMain);
     query.setForwardOnly (true);
 
+    setQuickAndDirty (true);
+
     while (0 != howmany) {
         mapLinkPath.clear ();
 
@@ -1259,13 +1263,18 @@ CacheDatabase::purge_temp_files(quint64 howmany)
             count--;
         }
 
+        QString filename;
         QMap<QString, QString>::Iterator i = mapLinkPath.begin ();
         while (i != mapLinkPath.end ()) {
             query.exec(QString("DELETE FROM " GV_TEMP_TABLE " WHERE "
                                GV_TT_LINK "='%1'").arg(i.key()));
 
-            if (!i.value().isEmpty () && (QFileInfo(i.value()).exists ())) {
-                QFile::remove (i.value());
+            filename = i.value ();
+
+            if (!filename.isEmpty () && (QFileInfo(filename).exists ())) {
+                QFile::remove (filename);
+            } else {
+                Q_WARN("Not found? ") << filename;
             }
             i++;
         }
@@ -1276,6 +1285,8 @@ CacheDatabase::purge_temp_files(quint64 howmany)
             break;
         }
     }
+
+    setQuickAndDirty (false);
 }//CacheDatabase::purge_temp_files
 
 bool

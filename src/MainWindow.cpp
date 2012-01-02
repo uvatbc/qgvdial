@@ -394,9 +394,10 @@ MainWindow::init ()
     if (!rv) { exit(1); }
 
     // Inbox Model creation
-    rv = connect (
-        &oContacts, SIGNAL (setContactsModel(QAbstractItemModel *)),
-         this     , SLOT (onSetContactsModel(QAbstractItemModel *)));
+    rv = connect (&oContacts, SIGNAL (setContactsModel(QAbstractItemModel *,
+                                                       QAbstractItemModel *)),
+                   this     , SLOT (onSetContactsModel(QAbstractItemModel *,
+                                                       QAbstractItemModel *)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
 
@@ -2009,10 +2010,12 @@ MainWindow::onSetInboxSelector(const QString &strSelector)
 }//MainWindow::onSetInboxSelector
 
 void
-MainWindow::onSetContactsModel(QAbstractItemModel *model)
+MainWindow::onSetContactsModel(QAbstractItemModel *model,
+                               QAbstractItemModel *searchModel)
 {
     QDeclarativeContext *ctx = this->rootContext();
     ctx->setContextProperty ("g_contactsModel", model);
+    ctx->setContextProperty ("g_contactsSearchModel", searchModel);
 }//MainWindow::onSetContactsModel
 
 void

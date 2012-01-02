@@ -62,7 +62,9 @@ Contact: yuvraaj@gmail.com
 // Update date time in contacts
 //#define GV_S_VALUE_DB_VER   "2011-08-05 12:05:58"
 // Stopped using webkit for almost everything
-#define GV_S_VALUE_DB_VER   "2011-12-28 23:50:30"
+//#define GV_S_VALUE_DB_VER   "2011-12-28 23:50:30"
+// For no appropriate reason
+#define GV_S_VALUE_DB_VER   "2012-01-02 00:27:56"
 ////////////////////////////////////////////////////////////////////////////////
 // Started using versioning for the settings
 //#define GV_SETTINGS_VER     "2011-05-13 16:33:50"

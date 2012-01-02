@@ -34,6 +34,7 @@ Contact: yuvraaj@gmail.com
 GVContactsTable::GVContactsTable (QObject *parent)
 : QObject (parent)
 , modelContacts (NULL)
+, modelSearchContacts (NULL)
 , nwMgr (this)
 , mutex(QMutex::Recursive)
 , bLoggedIn(false)
@@ -59,7 +60,13 @@ GVContactsTable::deinitModel ()
         delete modelContacts;
         modelContacts = NULL;
     }
-    emit setContactsModel (NULL);
+
+    if (NULL != modelSearchContacts) {
+        delete modelSearchContacts;
+        modelSearchContacts = NULL;
+    }
+
+    emit setContactsModel (NULL, NULL);
 }//GVContactsTable::deinitModel
 
 void
@@ -72,7 +79,9 @@ GVContactsTable::initModel ()
     connect(modelContacts, SIGNAL(noContactPhoto(const ContactInfo &)),
                      this, SLOT(onNoContactPhoto(const ContactInfo &)));
 
-    emit setContactsModel (modelContacts);
+    modelSearchContacts = dbMain.newContactsModel ();
+
+    emit setContactsModel (modelContacts, modelSearchContacts);
 
     while (modelContacts->canFetchMore ()) {
         modelContacts->fetchMore ();
@@ -603,8 +612,8 @@ GVContactsTable::onContactsParsed (bool rv, quint32 /*total*/, quint32 usable)
 void
 GVContactsTable::onSearchQueryChanged (const QString &query)
 {
-    if (NULL != modelContacts) {
-        modelContacts->refresh (query);
+    if (NULL != modelSearchContacts) {
+        modelSearchContacts->refresh (query);
     }
 }//GVContactsTable::onSearchQuerychanged
 

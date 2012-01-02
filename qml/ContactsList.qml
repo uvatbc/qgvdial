@@ -133,11 +133,8 @@ Rectangle {
             spacing: 2
             cacheBuffer: (100 * (allContacts.height + allContacts.width))
 
-//            model: g_contactsModel
+            model: imgSearch.selection ? g_contactsSearchModel : g_contactsModel
 //            model: testContactsModelData1
-            model: ListModel {
-                objectName: "ContactsModel"
-            }
 
             section.property: "name"
             section.criteria: ViewSection.FirstCharacter
