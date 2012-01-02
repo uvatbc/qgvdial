@@ -28,6 +28,8 @@ Contact: yuvraaj@gmail.com
 #include <iostream>
 using namespace std;
 
+extern QStringList arrLogFiles;
+
 MainWindow::MainWindow (QWidget *parent)
 : QDeclarativeView (parent)
 , gvApi (true, this)
@@ -567,38 +569,6 @@ MainWindow::initQML ()
                    this, SLOT   (onSigCloseVmail ()));
     Q_ASSERT(bOk);
     if (!bOk) { exit(1); }
-    bOk = connect (gObj, SIGNAL (sigUserChanged (const QString &)),
-                   this, SLOT   (onUserTextChanged (const QString &)));
-    Q_ASSERT(bOk);
-    if (!bOk) { exit(1); }
-    bOk = connect (gObj, SIGNAL (sigPassChanged (const QString &)),
-                   this, SLOT   (onPassTextChanged (const QString &)));
-    Q_ASSERT(bOk);
-    if (!bOk) { exit(1); }
-    bOk = connect (gObj, SIGNAL (sigLogin ()),
-                   this, SLOT   (doLogin ()));
-    Q_ASSERT(bOk);
-    if (!bOk) { exit(1); }
-    bOk = connect (gObj, SIGNAL (sigLogout ()),
-                   this, SLOT   (doLogout ()));
-    Q_ASSERT(bOk);
-    if (!bOk) { exit(1); }
-    bOk = connect (gObj, SIGNAL (sigRefresh ()),
-                   this, SLOT   (onRefresh ()));
-    Q_ASSERT(bOk);
-    if (!bOk) { exit(1); }
-    bOk = connect (gObj, SIGNAL (sigRefreshAll ()),
-                   this, SLOT   (onRefreshAll ()));
-    Q_ASSERT(bOk);
-    if (!bOk) { exit(1); }
-    bOk = connect (gObj, SIGNAL (sigRefreshInbox ()),
-                   this, SLOT   (onSigRefreshInbox ()));
-    Q_ASSERT(bOk);
-    if (!bOk) { exit(1); }
-    bOk = connect (gObj, SIGNAL (sigRefreshContacts ()),
-                   this, SLOT   (onSigRefreshContacts ()));
-    Q_ASSERT(bOk);
-    if (!bOk) { exit(1); }
     bOk = connect (gObj, SIGNAL (sigHide ()),
                    this, SLOT   (onSigHide ()));
     Q_ASSERT(bOk);
@@ -607,38 +577,6 @@ MainWindow::initQML ()
                    this, SLOT   (on_actionE_xit_triggered ()));
     Q_ASSERT(bOk);
     if (!bOk) { exit(1); }
-    bOk = connect (gObj, SIGNAL (sigLinkActivated (const QString &)),
-                   this, SLOT   (onLinkActivated (const QString &)));
-    Q_ASSERT(bOk);
-    if (!bOk) { exit(1); }
-    bOk = connect (
-        gObj, SIGNAL (sigProxyChanges(bool, bool, const QString &, int,
-                                      bool, const QString &, const QString &)),
-        this, SLOT (onSigProxyChanges(bool, bool, const QString &, int,
-                                      bool, const QString &, const QString &)));
-    bOk = connect (gObj, SIGNAL (sigProxyRefresh()),
-                   this, SLOT (onSigProxyRefresh()));
-    Q_ASSERT(bOk);
-    if (!bOk) { exit(1); }
-    bOk = connect (
-        gObj, SIGNAL (sigMosquittoChanges(bool, const QString &, int,
-                                          const QString &)),
-        this, SLOT   (onSigMosquittoChanges(bool, const QString &, int,
-                                            const QString &)));
-    Q_ASSERT(bOk);
-    if (!bOk) { exit(1); }
-    bOk = connect (gObj, SIGNAL (sigMosquittoRefresh()),
-                   this, SLOT   (refreshMqSettings()));
-    Q_ASSERT(bOk);
-    if (!bOk) { exit(1); }
-    bOk = connect (
-        gObj, SIGNAL(sigPinSettingChanges  (bool, const QString &)),
-        this, SLOT  (onSigPinSettingChanges(bool, const QString &)));
-    Q_ASSERT(bOk);
-    if (!bOk) { exit(1); }
-    bOk = connect (gObj, SIGNAL(sigPinRefresh()),
-                   this, SLOT  (refreshPinSettings()));
-    Q_ASSERT(bOk);
     if (!bOk) { exit(1); }
     bOk = connect (gObj, SIGNAL (sigMsgBoxDone(bool)),
                    this, SLOT (onSigMsgBoxDone(bool)));
@@ -649,6 +587,11 @@ MainWindow::initQML ()
         &oContacts, SLOT (onSearchQueryChanged(const QString &)));
     Q_ASSERT(bOk);
     if (!bOk) { exit(1); }
+
+    // Now do the settings page
+    if (!connectSettingsSignals ()) {
+        exit (1);
+    }
 
 #if MOBILE_OS
     bOk = connect(qApp->desktop(), SIGNAL(resized(int)),
@@ -668,6 +611,97 @@ MainWindow::initQML ()
 #endif
 
 }//MainWindow::initQML
+
+bool
+MainWindow::connectSettingsSignals()
+{
+    bool rv = false;
+    QObject *obj = getQMLObject ("SettingsPage");
+
+    do { // Begin cleanup block (not a loop)
+        if (obj == NULL) {
+            Q_WARN("Could not find SettingsPage");
+            break;
+        }
+        rv = connect (obj , SIGNAL (sigUserChanged (const QString &)),
+                      this, SLOT   (onUserTextChanged (const QString &)));
+        Q_ASSERT(rv);
+        if (!rv) { break; }
+        rv = connect (obj , SIGNAL (sigPassChanged (const QString &)),
+                      this, SLOT   (onPassTextChanged (const QString &)));
+        Q_ASSERT(rv);
+        if (!rv) { break; }
+        rv = connect (obj , SIGNAL (sigLogin ()),
+                      this, SLOT   (doLogin ()));
+        Q_ASSERT(rv);
+        if (!rv) { break; }
+        rv = connect (obj , SIGNAL (sigLogout ()),
+                      this, SLOT   (doLogout ()));
+        Q_ASSERT(rv);
+        if (!rv) { break; }
+        rv = connect (obj , SIGNAL (sigLinkActivated (const QString &)),
+                      this, SLOT   (onLinkActivated (const QString &)));
+        Q_ASSERT(rv);
+        if (!rv) { break; }
+        rv = connect (obj,
+                      SIGNAL (sigProxyChanges(bool, bool, const QString &, int,
+                                              bool, const QString &,
+                                              const QString &)),
+                      this,
+                      SLOT (onSigProxyChanges(bool, bool, const QString &, int,
+                                              bool, const QString &,
+                                              const QString &)));
+        Q_ASSERT(rv);
+        if (!rv) { break; }
+        rv = connect (obj , SIGNAL (sigProxyRefresh()),
+                      this, SLOT (onSigProxyRefresh()));
+        Q_ASSERT(rv);
+        if (!rv) { break; }
+        rv = connect (obj,
+                      SIGNAL (sigMosquittoChanges(bool, const QString &, int,
+                                                  const QString &)),
+                      this,
+                      SLOT   (onSigMosquittoChanges(bool, const QString &, int,
+                                                    const QString &)));
+        Q_ASSERT(rv);
+        if (!rv) { break; }
+        rv = connect (obj , SIGNAL (sigMosquittoRefresh()),
+                      this, SLOT   (refreshMqSettings()));
+        Q_ASSERT(rv);
+        if (!rv) { break; }
+        rv = connect (
+                    obj , SIGNAL(sigPinSettingChanges  (bool, const QString &)),
+                    this, SLOT (onSigPinSettingChanges(bool, const QString &)));
+        Q_ASSERT(rv);
+        if (!rv) { break; }
+        rv = connect (obj , SIGNAL(sigPinRefresh()),
+                      this, SLOT  (refreshPinSettings()));
+        Q_ASSERT(rv);
+        rv = connect (obj , SIGNAL (sigRefresh ()),
+                      this, SLOT   (onRefresh ()));
+        Q_ASSERT(rv);
+        if (!rv) { break; }
+        rv = connect (obj , SIGNAL (sigRefreshAll ()),
+                      this, SLOT   (onRefreshAll ()));
+        Q_ASSERT(rv);
+        if (!rv) { break; }
+        rv = connect (obj , SIGNAL (sigRefreshInbox ()),
+                      this, SLOT   (onSigRefreshInbox ()));
+        Q_ASSERT(rv);
+        if (!rv) { break; }
+        rv = connect (obj , SIGNAL (sigRefreshContacts ()),
+                      this, SLOT   (onSigRefreshContacts ()));
+        Q_ASSERT(rv);
+        if (!rv) { break; }
+
+        rv = connect (obj , SIGNAL (sigSendLogs ()),
+                      this, SLOT   (onSigSendLogs ()));
+        Q_ASSERT(rv);
+        if (!rv) { break; }
+    } while (0); // End cleanup block (not a loop)
+
+    return (rv);
+}//MainWindow::connectSettingsSignals
 
 /** Invoked to begin the login process.
  * We already have the username and password, so just start the login to the GV
@@ -2131,3 +2165,38 @@ MainWindow::onSigGvApiProgress(double percent)
     QString msg = QString("Progress : %1%").arg (percent);
     setStatus (msg);
 }//MainWindow::onSigGvApiProgress
+
+void
+MainWindow::onSigSendLogs()
+{
+    QUrl url("mailto:yuvraaj@gmail.com");
+    url.addQueryItem ("subject", "Logs");
+
+    OsDependent &osd = Singletons::getRef().getOSD ();
+    QDateTime dt = QDateTime::currentDateTime ();
+    QString body = QString("Logs captured at %1\n")
+                    .arg (dt.toUTC ().toString (Qt::ISODate));
+    body += "qgvdial version = __QGVDIAL_VERSION__\n";
+    body += QString("OS: %1\n").arg(osd.getOSDetails());
+    body += "See attachments:\n";
+
+    QString strTemp;
+    for (int i = arrLogFiles.count(); i > 0; i--) {
+        body += arrLogFiles[i-1] + '\n';
+
+        strTemp = QString("\"%1\"")
+                    .arg(QUrl::fromLocalFile(arrLogFiles[i-1]).toString ());
+
+        strTemp = QString("\"%1\"").arg(arrLogFiles[i-1]);
+        url.addQueryItem ("attachment", strTemp);
+    }
+
+    url.addQueryItem ("body", body);
+
+    Q_DEBUG(url.toString ());
+
+    if (!QDesktopServices::openUrl (url)) {
+        Q_WARN("Failed to send logs");
+        setStatus ("Failed to send logs");
+    }
+}//MainWindow::onSigSendLogs

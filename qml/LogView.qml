@@ -24,6 +24,7 @@ import Qt 4.7
 Item {
     id: container
 
+    signal sigSendLogs()
     signal sigBack()
 
     Column {
@@ -36,7 +37,7 @@ Item {
         property int pixSize: pixHeight / pixDiv
 
         ListView {
-            height: container.height - btnBack.height - mainColumn.spacing
+            height: container.height - btnRow.height - mainColumn.spacing
             width: parent.width
             model: g_logModel
             clip: true
@@ -56,14 +57,31 @@ Item {
             }
         }//ListView (rotating logs)
 
-        MyButton {
-            id: btnBack
-
-            mainText: "Back"
+        Row {
+            id: btnRow
+            height: btnBack.height
             width: parent.width
-            mainPixelSize: mainColumn.pixSize
+            spacing: 1
 
-            onClicked: container.sigBack();
-        }//MyButton (Back)
+            MyButton {
+                id: btnSendLogs
+
+                mainText: "Send logs"
+                width: (parent.width / 2) - parent.spacing
+                mainPixelSize: mainColumn.pixSize
+
+                onClicked: container.sigSendLogs();
+            }//MyButton (Send logs)
+
+            MyButton {
+                id: btnBack
+
+                mainText: "Back"
+                width: (parent.width / 2) - parent.spacing
+                mainPixelSize: mainColumn.pixSize
+
+                onClicked: container.sigBack();
+            }//MyButton (Back)
+        }//Button row (Send logs and Back)
     }//Column
 }//Item (container)

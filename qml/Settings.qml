@@ -29,8 +29,6 @@ Flickable {
     signal sigPassChanged(string password)
     signal sigLogin
     signal sigLogout
-    signal sigHide
-    signal sigQuit
     signal sigLinkActivated(string strLink)
 
     signal sigProxyChanges(bool bEnable,
@@ -48,6 +46,8 @@ Flickable {
     signal sigRefreshAll
     signal sigRefreshInbox
     signal sigRefreshContacts
+
+    signal sigSendLogs
 
     property real pixHeight: (height + width) / 30
     property real textItemHeight: pixHeight + 4
@@ -243,6 +243,7 @@ Flickable {
 
             opacity: parent.containedOpacity
             onSigBack: parent.isExpanded = false;
+            onSigSendLogs: container.sigSendLogs();
         }
     }//ExpandView (log view)
 

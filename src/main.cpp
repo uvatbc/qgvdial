@@ -33,6 +33,8 @@ QFile fLogfile;       //! Logfile
 int   logLevel = 5;   //! Log level
 int   logCounter = 0; //! Number of log entries since the last log flush
 
+QStringList arrLogFiles;
+
 void
 myMessageOutput(QtMsgType type, const char *msg)
 {
@@ -110,27 +112,17 @@ initLogging ()
     QString strLogfile = osd.getAppDirectory ();
     strLogfile += QDir::separator ();
     strLogfile += "qgvdial.log";
-    QString strLog0 = strLogfile + ".0";
-    QString strLog1 = strLogfile + ".1";
-    QString strLog2 = strLogfile + ".2";
-    QString strLog3 = strLogfile + ".3";
-    QString strLog4 = strLogfile + ".4";
 
-    QFile::remove (strLog4);
-    if (QFile::exists (strLog3)) {
-        QFile::rename (strLog3, strLog4);
+    for (int i = 4; i >= 0; i--) {
+        arrLogFiles.append (QString("%1.%2").arg(strLogfile).arg(i));
     }
-    if (QFile::exists (strLog2)) {
-        QFile::rename (strLog2, strLog3);
-    }
-    if (QFile::exists (strLog1)) {
-        QFile::rename (strLog1, strLog2);
-    }
-    if (QFile::exists (strLog0)) {
-        QFile::rename (strLog0, strLog1);
-    }
-    if (QFile::exists (strLogfile)) {
-        QFile::rename (strLogfile, strLog0);
+    arrLogFiles.append (strLogfile);
+
+    QFile::remove (arrLogFiles[0]);
+    for (int i = 1; i < arrLogFiles.count (); i++) {
+        if (QFile::exists (arrLogFiles[i])) {
+            QFile::rename (arrLogFiles[i], arrLogFiles[i-1]);
+        }
     }
 
     fLogfile.setFileName (strLogfile);

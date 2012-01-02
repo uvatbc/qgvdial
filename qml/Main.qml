@@ -46,32 +46,8 @@ Rectangle {
     // Inbox vmail entry has asked to close the vmail
     signal sigCloseVmail
     // Signals from the Settings page
-    signal sigUserChanged(string username)
-    signal sigPassChanged(string password)
-    signal sigLogin
-    signal sigLogout
     signal sigHide
     signal sigQuit
-
-    signal sigRefresh
-    signal sigRefreshAll
-    signal sigRefreshInbox
-    signal sigRefreshContacts
-
-    // If there is any link that is activated from anywhere
-    signal sigLinkActivated(string strLink)
-
-    signal sigProxyChanges(bool bEnable,
-                           bool bUseSystemProxy,
-                           string host, int port,
-                           bool bRequiresAuth,
-                           string user, string pass)
-    signal sigProxyRefresh
-
-    signal sigMosquittoChanges(bool bEnable, string host, int port, string topic)
-    signal sigMosquittoRefresh
-    signal sigPinSettingChanges(bool bEnable, string pin)
-    signal sigPinRefresh
 
     // Contacts search query changes
     signal sigSearchContacts(string query)
@@ -92,19 +68,10 @@ Rectangle {
     onSigCall: console.debug("QML: Call " + number)
     onSigText: console.debug("QML: Text " + numbers)
 
-    onSigLogin: console.debug("QML: Login")
-    onSigLogout: console.debug("QML: Logout")
-
     onSigSearchContacts: console.debug("QML: Search for contacts: " + query)
-
-    onSigRefresh: console.debug("QML: Refresh requested");
-    onSigRefreshAll: console.debug("QML: Refresh All requested");
-    onSigRefreshContacts: console.debug("QML: Refresh Contacts requested");
-    onSigRefreshInbox: console.debug("QML: Refresh inbox requested");
 
     onSigHide: console.debug("QML: Dismiss requested");
     onSigQuit: console.debug("QML: Quit requested");
-
 
     property bool bShowSettings: g_bShowSettings
     onBShowSettingsChanged: {
@@ -117,8 +84,6 @@ Rectangle {
         }
     }
 
-    onSigMosquittoChanges: console.debug("QML: Mosquitto setings changed");
-    onSigLinkActivated: console.debug("QML: Link activated: " + strLink);
     onSigMsgBoxDone: console.debug ("QML: User requested close on message box. Ok = " + ok);
 
     Flipable {
@@ -199,30 +164,7 @@ Rectangle {
 
                     Settings {
                         id: settingsView
-
                         anchors.fill: parent
-
-                        onSigUserChanged: main.sigUserChanged(username)
-                        onSigPassChanged: main.sigPassChanged(password)
-                        onSigLogin: main.sigLogin()
-                        onSigLogout: main.sigLogout()
-                        onSigHide: main.sigHide()
-                        onSigQuit: main.sigQuit()
-
-                        onSigProxyChanges: main.sigProxyChanges(bEnable, bUseSystemProxy,
-                                                                host, port, bRequiresAuth,
-                                                                user, pass)
-                        onSigProxyRefresh: main.sigProxyRefresh
-                        onSigLinkActivated: main.sigLinkActivated(strLink)
-                        onSigMosquittoChanges: main.sigMosquittoChanges(bEnable, host, port, topic)
-                        onSigMosquittoRefresh: main.sigMosquittoRefresh()
-                        onSigPinSettingChanges: main.sigPinSettingChanges(bEnable, pin)
-                        onSigPinRefresh: main.sigPinRefresh()
-
-                        onSigRefresh: main.sigRefresh()
-                        onSigRefreshAll: main.sigRefreshAll()
-                        onSigRefreshContacts: main.sigRefreshContacts();
-                        onSigRefreshInbox: main.sigRefreshInbox();
                     }
                 }//Tab (Settings)
             }//VisualDataModel (contains the tabs)

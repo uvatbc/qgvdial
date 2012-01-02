@@ -248,6 +248,118 @@ OsDependent::cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt)
     return (1 == iEVP);
 }//OsDependent::cipher
 
+QString
+OsDependent::getOSDetails()
+{
+    QString rv;
+
+#ifdef Q_WS_MAEMO_5
+    rv = "Maemo";
+#endif
+
+#if defined(MEEGO_HARMATTAN)
+    rv = "Meego Harmattan";
+#endif
+
+#if defined(Q_OS_SYMBIAN)
+    rv = "Symbian";
+
+    QSysInfo::SymbianVersion symVer = QSysInfo::symbianVersion ();
+    switch (symVer) {
+    case QSysInfo::SV_9_2:
+        rv += " OS v9.2";
+        break;
+    case QSysInfo::SV_9_3:
+        rv += " OS v9.3";
+        break;
+    case QSysInfo::SV_9_4:
+        rv += " OS v9.4";
+        break;
+    case QSysInfo::SV_SF_2:
+        rv += " ^2";
+        break;
+    case QSysInfo::SV_SF_3:
+        rv += " ^3";
+        break;
+    case QSysInfo::SV_SF_4:
+        rv += " ^4 (deprecated)";
+        break;
+    case QSysInfo::SV_API_5_3:
+        rv += " API version 5.3 release";
+        break;
+    case QSysInfo::SV_API_5_4:
+        rv += " API version 5.4 release";
+        break;
+    case QSysInfo::SV_Unknown:
+        rv += " Unknown";
+        break;
+    default:
+        rv += QString("really unknown: %1").arg(symVer);
+        break;
+    }
+#endif
+
+#if defined(Q_WS_WIN)
+    rv = "Windows";
+    QSysInfo::WinVersion winVer = QSysInfo::windowsVersion ();
+    switch (winVer) {
+    case QSysInfo::WV_32s:
+        rv += " 3.1 with Win 32s";
+        break;
+    case QSysInfo::WV_95:
+        rv += " 95";
+        break;
+    case QSysInfo::WV_98:
+        rv += " 98";
+        break;
+    case QSysInfo::WV_Me:
+        rv += " Me";
+        break;
+    case QSysInfo::WV_4_0:
+        rv += " 4.0 (NT)";
+        break;
+    case QSysInfo::WV_5_0:
+        rv += " 5.0 (2000)";
+        break;
+    case QSysInfo::WV_5_1:
+        rv += " 5.1 (XP)";
+        break;
+    case QSysInfo::WV_5_2:
+        rv += " 5.2 (2003)";
+        break;
+    case QSysInfo::WV_6_0:
+        rv += " 6.0 (Vista)";
+        break;
+    case QSysInfo::WV_6_1:
+        rv += " 6.1 (Win 7)";
+        break;
+    case QSysInfo::WV_CE:
+        rv += " CE";
+        break;
+    case QSysInfo::WV_CENET:
+        rv += " CENET";
+        break;
+    case QSysInfo::WV_CE_5:
+        rv += " CE 5.x";
+        break;
+    case QSysInfo::WV_CE_6:
+        rv += " CE 6.x";
+        break;
+    default:
+        rv += QString(" Unknown (%1)").arg(winVer);
+        break;
+    }
+#endif
+
+#if LINUX_DESKTOP
+    rv = "Linux";
+#endif
+
+//TODO: Mac
+
+    return (rv);
+}//OsDependent::getOSDetails
+
 #ifdef QT_NO_SYSTEMTRAYICON
 QSystemTrayIcon::QSystemTrayIcon(QWidget *parent /*= 0*/)
 : QWidget (parent)

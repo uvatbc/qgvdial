@@ -64,6 +64,8 @@ public:
 
     bool cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt);
 
+    QString getOSDetails();
+
 private:
     OsDependent(QObject *parent = 0);
 

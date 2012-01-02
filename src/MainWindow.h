@@ -199,11 +199,15 @@ private slots:
     //! Invoked when the desktop is resized (useful only on mobile platforms)
     void onDesktopResized();
 
+    //! When the user needs to send me logs
+    void onSigSendLogs();
+
 private:
     void initLogging ();
 
     //! Initialize the QML view
     void initQML ();
+    bool connectSettingsSignals();
 
     void initContacts ();
     void deinitContacts ();
