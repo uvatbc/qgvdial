@@ -55,6 +55,9 @@ signals:
     //! Status emitter for status bar
     void status(const QString &strText, int timeout = 2000);
 
+    //! Emitted with the details of a single contact
+    void oneContact(const QVariantMap &contact);
+
     //! Emitted when all contacts are done
     void allContacts (bool bOk);
 

@@ -133,8 +133,11 @@ Rectangle {
             spacing: 2
             cacheBuffer: (100 * (allContacts.height + allContacts.width))
 
-            model: g_contactsModel
+//            model: g_contactsModel
 //            model: testContactsModelData1
+            model: ListModel {
+                objectName: "ContactsModel"
+            }
 
             section.property: "name"
             section.criteria: ViewSection.FirstCharacter
@@ -161,7 +164,7 @@ Rectangle {
 
                     source: imagePath ? imagePath : "unknown_contact.png"
                     fillMode: Image.PreserveAspectFit
-                }
+                }//Image
 
                 Text {
                     anchors {
@@ -175,7 +178,7 @@ Rectangle {
                     color: "white"
 
                     font.pixelSize: parent.height - 6
-                }
+                }//Text
 
                 MouseArea {
                     anchors.fill: parent

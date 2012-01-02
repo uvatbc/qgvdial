@@ -373,7 +373,7 @@ MainWindow::init ()
     if (!rv) { exit(1); }
     // oContacts.allContacts -> this.getContactsDone
     rv = connect (&oContacts, SIGNAL (allContacts (bool)),
-                   this      , SLOT   (getContactsDone (bool)));
+                   this     , SLOT   (getContactsDone (bool)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
     // Status from inbox object
@@ -912,8 +912,7 @@ MainWindow::dieNow()
 void
 MainWindow::getContactsDone (bool bOk)
 {
-    if (!bOk)
-    {
+    if (!bOk) {
         this->showMsgBox ("Contacts retrieval failed");
         setStatus ("Contacts retrieval failed");
     }

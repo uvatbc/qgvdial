@@ -59,6 +59,8 @@ Contact: yuvraaj@gmail.com
 #define Q_WARN(_s) qWarning() << QString("%1(%2): %3").arg(__FUNCTION__).arg(__LINE__).arg(_s)
 #define Q_CRIT(_s) qCritical() << QString("%1(%2): %3").arg(__FUNCTION__).arg(__LINE__).arg(_s)
 
+typedef QList<QVariantMap> VarMapList;
+
 struct GVRegisteredNumber
 {
     QString     strId;
