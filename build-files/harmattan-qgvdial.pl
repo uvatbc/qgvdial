@@ -32,7 +32,7 @@ $curdir =~ s/\//\\\//g;
 # Delete any existing version file
 system("rm -f ver.cfg");
 # Get the latest version file from the repository
-$cmd = "ssh uv\@userver_x86 \"cd harmattan/export ; svn export $repo/build-files/ver.cfg\"";
+$cmd = "ssh uv\@userver_x86 \"cd harmattan/export/qgvdial ; svn export $repo/build-files/ver.cfg\"";
 system($cmd);
 
 # Pull out the version from the file
@@ -54,7 +54,7 @@ my $basedir = "./qgvdial-$qver";
 system("rm -rf qgvdial*");
 system("rm -rf qgvtp*");
 
-$cmd = "ssh uv\@userver_x86 \"cd harmattan/export ; svn export $repo $basedir\"";
+$cmd = "ssh uv\@userver_x86 \"cd harmattan/export/qgvdial ; svn export $repo $basedir\"";
 system($cmd);
 system("cp $basedir/icons/qgv.png $basedir/src/qgvdial.png");
 
