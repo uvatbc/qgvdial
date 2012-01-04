@@ -89,6 +89,8 @@ private:
     QDateTime       dateWaterLevel;
     bool            passedWaterLevel;
 
+    quint32         newEntries;
+
     //! Mutex for the following variables
     QMutex          mutex;
 

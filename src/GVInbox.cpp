@@ -118,6 +118,7 @@ GVInbox::refresh (const QDateTime &dtUpdate)
     Q_ASSERT(rv); Q_UNUSED(rv);
 
     bRefreshInProgress = true;
+    newEntries = 0;
 
     if (!gvApi.getInbox (token)) {
         getInboxDone (NULL);
@@ -155,6 +156,8 @@ GVInbox::oneInboxEntry (const GVInboxEntry &hevent)
         Q_DEBUG("Water level was =") << dateWaterLevel.toString()
                 << "current entry =" << hevent.startTime.toString();
         passedWaterLevel = true;
+    } else {
+        newEntries++;
     }
 
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
@@ -211,10 +214,10 @@ GVInbox::getInboxDone (AsyncTaskToken *token)
         return;
     }
 
-    int nNew = 0;
+    int count = 0;
     if (token) {
         emit status ("Inbox retrieved. Sorting...", 0);
-        nNew = token->outParams["message_count"].toInt();
+        count = token->outParams["message_count"].toInt();
 
         delete token;
         token = NULL;
@@ -225,8 +228,8 @@ GVInbox::getInboxDone (AsyncTaskToken *token)
 
     prepView ();
 
-    emit status (QString("Inbox ready. %1 %2 retrieved.")
-                 .arg(nNew).arg (nNew == 1?"entry":"entries"));
+    emit status (QString("Inbox ready. %1 new %2 retrieved.")
+                 .arg(newEntries).arg (newEntries == 1?"entry":"entries"));
 
     QMutexLocker locker(&mutex);
     bRefreshInProgress = false;

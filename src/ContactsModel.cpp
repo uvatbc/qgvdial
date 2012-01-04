@@ -58,7 +58,8 @@ ContactsModel::data (const QModelIndex &index, int role) const
         info.strId = QSqlQueryModel::data (index.sibling(index.row(), 0),
                         Qt::EditRole).toString ();
         if (info.strId.isEmpty ()) {
-            qWarning ("This link is empty!");
+            Q_WARN("This link is empty!");
+            retVar = "";
             break;
         }
         dbMain.getContactFromLink (info);
@@ -89,7 +90,7 @@ ContactsModel::data (const QModelIndex &index, int role) const
             break;
         }
 
-        qDebug ("This role can be handled by the base class");
+        // This role can be handled by the base class
         retVar = QSqlQueryModel::data (index, role);
     } while (0); // End cleanup block (not a loop)
 

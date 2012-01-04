@@ -460,6 +460,7 @@ GVContactsTable::onGotContactsFeed(bool success, const QByteArray &response,
                  this, SLOT   (gotOneContact (const ContactInfo &)));
         Q_ASSERT(success);
 
+        QMutexLocker locker(&mutex);
         refCount = 1;
         bBeginDrain = false;
         workerThread->start ();
@@ -478,6 +479,11 @@ GVContactsTable::gotOneContact (const ContactInfo &contactInfo)
     bool ok = false;
 
     do { // Begin cleanup block (not a loop)
+        if (contactInfo.hrefPhoto.isEmpty ()) {
+            Q_DEBUG("Empty photo link");
+            break;
+        }
+
         token = new AsyncTaskToken(this);
         if (!token) {
             break;
@@ -506,6 +512,8 @@ GVContactsTable::gotOneContact (const ContactInfo &contactInfo)
         if (cInfo) {
             updateModelWithContact (*cInfo);
             delete cInfo;
+        } else {
+            updateModelWithContact (contactInfo);
         }
     }
 }//GVContactsTable::gotOneContact
@@ -580,7 +588,7 @@ GVContactsTable::onGotPhoto(bool success, const QByteArray &response,
 
     if (!success) {
         if (cInfo) {
-            Q_WARN("Failed to get photo for contact ") << cInfo->strTitle;
+            Q_WARN("Failed to get photo for contact") << cInfo->strTitle;
         }
     }
 
