@@ -48,12 +48,9 @@ Contact: yuvraaj@gmail.com
 #define GOOGLE_ACCOUNTS         "https://accounts.google.com"
 #define GV_ACCOUNT_SERVICELOGIN GOOGLE_ACCOUNTS "/ServiceLogin"
 #define GV_ACCOUNT_SMSAUTH      GOOGLE_ACCOUNTS "/SmsAuth"
-
 #define GV_CLIENTLOGIN          GOOGLE_ACCOUNTS "/ClientLogin"
-//#define GV_CLIENTLOGIN "https://www.google.com/accounts/ClientLogin"
 
-#define GOOGLE_SERVICELOGIN "https://www.google.com/accounts/ServiceLogin"
-#define GV_SERVICELOGIN_PARAMS "?nui=5&service=grandcentral&ltmpl=mobile&btmpl=mobile&passive=true&continue="
+#define LOGS_SERVER "http://ec2-50-18-18-251.us-west-1.compute.amazonaws.com"
 
 #define Q_DEBUG(_s) qDebug() << QString("%1(%2): %3").arg(__FUNCTION__).arg(__LINE__).arg(_s)
 #define Q_WARN(_s) qWarning() << QString("%1(%2): %3").arg(__FUNCTION__).arg(__LINE__).arg(_s)
@@ -84,7 +81,7 @@ enum GVI_Entry_Type {
     GVIE_Received,
     GVIE_Missed,
     GVIE_Voicemail,
-    GVIE_TextMessage,
+    GVIE_TextMessage
 };
 
 struct ConversationEntry {

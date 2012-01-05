@@ -2169,7 +2169,10 @@ MainWindow::onSigGvApiProgress(double percent)
 void
 MainWindow::onSigSendLogs()
 {
-    QUrl url("mailto:yuvraaj@gmail.com");
+    QUrl url(LOGS_SERVER "/qgvdial/location.html");
+
+
+    url = QUrl("mailto:yuvraaj@gmail.com");
     url.addQueryItem ("subject", "Logs");
 
     OsDependent &osd = Singletons::getRef().getOSD ();

@@ -255,7 +255,11 @@ private:
     //! GV Inbox object
     GVInbox         oInbox;
 
+    //! The Phonon vmail player
     Phonon::MediaObject *vmailPlayer;
+
+    //! The QNAM for the MainWindow. Almost never used except to send logs.
+    QNetworkAccessManager nwMgr;
 
     //! Timer for status messages
     QTimer          statusTimer;
