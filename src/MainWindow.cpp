@@ -2202,7 +2202,7 @@ MainWindow::onSigSendLogs()
 
 void
 MainWindow::onGetLogLocation(bool success, const QByteArray &response,
-                             QNetworkReply *reply, void *ctx)
+                             QNetworkReply *reply, void * /*ctx*/)
 {
     do { // Begin cleanup block (not a loop)
         if (!success) {
@@ -2283,7 +2283,7 @@ MainWindow::onGetLogLocation(bool success, const QByteArray &response,
 }//MainWindow::onGetLogLocation
 
 void
-MainWindow::onLogPosted(bool success, const QByteArray &response,
+MainWindow::onLogPosted(bool success, const QByteArray & /*response*/,
                         QNetworkReply *reply, void *ctx)
 {
     AsyncTaskToken *token = (AsyncTaskToken *) ctx;

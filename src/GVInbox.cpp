@@ -214,11 +214,7 @@ GVInbox::getInboxDone (AsyncTaskToken *token)
         return;
     }
 
-    int count = 0;
     if (token) {
-        emit status ("Inbox retrieved. Sorting...", 0);
-        count = token->outParams["message_count"].toInt();
-
         delete token;
         token = NULL;
     }

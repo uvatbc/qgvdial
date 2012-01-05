@@ -771,7 +771,7 @@ GVApi::doTwoFactorAuth(const QString &strResponse, void *ctx)
 
 void
 GVApi::onTFAAutoPost(bool success, const QByteArray &response,
-                     QNetworkReply *reply, void *ctx)
+                     QNetworkReply * /*reply*/, void *ctx)
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QString strResponse = response;

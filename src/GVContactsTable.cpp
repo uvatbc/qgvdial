@@ -536,7 +536,7 @@ GVContactsTable::updateModelWithContact(const ContactInfo &contactInfo)
 
 void
 GVContactsTable::onGotPhoto(bool success, const QByteArray &response,
-                            QNetworkReply *reply, void *ctx)
+                            QNetworkReply * /*reply*/, void *ctx)
 {
     AsyncTaskToken *token = (AsyncTaskToken *) ctx;
     ContactInfo *cInfo = NULL;
