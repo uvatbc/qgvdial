@@ -25,9 +25,6 @@ Contact: yuvraaj@gmail.com
 
 #include <QtXmlPatterns>
 
-#define CONTENT_IS_FORM "application/x-www-form-urlencoded"
-#define CONTENT_IS_TEXT "text/plain"
-
 GVApi::GVApi(bool bEmitLog, QObject *parent)
 : QObject(parent)
 , emitLog(bEmitLog)
@@ -294,14 +291,14 @@ bool
 GVApi::doPostForm(QUrl url, QByteArray postData, void *ctx,
                   QObject *receiver, const char *method)
 {
-    return doPost (url, postData, CONTENT_IS_FORM, ctx, receiver, method);
+    return doPost (url, postData, POST_FORM, ctx, receiver, method);
 }//GVApi::doPostForm
 
 bool
 GVApi::doPostText(QUrl url, QByteArray postData, void *ctx,
                   QObject *receiver, const char *method)
 {
-    return doPost (url, postData, CONTENT_IS_TEXT, ctx, receiver, method);
+    return doPost (url, postData, POST_TEXT, ctx, receiver, method);
 }//GVApi::doPostForm
 
 bool
@@ -1963,7 +1960,7 @@ GVApi::markInboxEntryAsRead(AsyncTaskToken *token)
 
     QUrl url(GV_HTTPS "/b/0/inbox/mark");
     bool rv =
-    doPost(url, strContent.toAscii(), CONTENT_IS_FORM, UA_DESKTOP, token, this,
+    doPost(url, strContent.toAscii(), POST_FORM, UA_DESKTOP, token, this,
            SLOT(onMarkAsRead(bool, const QByteArray &, QNetworkReply*, void*)));
     Q_ASSERT(rv);
 
@@ -1990,7 +1987,7 @@ GVApi::onMarkAsRead(bool success, const QByteArray &response,
             QString strContent = QString("messages=%1&read=1&_rnr_se=%2")
                                     .arg(token->inParams["id"].toString())
                                     .arg(rnr_se);
-            success = doPost(url, strContent.toAscii(), CONTENT_IS_FORM, UA_DESKTOP,
+            success = doPost(url, strContent.toAscii(), POST_FORM, UA_DESKTOP,
                              token, this,
                              SLOT(onMarkAsRead(bool, QByteArray, void*)));
             Q_ASSERT(success);

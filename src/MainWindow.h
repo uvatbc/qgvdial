@@ -201,6 +201,12 @@ private slots:
 
     //! When the user needs to send me logs
     void onSigSendLogs();
+    //! When the server responds with the location to post the logs
+    void onGetLogLocation(bool success, const QByteArray &response,
+                          QNetworkReply *reply, void *ctx);
+    //! When the server responds once I've sent the logs
+    void onLogPosted(bool success, const QByteArray &response,
+                     QNetworkReply *reply, void *ctx);
 
 private:
     void initLogging ();
@@ -244,6 +250,8 @@ private:
 
     QObject * getQMLObject(const char *pageName);
 
+    bool ensureNwMgr();
+
 private:
     GVApi           gvApi;
 
@@ -259,7 +267,7 @@ private:
     Phonon::MediaObject *vmailPlayer;
 
     //! The QNAM for the MainWindow. Almost never used except to send logs.
-    QNetworkAccessManager nwMgr;
+    QNetworkAccessManager *nwMgr;
 
     //! Timer for status messages
     QTimer          statusTimer;

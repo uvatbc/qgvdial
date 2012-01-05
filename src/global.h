@@ -52,6 +52,9 @@ Contact: yuvraaj@gmail.com
 
 #define LOGS_SERVER "http://ec2-50-18-18-251.us-west-1.compute.amazonaws.com"
 
+#define POST_FORM "application/x-www-form-urlencoded"
+#define POST_TEXT "text/plain"
+
 #define Q_DEBUG(_s) qDebug() << QString("%1(%2): %3").arg(__FUNCTION__).arg(__LINE__).arg(_s)
 #define Q_WARN(_s) qWarning() << QString("%1(%2): %3").arg(__FUNCTION__).arg(__LINE__).arg(_s)
 #define Q_CRIT(_s) qCritical() << QString("%1(%2): %3").arg(__FUNCTION__).arg(__LINE__).arg(_s)

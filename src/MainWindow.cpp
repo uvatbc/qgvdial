@@ -38,6 +38,7 @@ MainWindow::MainWindow (QWidget *parent)
 , oContacts (this)
 , oInbox (gvApi, this)
 , vmailPlayer (NULL)
+, nwMgr (NULL)
 , statusTimer (this)
 #ifdef Q_WS_MAEMO_5
 , infoBox (this)
@@ -2166,40 +2167,153 @@ MainWindow::onSigGvApiProgress(double percent)
     setStatus (msg);
 }//MainWindow::onSigGvApiProgress
 
+bool
+MainWindow::ensureNwMgr()
+{
+    if (nwMgr) {
+        return true;
+    }
+
+    nwMgr = new QNetworkAccessManager(this);
+
+    return (nwMgr != NULL);
+}//MainWindow::ensureNwMgr
+
 void
 MainWindow::onSigSendLogs()
 {
-    QUrl url(LOGS_SERVER "/qgvdial/location.html");
-
-
-    url = QUrl("mailto:yuvraaj@gmail.com");
-    url.addQueryItem ("subject", "Logs");
-
-    OsDependent &osd = Singletons::getRef().getOSD ();
-    QDateTime dt = QDateTime::currentDateTime ();
-    QString body = QString("Logs captured at %1\n")
-                    .arg (dt.toUTC ().toString (Qt::ISODate));
-    body += "qgvdial version = __QGVDIAL_VERSION__\n";
-    body += QString("OS: %1\n").arg(osd.getOSDetails());
-    body += "See attachments:\n";
-
-    QString strTemp;
-    for (int i = arrLogFiles.count(); i > 0; i--) {
-        body += arrLogFiles[i-1] + '\n';
-
-        strTemp = QString("\"%1\"")
-                    .arg(QUrl::fromLocalFile(arrLogFiles[i-1]).toString ());
-
-        strTemp = QString("\"%1\"").arg(arrLogFiles[i-1]);
-        url.addQueryItem ("attachment", strTemp);
+    if (!ensureNwMgr ()) {
+        Q_WARN("Failed to ensure NW Mgr");
+        return;
     }
 
-    url.addQueryItem ("body", body);
-
-    Q_DEBUG(url.toString ());
-
-    if (!QDesktopServices::openUrl (url)) {
-        Q_WARN("Failed to send logs");
-        setStatus ("Failed to send logs");
+    QUrl url(LOGS_SERVER "/qgvdial/getLogLocation.py");
+    QNetworkRequest req(url);
+    QNetworkReply *reply = nwMgr->get (req);
+    if (!reply) {
+        return;
     }
+
+    NwReqTracker *tracker = new NwReqTracker(reply, NULL, NW_REPLY_TIMEOUT,
+                                             true, this);
+    connect(tracker, SIGNAL(sigDone(bool,QByteArray,QNetworkReply*,void*)),
+            this, SLOT(onGetLogLocation(bool,QByteArray,QNetworkReply*,void*)));
 }//MainWindow::onSigSendLogs
+
+void
+MainWindow::onGetLogLocation(bool success, const QByteArray &response,
+                             QNetworkReply *reply, void *ctx)
+{
+    do { // Begin cleanup block (not a loop)
+        if (!success) {
+            QString strR = reply->readAll ();
+            Q_WARN("Failed to get location to post logs") << strR;
+            break;
+        }
+
+        if (!ensureNwMgr ()) {
+            Q_WARN("Failed to ensure NW Mgr");
+            break;
+        }
+
+        AsyncTaskToken *token = new AsyncTaskToken(this);
+        if (!token) {
+            Q_WARN("Failed to create async token");
+            break;
+        }
+
+        QDateTime dtNow = QDateTime::currentDateTime().toUTC();
+        token->inParams["date"] = dtNow;
+
+        QDomDocument doc("qgvdial Logs");
+        QDomElement root = doc.createElement("Logs");
+        doc.appendChild(root);
+
+
+        QDomElement paramsTag = doc.createElement("Params");
+        root.appendChild(paramsTag);
+
+        QDomElement dateTag = doc.createElement("Date");
+        paramsTag.appendChild(dateTag);
+
+        QDomText dateTagText = doc.createTextNode(dtNow.toString (Qt::ISODate));
+        dateTag.appendChild(dateTagText);
+
+        QDomElement appVerTag = doc.createElement("Version");
+        paramsTag.appendChild(appVerTag);
+
+        QDomText appVerText = doc.createTextNode("__QGVDIAL_VERSION__");
+        appVerTag.appendChild(appVerText);
+
+        QDomElement osVerTag = doc.createElement("OsVer");
+        paramsTag.appendChild(osVerTag);
+
+        OsDependent &osd = Singletons::getRef().getOSD ();
+        QDomText osVerText = doc.createTextNode(osd.getOSDetails());
+        osVerTag.appendChild(osVerText);
+
+        for (int i = arrLogFiles.count(); i > 0; i--) {
+            QFile fLog(arrLogFiles[i-1]);
+            if (!fLog.open (QIODevice::ReadOnly)) {
+                continue;
+            }
+
+            QDomElement oneLogFile = doc.createElement(arrLogFiles[i-1]);
+            root.appendChild(oneLogFile);
+
+            QDomText t = doc.createTextNode(fLog.readAll ());
+            oneLogFile.appendChild(t);
+        }
+
+        QString postLocation = response;
+        QUrl url(postLocation);
+        QNetworkRequest req(url);
+        req.setHeader (QNetworkRequest::ContentTypeHeader, POST_TEXT);
+
+        reply = nwMgr->post (req, doc.toString().toAscii ());
+        if (!reply) {
+            break;
+        }
+
+        NwReqTracker *tracker = new NwReqTracker(reply, token, NW_REPLY_TIMEOUT,
+                                                 true, this);
+        connect(tracker, SIGNAL(sigDone(bool,QByteArray,QNetworkReply*,void*)),
+                this, SLOT(onLogPosted(bool,QByteArray,QNetworkReply*,void*)));
+    } while (0); // End cleanup block (not a loop)
+}//MainWindow::onGetLogLocation
+
+void
+MainWindow::onLogPosted(bool success, const QByteArray &response,
+                        QNetworkReply *reply, void *ctx)
+{
+    AsyncTaskToken *token = (AsyncTaskToken *) ctx;
+    do { // Begin cleanup block (not a loop)
+        if (!success) {
+            QString strR = reply->readAll ();
+            Q_WARN("Failed to post the logs") << strR;
+            break;
+        }
+
+        QUrl url("mailto:yuvraaj@gmail.com");
+        url.addQueryItem ("subject", "Logs");
+
+        OsDependent &osd = Singletons::getRef().getOSD ();
+        QDateTime dt = token->inParams["date"].toDateTime();
+        QString body = QString("Logs captured at %1\n")
+                                .arg (dt.toUTC ().toString (Qt::ISODate));
+        body += "qgvdial version = __QGVDIAL_VERSION__\n";
+        body += QString("OS: %1\n").arg(osd.getOSDetails());
+        url.addQueryItem ("body", body);
+
+        Q_DEBUG(url.toString ());
+
+        if (!QDesktopServices::openUrl (url)) {
+            Q_WARN("Failed to send email about logs");
+            setStatus ("Failed to send email");
+        }
+    } while (0); // End cleanup block (not a loop)
+
+    if (token) {
+        delete token;
+    }
+}//MainWindow::onLogPosted
