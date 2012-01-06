@@ -2283,7 +2283,7 @@ MainWindow::onGetLogLocation(bool success, const QByteArray &response,
 }//MainWindow::onGetLogLocation
 
 void
-MainWindow::onLogPosted(bool success, const QByteArray & /*response*/,
+MainWindow::onLogPosted(bool success, const QByteArray &response,
                         QNetworkReply *reply, void *ctx)
 {
     AsyncTaskToken *token = (AsyncTaskToken *) ctx;
@@ -2294,15 +2294,18 @@ MainWindow::onLogPosted(bool success, const QByteArray & /*response*/,
             break;
         }
 
+        QString strReply = response;
+
         QUrl url("mailto:yuvraaj@gmail.com");
         url.addQueryItem ("subject", "Logs");
 
         OsDependent &osd = Singletons::getRef().getOSD ();
         QDateTime dt = token->inParams["date"].toDateTime();
-        QString body = QString("Logs captured at %1\n")
+        QString body = QString("Logs captured at %1 \n")
                                 .arg (dt.toUTC ().toString (Qt::ISODate));
-        body += "qgvdial version = __QGVDIAL_VERSION__\n";
-        body += QString("OS: %1\n").arg(osd.getOSDetails());
+        body += "qgvdial version = __QGVDIAL_VERSION__ \n";
+        body += QString("OS: %1 \n").arg(osd.getOSDetails());
+        body += QString("Logs are in %1 \n").arg(strReply);
         url.addQueryItem ("body", body);
 
         Q_DEBUG(url.toString ());

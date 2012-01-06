@@ -101,6 +101,7 @@
     <ResourceCompile Include="winrsrc.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AsyncTaskToken.h" />
     <ClInclude Include="CacheDatabase.h" />
     <ClInclude Include="CacheDatabase_int.h" />
     <ClInclude Include="CallInitiatorFactory.h" />
@@ -116,6 +117,7 @@
     <ClInclude Include="DialContext.h" />
     <ClInclude Include="global.h" />
     <ClInclude Include="GVAccess.h" />
+    <ClInclude Include="GVApi.h" />
     <ClInclude Include="GVContactsTable.h" />
     <ClInclude Include="GVDataAccess.h" />
     <ClInclude Include="GVInbox.h" />
@@ -127,6 +129,8 @@
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="MobileWebPage.h" />
     <ClInclude Include="MqClientThread.h" />
+    <ClInclude Include="MyXmlErrorHandler.h" />
+    <ClInclude Include="NwReqTracker.h" />
     <ClInclude Include="ObserverFactory.h" />
     <ClInclude Include="OsDependent.h" />
     <ClInclude Include="PhoneNumberValidator.h" />
@@ -148,6 +152,7 @@
     <ClInclude Include="WebWidget.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AsyncTaskToken.cpp" />
     <ClCompile Include="CacheDatabase.cpp" />
     <ClCompile Include="CallInitiatorFactory.cpp" />
     <ClCompile Include="CalloutInitiator.cpp" />
@@ -161,6 +166,7 @@
     <ClCompile Include="DesktopSkypeCallInitiator.cpp" />
     <ClCompile Include="DialContext.cpp" />
     <ClCompile Include="GVAccess.cpp" />
+    <ClCompile Include="GVApi.cpp" />
     <ClCompile Include="GVContactsTable.cpp" />
     <ClCompile Include="GVDataAccess.cpp" />
     <ClCompile Include="GVInbox.cpp" />
@@ -172,6 +178,8 @@
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="MobileWebPage.cpp" />
     <ClCompile Include="MqClientThread.cpp" />
+    <ClCompile Include="MyXmlErrorHandler.cpp" />
+    <ClCompile Include="NwReqTracker.cpp" />
     <ClCompile Include="ObserverFactory.cpp" />
     <ClCompile Include="OsDependent.cpp" />
     <ClCompile Include="PhoneNumberValidator.cpp" />
