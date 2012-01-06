@@ -284,12 +284,12 @@ OsDependent::getOSDetails()
     case QSysInfo::SV_SF_4:
         rv += " ^4 (deprecated)";
         break;
-    case QSysInfo::SV_API_5_3:
-        rv += " API version 5.3 release";
-        break;
-    case QSysInfo::SV_API_5_4:
-        rv += " API version 5.4 release";
-        break;
+//    case QSysInfo::SV_API_5_3:
+//        rv += " API version 5.3 release";
+//        break;
+//    case QSysInfo::SV_API_5_4:
+//        rv += " API version 5.4 release";
+//        break;
     case QSysInfo::SV_Unknown:
         rv += " Unknown";
         break;
