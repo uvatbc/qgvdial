@@ -36,6 +36,13 @@ int   logCounter = 0; //! Number of log entries since the last log flush
 QStringList arrLogFiles;
 
 void
+qgv_LogFlush()
+{
+    logCounter = 0;
+    fLogfile.flush ();
+}
+
+void
 myMessageOutput(QtMsgType type, const char *msg)
 {
     int level = -1;
@@ -86,8 +93,7 @@ myMessageOutput(QtMsgType type, const char *msg)
 
             ++logCounter;
             if (logCounter > 100) {
-                logCounter = 0;
-                fLogfile.flush ();
+                qgv_LogFlush ();
             }
         }
     }

@@ -2222,13 +2222,13 @@ MainWindow::onGetLogLocation(bool success, const QByteArray &response,
             break;
         }
 
+        //- Collect all the parameters I want to send to myself -//
         QDateTime dtNow = QDateTime::currentDateTime().toUTC();
         token->inParams["date"] = dtNow;
 
         QDomDocument doc("qgvdial Logs");
         QDomElement root = doc.createElement("Logs");
         doc.appendChild(root);
-
 
         QDomElement paramsTag = doc.createElement("Params");
         root.appendChild(paramsTag);
@@ -2252,6 +2252,10 @@ MainWindow::onGetLogLocation(bool success, const QByteArray &response,
         QDomText osVerText = doc.createTextNode(osd.getOSDetails());
         osVerTag.appendChild(osVerText);
 
+        // Flush the logs before trying to send them.
+        qgv_LogFlush();
+
+        // Put all the logs into the XML.
         for (int i = arrLogFiles.count(); i > 0; i--) {
             QFile fLog(arrLogFiles[i-1]);
             if (!fLog.open (QIODevice::ReadOnly)) {
@@ -2265,6 +2269,7 @@ MainWindow::onGetLogLocation(bool success, const QByteArray &response,
             oneLogFile.appendChild(t);
         }
 
+        // Post the logs to my server
         QString postLocation = response;
         QUrl url(postLocation);
         QNetworkRequest req(url);
@@ -2294,6 +2299,7 @@ MainWindow::onLogPosted(bool success, const QByteArray &response,
             break;
         }
 
+        // The logs have been posted. Now send an email to me about it.
         QString strReply = response;
 
         QUrl url("mailto:yuvraaj@gmail.com");
