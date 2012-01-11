@@ -1,2 +1,2 @@
-  * Logs can now be uploaded
+  * Flush log file before sending logs to the server
 
