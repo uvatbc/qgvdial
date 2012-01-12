@@ -1,2 +1,2 @@
-  * Flush log file before sending logs to the server
+  * Fix the mosquitto update issue
 

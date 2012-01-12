@@ -113,6 +113,8 @@ GVInbox::refresh (const QDateTime &dtUpdate)
     dateWaterLevel = dtUpdate;
     passedWaterLevel = false;
 
+    Q_DEBUG(QString ("Water level = %1").arg(dateWaterLevel.toString()));
+
     bool rv = connect(token, SIGNAL(completed(AsyncTaskToken*)),
                       this, SLOT(getInboxDone(AsyncTaskToken*)));
     Q_ASSERT(rv); Q_UNUSED(rv);
@@ -152,7 +154,7 @@ GVInbox::oneInboxEntry (const GVInboxEntry &hevent)
         return;
     }
 
-    if (dateWaterLevel.isValid () && (hevent.startTime >= dateWaterLevel)) {
+    if (dateWaterLevel.isValid () && (hevent.startTime < dateWaterLevel)) {
         Q_DEBUG("Water level was =") << dateWaterLevel.toString()
                 << "current entry =" << hevent.startTime.toString();
         passedWaterLevel = true;
