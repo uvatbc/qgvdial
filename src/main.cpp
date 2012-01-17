@@ -69,20 +69,8 @@ myMessageOutput(QtMsgType type, const char *msg)
     // Send to standard output
     cout << strLog.toStdString () << endl;
 
-    QRegExp regex("^\"(.*)\"\\s*");
-    if (strLog.indexOf (regex) != -1) {
-        strLog = regex.cap (1);
-    }
-
-    if (strLog.contains ("password", Qt::CaseInsensitive)) {
-        strLog = QString("%1 : %2 : %3")
-                    .arg(dt.toString ("yyyy-MM-dd hh:mm:ss.zzz"))
-                    .arg(level)
-                    .arg("Log message with password blocked");
-    }
-
     if ((level <= logLevel) && (NULL != pw)) {
-        pw->log (strLog);
+        pw->log (dt, level, strLog);
     }
 
     strLog += '\n';

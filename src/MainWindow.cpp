@@ -61,6 +61,7 @@ MainWindow::MainWindow (QWidget *parent)
 , mqThread (QString("qgvdial:%1").arg(QHostInfo::localHostName())
             .toLatin1().constData (), this)
 #endif
+, bQuitPath (false)
 {
     initLogging ();
 
@@ -140,11 +141,14 @@ MainWindow::initLogging ()
 /** Log information to console and to log file
  * This function is invoked from the qDebug handler that is installed in main.
  * @param strText Text to be logged
- * @param level Log level
  */
 void
-MainWindow::log (const QString &strText)
+MainWindow::log (const QDateTime &dt, int level, QString &strText)
 {
+    if (!strPass.isEmpty() && strText.contains(strPass)) {
+        strText.replace(strPass, "XXXXXX");
+    }
+
     // Append it to the circular buffer
     QMutexLocker locker(&logMutex);
     arrLogMsgs.prepend (strText);
@@ -531,7 +535,7 @@ MainWindow::initQML ()
     QObject *gObj = this->getQMLObject ("MainPage");
     if (NULL == gObj) {
         Q_WARN("Could not get to MainPage");
-        qApp->quit();
+        requestQuit ();
         return;
     }
 
@@ -769,6 +773,8 @@ MainWindow::onPassTextChanged (const QString &strPassword)
     if (strPass != strPassword) {
         strPass = strPassword;
 
+        QList<QNetworkCookie> noCookies;
+        gvApi.setAllCookies(noCookies);
         this->setPassword (strPass);
     }
 }//MainWindow::onUserPassTextChanged
@@ -934,10 +940,17 @@ MainWindow::on_actionE_xit_triggered ()
     mqThread.setQuit ();
 #endif
 
+    requestQuit ();
+}//MainWindow::on_actionE_xit_triggered
+
+void
+MainWindow::requestQuit()
+{
+    bQuitPath = true;
     qApp->quit ();
 
-    QTimer::singleShot (300, this, SLOT(dieNow()));
-}//MainWindow::on_actionE_xit_triggered
+    QTimer::singleShot (1000, this, SLOT(dieNow()));
+}//MainWindow::requestQuit
 
 void
 MainWindow::dieNow()
@@ -1828,14 +1841,19 @@ MainWindow::initMq()
 void
 MainWindow::onMqThreadFinished ()
 {
+    if (bQuitPath) {
+        Q_DEBUG ("Quit path. Get out in a hurry");
+        return;
+    }
+
     if (bRunMqThread) {
         bRunMqThread = false;
 #if MOSQUITTO_CAPABLE
-        qDebug ("Finished waiting for Mq thread, restarting thread.");
+        Q_DEBUG ("Finished waiting for Mq thread, restarting thread.");
         mqThread.start();
 #endif
     } else {
-        qDebug ("Finished waiting for Mq thread. Not restarting");
+        Q_DEBUG ("Finished waiting for Mq thread. Not restarting");
 
         // Just send a command to turn off mosquitto enable
         refreshMqSettings (true);
@@ -2222,6 +2240,9 @@ MainWindow::onGetLogLocation(bool success, const QByteArray &response,
             break;
         }
 
+        // Flush the logs before trying to send them.
+        qgv_LogFlush();
+
         //- Collect all the parameters I want to send to myself -//
         QDateTime dtNow = QDateTime::currentDateTime().toUTC();
         token->inParams["date"] = dtNow;
@@ -2251,9 +2272,6 @@ MainWindow::onGetLogLocation(bool success, const QByteArray &response,
         OsDependent &osd = Singletons::getRef().getOSD ();
         QDomText osVerText = doc.createTextNode(osd.getOSDetails());
         osVerTag.appendChild(osVerText);
-
-        // Flush the logs before trying to send them.
-        qgv_LogFlush();
 
         // Put all the logs into the XML.
         for (int i = arrLogFiles.count(); i > 0; i--) {

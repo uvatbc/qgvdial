@@ -52,6 +52,8 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    void log (const QDateTime &dt, int level, QString &strText);
+
 signals:
     //! Emitted to complete a dial
     void dialCanFinish ();
@@ -60,7 +62,6 @@ signals:
     void regPhoneChange(const QStringList &phones, int index);
 
 public slots:
-    void log (const QString &strText);
     void setStatus (const QString &strText, int timeout = 3000);
 
 private slots:
@@ -252,6 +253,8 @@ private:
 
     bool ensureNwMgr();
 
+    void requestQuit();
+
 private:
     GVApi           gvApi;
 
@@ -329,6 +332,8 @@ private:
     MqClientThread  mqThread;
     bool            bRunMqThread;
 #endif
+
+    bool            bQuitPath;
 };
 
 #endif // MAINWINDOW_H
