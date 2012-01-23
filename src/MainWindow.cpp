@@ -62,6 +62,7 @@ MainWindow::MainWindow (QWidget *parent)
             .toLatin1().constData (), this)
 #endif
 , bQuitPath (false)
+, displayInfo (this)
 {
     initLogging ();
 
@@ -143,7 +144,7 @@ MainWindow::initLogging ()
  * @param strText Text to be logged
  */
 void
-MainWindow::log (const QDateTime &dt, int level, QString &strText)
+MainWindow::log (const QDateTime & /*dt*/, int /*level*/, QString &strText)
 {
     if (!strPass.isEmpty() && strText.contains(strPass)) {
         strText.replace(strPass, "XXXXXX");
@@ -510,7 +511,7 @@ MainWindow::initQML ()
     bool bTempFalse = false;
     int iTempZero = 0;
 
-    // Prepare the glabally accessible variants for QML.
+    // Prepare the globally accessible variants for QML.
     QDeclarativeContext *ctx = this->rootContext();
     ctx->setContextProperty ("g_bShowMsg", bTempFalse);
     ctx->setContextProperty ("g_registeredPhonesModel", &modelRegNumber);
@@ -525,7 +526,7 @@ MainWindow::initQML ()
     // Initialize the QML view
     this->setSource (QUrl(osd.getMainQML()));
 
-    onDesktopResized ();
+    onOrientationChanged (displayInfo.orientation(0));
     this->setResizeMode (QDeclarativeView::SizeRootObjectToView);
 
     this->setUsername ("example@gmail.com");
@@ -539,71 +540,72 @@ MainWindow::initQML ()
         return;
     }
 
-    bool bOk;
+    bool rv;
     // Connect all signals to slots in this class.
-    bOk = connect (gObj, SIGNAL (sigCall (QString)),
+    rv = connect (gObj, SIGNAL (sigCall (QString)),
                    this, SLOT   (dialNow (QString)));
-    Q_ASSERT(bOk);
-    if (!bOk) { exit(1); }
-    bOk = connect (
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+    rv = connect (
         gObj, SIGNAL (sigText (const QString &, const QString &)),
         this, SLOT   (onSigText (const QString &, const QString &)));
-    Q_ASSERT(bOk);
-    if (!bOk) { exit(1); }
-    bOk = connect (gObj, SIGNAL (sigVoicemail (QString)),
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+    rv = connect (gObj, SIGNAL (sigVoicemail (QString)),
                    this, SLOT   (retrieveVoicemail (const QString &)));
-    Q_ASSERT(bOk);
-    if (!bOk) { exit(1); }
-    bOk = connect (gObj, SIGNAL (sigVmailPlayback (int)),
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+    rv = connect (gObj, SIGNAL (sigVmailPlayback (int)),
                    this, SLOT   (onSigVmailPlayback (int)));
-    Q_ASSERT(bOk);
-    if (!bOk) { exit(1); }
-    bOk = connect (gObj, SIGNAL (sigSelChanged (int)),
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+    rv = connect (gObj, SIGNAL (sigSelChanged (int)),
                    this, SLOT   (onRegPhoneSelectionChange (int)));
-    Q_ASSERT(bOk);
-    if (!bOk) { exit(1); }
-    bOk = connect (gObj   , SIGNAL (sigInboxSelect (QString)),
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+    rv = connect (gObj   , SIGNAL (sigInboxSelect (QString)),
                    &oInbox, SLOT   (onInboxSelected (const QString &)));
-    Q_ASSERT(bOk);
-    if (!bOk) { exit(1); }
-    bOk = connect (gObj   , SIGNAL (sigMarkAsRead (QString)),
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+    rv = connect (gObj   , SIGNAL (sigMarkAsRead (QString)),
                    &oInbox, SLOT   (onSigMarkAsRead (const QString &)));
-    Q_ASSERT(bOk);
-    if (!bOk) { exit(1); }
-    bOk = connect (gObj, SIGNAL (sigCloseVmail ()),
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+    rv = connect (gObj, SIGNAL (sigCloseVmail ()),
                    this, SLOT   (onSigCloseVmail ()));
-    Q_ASSERT(bOk);
-    if (!bOk) { exit(1); }
-    bOk = connect (gObj, SIGNAL (sigHide ()),
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+    rv = connect (gObj, SIGNAL (sigHide ()),
                    this, SLOT   (onSigHide ()));
-    Q_ASSERT(bOk);
-    if (!bOk) { exit(1); }
-    bOk = connect (gObj, SIGNAL (sigQuit ()),
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+    rv = connect (gObj, SIGNAL (sigQuit ()),
                    this, SLOT   (on_actionE_xit_triggered ()));
-    Q_ASSERT(bOk);
-    if (!bOk) { exit(1); }
-    if (!bOk) { exit(1); }
-    bOk = connect (gObj, SIGNAL (sigMsgBoxDone(bool)),
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+    if (!rv) { exit(1); }
+    rv = connect (gObj, SIGNAL (sigMsgBoxDone(bool)),
                    this, SLOT (onSigMsgBoxDone(bool)));
-    Q_ASSERT(bOk);
-    if (!bOk) { exit(1); }
-    bOk = connect (
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+    rv = connect (
         gObj      , SIGNAL  (sigSearchContacts(const QString &)),
         &oContacts, SLOT (onSearchQueryChanged(const QString &)));
-    Q_ASSERT(bOk);
-    if (!bOk) { exit(1); }
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
 
     // Now do the settings page
     if (!connectSettingsSignals ()) {
         exit (1);
     }
 
-#if MOBILE_OS
-    bOk = connect(qApp->desktop(), SIGNAL(resized(int)),
-                  this           , SLOT(onDesktopResized()));
-    Q_ASSERT(bOk);
-    if (!bOk) { exit(1); }
-#endif
+    // Get notified about orientation changes
+    rv = connect (&displayInfo,
+        SIGNAL(orientationChanged(QSystemDisplayInfo::DisplayOrientation)),
+        this,
+        SLOT(onOrientationChanged(QSystemDisplayInfo::DisplayOrientation)));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
 
 #if DESKTOP_OS
     Qt::WindowFlags flags = this->windowFlags ();
@@ -2138,7 +2140,7 @@ MainWindow::onTwoStepAuthentication(AsyncTaskToken *token)
 }//MainWindow::onTwoStepAuthentication
 
 void
-MainWindow::onDesktopResized()
+MainWindow::onOrientationChanged(QSystemDisplayInfo::DisplayOrientation o)
 {
     QObject *pMain = this->rootObject ();
     if (NULL == pMain) {
@@ -2146,11 +2148,13 @@ MainWindow::onDesktopResized()
         return;
     }
 
+    Q_DEBUG(QString("Orientation changed to %1").arg(int(o)));
+
     OsDependent &osd = Singletons::getRef().getOSD ();
     QRect rect = osd.getStartingSize ();
     pMain->setProperty("height", rect.height());
     pMain->setProperty("width", rect.width());
-}//MainWindow::onDesktopResized
+}//MainWindow::onOrientationChanged
 
 QObject *
 MainWindow::getQMLObject(const char *pageName)

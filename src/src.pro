@@ -8,7 +8,8 @@ QT      *= core gui sql xml xmlpatterns script declarative phonon
 TARGET   = qgvdial
 TEMPLATE = app
 
-CONFIG  *= precompile_header
+CONFIG  *= precompile_header mobility
+MOBILITY *= systeminfo
 
 include(qtsingleapplication/qtsingleapplication.pri)
 

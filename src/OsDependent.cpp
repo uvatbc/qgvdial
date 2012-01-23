@@ -156,10 +156,13 @@ OsDependent::getStartingSize ()
 #if DESKTOP_OS
     rect.setWidth (250);
     rect.setHeight (400);
-    qDebug() << "Using desktop settings." << rect;
-#else
+    Q_DEBUG("Using desktop settings.") << rect;
+#elif defined(Q_WS_MAEMO_5)
     rect = qApp->desktop()->screenGeometry ();
-    qDebug() << "Using mobile settings." << rect;
+    Q_DEBUG("Using maemo settings.") << rect;
+#elif defined(MEEGO_HARMATTAN)
+    rect = qApp->desktop()->screenGeometry ();
+    Q_DEBUG("Using harmattan settings.") << rect;
 #endif
 
     return rect;
