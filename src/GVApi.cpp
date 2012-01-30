@@ -814,6 +814,8 @@ GVApi::onTFAAutoPost(bool success, const QByteArray &response,
 bool
 GVApi::getRnr(void *ctx)
 {
+    Q_DEBUG("User authenticated, now looking for RNR.");
+
     bool rv = doGet("https://www.google.com/voice/m/i/all", ctx, this,
                     SLOT (onGotRnr(bool, const QByteArray &,
                                    QNetworkReply *, void *)));
@@ -869,7 +871,8 @@ GVApi::onGotRnr(bool success, const QByteArray &response,
     } while (0); // End cleanup block (not a loop)
 
     if (!success) {
-        Q_WARN("Login failed.") << strResponse;
+        Q_WARN("Failed to get RNR. User cannot be authenticated.")
+                << strResponse;
 
         if (token) {
             token->status = ATTS_LOGIN_FAILURE;
