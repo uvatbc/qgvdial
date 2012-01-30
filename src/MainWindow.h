@@ -32,7 +32,7 @@ Contact: yuvraaj@gmail.com
 #include <QtDeclarative>
 #include <phonon/MediaObject>
 
-#include <QSystemDisplayInfo>
+#include <QtSystemInfo/QSystemDisplayInfo>
 QTM_USE_NAMESPACE
 
 #if MOSQUITTO_CAPABLE
