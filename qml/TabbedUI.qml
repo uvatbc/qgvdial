@@ -42,8 +42,7 @@ Rectangle {
         tabClicked(tabIndex);
     }
 
-    function tabClicked(index)
-    {
+    function tabClicked(index) {
         // unselect the currently selected tab
         tabs.children[tabIndex].color = "transparent";
 
@@ -107,6 +106,8 @@ Rectangle {
 
         Rectangle {
             id: rectX
+            objectName: "CloseButton"
+
             color: "black"
             anchors.right: tabBar.right
             width: tabBar.height
@@ -141,7 +142,7 @@ Rectangle {
 
             anchors {
                 left: tabBar.left
-                right: rectX.left
+                right: rectX.visible ? rectX.left : rectX.right
                 top: parent.top
                 bottom: parent.bottom
             }

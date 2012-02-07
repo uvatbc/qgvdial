@@ -48,8 +48,7 @@ Singletons::getOSD ()
 CacheDatabase &
 Singletons::getDBMain ()
 {
-    if (NULL == dbMain)
-    {
+    if (NULL == dbMain) {
         dbMain = new CacheDatabase (QSqlDatabase::addDatabase("QSQLITE"));
     }
     return (*dbMain);

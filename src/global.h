@@ -35,7 +35,7 @@ Contact: yuvraaj@gmail.com
 
 #define APPLICATION_NAME "qgvdial"
 
-#define UA_N900   "Mozilla/5.0 (X11; U; Linux armv7l; en-GB; rv:1.9.2a1pre) Gecko/20090928 Firefox/3.5 Maemo Browser 1.4.1.21 RX-51 N900"
+#define UA_N900    "Mozilla/5.0 (X11; U; Linux armv7l; en-GB; rv:1.9.2a1pre) Gecko/20090928 Firefox/3.5 Maemo Browser 1.4.1.21 RX-51 N900"
 #define UA_IPHONE  "Mozilla/5.0 (iPhone; U; CPU iPhone OS 3_0 like Mac OS X; en-us) AppleWebKit/528.18 (KHTML, like Gecko) Version/4.0 Mobile/7A341 Safari/528.16"
 #define UA_IPHONE4 "Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_3_1 like Mac OS X; zh-tw) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8G4 Safari/6533.18.5"
 #define UA_IPOD    "Mozilla/5.0 (iPod; U; CPU iPhone OS 4_3_3 like Mac OS X; ja-jp) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8J2 Safari/6533.18.5"
@@ -50,7 +50,7 @@ Contact: yuvraaj@gmail.com
 #define GV_ACCOUNT_SMSAUTH      GOOGLE_ACCOUNTS "/SmsAuth"
 #define GV_CLIENTLOGIN          GOOGLE_ACCOUNTS "/ClientLogin"
 
-#define LOGS_SERVER "http://ec2-50-18-18-251.us-west-1.compute.amazonaws.com"
+#define LOGS_SERVER "http://www.yuvraaj.net"
 
 #define POST_FORM "application/x-www-form-urlencoded"
 #define POST_TEXT "text/plain"

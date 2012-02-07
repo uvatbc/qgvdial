@@ -551,40 +551,40 @@ MainWindow::initQML ()
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
     rv = connect (gObj, SIGNAL (sigVoicemail (QString)),
-                   this, SLOT   (retrieveVoicemail (const QString &)));
+                  this, SLOT   (retrieveVoicemail (const QString &)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
     rv = connect (gObj, SIGNAL (sigVmailPlayback (int)),
-                   this, SLOT   (onSigVmailPlayback (int)));
+                  this, SLOT   (onSigVmailPlayback (int)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
     rv = connect (gObj, SIGNAL (sigSelChanged (int)),
-                   this, SLOT   (onRegPhoneSelectionChange (int)));
+                  this, SLOT   (onRegPhoneSelectionChange (int)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
     rv = connect (gObj   , SIGNAL (sigInboxSelect (QString)),
-                   &oInbox, SLOT   (onInboxSelected (const QString &)));
+                  &oInbox, SLOT   (onInboxSelected (const QString &)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
     rv = connect (gObj   , SIGNAL (sigMarkAsRead (QString)),
-                   &oInbox, SLOT   (onSigMarkAsRead (const QString &)));
+                  &oInbox, SLOT   (onSigMarkAsRead (const QString &)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
     rv = connect (gObj, SIGNAL (sigCloseVmail ()),
-                   this, SLOT   (onSigCloseVmail ()));
+                  this, SLOT   (onSigCloseVmail ()));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
     rv = connect (gObj, SIGNAL (sigHide ()),
-                   this, SLOT   (onSigHide ()));
+                  this, SLOT   (onSigHide ()));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
     rv = connect (gObj, SIGNAL (sigQuit ()),
-                   this, SLOT   (on_actionE_xit_triggered ()));
+                  this, SLOT   (on_actionE_xit_triggered ()));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
     if (!rv) { exit(1); }
     rv = connect (gObj, SIGNAL (sigMsgBoxDone(bool)),
-                   this, SLOT (onSigMsgBoxDone(bool)));
+                  this, SLOT (onSigMsgBoxDone(bool)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
     rv = connect (
@@ -606,11 +606,12 @@ MainWindow::initQML ()
 #if DESKTOP_OS
     Qt::WindowFlags flags = this->windowFlags ();
     flags |= Qt::CustomizeWindowHint;
-    flags &= ~(Qt::WindowTitleHint | Qt::WindowSystemMenuHint |
-               Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint |
-               Qt::WindowCloseButtonHint);
+    flags &= ~(Qt::WindowTitleHint | Qt::WindowMaximizeButtonHint);
     this->setWindowFlags (flags);
     this->setFixedSize(this->size());
+
+    gObj = getQMLObject ("CloseButton");
+    gObj->setProperty ("visible", (bool)false);
 #endif
 
 }//MainWindow::initQML

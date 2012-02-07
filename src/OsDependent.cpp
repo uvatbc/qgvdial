@@ -173,6 +173,9 @@ OsDependent::getStartingSize ()
         rect = QRect(0,0, 854, 480);
     }
     Q_DEBUG("Using harmattan settings.") << rect;
+#elif defined(Q_OS_SYMBIAN)
+    rect = qApp->desktop()->screenGeometry ();
+    Q_DEBUG("Using Symbian settings.") << rect;
 #endif
 
     return rect;

@@ -1,3 +1,5 @@
   * GVApi: Removed duplicated log message
   * TpObserver: this should fix the crashes on Telepathy capable platforms on incoming phone calls.
+  * Fix orientation code so that compilation works. Also made display size fixed on all platforms except Symbian.
+  * Desktop version gets back its borders, without resize and maximize
 
