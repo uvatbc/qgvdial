@@ -1,2 +1,3 @@
-  * Fix the mosquitto update issue
+  * GVApi: Removed duplicated log message
+  * TpObserver: this should fix the crashes on Telepathy capable platforms on incoming phone calls.
 

@@ -59,8 +59,42 @@ TpObserver::observeChannels(
         const QList<ChannelRequestPtr>      &requestsSatisfied,
         const ObserverInfo                  &observerInfo)
 {
-    observeChannels (context, account, connection, channels, dispatchOperation,
-                     requestsSatisfied, observerInfo.allInfo ());
+    bool bOk;
+    QString msg;
+    Q_DEBUG ("TpObserver: Observer got something!");
+
+    if (strContact.isEmpty ()) {
+        context->setFinished ();
+        Q_DEBUG ("TpObserver: But we weren't asked to notify anything");
+        return;
+    }
+
+    msg = QString("TpObserver: There are %1 channels in channels list")
+            .arg (channels.length ());
+    Q_DEBUG (msg);
+
+    foreach (ChannelPtr channel, channels) {
+        if (!channel->isReady ()) {
+            Q_DEBUG ("TpObserver: Channel is not ready");
+
+            ChannelAccepter *closer =
+            new ChannelAccepter(context,
+                                account,
+                                connection,
+                                channels,
+                                dispatchOperation,
+                                requestsSatisfied,
+                                observerInfo.allInfo (),
+                                channel,
+                                strContact,
+                                this);
+            bOk = connect (closer, SIGNAL (callStarted ()),
+                           this  , SIGNAL (callStarted ()));
+            Q_ASSERT(bOk);
+            closer->init ();
+            break;
+        }
+    }
 }//TpObserver::observeChannels
 
 QString

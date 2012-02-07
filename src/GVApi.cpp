@@ -629,7 +629,6 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
 
         // If "gvx" was found, then we're logged in.
         if (!loggedIn) {
-            Q_WARN("Login failed!") << strResponse;
             success = false;
             break;
         }
