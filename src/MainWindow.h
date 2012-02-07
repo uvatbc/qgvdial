@@ -32,9 +32,6 @@ Contact: yuvraaj@gmail.com
 #include <QtDeclarative>
 #include <phonon/MediaObject>
 
-#include <QtSystemInfo/QSystemDisplayInfo>
-QTM_USE_NAMESPACE
-
 #if MOSQUITTO_CAPABLE
 #include "MqClientThread.h"
 #endif
@@ -200,8 +197,7 @@ private slots:
     //! When two step authentication happens
     void onTwoStepAuthentication(AsyncTaskToken *token);
 
-    //! Invoked when the desktop is resized (useful only on mobile platforms)
-    void onOrientationChanged(QSystemDisplayInfo::DisplayOrientation o);
+    void onOrientationChanged(OsIndependentOrientation o);
 
     //! When the user needs to send me logs
     void onSigSendLogs();
@@ -218,6 +214,7 @@ private:
     //! Initialize the QML view
     void initQML ();
     bool connectSettingsSignals();
+
 
     void initContacts ();
     void deinitContacts ();
@@ -337,8 +334,6 @@ private:
 #endif
 
     bool            bQuitPath;
-
-    QSystemDisplayInfo  displayInfo;
 };
 
 #endif // MAINWINDOW_H

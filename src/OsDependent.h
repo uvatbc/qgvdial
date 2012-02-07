@@ -39,9 +39,20 @@ Contact: yuvraaj@gmail.com
 #include <openssl/aes.h>
 #include <openssl/evp.h>
 
+#include <QtSystemInfo/QSystemDisplayInfo>
+QTM_USE_NAMESPACE
+
 // For some reason the symbian MOC doesn't like it if I don't include QObject
 // even though it is present in QtCore which is included in global.h
 #include <QObject>
+
+enum OsIndependentOrientation {
+    OIO_Unknown = 0,
+    OIO_Landscape,
+    OIO_Portrait,
+    OIO_InvertedLandscape,
+    OIO_InvertedPortrait
+};
 
 class OsDependent : public QObject
 {
@@ -66,8 +77,24 @@ public:
 
     QString getOSDetails();
 
+    OsIndependentOrientation getOrientation(void);
+
+signals:
+    void orientationChanged (OsIndependentOrientation o);
+
 private:
     OsDependent(QObject *parent = 0);
+
+private slots:
+#if QTM_VERSION >= 0x010200
+    //! Invoked when the desktop is resized (useful only on mobile platforms)
+    void onOrientationChanged(QSystemDisplayInfo::DisplayOrientation o);
+#else
+    void desktopResized(int screen);
+#endif
+
+private:
+    QSystemDisplayInfo  displayInfo;
 
     friend class Singletons;
 };

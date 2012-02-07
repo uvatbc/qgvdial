@@ -62,7 +62,6 @@ MainWindow::MainWindow (QWidget *parent)
             .toLatin1().constData (), this)
 #endif
 , bQuitPath (false)
-, displayInfo (this)
 {
     initLogging ();
 
@@ -526,7 +525,7 @@ MainWindow::initQML ()
     // Initialize the QML view
     this->setSource (QUrl(osd.getMainQML()));
 
-    onOrientationChanged (displayInfo.orientation(0));
+    onOrientationChanged (osd.getOrientation ());
     this->setResizeMode (QDeclarativeView::SizeRootObjectToView);
 
     this->setUsername ("example@gmail.com");
@@ -599,11 +598,8 @@ MainWindow::initQML ()
         exit (1);
     }
 
-    // Get notified about orientation changes
-    rv = connect (&displayInfo,
-        SIGNAL(orientationChanged(QSystemDisplayInfo::DisplayOrientation)),
-        this,
-        SLOT(onOrientationChanged(QSystemDisplayInfo::DisplayOrientation)));
+    rv = connect (&osd, SIGNAL(orientationChanged(OsIndependentOrientation)),
+                  this, SLOT(onOrientationChanged(OsIndependentOrientation)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
 
@@ -2140,7 +2136,7 @@ MainWindow::onTwoStepAuthentication(AsyncTaskToken *token)
 }//MainWindow::onTwoStepAuthentication
 
 void
-MainWindow::onOrientationChanged(QSystemDisplayInfo::DisplayOrientation o)
+MainWindow::onOrientationChanged(OsIndependentOrientation o)
 {
     QObject *pMain = this->rootObject ();
     if (NULL == pMain) {
@@ -2148,13 +2144,11 @@ MainWindow::onOrientationChanged(QSystemDisplayInfo::DisplayOrientation o)
         return;
     }
 
-    Q_DEBUG(QString("Orientation changed to %1").arg(int(o)));
-
     OsDependent &osd = Singletons::getRef().getOSD ();
     QRect rect = osd.getStartingSize ();
     pMain->setProperty("height", rect.height());
     pMain->setProperty("width", rect.width());
-}//MainWindow::onOrientationChanged
+}//MainWindow::resetWindowSize
 
 QObject *
 MainWindow::getQMLObject(const char *pageName)

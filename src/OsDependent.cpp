@@ -152,21 +152,119 @@ OsDependent::setLongWork (QWidget *window, bool bSet /*= false*/)
 QRect
 OsDependent::getStartingSize ()
 {
+    OsIndependentOrientation o = getOrientation();
     QRect rect;
+
 #if DESKTOP_OS
-    rect.setWidth (250);
-    rect.setHeight (400);
+    Q_UNUSED(o);
+    rect = QRect(0,0, 250, 400);
     Q_DEBUG("Using desktop settings.") << rect;
 #elif defined(Q_WS_MAEMO_5)
-    rect = qApp->desktop()->screenGeometry ();
+    if (o == OIO_Portrait) {
+        rect = QRect(0,0, 480, 800);
+    } else {
+        rect = QRect(0,0, 800, 480);
+    }
     Q_DEBUG("Using maemo settings.") << rect;
 #elif defined(MEEGO_HARMATTAN)
-    rect = qApp->desktop()->screenGeometry ();
+    if (o == OIO_Portrait) {
+        rect = QRect(0,0, 480, 854);
+    } else {
+        rect = QRect(0,0, 854, 480);
+    }
     Q_DEBUG("Using harmattan settings.") << rect;
 #endif
 
     return rect;
 }//OsDependent::getStartingSize
+
+#if QTM_VERSION >= 0x010200
+void
+OsDependent::onOrientationChanged(QSystemDisplayInfo::DisplayOrientation o)
+{
+    OsIndependentOrientation emitValue = OIO_Unknown;
+    Q_DEBUG(QString("Orientation changed to %1").arg(int(o)));
+    switch (o) {
+    case QSystemDisplayInfo::Landscape:
+        emitValue = OIO_Landscape;
+        break;
+    case QSystemDisplayInfo::Portrait:
+        emitValue = OIO_Portrait;
+        break;
+    case QSystemDisplayInfo::InvertedLandscape:
+        emitValue = OIO_InvertedLandscape;
+        break;
+    case QSystemDisplayInfo::InvertedPortrait:
+        emitValue = OIO_InvertedPortrait;
+        break;
+    case QSystemDisplayInfo::Unknown:
+    default:
+        break;
+    }
+
+#if DESKTOP_OS
+    emitValue = OIO_Portrait;
+#endif
+
+    emit orientationChanged (emitValue);
+}//OsDependent::onOrientationChanged
+#else
+void
+OsDependent::desktopResized(int /*screen*/)
+{
+    OsIndependentOrientation emitValue = OIO_Portrait;
+
+    QRect screenGeometry = QApplication::desktop()->screenGeometry();
+    if (screenGeometry.width() > screenGeometry.height()) {
+        emitValue = OIO_Landscape;
+    }
+
+#if DESKTOP_OS
+    emitValue = OIO_Portrait;
+#endif
+
+    emit orientationChanged (emitValue);
+}//OsDependent::desktopResized
+#endif
+
+OsIndependentOrientation
+OsDependent::getOrientation(void)
+{
+    OsIndependentOrientation rv = OIO_Unknown;
+
+#if QTM_VERSION >= 0x010200
+    switch (displayInfo.orientation(0)) {
+    case QSystemDisplayInfo::Landscape:
+        rv = OIO_Landscape;
+        break;
+    case QSystemDisplayInfo::Portrait:
+        rv = OIO_Portrait;
+        break;
+    case QSystemDisplayInfo::InvertedLandscape:
+        rv = OIO_InvertedLandscape;
+        break;
+    case QSystemDisplayInfo::InvertedPortrait:
+        rv = OIO_InvertedPortrait;
+        break;
+    case QSystemDisplayInfo::Unknown:
+    default:
+        break;
+    }
+#else
+    QRect screenGeometry = QApplication::desktop()->screenGeometry();
+    if (screenGeometry.width() > screenGeometry.height()) {
+        rv = OIO_Landscape;
+    } else {
+        rv = OIO_Portrait;
+    }
+#endif
+
+#if DESKTOP_OS
+    rv = OIO_Portrait;
+#endif
+
+    return (rv);
+}//OsDependent::getOrientation
 
 QString
 OsDependent::getAppDirectory ()
