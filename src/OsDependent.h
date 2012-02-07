@@ -39,8 +39,14 @@ Contact: yuvraaj@gmail.com
 #include <openssl/aes.h>
 #include <openssl/evp.h>
 
+#if !defined(Q_OS_SYMBIAN)
 #include <QtSystemInfo/QSystemDisplayInfo>
 QTM_USE_NAMESPACE
+#endif
+
+#ifndef QTM_VERSION
+#define QTM_VERSION 0x010000
+#endif
 
 // For some reason the symbian MOC doesn't like it if I don't include QObject
 // even though it is present in QtCore which is included in global.h
@@ -94,7 +100,9 @@ private slots:
 #endif
 
 private:
+#if QTM_VERSION >= 0x010200
     QSystemDisplayInfo  displayInfo;
+#endif
 
     friend class Singletons;
 };

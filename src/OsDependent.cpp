@@ -39,6 +39,19 @@ OsDependent::init ()
     Tp::enableWarnings(true);
 #endif
 #endif
+
+    bool rv; Q_UNUSED(rv);
+#if QTM_VERSION >= 0x010200
+    rv =
+    connect(&displayInfo,
+            SIGNAL(orientationChanged(QSystemDisplayInfo::DisplayOrientation)),
+            this,
+            SLOT(onOrientationChanged(QSystemDisplayInfo::DisplayOrientation)));
+#else
+    rv = connect (qApp->desktop(), SIGNAL(resized(int)),
+                  this           , SLOT(desktopResized(int)));
+#endif
+    Q_ASSERT(rv);
 }//OsDependent::init
 
 bool
