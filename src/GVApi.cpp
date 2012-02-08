@@ -25,6 +25,8 @@ Contact: yuvraaj@gmail.com
 
 #include <QtXmlPatterns>
 
+#define ALWAYS_FAIL_DIALING 0
+
 GVApi::GVApi(bool bEmitLog, QObject *parent)
 : QObject(parent)
 , emitLog(bEmitLog)
@@ -1529,6 +1531,12 @@ GVApi::callOut(AsyncTaskToken *token)
         return false;
     }
 
+#if ALWAYS_FAIL_DIALING
+    token->status = ATTS_FAILURE;
+    token->emitCompleted ();
+    return (true);
+#endif
+
     // Ensure that the params  are valid
     if (!token->inParams.contains ("destination"))
     {
@@ -1637,6 +1645,12 @@ GVApi::callBack(AsyncTaskToken *token)
     if (!token) {
         return false;
     }
+
+#if ALWAYS_FAIL_DIALING
+    token->status = ATTS_FAILURE;
+    token->emitCompleted ();
+    return (true);
+#endif
 
     // Ensure that the params  are valid
     if (!token->inParams.contains ("destination"))
