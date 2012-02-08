@@ -77,7 +77,7 @@ print "$cmd\n";
 system($cmd);
 
 # Do everything upto the preparation of the debian directory. Code is still not compiled.
-$cmd = "cd $basedir && $mad qmake && $mad dh_make --createorig --single -e yuvraaj\@gmail.com -c lgpl";
+$cmd = "cd $basedir && $mad qmake && $mad dh_make -n --createorig --single -e yuvraaj\@gmail.com -c lgpl2";
 print "$cmd\n";
 system($cmd);
 

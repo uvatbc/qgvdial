@@ -9,7 +9,7 @@ system("rm -f ../build-files/qgvdial.Call.service");
 system("rm -f ../build-files/qgvdial.Text.service");
 system("rm -f ../build-files/qgvdial.desktop");
 
-system("dh_make -p qgvdial_2 --createorig --single -e yuvraaj\@gmail.com -c lgpl");
+system("dh_make -n -p qgvdial_2 --createorig --single -e yuvraaj\@gmail.com -c lgpl2");
 
 # Add a post install file to add the executable bit after installation on the device
 system("cp ../build-files/postinst.harmattan-qgvdial debian/postinst");
