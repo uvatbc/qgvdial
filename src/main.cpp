@@ -80,17 +80,13 @@ myMessageOutput(QtMsgType type, const char *msg)
             fLogfile.write(strLog.toLatin1 ());
 
             ++logCounter;
-            if (logCounter > 100) {
+            if (logCounter > 20) {
                 qgv_LogFlush ();
             }
         }
     }
 
     if (NULL == pOldHandler) {
-        if (NULL == pw) {
-            fwrite (strLog.toLatin1 (), strLog.size (), 1, stderr);
-        }
-
         if (QtFatalMsg == type) {
             abort();
         }
@@ -136,9 +132,6 @@ deinitLogging ()
 int
 main (int argc, char *argv[])
 {
-    cout << "Help! I'm here!" << endl;
-    cout << __FUNCTION__ << __LINE__ << endl;
-
 #if defined(Q_WS_S60)
     MainApp::setAttribute (Qt::AA_S60DontConstructApplicationPanes);
 #endif

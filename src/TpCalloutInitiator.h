@@ -47,6 +47,7 @@ public slots:
 private slots:
     void onConnectionChanged (const Tp::ConnectionPtr &connection);
     void onConnectionChanged (Tp::ConnectionStatus, Tp::ConnectionStatusReason);
+    void onConnectionChanged (Tp::ConnectionStatus);
 
     void onChannelReady (Tp::PendingOperation *op);
     void onConnectionReady (Tp::PendingOperation *op);

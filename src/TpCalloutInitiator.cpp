@@ -36,21 +36,35 @@ TpCalloutInitiator::TpCalloutInitiator (Tp::AccountPtr act, QObject *parent)
 , strSelfNumber("undefined")
 , bIsSpirit (false)
 {
-    bool rv = connect (
-        account.data (), SIGNAL(connectionChanged(const Tp::ConnectionPtr &)),
-        this, SLOT(onConnectionChanged(const Tp::ConnectionPtr &)));
-    if (!rv) {
-        Q_WARN("Failed to connect connectionChanged on Callout initiator");
+    // At least one of these is bound to work
+    int success = 0;
+    
+    bool rv = connect (account.data (),
+                       SIGNAL(connectionChanged(const Tp::ConnectionPtr &)),
+                       this,
+                       SLOT(onConnectionChanged(const Tp::ConnectionPtr &)));
+    if (rv) {
+        success++;
     }
 
-    rv = connect (
-        account.data(),
+    rv = connect (account.data(),
         SIGNAL(connectionStatusChanged(Tp::ConnectionStatus,
                                        Tp::ConnectionStatusReason)),
         this, SLOT(onConnectionChanged(Tp::ConnectionStatus,
                                        Tp::ConnectionStatusReason)));
-    if (!rv) {
-        Q_WARN("Failed to connect connectionStatusChanged on Callout initiator");
+    if (rv) {
+        success++;
+    }
+
+    rv = connect (account.data(),
+        SIGNAL(connectionStatusChanged(Tp::ConnectionStatus)),
+        this, SLOT(onConnectionChanged(Tp::ConnectionStatus)));
+    if (rv) {
+        success++;
+    }
+
+    if (0 == success) {
+        Q_WARN("Failed to connect connectionStatusChanged");
     }
 
     Tp::ConnectionPtr connection = account->connection();
@@ -58,23 +72,33 @@ TpCalloutInitiator::TpCalloutInitiator (Tp::AccountPtr act, QObject *parent)
 }//TpCalloutInitiator::TpCalloutInitiator
 
 void
-TpCalloutInitiator::onConnectionChanged (Tp::ConnectionStatus,
-                                         Tp::ConnectionStatusReason)
+TpCalloutInitiator::onConnectionChanged (Tp::ConnectionStatus)
 {
     Tp::ConnectionPtr connection = account->connection();
     onConnectionChanged (connection);
+}//TpCalloutInitiator::onConnectionChanged
+
+void
+TpCalloutInitiator::onConnectionChanged (Tp::ConnectionStatus s,
+                                         Tp::ConnectionStatusReason)
+{
+    onConnectionChanged (s);
 }
 
 void
 TpCalloutInitiator::onConnectionChanged (const Tp::ConnectionPtr &connection)
 {
-    if (!connection.isNull ())
-    {
+    if (!connection.isNull ()) {
         bool rv = connect (connection->becomeReady (),
                           SIGNAL (finished (Tp::PendingOperation *)),
                           this,
                           SLOT (onConnectionReady (Tp::PendingOperation *)));
-        Q_ASSERT(rv); Q_UNUSED(rv);
+        if (!rv) {
+            Q_WARN("CAnnot connect to connectionready signal");
+            Q_ASSERT(rv);
+        }
+    } else {
+        Q_WARN("Connection is NULL");
     }
 }//TpCalloutInitiator::onConnectionChanged
 
@@ -84,25 +108,24 @@ TpCalloutInitiator::onConnectionReady (Tp::PendingOperation *op)
     QString msg;
     do { // Begin cleanup block (not a loop)
         if (op->isError ()) {
-            qWarning ("Connection could not become ready");
+            Q_WARN ("Connection could not become ready");
             break;
         }
 
         // Whenever the account changes state, we change state.
         bool rv = connect (account.data (), SIGNAL(stateChanged(bool)),
-                          this           , SIGNAL(changed()));
+                           this           , SIGNAL(changed()));
         Q_ASSERT(rv); Q_UNUSED(rv);
 
         Tp::ContactPtr contact = account->connection()->selfContact();
-        if (!contact.isNull ())
-        {
+        if (!contact.isNull ()) {
             msg = QString ("Got contact!! id = \"%1\", alias = \"%1\"")
                           .arg(contact->id())
                           .arg(contact->alias());
-            qWarning () << msg;
+            Q_WARN (msg);
             break;
         }
-        qDebug ("Self Contact is null");
+        Q_DEBUG ("Self Contact is null");
 
         strActCmName = account->cmName ();
         if (strActCmName == "spirit") {
@@ -110,8 +133,7 @@ TpCalloutInitiator::onConnectionReady (Tp::PendingOperation *op)
             bIsSpirit = true;
         }
 
-        if (strActCmName == "sofiasip")
-        {
+        if (strActCmName == "sofiasip") {
             strActCmName = "SIP";
             strSelfNumber = account->parameters()["auth-user"].toString();
             if (!strSelfNumber.isEmpty ()) {
@@ -132,7 +154,7 @@ TpCalloutInitiator::onConnectionReady (Tp::PendingOperation *op)
 
         msg = QString ("Yet to figure out how to get phone number from %1")
               .arg (account->cmName ());
-        qDebug () << msg;
+        Q_DEBUG (msg);
 
         // We can find out some information about this account
         QVariantMap varMap = account->parameters ();
@@ -142,7 +164,7 @@ TpCalloutInitiator::onConnectionReady (Tp::PendingOperation *op)
             msg = QString ("\tkey = \"%1\", value = \"%2\"")
                   .arg(i.key())
                   .arg (i.value().toString ());
-            qDebug () << msg;
+            Q_DEBUG (msg);
         }
     } while (0); // End cleanup block (not a loop)
 
@@ -169,12 +191,17 @@ TpCalloutInitiator::initiateCall (const QString &strDestination,
                        true);
     }
 
+    Q_DEBUG(QString("Starting call to %1").arg(strDestination));
+
     Tp::PendingChannelRequest *pReq = account->ensureChannel(request);
 
     bool rv = connect (
         pReq, SIGNAL (finished (Tp::PendingOperation*)),
         this, SLOT   (onChannelReady (Tp::PendingOperation*)));
-    Q_ASSERT(rv); Q_UNUSED(rv);
+    Q_ASSERT(rv);
+    if (!rv) {
+        Q_WARN("Failed to connect to call ready signal!!");
+    }
 }//TpCalloutInitiator::initiateCall
 
 void
@@ -183,11 +210,11 @@ TpCalloutInitiator::onChannelReady (Tp::PendingOperation*op)
     bool bSuccess = false;
     do { // Begin cleanup block (not a loop)
         if (op->isError ()) {
-            qWarning ("Channel could not become ready");
+            Q_WARN ("Channel could not become ready");
             break;
         }
 
-        qDebug ("Call successful");
+        Q_DEBUG ("Call successful");
         bSuccess = true;
     } while (0); // End cleanup block (not a loop)
 

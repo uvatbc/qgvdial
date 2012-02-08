@@ -1277,7 +1277,7 @@ MainWindow::dialComplete (AsyncTaskToken *token)
         if (bDialCancelled) {
             setStatus ("Cancelled dial out");
         } else if (NULL == ctx->fallbackCi) {
-            // Not currently in fallback modem and there was a problem
+            // Not currently in fallback mode and there was a problem
             // ... so start fallback mode
             Q_DEBUG("Attempting fallback dial");
             bReleaseContext = false;
@@ -2006,9 +2006,11 @@ MainWindow::fallbackDialout (DialContext *ctx)
 
     ctx->fallbackCi = cif.getFallbacks()[0];
     bool rv = connect (ctx->fallbackCi, SIGNAL(callInitiated(bool,void*)),
-                      this,            SLOT  (onFallbackDialout(bool,void*)));
+                       this,          SLOT(onFallbackDialout(bool,void*)));
     Q_ASSERT(rv); Q_UNUSED(rv);
     GVApi::simplify_number (strFull);
+
+    Q_DEBUG(QString("Attempting fallback dial out to %1").arg(strFull));
     ctx->fallbackCi->initiateCall (strFull, ctx);
 }//MainWindow::fallbackDialout
 
@@ -2026,6 +2028,8 @@ MainWindow::onFallbackDialout (bool bSuccess, void *v_ctx)
         return;
     }
 
+    Q_DEBUG("Fallback dial is in progress. Now send DTMF");
+    
     QString strDTMF;
     strDTMF = "p*p2p" + ctx->strTarget;
     // Add the pin if it is there

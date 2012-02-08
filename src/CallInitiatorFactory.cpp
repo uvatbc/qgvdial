@@ -149,13 +149,14 @@ CallInitiatorFactory::onAllAccountsReady ()
     bool rv; Q_UNUSED(rv);
     QString msg;
     foreach (Tp::AccountPtr act, allAccounts) {
-        msg = QString ("Account cmName = %1").arg (act->cmName ());
-        if ((act->cmName () != "sofiasip") &&
-            (act->cmName () != "spirit") &&
-            (act->cmName () != "ring"))
+        QString cmName = act->cmName ();
+        msg = QString ("Account cmName = %1").arg (cmName);
+        if ((cmName != "sofiasip") &&
+            (cmName != "spirit") &&
+            (cmName != "ring"))
         {
             // Who cares about this one?
-            msg += "\tIGNORED!!";
+            msg += " IGNORED!!";
             Q_DEBUG (msg);
             continue;
         }
@@ -163,7 +164,7 @@ CallInitiatorFactory::onAllAccountsReady ()
         CalloutInitiator *initiator = new TpCalloutInitiator (act, this);
         listInitiators += initiator;
 
-        if (act->cmName () == "ring") {
+        if (cmName == "ring") {
             Q_DEBUG("Added ring as fallback");
             listFallback += initiator;
         }
@@ -174,7 +175,7 @@ CallInitiatorFactory::onAllAccountsReady ()
         rv = connect (initiator, SIGNAL (changed()), this, SIGNAL (changed()));
         Q_ASSERT(rv);
 
-        msg += "\tADDED!";
+        msg += " ADDED!";
         Q_DEBUG (msg);
     }
 }//CallInitiatorFactory::onAllAccountsReady

@@ -1532,6 +1532,7 @@ GVApi::callOut(AsyncTaskToken *token)
     }
 
 #if ALWAYS_FAIL_DIALING
+    Q_WARN("Fail call out for testing purposes!");
     token->status = ATTS_FAILURE;
     token->emitCompleted ();
     return (true);
@@ -1647,6 +1648,7 @@ GVApi::callBack(AsyncTaskToken *token)
     }
 
 #if ALWAYS_FAIL_DIALING
+    Q_WARN("Fail call back for testing purposes!");
     token->status = ATTS_FAILURE;
     token->emitCompleted ();
     return (true);
