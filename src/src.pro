@@ -313,3 +313,8 @@ unix:!symbian:!maemo5:!contains(MEEGO_EDITION,harmattan) {
     dbusservice.files += ../build-files/qgvdial.Call.service
     dbusservice.files += ../build-files/qgvdial.Text.service
 }
+
+unix: {
+    QMAKE_LFLAGS += --as-needed
+}
+

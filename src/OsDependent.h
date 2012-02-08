@@ -101,7 +101,7 @@ private slots:
 
 private:
 #if QTM_VERSION >= 0x010200
-    QSystemDisplayInfo  displayInfo;
+    QSystemDisplayInfo *displayInfo;
 #endif
 
     friend class Singletons;

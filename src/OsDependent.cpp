@@ -27,6 +27,9 @@ Contact: yuvraaj@gmail.com
 
 OsDependent::OsDependent(QObject *parent) : QObject(parent)
 {
+#if QTM_VERSION >= 0x010200
+    displayInfo = NULL;
+#endif
 }//OsDependent::OsDependent
 
 void
@@ -42,8 +45,10 @@ OsDependent::init ()
 
     bool rv; Q_UNUSED(rv);
 #if QTM_VERSION >= 0x010200
+    displayInfo = new QSystemDisplayInfo(this);
+
     rv =
-    connect(&displayInfo,
+    connect(displayInfo,
             SIGNAL(orientationChanged(QSystemDisplayInfo::DisplayOrientation)),
             this,
             SLOT(onOrientationChanged(QSystemDisplayInfo::DisplayOrientation)));
@@ -249,7 +254,7 @@ OsDependent::getOrientation(void)
     OsIndependentOrientation rv = OIO_Unknown;
 
 #if QTM_VERSION >= 0x010200
-    switch (displayInfo.orientation(0)) {
+    switch (displayInfo->orientation(0)) {
     case QSystemDisplayInfo::Landscape:
         rv = OIO_Landscape;
         break;

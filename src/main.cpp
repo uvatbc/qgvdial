@@ -136,6 +136,9 @@ deinitLogging ()
 int
 main (int argc, char *argv[])
 {
+    cout << "Help! I'm here!" << endl;
+    cout << __FUNCTION__ << __LINE__ << endl;
+
 #if defined(Q_WS_S60)
     MainApp::setAttribute (Qt::AA_S60DontConstructApplicationPanes);
 #endif
