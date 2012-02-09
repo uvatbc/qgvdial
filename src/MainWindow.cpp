@@ -175,6 +175,9 @@ MainWindow::onCleanupLogsArray()
         ctx->setContextProperty ("g_logModel", QVariant::fromValue(arrLogMsgs));
     } while (0); // End cleanup block (not a loop)
 
+    // Flush the log. flush it!
+    qgv_LogFlush ();
+
     logsTimer.start (timeout);
 }//MainWindow::onCleanupLogsArray
 

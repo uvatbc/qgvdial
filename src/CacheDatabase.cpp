@@ -215,7 +215,7 @@ int
 CacheDatabase::getLogLevel()
 {
     if (!settings->contains ("LogLevel")) {
-        settings->setValue ("LogLevel", 2);
+        settings->setValue ("LogLevel", 5);
     }
 
     return settings->value("LogLevel").toInt ();

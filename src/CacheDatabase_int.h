@@ -69,7 +69,9 @@ Contact: yuvraaj@gmail.com
 // Started using versioning for the settings
 //#define GV_SETTINGS_VER     "2011-05-13 16:33:50"
 // There is no longer any need for an updates table.
-#define GV_SETTINGS_VER     "2011-08-05 12:34:02"
+//#define GV_SETTINGS_VER     "2011-08-05 12:34:02"
+// Log levels need to be at 5 by default
+#define GV_SETTINGS_VER     "2012-02-08 23:10:19"
 ////////////////////////////// GV Contacts table ///////////////////////////////
 #define GV_CONTACTS_TABLE   "gvcontacts"
 #define GV_C_ID             "id"

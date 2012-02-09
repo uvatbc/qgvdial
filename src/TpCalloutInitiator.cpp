@@ -22,6 +22,7 @@ Contact: yuvraaj@gmail.com
 #include "TpCalloutInitiator.h"
 #include <TelepathyQt4/PendingChannelRequest>
 #include <TelepathyQt4/Connection>
+#include <TelepathyQt4/Channel>
 
 #if defined(Q_WS_MAEMO_5)
 #define CSD_SERVICE         "com.nokia.csd"
@@ -195,12 +196,12 @@ TpCalloutInitiator::initiateCall (const QString &strDestination,
 
     Tp::PendingChannelRequest *pReq = account->ensureChannel(request);
 
-    bool rv = connect (
-        pReq, SIGNAL (finished (Tp::PendingOperation*)),
-        this, SLOT   (onChannelReady (Tp::PendingOperation*)));
-    Q_ASSERT(rv);
+    bool rv =
+    connect (pReq, SIGNAL (finished (Tp::PendingOperation*)),
+            this, SLOT   (onChannelReady (Tp::PendingOperation*)));
     if (!rv) {
         Q_WARN("Failed to connect to call ready signal!!");
+        Q_ASSERT(rv);
     }
 }//TpCalloutInitiator::initiateCall
 
@@ -216,6 +217,19 @@ TpCalloutInitiator::onChannelReady (Tp::PendingOperation*op)
 
         Q_DEBUG ("Call successful");
         bSuccess = true;
+
+        Tp::PendingChannelRequest *pReq = (Tp::PendingChannelRequest *) op;
+        Tp::ChannelPtr channel = pReq->channelRequest()->channel();
+        Tp::Client::ChannelInterface *chIface =
+        channel->interface<Tp::Client::ChannelInterface> ();
+
+        if (NULL == chIface) {
+            Q_WARN("Invalid channel interface");
+            break;
+        }
+
+        Tp::Client::ChannelInterfaceDTMFInterface *dtmfIface =
+        new Tp::Client::ChannelInterfaceDTMFInterface(*chIface, this);
     } while (0); // End cleanup block (not a loop)
 
     emit callInitiated (bSuccess, m_Context);

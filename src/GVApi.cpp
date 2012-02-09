@@ -25,7 +25,7 @@ Contact: yuvraaj@gmail.com
 
 #include <QtXmlPatterns>
 
-#define ALWAYS_FAIL_DIALING 0
+#define ALWAYS_FAIL_DIALING 1
 
 GVApi::GVApi(bool bEmitLog, QObject *parent)
 : QObject(parent)

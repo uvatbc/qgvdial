@@ -38,8 +38,10 @@ QStringList arrLogFiles;
 void
 qgv_LogFlush()
 {
-    logCounter = 0;
-    fLogfile.flush ();
+    if (logCounter) {
+        logCounter = 0;
+        fLogfile.flush ();
+    }
 }
 
 void
@@ -80,7 +82,7 @@ myMessageOutput(QtMsgType type, const char *msg)
             fLogfile.write(strLog.toLatin1 ());
 
             ++logCounter;
-            if (logCounter > 20) {
+            if (logCounter > 50) {
                 qgv_LogFlush ();
             }
         }
@@ -116,8 +118,7 @@ initLogging ()
     }
 
     fLogfile.setFileName (strLogfile);
-    fLogfile.open (QIODevice::WriteOnly | QIODevice::Append);
-    fLogfile.seek (fLogfile.size ());
+    fLogfile.open (QIODevice::ReadWrite);
 
     pOldHandler = qInstallMsgHandler(myMessageOutput);
 }//initLogging
