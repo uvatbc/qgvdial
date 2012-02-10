@@ -27,6 +27,7 @@ Contact: yuvraaj@gmail.com
 #include <TelepathyQt4/AccountManager>
 #include <TelepathyQt4/SharedPtr>
 #include <TelepathyQt4/PendingReady>
+#include <TelepathyQt4/Channel>
 
 class TpCalloutInitiator : public CalloutInitiator
 {
@@ -52,6 +53,11 @@ private slots:
     void onChannelReady (Tp::PendingOperation *op);
     void onConnectionReady (Tp::PendingOperation *op);
 
+    void onDtmfChannelInvalidated(Tp::DBusProxy * proxy,
+                                  const QString & errorName,
+                                  const QString & errorMessage);
+    void onDtmfStoppedTones (bool cancelled);
+
 private:
     Tp::AccountPtr      account;
     QString             strActCmName;
@@ -59,6 +65,12 @@ private:
 
     //! Is this the buggy spirit (skype) TP-CM?
     bool                bIsSpirit;
+
+    //! Channel pointer that can be used for DTMF calls. Must check for validity
+    Tp::ChannelPtr      channel;
+
+    //! Pointer to the DTMF interface
+    Tp::Client::ChannelInterfaceDTMFInterface *dtmfIface;
 
     friend class CallInitiatorFactory;
 };

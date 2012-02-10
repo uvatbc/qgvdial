@@ -22,7 +22,6 @@ Contact: yuvraaj@gmail.com
 #include "TpCalloutInitiator.h"
 #include <TelepathyQt4/PendingChannelRequest>
 #include <TelepathyQt4/Connection>
-#include <TelepathyQt4/Channel>
 
 #if defined(Q_WS_MAEMO_5)
 #define CSD_SERVICE         "com.nokia.csd"
@@ -36,10 +35,11 @@ TpCalloutInitiator::TpCalloutInitiator (Tp::AccountPtr act, QObject *parent)
 , strActCmName("undefined")
 , strSelfNumber("undefined")
 , bIsSpirit (false)
+, channel (NULL)
 {
     // At least one of these is bound to work
     int success = 0;
-    
+
     bool rv = connect (account.data (),
                        SIGNAL(connectionChanged(const Tp::ConnectionPtr &)),
                        this,
@@ -219,23 +219,28 @@ TpCalloutInitiator::onChannelReady (Tp::PendingOperation*op)
         bSuccess = true;
 
         Tp::PendingChannelRequest *pReq = (Tp::PendingChannelRequest *) op;
-        Tp::ChannelPtr channel = pReq->channelRequest()->channel();
-        Tp::Client::ChannelInterface *chIface =
-        channel->interface<Tp::Client::ChannelInterface> ();
+        channel = pReq->channelRequest()->channel();
 
-        if (NULL == chIface) {
-            Q_WARN("Invalid channel interface");
-            break;
-        }
-
-        Tp::Client::ChannelInterfaceDTMFInterface *dtmfIface =
-        new Tp::Client::ChannelInterfaceDTMFInterface(*chIface, this);
+        connect(channel.data (), SIGNAL(invalidated(Tp::DBusProxy *,
+                                                    const QString &,
+                                                    const QString &)),
+                this, SLOT(onDtmfChannelInvalidated(Tp::DBusProxy *,
+                                                    const QString &,
+                                                    const QString &)));
     } while (0); // End cleanup block (not a loop)
 
     emit callInitiated (bSuccess, m_Context);
 
     op->deleteLater ();
 }//TpCalloutInitiator::onChannelReady
+
+void
+TpCalloutInitiator::onDtmfChannelInvalidated(Tp::DBusProxy * /*proxy*/,
+                                             const QString & /*errorName*/,
+                                             const QString & /*errorMessage*/)
+{
+    channel.reset ();
+}//TpCalloutInitiator::onDtmfChannelInvalidated
 
 QString
 TpCalloutInitiator::name ()
@@ -259,28 +264,67 @@ TpCalloutInitiator::isValid ()
 bool
 TpCalloutInitiator::sendDTMF (const QString &strTones)
 {
+    bool rv = false;
+    do { // Begin cleanup block (not a loop)
 #if defined(Q_WS_MAEMO_5)
-    if ("ring" == account->cmName ()) {
-        QList<QVariant> argsToSend;
-        argsToSend.append(strTones);
-        argsToSend.append(0);
-        QDBusConnection systemBus = QDBusConnection::systemBus();
-        QDBusMessage dbusMethodCall =
-        QDBusMessage::createMethodCall(CSD_SERVICE,
-                                       CSD_CALL_PATH,
-                                       CSD_CALL_INTERFACE,
-                                       QString("SendDTMF"));
-        dbusMethodCall.setArguments(argsToSend);
-        bool rv = systemBus.send(dbusMethodCall);
-        if (!rv) {
-            qDebug ("Dbus method call to send DTMF failed.");
+        if ("ring" == account->cmName ()) {
+            QList<QVariant> argsToSend;
+            argsToSend.append(strTones);
+            argsToSend.append(0);
+            QDBusConnection systemBus = QDBusConnection::systemBus();
+            QDBusMessage dbusMethodCall =
+                    QDBusMessage::createMethodCall(CSD_SERVICE,
+                                                   CSD_CALL_PATH,
+                                                   CSD_CALL_INTERFACE,
+                                                   QString("SendDTMF"));
+            dbusMethodCall.setArguments(argsToSend);
+            rv = systemBus.send(dbusMethodCall);
+            if (!rv) {
+                Q_WARN ("Dbus method call to send DTMF failed.");
+            }
+            break;
         }
-        return rv;
-    }
 #else
-    Q_UNUSED(strTones);
-#endif
+        if ((NULL == channel) || (!channel.isNull ())) {
+            Q_WARN("Invalid channel");
+            break;
+        }
 
-    //@@UV: Add DTMF to Telepathy
-    return false;
+        Tp::Client::ChannelInterface *chIface =
+            channel->interface<Tp::Client::ChannelInterface> ();
+
+        if ((NULL == chIface) || (!chIface->isValid ())) {
+            Q_WARN("Invalid channel interface");
+            break;
+        }
+
+        dtmfIface = new Tp::Client::ChannelInterfaceDTMFInterface(*chIface,
+                                                                  this);
+        if (!dtmfIface) {
+            Q_WARN("Failed to allocate dtmf interface.");
+            break;
+        }
+
+        rv = connect (dtmfIface, SIGNAL(StoppedTones(bool)),
+                      this,  SLOT(onDtmfStoppedTones(bool)));
+        if (!rv) {
+            Q_WARN("Could not connect to the DTMF singal");
+            // Don't bail. The object is attached to the call initiator object
+            // as a child. When the parent goes, it will clear out the child.
+        }
+
+        dtmfIface->MultipleTones (strTones);
+#endif
+    } while (0); // End cleanup block (not a loop)
+
+    return (rv);
 }//TpCalloutInitiator::sendDTMF
+
+void
+TpCalloutInitiator::onDtmfStoppedTones (bool /*cancelled*/)
+{
+    if (dtmfIface) {
+        dtmfIface->deleteLater ();
+        dtmfIface = NULL;
+    }
+}//TpCalloutInitiator::onDtmfStoppedTones

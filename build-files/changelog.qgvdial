@@ -1,2 +1,2 @@
-  * Screen resize signals weren't connected. Fixed.
+  * Fixed compile for Harmattan
 
