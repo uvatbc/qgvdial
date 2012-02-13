@@ -35,9 +35,8 @@ TpCalloutInitiator::TpCalloutInitiator (Tp::AccountPtr act, QObject *parent)
 , strActCmName("undefined")
 , strSelfNumber("undefined")
 , bIsSpirit (false)
-#if USE_DTMF_INTERFACE
 , channel (NULL)
-#endif
+, toneOn(false)
 {
     // At least one of these is bound to work
     int success = 0;
@@ -179,8 +178,10 @@ void
 TpCalloutInitiator::initiateCall (const QString &strDestination,
                                   void *ctx /*= NULL*/)
 {
+    bool rv;
     m_Context = ctx;
 
+#if USE_RAW_CHANNEL_METHOD
     QVariantMap request;
     request.insert(TELEPATHY_INTERFACE_CHANNEL ".ChannelType",
                    TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAMED_MEDIA);
@@ -197,18 +198,23 @@ TpCalloutInitiator::initiateCall (const QString &strDestination,
     Q_DEBUG(QString("Starting call to %1").arg(strDestination));
 
     Tp::PendingChannelRequest *pReq = account->ensureChannel(request);
+#else
+    Tp::PendingChannelRequest *pendingChannelRequest =
+        account->ensureStreamedMediaAudioCall (strDestination);
 
-    bool rv =
+#endif
+
+    rv =
     connect (pReq, SIGNAL (finished (Tp::PendingOperation*)),
             this, SLOT   (onChannelReady (Tp::PendingOperation*)));
     if (!rv) {
         Q_WARN("Failed to connect to call ready signal!!");
-        Q_ASSERT(rv);
+        Q_ASSERT(0 == "Failed to connect to call ready signal!!");
     }
 }//TpCalloutInitiator::initiateCall
 
 void
-TpCalloutInitiator::onChannelReady (Tp::PendingOperation*op)
+TpCalloutInitiator::onChannelReady (Tp::PendingOperation *op)
 {
     bool bSuccess = false;
     do { // Begin cleanup block (not a loop)
@@ -220,17 +226,18 @@ TpCalloutInitiator::onChannelReady (Tp::PendingOperation*op)
         Q_DEBUG ("Call successful");
         bSuccess = true;
 
-#if USE_DTMF_INTERFACE
         Tp::PendingChannelRequest *pReq = (Tp::PendingChannelRequest *) op;
-        channel = pReq->channelRequest()->channel();
-
+#if USE_RAW_CHANNEL_METHOD
+        channel = Tp::ChannelPtr::staticCast (pReq->object ());
+#else
+        channel = Tp::StreamedMediaChannel::staticCast (pReq->object ());
+#endif
         connect(channel.data (), SIGNAL(invalidated(Tp::DBusProxy *,
                                                     const QString &,
                                                     const QString &)),
                 this, SLOT(onDtmfChannelInvalidated(Tp::DBusProxy *,
                                                     const QString &,
                                                     const QString &)));
-#endif
     } while (0); // End cleanup block (not a loop)
 
     emit callInitiated (bSuccess, m_Context);
@@ -238,7 +245,6 @@ TpCalloutInitiator::onChannelReady (Tp::PendingOperation*op)
     op->deleteLater ();
 }//TpCalloutInitiator::onChannelReady
 
-#if USE_DTMF_INTERFACE
 void
 TpCalloutInitiator::onDtmfChannelInvalidated(Tp::DBusProxy * /*proxy*/,
                                              const QString & /*errorName*/,
@@ -246,7 +252,6 @@ TpCalloutInitiator::onDtmfChannelInvalidated(Tp::DBusProxy * /*proxy*/,
 {
     channel.reset ();
 }//TpCalloutInitiator::onDtmfChannelInvalidated
-#endif
 
 QString
 TpCalloutInitiator::name ()
@@ -292,7 +297,11 @@ TpCalloutInitiator::sendDTMF (const QString &strTones)
             Q_DEBUG("CSD version of DTMF requested");
             break;
         }
-#elif USE_DTMF_INTERFACE
+#elif !USE_RAW_CHANNEL_METHOD
+        remainingTones = strTones;
+        onDtmfNextTone ();
+
+#elif USE_DTMF_INTERFACE_1
         if ((NULL == channel) || (channel.isNull ())) {
             Q_WARN("Invalid channel");
             break;
@@ -346,7 +355,7 @@ TpCalloutInitiator::sendDTMF (const QString &strTones)
 void
 TpCalloutInitiator::onDtmfStoppedTones (bool /*cancelled*/)
 {
-#if USE_DTMF_INTERFACE
+#if USE_DTMF_INTERFACE_1
     if (dtmfIface) {
         dtmfIface->deleteLater ();
         dtmfIface = NULL;
@@ -354,3 +363,82 @@ TpCalloutInitiator::onDtmfStoppedTones (bool /*cancelled*/)
 #endif
 }//TpCalloutInitiator::onDtmfStoppedTones
 
+void
+TpCalloutInitiator::onDtmfNextTone()
+{
+    do { // Begin cleanup block (not a loop)
+        // Start the DTMF audio loop
+        if ((NULL == channel) || (channel.isNull ())) {
+            Q_WARN("Invalid channel");
+            break;
+        }
+
+#if !USE_RAW_CHANNEL_METHOD
+        Tp::StreamedMediaStreamPtr firstAudioStream =
+            channel->streamesForType(Tp::MediaStreamTypeAudio).first();
+
+        if (remainingTones.isEmpty ()) {
+            if (toneOn) {
+                firstAudioStream->stopDTMFTone();
+                toneOn = false;
+            }
+
+            Q_DEBUG ("All DTMF tones finished");
+            break;
+        }
+
+        if (toneOn) {
+            firstAudioStream->stopDTMFTone();
+            toneOn = false;
+            QTimer::singleShot (50, this, SLOT(onDtmfNextTone()));
+            break;
+        }
+
+        Tp::DTMFEvent event = -1;
+
+        QChar firstChar = remainingTones[0];
+        remainingTones.remove (0, 1);
+
+        if (firstChar == "0") {
+            event = Tp::DTMFEventDigit0;
+        } else if (firstChar == "1") {
+            event = Tp::DTMFEventDigit1;
+        } else if (firstChar == "2") {
+            event = Tp::DTMFEventDigit2;
+        } else if (firstChar == "3") {
+            event = Tp::DTMFEventDigit3;
+        } else if (firstChar == "4") {
+            event = Tp::DTMFEventDigit4;
+        } else if (firstChar == "5") {
+            event = Tp::DTMFEventDigit5;
+        } else if (firstChar == "6") {
+            event = Tp::DTMFEventDigit6;
+        } else if (firstChar == "7") {
+            event = Tp::DTMFEventDigit7;
+        } else if (firstChar == "8") {
+            event = Tp::DTMFEventDigit8;
+        } else if (remainingTones[0] == "9") {
+            event = Tp::DTMFEventDigit9;
+        } else if (firstChar == "*") {
+            event = Tp::DTMFEventAsterisk;
+        } else if (firstChar == "#") {
+            event = Tp::DTMFEventHash;
+        } else if (firstChar == "A") {
+            event = Tp::DTMFEventLetterA;
+        } else if (firstChar == "B") {
+            event = Tp::DTMFEventLetterB;
+        } else if (firstChar == "C") {
+            event = Tp::DTMFEventLetterC;
+        } else if (firstChar == "D") {
+            event = Tp::DTMFEventLetterD;
+        } else {
+            onDtmfNextTone ();
+            break;
+        }
+
+        toneOn = true;
+        firstAudioStream->startDTMFTone (event);
+        QTimer::singleShot (250, this, SLOT(onDtmfNextTone()));
+#endif
+    } while (0); // End cleanup block (not a loop)
+}//TpCalloutInitiator::onDtmfNextTone

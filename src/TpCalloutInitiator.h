@@ -22,7 +22,13 @@ Contact: yuvraaj@gmail.com
 #ifndef TPCALLOUTINITIATOR_H
 #define TPCALLOUTINITIATOR_H
 
-#define USE_DTMF_INTERFACE 0
+#define USE_DTMF_INTERFACE_1 0
+
+#ifdef MEEGO_HARMATTAN
+#define USE_RAW_CHANNEL_METHOD 0
+#else
+#define USE_RAW_CHANNEL_METHOD 1
+#endif
 
 #include "CalloutInitiator.h"
 
@@ -55,12 +61,12 @@ private slots:
     void onChannelReady (Tp::PendingOperation *op);
     void onConnectionReady (Tp::PendingOperation *op);
 
-#if USE_DTMF_INTERFACE
     void onDtmfChannelInvalidated(Tp::DBusProxy * proxy,
                                   const QString & errorName,
                                   const QString & errorMessage);
-#endif
     void onDtmfStoppedTones (bool cancelled);
+
+    void onDtmfNextTone();
 
 private:
     Tp::AccountPtr      account;
@@ -70,10 +76,17 @@ private:
     //! Is this the buggy spirit (skype) TP-CM?
     bool                bIsSpirit;
 
-#if USE_DTMF_INTERFACE
     //! Channel pointer that can be used for DTMF calls. Must check for validity
+#if USE_RAW_CHANNEL_METHOD
     Tp::ChannelPtr      channel;
+#else
+    Tp::StreamedMediaChannelPtr channel;
+    QString                     remainingTones;
+#endif
 
+    bool toneOn;
+
+#if USE_DTMF_INTERFACE_1
     //! Pointer to the DTMF interface
     Tp::Client::ChannelInterfaceDTMFInterface *dtmfIface;
 #endif
