@@ -35,7 +35,9 @@ TpCalloutInitiator::TpCalloutInitiator (Tp::AccountPtr act, QObject *parent)
 , strActCmName("undefined")
 , strSelfNumber("undefined")
 , bIsSpirit (false)
+#if USE_DTMF_INTERFACE
 , channel (NULL)
+#endif
 {
     // At least one of these is bound to work
     int success = 0;
@@ -218,6 +220,7 @@ TpCalloutInitiator::onChannelReady (Tp::PendingOperation*op)
         Q_DEBUG ("Call successful");
         bSuccess = true;
 
+#if USE_DTMF_INTERFACE
         Tp::PendingChannelRequest *pReq = (Tp::PendingChannelRequest *) op;
         channel = pReq->channelRequest()->channel();
 
@@ -227,6 +230,7 @@ TpCalloutInitiator::onChannelReady (Tp::PendingOperation*op)
                 this, SLOT(onDtmfChannelInvalidated(Tp::DBusProxy *,
                                                     const QString &,
                                                     const QString &)));
+#endif
     } while (0); // End cleanup block (not a loop)
 
     emit callInitiated (bSuccess, m_Context);
@@ -234,6 +238,7 @@ TpCalloutInitiator::onChannelReady (Tp::PendingOperation*op)
     op->deleteLater ();
 }//TpCalloutInitiator::onChannelReady
 
+#if USE_DTMF_INTERFACE
 void
 TpCalloutInitiator::onDtmfChannelInvalidated(Tp::DBusProxy * /*proxy*/,
                                              const QString & /*errorName*/,
@@ -241,6 +246,7 @@ TpCalloutInitiator::onDtmfChannelInvalidated(Tp::DBusProxy * /*proxy*/,
 {
     channel.reset ();
 }//TpCalloutInitiator::onDtmfChannelInvalidated
+#endif
 
 QString
 TpCalloutInitiator::name ()
@@ -270,7 +276,7 @@ TpCalloutInitiator::sendDTMF (const QString &strTones)
         if ("ring" == account->cmName ()) {
             QList<QVariant> argsToSend;
             argsToSend.append(strTones);
-            argsToSend.append(0);
+            //argsToSend.append(0);
             QDBusConnection systemBus = QDBusConnection::systemBus();
             QDBusMessage dbusMethodCall =
                     QDBusMessage::createMethodCall(CSD_SERVICE,
@@ -282,10 +288,12 @@ TpCalloutInitiator::sendDTMF (const QString &strTones)
             if (!rv) {
                 Q_WARN ("Dbus method call to send DTMF failed.");
             }
+
+            Q_DEBUG("CSD version of DTMF requested");
             break;
         }
-#else
-        if ((NULL == channel) || (!channel.isNull ())) {
+#elif USE_DTMF_INTERFACE
+        if ((NULL == channel) || (channel.isNull ())) {
             Q_WARN("Invalid channel");
             break;
         }
@@ -313,7 +321,22 @@ TpCalloutInitiator::sendDTMF (const QString &strTones)
             // as a child. When the parent goes, it will clear out the child.
         }
 
-        dtmfIface->MultipleTones (strTones);
+        QDBusPendingReply <> dReply = dtmfIface->MultipleTones (strTones);
+        Q_DEBUG("Multiple Tones requested!");
+
+        dReply.waitForFinished ();
+        if (dReply.isError ()) {
+            QString msg = QString("Failed to send multiple tones. Error: "
+                                  "Name = %1, Message = %2")
+                            .arg(dReply.error().name())
+                            .arg(dReply.error().message());
+            Q_WARN(msg);
+            rv = false;
+            break;
+        }
+
+        Q_DEBUG("DTMF tones sent");
+        rv = true;
 #endif
     } while (0); // End cleanup block (not a loop)
 
@@ -323,8 +346,11 @@ TpCalloutInitiator::sendDTMF (const QString &strTones)
 void
 TpCalloutInitiator::onDtmfStoppedTones (bool /*cancelled*/)
 {
+#if USE_DTMF_INTERFACE
     if (dtmfIface) {
         dtmfIface->deleteLater ();
         dtmfIface = NULL;
     }
+#endif
 }//TpCalloutInitiator::onDtmfStoppedTones
+

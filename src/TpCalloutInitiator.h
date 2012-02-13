@@ -22,6 +22,8 @@ Contact: yuvraaj@gmail.com
 #ifndef TPCALLOUTINITIATOR_H
 #define TPCALLOUTINITIATOR_H
 
+#define USE_DTMF_INTERFACE 0
+
 #include "CalloutInitiator.h"
 
 #include <TelepathyQt4/AccountManager>
@@ -53,9 +55,11 @@ private slots:
     void onChannelReady (Tp::PendingOperation *op);
     void onConnectionReady (Tp::PendingOperation *op);
 
+#if USE_DTMF_INTERFACE
     void onDtmfChannelInvalidated(Tp::DBusProxy * proxy,
                                   const QString & errorName,
                                   const QString & errorMessage);
+#endif
     void onDtmfStoppedTones (bool cancelled);
 
 private:
@@ -66,11 +70,13 @@ private:
     //! Is this the buggy spirit (skype) TP-CM?
     bool                bIsSpirit;
 
+#if USE_DTMF_INTERFACE
     //! Channel pointer that can be used for DTMF calls. Must check for validity
     Tp::ChannelPtr      channel;
 
     //! Pointer to the DTMF interface
     Tp::Client::ChannelInterfaceDTMFInterface *dtmfIface;
+#endif
 
     friend class CallInitiatorFactory;
 };
