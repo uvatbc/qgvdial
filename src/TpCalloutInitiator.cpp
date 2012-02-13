@@ -23,7 +23,7 @@ Contact: yuvraaj@gmail.com
 #include <TelepathyQt4/PendingChannelRequest>
 #include <TelepathyQt4/Connection>
 
-#if defined(Q_WS_MAEMO_5)
+#if defined(Q_WS_MAEMO_5) || defined(MEEGO_HARMATTAN)
 #define CSD_SERVICE         "com.nokia.csd"
 #define CSD_CALL_PATH		"/com/nokia/csd/call"
 #define CSD_CALL_INTERFACE	"com.nokia.csd.Call"
@@ -280,11 +280,11 @@ TpCalloutInitiator::sendDTMF (const QString &strTones)
 {
     bool rv = false;
     do { // Begin cleanup block (not a loop)
-#if defined(Q_WS_MAEMO_5)
+#if defined(Q_WS_MAEMO_5) || defined(MEEGO_HARMATTAN)
         if ("ring" == account->cmName ()) {
             QList<QVariant> argsToSend;
             argsToSend.append(strTones);
-            //argsToSend.append(0);
+            argsToSend.append(0);
             QDBusConnection systemBus = QDBusConnection::systemBus();
             QDBusMessage dbusMethodCall =
                     QDBusMessage::createMethodCall(CSD_SERVICE,

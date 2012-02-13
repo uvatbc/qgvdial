@@ -23,12 +23,7 @@ Contact: yuvraaj@gmail.com
 #define TPCALLOUTINITIATOR_H
 
 #define USE_DTMF_INTERFACE_1 0
-
-#ifdef MEEGO_HARMATTAN
 #define USE_RAW_CHANNEL_METHOD 1
-#else
-#define USE_RAW_CHANNEL_METHOD 1
-#endif
 
 #include "CalloutInitiator.h"
 
