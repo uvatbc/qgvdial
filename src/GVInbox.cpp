@@ -155,8 +155,6 @@ GVInbox::oneInboxEntry (const GVInboxEntry &hevent)
     }
 
     if (dateWaterLevel.isValid () && (hevent.startTime < dateWaterLevel)) {
-        Q_DEBUG("Water level was =") << dateWaterLevel.toString()
-                << "current entry =" << hevent.startTime.toString();
         passedWaterLevel = true;
     } else {
         newEntries++;

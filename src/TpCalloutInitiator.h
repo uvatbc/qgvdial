@@ -25,7 +25,7 @@ Contact: yuvraaj@gmail.com
 #define USE_DTMF_INTERFACE_1 0
 
 #ifdef MEEGO_HARMATTAN
-#define USE_RAW_CHANNEL_METHOD 0
+#define USE_RAW_CHANNEL_METHOD 1
 #else
 #define USE_RAW_CHANNEL_METHOD 1
 #endif
@@ -36,6 +36,7 @@ Contact: yuvraaj@gmail.com
 #include <TelepathyQt4/SharedPtr>
 #include <TelepathyQt4/PendingReady>
 #include <TelepathyQt4/Channel>
+#include <TelepathyQt4/StreamedMediaChannel>
 
 class TpCalloutInitiator : public CalloutInitiator
 {

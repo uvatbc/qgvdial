@@ -199,7 +199,7 @@ TpCalloutInitiator::initiateCall (const QString &strDestination,
 
     Tp::PendingChannelRequest *pReq = account->ensureChannel(request);
 #else
-    Tp::PendingChannelRequest *pendingChannelRequest =
+    Tp::PendingChannelRequest *pReq =
         account->ensureStreamedMediaAudioCall (strDestination);
 
 #endif
@@ -230,7 +230,7 @@ TpCalloutInitiator::onChannelReady (Tp::PendingOperation *op)
 #if USE_RAW_CHANNEL_METHOD
         channel = Tp::ChannelPtr::staticCast (pReq->object ());
 #else
-        channel = Tp::StreamedMediaChannel::staticCast (pReq->object ());
+        channel = Tp::StreamedMediaChannelPtr::staticCast (pReq->object ());
 #endif
         connect(channel.data (), SIGNAL(invalidated(Tp::DBusProxy *,
                                                     const QString &,
@@ -367,15 +367,23 @@ void
 TpCalloutInitiator::onDtmfNextTone()
 {
     do { // Begin cleanup block (not a loop)
-        // Start the DTMF audio loop
         if ((NULL == channel) || (channel.isNull ())) {
             Q_WARN("Invalid channel");
             break;
         }
 
+        Q_DEBUG("Here");
 #if !USE_RAW_CHANNEL_METHOD
-        Tp::StreamedMediaStreamPtr firstAudioStream =
-            channel->streamesForType(Tp::MediaStreamTypeAudio).first();
+        Tp::StreamedMediaStreams streams =
+            channel->streamsForType(Tp::MediaStreamTypeAudio);
+        if (streams.isEmpty ()) {
+            Q_WARN("No audio streams??");
+            break;
+        }
+
+        Tp::StreamedMediaStreamPtr firstAudioStream = streams.first();
+
+        Q_DEBUG("Got first audio stream");
 
         if (remainingTones.isEmpty ()) {
             if (toneOn) {
@@ -387,50 +395,55 @@ TpCalloutInitiator::onDtmfNextTone()
             break;
         }
 
+        // Start the DTMF audio loop
         if (toneOn) {
+            Q_DEBUG("Tone off");
             firstAudioStream->stopDTMFTone();
             toneOn = false;
             QTimer::singleShot (50, this, SLOT(onDtmfNextTone()));
             break;
         }
 
-        Tp::DTMFEvent event = -1;
+        Tp::DTMFEvent event;
 
         QChar firstChar = remainingTones[0];
         remainingTones.remove (0, 1);
 
-        if (firstChar == "0") {
+        if (firstChar == '0') {
             event = Tp::DTMFEventDigit0;
-        } else if (firstChar == "1") {
+        } else if (firstChar == '1') {
             event = Tp::DTMFEventDigit1;
-        } else if (firstChar == "2") {
+        } else if (firstChar == '2') {
             event = Tp::DTMFEventDigit2;
-        } else if (firstChar == "3") {
+        } else if (firstChar == '3') {
             event = Tp::DTMFEventDigit3;
-        } else if (firstChar == "4") {
+        } else if (firstChar == '4') {
             event = Tp::DTMFEventDigit4;
-        } else if (firstChar == "5") {
+        } else if (firstChar == '5') {
             event = Tp::DTMFEventDigit5;
-        } else if (firstChar == "6") {
+        } else if (firstChar == '6') {
             event = Tp::DTMFEventDigit6;
-        } else if (firstChar == "7") {
+        } else if (firstChar == '7') {
             event = Tp::DTMFEventDigit7;
-        } else if (firstChar == "8") {
+        } else if (firstChar == '8') {
             event = Tp::DTMFEventDigit8;
-        } else if (remainingTones[0] == "9") {
+        } else if (firstChar == '9') {
             event = Tp::DTMFEventDigit9;
-        } else if (firstChar == "*") {
+        } else if (firstChar == '*') {
             event = Tp::DTMFEventAsterisk;
-        } else if (firstChar == "#") {
+        } else if (firstChar == '#') {
             event = Tp::DTMFEventHash;
-        } else if (firstChar == "A") {
+        } else if (firstChar == 'A') {
             event = Tp::DTMFEventLetterA;
-        } else if (firstChar == "B") {
+        } else if (firstChar == 'B') {
             event = Tp::DTMFEventLetterB;
-        } else if (firstChar == "C") {
+        } else if (firstChar == 'C') {
             event = Tp::DTMFEventLetterC;
-        } else if (firstChar == "D") {
+        } else if (firstChar == 'D') {
             event = Tp::DTMFEventLetterD;
+        } else if (firstChar == 'p') {
+            QTimer::singleShot (1000, this, SLOT(onDtmfNextTone()));
+            break;
         } else {
             onDtmfNextTone ();
             break;
@@ -439,6 +452,7 @@ TpCalloutInitiator::onDtmfNextTone()
         toneOn = true;
         firstAudioStream->startDTMFTone (event);
         QTimer::singleShot (250, this, SLOT(onDtmfNextTone()));
+        Q_DEBUG(QString("tone on: %1").arg(firstChar));
 #endif
     } while (0); // End cleanup block (not a loop)
 }//TpCalloutInitiator::onDtmfNextTone
