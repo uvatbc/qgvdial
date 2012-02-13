@@ -231,6 +231,9 @@ TpCalloutInitiator::onChannelReady (Tp::PendingOperation *op)
         channel = Tp::ChannelPtr::staticCast (pReq->object ());
 #else
         channel = Tp::StreamedMediaChannelPtr::staticCast (pReq->object ());
+        if (channel->awaitingLocalAnswer()) {
+            channel->acceptCall();
+        }
 #endif
         connect(channel.data (), SIGNAL(invalidated(Tp::DBusProxy *,
                                                     const QString &,
