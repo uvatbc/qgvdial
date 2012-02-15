@@ -34,6 +34,8 @@ Rectangle {
     signal sigMarkAsRead(string msgId)
     signal sigCloseVmail
 
+    signal sigRefreshInbox
+
     property int vmailPlayState: g_vmailPlayerState  // 0=stopped 1=playing 2=paused
 
     // Private properties. DO NOT TOUCH from outside.
@@ -278,6 +280,43 @@ Rectangle {
         }
     }//Rectangle (details)
 
+    Timer {
+        id: refreshTime
+        interval: 500; running: false; repeat: false
+        onTriggered: {
+            listInbox.isRefreshing = true;
+        }
+    }//Timer
+
+    Component {
+        id: listHeader
+
+        Item {
+            width: listInbox.width
+            height: 0
+
+            Text {
+                anchors.bottom: parent.top
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottomMargin: 10
+
+                text: "Release to refresh ..."
+                color: "white"
+
+                opacity: {
+                    var threshold = - listInbox.contentY * 3;
+                    if (threshold > 180) {
+                        refreshTime.start();
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                }//rotation
+                Behavior on rotation { NumberAnimation { duration: 150 } }
+            }//Text
+        }//Item
+    }//Component (listHeader)
+
     Item { //  The combined inbox list and selector list
         id: inboxView
         anchors.fill: parent
@@ -372,6 +411,15 @@ Rectangle {
             }
             width: parent.width
             height: parent.height - barTop.height
+
+            header: listHeader
+            property bool isRefreshing: false
+            onContentYChanged: {
+                if (isRefreshing && (contentY == 0)) {
+                    isRefreshing = false;
+                    container.sigRefreshInbox();
+                }
+            }
 
             opacity: 1
             clip: true

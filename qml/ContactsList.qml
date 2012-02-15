@@ -29,6 +29,8 @@ Rectangle {
     signal sigText(string name, string number)
     signal sigSearchContacts(string query)
 
+    signal sigRefreshContacts
+
 ////////////////////////////////////////////////////////////////////////////////
 //                              Test Data models                              //
 ////////////////////////////////////////////////////////////////////////////////
@@ -56,6 +58,43 @@ Rectangle {
 
         onSigClose: container.state= '';
     }//ContactDetails
+
+    Timer {
+        id: refreshTime
+        interval: 500; running: false; repeat: false
+        onTriggered: {
+            contactsView.isRefreshing = true;
+        }
+    }//Timer
+
+    Component {
+        id: listHeader
+
+        Item {
+            width: contactsView.width
+            height: 0
+
+            Text {
+                anchors.bottom: parent.top
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottomMargin: 10
+
+                text: "Release to refresh ..."
+                color: "white"
+
+                opacity: {
+                    var threshold = - contactsView.contentY * 3;
+                    if (threshold > 180) {
+                        refreshTime.start();
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                }//rotation
+                Behavior on rotation { NumberAnimation { duration: 150 } }
+            }//Text
+        }//Item
+    }//Component (listHeader)
 
     Item { // All contacts
         id: allContacts
@@ -120,6 +159,14 @@ Rectangle {
         ListView {
             id: contactsView
 
+            property bool isRefreshing: false
+            onContentYChanged: {
+                if (isRefreshing && (contentY == 0)) {
+                    isRefreshing = false;
+                    container.sigRefreshContacts();
+                }
+            }
+
             anchors {
                 top: searchRow.bottom
                 topMargin: 2
@@ -132,6 +179,7 @@ Rectangle {
             opacity: 1
             spacing: 2
             cacheBuffer: (100 * (allContacts.height + allContacts.width))
+            header: listHeader
 
             model: imgSearch.selection ? g_contactsSearchModel : g_contactsModel
 //            model: testContactsModelData1

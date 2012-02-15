@@ -49,6 +49,10 @@ Rectangle {
     signal sigHide
     signal sigQuit
 
+    // From the contacts or inbox page
+    signal sigRefreshInbox
+    signal sigRefreshContacts
+
     // Contacts search query changes
     signal sigSearchContacts(string query)
 
@@ -136,6 +140,8 @@ Rectangle {
                             mainFlipView.flipped = true;
                             smsView.addSmsDestination(name, number);
                         }
+
+                        onSigRefreshContacts: main.sigRefreshContacts();
                     }
                 }//Tab (Contacts)
                 Tab {
@@ -156,6 +162,8 @@ Rectangle {
                         }
                         onSigMarkAsRead: main.sigMarkAsRead(msgId);
                         onSigCloseVmail: main.sigCloseVmail();
+
+                        onSigRefreshInbox: main.sigRefreshInbox();
                     }
                 }//Tab (Inbox)
                 Tab {

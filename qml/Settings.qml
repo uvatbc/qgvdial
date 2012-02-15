@@ -42,11 +42,6 @@ Flickable {
     signal sigPinSettingChanges(bool bEnable, string pin)
     signal sigPinRefresh
 
-    signal sigRefresh
-    signal sigRefreshAll
-    signal sigRefreshInbox
-    signal sigRefreshContacts
-
     signal sigSendLogs
 
     property real pixHeight: (height + width) / 30
@@ -54,7 +49,7 @@ Flickable {
 
     contentHeight: expandLoginDetails.height + expandProxySettings.height +
                    expandMqSettings.height + expandPinSettings.height +
-                   expandRefresh.height + expandLogView.height + expandAbout.height
+                   expandLogView.height + expandAbout.height
     contentWidth: width
     clip: true
 
@@ -193,38 +188,9 @@ Flickable {
     }//ExpandView (pin settings)
 
     ExpandView {
-        id: expandRefresh
-        anchors {
-            top: expandPinSettings.bottom
-            left: parent.left
-        }
-
-        width: parent.width
-        contentHeight: refreshButtons.height;
-
-        mainTitle: "Refresh"
-        mainTitlePixHeight: container.pixHeight
-
-        RefreshButtons {
-            id: refreshButtons
-            y: parent.startY
-
-            width: parent.width - 1
-            pixHeight: container.pixHeight
-
-            opacity: parent.containedOpacity
-
-            onSigRefreshContacts: container.sigRefreshContacts();
-            onSigRefreshInbox: container.sigRefreshInbox();
-            onSigRefresh: container.sigRefresh();
-            onSigRefreshAll: container.sigRefreshAll();
-        }
-    }//ExpandView (refresh buttons)
-
-    ExpandView {
         id: expandLogView
         anchors {
-            top: expandRefresh.bottom
+            top: expandPinSettings.bottom
             left: parent.left
         }
 

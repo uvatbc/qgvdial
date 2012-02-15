@@ -4,6 +4,7 @@
         <file alias="Phone.png">../icons/Phone.png</file>
         <file alias="SMS.png">../icons/SMS.png</file>
         <file alias="note.png">../icons/note.png</file>
+        <file alias="down_arrow.png">../icons/down_arrow.png</file>
         <file alias="left_arrow.png">../icons/left_arrow.png</file>
         <file alias="tick.png">../icons/tick.png</file>
         <file alias="in_Missed.png">../icons/in_Missed.png</file>
@@ -44,7 +45,6 @@
         <file alias="PinSetting.qml">../qml/PinSetting.qml</file>
         <file alias="Proxy.qml">../qml/Proxy.qml</file>
         <file alias="RadioButton.qml">../qml/RadioButton.qml</file>
-        <file alias="RefreshButtons.qml">../qml/RefreshButtons.qml</file>
         <file alias="SaveCancel.qml">../qml/SaveCancel.qml</file>
         <file alias="Scrollbar.qml">../qml/Scrollbar.qml</file>
         <file alias="Settings.qml">../qml/Settings.qml</file>

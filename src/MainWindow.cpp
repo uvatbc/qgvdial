@@ -545,7 +545,7 @@ MainWindow::initQML ()
     bool rv;
     // Connect all signals to slots in this class.
     rv = connect (gObj, SIGNAL (sigCall (QString)),
-                   this, SLOT   (dialNow (QString)));
+                  this, SLOT   (dialNow (QString)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
     rv = connect (
@@ -593,6 +593,15 @@ MainWindow::initQML ()
     rv = connect (
         gObj      , SIGNAL  (sigSearchContacts(const QString &)),
         &oContacts, SLOT (onSearchQueryChanged(const QString &)));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+
+    rv = connect (gObj, SIGNAL (sigRefreshContacts()),
+                  &oContacts, SLOT(refreshContacts()));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+    rv = connect (gObj, SIGNAL(sigRefreshInbox()),
+                  &oInbox,   SLOT(refresh()));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
 
@@ -684,22 +693,6 @@ MainWindow::connectSettingsSignals()
         rv = connect (obj , SIGNAL(sigPinRefresh()),
                       this, SLOT  (refreshPinSettings()));
         Q_ASSERT(rv);
-        rv = connect (obj , SIGNAL (sigRefresh ()),
-                      this, SLOT   (onRefresh ()));
-        Q_ASSERT(rv);
-        if (!rv) { break; }
-        rv = connect (obj , SIGNAL (sigRefreshAll ()),
-                      this, SLOT   (onRefreshAll ()));
-        Q_ASSERT(rv);
-        if (!rv) { break; }
-        rv = connect (obj , SIGNAL (sigRefreshInbox ()),
-                      this, SLOT   (onSigRefreshInbox ()));
-        Q_ASSERT(rv);
-        if (!rv) { break; }
-        rv = connect (obj , SIGNAL (sigRefreshContacts ()),
-                      this, SLOT   (onSigRefreshContacts ()));
-        Q_ASSERT(rv);
-        if (!rv) { break; }
 
         rv = connect (obj , SIGNAL (sigSendLogs ()),
                       this, SLOT   (onSigSendLogs ()));
@@ -1664,38 +1657,12 @@ MainWindow::onRegPhoneSelectionChange (int index)
 void
 MainWindow::onRefresh ()
 {
-    qDebug ("Refresh all requested.");
+    Q_DEBUG ("Refresh all requested.");
 
     refreshRegisteredNumbers ();
     oInbox.refresh ();
     oContacts.refreshContacts ();
 }//MainWindow::onRefresh
-
-void
-MainWindow::onRefreshAll ()
-{
-    qDebug ("Refresh all requested.");
-
-    refreshRegisteredNumbers ();
-    oInbox.refreshFullInbox ();
-    oContacts.refreshAllContacts ();
-}//MainWindow::onRefreshAll
-
-void
-MainWindow::onSigRefreshContacts()
-{
-    qDebug ("Refresh Contacts requested.");
-
-    oContacts.refreshContacts ();
-}//MainWindow::onSigRefreshContacts
-
-void
-MainWindow::onSigRefreshInbox()
-{
-    qDebug ("Refresh inbox requested.");
-
-    oInbox.refresh ();
-}//MainWindow::onSigRefreshInbox
 
 void
 MainWindow::onSigProxyChanges(bool bEnable, bool bUseSystemProxy,
@@ -2032,7 +1999,7 @@ MainWindow::onFallbackDialout (bool bSuccess, void *v_ctx)
     }
 
     Q_DEBUG("Fallback dial is in progress. Now send DTMF");
-    
+
     QString strDTMF;
     strDTMF = "p*p2p" + ctx->strTarget;
     // Add the pin if it is there
