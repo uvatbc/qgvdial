@@ -158,6 +158,7 @@ TpCalloutInitiator::onConnectionReady (Tp::PendingOperation *op)
               .arg (account->cmName ());
         Q_DEBUG (msg);
 
+#if 0
         // We can find out some information about this account
         QVariantMap varMap = account->parameters ();
         for (QVariantMap::iterator i = varMap.begin ();
@@ -168,6 +169,7 @@ TpCalloutInitiator::onConnectionReady (Tp::PendingOperation *op)
                   .arg (i.value().toString ());
             Q_DEBUG (msg);
         }
+#endif
     } while (0); // End cleanup block (not a loop)
 
     emit changed ();
