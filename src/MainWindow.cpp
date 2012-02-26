@@ -135,7 +135,7 @@ MainWindow::initLogging ()
                         this     , SLOT(onCleanupLogsArray()));
     Q_ASSERT(rv); Q_UNUSED(rv);
 
-    setStatus("Using qgvdial version __QGVDIAL_VERSION__");
+    Q_DEBUG("Using qgvdial version __QGVDIAL_VERSION__");
 }//MainWindow::initLogging
 
 /** Log information to console and to log file
@@ -193,8 +193,6 @@ MainWindow::onCleanupLogsArray()
 void
 MainWindow::setStatus(const QString &strText, int timeout /* = 3000*/)
 {
-    Q_WARN(strText);
-
 #ifdef Q_WS_MAEMO_5
     infoBox.hide ();
 
@@ -297,6 +295,7 @@ MainWindow::init ()
     OsDependent &osd = Singletons::getRef().getOSD ();
     bool rv;
 
+    Q_DEBUG ("Initializing...");
     setStatus ("Initializing...");
 
     // Initialize the database: This may create OR blowup and then re-create
@@ -496,6 +495,8 @@ MainWindow::init ()
         // Login without popping up the "enter user/pass" dialog
         doLogin ();
     } else {
+        Q_DEBUG("No user and password set up. Asking user to enter that info");
+
         // Show this status for 60 seconds (or until the next status)
         setStatus ("Please enter email and password", 60 * 1000);
 
@@ -726,6 +727,7 @@ MainWindow::doLogin ()
         token->inParams["user"] = strUser;
         token->inParams["pass"] = strPass;
 
+        Q_DEBUG("Login using user ") << strUser;
         setStatus ("Logging in...", 0);
 
         osd.setLongWork (this, true);
@@ -798,16 +800,20 @@ MainWindow::loginCompleted (AsyncTaskToken *token)
         osd.setLongWork (this, false);
 
         setStatus ("User login failed", 30*1000);
+
         QString strErr = gvApi.getLastErrorString ();
         if (strErr.isEmpty ()) {
             strErr = "User login failed";
         }
         this->showMsgBox (strErr);
 
+        Q_WARN("User login failed. Error string: ") << strErr;
+
         QTimer::singleShot (500, this, SLOT(onRecreateCookieJar()));
     } else {
         CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
         setStatus ("User logged in");
+        Q_DEBUG ("User logged in");
 
         QString strOldUser, strOldPass;
         dbMain.getUserPass (strOldUser, strOldPass);
@@ -891,6 +897,8 @@ MainWindow::logoutCompleted (AsyncTaskToken *token)
     ctx->setContextProperty ("g_bIsLoggedIn", bLoggedIn);
 
     setStatus ("Logout complete");
+    Q_DEBUG ("Logout complete");
+
     OsDependent &osd = Singletons::getRef().getOSD ();
     osd.setLongWork (this, false);
 
@@ -959,6 +967,7 @@ MainWindow::getContactsDone (bool bOk)
     if (!bOk) {
         this->showMsgBox ("Contacts retrieval failed");
         setStatus ("Contacts retrieval failed");
+        Q_WARN ("Contacts retrieval failed");
     }
 }//MainWindow::getContactsDone
 
@@ -1097,6 +1106,7 @@ MainWindow::dialNow (const QString &strTarget)
     do { // Begin cleanup block (not a loop)
         if (!bLoggedIn) {
             setStatus ("User is not logged in yet. Cannot make any calls.");
+            Q_WARN("User is not logged in yet. Cannot make any calls.");
             break;
         }
         if (gvApi.getSelfNumber().isEmpty () ||
@@ -1111,17 +1121,20 @@ MainWindow::dialNow (const QString &strTarget)
         QMutexLocker locker (&mtxDial);
         if (bCallInProgress) {
             setStatus ("Another call is in progress. Please try again later");
+            Q_WARN ("Cannot dial because another call is in progress.");
             break;
         }
 
         GVRegisteredNumber gvRegNumber;
         if (!getDialSettings (bDialout, gvRegNumber, ci)) {
             setStatus ("Unable to dial because settings are not valid.");
+            Q_WARN ("Unable to dial because settings are not valid.");
             break;
         }
 
         if (strTarget.isEmpty ()) {
             setStatus ("Cannot dial empty number");
+            Q_WARN ("Cannot dial empty number");
             break;
         }
 
@@ -1132,17 +1145,21 @@ MainWindow::dialNow (const QString &strTarget)
                .remove('-');
         if (!strTest.isEmpty ()) {
             setStatus ("Cannot use numbers with special symbols or characters");
+            Q_WARN (QString("Failed to dial the user entered number \"%1\"")
+                        .arg(strTarget));
             break;
         }
 
         ctx = new DialContext(gvApi.getSelfNumber(), strTarget, this);
         if (NULL == ctx) {
             setStatus ("Failed to dial out because of allocation problem");
+            Q_WARN ("Failed to malloc DialContext");
             break;
         }
         token = new AsyncTaskToken(this);
         if (NULL == token) {
             setStatus ("Failed to dial out because of allocation problem");
+            Q_WARN ("Failed to malloc AsyncTaskToken");
             break;
         }
 
@@ -1268,10 +1285,12 @@ MainWindow::dialComplete (AsyncTaskToken *token)
     QMutexLocker locker (&mtxDial);
     DialContext *ctx = (DialContext *) token->callerCtx;
     bool bReleaseContext = true;
+    QString accessNumber, msg;
 
     if (ATTS_SUCCESS != token->status) {
         if (bDialCancelled) {
             setStatus ("Cancelled dial out");
+            Q_WARN("Cancelled dial out");
         } else if (NULL == ctx->fallbackCi) {
             // Not currently in fallback mode and there was a problem
             // ... so start fallback mode
@@ -1279,8 +1298,14 @@ MainWindow::dialComplete (AsyncTaskToken *token)
             bReleaseContext = false;
             fallbackDialout (ctx);
         } else {
-            setStatus ("Dialing failed", 10*1000);
-            this->showMsgBox (gvApi.getLastErrorString ());
+            msg = "Dialing failed";
+            setStatus (msg, 10*1000);
+
+            QString eS = gvApi.getLastErrorString ();
+            this->showMsgBox (eS);
+
+            msg += QString(". Error string = %1").arg (eS);
+            Q_WARN (msg);
         }
     } else {
         bool success = false;
@@ -1300,7 +1325,7 @@ MainWindow::dialComplete (AsyncTaskToken *token)
                 break;
             }
 
-            QString accessNumber = token->outParams["access_number"].toString();
+            accessNumber = token->outParams["access_number"].toString();
             if (accessNumber.isEmpty ()) {
                 Q_WARN("Invalid access number");
                 break;
@@ -1308,14 +1333,22 @@ MainWindow::dialComplete (AsyncTaskToken *token)
 
             ctx->ci->initiateCall (accessNumber);
             setStatus ("Callout in progress");
+            Q_DEBUG("Callout in progress");
 
             success = true;
         } while (0); // End cleanup block (not a loop)
 
         if (success) {
-            setStatus (QString("Dial successful to %1.")
-                       .arg(token->inParams["destination"].toString()));
+            msg = QString("Dial successful to %1")
+                            .arg(token->inParams["destination"].toString());
+            setStatus (msg);
+
+            if (!accessNumber.isEmpty ()) {
+                msg += QString(" using access number %1").arg (accessNumber);
+            }
+            Q_DEBUG (msg);
         } else {
+            Q_DEBUG ("Callout failed");
             setStatus ("Callout failed");
         }
     }
@@ -1371,6 +1404,7 @@ MainWindow::sendSMS (const QStringList &arrNumbers, const QString &strText)
         msg = QString("Could not send a text to %1")
                 .arg (arrFailed.join (", "));
         setStatus (msg);
+        Q_WARN (msg);
     }
 }//MainWindow::sendSMS
 
@@ -1388,6 +1422,7 @@ MainWindow::sendSMSDone (bool bOk, const QVariantList &params)
     }
 
     setStatus (msg);
+    Q_DEBUG (msg);
 }//MainWindow::sendSMSDone
 
 bool
@@ -1443,11 +1478,13 @@ MainWindow::gotAllRegisteredPhones (AsyncTaskToken *token)
         if (ATTS_SUCCESS != token->status) {
             this->showMsgBox ("Failed to retrieve registered phones");
             setStatus ("Failed to retrieve registered phones");
+            Q_WARN ("Failed to retrieve registered phones");
             break;
         }
 
         this->onCallInitiatorsChange (true);
 
+        Q_DEBUG("GV callbacks retrieved.");
         setStatus ("GV callbacks retrieved.");
     } while (0); // End cleanup block (not a loop)
 
@@ -1491,8 +1528,10 @@ MainWindow::retrieveVoicemail (const QString &strVmailLink)
 
     do { // Begin cleanup block (not a loop)
         if (mapVmail.contains (strVmailLink)) {
+            QString strFile = mapVmail[strVmailLink];
+            Q_DEBUG("Playing cached vmail") << strFile;
             setStatus ("Playing cached vmail");
-            playVmail (mapVmail[strVmailLink]);
+            playVmail (strFile);
             rv = true;
             break;
         }
@@ -1540,8 +1579,10 @@ MainWindow::onVmailDownloaded (AsyncTaskToken *token)
         QString strVmailLink = token->inParams["vmail_link"].toString();
         if (!mapVmail.contains (strVmailLink)) {
             mapVmail[strVmailLink] = strFilename;
+            Q_DEBUG("Voicemail downloaded to ") << strFilename;
             setStatus ("Voicemail downloaded");
         } else {
+            Q_DEBUG("Voicemail already existed. Using cached vmail");
             setStatus ("Voicemail already existed. Using cached vmail");
             if (strFilename != mapVmail[strVmailLink]) {
                 QFile::remove (strFilename);
@@ -2111,7 +2152,7 @@ MainWindow::onTwoStepAuthentication(AsyncTaskToken *token)
 }//MainWindow::onTwoStepAuthentication
 
 void
-MainWindow::onOrientationChanged(OsIndependentOrientation o)
+MainWindow::onOrientationChanged(OsIndependentOrientation /*o*/)
 {
     QObject *pMain = this->rootObject ();
     if (NULL == pMain) {
