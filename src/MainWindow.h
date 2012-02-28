@@ -246,10 +246,10 @@ private:
 
     void initMq();
 
+    //! Get a pointer to the QML object
     QObject * getQMLObject(const char *pageName);
-
     bool ensureNwMgr();
-
+    //! Request quit in the app
     void requestQuit();
 
 private:

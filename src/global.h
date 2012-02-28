@@ -55,10 +55,6 @@ Contact: yuvraaj@gmail.com
 #define POST_FORM "application/x-www-form-urlencoded"
 #define POST_TEXT "text/plain"
 
-#define Q_DEBUG(_s) qDebug() << QString("%1(%2): %3").arg(__FUNCTION__).arg(__LINE__).arg(_s)
-#define Q_WARN(_s) qWarning() << QString("%1(%2): %3").arg(__FUNCTION__).arg(__LINE__).arg(_s)
-#define Q_CRIT(_s) qCritical() << QString("%1(%2): %3").arg(__FUNCTION__).arg(__LINE__).arg(_s)
-
 typedef QList<QVariantMap> VarMapList;
 
 struct GVRegisteredNumber
@@ -301,6 +297,16 @@ void qgv_LogFlush();
 #else
 #define MOBILITY_PRESENT 1
 #endif
+
+#if defined(Q_WS_X11)
+#define __FULLFUNC__ __PRETTY_FUNCTION__
+#else
+#define __FULLFUNC__ __FUNCTION__
+#endif
+
+#define Q_DEBUG(_s) qDebug() << QString("%1(%2): %3").arg(__FULLFUNC__).arg(__LINE__).arg(_s)
+#define Q_WARN(_s) qWarning() << QString("%1(%2): %3").arg(__FULLFUNC__).arg(__LINE__).arg(_s)
+#define Q_CRIT(_s) qCritical() << QString("%1(%2): %3").arg(__FULLFUNC__).arg(__LINE__).arg(_s)
 
 #include "AsyncTaskToken.h"
 

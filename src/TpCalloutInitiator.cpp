@@ -351,6 +351,8 @@ TpCalloutInitiator::sendDTMF (const QString &strTones)
 
         Q_DEBUG("DTMF tones sent");
         rv = true;
+#else
+        Q_UNUSED(strTones);
 #endif
     } while (0); // End cleanup block (not a loop)
 
@@ -377,7 +379,6 @@ TpCalloutInitiator::onDtmfNextTone()
             break;
         }
 
-        Q_DEBUG("Here");
 #if !USE_RAW_CHANNEL_METHOD
         Tp::StreamedMediaStreams streams =
             channel->streamsForType(Tp::MediaStreamTypeAudio);
