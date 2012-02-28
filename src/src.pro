@@ -65,7 +65,10 @@ SOURCES  += ../src/main.cpp                 \
             ../src/NwReqTracker.cpp         \
             ../src/AsyncTaskToken.cpp       \
             ../src/GVApi.cpp                \
-            ../src/MyXmlErrorHandler.cpp
+            ../src/MyXmlErrorHandler.cpp    \
+            ../src/MainWinLogs.cpp          \
+            ../src/MainWinCallText.cpp \
+    MainWinVmail.cpp
 
 HEADERS  += ../src/global.h                 \
             ../src/IObserver.h              \

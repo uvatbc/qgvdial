@@ -219,10 +219,6 @@ private:
     void initInbox ();
     void deinitInbox ();
 
-    bool getInfoFrom (const QString &strNumber,
-                      const QString &strNameLink,
-                      ContactInfo &info);
-
     bool findInfo (const QString &strNumber, ContactInfo &info);
 
     bool refreshRegisteredNumbers ();
