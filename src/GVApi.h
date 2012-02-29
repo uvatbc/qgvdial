@@ -42,7 +42,6 @@ public:
     void setAllCookies(QList<QNetworkCookie> cookies);
 
     QString getSelfNumber();
-    QString getLastErrorString();
 
     void cancel(AsyncTaskToken *token);
 
@@ -161,8 +160,6 @@ private:
     QString rnr_se;
     //! The users Google Voice number
     QString strSelfNumber;
-    //! A message box displayable error string
-    QString strLastErrorMessage;
 
     QNetworkAccessManager nwMgr;
     CookieJar *jar;

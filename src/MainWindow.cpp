@@ -678,7 +678,10 @@ MainWindow::loginCompleted (AsyncTaskToken *token)
 
         setStatus ("User login failed", 30*1000);
 
-        QString strErr = gvApi.getLastErrorString ();
+        QString strErr;
+        if (token) {
+            strErr = token->errorString;
+        }
         if (strErr.isEmpty ()) {
             strErr = "User login failed";
         }

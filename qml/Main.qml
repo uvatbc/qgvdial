@@ -80,7 +80,7 @@ Rectangle {
     property bool bShowSettings: g_bShowSettings
     onBShowSettingsChanged: {
         if (bShowSettings) {
-            console.debug("Settings on");
+            console.debug("Settings page shown");
             main.state = "Settings";
         } else {
             console.debug("Settings off");

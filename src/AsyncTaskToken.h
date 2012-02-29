@@ -35,6 +35,9 @@ public:
 
     // context to be used by the API to which this token is passed.
     void        *apiCtx;
+
+    //! If the work completed in error, then the error string is stored here.
+    QString     errorString;
 };
 
 #endif // ASYNCTASKTOKEN_H

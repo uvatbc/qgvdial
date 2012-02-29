@@ -365,12 +365,6 @@ GVApi::getSelfNumber()
     return strSelfNumber;
 }//GVApi::getSelfNumber
 
-QString
-GVApi::getLastErrorString()
-{
-    return strLastErrorMessage;
-}//GVApi::getLastErrorString
-
 QUrl
 GVApi::hasMoved(QNetworkReply *reply)
 {
@@ -603,6 +597,7 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
 {
     QString strResponse = response;
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
+    bool accountConfigured = true;
 
     do { // Begin cleanup block (not a loop)
         if (!success) break;
@@ -616,6 +611,17 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
                 }
                 success = beginTwoFactorAuth (urlMoved, token);
             } else {
+                QString dest = urlMoved.toString ();
+                if (dest.contains ("voice/help/setupMobile")) {
+                    accountConfigured = false;
+                    success = false;
+                    break;
+                }
+#if 0
+                if (emitLog) {
+                    Q_DEBUG("Moved to") << dest;
+                }
+#endif
                 success = postLogin (urlMoved, token);
             }
             break;
@@ -639,10 +645,20 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
     } while (0); // End cleanup block (not a loop)
 
     if (!success) {
-        Q_WARN("Login failed.") << strResponse;
+        if (accountConfigured) {
+            Q_WARN("Login failed.") << strResponse;
 
-        token->status = ATTS_LOGIN_FAILURE;
-        token->emitCompleted ();
+            token->errorString = "User login failure";
+            token->status = ATTS_LOGIN_FAILURE;
+            token->emitCompleted ();
+        } else {
+            Q_WARN("Login failed because user account was not configured.");
+
+            token->errorString = "Account setup incomplete.\n"
+                                 "Please set up using a desktop";
+            token->status = ATTS_AC_NOT_CONFIGURED;
+            token->emitCompleted ();
+        }
     }
 }//GVApi::onLogin2
 

@@ -269,10 +269,18 @@ MainWindow::dialComplete (AsyncTaskToken *token)
             msg = "Dialing failed";
             setStatus (msg, 10*1000);
 
-            QString eS = gvApi.getLastErrorString ();
-            this->showMsgBox (eS);
+            QString strErr;
+            if (token) {
+                strErr = token->errorString;
+            }
+            if (strErr.isEmpty ()) {
+                strErr = "Dial out failed";
+            } else {
+                msg += QString(". Error string = %1").arg (strErr);
+            }
 
-            msg += QString(". Error string = %1").arg (eS);
+            this->showMsgBox (strErr);
+
             Q_WARN (msg);
         }
     } else {
