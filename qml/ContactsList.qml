@@ -161,7 +161,7 @@ Rectangle {
 
             property bool isRefreshing: false
             onContentYChanged: {
-                if (isRefreshing && (contentY == 0)) {
+                if (isRefreshing && (contentY < 1)) {
                     isRefreshing = false;
                     container.sigRefreshContacts();
                 }

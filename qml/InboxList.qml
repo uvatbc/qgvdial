@@ -415,8 +415,7 @@ Rectangle {
             header: listHeader
             property bool isRefreshing: false
             onContentYChanged: {
-                console.debug("Y changing! isRefreshing = " + isRefreshing);
-                if (isRefreshing && (contentY == 0)) {
+                if (isRefreshing && (contentY < 1)) {
                     isRefreshing = false;
                     container.sigRefreshInbox();
                 }
