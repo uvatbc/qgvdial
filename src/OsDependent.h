@@ -78,6 +78,7 @@ public:
     QRect getStartingSize ();
     QString getAppDirectory ();
     QString getMainQML();
+    void getMultipliers(double &hMul, double &wMul, double &fontMul);
 
     bool cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt);
 

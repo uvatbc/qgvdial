@@ -391,6 +391,9 @@ MainWindow::initQML ()
     bool bTempFalse = false;
     int iTempZero = 0;
 
+    double hMul, wMul, fontMul;
+    osd.getMultipliers (hMul, wMul, fontMul);
+
     // Prepare the globally accessible variants for QML.
     QDeclarativeContext *ctx = this->rootContext();
     ctx->setContextProperty ("g_bShowMsg", bTempFalse);
@@ -402,6 +405,9 @@ MainWindow::initQML ()
     ctx->setContextProperty ("g_CurrentPhoneName", "Not loaded");
     ctx->setContextProperty ("g_vmailPlayerState", iTempZero);
     ctx->setContextProperty ("g_logModel", QVariant::fromValue(arrLogMsgs));
+    ctx->setContextProperty ("g_hMul", hMul);
+    ctx->setContextProperty ("g_wMul", wMul);
+    ctx->setContextProperty ("g_fontMul", fontMul);
 
     // Initialize the QML view
     this->setSource (QUrl(osd.getMainQML()));

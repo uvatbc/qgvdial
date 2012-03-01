@@ -317,6 +317,12 @@ OsDependent::getMainQML ()
     "Main.qml";
 }//OsDependent::getMainQML
 
+void
+OsDependent::getMultipliers(double &hMul, double &wMul, double &fontMul)
+{
+    hMul = wMul = fontMul = 1.0;
+}//OsDependent::getMultipliers
+
 bool
 OsDependent::cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt)
 {
