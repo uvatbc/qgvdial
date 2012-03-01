@@ -86,7 +86,6 @@ Rectangle {
             text: "SMS Text"
             color: "white"
 
-            font.pixelSize: mainFlick.pixHeight
             font { family: "Nokia Sans"; bold: true; pointSize: (7 * g_fontMul) }
         }
 

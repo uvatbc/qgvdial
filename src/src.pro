@@ -120,6 +120,7 @@ OTHER_FILES  += ../src/winrsrc.rc           \
                 ../qml/DialDisp.qml         \
                 ../qml/DigitButton.qml      \
                 ../qml/ExpandView.qml       \
+                ../qml/Fader.qml            \
                 ../qml/helper.js            \
                 ../qml/HMain.qml            \
                 ../qml/InboxList.qml        \

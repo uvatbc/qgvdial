@@ -32,6 +32,25 @@ Rectangle {
     signal sigMsgBoxOk
     signal sigMsgBoxCancel
 
+    Fader {
+        anchors.fill: parent
+        state: "faded"
+    }
+
+    Text {
+        text: container.msgText
+
+        width: parent.width * 0.8
+        anchors {
+            verticalCenter: parent.verticalCenter
+            horizontalCenter: parent.horizontalCenter
+        }
+
+        font { family: "Nokia Sans"; bold: true; pointSize: (7 * g_fontMul) }
+        wrapMode: Text.WordWrap
+        color: "white"
+    }
+
     Item {
         id: textItem
         height: parent.height * 2 / 3
@@ -41,20 +60,11 @@ Rectangle {
             left: parent.left
         }
 
-        Text {
-            text: container.msgText
-            width: parent.width
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.horizontalCenter: parent.horizontalCenter
-            font.pixelSize: parent.height * 1 / 3
-            wrapMode: Text.WordWrap
-            color: "yellow"
-        }
 
         MouseArea {
             anchors.fill: parent
         }
-    }// Item containing the test to display
+    }// Item containing the text to display
 
     Row { // (ok and cancel buttons)
         height: parent.height * 1 / 3
@@ -76,7 +86,7 @@ Rectangle {
                 text: "Ok"
                 focus: true
                 anchors.centerIn: parent
-                font.pixelSize: parent.height * 2 / 5
+                font { family: "Nokia Sans"; pointSize: (7 * g_fontMul) }
                 color: "white"
             }
 
@@ -92,6 +102,7 @@ Rectangle {
                 PropertyChanges { target: btnOk; color: "orange" }
             }
         }// Rectangle (ok)
+
         Rectangle {
             id: btnCancel
             height: parent.height - 1
@@ -104,7 +115,7 @@ Rectangle {
                 text: "Cancel"
                 focus: true
                 anchors.centerIn: parent
-                font.pixelSize: parent.height * 2 / 5
+                font { family: "Nokia Sans"; bold: true; pointSize: (7 * g_fontMul) }
                 color: "white"
             }
 

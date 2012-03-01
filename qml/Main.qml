@@ -231,9 +231,7 @@ Rectangle {
         opacity: ((g_bShowMsg === true) ? 1 : 0)
         msgText: g_strMsgText
 
-        width: main.width - 20
-        height: (main.width + main.height) / 6
-        anchors.centerIn: main
+        anchors.fill: parent
 
         onSigMsgBoxOk: main.sigMsgBoxDone(true)
         onSigMsgBoxCancel: main.sigMsgBoxDone(false)

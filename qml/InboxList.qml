@@ -415,7 +415,12 @@ Rectangle {
             header: listHeader
             property bool isRefreshing: false
             onContentYChanged: {
-                if (isRefreshing && (contentY < 1)) {
+                var cY = contentY;
+                if (cY < 0.0) {
+                    cY = -contentY;
+                }
+
+                if (isRefreshing && (cY < 1)) {
                     isRefreshing = false;
                     container.sigRefreshInbox();
                 }

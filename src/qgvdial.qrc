@@ -30,6 +30,7 @@
         <file alias="DialDisp.qml">../qml/DialDisp.qml</file>
         <file alias="DigitButton.qml">../qml/DigitButton.qml</file>
         <file alias="ExpandView.qml">../qml/ExpandView.qml</file>
+        <file alias="Fader.qml">../qml/Fader.qml</file>
         <file alias="helper.js">../qml/helper.js</file>
         <file alias="HMain.qml">../qml/HMain.qml</file>
         <file alias="InboxList.qml">../qml/InboxList.qml</file>
