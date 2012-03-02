@@ -174,7 +174,11 @@
     <ClCompile Include="InboxModel.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainApp.cpp" />
+    <ClCompile Include="MainWinCallText.cpp" />
     <ClCompile Include="MainWindow.cpp" />
+    <ClCompile Include="MainWinLogin.cpp" />
+    <ClCompile Include="MainWinLogs.cpp" />
+    <ClCompile Include="MainWinVmail.cpp" />
     <ClCompile Include="MobileWebPage.cpp" />
     <ClCompile Include="MqClientThread.cpp" />
     <ClCompile Include="MyXmlErrorHandler.cpp" />

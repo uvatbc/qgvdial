@@ -40,6 +40,10 @@ PRECOMPILED_HEADER = ../src/global.h
 SOURCES  += ../src/main.cpp                 \
             ../src/MainApp.cpp              \
             ../src/MainWindow.cpp           \
+            ../src/MainWinLogs.cpp          \
+            ../src/MainWinCallText.cpp      \
+            ../src/MainWinVmail.cpp         \
+            ../src/MainWinLogin.cpp         \
             ../src/Singletons.cpp           \
             ../src/CacheDatabase.cpp        \
             ../src/OsDependent.cpp          \
@@ -65,10 +69,7 @@ SOURCES  += ../src/main.cpp                 \
             ../src/NwReqTracker.cpp         \
             ../src/AsyncTaskToken.cpp       \
             ../src/GVApi.cpp                \
-            ../src/MyXmlErrorHandler.cpp    \
-            ../src/MainWinLogs.cpp          \
-            ../src/MainWinCallText.cpp \
-    MainWinVmail.cpp
+            ../src/MyXmlErrorHandler.cpp
 
 HEADERS  += ../src/global.h                 \
             ../src/IObserver.h              \
@@ -130,6 +131,7 @@ OTHER_FILES  += ../src/winrsrc.rc           \
                 ../qml/Main.qml             \
                 ../qml/MainView.qml         \
                 ../qml/Mosquitto.qml        \
+                ../qml/MeegoButton.qml      \
                 ../qml/MsgBox.qml           \
                 ../qml/MyButton.qml         \
                 ../qml/MyTextEdit.qml       \

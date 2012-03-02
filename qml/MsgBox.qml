@@ -21,11 +21,8 @@ Contact: yuvraaj@gmail.com
 
 import Qt 4.7
 
-Rectangle {
+Item {
     id: container
-    border.color: "grey"
-    color: "black"
-    radius: 7
 
     property string msgText: "Dialing\n+1 000 000 0000"
 
@@ -35,102 +32,59 @@ Rectangle {
     Fader {
         anchors.fill: parent
         state: "faded"
+
+        fadingOpacity: 0.8
     }
 
-    Text {
-        text: container.msgText
+    Rectangle {
+        anchors.fill: parent
+        color: "transparent"
+        border.color: "orange"
+    }
 
+    Column {
+        height: textItem.height + btnRow.height + spacing
         width: parent.width * 0.8
-        anchors {
-            verticalCenter: parent.verticalCenter
-            horizontalCenter: parent.horizontalCenter
-        }
 
-        font { family: "Nokia Sans"; bold: true; pointSize: (7 * g_fontMul) }
-        wrapMode: Text.WordWrap
-        color: "white"
-    }
+        anchors.centerIn: parent
+        spacing: 5 * g_hMul
 
-    Item {
-        id: textItem
-        height: parent.height * 2 / 3
-        width: parent.width
-        anchors {
-            top: parent.top
-            left: parent.left
-        }
+        Text {
+            id: textItem
+            text: container.msgText
+            width: parent.width
+            height: paintedHeight + (5 * g_hMul)
 
+            font { family: "Nokia Sans"; bold: true; pointSize: (7 * g_fontMul) }
+            wrapMode: Text.WordWrap
+            color: "white"
 
-        MouseArea {
-            anchors.fill: parent
-        }
-    }// Item containing the text to display
+            horizontalAlignment: Text.AlignHCenter
+        }// Item containing the text to display
 
-    Row { // (ok and cancel buttons)
-        height: parent.height * 1 / 3
-        width: parent.width
-        anchors {
-            top: textItem.bottom
-            left: parent.left
-        }
+        Row { // (ok and cancel buttons)
+            id: btnRow
 
-        Rectangle {
-            id: btnOk
-            height: parent.height - 1
-            width: parent.width / 2
-            border.color: "white"
-            color: "green"
-            radius: 7
+            height: 20 * g_hMul
+            width: parent.width
+            anchors {
+                top: textItem.bottom
+                horizontalCenter: parent.horizontalCenter
+            }
 
-            Text {
+            MeegoButton {
                 text: "Ok"
                 focus: true
-                anchors.centerIn: parent
-                font { family: "Nokia Sans"; pointSize: (7 * g_fontMul) }
-                color: "white"
-            }
 
-            MouseArea {
-                id: mouseAreaBtnOk
-                anchors.fill: parent
-                onClicked: container.sigMsgBoxOk()
-            }
+                onClicked: container.sigMsgBoxOk();
+            }// MeegoButton (ok)
 
-            states: State {
-                name: "pressed"
-                when: mouseAreaBtnOk.pressed
-                PropertyChanges { target: btnOk; color: "orange" }
-            }
-        }// Rectangle (ok)
-
-        Rectangle {
-            id: btnCancel
-            height: parent.height - 1
-            width: parent.width / 2
-            border.color: "white"
-            color: "red"
-            radius: 7
-
-            Text {
+            MeegoButton {
                 text: "Cancel"
-                focus: true
-                anchors.centerIn: parent
-                font { family: "Nokia Sans"; bold: true; pointSize: (7 * g_fontMul) }
-                color: "white"
-            }
 
-            MouseArea {
-                id: mouseAreaBtnCancel
-                anchors.fill: parent
-                onClicked: container.sigMsgBoxCancel()
-            }
-
-            states: State {
-                name: "pressed"
-                when: mouseAreaBtnCancel.pressed
-                PropertyChanges { target: btnCancel; color: "orange" }
-            }
-        }// Rectangle (cancel)
-    }// Row (ok and cancel)
-
+                onClicked: container.sigMsgBoxCancel();
+                onPressHold: container.sigMsgBoxCancel();
+            }// MeegoButton (cancel)
+        }// Row (ok and cancel)
+    }
 }// Rectangle (container)

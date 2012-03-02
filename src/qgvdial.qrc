@@ -22,6 +22,8 @@
         <file alias="unknown_contact.png">../icons/unknown_contact.png</file>
         <file alias="pause.svg">../icons/pause.svg</file>
         <file alias="play.svg">../icons/play.svg</file>
+        <file alias="pushbutton_normal.svg">../icons/pushbutton_normal.svg</file>
+        <file alias="pushbutton_pressed.svg">../icons/pushbutton_pressed.svg</file>
         <file alias="About.qml">../qml/About.qml</file>
         <file alias="ActionButtons.qml">../qml/ActionButtons.qml</file>
         <file alias="ComboBoxPhones.qml">../qml/ComboBoxPhones.qml</file>
@@ -39,6 +41,7 @@
         <file alias="LogView.qml">../qml/LogView.qml</file>
         <file alias="Main.qml">../qml/Main.qml</file>
         <file alias="MainView.qml">../qml/MainView.qml</file>
+        <file alias="MeegoButton.qml">../qml/MeegoButton.qml</file>
         <file alias="Mosquitto.qml">../qml/Mosquitto.qml</file>
         <file alias="MsgBox.qml">../qml/MsgBox.qml</file>
         <file alias="MyButton.qml">../qml/MyButton.qml</file>
