@@ -1,7 +1,3 @@
 #!/bin/sh
 chmod +x /usr/bin/qgvdial
-chmod +x /usr/bin/qgv-tp
-chmod +x /usr/bin/qgv-util
-rm -f /home/user/.qgvdial/*.log
-/usr/bin/qgv-util INSTALL
 
