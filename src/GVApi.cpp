@@ -654,8 +654,8 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
         } else {
             Q_WARN("Login failed because user account was not configured.");
 
-            token->errorString = "Account setup incomplete.\n"
-                                 "Please set up using a desktop";
+            token->errorString = "Account setup is incomplete. "
+                                 "Please complete setup using a desktop";
             token->status = ATTS_AC_NOT_CONFIGURED;
             token->emitCompleted ();
         }

@@ -36,12 +36,6 @@ Item {
         fadingOpacity: 0.8
     }//Fader (to fade out the back ground)
 
-    Rectangle {
-        anchors.fill: parent
-        color: "transparent"
-        border.color: "orange"
-    }
-
     Column {
         height: textItem.height + btnRow.height + spacing
         width: parent.width * 0.8
@@ -55,7 +49,7 @@ Item {
             width: parent.width
             height: paintedHeight + (5 * g_hMul)
 
-            font { family: "Nokia Sans"; bold: true; pointSize: (10 * g_fontMul) }
+            font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
             wrapMode: Text.WordWrap
             color: "white"
 
@@ -67,12 +61,9 @@ Item {
 
             height: 20 * g_hMul
             width: parent.width
-            anchors {
-                top: textItem.bottom
-                horizontalCenter: parent.horizontalCenter
-            }
+            anchors.horizontalCenter: parent.horizontalCenter
 
-            spacing: 5
+            spacing: 5 * g_wMul
 
             MeegoButton {
                 text: "Ok"
@@ -88,5 +79,5 @@ Item {
                 onPressHold: container.sigMsgBoxCancel();
             }// MeegoButton (cancel)
         }// Row (ok and cancel)
-    }
+    }// Column with the text and the two buttons
 }// Rectangle (container)

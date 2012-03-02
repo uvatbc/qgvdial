@@ -67,6 +67,7 @@ BorderImage {
         anchors.verticalCenter: parent.verticalCenter
 
         font { family: "Nokia Sans"; pointSize: (7 * g_fontMul) }
+        smooth: true
     }// Text
 
     MouseArea {
