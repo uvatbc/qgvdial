@@ -79,6 +79,9 @@ MainWindow::onUserTextChanged (const QString &strUsername)
     if (strUser != strUsername) {
         strUser = strUsername;
         this->setUsername (strUser);
+
+        QList<QNetworkCookie> noCookies;
+        gvApi.setAllCookies(noCookies);
     }
 }//MainWindow::onUserTextChanged
 
@@ -87,10 +90,10 @@ MainWindow::onPassTextChanged (const QString &strPassword)
 {
     if (strPass != strPassword) {
         strPass = strPassword;
+        this->setPassword (strPass);
 
         QList<QNetworkCookie> noCookies;
         gvApi.setAllCookies(noCookies);
-        this->setPassword (strPass);
     }
 }//MainWindow::onUserPassTextChanged
 
@@ -111,6 +114,8 @@ MainWindow::on_action_Login_triggered ()
 void
 MainWindow::loginCompleted (AsyncTaskToken *token)
 {
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+
     if (!token || (token->status != ATTS_SUCCESS)) {
         logoutCompleted (NULL);
 
@@ -130,9 +135,9 @@ MainWindow::loginCompleted (AsyncTaskToken *token)
 
         Q_WARN("User login failed. Error string: ") << strErr;
 
+        dbMain.clearUserPass ();
         QTimer::singleShot (500, this, SLOT(onRecreateCookieJar()));
     } else {
-        CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
         setStatus ("User logged in");
         Q_DEBUG ("User logged in");
 

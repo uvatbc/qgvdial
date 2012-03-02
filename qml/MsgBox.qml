@@ -34,7 +34,7 @@ Item {
         state: "faded"
 
         fadingOpacity: 0.8
-    }
+    }//Fader (to fade out the back ground)
 
     Rectangle {
         anchors.fill: parent
@@ -55,7 +55,7 @@ Item {
             width: parent.width
             height: paintedHeight + (5 * g_hMul)
 
-            font { family: "Nokia Sans"; bold: true; pointSize: (7 * g_fontMul) }
+            font { family: "Nokia Sans"; bold: true; pointSize: (10 * g_fontMul) }
             wrapMode: Text.WordWrap
             color: "white"
 
@@ -71,6 +71,8 @@ Item {
                 top: textItem.bottom
                 horizontalCenter: parent.horizontalCenter
             }
+
+            spacing: 5
 
             MeegoButton {
                 text: "Ok"

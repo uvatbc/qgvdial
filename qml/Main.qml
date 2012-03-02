@@ -235,7 +235,7 @@ Rectangle {
 
         onSigMsgBoxOk: main.sigMsgBoxDone(true)
         onSigMsgBoxCancel: main.sigMsgBoxDone(false)
-    }// MsgBox
+    }//MsgBox
 
     Rectangle {
         id: barStatus
@@ -253,4 +253,4 @@ Rectangle {
             color: "white"
         }
     }//Rectangle (status bar)
-}
+}//Rectangle (main)

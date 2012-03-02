@@ -302,6 +302,13 @@ CacheDatabase::putUserPass (const QString &strUser, const QString &strPass)
     return (true);
 }//CacheDatabase::putUserPass
 
+void
+CacheDatabase::clearUserPass ()
+{
+    settings->remove (GV_S_VAR_USER);
+    settings->remove (GV_S_VAR_PASS);
+}//CacheDatabase::clearUserPass
+
 bool
 CacheDatabase::getCallback (QString &strCallback)
 {

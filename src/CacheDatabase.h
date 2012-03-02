@@ -62,6 +62,7 @@ public:
     // username and password
     bool getUserPass (QString &strUser, QString &strPass);
     bool putUserPass (const QString &strUser, const QString &strPass);
+    void clearUserPass ();
 
     // GV callback / callout method
     bool getCallback (QString &strCallback);

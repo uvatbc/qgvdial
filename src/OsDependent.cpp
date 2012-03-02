@@ -321,6 +321,9 @@ void
 OsDependent::getMultipliers(double &hMul, double &wMul, double &fontMul)
 {
     hMul = wMul = fontMul = 1.0;
+#if DESKTOP_OS
+    fontMul = 1.5;
+#endif
 }//OsDependent::getMultipliers
 
 bool

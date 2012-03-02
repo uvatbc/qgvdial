@@ -25,11 +25,16 @@ BorderImage {
     id: button
 
     source: "pushbutton_normal.svg"
-    border.left: 5; border.top: 5
-    border.right: 5; border.bottom: 5
+    border {
+        left: 5
+        right: 5
+        bottom: 5
+        top: 5
+    }
 
-    height: 20 * g_hMul
+    height: 22 * g_hMul
     width: 100 * g_wMul
+    smooth: true
 
     // Main text in the button
     property string text: "Button"
@@ -61,7 +66,7 @@ BorderImage {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
 
-        font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
+        font { family: "Nokia Sans"; pointSize: (7 * g_fontMul) }
     }// Text
 
     MouseArea {
