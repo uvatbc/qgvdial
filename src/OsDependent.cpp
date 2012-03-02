@@ -323,6 +323,8 @@ OsDependent::getMultipliers(double &hMul, double &wMul, double &fontMul)
     hMul = wMul = fontMul = 1.0;
 #if DESKTOP_OS
     fontMul = 1.5;
+#elif defined(Q_WS_MAEMO_5)
+    hMul = wMul = fontMul = 2;
 #endif
 }//OsDependent::getMultipliers
 

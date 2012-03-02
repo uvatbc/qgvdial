@@ -59,8 +59,11 @@ Item {
         Row { // (ok and cancel buttons)
             id: btnRow
 
-            height: 20 * g_hMul
-            width: parent.width
+            //height: 20 * g_hMul
+            //width: parent.width
+            height: childrenRect.height
+            width: childrenRect.width
+
             anchors.horizontalCenter: parent.horizontalCenter
 
             spacing: 5 * g_wMul

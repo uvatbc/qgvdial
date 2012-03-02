@@ -66,7 +66,7 @@ BorderImage {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
 
-        font { family: "Nokia Sans"; pointSize: (7 * g_fontMul) }
+        font { family: "Nokia Sans"; pointSize: (8 * g_fontMul) }
         smooth: true
     }// Text
 
