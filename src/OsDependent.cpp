@@ -327,6 +327,8 @@ OsDependent::getMultipliers(double &hMul, double &wMul, double &fontMul)
     hMul = wMul = fontMul = 2;
 #elif defined(MEEGO_HARMATTAN)
     hMul = wMul = fontMul = 2;
+#elif defined(Q_OS_SYMBIAN)
+    hMul = wMul = 1.5;
 #endif
 }//OsDependent::getMultipliers
 
