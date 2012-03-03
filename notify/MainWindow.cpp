@@ -13,8 +13,6 @@ MainWindow::MainWindow(QObject *parent /*= 0*/)
 , oInbox (gvApi, this)
 , checkCounter (0)
 {
-    initLogging ();
-
     qRegisterMetaType<ContactInfo>("ContactInfo");
 
     // Status from contacts object
@@ -47,26 +45,6 @@ MainWindow::MainWindow(QObject *parent /*= 0*/)
 
     QTimer::singleShot (100, this, SLOT(doWork ()));
 }//MainWindow::MainWindow
-
-void
-MainWindow::initLogging ()
-{
-    QString strLogfile = baseDir ();
-    strLogfile += QDir::separator();
-    strLogfile += "notify.log";
-    fLogfile.setFileName (strLogfile);
-    fLogfile.open (QIODevice::WriteOnly | QIODevice::Append);
-}//MainWindow::initLogging
-
-/** Log information to console and to log file
- * This function is invoked from the qDebug handler that is installed in main.
- * @param strText Text to be logged
- * @param level Log level
- */
-void
-MainWindow::log (const QString & /*strText*/, int /*level = 10*/)
-{
-}//MainWindow::log
 
 void
 MainWindow::setStatus(const QString &strText, int /*timeout = 3000*/)

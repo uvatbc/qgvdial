@@ -15,7 +15,6 @@ class MainWindow : public QObject
 
 public:
     MainWindow(QObject *parent = 0);
-    void log (const QString &strText, int level = 10);
 
 private slots:
     void doWork ();
@@ -27,7 +26,6 @@ private slots:
     void dailyTimeout();
 
 private:
-    void initLogging ();
     void doLogin ();
     void doLogout ();
     void startTimer ();
@@ -38,9 +36,6 @@ private:
 private:
     //! THE API
     GVApi           gvApi;
-
-    //! Logfile
-    QFile           fLogfile;
 
     // Settings parsed from the ini file
     QString strUser;

@@ -3,7 +3,6 @@
 using namespace std;
 
 QtMsgHandler pOldHandler = NULL;
-MainWindow *pw = NULL;
 
 QStringList arrLogFiles;
 QFile fLogfile;       //! Logfile
@@ -46,10 +45,6 @@ myMessageOutput(QtMsgType type, const char *msg)
     // Send to standard output
     cout << strLog.toStdString () << endl;
 
-    if (NULL != pw) {
-        pw->log (strMsg, level);
-    }
-
     strLog += '\n';
     if (fLogfile.isOpen ()) {
         // Append it to the file
@@ -88,7 +83,7 @@ initLogging ()
 {
     QString strLogfile = baseDir ();
     strLogfile += QDir::separator ();
-    strLogfile += "qgvdial.log";
+    strLogfile += "notify.log";
 
     for (int i = 4; i >= 0; i--) {
         arrLogFiles.append (QString("%1.%2").arg(strLogfile).arg(i));
@@ -111,7 +106,6 @@ initLogging ()
 static void
 deinitLogging ()
 {
-    pw = NULL;
     fLogfile.close ();
 }//deinitLogging
 
@@ -122,7 +116,6 @@ main (int argc, char **argv)
 
     QCoreApplication app(argc, argv);
     MainWindow w;
-    pw = &w;
 
     int rv = app.exec ();
 
