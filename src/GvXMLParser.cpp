@@ -45,7 +45,6 @@ GvXMLParser::endElement (const QString & /*namespaceURI*/,
 {
     if (localName == "json") {
         strJson = strChars;
-        if (bEmitLog) qDebug ("Got json characters");
 
 #if 0
         QFile temp("dump-json.txt");
@@ -57,7 +56,6 @@ GvXMLParser::endElement (const QString & /*namespaceURI*/,
 
     if (localName == "html") {
         strHtml = "<html>" + strChars.trimmed ()+ "</html>";
-        if (bEmitLog) qDebug ("Got html characters");
 
 #if 0
         QFile temp("dump-html.txt");

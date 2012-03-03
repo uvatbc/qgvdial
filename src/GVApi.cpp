@@ -1208,15 +1208,9 @@ GVApi::onGetInbox(bool success, const QByteArray &response,
         simpleReader.setContentHandler (&xmlHandler);
         simpleReader.setErrorHandler (&xmlHandler);
 
-        if (emitLog) {
-            Q_DEBUG("Begin parsing");
-        }
         if (!simpleReader.parse (&inputSource, false)) {
             Q_WARN("Failed to parse GV Inbox XML. Data =") << strReply;
             break;
-        }
-        if (emitLog) {
-            Q_DEBUG("End parsing");
         }
 
         qint32 msgCount = 0;
@@ -1289,9 +1283,6 @@ GVApi::parseInboxJson(const QString &strJson, const QString &strHtml,
         }
 
         msgCount = scriptEngine.evaluate("msgList.length;").toInt32 ();
-        if (emitLog) {
-            Q_DEBUG("message count =") << msgCount;
-        }
 
         for (qint32 i = 0; i < msgCount; i++) {
             strTemp = QString(

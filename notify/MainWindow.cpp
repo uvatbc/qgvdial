@@ -3,11 +3,13 @@
 #include <iostream>
 using namespace std;
 
+// Forward function declarations
 QString baseDir();
+void initLogging (const QString &userIni);
 
 MainWindow::MainWindow(QObject *parent /*= 0*/)
 : QObject(parent)
-, gvApi (false, this)
+, gvApi (true, this)
 , bIsLoggedIn (false)
 , oContacts (this)
 , oInbox (gvApi, this)
@@ -84,10 +86,7 @@ MainWindow::checkParams ()
         QFileInfo fi(args[1]);
         strIni = fi.absoluteFilePath ();
 
-        QString strLogfile = strIni + ".log";
-        fLogfile.close ();
-        fLogfile.setFileName (strLogfile);
-        fLogfile.open (QIODevice::WriteOnly | QIODevice::Append);
+        initLogging (strIni);
     }
 
     if (bUseDefaultIni) {
