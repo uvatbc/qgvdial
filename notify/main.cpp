@@ -1,7 +1,22 @@
 #include "MainWindow.h"
+#include <iostream>
+using namespace std;
 
 QtMsgHandler pOldHandler = NULL;
 MainWindow *pw = NULL;
+
+QStringList arrLogFiles;
+QFile fLogfile;       //! Logfile
+int   logCounter = 0; //! Number of log entries since the last log flush
+
+void
+qgv_LogFlush()
+{
+    if (logCounter) {
+        logCounter = 0;
+        fLogfile.flush ();
+    }
+}
 
 void
 myMessageOutput(QtMsgType type, const char *msg)
@@ -22,16 +37,31 @@ myMessageOutput(QtMsgType type, const char *msg)
         level = 0;
     }
 
+    QDateTime dt = QDateTime::currentDateTime ();
+    QString strLog = QString("%1 : %2 : %3")
+                     .arg(dt.toString ("yyyy-MM-dd hh:mm:ss.zzz"))
+                     .arg(level)
+                     .arg(msg);
+
+    // Send to standard output
+    cout << strLog.toStdString () << endl;
+
     if (NULL != pw) {
         pw->log (strMsg, level);
     }
 
-    if (NULL == pOldHandler) {
-        if (NULL == pw) {
-            strMsg += "\n";
-            fwrite (strMsg.toLatin1 (), strMsg.size (), 1, stderr);
-        }
+    strLog += '\n';
+    if (fLogfile.isOpen ()) {
+        // Append it to the file
+        fLogfile.write(strLog.toLatin1 ());
 
+        ++logCounter;
+        if (logCounter > 50) {
+            qgv_LogFlush ();
+        }
+    }
+
+    if (NULL == pOldHandler) {
         if (QtFatalMsg == type) {
             abort();
         }
@@ -40,16 +70,62 @@ myMessageOutput(QtMsgType type, const char *msg)
     }
 }//myMessageOutput
 
+QString
+baseDir()
+{
+    QString strBasedir = QDir::homePath();
+    QDir baseDir(strBasedir);
+    if (!baseDir.exists (".qgvdial")) {
+        baseDir.mkdir (".qgvdial");
+    }
+    strBasedir += QDir::separator();
+    strBasedir += ".qgvdial";
+    return strBasedir;
+}//baseDir
+
+static void
+initLogging ()
+{
+    QString strLogfile = baseDir ();
+    strLogfile += QDir::separator ();
+    strLogfile += "qgvdial.log";
+
+    for (int i = 4; i >= 0; i--) {
+        arrLogFiles.append (QString("%1.%2").arg(strLogfile).arg(i));
+    }
+    arrLogFiles.append (strLogfile);
+
+    QFile::remove (arrLogFiles[0]);
+    for (int i = 1; i < arrLogFiles.count (); i++) {
+        if (QFile::exists (arrLogFiles[i])) {
+            QFile::rename (arrLogFiles[i], arrLogFiles[i-1]);
+        }
+    }
+
+    fLogfile.setFileName (strLogfile);
+    fLogfile.open (QIODevice::ReadWrite);
+
+    pOldHandler = qInstallMsgHandler(myMessageOutput);
+}//initLogging
+
+static void
+deinitLogging ()
+{
+    pw = NULL;
+    fLogfile.close ();
+}//deinitLogging
+
 int
 main (int argc, char **argv)
 {
-    pOldHandler = qInstallMsgHandler(myMessageOutput);
+    initLogging ();
 
     QCoreApplication app(argc, argv);
     MainWindow w;
     pw = &w;
 
     int rv = app.exec ();
-    pw = NULL;
-    return rv;
+
+    deinitLogging ();
+    return (rv);
 }//main

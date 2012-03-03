@@ -32,7 +32,6 @@ private:
     void doLogout ();
     void startTimer ();
 
-    QString baseDir();
     bool checkParams ();
     bool cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt);
 

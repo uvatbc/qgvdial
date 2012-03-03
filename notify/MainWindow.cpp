@@ -3,6 +3,8 @@
 #include <iostream>
 using namespace std;
 
+QString baseDir();
+
 MainWindow::MainWindow(QObject *parent /*= 0*/)
 : QObject(parent)
 , gvApi (false, this)
@@ -62,30 +64,8 @@ MainWindow::initLogging ()
  * @param level Log level
  */
 void
-MainWindow::log (const QString &strText, int level /*= 10*/)
+MainWindow::log (const QString & /*strText*/, int /*level = 10*/)
 {
-    QString strDisp;
-    QRegExp regex("^\"(.*)\"\\s*");
-    if (strText.indexOf (regex) != -1) {
-        strDisp = regex.cap (1);
-    } else {
-        strDisp = strText;
-    }
-
-    QDateTime dt = QDateTime::currentDateTime ();
-    QString strLog = QString("%1 : %2 : %3")
-                     .arg(dt.toString ("yyyy-MM-dd hh:mm:ss.zzz"))
-                     .arg(level)
-                     .arg(strDisp);
-
-    // Send to standard output
-    cout << strLog.toStdString () << endl;
-
-    // Send to log file
-    if (fLogfile.isOpen ()) {
-        QTextStream streamLog(&fLogfile);
-        streamLog << strLog << endl;
-    }
 }//MainWindow::log
 
 void
@@ -93,19 +73,6 @@ MainWindow::setStatus(const QString &strText, int /*timeout = 3000*/)
 {
     qDebug () << strText;
 }//MainWindow::setStatus
-
-QString
-MainWindow::baseDir()
-{
-    QString strBasedir = QDir::homePath();
-    QDir baseDir(strBasedir);
-    if (!baseDir.exists (".qgvdial")) {
-        baseDir.mkdir (".qgvdial");
-    }
-    strBasedir += QDir::separator();
-    strBasedir += ".qgvdial";
-    return strBasedir;
-}//MainWindow::baseDir
 
 void
 MainWindow::doWork ()
