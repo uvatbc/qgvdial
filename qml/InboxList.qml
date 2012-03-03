@@ -303,6 +303,8 @@ Rectangle {
                 text: "Release to refresh ..."
                 color: "white"
 
+                font { family: "Nokia Sans"; pointSize: (8 * g_fontMul) }
+
                 opacity: {
                     var threshold = - listInbox.contentY * 3;
                     if (threshold > 180) {
