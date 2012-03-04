@@ -461,6 +461,7 @@ GVApi::onLogin1(bool success, const QByteArray &response, QNetworkReply *reply,
             break;
         }
 
+        Q_DEBUG("Starting service login");
         QUrl url(GV_ACCOUNT_SERVICELOGIN);
         success = postLogin (url, token);
     } while (0); // End cleanup block (not a loop)
@@ -598,7 +599,9 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
     QString strResponse = response;
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     bool accountConfigured = true;
+    bool accountReviewRequested = false;
 
+    token->errorString.clear();
     do { // Begin cleanup block (not a loop)
         if (!success) break;
 
@@ -614,6 +617,13 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
                 QString dest = urlMoved.toString ();
                 if (dest.contains ("voice/help/setupMobile")) {
                     accountConfigured = false;
+                    success = false;
+                    break;
+                }
+
+                if (dest.contains ("AccountRecoveryOptions")) {
+                    token->outParams["nextUrl"] = urlMoved;
+                    accountReviewRequested = true;
                     success = false;
                     break;
                 }
@@ -648,8 +658,16 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
         if (accountConfigured) {
             Q_WARN("Login failed.") << strResponse;
 
-            token->errorString = "User login failure";
+            if (token->errorString.isEmpty()) {
+                token->errorString = "User login failure";
+            }
             token->status = ATTS_LOGIN_FAILURE;
+            token->emitCompleted ();
+        }
+        else if (accountReviewRequested) {
+            token->errorString = "User login failed: Account recovery "
+                                 "requested by Google";
+            token->status = ATTS_LOGIN_FAIL_SHOWURL;
             token->emitCompleted ();
         } else {
             Q_WARN("Login failed because user account was not configured.");

@@ -10,6 +10,7 @@
 #define ATTS_LOGIN_FAILURE      3
 #define ATTS_AC_NOT_CONFIGURED  4
 #define ATTS_NOT_LOGGED_IN      5
+#define ATTS_LOGIN_FAIL_SHOWURL 6
 
 class AsyncTaskToken : public QObject
 {
