@@ -26,8 +26,8 @@ Item {
 
     property string msgText: "Dialing\n+1 000 000 0000"
 
-    signal sigMsgBoxOk
-    signal sigMsgBoxCancel
+    signal sigOk
+    signal sigCancel
 
     Fader {
         anchors.fill: parent
@@ -59,8 +59,6 @@ Item {
         Row { // (ok and cancel buttons)
             id: btnRow
 
-            //height: 20 * g_hMul
-            //width: parent.width
             height: childrenRect.height
             width: childrenRect.width
 
@@ -72,14 +70,15 @@ Item {
                 text: "Ok"
                 focus: true
 
-                onClicked: container.sigMsgBoxOk();
+                onClicked: container.sigOk();
+                onPressHold: container.sigOk();
             }// MeegoButton (ok)
 
             MeegoButton {
                 text: "Cancel"
 
-                onClicked: container.sigMsgBoxCancel();
-                onPressHold: container.sigMsgBoxCancel();
+                onClicked: container.sigCancel();
+                onPressHold: container.sigCancel();
             }// MeegoButton (cancel)
         }// Row (ok and cancel)
     }// Column with the text and the two buttons

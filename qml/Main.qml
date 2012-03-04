@@ -233,8 +233,8 @@ Rectangle {
 
         anchors.fill: parent
 
-        onSigMsgBoxOk: main.sigMsgBoxDone(true)
-        onSigMsgBoxCancel: main.sigMsgBoxDone(false)
+        onSigOk: main.sigMsgBoxDone(true)
+        onSigCancel: main.sigMsgBoxDone(false)
     }//MsgBox
 
     Rectangle {
