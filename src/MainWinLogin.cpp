@@ -116,7 +116,17 @@ MainWindow::loginCompleted (AsyncTaskToken *token)
 {
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
 
-    if (!token || (token->status != ATTS_SUCCESS)) {
+    if (!token) {
+        Q_CRIT("NULL TOKEN!!");
+        setStatus ("Severe internal error");
+        this->showMsgBox ("Severe internal error");
+
+        dbMain.clearUserPass ();
+        QTimer::singleShot (500, this, SLOT(onRecreateCookieJar()));
+        return;
+    }
+
+    if (token->status != ATTS_SUCCESS) {
         logoutCompleted (NULL);
 
         OsDependent &osd = Singletons::getRef().getOSD ();
@@ -137,6 +147,11 @@ MainWindow::loginCompleted (AsyncTaskToken *token)
 
         dbMain.clearUserPass ();
         QTimer::singleShot (500, this, SLOT(onRecreateCookieJar()));
+
+        if (token->status == ATTS_LOGIN_FAIL_SHOWURL) {
+            QUrl url = token->outParams["nextUrl"].toUrl ();
+            QDesktopServices::openUrl (url);
+        }
     } else {
         setStatus ("User logged in");
         Q_DEBUG ("User logged in");
