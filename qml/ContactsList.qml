@@ -96,7 +96,7 @@ Rectangle {
                 Behavior on rotation { NumberAnimation { duration: 150 } }
             }//Text
         }//Item
-    }//Component (listHeader)
+    }//Component (listHeader: "Release to refresh")
 
     Item { // All contacts
         id: allContacts
@@ -144,7 +144,7 @@ Rectangle {
             MyTextEdit {
                 id: edSearch
                 width: parent.width - imgSearch.width - parent.spacing
-                pixelSize: searchRow.height - 6
+                pointSize: 10
                 text: ""
                 onTextChanged: {
                     if (imgSearch.selection) {

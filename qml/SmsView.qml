@@ -123,21 +123,7 @@ Rectangle {
 
                     font.pixelSize: mainFlick.pixHeight
                     color: "white"
-
-                    activeFocusOnPress: false
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            if (!smsText.activeFocus) {
-                                smsText.forceActiveFocus();
-                                smsText.openSoftwareInputPanel();
-                            } else {
-                                smsText.closeSoftwareInputPanel();
-                                smsText.focus = false;
-                            }
-                        }
-                    }//MouseArea
-                }//TextEdit
+                }//TextEdit (with all the SMS text)
             }//Rectangle (bounding the sms text edit)
         }//FocusScope
 

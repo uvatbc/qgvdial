@@ -77,7 +77,6 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 text: "0000"
                 validator: IntValidator { bottom: 0; top: 9999 }
-                pixelSize: container.pixHeight
                 height: lblPin.height
             }
         }// Row (pin)

@@ -29,7 +29,7 @@ FocusScope {
 
     property string text: "You should have changed this text"
     property alias echoMode: textEd.echoMode
-    property int pixelSize: 5000
+    property int pointSize: 10
     property alias validator: textEd.validator
 
     height: textEd.height
@@ -47,11 +47,16 @@ FocusScope {
             text: container.text
             color: "white"
             width: container.width
-            font.pixelSize: container.pixelSize
+
+            focus: true
+
+            font {
+                family: "Nokia Sans"
+                pointSize: (container.pointSize * g_fontMul)
+            }
 
             inputMethodHints: Qt.ImhNoAutoUppercase + Qt.ImhNoPredictiveText
 
-            activeFocusOnPress: false
             Keys.onReturnPressed: {
                 closeSoftwareInputPanel ();
                 event.accepted = true;
@@ -66,6 +71,7 @@ FocusScope {
             }
         }//TextInput
 
+/* Keep this around for later.... Just in case.
         MouseArea {
             anchors.fill: parent
             onClicked: {
@@ -78,6 +84,7 @@ FocusScope {
                 }
             }
         }//MouseArea
+*/
    }//Rectangle (around the text box)
 }//FocusScope
 

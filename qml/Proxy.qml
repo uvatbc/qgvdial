@@ -101,7 +101,6 @@ Item {
                 width: parent.width - lblHost.width
                 anchors.verticalCenter: parent.verticalCenter
                 text: "proxy.example.com"
-                pixelSize: parent.height - 2
                 KeyNavigation.tab: textUserProxyPort
                 KeyNavigation.backtab: (bEnableProxy && !bSystemProxy && bProxyUserPass ? textUserProxyPass : textUserProxyPort)
             }
@@ -130,7 +129,6 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 text: "80"
                 validator: IntValidator { bottom: 0; top: 65535 }
-                pixelSize: parent.height - 2
                 KeyNavigation.tab: (bEnableProxy && !bSystemProxy && bProxyUserPass ? textUserProxyUser : textUserProxyHost)
                 KeyNavigation.backtab: textUserProxyHost
             }
@@ -167,7 +165,6 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 width: parent.width - lblProxyUser.width
                 text: "exampleuser"
-                pixelSize: parent.height - 2
                 KeyNavigation.tab: textUserProxyPass
                 KeyNavigation.backtab: textUserProxyPort
             }
@@ -196,7 +193,6 @@ Item {
                 width: parent.width - lblProxyPass.width
                 text: "hunter2 :P"
                 echoMode: TextInput.Password
-                pixelSize: parent.height - 2
                 KeyNavigation.tab: textUserProxyHost
                 KeyNavigation.backtab: textUserProxyUser
             }

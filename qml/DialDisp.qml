@@ -76,23 +76,12 @@ Rectangle {
             cursorVisible: true
             wrapMode: TextEdit.WrapAnywhere
             selectByMouse: true
+
             font {
-                pixelSize: (height/3) - 4
+                family: "Nokia Sans"
+                pointSize: (12 * g_fontMul)
                 bold: true
             }
-
-            onFocusChanged: txtNum.closeSoftwareInputPanel();
-            activeFocusOnPress: false
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    if (!txtNum.activeFocus) {
-                        txtNum.forceActiveFocus();
-                    } else {
-                        txtNum.focus = false;
-                    }
-                }
-            }//MouseArea
 
             onTextChanged: wDisp.sigNumChanged(txtNum.text);
         }// TextEdit

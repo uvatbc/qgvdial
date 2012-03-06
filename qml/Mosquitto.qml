@@ -79,7 +79,6 @@ Item {
                 height: lblHost.height
                 anchors.verticalCenter: parent.verticalCenter
                 text: "mosquitto.example.com"
-                pixelSize: container.pixHeight
                 KeyNavigation.tab: textMqPort
                 KeyNavigation.backtab: textMqTopic
             }
@@ -108,7 +107,6 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 text: "1883"
                 validator: IntValidator { bottom: 0; top: 65535 }
-                pixelSize: container.pixHeight
                 KeyNavigation.tab: textMqTopic
                 KeyNavigation.backtab: textMqServer
             }
@@ -135,7 +133,6 @@ Item {
                 height: lblTopic.height
                 anchors.verticalCenter: parent.verticalCenter
                 text: "gv_notify"
-                pixelSize: container.pixHeight
                 KeyNavigation.tab: textMqServer
                 KeyNavigation.backtab: textMqPort
             }

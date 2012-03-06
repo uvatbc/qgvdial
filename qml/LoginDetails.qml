@@ -30,6 +30,7 @@ Item {
     signal sigLogout
 
     property real pixHeight: 200
+    property real pointSize: (10 * g_fontMul)
     property alias username: textUsername.text
     property alias password: textPassword.text
 
@@ -53,7 +54,7 @@ Item {
             color: "white"
             anchors.verticalCenter: parent.verticalCenter
             height: paintedHeight + 2
-            font.pixelSize: container.pixHeight
+            font { family: "Nokia Sans"; pointSize: container.pointSize }
         }
 
         MyTextEdit {
@@ -61,7 +62,7 @@ Item {
             height: lblEmail.height
             width: parent.width - lblEmail.width - (parent.spacing * 2)
             opacity: (g_bIsLoggedIn == true ? 0 : 1)
-            pixelSize: container.pixHeight
+            pointSize: container.pointSize
 
             KeyNavigation.tab: textPassword
             onSigTextChanged: container.sigUserChanged(strText);
@@ -75,6 +76,7 @@ Item {
             height: paintedHeight + 2
             font.pixelSize: container.pixHeight
             opacity: (g_bIsLoggedIn == true ? 1 : 0)
+            font { family: "Nokia Sans"; pointSize: container.pointSize }
 
             text: container.username
         }
@@ -99,7 +101,7 @@ Item {
             color: "white"
             anchors.verticalCenter: parent.verticalCenter
             height: paintedHeight + 2
-            font.pixelSize: container.pixHeight
+            font { family: "Nokia Sans"; pointSize: container.pointSize }
         }
 
         MyTextEdit {
@@ -108,7 +110,7 @@ Item {
             width: parent.width - lblPass.width - (parent.spacing * 2)
             opacity: (g_bIsLoggedIn == true ? 0 : 1)
             echoMode: TextInput.Password
-            pixelSize: container.pixHeight
+            pointSize: container.pointSize
 
             KeyNavigation.tab: textUsername
             onSigTextChanged: container.sigPassChanged(strText);
@@ -120,7 +122,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             color: "white"
             height: paintedHeight + 2
-            font.pixelSize: container.pixHeight
+            font { family: "Nokia Sans"; pointSize: container.pointSize }
             opacity: (g_bIsLoggedIn == true ? 1 : 0)
 
             text: Array(container.password.length+1).join("*")

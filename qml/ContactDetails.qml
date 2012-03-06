@@ -62,7 +62,8 @@ Rectangle { // Contact details
                 right: parent.right
             }
             spacing: 1
-            height: imageName.height + notes.height + contactNumbers.height + (spacing * 5)
+//            height: imageName.height + notes.height + contactNumbers.height + (spacing * 5)
+            height: childrenRect.height
 
             Row {
                 id: imageName
