@@ -663,7 +663,7 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
                 }
 #endif
 
-                int foreign;
+                int foreign = 0;
                 if ((token->outParams.contains ("foreign")) &&
                     ((dest == GV_HTTPS_M) ||
                       (foreign = token->outParams["foreign"].toInt()) > 0))
@@ -712,7 +712,7 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
             int i;
             for (i = 0; i < aList.length (); i++)
             {
-            	QDomElement a = aList.at(i).toElement ();
+                QDomElement a = aList.at(i).toElement ();
                 if (a.isNull ()) {
                     continue;
                 }
