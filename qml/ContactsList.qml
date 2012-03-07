@@ -31,6 +31,8 @@ Rectangle {
 
     signal sigRefreshContacts
 
+    onSigRefreshContacts: console.debug("ping contacts")
+
 ////////////////////////////////////////////////////////////////////////////////
 //                              Test Data models                              //
 ////////////////////////////////////////////////////////////////////////////////
@@ -61,11 +63,13 @@ Rectangle {
 
     Timer {
         id: refreshTime
-        interval: 500; running: false; repeat: false
+        interval: 1000; running: false; repeat: false
         onTriggered: {
-            contactsView.isRefreshing = true;
+            if (contactsView.contentY < -60) {
+                container.sigRefreshContacts();
+            }
         }
-    }//Timer
+    }//Timer (to delay the refresh)
 
     Component {
         id: listHeader
@@ -85,8 +89,8 @@ Rectangle {
                 font { family: "Nokia Sans"; pointSize: (8 * g_fontMul) }
 
                 opacity: {
-                    var threshold = - contactsView.contentY * 3;
-                    if (threshold > 180) {
+                    var threshold = - contactsView.contentY;
+                    if (threshold > 60) {
                         refreshTime.start();
                         return 1;
                     } else {
@@ -144,7 +148,7 @@ Rectangle {
             MyTextEdit {
                 id: edSearch
                 width: parent.width - imgSearch.width - parent.spacing
-                pointSize: 10
+                pointSize: 11 * g_fontMul
                 text: ""
                 onTextChanged: {
                     if (imgSearch.selection) {
@@ -160,19 +164,6 @@ Rectangle {
 
         ListView {
             id: contactsView
-
-            property bool isRefreshing: false
-            onContentYChanged: {
-                var cY = contentY;
-                if (cY < 0.0) {
-                    cY = -contentY;
-                }
-
-                if (isRefreshing && (cY < 1)) {
-                    isRefreshing = false;
-                    container.sigRefreshContacts();
-                }
-            }
 
             anchors {
                 top: searchRow.bottom

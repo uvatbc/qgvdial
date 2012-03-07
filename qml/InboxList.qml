@@ -282,9 +282,11 @@ Rectangle {
 
     Timer {
         id: refreshTime
-        interval: 500; running: false; repeat: false
+        interval: 1000; running: false; repeat: false
         onTriggered: {
-            listInbox.isRefreshing = true;
+            if (listInbox.contentY < -60) {
+                container.sigRefreshContacts();
+            }
         }
     }//Timer
 
@@ -306,8 +308,8 @@ Rectangle {
                 font { family: "Nokia Sans"; pointSize: (8 * g_fontMul) }
 
                 opacity: {
-                    var threshold = - listInbox.contentY * 3;
-                    if (threshold > 180) {
+                    var threshold = - listInbox.contentY;
+                    if (threshold > 60) {
                         refreshTime.start();
                         return 1;
                     } else {
@@ -415,18 +417,6 @@ Rectangle {
             height: parent.height - barTop.height
 
             header: listHeader
-            property bool isRefreshing: false
-            onContentYChanged: {
-                var cY = contentY;
-                if (cY < 0.0) {
-                    cY = -contentY;
-                }
-
-                if (isRefreshing && (cY < 1)) {
-                    isRefreshing = false;
-                    container.sigRefreshInbox();
-                }
-            }
 
             opacity: 1
             clip: true
