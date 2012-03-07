@@ -285,7 +285,7 @@ Rectangle {
         interval: 1000; running: false; repeat: false
         onTriggered: {
             if (listInbox.contentY < -60) {
-                container.sigRefreshContacts();
+                container.sigRefreshInbox();
             }
         }
     }//Timer

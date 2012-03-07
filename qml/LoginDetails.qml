@@ -30,7 +30,7 @@ Item {
     signal sigLogout
 
     property real pixHeight: 200
-    property real pointSize: (10 * g_fontMul)
+    property real pointSize: (8 * g_fontMul)
     property alias username: textUsername.text
     property alias password: textPassword.text
 
@@ -74,7 +74,6 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             color: "white"
             height: paintedHeight + 2
-            font.pixelSize: container.pixHeight
             opacity: (g_bIsLoggedIn == true ? 1 : 0)
             font { family: "Nokia Sans"; pointSize: container.pointSize }
 
