@@ -29,7 +29,7 @@ FocusScope {
 
     property string text: "You should have changed this text"
     property alias echoMode: textEd.echoMode
-    property int pointSize: 10
+    property int pointSize: (10 * g_fontMul)
     property alias validator: textEd.validator
 
     height: textEd.height
@@ -52,7 +52,7 @@ FocusScope {
 
             font {
                 family: "Nokia Sans"
-                pointSize: (container.pointSize * g_fontMul)
+                pointSize: container.pointSize
             }
 
             inputMethodHints: Qt.ImhNoAutoUppercase + Qt.ImhNoPredictiveText

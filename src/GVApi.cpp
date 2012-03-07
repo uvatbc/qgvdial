@@ -206,6 +206,9 @@ GVApi::doGet(QUrl url, void *ctx, QObject *receiver, const char *method)
     QNetworkRequest req(url);
     req.setRawHeader("User-Agent", UA_IPHONE4);
 
+    req.setHeader (QNetworkRequest::CookieHeader,
+                   QVariant::fromValue(jar->getAllCookies ()));
+
     QNetworkReply *reply = nwMgr.get(req);
     if (!reply) {
         return false;
@@ -368,7 +371,32 @@ GVApi::getSelfNumber()
 QUrl
 GVApi::hasMoved(QNetworkReply *reply)
 {
-    return reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
+    QUrl url = reply->attribute(QNetworkRequest::RedirectionTargetAttribute)
+                     .toUrl ();
+
+    do { // Begin cleanup block (not a loop)
+        if (url.isEmpty ()) {
+            break;
+        }
+        if ((url.scheme () == "https") || (url.scheme () == "http")) {
+            break;
+        }
+
+        QString result = url.scheme ();
+        if (!result.isEmpty ()) {
+            break;
+        }
+
+        result = url.toString ();
+        int pos = result.indexOf ("https://");
+        if (-1 == pos) {
+            break;
+        }
+
+        url = QUrl(result.remove (0, pos));
+        Q_DEBUG("url:") << url.toString ();
+    } while (0); // End cleanup block (not a loop)
+    return url;
 }//GVApi::hasMoved
 
 void
@@ -550,6 +578,7 @@ GVApi::postLogin(QUrl url, void *ctx)
         if (cookie.name () == "GALX") {
             galx = cookie;
             found = true;
+            break;
         }
     }
 
@@ -600,6 +629,7 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     bool accountConfigured = true;
     bool accountReviewRequested = false;
+    bool foreignUrl = false;
 
     token->errorString.clear();
     do { // Begin cleanup block (not a loop)
@@ -632,8 +662,83 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
                     Q_DEBUG("Moved to") << dest;
                 }
 #endif
-                success = postLogin (urlMoved, token);
+
+                int foreign;
+                if ((token->outParams.contains ("foreign")) &&
+                    ((dest == GV_HTTPS_M) ||
+                      (foreign = token->outParams["foreign"].toInt()) > 0))
+                {
+                    foreign++;
+                    token->outParams["foreign"] = foreign;
+                    success = doGet (urlMoved, token, this,
+                                     SLOT(onLogin2(bool, const QByteArray &,
+                                                   QNetworkReply *, void *)));
+                } else {
+                    success = postLogin (urlMoved, token);
+                }
             }
+            break;
+        }
+
+        do { // Begin cleanup block (not a loop)
+            QUrl replyUrl = reply->url ();
+            if (!replyUrl.toString().contains (GOOGLE_ACCOUNTS)) {
+                break;
+            }
+
+            QRegExp rxBody("<body>(.*)</body>");
+            if (!strResponse.contains (rxBody)) {
+                break;
+            }
+
+            QString cap = rxBody.cap (0);
+
+            QDomDocument doc("foreign");
+            doc.setContent (cap);
+
+            QDomElement docElem = doc.documentElement();
+            if (docElem.isNull ()) {
+                break;
+            }
+
+            Q_DEBUG("docElem = ") << docElem.text ();
+
+            QDomNodeList aList = docElem.elementsByTagName ("a");
+            if (aList.isEmpty ()) {
+                break;
+            }
+
+            QString newLoc;
+            int i;
+            for (i = 0; i < aList.length (); i++)
+            {
+            	QDomElement a = aList.at(i).toElement ();
+                if (a.isNull ()) {
+                    continue;
+                }
+
+                newLoc = a.attribute ("href");
+                if (newLoc.isEmpty ()) {
+                    continue;
+                }
+
+                break;
+            }
+
+            if (newLoc.isEmpty ()) {
+                break;
+            }
+
+            Q_DEBUG("Foreign account! Destination: ") << newLoc;
+            foreignUrl = true;
+
+            urlMoved = QUrl(newLoc);
+            success = doGet (urlMoved, token, this,
+                SLOT(onLogin2(bool,const QByteArray &,QNetworkReply *,void *)));
+            token->outParams["foreign"] = 0;
+        } while (0); // End cleanup block (not a loop)
+
+        if (foreignUrl) {
             break;
         }
 
@@ -672,8 +777,9 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
         } else {
             Q_WARN("Login failed because user account was not configured.");
 
-            token->errorString = "Account setup is incomplete. "
-                                 "Please complete setup using a desktop";
+            token->errorString = "Account setup is incomplete. qgvdial cannot "
+                "work with this account. Please complete setup using a desktop "
+                "browser";
             token->status = ATTS_AC_NOT_CONFIGURED;
             token->emitCompleted ();
         }

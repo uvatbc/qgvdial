@@ -1,2 +1,3 @@
-  * Account Review Prompt from Google. Show the webpage and drop login.
+  * Better identification of accounts that have not completed GV set up.
+  * Google accounts form outside the US use a longer more protracted method of login. I've finally nailed it.
 
