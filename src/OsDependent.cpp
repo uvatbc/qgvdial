@@ -325,10 +325,10 @@ OsDependent::getMultipliers(double &hMul, double &wMul, double &fontMul)
     fontMul = 1.5;
 #elif defined(Q_WS_MAEMO_5)
     hMul = wMul = 2;
-    fontMul = 2.5;
+    fontMul = 3;
 #elif defined(MEEGO_HARMATTAN)
     hMul = wMul = 2;
-    fontMul = 2;
+    fontMul = 3;
 #elif defined(Q_OS_SYMBIAN)
     hMul = wMul = 1.5;
 #endif
