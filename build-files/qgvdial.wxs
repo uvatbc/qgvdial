@@ -87,6 +87,9 @@
             <Component Id="QtXmlPatterns4.dll" Guid="27574D0D-D570-40AB-A248-CEE276C6F05F">
                 <File Id="QtXmlPatterns4.dll" Source="__QTDIR__\lib\QtXmlPatterns4.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
+            <Component Id="QtSystemInfo1.dll" Guid="66F18195-A4CD-4AB2-95C6-643D58FF6D36">
+                <File Id="QtSystemInfo1.dll" Source="__QTDIR__\lib\QtSystemInfo1.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
         </DirectoryRef>
 
         <DirectoryRef Id="plugins_bearer">
@@ -157,6 +160,7 @@
             <ComponentRef Id="QtWebKit4.dll" />
             <ComponentRef Id="QtXml4.dll" />
             <ComponentRef Id="QtXmlPatterns4.dll" />
+            <ComponentRef Id="QtSystemInfo1.dll" />
             <ComponentRef Id="qgenericbearer4.dll" />
             <ComponentRef Id="qnativewifibearer4.dll" />
             <ComponentRef Id="qgif4.dll" />

@@ -60,6 +60,21 @@ Flickable {
         loginDetails.password = strP;
     }
 
+            
+    Timer {
+        id: logsYAdjustTimer
+
+        property real setY: 0.0
+        onSetYChanged: {
+            logsYAdjustTimer.stop();
+            logsYAdjustTimer.start();
+        }
+
+        interval: 700; repeat: false; running: false
+        onTriggered: container.contentY = setY;
+    }//Timer for delayed setting of contentY so that when you click on an
+    // ExpandView, it gets into focus. Expecially important for the logs
+
     ExpandView {
         id: expandLoginDetails
         anchors {
@@ -69,6 +84,8 @@ Flickable {
 
         width: parent.width
         contentHeight: loginDetails.height;
+
+        onClicked: if (isExpanded) logsYAdjustTimer.setY = y;
 
         mainTitle: "Login details"
         mainTitlePixHeight: container.pixHeight
@@ -98,9 +115,11 @@ Flickable {
         width: parent.width
         contentHeight: proxySettings.height;
 
+        onClicked: if (isExpanded) logsYAdjustTimer.setY = y;
+
         mainTitle: "Proxy"
         mainTitlePixHeight: container.pixHeight
-
+        
         Proxy {
             id: proxySettings
             y: parent.startY
@@ -132,6 +151,8 @@ Flickable {
 
         width: parent.width
         contentHeight: mqSettings.height;
+
+        onClicked: if (isExpanded) logsYAdjustTimer.setY = y;
 
         mainTitle: "Mosquitto"
         mainTitlePixHeight: container.pixHeight
@@ -165,6 +186,8 @@ Flickable {
         width: parent.width
         contentHeight: pinSettings.height;
 
+        onClicked: if (isExpanded) logsYAdjustTimer.setY = y;
+
         mainTitle: "Pin"
         mainTitlePixHeight: container.pixHeight
 
@@ -197,6 +220,8 @@ Flickable {
         width: parent.width
         contentHeight: logView.height;
 
+        onClicked: if (isExpanded) logsYAdjustTimer.setY = y;
+
         mainTitle: "Logs"
         mainTitlePixHeight: container.pixHeight
 
@@ -204,7 +229,7 @@ Flickable {
             id: logView
 
             width: parent.width - 1
-            height: container.height
+            height: container.height * 0.95
             y: parent.startY
 
             opacity: parent.containedOpacity
@@ -222,6 +247,8 @@ Flickable {
 
         width: parent.width
         contentHeight: aboutWin.height;
+
+        onClicked: if (isExpanded) logsYAdjustTimer.setY = y;
 
         mainTitle: "About"
         mainTitlePixHeight: container.pixHeight
