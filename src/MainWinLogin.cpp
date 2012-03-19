@@ -30,10 +30,20 @@ void
 MainWindow::doLogin ()
 {
     OsDependent &osd = Singletons::getRef().getOSD ();
-    AsyncTaskToken *token = new AsyncTaskToken(this);
+    AsyncTaskToken *token = NULL;
     bool bOk = false;
 
     do { // Begin cleanup block (not a loop)
+        strUser = strUser.simplified ();
+        strUser = strUser.remove (QChar(' '));
+        if (strUser.isEmpty ()) {
+            Q_WARN("Username is empty!");
+            setStatus (tr("Username is empty!"), 0);
+            showMsgBox (tr("Username is empty!"));
+            break;
+        }
+
+        token = new AsyncTaskToken(this);
         if (!token) {
             Q_WARN("Failed to allocate token");
             break;

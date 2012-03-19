@@ -701,7 +701,14 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
                 break;
             }
 
-            Q_DEBUG("docElem = ") << docElem.text ();
+            QString docElemText = docElem.text ();
+            Q_DEBUG("docElem = ") << docElemText;
+
+            if (docElemText.contains ("The username or password you entered "
+                                      "is incorrect."))
+            {
+                break;
+            }
 
             QDomNodeList aList = docElem.elementsByTagName ("a");
             if (aList.isEmpty ()) {
@@ -709,9 +716,7 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
             }
 
             QString newLoc;
-            int i;
-            for (i = 0; i < aList.length (); i++)
-            {
+            for (uint i = 0; i < aList.length (); i++) {
                 QDomElement a = aList.at(i).toElement ();
                 if (a.isNull ()) {
                     continue;
@@ -764,7 +769,8 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
             Q_WARN("Login failed.") << strResponse;
 
             if (token->errorString.isEmpty()) {
-                token->errorString = "User login failure";
+                token->errorString = tr("The username or password you entered "
+                                        "is incorrect.");
             }
             token->status = ATTS_LOGIN_FAILURE;
             token->emitCompleted ();
@@ -777,9 +783,11 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
         } else {
             Q_WARN("Login failed because user account was not configured.");
 
-            token->errorString = "Account setup is incomplete. qgvdial cannot "
-                "work with this account. Please complete setup using a desktop "
-                "browser";
+            token->errorString = tr("The username that you have entered is not "
+                                    "configured for Google Voice. Please go "
+                                    "to www.google.com/voice on a desktop "
+                                    "browser and complete the setup of your "
+                                    "Google Voice account.");
             token->status = ATTS_AC_NOT_CONFIGURED;
             token->emitCompleted ();
         }
