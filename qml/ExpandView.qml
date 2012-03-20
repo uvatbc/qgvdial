@@ -29,8 +29,6 @@ Rectangle {
     height: titleText.height + 1
 
     property string mainTitle: "Main title"
-    property real mainTitlePixHeight: 2000   // Make sure you set this
-
     property real contentHeight: 50
     property real startY: titleText.height + 1
     property real containedOpacity: 0
@@ -86,7 +84,7 @@ Rectangle {
             text: container.mainTitle
             color: "white"
 
-            font.pixelSize: mainTitlePixHeight
+            font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
 
             width: parent.width - imgArrow.width - parent.spacing
             height: paintedHeight

@@ -53,7 +53,6 @@ Item {
         RadioButton {
             id: mqSupport
             width: parent.width
-            pixelSize: container.pixHeight
 
             text: "Enable mosquitto"
         }// RadioButton (mqSupport)

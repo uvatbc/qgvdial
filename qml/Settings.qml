@@ -60,7 +60,7 @@ Flickable {
         loginDetails.password = strP;
     }
 
-            
+
     Timer {
         id: logsYAdjustTimer
 
@@ -88,7 +88,6 @@ Flickable {
         onClicked: if (isExpanded) logsYAdjustTimer.setY = y;
 
         mainTitle: "Login details"
-        mainTitlePixHeight: container.pixHeight
 
         LoginDetails {
             id: loginDetails
@@ -117,8 +116,7 @@ Flickable {
         onClicked: if (isExpanded) logsYAdjustTimer.setY = y;
 
         mainTitle: "Proxy"
-        mainTitlePixHeight: container.pixHeight
-        
+
         Proxy {
             id: proxySettings
             y: parent.startY
@@ -154,7 +152,6 @@ Flickable {
         onClicked: if (isExpanded) logsYAdjustTimer.setY = y;
 
         mainTitle: "Mosquitto"
-        mainTitlePixHeight: container.pixHeight
 
         Mosquitto {
             id: mqSettings
@@ -188,7 +185,6 @@ Flickable {
         onClicked: if (isExpanded) logsYAdjustTimer.setY = y;
 
         mainTitle: "Pin"
-        mainTitlePixHeight: container.pixHeight
 
         PinSetting {
             id: pinSettings
@@ -222,7 +218,6 @@ Flickable {
         onClicked: if (isExpanded) logsYAdjustTimer.setY = y;
 
         mainTitle: "Logs"
-        mainTitlePixHeight: container.pixHeight
 
         LogView {
             id: logView
@@ -250,7 +245,6 @@ Flickable {
         onClicked: if (isExpanded) logsYAdjustTimer.setY = y;
 
         mainTitle: "About"
-        mainTitlePixHeight: container.pixHeight
 
         About {
             id: aboutWin

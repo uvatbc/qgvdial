@@ -51,7 +51,6 @@ Item {
         RadioButton {
             id: pinSupport
             width: parent.width
-            pixelSize: container.pixHeight
 
             text: "Use PIN for GV dial"
         }// RadioButton (pinSupport)

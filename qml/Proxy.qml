@@ -65,7 +65,6 @@ Item {
         RadioButton {
             id: proxySupport
             width: parent.width
-            pixelSize: pixHeight
 
             text: "Enable proxy support"
         }// RadioButton (proxySupport)
@@ -74,7 +73,6 @@ Item {
             id: proxySystem
             width: parent.width
             opacity: (bEnableProxy? 1 : 0)
-            pixelSize: pixHeight
 
             text: "Use system proxy settings"
         }// RadioButton (proxySystem)
@@ -138,7 +136,6 @@ Item {
             id: proxyUserPassRequired
             width: parent.width
             opacity: (bEnableProxy && !bSystemProxy ? 1 : 0)
-            pixelSize: pixHeight
 
             text: "Requires username and password"
         }// RadioButton (proxyUserPassRequired)
