@@ -1488,6 +1488,9 @@ GVApi::parseInboxJson(const QString &strJson, const QString &strHtml,
                 } else if (strPName == "children") {
                 } else if (strPName == "messageText") {
                     inboxEntry.strText = strVal;
+                } else if (strPName == "hasMp3") {
+                } else if (strPName == "duration") {
+                    inboxEntry.vmailDuration = strVal.toInt ();
                 } else {
                     if (emitLog) {
                         Q_DEBUG(QString ("param = %1. value = %2")

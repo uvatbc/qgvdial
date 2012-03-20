@@ -52,6 +52,7 @@ Item {
         Text {
             width: parent.width
             height: paintedHeight + 3
+            font { family: "Nokia Sans"; pointSize: (8 * g_fontMul) }
             font.pixelSize: pixHeight
             color: "white"
 

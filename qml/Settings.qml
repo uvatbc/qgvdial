@@ -95,7 +95,6 @@ Flickable {
             y: parent.startY
 
             width: parent.width - 1
-            pixHeight: container.pixHeight
             opacity: parent.containedOpacity
 
             onSigUserChanged: container.sigUserChanged(user);

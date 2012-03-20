@@ -29,7 +29,6 @@ Item {
     signal sigLogin
     signal sigLogout
 
-    property real pixHeight: 200
     property real pointSize: (8 * g_fontMul)
     property alias username: textUsername.text
     property alias password: textPassword.text
@@ -128,20 +127,16 @@ Item {
         }
     }//Row (password)
 
-    MyButton {
+    MeegoButton {
         id: btnLogin
 
         anchors {
-            left: parent.left
+            horizontalCenter: parent.horizontalCenter
             top: rowPass.bottom
             topMargin: 2
-            leftMargin: 1
         }
 
-        mainText: (g_bIsLoggedIn == true ? "Logout" : "Login")
-        width: parent.width - 2
-        height: container.pixHeight * 3 / 2
-        mainPixelSize: container.pixHeight
+        text: (g_bIsLoggedIn == true ? "Logout" : "Login")
 
         function doClick() {
             if (g_bIsLoggedIn) {

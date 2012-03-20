@@ -97,17 +97,24 @@ struct ConversationEntry {
 
 struct GVInboxEntry
 {
+    //! Unique ID per inbox entry.
     QString         id;
+    //! SMS / Call / Voicemail
     GVI_Entry_Type  Type;
+    //! The start date and time of this entry.
     QDateTime       startTime;
 
     QString         strDisplayNumber;
     QString         strPhoneNumber;
+
+    //! The text if this is an SMS
     QString         strText;
-
+    //! The entire conversation
     QVector<ConversationEntry> conversation;
-
+    //! The note associated with this inbox entry, if any.
     QString         strNote;
+    //! The duration of the voice mail (if it's a voicemail)
+    quint32         vmailDuration;
 
     bool            bRead;
     bool            bSpam;
@@ -127,6 +134,8 @@ struct GVInboxEntry
         strText.clear ();
         conversation.clear ();
         strNote.clear ();
+
+        vmailDuration = 0;
 
         bRead = bSpam = bTrash = bStar = false;
     }
