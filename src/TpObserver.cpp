@@ -38,14 +38,14 @@ TpObserver::setId (int i)
 void
 TpObserver::startMonitoring (const QString &strC)
 {
-    qDebug() << "TpObserver: Start monitoring" << strC;
+    Q_DEBUG ("TpObserver: Start monitoring") << strC;
     strContact = strC;
 }//TpObserver::startMonitoring
 
 void
 TpObserver::stopMonitoring ()
 {
-    qDebug() << "TpObserver: Stop monitoring" << strContact;
+    Q_DEBUG ("TpObserver: Stop monitoring") << strContact;
     strContact.clear ();
 }//TpObserver::stopMonitoring
 
@@ -90,7 +90,7 @@ TpObserver::observeChannels(
                                 this);
             bOk = connect (closer, SIGNAL (callStarted ()),
                            this  , SIGNAL (callStarted ()));
-            Q_ASSERT(bOk);
+            Q_ASSERT(bOk); Q_UNUSED(bOk);
             closer->init ();
             break;
         }

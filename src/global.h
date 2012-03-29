@@ -95,6 +95,12 @@ struct ConversationEntry {
     }
 };
 
+enum GVI_VMailFmt {
+    GVIVFMT_Unknown = 0,
+    GVIVFMT_Mp3,
+    GVIVFMT_Ogg
+};
+
 struct GVInboxEntry
 {
     //! Unique ID per inbox entry.
@@ -115,6 +121,8 @@ struct GVInboxEntry
     QString         strNote;
     //! The duration of the voice mail (if it's a voicemail)
     quint32         vmailDuration;
+
+    GVI_VMailFmt    vmailFormat;
 
     bool            bRead;
     bool            bSpam;

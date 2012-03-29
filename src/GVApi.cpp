@@ -1489,6 +1489,9 @@ GVApi::parseInboxJson(const QString &strJson, const QString &strHtml,
                 } else if (strPName == "messageText") {
                     inboxEntry.strText = strVal;
                 } else if (strPName == "hasMp3") {
+                    inboxEntry.vmailFormat = GVIVFMT_Mp3;
+                } else if (strPName == "hasOgg") {
+                    inboxEntry.vmailFormat = GVIVFMT_Ogg;
                 } else if (strPName == "duration") {
                     inboxEntry.vmailDuration = strVal.toInt ();
                 } else {
