@@ -115,7 +115,7 @@ MainWindow::on_action_Login_triggered ()
 {
     if (!bLoggedIn) {
         QDeclarativeContext *ctx = this->rootContext();
-        ctx->setContextProperty ("g_bShowSettings", true);
+        ctx->setContextProperty ("g_bShowLoginSettings", true);
     } else {
         doLogout ();
     }
@@ -191,7 +191,7 @@ MainWindow::loginCompleted (AsyncTaskToken *token)
         QDeclarativeContext *ctx = this->rootContext();
         ctx->setContextProperty ("g_bIsLoggedIn", bLoggedIn);
         bool bTemp = false;
-        ctx->setContextProperty ("g_bShowSettings", bTemp);
+        ctx->setContextProperty ("g_bShowLoginSettings", bTemp);
 
         // Fill up the combobox on the main page
         refreshRegisteredNumbers ();

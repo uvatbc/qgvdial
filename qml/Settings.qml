@@ -60,7 +60,6 @@ Flickable {
         loginDetails.password = strP;
     }
 
-
     Timer {
         id: logsYAdjustTimer
 
@@ -84,6 +83,9 @@ Flickable {
 
         width: parent.width
         contentHeight: loginDetails.height;
+
+        property bool bShowLogindetails: g_bShowLoginSettings
+        onBShowLogindetailsChanged: { if (bShowLogindetails) isExpanded = true; }
 
         onClicked: if (isExpanded) logsYAdjustTimer.setY = y;
 

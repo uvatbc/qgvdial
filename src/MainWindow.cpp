@@ -399,7 +399,7 @@ MainWindow::initQML ()
     ctx->setContextProperty ("g_bShowMsg", bTempFalse);
     ctx->setContextProperty ("g_registeredPhonesModel", &modelRegNumber);
     ctx->setContextProperty ("g_bIsLoggedIn", bTempFalse);
-    ctx->setContextProperty ("g_bShowSettings", bTempFalse);
+    ctx->setContextProperty ("g_bShowLoginSettings", bTempFalse);
     ctx->setContextProperty ("g_strStatus", "Getting Ready");
     ctx->setContextProperty ("g_strMsgText", "No message");
     ctx->setContextProperty ("g_CurrentPhoneName", "Not loaded");

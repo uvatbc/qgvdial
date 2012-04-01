@@ -707,6 +707,7 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
             if (docElemText.contains ("The username or password you entered "
                                       "is incorrect."))
             {
+                Q_WARN("Found Google's login failure string.");
                 break;
             }
 

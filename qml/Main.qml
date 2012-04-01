@@ -77,7 +77,7 @@ Rectangle {
     onSigHide: console.debug("QML: Dismiss requested");
     onSigQuit: console.debug("QML: Quit requested");
 
-    property bool bShowSettings: g_bShowSettings
+    property bool bShowSettings: g_bShowLoginSettings
     onBShowSettingsChanged: {
         if (bShowSettings) {
             console.debug("Settings page shown");
