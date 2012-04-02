@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2009-2012 Roger Light <roger@atchoo.org>
+Copyright (c) 2010,2011 Roger Light <roger@atchoo.org>
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -26,15 +26,13 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _UTIL_MOSQ_H_
-#define _UTIL_MOSQ_H_
+
+#ifndef _WILL_MOSQ_H_
+#define _WILL_MOSQ_H_
 
 #include <mosquitto.h>
+#include <mosquitto_internal.h>
 
-int _mosquitto_packet_alloc(struct _mosquitto_packet *packet);
-void _mosquitto_check_keepalive(struct mosquitto *mosq);
-int _mosquitto_fix_sub_topic(char **subtopic);
-uint16_t _mosquitto_mid_generate(struct mosquitto *mosq);
-int _mosquitto_topic_wildcard_len_check(const char *str);
+int _mosquitto_will_set(struct mosquitto *mosq, bool will, const char *topic, uint32_t payloadlen, const uint8_t *payload, int qos, bool retain);
 
 #endif

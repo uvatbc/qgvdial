@@ -24,11 +24,8 @@
  * retained messages and durable subscriptions to a file periodically and on
  * shutdown. This is usually desirable (and is suggested by the MQTT spec), but
  * it can be disabled by commenting out this define if required.
- * Not available on Windows.
  */
-#ifndef WIN32
 #define WITH_PERSISTENCE
-#endif
 
 /* Compile with bridge support included. This allow the broker to connect to
  * other brokers and subscribe/publish to topics. You probably want to leave
@@ -36,6 +33,15 @@
  * CPU time.
  */
 #define WITH_BRIDGE
+
+/* Compile with strict protocol support. This means that both the client
+ * library and the broker will be very strict about protocol compliance on
+ * incoming data. Neither of them will return an error on incorrect "remaining
+ * length" values if this is commented out. The old behaviour (prior to 0.12)
+ * is equivalent to compiling with WITH_STRICT_PROTOCOL defined and means that
+ * clients will be immediately disconnected from the broker on non-compliance.
+ */
+//#define WITH_STRICT_PROTOCOL
 
 /* Use the username/password and ACL checks defined in security_external.c
  * This is empty by default, but gives a more straightforward way of adding
