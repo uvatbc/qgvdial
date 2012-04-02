@@ -206,8 +206,9 @@ GVApi::doGet(QUrl url, void *ctx, QObject *receiver, const char *method)
     QNetworkRequest req(url);
     req.setRawHeader("User-Agent", UA_IPHONE4);
 
-    req.setHeader (QNetworkRequest::CookieHeader,
-                   QVariant::fromValue(jar->getAllCookies ()));
+    QVariant var;
+    var.setValue (jar->getAllCookies ());
+    req.setHeader (QNetworkRequest::CookieHeader, var);
 
     QNetworkReply *reply = nwMgr.get(req);
     if (!reply) {
