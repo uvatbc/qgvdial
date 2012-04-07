@@ -27,61 +27,60 @@ Item {
     signal sigSendLogs()
     signal sigBack()
 
-    Column {
-        id: mainColumn
-        anchors.fill: parent
+    ListView {
+        anchors {
+            top: parent.top
+            left: parent.left
+            right: parent.right
+            bottom: btnRow.top
+        }
+
+        width: parent.width
+        model: g_logModel
+        clip: true
+
+        delegate: Rectangle {
+            height: logText.height + 2
+            width: mainColumn.width
+            color: "black"
+            Text {
+                id: logText
+                text: modelData
+                color: "white"
+                width: parent.width
+                wrapMode: Text.Wrap
+                font { family: "Nokia Sans"; pointSize: (6 * g_fontMul) }
+            }
+        }
+    }//ListView (rotating logs)
+
+    Row {
+        id: btnRow
+
+        anchors {
+            left: parent.left
+            right: parent.right
+            bottom: parent.bottom
+        }
+
         spacing: 1
 
-        property int pixDiv: 15
-        property int pixHeight: (container.height + container.width) / 2
-        property int pixSize: pixHeight / pixDiv
+        MeegoButton {
+            id: btnSendLogs
 
-        ListView {
-            height: container.height - btnRow.height - mainColumn.spacing
-            width: parent.width
-            model: g_logModel
-            clip: true
+            text: "Send logs"
+            width: (parent.width / 2) - parent.spacing
 
-            delegate: Rectangle {
-                height: logText.height + 2
-                width: mainColumn.width
-                color: "black"
-                Text {
-                    id: logText
-                    text: modelData
-                    color: "white"
-                    width: parent.width
-                    wrapMode: Text.Wrap
-                    font.pixelSize: mainColumn.pixSize / 1.8
-                }
-            }
-        }//ListView (rotating logs)
+            onClicked: container.sigSendLogs();
+        }//MyButton (Send logs)
 
-        Row {
-            id: btnRow
-            height: btnBack.height
-            width: parent.width
-            spacing: 1
+        MeegoButton {
+            id: btnBack
 
-            MyButton {
-                id: btnSendLogs
+            text: "Back"
+            width: (parent.width / 2) - parent.spacing
 
-                mainText: "Send logs"
-                width: (parent.width / 2) - parent.spacing
-                mainPixelSize: mainColumn.pixSize
-
-                onClicked: container.sigSendLogs();
-            }//MyButton (Send logs)
-
-            MyButton {
-                id: btnBack
-
-                mainText: "Back"
-                width: (parent.width / 2) - parent.spacing
-                mainPixelSize: mainColumn.pixSize
-
-                onClicked: container.sigBack();
-            }//MyButton (Back)
-        }//Button row (Send logs and Back)
-    }//Column
+            onClicked: container.sigBack();
+        }//MyButton (Back)
+    }//Button row (Send logs and Back)
 }//Item (container)

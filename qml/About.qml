@@ -27,7 +27,6 @@ Item {
     signal sigLinkActivated(string strLink)
 
     height: mainColumn.height
-    property real pixHeight: 500
 
     Column {
         id: mainColumn
@@ -38,22 +37,18 @@ Item {
         spacing: 2
         width: parent.width
 
-        property int pixDiv: 15
-        property int pixSize: pixHeight / pixDiv
-
         Text {
             text: "Version: __QGVDIAL_VERSION__"
             width: parent.width
             height: paintedHeight + 2
-            font.pixelSize: pixHeight
+            font { family: "Nokia Sans"; pointSize: (8 * g_fontMul) }
             color: "white"
         }//Text (version)
 
         Text {
             width: parent.width
-            height: paintedHeight + 3
+            height: paintedHeight + 2
             font { family: "Nokia Sans"; pointSize: (8 * g_fontMul) }
-            font.pixelSize: pixHeight
             color: "white"
 
             onLinkActivated: container.sigLinkActivated(link)

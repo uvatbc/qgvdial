@@ -50,10 +50,7 @@ FocusScope {
 
             focus: true
 
-            font {
-                family: "Nokia Sans"
-                pointSize: container.pointSize
-            }
+            font { family: "Nokia Sans"; pointSize: container.pointSize; }
 
             inputMethodHints: Qt.ImhNoAutoUppercase + Qt.ImhNoPredictiveText
 

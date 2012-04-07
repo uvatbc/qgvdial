@@ -27,8 +27,6 @@ Item {
 
     height: mainColumn.height + 2
 
-    property real pixHeight: 500
-
     function setValues(bEnable, bUseSystemProxy, host, port,
                        bRequiresAuth, user, pass) {
         console.debug ("QML: Setting proxy settings")
@@ -80,7 +78,7 @@ Item {
         Row {
             id: rowUserProxyHost
 
-            height: pixHeight + 2
+            height: lblHost.height
             width: parent.width
             spacing: 2
 
@@ -91,7 +89,7 @@ Item {
                 text: "Host:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: parent.height - 2
+                font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
             }
 
             MyTextEdit {
@@ -107,7 +105,7 @@ Item {
         Row {
             id: rowUserProxyPort
 
-            height: pixHeight + 2
+            height: lblPort.height
             width: parent.width
             spacing: 2
 
@@ -118,7 +116,7 @@ Item {
                 text: "Port:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: parent.height - 2
+                font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
             }
 
             MyTextEdit {
@@ -143,7 +141,7 @@ Item {
         Row {
             id: rowProxyUsername
 
-            height: pixHeight + 2
+            height: lblProxyUser.height
             width: parent.width
             spacing: 2
 
@@ -154,7 +152,7 @@ Item {
                 text: "Proxy user:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: parent.height - 2
+                font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
             }
 
             MyTextEdit {
@@ -170,7 +168,7 @@ Item {
         Row {
             id: rowProxyPassword
 
-            height: pixHeight + 2
+            height: lblProxyPass.height
             width: parent.width
             spacing: 2
 
@@ -181,7 +179,7 @@ Item {
                 text: "Proxy password:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: parent.height - 2
+                font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
             }
 
             MyTextEdit {
@@ -201,7 +199,6 @@ Item {
                 leftMargin: 1
             }
             width: parent.width - 1
-            pixHeight: container.pixHeight
 
             onSigSave: {
                 container.sigProxyChanges (bEnableProxy,

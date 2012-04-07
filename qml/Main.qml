@@ -247,9 +247,11 @@ Rectangle {
 
         Text {
             text: g_strStatus
-            font.pixelSize: (parent.height * 2 / 3)
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.horizontalCenter: parent.horizontalCenter
+            font { family: "Nokia Sans"; pointSize: (7 * g_fontMul) }
+            anchors {
+                verticalCenter: parent.verticalCenter
+                horizontalCenter: parent.horizontalCenter
+            }
             color: "white"
         }
     }//Rectangle (status bar)

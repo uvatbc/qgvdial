@@ -44,9 +44,6 @@ Flickable {
 
     signal sigSendLogs
 
-    property real pixHeight: (height + width) / 30
-    property real textItemHeight: pixHeight + 4
-
     contentHeight: expandLoginDetails.height + expandProxySettings.height +
                    expandMqSettings.height + expandPinSettings.height +
                    expandLogView.height + expandAbout.height
@@ -124,7 +121,6 @@ Flickable {
             y: parent.startY
 
             width: parent.width - 1
-            pixHeight: container.pixHeight
 
             opacity: parent.containedOpacity
 
@@ -160,7 +156,6 @@ Flickable {
             y: parent.startY
 
             width: parent.width - 1
-            pixHeight: container.pixHeight
 
             opacity: parent.containedOpacity
 
@@ -193,7 +188,6 @@ Flickable {
             y: parent.startY
 
             width: parent.width - 1
-            pixHeight: container.pixHeight
 
             opacity: parent.containedOpacity
 
@@ -225,7 +219,7 @@ Flickable {
             id: logView
 
             width: parent.width - 1
-            height: container.height * 0.95
+            height: container.height - expandLogView.textHeight
             y: parent.startY
 
             opacity: parent.containedOpacity
@@ -253,7 +247,6 @@ Flickable {
 
             width: parent.width - 1
             y: parent.startY
-            pixHeight: container.pixHeight
             opacity: parent.containedOpacity
 
             onSigLinkActivated: container.sigLinkActivated(strLink)

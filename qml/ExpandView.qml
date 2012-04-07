@@ -29,15 +29,19 @@ Rectangle {
     height: titleText.height + 1
 
     property string mainTitle: "Main title"
-    property real contentHeight: 50
-    property real startY: titleText.height + 1
     property real containedOpacity: 0
     property bool isExpanded: false
+
+    property real startY: titleText.height + 1
+    property alias textHeight: textRow.height
+    property real contentHeight: 50
 
     signal clicked
     signal pressAndHold
 
     Row {
+        id: textRow
+
         anchors {
             top: parent.top
             left: parent.left

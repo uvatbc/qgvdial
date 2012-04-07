@@ -26,7 +26,6 @@ Item {
     objectName: "MosquittoPage"
 
     height: mainColumn.height + 2
-    property real pixHeight: 500
 
     function setValues(bEnable, host, port, topic) {
         console.debug ("QML: Setting Mq settings")
@@ -68,7 +67,7 @@ Item {
                 text: "Host:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: container.pixHeight
+                font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
                 height: paintedHeight + 2
             }
 
@@ -95,7 +94,7 @@ Item {
                 text: "Port:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: container.pixHeight
+                font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
                 height: paintedHeight + 2
             }
 
@@ -122,7 +121,7 @@ Item {
                 text: "Topic to sub:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: container.pixHeight
+                font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
                 height: paintedHeight + 2
             }
 
@@ -143,7 +142,6 @@ Item {
                 leftMargin: 1
             }
             width: parent.width - 1
-            pixHeight: container.pixHeight
 
             onSigSave: {
                 container.sigMosquittoChanges (bEnable,

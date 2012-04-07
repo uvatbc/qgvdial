@@ -24,27 +24,22 @@ import Qt 4.7
 Row {
     signal sigSave
     signal sigCancel
-    property real pixHeight: 500
 
     id: container
     spacing: 2
     height: btnSave.height
 
-    MyButton {
+    MeegoButton {
         id: btnSave
-        mainText: "Save"
+        text: "Save"
         width: (parent.width / 2) - parent.spacing
-        mainPixelSize: container.pixHeight
-        height: mainPixelSize * 3 / 2
 
         onClicked: container.sigSave();
     }//MyButton (Save)
 
-    MyButton {
-        mainText: "Cancel"
+    MeegoButton {
+        text: "Cancel"
         width: (parent.width / 2) - parent.spacing
-        mainPixelSize: container.pixHeight
-        height: mainPixelSize * 3 / 2
 
         onClicked: container.sigCancel();
     }//MyButton (Cancel)

@@ -70,10 +70,8 @@ Rectangle {
         contentHeight: smsLabel.height + smsLabel.anchors.topMargin +
                        smsTextRect.height + smsTextRect.anchors.topMargin +
                        remainingCharsText.height + remainingCharsText.anchors.topMargin +
-                       ((pixHeight+1) * modelDestinations.count) + btnRow.height + 8
+                       repeaterColumn.height + btnRow.height + 8
         contentWidth: width
-
-        property real pixHeight: (parent.height + parent.width) / 35
 
         Text {
             id: smsLabel
@@ -119,9 +117,7 @@ Rectangle {
                     wrapMode: Text.WordWrap
                     textFormat: TextEdit.PlainText
 
-                    height: font.pixelSize > paintedHeight ? font.pixelSize : paintedHeight
-
-                    font.pixelSize: mainFlick.pixHeight
+                    font { family: "Nokia Sans"; pointSize: (8 * g_fontMul) }
                     color: "white"
                 }//TextEdit (with all the SMS text)
             }//Rectangle (bounding the sms text edit)
@@ -131,7 +127,7 @@ Rectangle {
             id: remainingCharsText
             text: "Remaining characters = " + (140 - smsText.text.length)
             color: "white"
-            font.pixelSize: mainFlick.pixHeight
+            font { family: "Nokia Sans"; pointSize: (6 * g_fontMul) }
 
             anchors {
                 top: smsTextRect.bottom
@@ -139,7 +135,7 @@ Rectangle {
                 left: parent.left
                 right: parent.right
             }
-        }
+        }// Text (remaining characters)
 
         Column {
             id: repeaterColumn
@@ -150,6 +146,8 @@ Rectangle {
                 right: parent.right
             }
 
+            height: childrenRect.height
+
             Repeater {
                 width: mainFlick.width
 
@@ -157,19 +155,19 @@ Rectangle {
                 delegate: Item {
                     id: entryRepeater
 
-                    height: mainFlick.pixHeight + 2
+                    height: entryText.height
                     width: mainFlick.width
 
                     Text {
+                        id: entryText
+
                         anchors {
                             left: parent.left
                             top: parent.top
-                            bottom: parent.bottom
                         }
 
-                        id: entryText
                         text: name + " (" + number + ")"
-                        font.pixelSize: mainFlick.pixHeight / 1.2
+                        font { family: "Nokia Sans"; pointSize: (7 * g_fontMul) }
                         color: "white"
                     }//Text
 
@@ -177,6 +175,7 @@ Rectangle {
                         id: imageRect
                         anchors {
                             right: parent.right
+                            rightMargin: 1
                             top: parent.top
                             bottom: parent.bottom
                         }
@@ -184,6 +183,7 @@ Rectangle {
                         height: entryRepeater.height - 1
 
                         color: "black"
+                        border.color: "slategrey"
 
                         Image {
                             anchors.fill: parent
@@ -215,36 +215,28 @@ Rectangle {
 
             anchors {
                 top: repeaterColumn.bottom
-                topMargin: 10
+                topMargin: 5
                 left: parent.left
                 right: parent.right
                 rightMargin: 1
             }
-            height: (mainFlick.pixHeight*1.5) + 4
+            height: btnBack.height + 2
 
-            MyButton {
+            MeegoButton {
                 id: btnBack
 
-                mainText: "Back"
-                mainPixelSize: (mainFlick.pixHeight * 1.1)
-
+                text: "Back"
                 width: (parent.width / 2) - parent.spacing
-                height: parent.height
-
                 anchors.verticalCenter: parent.verticalCenter
 
                 onClicked: container.sigBack();
             }// Back button
 
-            MyButton {
+            MeegoButton {
                 id: btnSend
 
-                mainText: "Send"
-                mainPixelSize: (mainFlick.pixHeight * 1.1)
-
+                text: "Send"
                 width: (parent.width / 2) - parent.spacing
-                height: parent.height
-
                 anchors.verticalCenter: parent.verticalCenter
 
                 onClicked: {
