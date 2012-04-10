@@ -151,7 +151,7 @@ GVContactsTable::doPost(QUrl url, QByteArray postData, const char *contentType,
         return false;
     }
 
-    token->apiCtx = ctx;
+    token->apiCtx = tracker;
 
     bool rv = connect(tracker,
                       SIGNAL(sigDone(bool,QByteArray,QNetworkReply*,void*)),

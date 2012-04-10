@@ -760,10 +760,10 @@ GVWebPage::onGotPhonesListXML (QNetworkReply *reply)
 
         QString strTemp;
         QScriptEngine scriptEngine;
-        strTemp = "var topObj = " + xmlHandler.strJson;
+        strTemp = "var obj = " + xmlHandler.strJson;
         scriptEngine.evaluate (strTemp);
         if (scriptEngine.hasUncaughtException ()) {
-            strTemp = QString ("Could not assign json to topObj : %1")
+            strTemp = QString ("Could not assign json to obj : %1")
                       .arg (scriptEngine.uncaughtException().toString());
             qWarning() << strTemp;
             if (bEmitLog) qDebug() << "Data from GV:" << strReply;
@@ -771,9 +771,9 @@ GVWebPage::onGotPhonesListXML (QNetworkReply *reply)
         }
 
         strSelfNumber =
-        scriptEngine.evaluate("topObj[\"settings\"][\"primaryDid\"]").toString();
+        scriptEngine.evaluate("obj[\"settings\"][\"primaryDid\"]").toString();
         if (scriptEngine.hasUncaughtException ()) {
-            strTemp = QString ("Could not parse primaryDid from topObj : %1")
+            strTemp = QString ("Could not parse primaryDid from obj : %1")
                       .arg (scriptEngine.uncaughtException().toString());
             qWarning() << strTemp;
             if (bEmitLog) qDebug() << "Data from GV:" << strReply;
@@ -788,7 +788,7 @@ GVWebPage::onGotPhonesListXML (QNetworkReply *reply)
 
         strTemp = "var phoneParams = []; "
                   "var phoneList = []; "
-                  "for (var phoneId in topObj[\"phones\"]) { "
+                  "for (var phoneId in obj[\"phones\"]) { "
                   "    phoneList.push(phoneId); "
                   "}";
         scriptEngine.evaluate (strTemp);
@@ -806,7 +806,7 @@ GVWebPage::onGotPhonesListXML (QNetworkReply *reply)
         for (qint32 i = 0; i < nPhoneCount; i++) {
             strTemp = QString(
                     "phoneParams = []; "
-                    "for (var params in topObj[\"phones\"][phoneList[%1]]) { "
+                    "for (var params in obj[\"phones\"][phoneList[%1]]) { "
                     "    phoneParams.push(params); "
                     "}").arg(i);
             scriptEngine.evaluate (strTemp);
@@ -826,7 +826,7 @@ GVWebPage::onGotPhonesListXML (QNetworkReply *reply)
                 strTemp = QString("phoneParams[%1];").arg (j);
                 QString strPName = scriptEngine.evaluate (strTemp).toString ();
                 strTemp = QString(
-                          "topObj[\"phones\"][phoneList[%1]][phoneParams[%2]];")
+                          "obj[\"phones\"][phoneList[%1]][phoneParams[%2]];")
                             .arg (i)
                             .arg (j);
                 QString strVal = scriptEngine.evaluate (strTemp).toString ();
@@ -1096,10 +1096,10 @@ GVWebPage::parseInboxJson(const QDateTime &dtUpdate, const QString &strJson,
     do { // Begin cleanup block (not a loop)
         QString strTemp;
         QScriptEngine scriptEngine;
-        strTemp = "var topObj = " + strJson;
+        strTemp = "var obj = " + strJson;
         scriptEngine.evaluate (strTemp);
         if (scriptEngine.hasUncaughtException ()) {
-            qWarning () << "Failed to assign JSon to topObj. error ="
+            qWarning () << "Failed to assign JSon to obj. error ="
                         << scriptEngine.uncaughtException ().toString ()
                         << "JSON =" << strJson;
             break;
@@ -1107,7 +1107,7 @@ GVWebPage::parseInboxJson(const QDateTime &dtUpdate, const QString &strJson,
 
         strTemp = "var msgParams = []; "
                   "var msgList = []; "
-                  "for (var msgId in topObj[\"messages\"]) { "
+                  "for (var msgId in obj[\"messages\"]) { "
                   "    msgList.push(msgId); "
                   "}";
         scriptEngine.evaluate (strTemp);
@@ -1126,7 +1126,7 @@ GVWebPage::parseInboxJson(const QDateTime &dtUpdate, const QString &strJson,
         for (qint32 i = 0; i < nMsgCount; i++) {
             strTemp = QString(
                     "msgParams = []; "
-                    "for (var params in topObj[\"messages\"][msgList[%1]]) { "
+                    "for (var params in obj[\"messages\"][msgList[%1]]) { "
                     "    msgParams.push(params); "
                     "}").arg(i);
             scriptEngine.evaluate (strTemp);
@@ -1145,7 +1145,7 @@ GVWebPage::parseInboxJson(const QDateTime &dtUpdate, const QString &strJson,
                 strTemp = QString("msgParams[%1];").arg (j);
                 QString strPName = scriptEngine.evaluate (strTemp).toString ();
                 strTemp = QString(
-                          "topObj[\"messages\"][msgList[%1]][msgParams[%2]];")
+                          "obj[\"messages\"][msgList[%1]][msgParams[%2]];")
                             .arg (i)
                             .arg (j);
                 QString strVal = scriptEngine.evaluate (strTemp).toString ();

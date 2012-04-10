@@ -121,27 +121,28 @@ private:
     QUrl hasMoved(QNetworkReply *reply);
     bool getSystemProxies (QNetworkProxy &http, QNetworkProxy &https);
 
-    bool doGet(QUrl url, void *ctx, QObject *receiver, const char *method);
-    bool doGet(const QString &strUrl, void *ctx, QObject *receiver,
+    bool doGet(QUrl url, AsyncTaskToken *token, QObject *receiver,
+               const char *method);
+    bool doGet(const QString &strUrl, AsyncTaskToken *token, QObject *receiver,
                const char *method);
 
     bool doPost(QUrl url, QByteArray postData, const char *contentType,
-                const char *ua, void *ctx, QObject *receiver,
+                const char *ua, AsyncTaskToken *token, QObject *receiver,
                 const char *method);
     bool doPost(QUrl url, QByteArray postData, const char *contentType,
-                void *ctx, QObject *receiver, const char *method);
-    bool doPostForm(QUrl url, QByteArray postData, void *ctx,
+                AsyncTaskToken *token, QObject *receiver, const char *method);
+    bool doPostForm(QUrl url, QByteArray postData, AsyncTaskToken *token,
                     QObject *receiver, const char *method);
-    bool doPostText(QUrl url, QByteArray postData, void *ctx,
+    bool doPostText(QUrl url, QByteArray postData, AsyncTaskToken *token,
                     QObject *receiver, const char *method);
 
     // Login and two factor
     bool doLogin1(QUrl url, AsyncTaskToken *token);
-    bool postLogin(QUrl url, void *ctx);
+    bool postLogin(QUrl url, AsyncTaskToken *token);
     bool parseHiddenLoginFields(const QString &strResponse, QVariantMap &ret);
-    bool beginTwoFactorAuth(QUrl url, void *ctx);
-    bool doTwoFactorAuth(const QString &strResponse, void *ctx);
-    bool getRnr(void *ctx);
+    bool beginTwoFactorAuth(QUrl url, AsyncTaskToken *token);
+    bool doTwoFactorAuth(const QString &strResponse, AsyncTaskToken *token);
+    bool getRnr(AsyncTaskToken *token);
 
     // Send SMS
     bool doSendSms(QUrl url, AsyncTaskToken *token);

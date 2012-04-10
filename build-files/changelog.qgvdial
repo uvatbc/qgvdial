@@ -1,2 +1,2 @@
-  * Bunch of QML fixes to make it look better.
+  * Fix the GVAPI so that calls can be canceled.
 

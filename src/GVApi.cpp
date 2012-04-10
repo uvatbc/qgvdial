@@ -196,9 +196,8 @@ GVApi::beautify_number (QString &strNumber)
 }//GVApi::beautify_number
 
 bool
-GVApi::doGet(QUrl url, void *ctx, QObject *receiver, const char *method)
+GVApi::doGet(QUrl url, AsyncTaskToken *token, QObject *receiver, const char *method)
 {
-    AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     if (!token) {
         return false;
     }
@@ -206,8 +205,9 @@ GVApi::doGet(QUrl url, void *ctx, QObject *receiver, const char *method)
     QNetworkRequest req(url);
     req.setRawHeader("User-Agent", UA_IPHONE4);
 
+    QList<QNetworkCookie> cookies = jar->cookiesForUrl(req.url());
     QVariant var;
-    var.setValue (jar->getAllCookies ());
+    var.setValue (cookies);
     req.setHeader (QNetworkRequest::CookieHeader, var);
 
     QNetworkReply *reply = nwMgr.get(req);
@@ -215,7 +215,7 @@ GVApi::doGet(QUrl url, void *ctx, QObject *receiver, const char *method)
         return false;
     }
 
-    NwReqTracker *tracker = new NwReqTracker(reply, ctx, NW_REPLY_TIMEOUT,
+    NwReqTracker *tracker = new NwReqTracker(reply, token, NW_REPLY_TIMEOUT,
                                              emitLog, true, this);
     if (!tracker) {
         reply->abort ();
@@ -238,17 +238,17 @@ GVApi::doGet(QUrl url, void *ctx, QObject *receiver, const char *method)
 }//GVApi::doGet
 
 bool
-GVApi::doGet(const QString &strUrl, void *ctx, QObject *receiver,
+GVApi::doGet(const QString &strUrl, AsyncTaskToken *token, QObject *receiver,
              const char *method)
 {
-    return doGet(QUrl(strUrl), ctx, receiver, method);
+    return doGet(QUrl(strUrl), token, receiver, method);
 }//GVApi::doGet
 
 bool
 GVApi::doPost(QUrl url, QByteArray postData, const char *contentType,
-              const char *ua, void *ctx, QObject *receiver, const char *method)
+              const char *ua, AsyncTaskToken *token, QObject *receiver,
+              const char *method)
 {
-    AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     if (!token) {
         return false;
     }
@@ -265,7 +265,7 @@ GVApi::doPost(QUrl url, QByteArray postData, const char *contentType,
         return false;
     }
 
-    NwReqTracker *tracker = new NwReqTracker(reply, ctx, NW_REPLY_TIMEOUT,
+    NwReqTracker *tracker = new NwReqTracker(reply, token, NW_REPLY_TIMEOUT,
                                              emitLog, this);
     if (!tracker) {
         reply->abort ();
@@ -273,7 +273,7 @@ GVApi::doPost(QUrl url, QByteArray postData, const char *contentType,
         return false;
     }
 
-    token->apiCtx = ctx;
+    token->apiCtx = tracker;
 
     bool rv = connect(tracker, SIGNAL(sigDone(bool, const QByteArray &,
                                               QNetworkReply *, void *)),
@@ -287,24 +287,25 @@ GVApi::doPost(QUrl url, QByteArray postData, const char *contentType,
 }//GVApi::doPost
 
 bool
-GVApi::doPost(QUrl url, QByteArray postData, const char *contentType, void *ctx,
-              QObject *receiver, const char *method)
+GVApi::doPost(QUrl url, QByteArray postData, const char *contentType,
+              AsyncTaskToken *token, QObject *receiver, const char *method)
 {
-    return doPost(url, postData, contentType, UA_IPHONE4, ctx, receiver, method);
+    return doPost(url, postData, contentType, UA_IPHONE4, token, receiver,
+                  method);
 }//GVApi::doPost
 
 bool
-GVApi::doPostForm(QUrl url, QByteArray postData, void *ctx,
+GVApi::doPostForm(QUrl url, QByteArray postData, AsyncTaskToken *token,
                   QObject *receiver, const char *method)
 {
-    return doPost (url, postData, POST_FORM, ctx, receiver, method);
+    return doPost (url, postData, POST_FORM, token, receiver, method);
 }//GVApi::doPostForm
 
 bool
-GVApi::doPostText(QUrl url, QByteArray postData, void *ctx,
+GVApi::doPostText(QUrl url, QByteArray postData, AsyncTaskToken *token,
                   QObject *receiver, const char *method)
 {
-    return doPost (url, postData, POST_TEXT, ctx, receiver, method);
+    return doPost (url, postData, POST_TEXT, token, receiver, method);
 }//GVApi::doPostForm
 
 bool
@@ -569,11 +570,10 @@ gonext:
 }//GVApi::parseHiddenLoginFields
 
 bool
-GVApi::postLogin(QUrl url, void *ctx)
+GVApi::postLogin(QUrl url, AsyncTaskToken *token)
 {
     QNetworkCookie galx;
     bool found = false;
-    AsyncTaskToken *token = (AsyncTaskToken *)ctx;
 
     foreach (QNetworkCookie cookie, jar->getAllCookies ()) {
         if (cookie.name () == "GALX") {
@@ -614,7 +614,7 @@ GVApi::postLogin(QUrl url, void *ctx)
         }
     }
 
-    found = doPostForm(url, url.encodedQuery(), ctx, this,
+    found = doPostForm(url, url.encodedQuery(), token, this,
                        SLOT (onLogin2(bool, const QByteArray &,
                                       QNetworkReply *, void *)));
     Q_ASSERT(found);
@@ -626,8 +626,8 @@ void
 GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
                 void *ctx)
 {
-    QString strResponse = response;
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
+    QString strResponse = response;
     bool accountConfigured = true;
     bool accountReviewRequested = false;
     bool foreignUrl = false;
@@ -741,7 +741,8 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
 
             urlMoved = QUrl(newLoc);
             success = doGet (urlMoved, token, this,
-                SLOT(onLogin2(bool,const QByteArray &,QNetworkReply *,void *)));
+                SLOT(onLogin2(bool, const QByteArray &, QNetworkReply *,
+                              void *)));
             token->outParams["foreign"] = 0;
         } while (0); // End cleanup block (not a loop)
 
@@ -797,11 +798,11 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
 }//GVApi::onLogin2
 
 bool
-GVApi::beginTwoFactorAuth(QUrl url, void *ctx)
+GVApi::beginTwoFactorAuth(QUrl url, AsyncTaskToken *token)
 {
     url.addQueryItem("service", "grandcentral");
 
-    bool rv = doGet(url, ctx, this,
+    bool rv = doGet(url, token, this,
                     SLOT(onTwoFactorLogin(bool, const QByteArray &,
                                           QNetworkReply *, void *)));
     Q_ASSERT(rv);
@@ -858,9 +859,8 @@ GVApi::onTwoFactorLogin(bool success, const QByteArray &response,
 }//GVApi::onTwoFactorLogin
 
 bool
-GVApi::doTwoFactorAuth(const QString &strResponse, void *ctx)
+GVApi::doTwoFactorAuth(const QString &strResponse, AsyncTaskToken *token)
 {
-    AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QNetworkCookie galx;
     bool foundgalx = false;
     bool rv = false;
@@ -911,7 +911,7 @@ GVApi::doTwoFactorAuth(const QString &strResponse, void *ctx)
             url1.addQueryItem(key, ret[key].toString());
         }
 
-        rv = doPostForm(url, url1.encodedQuery(), ctx, this,
+        rv = doPostForm(url, url1.encodedQuery(), token, this,
                         SLOT(onTFAAutoPost(bool, const QByteArray &,
                                            QNetworkReply *, void *)));
         Q_ASSERT(rv);
@@ -963,11 +963,11 @@ GVApi::onTFAAutoPost(bool success, const QByteArray &response,
 }//GVApi::onTFAAutoPost
 
 bool
-GVApi::getRnr(void *ctx)
+GVApi::getRnr(AsyncTaskToken *token)
 {
     Q_DEBUG("User authenticated, now looking for RNR.");
 
-    bool rv = doGet("https://www.google.com/voice/m/i/all", ctx, this,
+    bool rv = doGet("https://www.google.com/voice/m/i/all", token, this,
                     SLOT (onGotRnr(bool, const QByteArray &,
                                    QNetworkReply *, void *)));
     Q_ASSERT(rv);
@@ -987,7 +987,7 @@ GVApi::onGotRnr(bool success, const QByteArray &response,
 
         QUrl urlMoved = hasMoved (reply);
         if (!urlMoved.isEmpty ()) {
-            success = doGet(urlMoved, ctx, this,
+            success = doGet(urlMoved, token, this,
                             SLOT(onGotRnr(bool,const QByteArray &,
                                           QNetworkReply *, void *)));
             Q_ASSERT(success);
@@ -1047,8 +1047,8 @@ GVApi::logout(AsyncTaskToken *token)
     }
 
     bool rv = doGet(GV_HTTPS "/account/signout", token, this,
-                    SLOT (onLogout(bool, const QByteArray &,
-                                   QNetworkReply *, void *)));
+                    SLOT (onLogout(bool, const QByteArray &, QNetworkReply *,
+                                   void *)));
     Q_ASSERT(rv);
 
     return rv;
@@ -1059,7 +1059,6 @@ GVApi::onLogout(bool /*success*/, const QByteArray & /*response*/,
                 QNetworkReply * /*reply*/, void *ctx)
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
-
     loggedIn = false;
 
     token->status = ATTS_SUCCESS;
@@ -1082,7 +1081,7 @@ GVApi::getPhones(AsyncTaskToken *token)
 
     bool rv = doGet (GV_HTTPS "/b/0/settings/tab/phones", token, this,
                      SLOT (onGetPhones(bool, const QByteArray &,
-                                       QNetworkReply *, void*)));
+                                       QNetworkReply *, void *)));
     Q_ASSERT(rv);
 
     return rv;
@@ -1118,15 +1117,14 @@ GVApi::onGetPhones(bool success, const QByteArray &response,
 
         simpleReader.setContentHandler (&xmlHandler);
         simpleReader.setErrorHandler (&xmlHandler);
-
         simpleReader.parse (&inputSource, false);
 
         QString strTemp;
         QScriptEngine scriptEngine;
-        strTemp = "var topObj = " + xmlHandler.strJson;
+        strTemp = "var obj = " + xmlHandler.strJson;
         scriptEngine.evaluate (strTemp);
         if (scriptEngine.hasUncaughtException ()) {
-            strTemp = QString ("Could not assign json to topObj : %1")
+            strTemp = QString ("Could not assign json to obj : %1")
                       .arg (scriptEngine.uncaughtException().toString());
             qWarning() << strTemp;
             if (emitLog) {
@@ -1136,9 +1134,9 @@ GVApi::onGetPhones(bool success, const QByteArray &response,
         }
 
         strSelfNumber =
-        scriptEngine.evaluate("topObj[\"settings\"][\"primaryDid\"]").toString();
+        scriptEngine.evaluate("obj[\"settings\"][\"primaryDid\"]").toString();
         if (scriptEngine.hasUncaughtException ()) {
-            strTemp = QString ("Could not parse primaryDid from topObj : %1")
+            strTemp = QString ("Could not parse primaryDid from obj : %1")
                       .arg (scriptEngine.uncaughtException().toString());
             qWarning() << strTemp;
             if (emitLog) {
@@ -1155,7 +1153,7 @@ GVApi::onGetPhones(bool success, const QByteArray &response,
 
         strTemp = "var phoneParams = []; "
                   "var phoneList = []; "
-                  "for (var phoneId in topObj[\"phones\"]) { "
+                  "for (var phoneId in obj[\"phones\"]) { "
                   "    phoneList.push(phoneId); "
                   "}";
         scriptEngine.evaluate (strTemp);
@@ -1177,7 +1175,7 @@ GVApi::onGetPhones(bool success, const QByteArray &response,
         for (qint32 i = 0; i < nPhoneCount; i++) {
             strTemp = QString(
                     "phoneParams = []; "
-                    "for (var params in topObj[\"phones\"][phoneList[%1]]) { "
+                    "for (var params in obj[\"phones\"][phoneList[%1]]) { "
                     "    phoneParams.push(params); "
                     "}").arg(i);
             scriptEngine.evaluate (strTemp);
@@ -1199,7 +1197,7 @@ GVApi::onGetPhones(bool success, const QByteArray &response,
                 strTemp = QString("phoneParams[%1];").arg (j);
                 QString strPName = scriptEngine.evaluate (strTemp).toString ();
                 strTemp = QString(
-                          "topObj[\"phones\"][phoneList[%1]][phoneParams[%2]];")
+                          "obj[\"phones\"][phoneList[%1]][phoneParams[%2]];")
                             .arg (i)
                             .arg (j);
                 QString strVal = scriptEngine.evaluate (strTemp).toString ();
@@ -1394,10 +1392,10 @@ GVApi::parseInboxJson(const QString &strJson, const QString &strHtml,
     do { // Begin cleanup block (not a loop)
         QString strTemp;
         QScriptEngine scriptEngine;
-        strTemp = "var topObj = " + strJson;
+        strTemp = "var obj = " + strJson;
         scriptEngine.evaluate (strTemp);
         if (scriptEngine.hasUncaughtException ()) {
-            Q_WARN("Failed to assign JSon to topObj. error =")
+            Q_WARN("Failed to assign JSon to obj. error =")
                << scriptEngine.uncaughtException().toString ()
                << "JSON =" << strJson;
             break;
@@ -1405,7 +1403,7 @@ GVApi::parseInboxJson(const QString &strJson, const QString &strHtml,
 
         strTemp = "var msgParams = []; "
                   "var msgList = []; "
-                  "for (var msgId in topObj[\"messages\"]) { "
+                  "for (var msgId in obj[\"messages\"]) { "
                   "    msgList.push(msgId); "
                   "}";
         scriptEngine.evaluate (strTemp);
@@ -1421,7 +1419,7 @@ GVApi::parseInboxJson(const QString &strJson, const QString &strHtml,
         for (qint32 i = 0; i < msgCount; i++) {
             strTemp = QString(
                     "msgParams = []; "
-                    "for (var params in topObj[\"messages\"][msgList[%1]]) { "
+                    "for (var params in obj[\"messages\"][msgList[%1]]) { "
                     "    msgParams.push(params); "
                     "}").arg(i);
             scriptEngine.evaluate (strTemp);
@@ -1440,7 +1438,7 @@ GVApi::parseInboxJson(const QString &strJson, const QString &strHtml,
                 strTemp = QString("msgParams[%1];").arg (j);
                 QString strPName = scriptEngine.evaluate (strTemp).toString ();
                 strTemp = QString(
-                          "topObj[\"messages\"][msgList[%1]][msgParams[%2]];")
+                          "obj[\"messages\"][msgList[%1]][msgParams[%2]];")
                             .arg (i)
                             .arg (j);
                 QString strVal = scriptEngine.evaluate (strTemp).toString ();
@@ -1759,8 +1757,8 @@ GVApi::onCallout(bool success, const QByteArray &response, QNetworkReply *reply,
 #endif
 
         QScriptEngine scriptEngine(this);
-        strTemp = QString("var topObj = %1; "
-                          "topObj.call_through_response.access_number;")
+        strTemp = QString("var obj = %1; "
+                          "obj.call_through_response.access_number;")
                           .arg(strTemp);
         strTemp = scriptEngine.evaluate (strTemp).toString ();
         if (scriptEngine.hasUncaughtException ()) {
@@ -1872,7 +1870,7 @@ GVApi::onCallback(bool success, const QByteArray &response,
         }
 
         QScriptEngine scriptEngine(this);
-        strTemp = QString("var topObj = %1; topObj.ok;").arg(strTemp);
+        strTemp = QString("var obj = %1; obj.ok;").arg(strTemp);
         strTemp = scriptEngine.evaluate (strTemp).toString ();
         if (scriptEngine.hasUncaughtException ()) {
             Q_WARN("Failed to parse call out response: ") << strReply;
@@ -1989,8 +1987,7 @@ GVApi::onSendSms(bool success, const QByteArray &response, QNetworkReply *reply,
         }
 
         QScriptEngine scriptEngine(this);
-        strTemp = QString("var topObj = %1; "
-                          "topObj.send_sms_response.status.status;")
+        strTemp = QString("var obj = %1; obj.send_sms_response.status.status;")
                     .arg(strTemp);
         strTemp = scriptEngine.evaluate (strTemp).toString ();
         if (scriptEngine.hasUncaughtException ()) {
@@ -2126,7 +2123,8 @@ GVApi::markInboxEntryAsRead(AsyncTaskToken *token)
     QUrl url(GV_HTTPS "/b/0/inbox/mark");
     bool rv =
     doPost(url, strContent.toAscii(), POST_FORM, UA_DESKTOP, token, this,
-           SLOT(onMarkAsRead(bool, const QByteArray &, QNetworkReply*, void*)));
+           SLOT(onMarkAsRead(bool, const QByteArray &, QNetworkReply *,
+                             void *)));
     Q_ASSERT(rv);
 
     return (rv);
@@ -2154,7 +2152,8 @@ GVApi::onMarkAsRead(bool success, const QByteArray &response,
                                     .arg(rnr_se);
             success = doPost(url, strContent.toAscii(), POST_FORM, UA_DESKTOP,
                              token, this,
-                             SLOT(onMarkAsRead(bool, QByteArray, void*)));
+                             SLOT(onMarkAsRead(bool, const QByteArray &,
+                                               QNetworkReply *, void *)));
             Q_ASSERT(success);
             break;
         }
@@ -2169,7 +2168,7 @@ GVApi::onMarkAsRead(bool success, const QByteArray &response,
         }
 
         QScriptEngine scriptEngine(this);
-        strTemp = QString("var topObj = %1; topObj.ok;").arg(strTemp);
+        strTemp = QString("var obj = %1; obj.ok;").arg(strTemp);
         strTemp = scriptEngine.evaluate (strTemp).toString ();
         if (scriptEngine.hasUncaughtException ()) {
             Q_WARN("Failed to parse response: ") << strReply;
