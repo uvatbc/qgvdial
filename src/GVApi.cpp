@@ -862,8 +862,7 @@ bool
 GVApi::doTwoFactorAuth(const QString &strResponse, AsyncTaskToken *token)
 {
     QNetworkCookie galx;
-    bool foundgalx = false;
-    bool rv = false;
+    bool foundgalx = false, rv = false;
 
     do { // Begin cleanup block (not a loop)
         foreach (QNetworkCookie cookie, jar->getAllCookies ()) {

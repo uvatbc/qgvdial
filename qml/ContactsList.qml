@@ -108,7 +108,7 @@ Rectangle {
 
         Row {
             id: searchRow
-            height: (allContacts.height + allContacts.width) / 20
+            height: edSearch.height
             width: parent.width
             spacing: 1
 
@@ -125,12 +125,39 @@ Rectangle {
                 }
             }
 
+            Text {
+                id: searchLabel
+                text: "Search:"
+                color: "white"
+                font { family: "Nokia Sans"; pointSize: (6 * g_fontMul); }
+                anchors.verticalCenter: parent.verticalCenter
+            }//Text ("Search")
+
+            MyTextEdit {
+                id: edSearch
+                width: parent.width - imgSearch.width - searchLabel.width - (parent.spacing * 2)
+                anchors.verticalCenter: parent.verticalCenter
+                pointSize: 10 * g_fontMul
+                text: ""
+                onTextChanged: {
+                    if (imgSearch.selection) {
+                        imgSearch.selection = false;
+                    }
+                }
+
+                onSigEnter: {
+                    searchRow.doSearch();
+                }
+            }//MyTextEdit (search box text edit)
+
             Image {
                 id: imgSearch
                 source: (imgSearch.selection ? "close.png" : "search.png")
-                height: searchRow.height
-                width: searchRow.height
+                height: edSearch.height * 0.75
+                width: height
                 fillMode: Image.PreserveAspectFit
+
+                anchors.verticalCenter: parent.verticalCenter
 
                 property bool selection: false
 
@@ -144,23 +171,7 @@ Rectangle {
                     }
                 }
             }//Image (search or close button)
-
-            MyTextEdit {
-                id: edSearch
-                width: parent.width - imgSearch.width - parent.spacing
-                pointSize: 11 * g_fontMul
-                text: ""
-                onTextChanged: {
-                    if (imgSearch.selection) {
-                        imgSearch.selection = false;
-                    }
-                }
-
-                onSigEnter: {
-                    searchRow.doSearch();
-                }
-            }//MyTextEdit (search box text edit)
-        }//Search box
+        }//Row (Search box)
 
         ListView {
             id: contactsView
@@ -193,7 +204,7 @@ Rectangle {
                 radius: 5
 
                 width:  (allContacts.width - border.width)
-                height: (allContacts.height + allContacts.width) / 20
+                height: contactNameText.height + 4
 
                 Image {
                     id: contactImage
@@ -202,14 +213,18 @@ Rectangle {
                         verticalCenter: parent.verticalCenter
                         leftMargin: 2
                     }
-                    height: parent.height
-                    width: parent.height
+                    height: contactNameText.height / 0.8
+                    width: height
 
                     source: imagePath ? imagePath : "unknown_contact.png"
                     fillMode: Image.PreserveAspectFit
-                }//Image
+
+                    smooth: true
+                }//Image (contact images)
 
                 Text {
+                    id: contactNameText
+
                     anchors {
                         verticalCenter: parent.verticalCenter
                         left: contactImage.right
@@ -220,8 +235,8 @@ Rectangle {
                     text: name
                     color: "white"
 
-                    font.pixelSize: parent.height - 6
-                }//Text
+                    font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
+                }//Text (contact name)
 
                 MouseArea {
                     anchors.fill: parent

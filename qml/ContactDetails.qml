@@ -81,7 +81,8 @@ Rectangle { // Contact details
                     width: (txtContactName.height * 2.5)
 
                     fillMode: Image.PreserveAspectFit
-                }//Image
+                    smooth: true
+                }//Image (contact icon)
 
                 Item {
                     anchors {
@@ -94,14 +95,11 @@ Rectangle { // Contact details
                         id: txtContactName
                         anchors.centerIn: parent
 
-                        width: paintedWidth
-                        height: paintedHeight
-
                         text: "Contact name"
                         color: "white"
-                        font.pixelSize: container.suggestedPixelSize
+                        font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
                     }
-                }//Item (name)
+                }//Item (contact name)
             }//Row (image and name)
 
             Text {
@@ -117,7 +115,7 @@ Rectangle { // Contact details
 
                 wrapMode: Text.WordWrap
 
-                font.pixelSize: suggestedPixelSize
+                font { family: "Nokia Sans"; pointSize: (8 * g_fontMul) }
                 color: "white"
             }// Text (contact notes)
 
@@ -139,7 +137,7 @@ Rectangle { // Contact details
                             right: callTextButtons.left
                         }
 
-                        spacing: 0
+                        spacing: 1
 
                         Text { // The phone number
                             id: textType
@@ -148,7 +146,7 @@ Rectangle { // Contact details
 
                             text: type
                             color: "white"
-                            font.pixelSize: container.suggestedPixelSize
+                            font { family: "Nokia Sans"; pointSize: (8 * g_fontMul) }
                         }// Item (phone type)
 
                         Text { // The phone number
@@ -158,20 +156,20 @@ Rectangle { // Contact details
 
                             text: number
                             color: "white"
-                            font.pixelSize: container.suggestedPixelSize
+                            font { family: "Nokia Sans"; pointSize: (8 * g_fontMul) }
                         }// Item (phone number)
                     }//Column (type and number)
 
                     Row {
                         id: callTextButtons
                         anchors {
-                            top: parent.top
+                            verticalCenter: parent.verticalCenter
                             right: parent.right
-                            rightMargin: 1
+                            rightMargin: 2
                         }
 
                         height: phoneColumn.height
-                        width: btnCall.width + btnText.width + spacing - 1
+                        width: btnCall.width + btnText.width + spacing - 2
                         spacing: 2
 
                         Rectangle {
@@ -191,6 +189,8 @@ Rectangle { // Contact details
 
                                 height: parent.height * 0.8
                                 width: height
+
+                                smooth: true
                             }
 
                             MouseArea {
@@ -219,6 +219,8 @@ Rectangle { // Contact details
 
                                 height: parent.height * 0.8
                                 width: height
+
+                                smooth: true
                             }
 
                             MouseArea {
@@ -235,18 +237,14 @@ Rectangle { // Contact details
         }// Column (all the details in one column)
     }//Flickable (mainFlick)
 
-    MyButton {
+    MeegoButton {
         id: backButton
-        mainText: "Back"
+        text: "Back"
         onClicked: container.sigClose();
-        width: parent.width
-        height: mainPixelSize + 4
-        mainPixelSize: suggestedPixelSize
 
         anchors {
             bottom: parent.bottom
-            left: parent.left
-            right: parent.right
+            horizontalCenter: parent.horizontalCenter
         }
     }//MyButton (close details window)
 }// Rectangle (Contact details)

@@ -44,13 +44,13 @@ Rectangle {
     property bool isVoicemail: false
     property string strNumber: "The number"
     property string strLink: "BAD LINK!"
-    property string strSelected: "All"
+    property string strInboxFilter: "All"
     property string strSmsText: "Some text!"
 
     property real suggestedPixelSize: (width + height) / 32
 
     function setSelector(strSelector) {
-        container.strSelected = strSelector
+        container.strInboxFilter = strSelector
     }
 
     onOpacityChanged: {
@@ -100,18 +100,20 @@ Rectangle {
                     id: detailName
                     text: container.strDetailsName
                     color: "white"
-                    width: parent.width
-                    height: paintedHeight + 2
-                    font.pixelSize: suggestedPixelSize
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
                 }// Text (name)
 
                 Text {
                     id: theTime
 
-                    width: parent.width
-                    height: paintedHeight + 2
+                    anchors {
+                        left: parent.left
+                        leftMargin: 5 * g_wMul
+                    }
+                    font { family: "Nokia Sans"; pointSize: (8 * g_fontMul) }
+
                     color: "white"
-                    font.pixelSize: suggestedPixelSize
                     wrapMode: Text.Wrap
 
                     text: strDetailsTime
@@ -120,10 +122,14 @@ Rectangle {
                 Text {
                     id: theNumber
 
+                    anchors {
+                        left: parent.left
+                        leftMargin: 5 * g_wMul
+                    }
+                    font { family: "Nokia Sans"; pointSize: (8 * g_fontMul) }
+
                     width: parent.width
-                    height: paintedHeight + 2
                     color: "white"
-                    font.pixelSize: suggestedPixelSize
                     wrapMode: Text.Wrap
 
                     text: container.strNumber
@@ -157,6 +163,7 @@ Rectangle {
 
                                 height: parent.height * 0.8
                                 width: height
+                                smooth: true
                             }
 
                             MouseArea {
@@ -185,6 +192,7 @@ Rectangle {
 
                                 height: parent.height * 0.8
                                 width: height
+                                smooth: true
                             }
 
                             MouseArea {
@@ -215,6 +223,7 @@ Rectangle {
 
                                 height: parent.height * 0.8
                                 width: height
+                                smooth: true
                             }
 
                             MouseArea {
@@ -259,25 +268,20 @@ Rectangle {
             }//Column of all details
         }//Flickable (text / voicemail)
 
-        MyButton {
+        MeegoButton {
             id: backButton
-            mainText: "Back"
+            text: "Back"
             onClicked: {
                 container.state= ''
                 container.sigVmailPlayback(0);
                 container.sigCloseVmail();
             }
-            width: parent.width
-            height: suggestedPixelSize + 4
-
-            mainPixelSize: suggestedPixelSize
 
             anchors {
                 bottom: parent.bottom
-                left: parent.left
-                right: parent.right
+                horizontalCenter: parent.horizontalCenter
             }
-        }
+        }// MeegoButton (back button)
     }//Rectangle (details)
 
     Timer {
@@ -328,8 +332,9 @@ Rectangle {
 
         Rectangle { // Selector bar at the top
             id: barTop
+
             width: parent.width
-            height: (parent.height + parent.width) / 30
+            height: txtInboxFilter.height
             anchors.top: parent.top
 
             color: "black"
@@ -337,10 +342,12 @@ Rectangle {
             signal clickedTopBar
 
             Text {
-                text: strSelected
-                font.pixelSize: barTop.height - 4
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.horizontalCenter: parent.horizontalCenter
+                id: txtInboxFilter
+                text: strInboxFilter
+                font { family: "Nokia Sans"; pointSize: (9 * g_fontMul); }
+                anchors {
+                    horizontalCenter: parent.horizontalCenter
+                }
                 color: "white"
             }
 
@@ -381,26 +388,28 @@ Rectangle {
 
             model: ["All", "Placed", "Missed", "Received", "Voicemail", "Sms"]
             delegate:  Rectangle {
-                height: barTop.height
-                width: listSelector.width - border.width
+                height: lblSelector.height + 2
+                width: parent.width
 
                 color: "black"
                 border.color: "orange"
 
                 Text {
                     id: lblSelector
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors {
+                        verticalCenter: parent.verticalCenter
+                        horizontalCenter: parent.horizontalCenter
+                    }
                     text: modelData
-                    font.pixelSize: parent.height - 4
                     color: "white"
+                    font { family: "Nokia Sans"; pointSize: (8 * g_fontMul) }
                 }
 
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
                         inboxView.state = '';
-                        strSelected = modelData
+                        strInboxFilter = modelData
                         container.sigInboxSelect(modelData)
                     }
                 }
@@ -466,6 +475,7 @@ Rectangle {
                         fillMode: Image.PreserveAspectFit
                         source: "in_Received.png"
                         opacity: type == "Received" ? 1 : 0
+                        smooth: true
                     }// green arrow
                     Image {
                         id: imgPlaced
@@ -473,6 +483,7 @@ Rectangle {
                         fillMode: Image.PreserveAspectFit
                         source: "in_Placed.png"
                         opacity: type == "Placed" ? 1 : 0
+                        smooth: true
                     }// green arrow out
                     Image {
                         id: imgMissed
@@ -480,6 +491,7 @@ Rectangle {
                         fillMode: Image.PreserveAspectFit
                         source: "in_Missed.png"
                         opacity: type == "Missed" ? 1 : 0
+                        smooth: true
                     }// red arrow
                     Image {
                         id: imgVmail
@@ -487,6 +499,7 @@ Rectangle {
                         fillMode: Image.PreserveAspectFit
                         source: "in_Voicemail.png"
                         opacity: type == "Voicemail" ? 1 : 0
+                        smooth: true
                     }// vmail icon
                     Image {
                         id: imgSMS
@@ -494,8 +507,9 @@ Rectangle {
                         fillMode: Image.PreserveAspectFit
                         source: "in_Sms.png"
                         opacity: type == "SMS" ? 1 : 0
+                        smooth: true
                     }// SMS icon
-                }
+                }//Item (the inbox entry image)
 
                 Text {
                     id: entryName
@@ -503,12 +517,13 @@ Rectangle {
                     anchors {
                         left: imageItem.right
                         right: entryTime.left
+                        verticalCenter: parent.verticalCenter
                     }
 
                     clip: true
                     text: name
                     color: "white"
-                    font.pixelSize: (entryName.height * 0.7) - 3
+                    font { family: "Nokia Sans"; pointSize: (9 * g_fontMul) }
                 }//Text (name)
 
                 Text {
@@ -525,8 +540,8 @@ Rectangle {
 
                     text: time
                     color: "white"
-                    font.pixelSize: (entryTime.height / 2) - 3
-                }
+                    font { family: "Nokia Sans"; pointSize: (5 * g_fontMul) }
+                }//Text (entry time
 
                 MouseArea {
                     anchors.fill: parent
