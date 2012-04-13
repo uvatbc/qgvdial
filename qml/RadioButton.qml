@@ -31,6 +31,8 @@ Rectangle {
     property string text: "Yes or no question?"
     property bool check: false
 
+    signal clicked
+
     Row {
         anchors.fill: parent
         spacing: 2
@@ -51,9 +53,9 @@ Rectangle {
 
                 anchors.fill: parent
 
-                opacity: (container.check == true ? 1 : 0)
+                visible: container.check == true
             }
-        }
+        }//Rectangle with tick mark Image
 
         Text {
             id: textLabel
@@ -62,8 +64,8 @@ Rectangle {
             font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
 
             color: "white"
-        }
-    }
+        }//Text
+    }//Row (tick mark and text)
 
     MouseArea {
         anchors.fill: parent
@@ -74,14 +76,14 @@ Rectangle {
             } else {
                 container.check = true;
             }
+            container.clicked();
         }
-    }
+    }//MouseArea
 
     states: [
         State {
             name: "pressed"
             PropertyChanges { target: container; color: "orange"}
         }
-
-    ]
-}
+    ]//states
+}//Rectangle (container)

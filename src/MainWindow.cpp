@@ -469,7 +469,6 @@ MainWindow::initQML ()
                   this, SLOT   (on_actionE_xit_triggered ()));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
-    if (!rv) { exit(1); }
     rv = connect (gObj, SIGNAL (sigMsgBoxDone(bool)),
                   this, SLOT (onSigMsgBoxDone(bool)));
     Q_ASSERT(rv);
@@ -751,6 +750,10 @@ MainWindow::gotAllRegisteredPhones (AsyncTaskToken *token)
 void
 MainWindow::onRegPhoneSelectionChange (int index)
 {
+    QObject *regView = getQMLObject ("RegisteredPhonesView");
+    Q_ASSERT(regView);
+    QMetaObject::invokeMethod (regView, "setSelected", Q_ARG(QVariant, index));
+
     indRegPhone = index;
 
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
@@ -1011,19 +1014,38 @@ MainWindow::onSigMsgBoxDone (bool /*ok*/)
 void
 MainWindow::onCallInitiatorsChange (bool bSave)
 {
+    QObject *model = getQMLObject ("RegisteredPhonesModel");
+    Q_ASSERT(model);
+
     // Set the correct callback
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     QString strCallback;
     bool bGotCallback = dbMain.getCallback (strCallback);
 
+    QVariantMap oneEntry;
+    QScriptEngine scriptEngine;
+    bool isChecked = false;
+
     QString strCiName;
+
+    // Clear out all entries in the model...
+    QMetaObject::invokeMethod (model, "clear");
     modelRegNumber.clear ();
-    for (int i = 0; i < arrNumbers.size (); i++)
-    {
+
+    for (int i = 0; i < arrNumbers.size (); i++) {
         strCiName = "Dial back: " + arrNumbers[i].strName;
         modelRegNumber.insertRow (strCiName,
                                   arrNumbers[i].strNumber,
                                   arrNumbers[i].chType);
+
+        oneEntry.clear ();
+        oneEntry["entryText"] = strCiName;
+        oneEntry["entryNumber"] = arrNumbers[i].strNumber;
+        oneEntry["entryType"] = arrNumbers[i].chType;
+        oneEntry["isChecked"] = isChecked;
+
+        QMetaObject::invokeMethod (model, "append",
+            Q_ARG(QScriptValue, scriptEngine.toScriptValue(oneEntry)));
     }
 
     // Store the callouts in the same widget as the callbacks
@@ -1032,6 +1054,15 @@ MainWindow::onCallInitiatorsChange (bool bSave)
         if (ci->isValid ()) {
             strCiName = "Dial out: " + ci->name ();
             modelRegNumber.insertRow (strCiName, ci->selfNumber (), ci);
+
+            oneEntry.clear ();
+            oneEntry["entryText"] = strCiName;
+            oneEntry["entryNumber"] = ci->selfNumber ();
+            oneEntry["entryType"] = 'O';
+            oneEntry["isChecked"] = isChecked;
+
+            QMetaObject::invokeMethod (model, "append",
+                Q_ARG(QScriptValue, scriptEngine.toScriptValue(oneEntry)));
         }
     }
 

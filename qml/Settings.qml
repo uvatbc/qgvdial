@@ -44,9 +44,11 @@ Flickable {
 
     signal sigSendLogs
 
+    // Cannot use childrenRect.height because it causes a binding loop
     contentHeight: expandLoginDetails.height + expandProxySettings.height +
-                   expandMqSettings.height + expandPinSettings.height +
-                   expandLogView.height + expandAbout.height
+                   expandDialSettings.height + expandMqSettings.height +
+                   expandPinSettings.height + expandLogView.height +
+                   expandAbout.height
     contentWidth: width
     clip: true
 
@@ -58,12 +60,12 @@ Flickable {
     }
 
     Timer {
-        id: logsYAdjustTimer
+        id: yAdjustTimer
 
         property real setY: 0.0
         onSetYChanged: {
-            logsYAdjustTimer.stop();
-            logsYAdjustTimer.start();
+            yAdjustTimer.stop();
+            yAdjustTimer.start();
         }
 
         interval: 700; repeat: false; running: false
@@ -84,7 +86,7 @@ Flickable {
         property bool bShowLogindetails: g_bShowLoginSettings
         onBShowLogindetailsChanged: { if (bShowLogindetails) isExpanded = true; }
 
-        onClicked: if (isExpanded) logsYAdjustTimer.setY = y;
+        onClicked: if (isExpanded) yAdjustTimer.setY = y;
 
         mainTitle: "Login details"
 
@@ -103,16 +105,47 @@ Flickable {
     }//ExpandView (login/logout)
 
     ExpandView {
-        id: expandProxySettings
+        id: expandDialSettings
         anchors {
             top: expandLoginDetails.bottom
             left: parent.left
         }
 
         width: parent.width
+        contentHeight: dialSettings.height;
+
+        onClicked: if (isExpanded) yAdjustTimer.setY = y;
+
+        mainTitle: "Dial settings"
+
+        DialSettings {
+            id: dialSettings
+            y: parent.startY
+
+            width: parent.width - 1
+
+            opacity: parent.containedOpacity
+
+            onSigDone: {
+                if (!bSave) {
+                    console.debug("Dont save any changes");
+                }
+                parent.isExpanded = false;
+            }
+        }
+    }//ExpandView (dial settings)
+
+    ExpandView {
+        id: expandProxySettings
+        anchors {
+            top: expandDialSettings.bottom
+            left: parent.left
+        }
+
+        width: parent.width
         contentHeight: proxySettings.height;
 
-        onClicked: if (isExpanded) logsYAdjustTimer.setY = y;
+        onClicked: if (isExpanded) yAdjustTimer.setY = y;
 
         mainTitle: "Proxy"
 
@@ -147,7 +180,7 @@ Flickable {
         width: parent.width
         contentHeight: mqSettings.height;
 
-        onClicked: if (isExpanded) logsYAdjustTimer.setY = y;
+        onClicked: if (isExpanded) yAdjustTimer.setY = y;
 
         mainTitle: "Mosquitto"
 
@@ -179,7 +212,7 @@ Flickable {
         width: parent.width
         contentHeight: pinSettings.height;
 
-        onClicked: if (isExpanded) logsYAdjustTimer.setY = y;
+        onClicked: if (isExpanded) yAdjustTimer.setY = y;
 
         mainTitle: "Pin"
 
@@ -211,7 +244,7 @@ Flickable {
         width: parent.width
         contentHeight: logView.height;
 
-        onClicked: if (isExpanded) logsYAdjustTimer.setY = y;
+        onClicked: if (isExpanded) yAdjustTimer.setY = y;
 
         mainTitle: "Logs"
 
@@ -238,7 +271,7 @@ Flickable {
         width: parent.width
         contentHeight: aboutWin.height;
 
-        onClicked: if (isExpanded) logsYAdjustTimer.setY = y;
+        onClicked: if (isExpanded) yAdjustTimer.setY = y;
 
         mainTitle: "About"
 

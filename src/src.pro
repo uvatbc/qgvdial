@@ -119,6 +119,7 @@ OTHER_FILES  += ../src/winrsrc.rc           \
                 ../qml/ContactDetails.qml   \
                 ../qml/ContactsList.qml     \
                 ../qml/DialDisp.qml         \
+                ../qml/DialSettings.qml     \
                 ../qml/DigitButton.qml      \
                 ../qml/ExpandView.qml       \
                 ../qml/Fader.qml            \
