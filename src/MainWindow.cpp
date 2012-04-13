@@ -402,7 +402,6 @@ MainWindow::initQML ()
     ctx->setContextProperty ("g_bShowLoginSettings", bTempFalse);
     ctx->setContextProperty ("g_strStatus", "Getting Ready");
     ctx->setContextProperty ("g_strMsgText", "No message");
-    ctx->setContextProperty ("g_CurrentPhoneName", "Not loaded");
     ctx->setContextProperty ("g_vmailPlayerState", iTempZero);
     ctx->setContextProperty ("g_logModel", QVariant::fromValue(arrLogMsgs));
     ctx->setContextProperty ("g_hMul", hMul);
@@ -485,6 +484,17 @@ MainWindow::initQML ()
     if (!rv) { exit(1); }
     rv = connect (gObj, SIGNAL(sigRefreshInbox()),
                   &oInbox,   SLOT(refresh()));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+
+    gObj = getQMLObject ("RegisteredPhonesView");
+    if (NULL == gObj) {
+        Q_WARN("Could not get to RegisteredPhonesView");
+        requestQuit ();
+        return;
+    }
+    rv = connect (gObj, SIGNAL (sigSelChanged (int)),
+                  this, SLOT   (onRegPhoneSelectionChange (int)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
 
@@ -763,9 +773,6 @@ MainWindow::onRegPhoneSelectionChange (int index)
     if (!modelRegNumber.getAt (indRegPhone, data)) {
         data.strName = "<Unknown>";
     }
-
-    QDeclarativeContext *ctx = this->rootContext();
-    ctx->setContextProperty ("g_CurrentPhoneName", data.strName);
 
     OsDependent &osd = Singletons::getRef().getOSD ();
     osd.setLongWork (this, false);

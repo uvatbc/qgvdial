@@ -24,8 +24,6 @@ import Qt 4.7
 Item {
     id: container
 
-    signal sigDone(bool bSave)
-
     height: mainColumn.height + 2
 
     Column {
@@ -35,7 +33,6 @@ Item {
             top: parent.top
             left: parent.left
         }
-        spacing: 2
         width: parent.width
         height: childrenRect.height
 
@@ -47,19 +44,12 @@ Item {
             function setSelected(index) {
                 var i;
                 for (i = 0; i < regPhoneModel.count; i++) {
-                    regPhoneModel.setProperty (i, "isChecked", (i == index));
+                    regPhoneModel.setProperty (i, "isChecked", (i === index));
                 }
             }
 
-            RadioButton {
-                id: delegateRadioButton
-                visible: false
-                width: parent.width
-                text: "whatever"
-            }
-
             width: parent.width
-            height: (delegateRadioButton.height + spacing) * regPhoneModel.count
+            height: (delegateRadioButton.height + spacing) * (regPhoneModel.count+1)
             interactive: false
 
             model: ListModel {
@@ -71,25 +61,19 @@ Item {
                 width: parent.width
                 text: entryText
                 check: isChecked
+                autoChange: false
                 onClicked: {
                     registeredPhonesView.sigSelChanged(index);
-                    registeredPhonesView.setSelected(index);
                 }
             }
         }//ListView (of the registered phones)
-
-        SaveCancel {
-            anchors {
-                left: parent.left
-                leftMargin: 1
-            }
-            width: parent.width - 1
-
-            onSigSave: {
-                container.sigDone(true);
-            }
-
-            onSigCancel: container.sigDone(false);
-        }// Save and cancel buttons
     }// Main
+    // Only for the sake of height calculations
+    RadioButton {
+        id: delegateRadioButton
+        width: parent.width
+        text: "entryText"
+        visible: false
+        opacity: 0
+    }
 }//Item(container)

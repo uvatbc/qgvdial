@@ -30,6 +30,7 @@ Rectangle {
 
     property string text: "Yes or no question?"
     property bool check: false
+    property bool autoChange: true
 
     signal clicked
 
@@ -71,10 +72,12 @@ Rectangle {
         anchors.fill: parent
 
         onClicked: {
-            if (container.check == true) {
-                container.check = false;
-            } else {
-                container.check = true;
+            if (autoChange) {
+                if (container.check == true) {
+                    container.check = false;
+                } else {
+                    container.check = true;
+                }
             }
             container.clicked();
         }

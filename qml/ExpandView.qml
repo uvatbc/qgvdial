@@ -66,20 +66,6 @@ Rectangle {
                 }
                 angle: 0
             }
-
-            // MouseArea needs to be inside this item because:
-            // "QML Row: Cannot specify left, right, horizontalCenter, fill or
-            // centerIn anchors for items inside Row"
-            MouseArea {
-                anchors.fill: parent
-
-                onClicked: {
-                    container.isExpanded = (container.isExpanded == true ? false : true);
-                    container.clicked();
-                }
-
-                onPressAndHold: container.pressAndHold();
-            }//MouseArea (over the main Title)
         }//Image
 
         Text {
@@ -92,23 +78,23 @@ Rectangle {
 
             width: parent.width - imgArrow.width - parent.spacing
             height: paintedHeight
-
-            // MouseArea needs to be inside this item because:
-            // "QML Row: Cannot specify left, right, horizontalCenter, fill or
-            // centerIn anchors for items inside Row"
-            MouseArea {
-                anchors.fill: parent
-
-                onClicked: {
-                    container.isExpanded = (container.isExpanded == true ? false : true);
-                    container.clicked();
-                }
-
-                onPressAndHold: container.pressAndHold();
-            }//MouseArea (over the main Title)
         }
     }//Row (arrow and text)
 
+    Rectangle {
+        color: "transparent"
+        anchors.fill: textRow
+        MouseArea {
+            anchors.fill: parent
+
+            onClicked: {
+                container.isExpanded = (container.isExpanded == true ? false : true);
+                container.clicked();
+            }
+
+            onPressAndHold: container.pressAndHold();
+        }//MouseArea (over the main Title)
+    }//Transparent Rectangle overlaying the Row - just to contain a MouseArea
 
     states: [
         State {

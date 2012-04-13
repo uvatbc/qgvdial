@@ -123,15 +123,7 @@ Flickable {
             y: parent.startY
 
             width: parent.width - 1
-
             opacity: parent.containedOpacity
-
-            onSigDone: {
-                if (!bSave) {
-                    console.debug("Dont save any changes");
-                }
-                parent.isExpanded = false;
-            }
         }
     }//ExpandView (dial settings)
 
@@ -154,7 +146,6 @@ Flickable {
             y: parent.startY
 
             width: parent.width - 1
-
             opacity: parent.containedOpacity
 
             onSigProxyChanges: container.sigProxyChanges(bEnable, bUseSystemProxy,
@@ -189,7 +180,6 @@ Flickable {
             y: parent.startY
 
             width: parent.width - 1
-
             opacity: parent.containedOpacity
 
             onSigDone: {
@@ -221,7 +211,6 @@ Flickable {
             y: parent.startY
 
             width: parent.width - 1
-
             opacity: parent.containedOpacity
 
             onSigDone: {
@@ -252,7 +241,7 @@ Flickable {
             id: logView
 
             width: parent.width - 1
-            height: container.height - expandLogView.textHeight
+            height: container.height - parent.textHeight
             y: parent.startY
 
             opacity: parent.containedOpacity

@@ -40,22 +40,33 @@ Rectangle {
         anchors.fill: parent
 
         Column {
-            width: wDisp.width
-            height: wDisp.height + (actBtn_l.height * actBtn_l.opacity)
+            width: txtNum.width
+            height: txtNum.height + (actBtn_l.height * actBtn_l.opacity)
             spacing: 0
 
-            DialDisp {
-                id: wDisp
+            TextEdit {
+                id: txtNum
+                opacity: 1
 
-                theNumber: main.theNumber
-
-                color: main.color
                 width: (landscape ? main.width / 2 : main.width) - 1
                 height: main.height * (landscape ? (3 / 4) : (7.5 / 18))
 
-                onSigSelChanged: main.sigSelChanged (index)
-                onSigNumChanged: {main.theNumber = strNumber;}
-            }//DialDisp
+                color: "white"
+                textFormat: TextEdit.PlainText
+                cursorVisible: true
+                wrapMode: TextEdit.WrapAnywhere
+                selectByMouse: true
+
+                text: main.theNumber
+
+                font {
+                    family: "Nokia Sans"
+                    pointSize: (12 * g_fontMul)
+                    bold: true
+                }
+
+                onTextChanged: {main.theNumber = txtNum.text;}
+            }// TextEdit
 
             ActionButtons {
                 id: actBtn_l
@@ -63,14 +74,14 @@ Rectangle {
 
                 opacity: landscape ? 1 : 0
 
-                width: wDisp.width
-                height: wDisp.height / 3
+                width: txtNum.width
+                height: txtNum.height / 3
 
-                onSigCall: main.sigCall(wDisp.txtEd.text)
-                onSigText: main.sigText(wDisp.txtEd.text)
+                onSigCall: main.sigCall(txtNum.text)
+                onSigText: main.sigText(txtNum.text)
 
                 onSigDel: Code.doDel()
-                onSigClear: wDisp.txtEd.text = ""
+                onSigClear: main.theNumber = ""
             }//ActionButtons (landscape mode - horizontal)
         }//Column
 
@@ -90,11 +101,11 @@ Rectangle {
             width: main.width
             height: main.height * (2.5 / 18)
 
-            onSigCall: main.sigCall(wDisp.txtEd.text)
-            onSigText: main.sigText(wDisp.txtEd.text)
+            onSigCall: main.sigCall(txtNum.text)
+            onSigText: main.sigText(txtNum.text)
 
             onSigDel: Code.doDel()
-            onSigClear: wDisp.txtEd.text = ""
+            onSigClear: main.theNumber = ""
         }//ActionButtons (portrait mode - vertical)
     }//Flow
 }//main

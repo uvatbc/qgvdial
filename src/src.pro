@@ -118,7 +118,6 @@ OTHER_FILES  += ../src/winrsrc.rc           \
                 ../qml/ComboBoxPhones.qml   \
                 ../qml/ContactDetails.qml   \
                 ../qml/ContactsList.qml     \
-                ../qml/DialDisp.qml         \
                 ../qml/DialSettings.qml     \
                 ../qml/DigitButton.qml      \
                 ../qml/ExpandView.qml       \
