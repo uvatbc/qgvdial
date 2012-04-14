@@ -38,13 +38,12 @@ class DialContext : public QObject
 public:
     DialContext(const QString &strMy, const QString &strT,
                 QDeclarativeView *mainView);
-    ~DialContext();
 
-    void showMsgBox();
-    void hideMsgBox();
+    QString getMsgBoxText(void);
 
 signals:
     void sigDialComplete (DialContext *self, bool ok);
+    void hideMsgBox ();
 
 public:
     bool    bDialOut;

@@ -107,10 +107,8 @@ MainWindow::dialNow (const QString &strTarget)
         }
 
         QString strTest = strTarget;
-        strTest.remove(QRegExp ("\\d*"))
-               .remove(QRegExp ("\\s"))
-               .remove('+')
-               .remove('-');
+        strTest.remove(QRegExp ("\\d*")).remove(QRegExp ("\\s"))
+               .remove('+').remove('-');
         if (!strTest.isEmpty ()) {
             setStatus ("Cannot use numbers with special symbols or characters");
             Q_WARN (QString("Failed to dial the user entered number \"%1\"")
@@ -124,6 +122,15 @@ MainWindow::dialNow (const QString &strTarget)
             Q_WARN ("Failed to malloc DialContext");
             break;
         }
+        success = connect (ctx,     SIGNAL(hideMsgBox()),
+                           this, SLOT(onSigMsgBoxDone()));
+        if (!success) {
+            Q_ASSERT(success);
+            delete ctx;
+            ctx = NULL;
+            break;
+        }
+
         token = new AsyncTaskToken(this);
         if (NULL == token) {
             setStatus ("Failed to dial out because of allocation problem");
@@ -149,7 +156,7 @@ MainWindow::dialNow (const QString &strTarget)
         bCallInProgress = true;
         bDialCancelled = false;
 
-        ctx->showMsgBox ();
+        showMsgBox (ctx->getMsgBoxText ());
 
         if (bDialout) {
             ctx->ci = ci;
@@ -166,7 +173,6 @@ MainWindow::dialNow (const QString &strTarget)
     if (success) {
         return;
     }
-
     if (ctx) {
         ctx->deleteLater ();
     }
@@ -329,6 +335,8 @@ MainWindow::dialComplete (AsyncTaskToken *token)
         }
     }
     bCallInProgress = false;
+
+    this->onSigMsgBoxDone();
 
     OsDependent &osd = Singletons::getRef().getOSD ();
     osd.setLongWork (this, false);

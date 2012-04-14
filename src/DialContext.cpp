@@ -58,31 +58,16 @@ DialContext::DialContext (const QString &strMy, const QString &strT,
     Q_ASSERT(rv); Q_UNUSED(rv);
 }//DialContext::DialContext
 
-DialContext::~DialContext() {
-    hideMsgBox ();
-}//DialContext::~DialContext
-
-void
-DialContext::showMsgBox ()
+QString
+DialContext::getMsgBoxText (void)
 {
     ObserverFactory &obsF = Singletons::getRef().getObserverFactory ();
     obsF.startObservers (strMyNumber, this, SLOT (callStarted()));
 
     QString strMessage = QString("Dialing\n%1").arg(strTarget);
 
-    QDeclarativeContext *ctx = mainView->rootContext();
-    bool bTemp = true;
-    ctx->setContextProperty ("g_bShowMsg", bTemp);
-    ctx->setContextProperty ("g_strMsgText", strMessage);
+    return (strMessage);
 }//DialContext::showMsgBox
-
-void
-DialContext::hideMsgBox ()
-{
-    QDeclarativeContext *ctx = mainView->rootContext();
-    bool bTemp = false;
-    ctx->setContextProperty ("g_bShowMsg", bTemp);
-}//DialContext::hideMsgBox
 
 void
 DialContext::callStarted ()
@@ -96,7 +81,7 @@ DialContext::onSigMsgBoxDone (bool ok)
     ObserverFactory &obsF = Singletons::getRef().getObserverFactory ();
     obsF.stopObservers ();
 
-    hideMsgBox ();
+    emit hideMsgBox ();
 
     emit sigDialComplete (this, ok);
 }//DialContext::onSigMsgBoxDone

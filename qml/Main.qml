@@ -228,8 +228,10 @@ Rectangle {
 
     MsgBox {
         id: msgBox
-        opacity: ((g_bShowMsg === true) ? 1 : 0)
-        msgText: g_strMsgText
+        objectName: "MsgBox"
+
+        opacity: 0
+        msgText: "No message"
 
         anchors.fill: parent
 

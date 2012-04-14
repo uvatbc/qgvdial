@@ -26,7 +26,6 @@
         <file alias="pushbutton_pressed.svg">../icons/pushbutton_pressed.svg</file>
         <file alias="About.qml">../qml/About.qml</file>
         <file alias="ActionButtons.qml">../qml/ActionButtons.qml</file>
-        <file alias="ComboBoxPhones.qml">../qml/ComboBoxPhones.qml</file>
         <file alias="ContactDetails.qml">../qml/ContactDetails.qml</file>
         <file alias="ContactsList.qml">../qml/ContactsList.qml</file>
         <file alias="DialSettings.qml">../qml/DialSettings.qml</file>

@@ -396,12 +396,9 @@ MainWindow::initQML ()
 
     // Prepare the globally accessible variants for QML.
     QDeclarativeContext *ctx = this->rootContext();
-    ctx->setContextProperty ("g_bShowMsg", bTempFalse);
-    ctx->setContextProperty ("g_registeredPhonesModel", &modelRegNumber);
     ctx->setContextProperty ("g_bIsLoggedIn", bTempFalse);
     ctx->setContextProperty ("g_bShowLoginSettings", bTempFalse);
     ctx->setContextProperty ("g_strStatus", "Getting Ready");
-    ctx->setContextProperty ("g_strMsgText", "No message");
     ctx->setContextProperty ("g_vmailPlayerState", iTempZero);
     ctx->setContextProperty ("g_logModel", QVariant::fromValue(arrLogMsgs));
     ctx->setContextProperty ("g_hMul", hMul);
@@ -1005,17 +1002,26 @@ MainWindow::refreshPinSettings()
 void
 MainWindow::showMsgBox (const QString &strMessage)
 {
-    QDeclarativeContext *ctx = this->rootContext();
-    ctx->setContextProperty ("g_bShowMsg", true);
-    ctx->setContextProperty ("g_strMsgText", strMessage);
+    QObject *obj = getQMLObject ("MsgBox");
+    if (NULL == obj) {
+        Q_ASSERT(obj);
+        return;
+    }
+
+    obj->setProperty ("msgText", strMessage);
+    obj->setProperty ("opacity", QVariant(1.0));
 }//MainWindow::showMsgBox
 
 void
-MainWindow::onSigMsgBoxDone (bool /*ok*/)
+MainWindow::onSigMsgBoxDone (bool /*ok = true*/)
 {
-    QDeclarativeContext *ctx = this->rootContext();
-    bool bTemp = false;
-    ctx->setContextProperty ("g_bShowMsg", bTemp);
+    QObject *obj = getQMLObject ("MsgBox");
+    if (NULL == obj) {
+        Q_ASSERT(obj);
+        return;
+    }
+
+    obj->setProperty ("opacity", QVariant(0.0));
 }//MainWindow::onSigMsgBoxDone
 
 void

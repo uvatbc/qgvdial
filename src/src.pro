@@ -115,7 +115,6 @@ RESOURCES += ../src/qgvdial.qrc
 OTHER_FILES  += ../src/winrsrc.rc           \
                 ../qml/About.qml            \
                 ../qml/ActionButtons.qml    \
-                ../qml/ComboBoxPhones.qml   \
                 ../qml/ContactDetails.qml   \
                 ../qml/ContactsList.qml     \
                 ../qml/DialSettings.qml     \

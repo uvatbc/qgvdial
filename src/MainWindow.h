@@ -163,7 +163,7 @@ private slots:
     void onMqThreadFinished();
 
     //! Invoked when the message box is done
-    void onSigMsgBoxDone(bool ok);
+    void onSigMsgBoxDone(bool ok = true);
 
     //! Invoked when the Call initiators list changes
     void onCallInitiatorsChange(bool bSave = true);
