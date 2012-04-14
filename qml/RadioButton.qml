@@ -52,7 +52,10 @@ Rectangle {
                 id: imageTick
                 source: "tick.png"
 
-                anchors.fill: parent
+                anchors.centerIn: parent
+                height: parent.height * 0.8
+                width: height
+                smooth: visible
 
                 visible: container.check == true
             }
