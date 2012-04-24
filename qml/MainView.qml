@@ -57,6 +57,8 @@ Rectangle {
                 wrapMode: TextEdit.WrapAnywhere
                 selectByMouse: true
 
+                inputMethodHints: Qt.ImhNoAutoUppercase + Qt.ImhNoPredictiveText
+
                 text: main.theNumber
 
                 font {

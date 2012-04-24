@@ -117,6 +117,8 @@ Rectangle {
                     wrapMode: Text.WordWrap
                     textFormat: TextEdit.PlainText
 
+                    inputMethodHints: Qt.ImhNoAutoUppercase + Qt.ImhNoPredictiveText
+
                     font { family: "Nokia Sans"; pointSize: (8 * g_fontMul) }
                     color: "white"
                 }//TextEdit (with all the SMS text)

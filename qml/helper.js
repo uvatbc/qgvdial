@@ -59,29 +59,29 @@ function btnSubTextFontPoint () {
 
 // Deletion in the MainView
 function doDel () {
-    var origStart = wDisp.txtEd.selectionStart;
-    var sel = wDisp.txtEd.selectionEnd - origStart;
-    var result = wDisp.txtEd.text.substr(0,origStart);
+    var origStart = txtNum.selectionStart;
+    var sel = txtNum.selectionEnd - origStart;
+    var result = txtNum.text.substr(0,origStart);
     if (sel == 0) {
         result = result.substr(0,origStart-1);
     }
-    result += wDisp.txtEd.text.substr(wDisp.txtEd.selectionEnd);
-    wDisp.txtEd.text = result;
+    result += txtNum.text.substr(txtNum.selectionEnd);
+    txtNum.text = result;
 
     if (origStart > result.length) {
         origStart = result.length;
     }
 
-    wDisp.txtEd.cursorPosition = origStart;
+    txtNum.cursorPosition = origStart;
 }
 
 function doIns (strText) {
-    var origStart = wDisp.txtEd.selectionStart;
-    var result = wDisp.txtEd.text.substr(0,origStart);
+    var origStart = txtNum.selectionStart;
+    var result = txtNum.text.substr(0,origStart);
     result += strText;
-    result += wDisp.txtEd.text.substr(wDisp.txtEd.selectionEnd);
-    wDisp.txtEd.text = result;
-    wDisp.txtEd.cursorPosition = origStart + strText.length;
+    result += txtNum.text.substr(txtNum.selectionEnd);
+    txtNum.text = result;
+    txtNum.cursorPosition = origStart + strText.length;
 }
 
 function getOriName (ori) {
