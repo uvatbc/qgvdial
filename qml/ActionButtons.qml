@@ -22,6 +22,8 @@ Contact: yuvraaj@gmail.com
 import Qt 4.7
 
 Rectangle {
+    id: container
+
     signal sigCall
     signal sigText
     signal sigDel
@@ -46,7 +48,7 @@ Rectangle {
 
             MouseArea {
                 anchors.fill: parent
-                onClicked: sigCall()
+                onClicked: container.sigCall();
 
                 onPressed: btnCall.border.color = "grey"
                 onReleased: btnCall.border.color = "black"
@@ -69,7 +71,7 @@ Rectangle {
 
             MouseArea {
                 anchors.fill: parent
-                onClicked: sigText()
+                onClicked: container.sigText();
 
                 onPressed: btnText.border.color = "grey"
                 onReleased: btnText.border.color = "black"
@@ -92,12 +94,12 @@ Rectangle {
 
             MouseArea {
                 anchors.fill: parent
-                onClicked: sigDel()
-                onPressAndHold: sigClear()
+                onClicked: container.sigDel();
+                onPressAndHold: container.sigClear();
 
                 onPressed: btnDel.border.color = "grey"
                 onReleased: btnDel.border.color = "black"
             }
         }//Rectangle (del)
-    }
-}
+    }// Row of buttons (call, SMS, del)
+}//Rectangle (container)

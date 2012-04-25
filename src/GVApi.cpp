@@ -195,6 +195,15 @@ GVApi::beautify_number (QString &strNumber)
     } while (0); // End cleanup block (not a loop)
 }//GVApi::beautify_number
 
+void
+GVApi::setCookies(QNetworkRequest &req)
+{
+    QList<QNetworkCookie> cookies = jar->cookiesForUrl(req.url());
+    QVariant var;
+    var.setValue (cookies);
+    req.setHeader (QNetworkRequest::CookieHeader, var);
+}//GVApi::setCookies
+
 bool
 GVApi::doGet(QUrl url, AsyncTaskToken *token, QObject *receiver, const char *method)
 {
@@ -205,10 +214,7 @@ GVApi::doGet(QUrl url, AsyncTaskToken *token, QObject *receiver, const char *met
     QNetworkRequest req(url);
     req.setRawHeader("User-Agent", UA_IPHONE4);
 
-    QList<QNetworkCookie> cookies = jar->cookiesForUrl(req.url());
-    QVariant var;
-    var.setValue (cookies);
-    req.setHeader (QNetworkRequest::CookieHeader, var);
+    setCookies (req);
 
     QNetworkReply *reply = nwMgr.get(req);
     if (!reply) {
@@ -257,8 +263,7 @@ GVApi::doPost(QUrl url, QByteArray postData, const char *contentType,
     req.setRawHeader("User-Agent", ua);
     req.setHeader (QNetworkRequest::ContentTypeHeader, contentType);
 
-    req.setHeader (QNetworkRequest::CookieHeader,
-                   QVariant::fromValue(jar->getAllCookies ()));
+    setCookies (req);
 
     QNetworkReply *reply = nwMgr.post(req, postData);
     if (!reply) {

@@ -158,8 +158,7 @@ InboxModel::data (const QModelIndex &index,
             }
 
             if (!GVApi::isNumberValid (strNum)) {
-                qWarning () << "Inbox: Display phone number is invalid : "
-                            << strNum;
+                Q_WARN("Inbox: Display phone number is invalid : ") << strNum;
                 var = "Unknown";
                 break;
             }

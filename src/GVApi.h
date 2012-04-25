@@ -121,6 +121,8 @@ private:
     QUrl hasMoved(QNetworkReply *reply);
     bool getSystemProxies (QNetworkProxy &http, QNetworkProxy &https);
 
+    void setCookies(QNetworkRequest &req);
+
     bool doGet(QUrl url, AsyncTaskToken *token, QObject *receiver,
                const char *method);
     bool doGet(const QString &strUrl, AsyncTaskToken *token, QObject *receiver,

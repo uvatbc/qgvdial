@@ -61,9 +61,9 @@ function btnSubTextFontPoint () {
 function doDel () {
     var origStart = txtNum.selectionStart;
     var sel = txtNum.selectionEnd - origStart;
-    var result = txtNum.text.substr(0,origStart);
+    var result = txtNum.text.substr(0, origStart);
     if (sel == 0) {
-        result = result.substr(0,origStart-1);
+        result = result.substr(0, origStart-1);
     }
     result += txtNum.text.substr(txtNum.selectionEnd);
     txtNum.text = result;
@@ -77,7 +77,7 @@ function doDel () {
 
 function doIns (strText) {
     var origStart = txtNum.selectionStart;
-    var result = txtNum.text.substr(0,origStart);
+    var result = txtNum.text.substr(0, origStart);
     result += strText;
     result += txtNum.text.substr(txtNum.selectionEnd);
     txtNum.text = result;
