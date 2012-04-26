@@ -50,6 +50,14 @@ Item {
     property bool bSystemProxy: proxySystem.check
     property bool bProxyUserPass: proxyUserPassRequired.check
 
+
+    onSigDone: {
+        textUserProxyHost.closeSoftwareInputPanel();
+        textUserProxyPort.closeSoftwareInputPanel();
+        textUserProxyUser.closeSoftwareInputPanel();
+        textUserProxyPass.closeSoftwareInputPanel();
+    }
+
     Column {
         id: mainColumn
 

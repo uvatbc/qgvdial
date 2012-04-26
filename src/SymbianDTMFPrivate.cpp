@@ -25,7 +25,17 @@ Contact: yuvraaj@gmail.com
 SymbianDTMFPrivate::SymbianDTMFPrivate(SymbianCallInitiator *p)
 : CActive(EPriorityNormal)
 , parent (p)
+, bUsable (false)
 {
+    TInt rv;
+    TRAP(rv, CActiveScheduler::Add(this));
+    if (KErrNone == rv) {
+        bUsable = true;
+        return;
+    }
+
+    QString msg = QString("Error adding activeschedular : %1").arg (rv);
+    Q_WARN(msg);
 }//SymbianDTMFPrivate::SymbianDTMFPrivate
 
 SymbianDTMFPrivate::~SymbianDTMFPrivate ()
@@ -34,16 +44,39 @@ SymbianDTMFPrivate::~SymbianDTMFPrivate ()
     parent = NULL;
 }//SymbianDTMFPrivate::~SymbianDTMFPrivate
 
+SymbianDTMFPrivate *
+SymbianDTMFPrivate::NewL(SymbianCallInitiator *p)
+{
+    SymbianDTMFPrivate* self =
+    SymbianDTMFPrivate::NewLC(p);
+    CleanupStack::Pop(self);
+    return self;
+}//SymbianDTMFPrivate::NewL
+
+SymbianDTMFPrivate *
+SymbianDTMFPrivate::NewLC(SymbianCallInitiator *p)
+{
+    SymbianDTMFPrivate *self = new (ELeave) SymbianDTMFPrivate(p);
+    if (NULL == self) {
+        Q_WARN ("Malloc failure on SymbianDTMFPrivate!");
+        return NULL;
+    }
+
+    CleanupStack::PushL(self);
+//    self->ConstructL();
+    return self;
+}//SymbianDTMFPrivate::NewLC
+
 void
 SymbianDTMFPrivate::RunL ()
 {
-    qDebug("RunL");
+    Q_DEBUG("RunL");
     bool bSuccess = (iStatus == KErrNone);
     if (NULL != parent) {
-        qDebug("RunL about to call onDtmfSent");
+        Q_DEBUG("RunL about to call onDtmfSent");
         parent->onDtmfSent (this, bSuccess);
     }
-    qDebug("RunL called onDtmfSent");
+    Q_DEBUG("RunL called onDtmfSent");
 }//SymbianDTMFPrivate::RunL
 
 void
@@ -57,7 +90,7 @@ SymbianDTMFPrivate::sendDTMF (const QString &strTones)
 {
 #define SIZE_LIMIT 40
     if (strTones.length () > SIZE_LIMIT) {
-        qDebug ("Too many DTMF characters");
+        Q_DEBUG ("Too many DTMF characters");
         return;
     }
     TBuf<SIZE_LIMIT>aNumber;

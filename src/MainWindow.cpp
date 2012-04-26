@@ -1112,7 +1112,7 @@ MainWindow::fallbackDialout (DialContext *ctx)
 
     ctx->fallbackCi = cif.getFallbacks()[0];
     bool rv = connect (ctx->fallbackCi, SIGNAL(callInitiated(bool,void*)),
-                       this,          SLOT(onFallbackDialout(bool,void*)));
+                       this,    SLOT(onFallbackCallInitiated(bool,void*)));
     Q_ASSERT(rv); Q_UNUSED(rv);
     GVApi::simplify_number (strFull);
 
@@ -1121,11 +1121,11 @@ MainWindow::fallbackDialout (DialContext *ctx)
 }//MainWindow::fallbackDialout
 
 void
-MainWindow::onFallbackDialout (bool bSuccess, void *v_ctx)
+MainWindow::onFallbackCallInitiated (bool bSuccess, void *v_ctx)
 {
     DialContext *ctx = (DialContext *) v_ctx;
     disconnect (ctx->fallbackCi, SIGNAL(callInitiated(bool,void*)),
-                this,            SLOT  (onFallbackDialout(bool,void*)));
+                this,    SLOT(onFallbackCallInitiated(bool,void*)));
 
     if (!bSuccess) {
         this->showMsgBox ("Dialing failed");
@@ -1147,7 +1147,7 @@ MainWindow::onFallbackDialout (bool bSuccess, void *v_ctx)
     ctx->fallbackCi->sendDTMF (strDTMF);
 
     ctx->deleteLater ();
-}//MainWindow::onFallbackDialout
+}//MainWindow::onFallbackCallInitiated
 
 void
 MainWindow::onSetInboxModel(QAbstractItemModel *model)

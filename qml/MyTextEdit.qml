@@ -34,6 +34,10 @@ FocusScope {
 
     height: textEd.height
 
+    function closeSoftwareInputPanel() {
+        textEd.closeSoftwareInputPanel ();
+    }
+
     Rectangle {
         border.color: textEd.activeFocus ? "orange" : "blue"
         color: "slategray"
@@ -55,7 +59,7 @@ FocusScope {
             inputMethodHints: Qt.ImhNoAutoUppercase + Qt.ImhNoPredictiveText
 
             Keys.onReturnPressed: {
-                closeSoftwareInputPanel ();
+                container.closeSoftwareInputPanel ();
                 event.accepted = true;
                 container.sigEnter();
                 textEd.focus = false;

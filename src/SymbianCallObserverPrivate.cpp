@@ -36,7 +36,7 @@ SymbianCallObserverPrivate::SymbianCallObserverPrivate(SymbianCallInitiator *p)
     }
 
     QString msg = QString("Error adding activeschedular : %1").arg (rv);
-    qDebug() << msg;
+    Q_WARN(msg);
 }//SymbianCallObserverPrivate::SymbianCallObserverPrivate
 
 SymbianCallObserverPrivate::~SymbianCallObserverPrivate ()
@@ -78,11 +78,11 @@ SymbianCallObserverPrivate::NewLC (SymbianCallInitiator *parent)
     SymbianCallObserverPrivate *self =
         new (ELeave) SymbianCallObserverPrivate(parent);
     if (NULL == self) {
-        qDebug ("Malloc failure on SymbianCallObserverPrivate!");
+        Q_WARN ("Malloc failure on SymbianCallObserverPrivate!");
         return NULL;
     }
     if (!self->bUsable) {
-        qDebug ("SymbianCallObserverPrivate: Is not usable!");
+        Q_WARN ("SymbianCallObserverPrivate: Is not usable!");
         delete self;
         return NULL;
     }

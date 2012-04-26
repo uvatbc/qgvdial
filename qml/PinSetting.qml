@@ -38,6 +38,10 @@ Item {
 
     property bool bEnable: pinSupport.check
 
+    onSigDone: {
+        textPin.closeSoftwareInputPanel();
+    }
+
     Column {
         id: mainColumn
         anchors {

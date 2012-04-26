@@ -172,7 +172,7 @@ private slots:
     void onCleanupLogsArray();
 
     //! Invoked when the call is completed on fallback
-    void onFallbackDialout (bool bSuccess, void *v_ctx);
+    void onFallbackCallInitiated (bool bSuccess, void *v_ctx);
 
     //! Invoked when the Inbox model is created
     void onSetInboxModel(QAbstractItemModel *model);

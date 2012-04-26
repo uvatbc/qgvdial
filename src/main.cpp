@@ -32,6 +32,7 @@ MainWindow     *pw = NULL;
 QFile fLogfile;       //! Logfile
 int   logLevel = 5;   //! Log level
 int   logCounter = 0; //! Number of log entries since the last log flush
+#define LOG_FLUSH_LEVEL 50
 
 QStringList arrLogFiles;
 
@@ -82,7 +83,7 @@ myMessageOutput(QtMsgType type, const char *msg)
             fLogfile.write(strLog.toLatin1 ());
 
             ++logCounter;
-            if (logCounter > 50) {
+            if (logCounter > LOG_FLUSH_LEVEL) {
                 qgv_LogFlush ();
             }
         }

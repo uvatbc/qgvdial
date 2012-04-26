@@ -31,22 +31,26 @@ SymbianCallInitiator::SymbianCallInitiator (QObject *parent)
 , dtmfSender (NULL)
 {
     iTelephony = CTelephony::NewL();
-    dtmfSender = new SymbianDTMFPrivate (this);
+    dtmfSender = SymbianDTMFPrivate::NewL (this);
 }//SymbianCallInitiator::SymbianCallInitiator
 
 SymbianCallInitiator::~SymbianCallInitiator()
 {
     if (NULL != observer) {
-        delete observer;
+        CBase::Delete (observer);
+        observer = NULL;
     }
     if (NULL != dialer) {
-        delete dialer;
+        CBase::Delete (dialer);
+        dialer = NULL;
     }
     if (NULL != dtmfSender) {
-        delete dtmfSender;
+        CBase::Delete (dtmfSender);
+        dtmfSender = NULL;
     }
     if (NULL != iTelephony) {
-        delete iTelephony;
+        CBase::Delete (iTelephony);
+        iTelephony = NULL;
     }
 }//SymbianCallInitiator::~SymbianCallInitiator
 
@@ -76,12 +80,12 @@ SymbianCallInitiator::initiateCall (const QString &strDestination,
     m_Context = ctx;
     do { // Begin cleanup block (not a loop)
         if (NULL != dialer) {
-            qWarning ("Call in progress. Ask again later.");
+            Q_WARN ("Call in progress. Ask again later.");
             break;  // false
         }
         if (NULL != observer) {
-            qWarning ("observer was still alive. WTF?");
-            delete observer;
+            Q_WARN ("observer was still alive. WTF?");
+            CBase::Delete (observer);
         }
         observer = SymbianCallObserverPrivate::NewL (this);
 
@@ -90,9 +94,9 @@ SymbianCallInitiator::initiateCall (const QString &strDestination,
 
         dialer = SymbianCallInitiatorPrivate::NewL (this, strDestination);
         if (NULL == dialer) {
-            delete observer;
+            CBase::Delete (observer);
             observer = NULL;
-            qWarning ("Could not dial out.");
+            Q_WARN ("Could not dial out.");
             break;  // false
         }
         bOk = true;
@@ -111,14 +115,14 @@ SymbianCallInitiator::callDone (SymbianCallInitiatorPrivate *self, int status)
     strObservedNumber.clear ();
 
     if (NULL != observer) {
-        delete observer;
+        CBase::Delete (observer);
         observer = NULL;
     }
 
     if (dialer != self) {
-        qWarning ("Dialer does not match!!!");
+        Q_WARN ("Dialer does not match!!!");
         if (NULL != dialer) {
-            delete dialer;
+            CBase::Delete (dialer);
         }
     }
     dialer = NULL;
@@ -155,7 +159,7 @@ SymbianCallInitiator::sendDTMF (const QString &strTones)
 void
 SymbianCallInitiator::onDtmfSent (SymbianDTMFPrivate *self, bool bSuccess)
 {
-    qDebug() << "Send DTMF " << (bSuccess ? "suceeded" : "failed");
+    Q_DEBUG(QString("Send DTMF %1").arg(bSuccess ? "suceeded" : "failed"));
     QTimer::singleShot (1000, this, SLOT(nextDtmf ()));
 }//SymbianCallInitiator::onDtmfSent
 
@@ -163,7 +167,7 @@ void
 SymbianCallInitiator::nextDtmf()
 {
     if (arrTones.isEmpty ()) {
-        qDebug ("No more tones");
+        Q_DEBUG ("No more tones");
         return;
     }
 
@@ -171,10 +175,10 @@ SymbianCallInitiator::nextDtmf()
     arrTones.pop_front ();
 
     if (strTones.isEmpty ()) {
-        qDebug ("Blank tone");
+        Q_DEBUG ("Blank tone");
         QTimer::singleShot (1000, this, SLOT(nextDtmf ()));
     } else {
-        qDebug () << "Current tone =" << strTones;
+        Q_DEBUG(QString("Current tone = %1").arg(strTones));
 
         dtmfSender->sendDTMF (strTones);
     }

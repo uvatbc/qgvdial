@@ -144,6 +144,9 @@ Item {
             } else {
                 container.sigLogin();
             }
+
+            textUsername.closeSoftwareInputPanel();
+            textPassword.closeSoftwareInputPanel();
         }
 
         onClicked: btnLogin.doClick();

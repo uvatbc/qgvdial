@@ -40,6 +40,12 @@ Item {
 
     property bool bEnable: mqSupport.check
 
+    onSigDone: {
+        textMqServer.closeSoftwareInputPanel();
+        textMqPort.closeSoftwareInputPanel();
+        textMqTopic.closeSoftwareInputPanel();
+    }
+
     Column {
         id: mainColumn
         anchors {

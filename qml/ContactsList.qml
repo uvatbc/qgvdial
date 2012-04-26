@@ -117,6 +117,7 @@ Rectangle {
                 if (searchRow.lastSearchValue != edSearch.text) {
                     container.sigSearchContacts(edSearch.text);
                     searchRow.lastSearchValue = edSearch.text;
+                    edSearch.closeSoftwareInputPanel();
                 }
                 if (edSearch.text != "") {
                     imgSearch.selection = true;

@@ -28,9 +28,14 @@ Contact: yuvraaj@gmail.com
 class SymbianCallInitiator;
 class SymbianDTMFPrivate : public CActive
 {
-public:
+private:
     SymbianDTMFPrivate (SymbianCallInitiator *p);
+
+public:
     ~SymbianDTMFPrivate ();
+
+    static SymbianDTMFPrivate* NewL(SymbianCallInitiator *p);
+    static SymbianDTMFPrivate* NewLC(SymbianCallInitiator *p);
 
     void sendDTMF (const QString &strTones);
 
@@ -40,6 +45,7 @@ private:
 
 private:
     SymbianCallInitiator *parent;
+    bool bUsable;
 };
 
 #endif // SYMBIANDTMFPRIVATE_H
