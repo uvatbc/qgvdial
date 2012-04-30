@@ -23,10 +23,7 @@ Contact: yuvraaj@gmail.com
 
 #if TELEPATHY_CAPABLE
 #include "TpObserver.h"
-#include <TelepathyQt4/ClientRegistrar>
-
-ClientRegistrarPtr  clientRegistrar;
-
+static ClientRegistrarPtr clientRegistrar;
 #endif
 
 #if LINUX_DESKTOP || defined(Q_WS_WIN32)
@@ -63,7 +60,11 @@ ObserverFactory::init ()
 
     ChannelClassSpecList filters;
     filters.append (Tp::ChannelClassSpec(
+#ifdef DESKTOP_OS
+                    TP_QT_IFACE_CHANNEL_TYPE_STREAMED_MEDIA,
+#else
                     TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAMED_MEDIA,
+#endif
                     Tp::HandleTypeContact));
     TpObserver *myobserver = new TpObserver(filters, this);
     AbstractClientPtr appr = (AbstractClientPtr) myobserver;

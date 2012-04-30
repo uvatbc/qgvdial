@@ -27,6 +27,7 @@ maemo5 {
 unix:!symbian: {
     QT *= dbus
     INCLUDEPATH += $$QMAKESPEC/usr/include/telepathy-1.0/
+    INCLUDEPATH += $$QMAKESPEC/usr/include/telepathy-qt4/
     LIBS += -ltelepathy-qt4 -lssl -lcrypto
 }
 
@@ -72,6 +73,7 @@ SOURCES  += ../src/main.cpp                 \
             ../src/MyXmlErrorHandler.cpp
 
 HEADERS  += ../src/global.h                 \
+            ../src/TpHeaders.h              \
             ../src/IObserver.h              \
             ../src/MainApp.h                \
             ../src/MainWindow.h             \

@@ -24,14 +24,6 @@ Contact: yuvraaj@gmail.com
 
 #include "global.h"
 
-#if TELEPATHY_CAPABLE
-#include <TelepathyQt4/Constants>
-#include <TelepathyQt4/Types>
-#ifdef DBG_TP_VERBOSE
-#include <TelepathyQt4/Debug>
-#endif
-#endif
-
 #ifdef Q_WS_MAEMO_5
 #include <QtMaemo5>
 #endif

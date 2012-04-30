@@ -205,7 +205,11 @@ ChannelAccepter::decrefCleanup ()
 
         int interested = 0;
         if (0 == currentChannel->channelType().compare (
+#ifdef DESKTOP_OS
+                TP_QT_IFACE_CHANNEL_TYPE_STREAMED_MEDIA))
+#else
                 TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAMED_MEDIA))
+#endif
         {
             interested++;
         }

@@ -20,8 +20,6 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "TpCalloutInitiator.h"
-#include <TelepathyQt4/PendingChannelRequest>
-#include <TelepathyQt4/Connection>
 
 #if defined(Q_WS_MAEMO_5) || defined(MEEGO_HARMATTAN)
 #define CSD_SERVICE         "com.nokia.csd"
@@ -185,16 +183,28 @@ TpCalloutInitiator::initiateCall (const QString &strDestination,
 
 #if USE_RAW_CHANNEL_METHOD
     QVariantMap request;
+#ifdef DESKTOP_OS
+    request.insert(TP_QT_IFACE_CHANNEL + ".ChannelType",
+                   TP_QT_IFACE_CHANNEL_TYPE_STREAMED_MEDIA);
+    request.insert(TP_QT_IFACE_CHANNEL + ".TargetHandleType",
+                   (uint) Tp::HandleTypeContact);
+    request.insert(TP_QT_IFACE_CHANNEL + ".TargetID",
+                   strDestination);
+#else
     request.insert(TELEPATHY_INTERFACE_CHANNEL ".ChannelType",
                    TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAMED_MEDIA);
     request.insert(TELEPATHY_INTERFACE_CHANNEL ".TargetHandleType",
                    (uint) Tp::HandleTypeContact);
     request.insert(TELEPATHY_INTERFACE_CHANNEL ".TargetID",
                    strDestination);
+#endif
     if (!bIsSpirit) {
+#ifdef DESKTOP_OS
+        request.insert(TP_QT_IFACE_CHANNEL +
+#else
         request.insert(TELEPATHY_INTERFACE_CHANNEL
-                       ".Type.StreamedMedia.InitialAudio",
-                       true);
+#endif
+                       ".Type.StreamedMedia.InitialAudio", true);
     }
 
     Q_DEBUG(QString("Starting call to %1").arg(strDestination));

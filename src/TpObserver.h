@@ -24,21 +24,6 @@ Contact: yuvraaj@gmail.com
 
 #include "global.h"
 #include <QtDBus>
-#include <TelepathyQt4/Types>
-#include <TelepathyQt4/AbstractClientObserver>
-#include <TelepathyQt4/PendingReady>
-#include <TelepathyQt4/ChannelDispatchOperation>
-#include <TelepathyQt4/Channel>
-#include <TelepathyQt4/StreamedMediaChannel>
-#include <TelepathyQt4/Contact>
-#include <TelepathyQt4/Account>
-#include <TelepathyQt4/Connection>
-#include <TelepathyQt4/Channel>
-#include <TelepathyQt4/ChannelDispatchOperation>
-#include <TelepathyQt4/ChannelRequest>
-#include <TelepathyQt4/ChannelClassSpecList>
-
-using namespace Tp;
 
 #include "IObserver.h"
 

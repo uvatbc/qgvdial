@@ -27,12 +27,6 @@ Contact: yuvraaj@gmail.com
 
 #include "CalloutInitiator.h"
 
-#include <TelepathyQt4/AccountManager>
-#include <TelepathyQt4/SharedPtr>
-#include <TelepathyQt4/PendingReady>
-#include <TelepathyQt4/Channel>
-#include <TelepathyQt4/StreamedMediaChannel>
-
 class TpCalloutInitiator : public CalloutInitiator
 {
     Q_OBJECT

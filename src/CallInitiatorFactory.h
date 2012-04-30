@@ -29,12 +29,6 @@ Contact: yuvraaj@gmail.com
 // even though it is present in QtCore which is included in global.h
 #include <QObject>
 
-#if TELEPATHY_CAPABLE
-#include <TelepathyQt4/AccountManager>
-#include <TelepathyQt4/SharedPtr>
-#include <TelepathyQt4/PendingReady>
-#endif
-
 class CallInitiatorFactory : public QObject
 {
     Q_OBJECT
