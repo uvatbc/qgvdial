@@ -3,9 +3,10 @@
 
 #include "global.h"
 
-#ifdef TELEPATHY_CAPABLE
+#if TELEPATHY_CAPABLE
 
-#ifdef DESKTOP_OS
+#ifndef TP10
+#error
 #include <TelepathyQt/Constants>
 #include <TelepathyQt/Types>
 #ifdef DBG_TP_VERBOSE

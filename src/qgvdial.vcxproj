@@ -147,6 +147,7 @@
     <ClInclude Include="SymbianCallObserverPrivate.h" />
     <ClInclude Include="SymbianDTMFPrivate.h" />
     <ClInclude Include="TpCalloutInitiator.h" />
+    <ClInclude Include="TpHeaders.h" />
     <ClInclude Include="TpObserver.h" />
     <ClInclude Include="WebWidget.h" />
   </ItemGroup>
