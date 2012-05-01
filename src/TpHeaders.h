@@ -6,7 +6,6 @@
 #if TELEPATHY_CAPABLE
 
 #ifndef TP10
-#error
 #include <TelepathyQt/Constants>
 #include <TelepathyQt/Types>
 #ifdef DBG_TP_VERBOSE
@@ -50,6 +49,14 @@
 #include <TelepathyQt4/Connection>
 #include <TelepathyQt4/ChannelRequest>
 #include <TelepathyQt4/ChannelClassSpecList>
+#endif
+
+#ifndef TP10
+#define TPQT_CHANNEL_TYPE_STREAMED_MEDIA TP_QT_IFACE_CHANNEL_TYPE_STREAMED_MEDIA
+#define TPQT_IFACE_CHANNEL TP_QT_IFACE_CHANNEL
+#else
+#define TPQT_CHANNEL_TYPE_STREAMED_MEDIA TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAMED_MEDIA
+#define TPQT_IFACE_CHANNEL TELEPATHY_INTERFACE_CHANNEL
 #endif
 
 using namespace Tp;

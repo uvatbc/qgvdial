@@ -183,28 +183,17 @@ TpCalloutInitiator::initiateCall (const QString &strDestination,
 
 #if USE_RAW_CHANNEL_METHOD
     QVariantMap request;
-#ifdef DESKTOP_OS
-    request.insert(TP_QT_IFACE_CHANNEL + ".ChannelType",
-                   TP_QT_IFACE_CHANNEL_TYPE_STREAMED_MEDIA);
-    request.insert(TP_QT_IFACE_CHANNEL + ".TargetHandleType",
+    request.insert(QString(TPQT_IFACE_CHANNEL) + ".ChannelType",
+                   TPQT_CHANNEL_TYPE_STREAMED_MEDIA);
+    request.insert(QString(TPQT_IFACE_CHANNEL) + ".TargetHandleType",
                    (uint) Tp::HandleTypeContact);
-    request.insert(TP_QT_IFACE_CHANNEL + ".TargetID",
+    request.insert(QString(TPQT_IFACE_CHANNEL) + ".TargetID",
                    strDestination);
-#else
-    request.insert(TELEPATHY_INTERFACE_CHANNEL ".ChannelType",
-                   TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAMED_MEDIA);
-    request.insert(TELEPATHY_INTERFACE_CHANNEL ".TargetHandleType",
-                   (uint) Tp::HandleTypeContact);
-    request.insert(TELEPATHY_INTERFACE_CHANNEL ".TargetID",
-                   strDestination);
-#endif
+
     if (!bIsSpirit) {
-#ifdef DESKTOP_OS
-        request.insert(TP_QT_IFACE_CHANNEL +
-#else
-        request.insert(TELEPATHY_INTERFACE_CHANNEL
-#endif
-                       ".Type.StreamedMedia.InitialAudio", true);
+        request.insert(QString(TPQT_IFACE_CHANNEL) +
+                        ".Type.StreamedMedia.InitialAudio",
+                       true);
     }
 
     Q_DEBUG(QString("Starting call to %1").arg(strDestination));

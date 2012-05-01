@@ -144,7 +144,7 @@ ChannelAccepter::init ()
         pendingReady, SIGNAL (finished (Tp::PendingOperation *)),
         this        , SLOT   (onConnectionReady (Tp::PendingOperation *)));
     if (bOk) {
-        qDebug ("TpObserver: Waiting for connection to become ready");
+        Q_DEBUG ("TpObserver: Waiting for connection to become ready");
     }
 
     nRefCount ++;
@@ -153,7 +153,7 @@ ChannelAccepter::init ()
         pendingReady, SIGNAL (finished (Tp::PendingOperation *)),
         this        , SLOT   (onAccountReady (Tp::PendingOperation *)));
     if (bOk) {
-        qDebug ("TpObserver: Waiting for account to become ready");
+        Q_DEBUG ("TpObserver: Waiting for account to become ready");
     }
 
     nRefCount ++;
@@ -162,10 +162,10 @@ ChannelAccepter::init ()
         pendingReady, SIGNAL (finished (Tp::PendingOperation *)),
         this        , SLOT   (onChannelReady (Tp::PendingOperation *)));
     if (bOk) {
-        qDebug ("TpObserver: Waiting for channel to become ready");
+        Q_DEBUG ("TpObserver: Waiting for channel to become ready");
     }
 
-    qDebug ("TpObserver: All become ready's sent");
+    Q_DEBUG ("TpObserver: All become ready's sent");
     decrefCleanup ();
 
     return (bOk);
@@ -181,13 +181,12 @@ ChannelAccepter::decrefCleanup ()
         return;
     }
 
-    qDebug ("TpObserver: Everything ready. Cleaning up");
+    Q_DEBUG ("TpObserver: Everything ready. Cleaning up");
 
     bool bCleanupLater = false;
     do { // Not a loop
-        if (bFailure)
-        {
-            qWarning ("TpObserver: Failed while waiting for something");
+        if (bFailure) {
+            Q_WARN ("TpObserver: Failed while waiting for something");
             break;
         }
 
@@ -195,21 +194,17 @@ ChannelAccepter::decrefCleanup ()
         msg = QString("TpObserver: Channel type = %1. isRequested = %2")
                 .arg (currentChannel->channelType ())
                 .arg (currentChannel->isRequested ());
-        qDebug () << msg;
+        Q_DEBUG (msg);
 
         ContactPtr contact = currentChannel->initiatorContact ();
         msg = QString("TpObserver: Contact id = %1. alias = %2")
                .arg (contact->id ())
                .arg (contact->alias ());
-        qDebug () << msg;
+        Q_DEBUG (msg);
 
         int interested = 0;
         if (0 == currentChannel->channelType().compare (
-#ifdef DESKTOP_OS
-                TP_QT_IFACE_CHANNEL_TYPE_STREAMED_MEDIA))
-#else
-                TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAMED_MEDIA))
-#endif
+                                              TPQT_CHANNEL_TYPE_STREAMED_MEDIA))
         {
             interested++;
         }
@@ -224,11 +219,11 @@ ChannelAccepter::decrefCleanup ()
 
         if (3 != interested)
         {
-            qDebug ("TpObserver: Channel that we're not interested in");
+            Q_DEBUG ("TpObserver: Channel that we're not interested in");
             break;
         }
 
-        qDebug ("TpObserver: Incoming call from our number!");
+        Q_DEBUG ("TpObserver: Incoming call from our number!");
         emit callStarted ();
     } while (0); // Not a loop
 
@@ -242,13 +237,10 @@ ChannelAccepter::decrefCleanup ()
 void
 ChannelAccepter::onCallAccepted (Tp::PendingOperation *operation)
 {
-    if (operation->isError ())
-    {
-        qWarning ("TpObserver: Failed to accept call");
-    }
-    else
-    {
-        qDebug ("TpObserver: Call accepted");
+    if (operation->isError ()) {
+        Q_WARN ("TpObserver: Failed to accept call");
+    } else {
+        Q_DEBUG ("TpObserver: Call accepted");
     }
     context->setFinished ();
     this->deleteLater ();
@@ -258,19 +250,15 @@ void
 ChannelAccepter::onChannelReady (Tp::PendingOperation *operation)
 {
     do { // Not a loop
-        if (operation->isError ())
-        {
-            qWarning ("TpObserver: Channel could not become ready");
+        if (operation->isError ()) {
+            Q_WARN ("TpObserver: Channel could not become ready");
             bFailure = true;
         }
 
-        if (!currentChannel->isReady ())
-        {
-            qWarning ("TpObserver: Dammit the channel is still not ready");
-        }
-        else
-        {
-            qDebug ("TpObserver: Channel is ready");
+        if (!currentChannel->isReady ()) {
+            Q_WARN ("TpObserver: Dammit the channel is still not ready");
+        } else {
+            Q_DEBUG ("TpObserver: Channel is ready");
         }
 
         decrefCleanup ();
@@ -282,19 +270,15 @@ void
 ChannelAccepter::onConnectionReady (Tp::PendingOperation *operation)
 {
     do { // Not a loop
-        if (operation->isError ())
-        {
-            qWarning ("TpObserver: Connection could not become ready");
+        if (operation->isError ()) {
+            Q_WARN ("TpObserver: Connection could not become ready");
             bFailure = true;
         }
 
-        if (!connection->isReady ())
-        {
-            qWarning ("TpObserver: Dammit the connection is still not ready");
-        }
-        else
-        {
-            qDebug ("TpObserver: Connection is ready");
+        if (!connection->isReady ()) {
+            Q_WARN ("TpObserver: Dammit the connection is still not ready");
+        } else {
+            Q_DEBUG ("TpObserver: Connection is ready");
         }
 
         decrefCleanup ();
@@ -306,19 +290,15 @@ void
 ChannelAccepter::onAccountReady (Tp::PendingOperation *operation)
 {
     do { // Not a loop
-        if (operation->isError ())
-        {
-            qWarning ("TpObserver: Account could not become ready");
+        if (operation->isError ()) {
+            Q_WARN ("TpObserver: Account could not become ready");
             bFailure = true;
         }
 
-        if (!account->isReady ())
-        {
-            qWarning ("TpObserver: Dammit the account is still not ready");
-        }
-        else
-        {
-            qDebug ("TpObserver: Account is ready");
+        if (!account->isReady ()) {
+            Q_WARN ("TpObserver: Dammit the account is still not ready");
+        } else {
+            Q_DEBUG ("TpObserver: Account is ready");
         }
 
         decrefCleanup ();

@@ -59,12 +59,7 @@ ObserverFactory::init ()
     clientRegistrar = ClientRegistrar::create();
 
     ChannelClassSpecList filters;
-    filters.append (Tp::ChannelClassSpec(
-#ifdef DESKTOP_OS
-                    TP_QT_IFACE_CHANNEL_TYPE_STREAMED_MEDIA,
-#else
-                    TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAMED_MEDIA,
-#endif
+    filters.append (Tp::ChannelClassSpec(TPQT_CHANNEL_TYPE_STREAMED_MEDIA,
                     Tp::HandleTypeContact));
     TpObserver *myobserver = new TpObserver(filters, this);
     AbstractClientPtr appr = (AbstractClientPtr) myobserver;
