@@ -27,13 +27,19 @@ maemo5 {
 unix:!symbian: {
     QT *= dbus
 
-exists($$QMAKESPEC/usr/include/telepathy-qt4/TelepathyQt/Constants) {
-    message(Brand new TP)
-    INCLUDEPATH += $$QMAKESPEC/usr/include/telepathy-qt4/
-} else {
+maemo5 {
     message(Maemo or Meego TP)
     INCLUDEPATH += $$QMAKESPEC/usr/include/telepathy-1.0/
     DEFINES += TP10
+} else {
+    exists($$QMAKESPEC/usr/include/telepathy-qt4/TelepathyQt/Constants) {
+        message(Brand new TP)
+        INCLUDEPATH += $$QMAKESPEC/usr/include/telepathy-qt4/
+    } else {
+        message(Old TP)
+        INCLUDEPATH += $$QMAKESPEC/usr/include/telepathy-1.0/
+        DEFINES += TP10
+    }
 }
     LIBS += -ltelepathy-qt4 -lssl -lcrypto
 }

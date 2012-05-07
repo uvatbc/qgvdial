@@ -207,7 +207,7 @@ TpCalloutInitiator::initiateCall (const QString &strDestination,
 
     rv =
     connect (pReq, SIGNAL (finished (Tp::PendingOperation*)),
-            this, SLOT   (onChannelReady (Tp::PendingOperation*)));
+             this, SLOT   (onChannelReady (Tp::PendingOperation*)));
     if (!rv) {
         Q_WARN("Failed to connect to call ready signal!!");
         Q_ASSERT(0 == "Failed to connect to call ready signal!!");
@@ -228,10 +228,13 @@ TpCalloutInitiator::onChannelReady (Tp::PendingOperation *op)
         bSuccess = true;
 
         Tp::PendingChannelRequest *pReq = (Tp::PendingChannelRequest *) op;
-#if USE_RAW_CHANNEL_METHOD
-        channel = Tp::ChannelPtr::staticCast (pReq->object ());
-#else
-        channel = Tp::StreamedMediaChannelPtr::staticCast (pReq->object ());
+        if (NULL == pReq->channelRequest().constData ()) {
+            Q_WARN("Channel request is NULL");
+            break;
+        }
+        channel = pReq->channelRequest().constData ()->channel ();
+
+#if !USE_RAW_CHANNEL_METHOD
         if (channel->awaitingLocalAnswer()) {
             channel->acceptCall();
         }
