@@ -66,15 +66,15 @@ CacheDatabase::init ()
 
     dbMain.setDatabaseName(strDbFile);
     if (!dbMain.open ()) {
-        qWarning() << "Failed to open database" << strDbFile
-                   << ". Error text =" << dbMain.lastError ().text ();
+        Q_WARN(QString("Failed to open database %1. Error text = %2")
+                .arg(strDbFile, dbMain.lastError().text()));
         qApp->quit ();
         return;
     }
 
     settings = new QSettings(strIniFile, QSettings::IniFormat, this);
     if (NULL == settings) {
-        qCritical ("Failed to open settings file");
+        Q_CRIT ("Failed to open settings file");
         qApp->quit ();
         return;
     }
@@ -1450,3 +1450,13 @@ CacheDatabase::loadCookies(QList<QNetworkCookie> &cookies)
 
     return (true);
 }//CacheDatabase::saveCookies
+
+bool
+CacheDatabase::dbgGetAlwaysFailDialing()
+{
+    bool rv = false;
+    settings->beginGroup (GV_DEBUG_TABLE);
+    rv = settings->value (GV_S_DBG_FAILDIAL, rv).toBool ();
+    settings->endGroup ();
+    return (rv);
+}//CacheDatabase::dbgGetAlwaysFailDialing

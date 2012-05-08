@@ -25,14 +25,13 @@ Contact: yuvraaj@gmail.com
 
 #include <QtXmlPatterns>
 
-#define ALWAYS_FAIL_DIALING 0
-
 GVApi::GVApi(bool bEmitLog, QObject *parent)
 : QObject(parent)
 , emitLog(bEmitLog)
 , loggedIn(false)
 , nwMgr(this)
 , jar(new CookieJar(NULL))
+, dbgAlwaysFailDialing (false)
 {
     nwMgr.setCookieJar (jar);
 }//GVApi::GVApi
@@ -1680,12 +1679,12 @@ GVApi::callOut(AsyncTaskToken *token)
         return false;
     }
 
-#if ALWAYS_FAIL_DIALING
-    Q_WARN("Fail call out for testing purposes!");
-    token->status = ATTS_FAILURE;
-    token->emitCompleted ();
-    return (true);
-#endif
+    if (dbgAlwaysFailDialing) {
+        Q_WARN("Fail call out for testing purposes!");
+        token->status = ATTS_FAILURE;
+        token->emitCompleted ();
+        return (true);
+    }
 
     // Ensure that the params  are valid
     if (!token->inParams.contains ("destination"))
@@ -1796,12 +1795,12 @@ GVApi::callBack(AsyncTaskToken *token)
         return false;
     }
 
-#if ALWAYS_FAIL_DIALING
-    Q_WARN("Fail call back for testing purposes!");
-    token->status = ATTS_FAILURE;
-    token->emitCompleted ();
-    return (true);
-#endif
+    if (dbgAlwaysFailDialing) {
+        Q_WARN("Fail call back for testing purposes!");
+        token->status = ATTS_FAILURE;
+        token->emitCompleted ();
+        return (true);
+    }
 
     // Ensure that the params  are valid
     if (!token->inParams.contains ("destination"))
@@ -2199,3 +2198,9 @@ GVApi::onMarkAsRead(bool success, const QByteArray &response,
         }
     }
 }//GVApi::onMarkAsRead
+
+void
+GVApi::dbg_alwaysFailDialing(bool set /*= true*/)
+{
+    dbgAlwaysFailDialing = set;
+}//GVApi::dbg_alwaysFailDialing

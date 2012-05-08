@@ -136,6 +136,8 @@ public:
     bool saveCookies(QList<QNetworkCookie> cookies);
     bool loadCookies(QList<QNetworkCookie> &cookies);
 
+    bool dbgGetAlwaysFailDialing();
+
 private:
     bool putContactInfo (const ContactInfo &info);
     bool deleteContactInfo (const QString &strId);

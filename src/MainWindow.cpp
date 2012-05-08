@@ -199,6 +199,7 @@ MainWindow::init ()
     QList<QNetworkCookie> cookies;
     dbMain.loadCookies (cookies);
     gvApi.setAllCookies (cookies);
+    gvApi.dbg_alwaysFailDialing (dbMain.dbgGetAlwaysFailDialing ());
 
     // The GV access class signals these during the dialling protocol
     rv = connect(&gvApi, SIGNAL(twoStepAuthentication(AsyncTaskToken *)),

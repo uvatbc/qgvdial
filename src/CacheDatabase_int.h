@@ -32,6 +32,7 @@ Contact: yuvraaj@gmail.com
 #define GV_S_VAR_INBOX_SEL      "inbox_sel"
 #define GV_S_VAR_PIN            "gvpin"
 #define GV_S_VAR_PIN_ENABLE     "gvpin_enable"
+
 #define GV_S_VAR_DB_VER         "db_ver"
 #define GV_S_VAR_VER            "settings_ver"
 ////////////////////////////////////////////////////////////////////////////////
@@ -134,6 +135,9 @@ Contact: yuvraaj@gmail.com
 #define GV_CJ_NAME          "name"
 #define GV_CJ_PATH          "path"
 #define GV_CJ_VALUE         "value"
+////////////////////////////////////////////////////////////////////////////////
+#define GV_DEBUG_TABLE      "debug"
+#define GV_S_DBG_FAILDIAL   "AlwaysFailDialing"
 ////////////////////////////////////////////////////////////////////////////////
 
 #endif //__CACHEDATABASE_INT_H__

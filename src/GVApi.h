@@ -41,6 +41,8 @@ public:
     QList<QNetworkCookie> getAllCookies();
     void setAllCookies(QList<QNetworkCookie> cookies);
 
+    void dbg_alwaysFailDialing(bool set = true);
+
     QString getSelfNumber();
 
     void cancel(AsyncTaskToken *token);
@@ -166,6 +168,8 @@ private:
     QNetworkAccessManager nwMgr;
     CookieJar *jar;
     QVariantMap hiddenLoginFields;
+
+    bool dbgAlwaysFailDialing;
 };
 
 #endif // GVAPI_H
