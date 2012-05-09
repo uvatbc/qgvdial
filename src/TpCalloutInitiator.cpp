@@ -32,6 +32,7 @@ TpCalloutInitiator::TpCalloutInitiator (Tp::AccountPtr act, QObject *parent)
 , account (act)
 , strActCmName("undefined")
 , strSelfNumber("undefined")
+, systemBus(QDBusConnection::systemBus())
 , bIsSpirit (false)
 , channel (NULL)
 , toneOn(false)
@@ -69,6 +70,7 @@ TpCalloutInitiator::TpCalloutInitiator (Tp::AccountPtr act, QObject *parent)
 
     Tp::ConnectionPtr connection = account->connection();
     onConnectionChanged (connection);
+
 }//TpCalloutInitiator::TpCalloutInitiator
 
 void
@@ -218,6 +220,8 @@ void
 TpCalloutInitiator::onChannelReady (Tp::PendingOperation *op)
 {
     bool bSuccess = false;
+    Tp::ChannelPtr ch1;
+
     do { // Begin cleanup block (not a loop)
         if (op->isError ()) {
             Q_WARN ("Channel could not become ready");
@@ -232,9 +236,13 @@ TpCalloutInitiator::onChannelReady (Tp::PendingOperation *op)
             Q_WARN("Channel request is NULL");
             break;
         }
-        channel = pReq->channelRequest().constData ()->channel ();
 
-#if !USE_RAW_CHANNEL_METHOD
+        ch1 = pReq->channelRequest().constData ()->channel ();
+
+#if USE_RAW_CHANNEL_METHOD
+        channel = ch1;
+#else
+        channel = Tp::StreamedMediaChannelPtr::dynamicCast(ch1);
         if (channel->awaitingLocalAnswer()) {
             channel->acceptCall();
         }
@@ -288,8 +296,7 @@ TpCalloutInitiator::sendDTMF (const QString &strTones)
         if ("ring" == account->cmName ()) {
             QList<QVariant> argsToSend;
             argsToSend.append(strTones);
-            argsToSend.append(0);
-            QDBusConnection systemBus = QDBusConnection::systemBus();
+//            argsToSend.append(0);
             QDBusMessage dbusMethodCall =
                     QDBusMessage::createMethodCall(CSD_SERVICE,
                                                    CSD_CALL_PATH,
@@ -298,15 +305,20 @@ TpCalloutInitiator::sendDTMF (const QString &strTones)
             dbusMethodCall.setArguments(argsToSend);
             rv = systemBus.send(dbusMethodCall);
             if (!rv) {
-                Q_WARN ("Dbus method call to send DTMF failed.");
+                Q_WARN ("CSD method call to send DTMF failed.");
+            } else {
+                Q_DEBUG("CSD version of DTMF requested");
             }
-
-            Q_DEBUG("CSD version of DTMF requested");
-            break;
+        } else {
+            Q_DEBUG("Not ring, so cannot send DTMF...");
         }
+        break;
+
 #elif !USE_RAW_CHANNEL_METHOD
+
         remainingTones = strTones;
         onDtmfNextTone ();
+        break;
 
 #elif USE_DTMF_INTERFACE_1
         if ((NULL == channel) || (channel.isNull ())) {
@@ -353,8 +365,11 @@ TpCalloutInitiator::sendDTMF (const QString &strTones)
 
         Q_DEBUG("DTMF tones sent");
         rv = true;
+        break;
 #else
+        Q_WARN("DTMF tones not supported");
         Q_UNUSED(strTones);
+        break;
 #endif
     } while (0); // End cleanup block (not a loop)
 
@@ -386,6 +401,11 @@ TpCalloutInitiator::onDtmfNextTone()
             channel->streamsForType(Tp::MediaStreamTypeAudio);
         if (streams.isEmpty ()) {
             Q_WARN("No audio streams??");
+            streams = channel->streams();
+        }
+
+        if (streams.isEmpty ()) {
+            Q_WARN("No streams at all???");
             break;
         }
 

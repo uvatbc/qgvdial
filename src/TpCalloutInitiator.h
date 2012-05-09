@@ -23,7 +23,7 @@ Contact: yuvraaj@gmail.com
 #define TPCALLOUTINITIATOR_H
 
 #define USE_DTMF_INTERFACE_1 0
-#define USE_RAW_CHANNEL_METHOD 1
+#define USE_RAW_CHANNEL_METHOD 0
 
 #include "CalloutInitiator.h"
 
@@ -62,6 +62,9 @@ private:
     Tp::AccountPtr      account;
     QString             strActCmName;
     QString             strSelfNumber;
+
+    //! DBUS System bus
+    QDBusConnection     systemBus;
 
     //! Is this the buggy spirit (skype) TP-CM?
     bool                bIsSpirit;
