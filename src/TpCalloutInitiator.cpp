@@ -22,9 +22,11 @@ Contact: yuvraaj@gmail.com
 #include "TpCalloutInitiator.h"
 
 #if defined(Q_WS_MAEMO_5) || defined(MEEGO_HARMATTAN)
-#define CSD_SERVICE         "com.nokia.csd"
-#define CSD_CALL_PATH		"/com/nokia/csd/call"
-#define CSD_CALL_INTERFACE	"com.nokia.csd.Call"
+#define CSD_SERVICE                 "com.nokia.csd"
+#define CSD_CALL_PATH               "/com/nokia/csd/call"
+#define CSD_CALL_INSTANCE_PATH      "/com/nokia/csd/call/1"
+#define CSD_CALL_INTERFACE          "com.nokia.csd.Call"
+#define CSD_CALL_INSTANCE_INTERFACE	"com.nokia.csd.Call.Instance"
 #endif
 
 TpCalloutInitiator::TpCalloutInitiator (Tp::AccountPtr act, QObject *parent)

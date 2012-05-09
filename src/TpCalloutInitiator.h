@@ -74,8 +74,9 @@ private:
     Tp::ChannelPtr      channel;
 #else
     Tp::StreamedMediaChannelPtr channel;
-    QString                     remainingTones;
 #endif
+
+    QString remainingTones;
 
     bool toneOn;
 
