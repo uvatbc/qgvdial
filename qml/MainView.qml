@@ -29,6 +29,7 @@ Rectangle {
     signal sigCall(string number)
     signal sigText(string number)
     signal sigSelChanged (int index)
+    signal sigHaptic
 
     property bool landscape: main.width > main.height
     property variant rotationDelta: landscape? -90 : 0
@@ -68,6 +69,12 @@ Rectangle {
                 }
 
                 onTextChanged: {main.theNumber = txtNum.text;}
+
+                MouseArea {
+                    anchors.fill: parent
+                    onPressed: txtNum.closeSoftwareInputPanel();
+                    onReleased: txtNum.closeSoftwareInputPanel();
+                }
             }// TextEdit
 
             ActionButtons {
@@ -94,6 +101,8 @@ Rectangle {
 
             onBtnClick: Code.doIns(strText)
             onBtnDelClick: Code.doDel()
+
+            onSigHaptic: main.sigHaptic();
         }//Keypad
 
         ActionButtons {

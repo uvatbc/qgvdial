@@ -68,7 +68,7 @@ Flickable {
             yAdjustTimer.start();
         }
 
-        interval: 700; repeat: false; running: false
+        interval: 300; repeat: false; running: false
         onTriggered: container.contentY = setY;
     }//Timer for delayed setting of contentY so that when you click on an
     // ExpandView, it gets into focus. Expecially important for the logs

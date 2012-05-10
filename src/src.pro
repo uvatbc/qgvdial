@@ -9,7 +9,7 @@ TARGET   = qgvdial
 TEMPLATE = app
 
 CONFIG  *= precompile_header mobility
-MOBILITY *= systeminfo
+MOBILITY *= systeminfo feedback
 
 include(qtsingleapplication/qtsingleapplication.pri)
 

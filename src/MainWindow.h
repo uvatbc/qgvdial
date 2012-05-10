@@ -31,6 +31,7 @@ Contact: yuvraaj@gmail.com
 
 #include <QtDeclarative>
 #include <phonon/MediaObject>
+#include <QFeedbackHapticsEffect>
 
 #if MOSQUITTO_CAPABLE
 #include "MqClientThread.h"
@@ -205,6 +206,9 @@ private slots:
     void onLogPosted(bool success, const QByteArray &response,
                      QNetworkReply *reply, void *ctx);
 
+    //! Invoked when ANY button is clicked and requires a haptic feedback
+    void onBtnClickFroHapticFeedback();
+
 private:
     void initLogging ();
 
@@ -319,6 +323,8 @@ private:
     QTimer          logsTimer;
     //! kick timer
     bool            bKickLocksTimer;
+
+    QFeedbackHapticsEffect btnClickBuzz;
 
 #if MOSQUITTO_CAPABLE
     //! This holds the thread that communicates with the mosquitto server.

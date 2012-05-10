@@ -22,11 +22,15 @@ Contact: yuvraaj@gmail.com
 import Qt 4.7
 
 Rectangle {
-    id: wDialer
+    id: container
     color: "black"
 
     signal btnClick(string strText)
     signal btnDelClick
+    signal sigHaptic
+
+    onBtnClick: container.sigHaptic();
+    onBtnDelClick: container.sigHaptic();
 
     Grid {
         id: layoutGrid
@@ -34,41 +38,41 @@ Rectangle {
         rows: 4; columns: 3
 
         DigitButton { mainText: "1"; subText: ""
-            onClicked: btnClick(strText);
+            onClicked: container.btnClick(strText);
         }
         DigitButton { mainText: "2"; subText: "ABC"
-            onClicked: btnClick(strText);
+            onClicked: container.btnClick(strText);
         }
         DigitButton { mainText: "3"; subText: "DEF"
-            onClicked: btnClick(strText);
+            onClicked: container.btnClick(strText);
         }
         DigitButton { mainText: "4"; subText: "GHI"
-            onClicked: btnClick(strText);
+            onClicked: container.btnClick(strText);
         }
         DigitButton { mainText: "5"; subText: "JKL"
-            onClicked: btnClick(strText);
+            onClicked: container.btnClick(strText);
         }
         DigitButton { mainText: "6"; subText: "MNO"
-            onClicked: btnClick(strText);
+            onClicked: container.btnClick(strText);
         }
         DigitButton { mainText: "7"; subText: "PQRS"
-            onClicked: btnClick(strText);
+            onClicked: container.btnClick(strText);
         }
         DigitButton { mainText: "8"; subText: "TUV"
-            onClicked: btnClick(strText);
+            onClicked: container.btnClick(strText);
         }
         DigitButton { mainText: "9"; subText: "WXYZ"
-            onClicked: btnClick(strText);
+            onClicked: container.btnClick(strText);
         }
         DigitButton { mainText: "*+"; subText: ""
-            onClicked: btnClick(strText);
-            onDelClicked: btnDelClick();
+            onClicked: container.btnClick(strText);
+            onDelClicked: container.btnDelClick();
         }
         DigitButton { mainText: "0"; subText: ""
-            onClicked: btnClick(strText);
+            onClicked: container.btnClick(strText);
         }
         DigitButton { mainText: "#"; subText: ""
-            onClicked: btnClick(strText);
+            onClicked: container.btnClick(strText);
         }
     }// Grid
 }// Rectangle

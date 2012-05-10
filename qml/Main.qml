@@ -59,6 +59,9 @@ Rectangle {
     // Signals from the message box
     signal sigMsgBoxDone (bool ok)
 
+    // Hapetic feedback required
+    signal sigHaptic
+
     function doRotate(rot) {
         console.debug("Rotate by " + rot);
         main.rotation = rot;
@@ -124,6 +127,8 @@ Rectangle {
                             mainFlipView.flipped = true;
                             smsView.addSmsDestination(number, number);
                         }
+
+                        onSigHaptic: main.sigHaptic();
                     }
                 }//Tab (Dialpad)
                 Tab {

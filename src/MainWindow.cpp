@@ -53,6 +53,7 @@ MainWindow::MainWindow (QWidget *parent)
 , logMutex (QMutex::Recursive)
 , logsTimer (this)
 , bKickLocksTimer (false)
+, btnClickBuzz (this)
 #if MOSQUITTO_CAPABLE
 , mqThread (QString("qgvdial:%1").arg(QHostInfo::localHostName())
             .toLatin1().constData (), this)
@@ -344,6 +345,10 @@ MainWindow::init ()
     }
     oContacts.setTempStore(strTempStore);
 
+    // Initialize the haptic feedback
+    btnClickBuzz.setIntensity (1.0);
+    btnClickBuzz.setDuration (50);
+
 #if MOSQUITTO_CAPABLE
     // Connect the signals from the Mosquitto thread
     rv = connect (&mqThread , SIGNAL(sigUpdateInbox(const QDateTime &)),
@@ -482,6 +487,10 @@ MainWindow::initQML ()
     if (!rv) { exit(1); }
     rv = connect (gObj, SIGNAL(sigRefreshInbox()),
                   &oInbox,   SLOT(refresh()));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+    rv = connect (gObj, SIGNAL(sigHaptic()),
+                  this, SLOT(onBtnClickFroHapticFeedback()));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
 
@@ -1254,3 +1263,10 @@ MainWindow::ensureNwMgr()
 
     return (nwMgr != NULL);
 }//MainWindow::ensureNwMgr
+
+void
+MainWindow::onBtnClickFroHapticFeedback()
+{
+    btnClickBuzz.stop ();
+    btnClickBuzz.start ();
+}//MainWindow::onBtnClickFroHapticFeedback
