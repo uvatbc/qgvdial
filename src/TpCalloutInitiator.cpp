@@ -216,6 +216,8 @@ TpCalloutInitiator::initiateCall (const QString &strDestination,
         Q_WARN("Failed to connect to call ready signal!!");
         Q_ASSERT(0 == "Failed to connect to call ready signal!!");
     }
+
+    startMonitoringCall();
 }//TpCalloutInitiator::initiateCall
 
 void
@@ -296,20 +298,11 @@ TpCalloutInitiator::sendDTMF (const QString &strTones)
     do { // Begin cleanup block (not a loop)
 #if defined(Q_WS_MAEMO_5) || defined(MEEGO_HARMATTAN)
         if ("ring" == account->cmName ()) {
-            QList<QVariant> argsToSend;
-            argsToSend.append(strTones);
-//            argsToSend.append(0);
-            QDBusMessage dbusMethodCall =
-                    QDBusMessage::createMethodCall(CSD_SERVICE,
-                                                   CSD_CALL_PATH,
-                                                   CSD_CALL_INTERFACE,
-                                                   QString("SendDTMF"));
-            dbusMethodCall.setArguments(argsToSend);
-            rv = systemBus.send(dbusMethodCall);
-            if (!rv) {
-                Q_WARN ("CSD method call to send DTMF failed.");
+            if (bMaemoAudioConnected) {
+                sendMaemoDTMF(strTones);
             } else {
-                Q_DEBUG("CSD version of DTMF requested");
+                Q_DEBUG("Audio not yet connected.");
+                remainingTones = strTones;
             }
         } else {
             Q_DEBUG("Not ring, so cannot send DTMF...");
@@ -486,3 +479,129 @@ TpCalloutInitiator::onDtmfNextTone()
 #endif
     } while (0); // End cleanup block (not a loop)
 }//TpCalloutInitiator::onDtmfNextTone
+
+void
+TpCalloutInitiator::startMonitoringCall()
+{
+    bool rv;
+
+    do { // Begin cleanup block (not a loop)
+        rv = systemBus.connect(QString(""),
+                               CSD_CALL_INSTANCE_PATH,
+                               CSD_CALL_INSTANCE_INTERFACE,
+                               QString("AudioConnect"), this,
+                               SLOT(readyToSendDTMF(const QDBusMessage&)));
+        if (!rv) {
+            Q_WARN(QString("Failed to connect to AudioConnect"));
+            break;
+        }
+
+        rv = systemBus.connect(QString(""),
+                               CSD_CALL_INSTANCE_PATH,
+                               CSD_CALL_INSTANCE_INTERFACE,
+                               QString("StoppedDTMF"), this,
+                               SLOT(allDTMFDone(const QDBusMessage&)));
+        if (!rv) {
+            Q_WARN(QString("Failed to connect to StoppedDTMF"));
+            break;
+        }
+
+        rv = systemBus.connect(QString(""),
+                               CSD_CALL_INSTANCE_PATH,
+                               CSD_CALL_INSTANCE_INTERFACE,
+                               QString("Terminated"), this,
+                               SLOT(stopMonitoringCall()));
+        if (!rv) {
+            Q_WARN(QString("Failed to connect to Terminated"));
+            break;
+        }
+
+        bMaemoAudioConnected = false;
+        Q_DEBUG("Start monitoring");
+    } while (0); // End cleanup block (not a loop)
+
+    if (!rv) {
+        stopMonitoringCall();
+    }
+}//TpCalloutInitiator::startMonitoringCall
+
+void
+TpCalloutInitiator::stopMonitoringCall()
+{
+    bool rv;
+
+    Q_DEBUG("Stop monotioring");
+
+    rv = systemBus.disconnect(QString(""),
+                              CSD_CALL_INSTANCE_PATH,
+                              CSD_CALL_INSTANCE_INTERFACE,
+                              QString("Terminated"), this,
+                              SLOT(stopMonitoringCall()));
+    if (!rv) {
+        Q_WARN(QString("Failed to disconnect from Terminated"));
+    }
+
+    rv = systemBus.disconnect(QString(""),
+                              CSD_CALL_INSTANCE_PATH,
+                              CSD_CALL_INSTANCE_INTERFACE,
+                              QString("StoppedDTMF"), this,
+                              SLOT(displayDTMFConfirmation(const QDBusMessage&)));
+     if (!rv) {
+         Q_WARN(QString("Failed to disconnect from StoppedDTMF"));
+     }
+
+     rv = systemBus.disconnect(QString(""),
+                               CSD_CALL_INSTANCE_PATH,
+                               CSD_CALL_INSTANCE_INTERFACE,
+                               QString("AudioConnect"), this,
+                               SLOT(sendNumberAsDTMFCode(const QDBusMessage&)));
+     if (!rv) {
+        Q_WARN(QString("Failed to disconnect from AudioConnect"));
+     }
+}//TpCalloutInitiator::stopMonitoringCall
+
+void
+TpCalloutInitiator::readyToSendDTMF(const QDBusMessage &msg)
+{
+    QList<QVariant> listArguments = msg.arguments();
+    bMaemoAudioConnected = listArguments.first().toBool();
+
+    if (bMaemoAudioConnected && !remainingTones.isEmpty()) {
+        sendMaemoDTMF(remainingTones);
+        remainingTones.clear();
+    } else {
+        Q_DEBUG("Audio not yet connected.");
+    }
+}//TpCalloutInitiator::readyToSendDTMF
+
+void
+TpCalloutInitiator::allDTMFDone(const QDBusMessage & /*msg*/)
+{
+    Q_DEBUG("DTMF sent.");
+    stopMonitoringCall();
+}//TpCalloutInitiator::allDTMFDone
+
+void
+TpCalloutInitiator::sendMaemoDTMF(const QString &strTones)
+{
+    if (strTones.isEmpty())  {
+        Q_WARN("No DTMF tones to send");
+        return;
+    }
+
+    QList<QVariant> argsToSend;
+    argsToSend.append(strTones);
+//    argsToSend.append(0);
+    QDBusMessage dbusMethodCall =
+    QDBusMessage::createMethodCall(CSD_SERVICE, CSD_CALL_PATH,
+                                   CSD_CALL_INTERFACE,
+                                   QString("SendDTMF"));
+    dbusMethodCall.setArguments(argsToSend);
+    bool rv = systemBus.send(dbusMethodCall);
+    if (!rv) {
+        Q_WARN ("CSD method call to send DTMF failed.");
+    } else {
+        Q_DEBUG("CSD version of DTMF requested");
+    }
+}//TpCalloutInitiator::sendMaemoDTMF
+

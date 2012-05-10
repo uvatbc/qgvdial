@@ -58,6 +58,14 @@ private slots:
 
     void onDtmfNextTone();
 
+    void startMonitoringCall();
+    void stopMonitoringCall();
+    void readyToSendDTMF(const QDBusMessage &msg);
+    void allDTMFDone(const QDBusMessage &msg);
+
+private:
+    void sendMaemoDTMF(const QString &strTones);
+
 private:
     Tp::AccountPtr      account;
     QString             strActCmName;
@@ -77,7 +85,7 @@ private:
 #endif
 
     QString remainingTones;
-
+    bool bMaemoAudioConnected;
     bool toneOn;
 
 #if USE_DTMF_INTERFACE_1
