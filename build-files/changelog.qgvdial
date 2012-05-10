@@ -1,2 +1,2 @@
-  * Small QML improvements and fixed (and so enabled) the Symbian fallback dial.
+  * Fallback dialout works correctly for Symbian, Maemo and Harmattan!!
 
