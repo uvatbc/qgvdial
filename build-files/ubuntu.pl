@@ -74,5 +74,5 @@ system("cd $basedir && make src/Makefile");
 # Replace hard coded current directory with relative directory.
 
 # Execute the rest of the build command
-$cmd = "cd $basedir && $mad dpkg-buildpackage";
+$cmd = "cd $basedir && $mad dpkg-buildpackage --source-option=--auto-commit";
 system($cmd);
