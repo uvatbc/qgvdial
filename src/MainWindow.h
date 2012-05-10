@@ -32,10 +32,6 @@ Contact: yuvraaj@gmail.com
 #include <QtDeclarative>
 #include <phonon/MediaObject>
 
-#include <qmobilityglobal.h>
-#include <QFeedbackHapticsEffect>
-QTM_USE_NAMESPACE
-
 #if MOSQUITTO_CAPABLE
 #include "MqClientThread.h"
 #endif
@@ -326,8 +322,6 @@ private:
     QTimer          logsTimer;
     //! kick timer
     bool            bKickLocksTimer;
-
-    QFeedbackHapticsEffect btnClickBuzz;
 
 #if MOSQUITTO_CAPABLE
     //! This holds the thread that communicates with the mosquitto server.

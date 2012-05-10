@@ -1,3 +1,16 @@
+# For the beta version of the SDK, this part will identify Meego/Harmattan
+exists($$QMAKE_INCDIR_QT"/../qmsystem2/qmkeys.h"):!contains(MEEGO_EDITION,harmattan): {
+  MEEGO_VERSION_MAJOR     = 1
+  MEEGO_VERSION_MINOR     = 2
+  MEEGO_VERSION_PATCH     = 0
+  MEEGO_EDITION           = harmattan
+}
+
+contains(MEEGO_EDITION,harmattan) {
+  message(Meego!)
+  DEFINES += MEEGO_HARMATTAN
+}
+
 DEFINES += NO_CONTACTS_CAPTCHA
 
 # For verbose debugging
@@ -9,8 +22,11 @@ TARGET   = qgvdial
 TEMPLATE = app
 
 CONFIG  *= precompile_header mobility
-MOBILITY *= systeminfo feedback
-INCLUDEPATH *= $$QT_MOBILITY_SOURCE_TREE/src/feedback
+MOBILITY *= systeminfo
+
+symbian|contains(MEEGO_EDITION,harmattan) {
+MOBILITY *= feedback
+}
 
 include(qtsingleapplication/qtsingleapplication.pri)
 
@@ -236,19 +252,6 @@ symbian {
 
     my_deployment.pkg_prerules = vendorinfo
     DEPLOYMENT += my_deployment
-}
-
-# For the beta version of the SDK, this part will identify Meego/Harmattan
-exists($$QMAKE_INCDIR_QT"/../qmsystem2/qmkeys.h"):!contains(MEEGO_EDITION,harmattan): {
-  MEEGO_VERSION_MAJOR     = 1
-  MEEGO_VERSION_MINOR     = 2
-  MEEGO_VERSION_PATCH     = 0
-  MEEGO_EDITION           = harmattan
-}
-
-contains(MEEGO_EDITION,harmattan) {
-  message(Meego!)
-  DEFINES += MEEGO_HARMATTAN
 }
 
 ###############################################################

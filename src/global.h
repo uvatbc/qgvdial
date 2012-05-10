@@ -315,6 +315,12 @@ void qgv_LogFlush();
 #define MOBILITY_PRESENT 1
 #endif
 
+#if defined(Q_OS_SYMBIAN) || defined(MEEGO_HARMATTAN)
+#define HAS_FEEDBACK 1
+#else
+#define HAS_FEEDBACK 0
+#endif
+
 #if defined(Q_WS_X11)
 #define __FULLFUNC__ __PRETTY_FUNCTION__
 #else

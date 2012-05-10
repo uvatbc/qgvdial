@@ -30,6 +30,9 @@ OsDependent::OsDependent(QObject *parent) : QObject(parent)
 #if QTM_VERSION >= 0x010200
     displayInfo = NULL;
 #endif
+#if HAS_FEEDBACK
+    btnClickBuzz = NULL;
+#endif
 }//OsDependent::OsDependent
 
 void
@@ -56,6 +59,16 @@ OsDependent::init ()
     rv = connect (qApp->desktop(), SIGNAL(resized(int)),
                   this           , SLOT(desktopResized(int)));
 #endif
+
+#if HAS_FEEDBACK
+    btnClickBuzz = new QFeedbackHapticsEffect(this);
+    if (NULL != btnClickBuzz) {
+        // Initialize the haptic feedback
+        btnClickBuzz->setIntensity (1.0);
+        btnClickBuzz->setDuration (50);
+    }
+#endif
+
     Q_ASSERT(rv);
 }//OsDependent::init
 
@@ -498,6 +511,17 @@ OsDependent::getOSDetails()
 
     return (rv);
 }//OsDependent::getOSDetails
+
+void
+OsDependent::onBtnClickFroHapticFeedback()
+{
+#if HAS_FEEDBACK
+    if (NULL != btnClickBuzz) {
+        btnClickBuzz->stop ();
+        btnClickBuzz->start ();
+    }
+#endif
+}//OsDependent::onBtnClickFroHapticFeedback
 
 #ifdef QT_NO_SYSTEMTRAYICON
 QSystemTrayIcon::QSystemTrayIcon(QWidget *parent /*= 0*/)

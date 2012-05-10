@@ -40,6 +40,11 @@ QTM_USE_NAMESPACE
 #define QTM_VERSION 0x010000
 #endif
 
+#if HAS_FEEDBACK
+#include <QFeedbackHapticsEffect>
+QTM_USE_NAMESPACE
+#endif
+
 // For some reason the symbian MOC doesn't like it if I don't include QObject
 // even though it is present in QtCore which is included in global.h
 #include <QObject>
@@ -78,6 +83,8 @@ public:
 
     OsIndependentOrientation getOrientation(void);
 
+    void onBtnClickFroHapticFeedback();
+
 signals:
     void orientationChanged (OsIndependentOrientation o);
 
@@ -95,6 +102,10 @@ private slots:
 private:
 #if QTM_VERSION >= 0x010200
     QSystemDisplayInfo *displayInfo;
+#endif
+
+#if HAS_FEEDBACK
+    QFeedbackHapticsEffect *btnClickBuzz;
 #endif
 
     friend class Singletons;

@@ -53,7 +53,6 @@ MainWindow::MainWindow (QWidget *parent)
 , logMutex (QMutex::Recursive)
 , logsTimer (this)
 , bKickLocksTimer (false)
-, btnClickBuzz (this)
 #if MOSQUITTO_CAPABLE
 , mqThread (QString("qgvdial:%1").arg(QHostInfo::localHostName())
             .toLatin1().constData (), this)
@@ -344,10 +343,6 @@ MainWindow::init ()
         dirApp.mkdir ("temp");
     }
     oContacts.setTempStore(strTempStore);
-
-    // Initialize the haptic feedback
-    btnClickBuzz.setIntensity (1.0);
-    btnClickBuzz.setDuration (50);
 
 #if MOSQUITTO_CAPABLE
     // Connect the signals from the Mosquitto thread
@@ -1267,6 +1262,6 @@ MainWindow::ensureNwMgr()
 void
 MainWindow::onBtnClickFroHapticFeedback()
 {
-    btnClickBuzz.stop ();
-    btnClickBuzz.start ();
+    OsDependent &osd = Singletons::getRef().getOSD ();
+    osd.onBtnClickFroHapticFeedback ();
 }//MainWindow::onBtnClickFroHapticFeedback
