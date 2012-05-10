@@ -31,7 +31,9 @@ Contact: yuvraaj@gmail.com
 
 #include <QtDeclarative>
 #include <phonon/MediaObject>
+
 #include <QFeedbackHapticsEffect>
+QTM_USE_NAMESPACE
 
 #if MOSQUITTO_CAPABLE
 #include "MqClientThread.h"

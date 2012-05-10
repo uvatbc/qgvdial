@@ -1,2 +1,3 @@
-  * Fallback dialout works correctly for Symbian, Maemo and Harmattan!!
+  * Added Haptic feedback to Symbian, Maemo and Harmattan.
+  * Fixed QML
 

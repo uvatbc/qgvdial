@@ -221,7 +221,7 @@ symbian {
     LIBS += -letel3rdparty -llibcrypto
 
     TARGET.UID3 = 0x2003B499
-    TARGET.CAPABILITY += NetworkServices ReadUserData ReadDeviceData SwEvent
+    TARGET.CAPABILITY += NetworkServices ReadUserData ReadDeviceData SwEvent WriteDeviceData
     TARGET.EPOCSTACKSIZE = 0x14000          # 80 KB stack size
     TARGET.EPOCHEAPSIZE = 0x020000 0x2000000 # 128 KB - 20 MB
 

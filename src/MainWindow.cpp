@@ -586,7 +586,7 @@ MainWindow::connectSettingsSignals()
         Q_ASSERT(rv);
         if (!rv) { break; }
         rv = connect (
-                    obj , SIGNAL(sigPinSettingChanges  (bool, const QString &)),
+                    obj , SIGNAL(sigPinSettingChanges (bool, const QString &)),
                     this, SLOT (onSigPinSettingChanges(bool, const QString &)));
         Q_ASSERT(rv);
         if (!rv) { break; }
