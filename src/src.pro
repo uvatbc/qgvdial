@@ -10,6 +10,7 @@ TEMPLATE = app
 
 CONFIG  *= precompile_header mobility
 MOBILITY *= systeminfo feedback
+INCLUDEPATH *= $$QT_MOBILITY_SOURCE_TREE/src/feedback
 
 include(qtsingleapplication/qtsingleapplication.pri)
 

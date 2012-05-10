@@ -32,6 +32,7 @@ Contact: yuvraaj@gmail.com
 #include <QtDeclarative>
 #include <phonon/MediaObject>
 
+#include <qmobilityglobal.h>
 #include <QFeedbackHapticsEffect>
 QTM_USE_NAMESPACE
 
