@@ -1,17 +1,27 @@
 #include "NwReqTracker.h"
 
 
-NwReqTracker::NwReqTracker(QNetworkReply *r, void *c, quint32 timeout,
-                           bool bEmitlog, bool autoDel, QObject *parent)
+NwReqTracker::NwReqTracker(QNetworkReply *r, QNetworkAccessManager &nwManager,
+                           void *c, quint32 timeout, bool bEmitlog,
+                           bool autoDel, QObject *parent)
 : QObject(parent)
-, reply (r)
 , replyTimer (this)
-, aborted (false)
-, autoDelete(autoDel)
-, emitLog(bEmitlog)
-, ctx(c)
-, autoRedirect(false)
+, nwMgr (nwManager)
 {
+    init (r, c, timeout, bEmitlog, autoDel);
+}//NwReqTracker::NwReqTracker
+
+void
+NwReqTracker::init(QNetworkReply *r, void *c, quint32 timeout, bool bEmitlog,
+                   bool autoDel)
+{
+    reply = r;
+    aborted = false;
+    autoDelete = autoDel;
+    emitLog = bEmitlog;
+    ctx = c;
+    autoRedirect = false;
+
     bool rv = connect (reply, SIGNAL(finished()),
                        this , SLOT(onReplyFinished()));
     Q_ASSERT(rv);
@@ -42,7 +52,7 @@ NwReqTracker::NwReqTracker(QNetworkReply *r, void *c, quint32 timeout,
     Q_ASSERT(rv); Q_UNUSED(rv);
 
     replyTimer.start ();
-}//NwReqTracker::NwReqTracker
+}//NwReqTracker::init
 
 void
 NwReqTracker::setTimeout(quint32 timeout)
@@ -66,27 +76,61 @@ NwReqTracker::onReplyFinished()
 {
     replyTimer.stop ();
 
-    bool rv = false;
+    bool rv = false, done = false;
     QByteArray response;
+    QNetworkReply *origReply = reply;
+
     do { // Begin cleanup block (not a loop)
         if (aborted) {
             Q_WARN("Reply was aborted");
             break;
         }
 
-        if (QNetworkReply::NoError != reply->error ()) {
-            Q_WARN("Response error: ") << reply->errorString ();
+        if (QNetworkReply::NoError != origReply->error ()) {
+            Q_WARN("Response error: ") << origReply->errorString ();
             break;
         }
 
-        response = reply->readAll ();
+        response = origReply->readAll ();
         rv = true;
     } while (0); // End cleanup block (not a loop)
 
-    emit sigDone (rv, response, reply, ctx);
+    do { // Begin cleanup block (not a loop)
+        done = true;
 
-    reply->deleteLater ();
-    if (autoDelete) {
+        if (!rv) {
+            break;
+        }
+
+        if (!autoRedirect) {
+            break;
+        }
+
+        QUrl urlMoved = hasMoved (origReply);
+        if (urlMoved.isEmpty ()) {
+            break;
+        }
+
+        QNetworkRequest req(urlMoved);
+        req.setRawHeader("User-Agent", uaString);
+
+        NwReqTracker::setCookies (jar, req);
+        QNetworkReply *nextReply = nwMgr.get(req);
+        if (!nextReply) {
+            break;
+        }
+
+        init (nextReply, ctx, replyTimer.interval (), emitLog, autoDelete);
+
+        done = false;
+    } while (0); // End cleanup block (not a loop)
+
+    if (done) {
+        emit sigDone (rv, response, origReply, ctx);
+    }
+
+    origReply->deleteLater ();
+    if (done && autoDelete) {
         this->deleteLater ();
     }
 }//NwReqTracker::onReplyFinished
@@ -158,7 +202,58 @@ NwReqTracker::onXferProgress(qint64 bytesReceived, qint64 bytesTotal)
 }//NwReqTracker::onXferProgress
 
 void
-NwReqTracker::setAutoRedirect(bool set)
+NwReqTracker::setAutoRedirect(QNetworkCookieJar *j, const QByteArray &ua,
+                              bool set)
 {
+    jar = j;
+    uaString = ua;
     autoRedirect = set;
 }//NwReqTracker::setAutoRedirect
+
+void
+NwReqTracker::setCookies(QNetworkCookieJar *jar, QNetworkRequest &req)
+{
+    // Different version of Qt mess up the cookie setup logic. Do it myself
+    // to be absolutely sure.
+    QList<QNetworkCookie> cookies = jar->cookiesForUrl(req.url());
+    QByteArray result;
+    bool first = true;
+    foreach (const QNetworkCookie &cookie, cookies) {
+        if (!first)
+            result += "; ";
+        first = false;
+        result += cookie.toRawForm(QNetworkCookie::NameAndValueOnly);
+    }
+    req.setRawHeader ("Cookie", result);
+}//NwReqTracker::setCookies
+
+QUrl
+NwReqTracker::hasMoved(QNetworkReply *reply)
+{
+    QUrl url = reply->attribute(QNetworkRequest::RedirectionTargetAttribute)
+                     .toUrl ();
+
+    do { // Begin cleanup block (not a loop)
+        if (url.isEmpty ()) {
+            break;
+        }
+        if ((url.scheme () == "https") || (url.scheme () == "http")) {
+            break;
+        }
+
+        QString result = url.scheme ();
+        if (!result.isEmpty ()) {
+            break;
+        }
+
+        result = url.toString ();
+        int pos = result.indexOf ("https://");
+        if (-1 == pos) {
+            break;
+        }
+
+        url = QUrl(result.remove (0, pos));
+        Q_DEBUG("url:") << url.toString ();
+    } while (0); // End cleanup block (not a loop)
+    return url;
+}//NwReqTracker::hasMoved

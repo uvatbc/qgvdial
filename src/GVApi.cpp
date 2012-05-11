@@ -194,23 +194,6 @@ GVApi::beautify_number (QString &strNumber)
     } while (0); // End cleanup block (not a loop)
 }//GVApi::beautify_number
 
-void
-GVApi::setCookies(QNetworkRequest &req)
-{
-    // Different version of Qt mess up the cookie setup logic. Do it myself
-    // to be absolutely sure.
-    QList<QNetworkCookie> cookies = jar->cookiesForUrl(req.url());
-    QByteArray result;
-    bool first = true;
-    foreach (const QNetworkCookie &cookie, cookies) {
-        if (!first)
-            result += "; ";
-        first = false;
-        result += cookie.toRawForm(QNetworkCookie::NameAndValueOnly);
-    }
-    req.setRawHeader ("Cookie", result);
-}//GVApi::setCookies
-
 bool
 GVApi::doGet(QUrl url, AsyncTaskToken *token, QObject *receiver, const char *method)
 {
@@ -221,20 +204,22 @@ GVApi::doGet(QUrl url, AsyncTaskToken *token, QObject *receiver, const char *met
     QNetworkRequest req(url);
     req.setRawHeader("User-Agent", UA_IPHONE4);
 
-    setCookies (req);
+    NwReqTracker::setCookies (jar, req);
 
     QNetworkReply *reply = nwMgr.get(req);
     if (!reply) {
         return false;
     }
 
-    NwReqTracker *tracker = new NwReqTracker(reply, token, NW_REPLY_TIMEOUT,
-                                             emitLog, true, this);
+    NwReqTracker *tracker = new NwReqTracker(reply, nwMgr, token,
+                                        NW_REPLY_TIMEOUT, emitLog, true, this);
     if (!tracker) {
         reply->abort ();
         reply->deleteLater ();
         return false;
     }
+
+    tracker->setAutoRedirect (jar, UA_IPHONE4, true);
 
     token->apiCtx = tracker;
 
@@ -270,20 +255,22 @@ GVApi::doPost(QUrl url, QByteArray postData, const char *contentType,
     req.setRawHeader("User-Agent", ua);
     req.setHeader (QNetworkRequest::ContentTypeHeader, contentType);
 
-    setCookies (req);
+    NwReqTracker::setCookies (jar, req);
 
     QNetworkReply *reply = nwMgr.post(req, postData);
     if (!reply) {
         return false;
     }
 
-    NwReqTracker *tracker = new NwReqTracker(reply, token, NW_REPLY_TIMEOUT,
-                                             emitLog, this);
+    NwReqTracker *tracker =
+    new NwReqTracker(reply, nwMgr, token, NW_REPLY_TIMEOUT, emitLog, this);
     if (!tracker) {
         reply->abort ();
         reply->deleteLater ();
         return false;
     }
+
+    tracker->setAutoRedirect (jar, ua, true);
 
     token->apiCtx = tracker;
 
@@ -382,37 +369,6 @@ GVApi::getSelfNumber()
     return strSelfNumber;
 }//GVApi::getSelfNumber
 
-QUrl
-GVApi::hasMoved(QNetworkReply *reply)
-{
-    QUrl url = reply->attribute(QNetworkRequest::RedirectionTargetAttribute)
-                     .toUrl ();
-
-    do { // Begin cleanup block (not a loop)
-        if (url.isEmpty ()) {
-            break;
-        }
-        if ((url.scheme () == "https") || (url.scheme () == "http")) {
-            break;
-        }
-
-        QString result = url.scheme ();
-        if (!result.isEmpty ()) {
-            break;
-        }
-
-        result = url.toString ();
-        int pos = result.indexOf ("https://");
-        if (-1 == pos) {
-            break;
-        }
-
-        url = QUrl(result.remove (0, pos));
-        Q_DEBUG("url:") << url.toString ();
-    } while (0); // End cleanup block (not a loop)
-    return url;
-}//GVApi::hasMoved
-
 void
 GVApi::cancel(AsyncTaskToken *token)
 {
@@ -468,7 +424,7 @@ GVApi::doLogin1(QUrl url, AsyncTaskToken *token)
 }//GVApi::doLogin1
 
 void
-GVApi::onLogin1(bool success, const QByteArray &response, QNetworkReply *reply,
+GVApi::onLogin1(bool success, const QByteArray &response, QNetworkReply *,
                 void *ctx)
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
@@ -476,12 +432,6 @@ GVApi::onLogin1(bool success, const QByteArray &response, QNetworkReply *reply,
 
     do { // Begin cleanup block (not a loop)
         if (!success) break;
-
-        QUrl urlMoved = hasMoved (reply);
-        if (!urlMoved.isEmpty ()) {
-            doLogin1 (urlMoved, token);
-            break;
-        }
 
         // We may have completed login already. Check for cookie "gvx"
         foreach (QNetworkCookie cookie, jar->getAllCookies ()) {
@@ -649,7 +599,7 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
         if (!success) break;
 
         // There will be 2-3 moved temporarily redirects.
-        QUrl urlMoved = hasMoved(reply);
+        QUrl urlMoved = NwReqTracker::hasMoved(reply);
         if (!urlMoved.isEmpty ()) {
             if (urlMoved.toString().contains ("smsAuth", Qt::CaseInsensitive)) {
                 if (emitLog) {
@@ -832,7 +782,7 @@ GVApi::onTwoFactorLogin(bool success, const QByteArray &response,
     do { // Begin cleanup block (not a loop)
         if (!success) break;
 
-        QUrl urlMoved = hasMoved (reply);
+        QUrl urlMoved = NwReqTracker::hasMoved (reply);
         if (!urlMoved.isEmpty ()) {
             success = beginTwoFactorAuth (urlMoved, token);
             break;
@@ -987,23 +937,14 @@ GVApi::getRnr(AsyncTaskToken *token)
 }//GVApi::getRnr
 
 void
-GVApi::onGotRnr(bool success, const QByteArray &response,
-                QNetworkReply *reply, void *ctx)
+GVApi::onGotRnr(bool success, const QByteArray &response, QNetworkReply *,
+                void *ctx)
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QString strResponse = response;
 
     do { // Begin cleanup block (not a loop)
         if (!success) break;
-
-        QUrl urlMoved = hasMoved (reply);
-        if (!urlMoved.isEmpty ()) {
-            success = doGet(urlMoved, token, this,
-                            SLOT(onGotRnr(bool,const QByteArray &,
-                                          QNetworkReply *, void *)));
-            Q_ASSERT(success);
-            break;
-        }
 
         success = false;
         int pos = strResponse.indexOf ("_rnr_se");
@@ -1099,8 +1040,8 @@ GVApi::getPhones(AsyncTaskToken *token)
 }//GVApi::getPhones
 
 void
-GVApi::onGetPhones(bool success, const QByteArray &response,
-                   QNetworkReply *reply, void *ctx)
+GVApi::onGetPhones(bool success, const QByteArray &response, QNetworkReply *,
+                   void *ctx)
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QString strReply = response;
@@ -1111,14 +1052,6 @@ GVApi::onGetPhones(bool success, const QByteArray &response,
             break;
         }
         success = false;
-
-        QUrl urlMoved = hasMoved (reply);
-        if (!urlMoved.isEmpty ()) {
-            success = doGet (urlMoved, token, this,
-                             SLOT(onGetPhones(bool, const QByteArray &,
-                                              QNetworkReply *, void *)));
-            break;
-        }
 
         QXmlInputSource inputSource;
         QXmlSimpleReader simpleReader;
@@ -1137,7 +1070,7 @@ GVApi::onGetPhones(bool success, const QByteArray &response,
         if (scriptEngine.hasUncaughtException ()) {
             strTemp = QString ("Could not assign json to obj : %1")
                       .arg (scriptEngine.uncaughtException().toString());
-            qWarning() << strTemp;
+            Q_WARN(strTemp);
             if (emitLog) {
                 Q_DEBUG("Data from GV:") << strReply;
             }
@@ -1149,7 +1082,7 @@ GVApi::onGetPhones(bool success, const QByteArray &response,
         if (scriptEngine.hasUncaughtException ()) {
             strTemp = QString ("Could not parse primaryDid from obj : %1")
                       .arg (scriptEngine.uncaughtException().toString());
-            qWarning() << strTemp;
+            Q_WARN(strTemp);
             if (emitLog) {
                 Q_DEBUG("Data from GV:") << strReply;
             }
@@ -1159,7 +1092,7 @@ GVApi::onGetPhones(bool success, const QByteArray &response,
         token->outParams["self_number"] = strSelfNumber;
 
         if ("CLIENT_ONLY" == strSelfNumber) {
-            qWarning ("This account has not been configured. No phone calls possible.");
+            Q_WARN("This account has not been configured. No phone calls possible.");
         }
 
         strTemp = "var phoneParams = []; "
@@ -1171,7 +1104,7 @@ GVApi::onGetPhones(bool success, const QByteArray &response,
         if (scriptEngine.hasUncaughtException ()) {
             strTemp = QString ("Uncaught exception executing script : %1")
                       .arg (scriptEngine.uncaughtException().toString());
-            qWarning() << strTemp;
+            Q_WARN(strTemp);
             if (emitLog) {
                 Q_DEBUG("Data from GV:") << strReply;
             }
@@ -1193,7 +1126,7 @@ GVApi::onGetPhones(bool success, const QByteArray &response,
             if (scriptEngine.hasUncaughtException ()) {
                 strTemp = QString ("Uncaught exception in phone loop: %1")
                           .arg (scriptEngine.uncaughtException().toString());
-                qWarning() << strTemp;
+                Q_WARN(strTemp);
                 if (emitLog) {
                     Q_DEBUG("Data from GV:") << strReply;
                 }
@@ -1216,7 +1149,7 @@ GVApi::onGetPhones(bool success, const QByteArray &response,
                     strTemp =
                     QString ("Uncaught exception in phone params loop: %1")
                             .arg (scriptEngine.uncaughtException().toString());
-                    qWarning() << strTemp;
+                    Q_WARN(strTemp);
                     if (emitLog) {
                         Q_DEBUG("Data from GV:") << strReply;
                     }
@@ -1321,8 +1254,8 @@ GVApi::getInbox(AsyncTaskToken *token)
 }//GVApi::getInbox
 
 void
-GVApi::onGetInbox(bool success, const QByteArray &response,
-                  QNetworkReply *reply, void *ctx)
+GVApi::onGetInbox(bool success, const QByteArray &response, QNetworkReply *,
+                  void *ctx)
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QString strReply = response;
@@ -1333,14 +1266,6 @@ GVApi::onGetInbox(bool success, const QByteArray &response,
             break;
         }
         success = false;
-
-        QUrl urlMoved = hasMoved (reply);
-        if (!urlMoved.isEmpty ()) {
-            success = doGet (urlMoved, token, this,
-                             SLOT(onGetInbox(bool, const QByteArray &,
-                                             QNetworkReply *, void *)));
-            break;
-        }
 
         QXmlInputSource inputSource;
         QXmlSimpleReader simpleReader;
@@ -1390,11 +1315,11 @@ GVApi::parseInboxJson(const QString &strJson, const QString &strHtml,
 
     QTemporaryFile fHtml, fSms;
     if (!fHtml.open()) {
-        qWarning ("Failed to open HTML buffer temporary file");
+        Q_WARN ("Failed to open HTML buffer temporary file");
         return false;
     }
     if (!fSms.open()) {
-        qWarning ("Failed to open SMS buffer temporary file");
+        Q_WARN ("Failed to open SMS buffer temporary file");
         return false;
     }
     fHtml.write(strFixedHtml.toUtf8());
@@ -1514,18 +1439,18 @@ GVApi::parseInboxJson(const QString &strJson, const QString &strHtml,
             }
 
             if (inboxEntry.id.isEmpty()) {
-                qWarning ("Invalid ID");
+                Q_WARN ("Invalid ID");
                 continue;
             }
             if (inboxEntry.strPhoneNumber.isEmpty()) {
-                qWarning ("Invalid Phone number");
+                Q_WARN ("Invalid Phone number");
                 inboxEntry.strPhoneNumber = "Unknown";
             }
             if (inboxEntry.strDisplayNumber.isEmpty()) {
                 inboxEntry.strDisplayNumber = "Unknown";
             }
             if (!inboxEntry.startTime.isValid ()) {
-                qWarning ("Invalid start time");
+                Q_WARN ("Invalid start time");
                 continue;
             }
 
@@ -1613,7 +1538,7 @@ GVApi::parseMessageRow(QString &strRow, GVInboxEntry &entry)
         doc.setContent (strRow);
         QDomElement topElement = doc.childNodes ().at (0).toElement ();
         if (topElement.isNull ()) {
-            qWarning("Top element is null");
+            Q_WARN ("Top element is null");
             break;
         }
 
@@ -1737,7 +1662,7 @@ GVApi::callOut(AsyncTaskToken *token)
 }//GVApi::callOut
 
 void
-GVApi::onCallout(bool success, const QByteArray &response, QNetworkReply *reply,
+GVApi::onCallout(bool success, const QByteArray &response, QNetworkReply *,
                  void *ctx)
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
@@ -1749,14 +1674,6 @@ GVApi::onCallout(bool success, const QByteArray &response, QNetworkReply *reply,
             break;
         }
         success = false;
-
-        QUrl urlMoved = hasMoved (reply);
-        if (!urlMoved.isEmpty ()) {
-            success = doGet (urlMoved, token, this,
-                             SLOT(onCallout(bool, const QByteArray &,
-                                            QNetworkReply *, void *)));
-            break;
-        }
 
         QString strTemp = strReply.mid (strReply.indexOf (",\n"));
         if (strTemp.startsWith (',')) {
@@ -1850,8 +1767,8 @@ GVApi::callBack(AsyncTaskToken *token)
 }//GVApi::callBack
 
 void
-GVApi::onCallback(bool success, const QByteArray &response,
-                  QNetworkReply *reply, void *ctx)
+GVApi::onCallback(bool success, const QByteArray &response, QNetworkReply *,
+                  void *ctx)
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QString strReply = response;
@@ -1862,14 +1779,6 @@ GVApi::onCallback(bool success, const QByteArray &response,
             break;
         }
         success = false;
-
-        QUrl urlMoved = hasMoved (reply);
-        if (!urlMoved.isEmpty ()) {
-            success = doGet (urlMoved, token, this,
-                             SLOT(onCallback(bool, const QByteArray &,
-                                             QNetworkReply *, void *)));
-            break;
-        }
 
 #if 0
         Q_DEBUG(strReply);
@@ -1968,7 +1877,7 @@ GVApi::doSendSms(QUrl url, AsyncTaskToken *token)
 }//GVApi::doSendSms
 
 void
-GVApi::onSendSms(bool success, const QByteArray &response, QNetworkReply *reply,
+GVApi::onSendSms(bool success, const QByteArray &response, QNetworkReply *,
                  void *ctx)
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
@@ -1980,13 +1889,6 @@ GVApi::onSendSms(bool success, const QByteArray &response, QNetworkReply *reply,
             break;
         }
         success = false;
-
-        QUrl urlMoved = hasMoved (reply);
-        if (!urlMoved.isEmpty ()) {
-            QUrl url(urlMoved);
-            success = doSendSms (url, token);
-            break;
-        }
 
 #if 0
         Q_DEBUG(strReply);
@@ -2057,7 +1959,7 @@ GVApi::getVoicemail(AsyncTaskToken *token)
 }//GVApi::getVoicemail
 
 void
-GVApi::onVmail(bool success, const QByteArray &response, QNetworkReply *reply,
+GVApi::onVmail(bool success, const QByteArray &response, QNetworkReply *,
                void *ctx)
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
@@ -2069,14 +1971,6 @@ GVApi::onVmail(bool success, const QByteArray &response, QNetworkReply *reply,
             break;
         }
         success = false;
-
-        QUrl urlMoved = hasMoved (reply);
-        if (!urlMoved.isEmpty ()) {
-            success = doGet(urlMoved, token, this,
-                             SLOT(onVmail(bool, const QByteArray &,
-                                          QNetworkReply *, void *)));
-            break;
-        }
 
         QFile file(token->inParams["file_location"].toString());
         if (!file.open(QFile::ReadWrite)) {
@@ -2142,8 +2036,8 @@ GVApi::markInboxEntryAsRead(AsyncTaskToken *token)
 }//GVApi::markInboxEntryAsRead
 
 void
-GVApi::onMarkAsRead(bool success, const QByteArray &response,
-                    QNetworkReply *reply, void *ctx)
+GVApi::onMarkAsRead(bool success, const QByteArray &response, QNetworkReply *,
+                    void *ctx)
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QString strReply = response;
@@ -2154,20 +2048,6 @@ GVApi::onMarkAsRead(bool success, const QByteArray &response,
             break;
         }
         success = false;
-
-        QUrl urlMoved = hasMoved (reply);
-        if (!urlMoved.isEmpty ()) {
-            QUrl url(urlMoved);
-            QString strContent = QString("messages=%1&read=1&_rnr_se=%2")
-                                    .arg(token->inParams["id"].toString())
-                                    .arg(rnr_se);
-            success = doPost(url, strContent.toAscii(), POST_FORM, UA_DESKTOP,
-                             token, this,
-                             SLOT(onMarkAsRead(bool, const QByteArray &,
-                                               QNetworkReply *, void *)));
-            Q_ASSERT(success);
-            break;
-        }
 
 #if 0
         Q_DEBUG(strReply);

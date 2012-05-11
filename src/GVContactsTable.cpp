@@ -108,7 +108,7 @@ GVContactsTable::doGet(QUrl url, void *ctx, QObject *obj, const char *method)
     }
 
     NwReqTracker *tracker =
-    new NwReqTracker(reply, ctx, NW_REPLY_TIMEOUT, false, true, this);
+    new NwReqTracker(reply, nwMgr, ctx, NW_REPLY_TIMEOUT, false, true, this);
     if (!tracker) {
         reply->abort ();
         reply->deleteLater ();
@@ -144,7 +144,7 @@ GVContactsTable::doPost(QUrl url, QByteArray postData, const char *contentType,
     }
 
     NwReqTracker *tracker =
-    new NwReqTracker(reply, ctx, NW_REPLY_TIMEOUT, false, this);
+    new NwReqTracker(reply, nwMgr, ctx, NW_REPLY_TIMEOUT, false, this);
     if (!tracker) {
         reply->abort ();
         reply->deleteLater ();

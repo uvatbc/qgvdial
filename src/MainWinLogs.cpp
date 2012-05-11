@@ -162,8 +162,8 @@ MainWindow::onSigSendLogs()
         return;
     }
 
-    NwReqTracker *tracker = new NwReqTracker(reply, NULL, NW_REPLY_TIMEOUT,
-                                             true, this);
+    NwReqTracker *tracker = new NwReqTracker(reply, *nwMgr, NULL,
+                                             NW_REPLY_TIMEOUT, true, this);
     connect(tracker, SIGNAL(sigDone(bool,QByteArray,QNetworkReply*,void*)),
             this, SLOT(onGetLogLocation(bool,QByteArray,QNetworkReply*,void*)));
 }//MainWindow::onSigSendLogs
@@ -254,8 +254,8 @@ MainWindow::onGetLogLocation(bool success, const QByteArray &response,
             break;
         }
 
-        NwReqTracker *tracker = new NwReqTracker(reply, token, NW_REPLY_TIMEOUT,
-                                                 true, this);
+        NwReqTracker *tracker = new NwReqTracker(reply, *nwMgr, token,
+                                                 NW_REPLY_TIMEOUT, true, this);
         connect(tracker, SIGNAL(sigDone(bool,QByteArray,QNetworkReply*,void*)),
                 this, SLOT(onLogPosted(bool,QByteArray,QNetworkReply*,void*)));
     } while (0); // End cleanup block (not a loop)

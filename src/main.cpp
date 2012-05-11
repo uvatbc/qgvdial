@@ -69,6 +69,11 @@ myMessageOutput(QtMsgType type, const char *msg)
                      .arg(level)
                      .arg(msg);
 
+    // Ignore some log messages.
+    if (strLog.contains ("touch point pressed twice")) {
+        return;
+    }
+
     // Send to standard output
     cout << strLog.toStdString () << endl;
 

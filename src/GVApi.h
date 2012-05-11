@@ -120,10 +120,7 @@ private slots:
     void onVmail(bool success, const QByteArray &response, QNetworkReply *reply,
                  void *ctx);
 private:
-    QUrl hasMoved(QNetworkReply *reply);
     bool getSystemProxies (QNetworkProxy &http, QNetworkProxy &https);
-
-    void setCookies(QNetworkRequest &req);
 
     bool doGet(QUrl url, AsyncTaskToken *token, QObject *receiver,
                const char *method);

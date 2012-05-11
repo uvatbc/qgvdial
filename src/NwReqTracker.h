@@ -10,17 +10,24 @@ class NwReqTracker : public QObject
 {
     Q_OBJECT
 public:
-    NwReqTracker(QNetworkReply *r, void *c, quint32 timeout = NW_REPLY_TIMEOUT,
-                 bool bEmitlog = true, bool autoDel = true,
-                 QObject *parent = 0);
+    NwReqTracker(QNetworkReply *r, QNetworkAccessManager &nwManager, void *c,
+                 quint32 timeout = NW_REPLY_TIMEOUT, bool bEmitlog = true,
+                 bool autoDel = true, QObject *parent = NULL);
+
     void abort();
     void setTimeout(quint32 timeout);
 
-    void setAutoRedirect(bool set);
+    void setAutoRedirect(QNetworkCookieJar *j, const QByteArray &ua, bool set);
+    static void setCookies(QNetworkCookieJar *jar, QNetworkRequest &req);
+    static QUrl hasMoved(QNetworkReply *reply);
 
 signals:
     void sigDone(bool success, QByteArray response, QNetworkReply *r, void *ctx);
     void sigProgress(double percent);
+
+protected:
+    void init(QNetworkReply *r, void *c, quint32 timeout, bool bEmitlog,
+              bool autoDel);
 
 protected slots:
     void onReplyFinished();
@@ -43,6 +50,9 @@ protected:
     void           *ctx;
 
     bool            autoRedirect;
+    QNetworkCookieJar *jar;
+    QByteArray      uaString;
+    QNetworkAccessManager &nwMgr;
 };
 
 #endif // NWREQTRACKER_H
