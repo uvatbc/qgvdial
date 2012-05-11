@@ -16,6 +16,8 @@ public:
     void abort();
     void setTimeout(quint32 timeout);
 
+    void setAutoRedirect(bool set);
+
 signals:
     void sigDone(bool success, QByteArray response, QNetworkReply *r, void *ctx);
     void sigProgress(double percent);
@@ -38,7 +40,9 @@ protected:
     bool            autoDelete;
     bool            emitLog;
 
-    void            *ctx;
+    void           *ctx;
+
+    bool            autoRedirect;
 };
 
 #endif // NWREQTRACKER_H

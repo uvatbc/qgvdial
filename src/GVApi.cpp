@@ -197,10 +197,18 @@ GVApi::beautify_number (QString &strNumber)
 void
 GVApi::setCookies(QNetworkRequest &req)
 {
+    // Different version of Qt mess up the cookie setup logic. Do it myself
+    // to be absolutely sure.
     QList<QNetworkCookie> cookies = jar->cookiesForUrl(req.url());
-    QVariant var;
-    var.setValue (cookies);
-    req.setHeader (QNetworkRequest::CookieHeader, var);
+    QByteArray result;
+    bool first = true;
+    foreach (const QNetworkCookie &cookie, cookies) {
+        if (!first)
+            result += "; ";
+        first = false;
+        result += cookie.toRawForm(QNetworkCookie::NameAndValueOnly);
+    }
+    req.setRawHeader ("Cookie", result);
 }//GVApi::setCookies
 
 bool

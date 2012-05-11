@@ -10,6 +10,7 @@ NwReqTracker::NwReqTracker(QNetworkReply *r, void *c, quint32 timeout,
 , autoDelete(autoDel)
 , emitLog(bEmitlog)
 , ctx(c)
+, autoRedirect(false)
 {
     bool rv = connect (reply, SIGNAL(finished()),
                        this , SLOT(onReplyFinished()));
@@ -155,3 +156,9 @@ NwReqTracker::onXferProgress(qint64 bytesReceived, qint64 bytesTotal)
         replyTimer.start ();
     }
 }//NwReqTracker::onXferProgress
+
+void
+NwReqTracker::setAutoRedirect(bool set)
+{
+    autoRedirect = set;
+}//NwReqTracker::setAutoRedirect
