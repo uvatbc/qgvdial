@@ -297,7 +297,7 @@ void qgv_LogFlush();
 #define MOBILE_OS 0
 #endif
 
-#if defined(Q_WS_X11)
+#if defined(Q_WS_X11) && !defined(DISABLE_TELEPATHY)
 #define TELEPATHY_CAPABLE 1
 #else
 #define TELEPATHY_CAPABLE 0

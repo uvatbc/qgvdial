@@ -4,6 +4,7 @@ TEMPLATE = app
 INCLUDEPATH=../src
 
 CONFIG  *= precompile_header mobility console
+DEFINES += DISABLE_TELEPATHY
 
 # In Windows, add the mosquitto dll
 win32 {
