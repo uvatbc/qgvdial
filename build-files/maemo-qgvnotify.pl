@@ -19,8 +19,7 @@ my $cmd;
 my $line;
 
 # Delete any existing version file
-if (-f ver.cfg)
-{
+if (-f ver.cfg) {
     unlink(ver.cfg);
 }
 # Get the latest version file from the repository
