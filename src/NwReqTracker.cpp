@@ -8,12 +8,19 @@ NwReqTracker::NwReqTracker(QNetworkReply *r, QNetworkAccessManager &nwManager,
 , replyTimer (this)
 , nwMgr (nwManager)
 {
-    init (r, c, timeout, bEmitlog, autoDel);
+    bool rv;
+
+    replyTimer.setSingleShot (true);
+    replyTimer.setInterval (timeout);
+
+    rv = connect (&replyTimer, SIGNAL(timeout()), this, SLOT(onTimedOut()));
+    Q_ASSERT(rv); Q_UNUSED(rv);
+
+    init (r, c, bEmitlog, autoDel);
 }//NwReqTracker::NwReqTracker
 
 void
-NwReqTracker::init(QNetworkReply *r, void *c, quint32 timeout, bool bEmitlog,
-                   bool autoDel)
+NwReqTracker::init(QNetworkReply *r, void *c, bool bEmitlog, bool autoDel)
 {
     reply = r;
     aborted = false;
@@ -24,7 +31,7 @@ NwReqTracker::init(QNetworkReply *r, void *c, quint32 timeout, bool bEmitlog,
 
     bool rv = connect (reply, SIGNAL(finished()),
                        this , SLOT(onReplyFinished()));
-    Q_ASSERT(rv);
+    Q_ASSERT(rv); Q_UNUSED(rv);
     rv = connect (reply, SIGNAL(downloadProgress(qint64,qint64)),
                   this , SLOT(onReplyProgress(qint64,qint64)));
     Q_ASSERT(rv);
@@ -45,14 +52,36 @@ NwReqTracker::init(QNetworkReply *r, void *c, quint32 timeout, bool bEmitlog,
                   this , SLOT(onXferProgress(qint64,qint64)));
     Q_ASSERT(rv);
 
-    replyTimer.setSingleShot (true);
-    replyTimer.setInterval (timeout);
-
-    rv = connect (&replyTimer, SIGNAL(timeout()), this, SLOT(onTimedOut()));
-    Q_ASSERT(rv); Q_UNUSED(rv);
-
+    replyTimer.stop ();
     replyTimer.start ();
 }//NwReqTracker::init
+
+void
+NwReqTracker::disconnectReply()
+{
+    bool rv = disconnect (reply, SIGNAL(finished()),
+                          this , SLOT(onReplyFinished()));
+    Q_ASSERT(rv); Q_UNUSED(rv);
+    rv = disconnect (reply, SIGNAL(downloadProgress(qint64,qint64)),
+                     this , SLOT(onReplyProgress(qint64,qint64)));
+    Q_ASSERT(rv);
+    rv = disconnect (reply, SIGNAL(uploadProgress(qint64,qint64)),
+                     this , SLOT(onReplyProgress(qint64,qint64)));
+    Q_ASSERT(rv);
+    rv = disconnect (reply, SIGNAL(sslErrors(QList<QSslError>)),
+                     this , SLOT(onReplySslErrors(QList<QSslError>)));
+    Q_ASSERT(rv);
+    rv = disconnect (reply, SIGNAL(error(QNetworkReply::NetworkError)),
+                     this , SLOT(onReplyError(QNetworkReply::NetworkError)));
+    Q_ASSERT(rv);
+
+    rv = disconnect (reply, SIGNAL(downloadProgress(qint64,qint64)),
+                     this , SLOT(onXferProgress(qint64,qint64)));
+    Q_ASSERT(rv);
+    rv = disconnect (reply, SIGNAL(uploadProgress(qint64,qint64)),
+                     this , SLOT(onXferProgress(qint64,qint64)));
+    Q_ASSERT(rv);
+}//NwReqTracker::disconnectReply
 
 void
 NwReqTracker::setTimeout(quint32 timeout)
@@ -120,12 +149,33 @@ NwReqTracker::onReplyFinished()
             break;
         }
 
-        init (nextReply, ctx, replyTimer.interval (), emitLog, autoDelete);
+        disconnectReply ();
+        init (nextReply, ctx, emitLog, autoDelete);
+        autoRedirect = true;
 
         done = false;
     } while (0); // End cleanup block (not a loop)
 
     if (done) {
+        if (!autoRedirect && response.contains ("Moved Temporarily")) {
+            QString msg = "Auto-redirect not requested, but page content "
+                          "probably indicates that this page has been "
+                          "temporarily moved. Original request = %1";
+
+            msg = msg.arg (origReply->request().url().toString ());
+
+            QString strResp = response;
+            int pos = strResp.indexOf ("a href=", 0, Qt::CaseInsensitive);
+            if (-1 != pos) {
+                int endpos = strResp.indexOf ("</a>", pos, Qt::CaseInsensitive);
+                if (-1 != endpos) {
+                    msg += "\nRedirect URL = " + strResp.mid(pos+8, endpos-pos);
+                }
+            }
+
+            Q_WARN(msg);
+        }
+
         emit sigDone (rv, response, origReply, ctx);
     }
 
@@ -213,6 +263,8 @@ NwReqTracker::setAutoRedirect(QNetworkCookieJar *j, const QByteArray &ua,
 void
 NwReqTracker::setCookies(QNetworkCookieJar *jar, QNetworkRequest &req)
 {
+    if (jar) return;
+
     // Different version of Qt mess up the cookie setup logic. Do it myself
     // to be absolutely sure.
     QList<QNetworkCookie> cookies = jar->cookiesForUrl(req.url());

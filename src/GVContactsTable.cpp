@@ -101,6 +101,7 @@ GVContactsTable::doGet(QUrl url, void *ctx, QObject *obj, const char *method)
     QByteArray byAuth = QString("GoogleLogin auth=%1")
                                 .arg(strGoogleAuth).toAscii ();
     req.setRawHeader ("Authorization", byAuth);
+    req.setRawHeader("User-Agent", UA_IPHONE4);
 
     QNetworkReply *reply = nwMgr.get(req);
     if (!reply) {
@@ -115,6 +116,7 @@ GVContactsTable::doGet(QUrl url, void *ctx, QObject *obj, const char *method)
         return false;
     }
 
+    tracker->setAutoRedirect (NULL, UA_IPHONE4, true);
     token->apiCtx = tracker;
 
     bool rv =
@@ -137,6 +139,7 @@ GVContactsTable::doPost(QUrl url, QByteArray postData, const char *contentType,
 
     QNetworkRequest req(url);
     req.setHeader (QNetworkRequest::ContentTypeHeader, contentType);
+    req.setRawHeader("User-Agent", UA_IPHONE4);
 
     QNetworkReply *reply = nwMgr.post(req, postData);
     if (!reply) {
@@ -151,6 +154,7 @@ GVContactsTable::doPost(QUrl url, QByteArray postData, const char *contentType,
         return false;
     }
 
+    tracker->setAutoRedirect (NULL, UA_IPHONE4, true);
     token->apiCtx = tracker;
 
     bool rv = connect(tracker,

@@ -26,8 +26,8 @@ signals:
     void sigProgress(double percent);
 
 protected:
-    void init(QNetworkReply *r, void *c, quint32 timeout, bool bEmitlog,
-              bool autoDel);
+    void init(QNetworkReply *r, void *c, bool bEmitlog, bool autoDel);
+    void disconnectReply();
 
 protected slots:
     void onReplyFinished();

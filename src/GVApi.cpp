@@ -220,7 +220,6 @@ GVApi::doGet(QUrl url, AsyncTaskToken *token, QObject *receiver, const char *met
     }
 
     tracker->setAutoRedirect (jar, UA_IPHONE4, true);
-
     token->apiCtx = tracker;
 
     bool rv =
@@ -271,7 +270,6 @@ GVApi::doPost(QUrl url, QByteArray postData, const char *contentType,
     }
 
     tracker->setAutoRedirect (jar, ua, true);
-
     token->apiCtx = tracker;
 
     bool rv = connect(tracker, SIGNAL(sigDone(bool, const QByteArray &,
