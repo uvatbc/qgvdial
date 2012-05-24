@@ -23,8 +23,6 @@ Contact: yuvraaj@gmail.com
 #include "GvXMLParser.h"
 #include "MyXmlErrorHandler.h"
 
-#include <QtXmlPatterns>
-
 GVApi::GVApi(bool bEmitLog, QObject *parent)
 : QObject(parent)
 , emitLog(bEmitLog)
@@ -32,6 +30,7 @@ GVApi::GVApi(bool bEmitLog, QObject *parent)
 , nwMgr(this)
 , jar(new CookieJar(NULL))
 , dbgAlwaysFailDialing (false)
+, scriptEngine (this)
 {
     nwMgr.setCookieJar (jar);
 }//GVApi::GVApi
@@ -1062,7 +1061,6 @@ GVApi::onGetPhones(bool success, const QByteArray &response, QNetworkReply *,
         simpleReader.parse (&inputSource, false);
 
         QString strTemp;
-        QScriptEngine scriptEngine;
         strTemp = "var obj = " + xmlHandler.strJson;
         scriptEngine.evaluate (strTemp);
         if (scriptEngine.hasUncaughtException ()) {
@@ -1325,7 +1323,6 @@ GVApi::parseInboxJson(const QString &strJson, const QString &strHtml,
 
     do { // Begin cleanup block (not a loop)
         QString strTemp;
-        QScriptEngine scriptEngine;
         strTemp = "var obj = " + strJson;
         scriptEngine.evaluate (strTemp);
         if (scriptEngine.hasUncaughtException ()) {
@@ -1682,7 +1679,6 @@ GVApi::onCallout(bool success, const QByteArray &response, QNetworkReply *,
         Q_DEBUG(strTemp);
 #endif
 
-        QScriptEngine scriptEngine(this);
         strTemp = QString("var obj = %1; "
                           "obj.call_through_response.access_number;")
                           .arg(strTemp);
@@ -1787,7 +1783,6 @@ GVApi::onCallback(bool success, const QByteArray &response, QNetworkReply *,
             strTemp = strTemp.mid (strTemp.indexOf ('{'));
         }
 
-        QScriptEngine scriptEngine(this);
         strTemp = QString("var obj = %1; obj.ok;").arg(strTemp);
         strTemp = scriptEngine.evaluate (strTemp).toString ();
         if (scriptEngine.hasUncaughtException ()) {
@@ -1897,7 +1892,6 @@ GVApi::onSendSms(bool success, const QByteArray &response, QNetworkReply *,
             strTemp = strTemp.mid (strTemp.indexOf ('{'));
         }
 
-        QScriptEngine scriptEngine(this);
         strTemp = QString("var obj = %1; obj.send_sms_response.status.status;")
                     .arg(strTemp);
         strTemp = scriptEngine.evaluate (strTemp).toString ();
@@ -2056,7 +2050,6 @@ GVApi::onMarkAsRead(bool success, const QByteArray &response, QNetworkReply *,
             strTemp = strTemp.mid (strTemp.indexOf ('{'));
         }
 
-        QScriptEngine scriptEngine(this);
         strTemp = QString("var obj = %1; obj.ok;").arg(strTemp);
         strTemp = scriptEngine.evaluate (strTemp).toString ();
         if (scriptEngine.hasUncaughtException ()) {

@@ -167,6 +167,8 @@ private:
     QVariantMap hiddenLoginFields;
 
     bool dbgAlwaysFailDialing;
+
+    QScriptEngine scriptEngine;
 };
 
 #endif // GVAPI_H
