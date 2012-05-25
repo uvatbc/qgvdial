@@ -60,6 +60,7 @@ MainWindow::doLogin ()
 
         osd.setLongWork (this, true);
 
+        gvApiProgressString = "Login progress";
         if (!gvApi.login (token)) {
             Q_WARN("Login returned immediately with failure!");
             osd.setLongWork (this, false);
@@ -124,6 +125,8 @@ MainWindow::on_action_Login_triggered ()
 void
 MainWindow::loginCompleted (AsyncTaskToken *token)
 {
+    gvApiProgressString.clear ();
+
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
 
     if (!token) {

@@ -114,6 +114,7 @@ MainWindow::retrieveVoicemail (const QString &strVmailLink)
         rv = connect (token, SIGNAL(completed(AsyncTaskToken*)),
                       this , SLOT(onVmailDownloaded(AsyncTaskToken*)));
 
+        gvApiProgressString = "Voicemail progress";
         token->inParams["vmail_link"] = strVmailLink;
         token->inParams["file_location"] = strTemp;
         if (!gvApi.getVoicemail (token)) {
@@ -132,6 +133,8 @@ MainWindow::retrieveVoicemail (const QString &strVmailLink)
 void
 MainWindow::onVmailDownloaded (AsyncTaskToken *token)
 {
+    gvApiProgressString.clear ();
+
     QString strFilename = token->inParams["file_location"].toString();
     if (ATTS_SUCCESS == token->status) {
         QString strVmailLink = token->inParams["vmail_link"].toString();

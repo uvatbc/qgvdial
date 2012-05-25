@@ -329,7 +329,13 @@ private:
     bool            bRunMqThread;
 #endif
 
+    //! Turn on this flag to make sure MQ Thread quits sooner. Can be used for
+    //  other quit synchronisations as well.
     bool            bQuitPath;
+
+    //! Use this to format a progress string:
+    //  QString("Progress : %1%").arg(progressPercent);
+    QString         gvApiProgressString;
 };
 
 #endif // MAINWINDOW_H

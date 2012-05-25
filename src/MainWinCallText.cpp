@@ -158,6 +158,7 @@ MainWindow::dialNow (const QString &strTarget)
 
         showMsgBox (ctx->getMsgBoxText ());
 
+        gvApiProgressString = "Call progress";
         if (bDialout) {
             ctx->ci = ci;
 
@@ -256,6 +257,8 @@ MainWindow::onSigDialComplete (DialContext *ctx, bool ok)
 void
 MainWindow::dialComplete (AsyncTaskToken *token)
 {
+    gvApiProgressString.clear ();
+
     QMutexLocker locker (&mtxDial);
     DialContext *ctx = (DialContext *) token->callerCtx;
     bool bReleaseContext = true;
@@ -396,12 +399,9 @@ void
 MainWindow::sendSMSDone (bool bOk, const QVariantList &params)
 {
     QString msg;
-    if (!bOk)
-    {
+    if (!bOk) {
         msg = QString("Failed to send SMS to %1").arg (params[0].toString());
-    }
-    else
-    {
+    } else {
         msg = QString("SMS sent to %1").arg (params[0].toString());
     }
 

@@ -49,7 +49,7 @@ Item {
             }
 
             width: parent.width
-            height: ((delegateRadioButton.height + spacing) * (regPhoneModel.count)) + 5
+            height: ((delegateRadioButton.height + spacing) * regPhoneModel.count) + 5
             interactive: false
 
             model: ListModel {
@@ -58,7 +58,7 @@ Item {
             }//ListModel (of the registered phones)
 
             delegate: RadioButton {
-                width: parent.width
+                width: registeredPhonesView.width
                 text: entryText
                 check: isChecked
                 autoChange: false

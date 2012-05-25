@@ -722,6 +722,7 @@ MainWindow::refreshRegisteredNumbers ()
             Q_WARN("Get registered numbers failed at the start!!!");
             break;
         }
+        gvApiProgressString = "Getting user phones";
     } while (0); // End cleanup block (not a loop)
 
     if (!rv) {
@@ -756,6 +757,7 @@ MainWindow::gotAllRegisteredPhones (AsyncTaskToken *token)
         setStatus ("GV callbacks retrieved.");
     } while (0); // End cleanup block (not a loop)
 
+    gvApiProgressString.clear ();
     token->deleteLater ();
 }//MainWindow::gotAllRegisteredPhones
 
@@ -1243,7 +1245,13 @@ MainWindow::getQMLObject(const char *pageName)
 void
 MainWindow::onSigGvApiProgress(double percent)
 {
-    QString msg = QString("Progress : %1%").arg (percent);
+    QString msg;
+
+    if (gvApiProgressString.isEmpty ()) {
+        msg = QString("Progress : %1%").arg(percent);
+    } else {
+        msg = QString("%1 : %2%").arg(gvApiProgressString).arg(percent);
+    }
     setStatus (msg);
 }//MainWindow::onSigGvApiProgress
 
