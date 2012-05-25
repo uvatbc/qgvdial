@@ -69,6 +69,8 @@ system("mv $basedir/build-files/postinst.maemo-qgvnotify $basedir/debian/postins
 system("mv $basedir/build-files/prerm.maemo-qgvnotify $basedir/debian/prerm");
 # Fix the control file
 system("mv $basedir/build-files/control.maemo-qgvnotify $basedir/debian/control");
+# Copy the rules file
+system("mv $basedir/build-files/qgvnotify.$target.rules $basedir/debian/rules");
 
 system("head -1 $basedir/debian/changelog >dest.txt ; cat $basedir/build-files/changelog.qgvnotify >>dest.txt ; tail -2 $basedir/debian/changelog | head -1 | sed 's/unknown/Yuvraaj Kelkar/g' >>dest.txt ; mv dest.txt $basedir/debian/changelog");
 
