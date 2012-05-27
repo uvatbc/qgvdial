@@ -1628,11 +1628,14 @@ GVApi::callOut(AsyncTaskToken *token)
         return true;
     }
 
+    QString dest = token->inParams["destination"].toString();
     QUrl url(GV_HTTPS_M "/x");
     url.addQueryItem("m" , "call");
-    url.addQueryItem("n" , token->inParams["destination"].toString());
+    url.addQueryItem("n" , dest);
     url.addQueryItem("f" , "");
     url.addQueryItem("v" , "7");
+
+    Q_DEBUG(QString("Call back: dest=%1, using=").arg(dest));
 
     QByteArray content;
     QList<QNetworkCookie> allCookies = jar->getAllCookies ();
@@ -1751,6 +1754,8 @@ GVApi::callBack(AsyncTaskToken *token)
 
     strContent += QString("&subscriberNumber=%1&remember=1&_rnr_se=%2")
                     .arg (strSelfNumber, rnr_se);
+
+    Q_DEBUG(QString("Call back request = %1").arg(strContent));
 
     bool rv = doPostForm(url, strContent.toAscii (), token, this,
                          SLOT(onCallback(bool, const QByteArray &,
