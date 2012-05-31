@@ -711,7 +711,7 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
 
         // After this we should have completed login. Check for cookie "gvx"
         foreach (QNetworkCookie cookie, jar->getAllCookies ()) {
-            if (cookie.name () == "gvx") {
+            if (cookie.name() == "gvx") {
                 loggedIn = true;
                 break;
             }

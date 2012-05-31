@@ -79,9 +79,11 @@ Rectangle {
             height: 0
 
             Text {
-                anchors.bottom: parent.top
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.bottomMargin: 10
+                anchors {
+                    bottom: parent.top
+                    horizontalCenter: parent.horizontalCenter
+                    bottomMargin: 10
+                }
 
                 text: "Release to refresh ..."
                 color: "white"

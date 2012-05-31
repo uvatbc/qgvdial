@@ -70,7 +70,7 @@ myMessageOutput(QtMsgType type, const char *msg)
                      .arg(msg);
 
     // Ignore some log messages.
-    if (strLog.contains ("touch point pressed twice")) {
+    if (strLog.contains("MPanRecognizerTouch")) {
         return;
     }
 
