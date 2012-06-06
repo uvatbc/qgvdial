@@ -36,12 +36,12 @@ Item {
             return;
         }
 
-        var threshold = - contentY;
-        if (threshold > (btnRefresh.height+2)) {
+        var threshold = btnRefresh.height + 2;
+        if ((-contentY) > threshold) {
             //console.debug("true because threshold > button height");
             shouldShow = true;
         }
-        if (threshold > 60) {
+        if ((-contentY) > (threshold * 2)) {
             refreshTime.start();
         }
     }
