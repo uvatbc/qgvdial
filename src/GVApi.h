@@ -90,6 +90,8 @@ private slots:
     void onGotRnr(bool success, const QByteArray &response,
                   QNetworkReply *reply, void *ctx);
 
+    void internalLogoutForReLogin(AsyncTaskToken *token);
+
     // Logout
     void onLogout(bool success, const QByteArray &response,
                   QNetworkReply *reply, void *ctx);

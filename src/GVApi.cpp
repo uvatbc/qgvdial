@@ -925,7 +925,7 @@ GVApi::getRnr(AsyncTaskToken *token)
 {
     Q_DEBUG("User authenticated, now looking for RNR.");
 
-    bool rv = doGet("https://www.google.com/voice/m/i/all", token, this,
+    bool rv = doGet(GV_HTTPS_M "/i/all", token, this,
                     SLOT (onGotRnr(bool, const QByteArray &,
                                    QNetworkReply *, void *)));
     Q_ASSERT(rv);
@@ -934,7 +934,7 @@ GVApi::getRnr(AsyncTaskToken *token)
 }//GVApi::getRnr
 
 void
-GVApi::onGotRnr(bool success, const QByteArray &response, QNetworkReply *,
+GVApi::onGotRnr(bool success, const QByteArray &response, QNetworkReply *reply,
                 void *ctx)
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
@@ -942,6 +942,44 @@ GVApi::onGotRnr(bool success, const QByteArray &response, QNetworkReply *,
 
     do { // Begin cleanup block (not a loop)
         if (!success) break;
+
+        QString strReplyUrl = reply->url().toString();
+        if (!strReplyUrl.contains ("/i/all")) {
+            success = false;
+
+            if (token->outParams["attempts"].toInt() != 0) {
+                Q_WARN("Too many attempts at relogin");
+                break;
+            }
+
+            Q_DEBUG(strReplyUrl);
+
+            // Probably failed to login correctly. Try one more time.
+            AsyncTaskToken *internalLogoutTask = new AsyncTaskToken(this);
+            if (!internalLogoutTask) {
+                Q_WARN("Failed to login because failed to logout!!");
+                break;
+            }
+
+            internalLogoutTask->callerCtx = token;
+
+            success =
+            connect(internalLogoutTask, SIGNAL(completed(AsyncTaskToken*)),
+                    this,  SLOT(internalLogoutForReLogin(AsyncTaskToken*)));
+            Q_ASSERT(success);
+
+            success = logout(internalLogoutTask);
+            if (!success) {
+                internalLogoutTask->deleteLater ();
+                break;
+            }
+
+            int attempts = 1;
+            token->outParams["attempts"] = attempts;
+
+            success = true;
+            break;
+        }
 
         success = false;
         int pos = strResponse.indexOf ("_rnr_se");
@@ -980,6 +1018,14 @@ GVApi::onGotRnr(bool success, const QByteArray &response, QNetworkReply *,
         }
     }
 }//GVApi::onGotRnr
+
+void
+GVApi::internalLogoutForReLogin(AsyncTaskToken *token)
+{
+    AsyncTaskToken *origToken = (AsyncTaskToken *) token->callerCtx;
+    login (origToken);
+    token->deleteLater ();
+}//GVApi::internalLogoutForReLogin
 
 bool
 GVApi::logout(AsyncTaskToken *token)
