@@ -157,6 +157,7 @@ OTHER_FILES  += ../src/winrsrc.rc           \
                 ../qml/HMain.qml            \
                 ../qml/InboxList.qml        \
                 ../qml/Keypad.qml           \
+                ../qml/ListRefreshComponent.qml \
                 ../qml/LoginDetails.qml     \
                 ../qml/LogView.qml          \
                 ../qml/Main.qml             \

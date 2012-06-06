@@ -284,47 +284,6 @@ Rectangle {
         }// MeegoButton (back button)
     }//Rectangle (details)
 
-    Timer {
-        id: refreshTime
-        interval: 1000; running: false; repeat: false
-        onTriggered: {
-            if (listInbox.contentY < -60) {
-                container.sigRefreshInbox();
-            }
-        }
-    }//Timer
-
-    Component {
-        id: listHeader
-
-        Item {
-            width: listInbox.width
-            height: 0
-
-            Text {
-                anchors.bottom: parent.top
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.bottomMargin: 10
-
-                text: "Release to refresh ..."
-                color: "white"
-
-                font { family: "Nokia Sans"; pointSize: (8 * g_fontMul) }
-
-                opacity: {
-                    var threshold = - listInbox.contentY;
-                    if (threshold > 60) {
-                        refreshTime.start();
-                        return 1;
-                    } else {
-                        return 0;
-                    }
-                }//rotation
-                Behavior on rotation { NumberAnimation { duration: 150 } }
-            }//Text
-        }//Item
-    }//Component (listHeader)
-
     Item { //  The combined inbox list and selector list
         id: inboxView
         anchors.fill: parent
@@ -425,7 +384,11 @@ Rectangle {
             width: parent.width
             height: parent.height - barTop.height
 
-            header: listHeader
+            header: ListRefreshComponent {
+                width: listInbox.width
+                onClicked: container.sigRefreshInbox();
+                copyY: listInbox.contentY
+            }
 
             opacity: 1
             clip: true
@@ -559,7 +522,10 @@ Rectangle {
                             container.isVoicemail = false;
                         }
 
-                        container.sigMarkAsRead(link);
+                        if (!is_read) {
+                            container.sigMarkAsRead(link);
+                        }
+
                         container.state = "Details"
                     }
                 }

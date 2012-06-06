@@ -61,49 +61,6 @@ Rectangle {
         onSigClose: container.state= '';
     }//ContactDetails
 
-    Timer {
-        id: refreshTime
-        interval: 1000; running: false; repeat: false
-        onTriggered: {
-            if (contactsView.contentY < -60) {
-                container.sigRefreshContacts();
-            }
-        }
-    }//Timer (to delay the refresh)
-
-    Component {
-        id: listHeader
-
-        Item {
-            width: contactsView.width
-            height: 0
-
-            Text {
-                anchors {
-                    bottom: parent.top
-                    horizontalCenter: parent.horizontalCenter
-                    bottomMargin: 10
-                }
-
-                text: "Release to refresh ..."
-                color: "white"
-
-                font { family: "Nokia Sans"; pointSize: (8 * g_fontMul) }
-
-                opacity: {
-                    var threshold = - contactsView.contentY;
-                    if (threshold > 60) {
-                        refreshTime.start();
-                        return 1;
-                    } else {
-                        return 0;
-                    }
-                }//rotation
-                Behavior on rotation { NumberAnimation { duration: 150 } }
-            }//Text
-        }//Item
-    }//Component (listHeader: "Release to refresh")
-
     Item { // All contacts
         id: allContacts
         anchors.fill: parent
@@ -191,7 +148,12 @@ Rectangle {
             opacity: 1
             spacing: 2
             cacheBuffer: (100 * (allContacts.height + allContacts.width))
-            header: listHeader
+
+            header: ListRefreshComponent {
+                width: contactsView.width
+                onClicked: container.sigRefreshContacts();
+                copyY: contactsView.contentY
+            }
 
             model: imgSearch.selection ? g_contactsSearchModel : g_contactsModel
 //            model: testContactsModelData1
