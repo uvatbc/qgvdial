@@ -42,6 +42,11 @@ MainWindow::doLogin ()
             showMsgBox (tr("Username is empty!"));
             break;
         }
+        if (!strUser.contains ("@")) {
+            Q_WARN(QString("Username without domain! %1").arg (strUser));
+            showMsgBox (tr("Please enter the full username, eg: user@gmail.com"));
+            break;
+        }
 
         token = new AsyncTaskToken(this);
         if (!token) {

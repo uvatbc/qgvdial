@@ -939,20 +939,21 @@ GVApi::onGotRnr(bool success, const QByteArray &response, QNetworkReply *reply,
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QString strResponse = response;
+    QString strReplyUrl = reply->url().toString();
 
     do { // Begin cleanup block (not a loop)
         if (!success) break;
 
-        QString strReplyUrl = reply->url().toString();
-        if (!strReplyUrl.contains ("/i/all")) {
-            success = false;
-
+        success = false;
+        int pos = strResponse.indexOf ("_rnr_se");
+        if (pos == -1) {
             if (token->outParams["attempts"].toInt() != 0) {
                 Q_WARN("Too many attempts at relogin");
                 break;
             }
 
-            Q_DEBUG(strReplyUrl);
+            Q_DEBUG(QString("Current URL = %1. Attempting re-login")
+                        .arg(strReplyUrl));
 
             // Probably failed to login correctly. Try one more time.
             AsyncTaskToken *internalLogoutTask = new AsyncTaskToken(this);
@@ -981,12 +982,6 @@ GVApi::onGotRnr(bool success, const QByteArray &response, QNetworkReply *reply,
             break;
         }
 
-        success = false;
-        int pos = strResponse.indexOf ("_rnr_se");
-        if (pos == -1) {
-            break;
-        }
-
         int pos1 = strResponse.indexOf (">", pos);
         if (pos1 == -1) {
             break;
@@ -1009,8 +1004,10 @@ GVApi::onGotRnr(bool success, const QByteArray &response, QNetworkReply *reply,
     } while (0); // End cleanup block (not a loop)
 
     if (!success) {
-        Q_WARN("Failed to get RNR. User cannot be authenticated.")
-                << strResponse;
+        QString msg = QString("Failed to get RNR. User cannot be "
+                              "authenticated. URL = %1. Response = %2")
+                        .arg(strReplyUrl, strResponse);
+        Q_WARN(msg);
 
         if (token) {
             token->status = ATTS_LOGIN_FAILURE;
