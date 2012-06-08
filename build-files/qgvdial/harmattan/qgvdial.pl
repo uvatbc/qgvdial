@@ -1,33 +1,7 @@
 use Cwd;
 
-my $machine = `uname -m`; chomp $machine;
-my $mad;
-my $asroot;
-my $qtsdk;
 my $repo = "https://qgvdial.googlecode.com/svn/trunk";
 my $cmd;
-my $line;
-my $pathreplace;
-my $curdir = getcwd();
-
-if ($machine ne "arm") {
-    $qtsdk = $ENV{'QTSDK'};
-    if ($qtsdk eq undef) {
-        die "Need to specify QTSDK environment variable";
-    }
-    
-    if (`hostname` =~ m/win/) { # This is the only way I know to differentiate the build machine as windows
-        $pathreplace = "$qtsdk/Maemo/4.6.2/sysroots/fremantle-arm-sysroot-20.2010.36-2-slim";
-        $curdir =~ s/^\/c/C\:/i;
-    }
-
-    $mad = "mad"; 
-} else {
-    $asroot = "fakeroot";
-    $pathreplace = "/targets/FREMANTLE_ARMEL";
-}
-$pathreplace =~ s/\//\\\//g;
-$curdir =~ s/\//\\\//g;
 
 # Delete any existing version file
 system("rm -f ver.cfg");
@@ -76,44 +50,24 @@ print "$cmd\n";
 system($cmd);
 
 # Do everything upto the preparation of the debian directory. Code is still not compiled.
-$cmd = "cd $basedir && $mad qmake && $mad dh_make -n --createorig --single -e yuvraaj\@gmail.com -c lgpl2";
+$cmd = "cd $basedir && qmake && dh_make -n --createorig --single -e yuvraaj\@gmail.com -c lgpl2";
 print "$cmd\n";
 system($cmd);
 
 # Put all the debianization files into the debian folder
-system("cd $basedir/build-files/qgvdial/harmattan ; mv postinst prerm control qgvdial.aegis $basedir/debian/");
+system("cd $basedir/build-files/qgvdial/harmattan ; mv postinst prerm control qgvdial.aegis rules $basedir/debian/");
 
 # Fix the changelog and put it into the correct location
 system("head -1 $basedir/debian/changelog >dest.txt && cat $basedir/build-files/qgvdial/changelog.qgvdial >>dest.txt && tail -2 $basedir/debian/changelog | sed 's/unknown/Yuvraaj Kelkar/g' >>dest.txt && mv dest.txt $basedir/debian/changelog");
 
-# Make sure all make files are present before mucking with them.
-system("cd $basedir && make src/Makefile");
-
-# Strip out "/targets/FREMANTLE_ARMEL/" or "$qtsdk/Maemo/4.6.2/sysroots/fremantle-arm-sysroot-20.2010.36-2-slim"
-$cmd="sed \"s/$pathreplace//ig\" $basedir/Makefile >$basedir/Makefile1 && mv $basedir/Makefile1 $basedir/Makefile && sed \"s/$pathreplace//ig\" $basedir/src/Makefile >$basedir/src/Makefile1 && mv $basedir/src/Makefile1 $basedir/src/Makefile";
-print "$cmd\n";
-system($cmd);
-
-# Replace hard coded current directory with relative directory - pass #1.
-$cmd="sed 's/\$\(INSTALL_ROOT\)//g' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/\$\(INSTALL_ROOT\)//g' $basedir/src/Makefile >$basedir/src/Makefile1 ; mv $basedir/src/Makefile1 $basedir/src/Makefile";
-print "$cmd\n";
-system($cmd);
-
 # Remove the GLESv2 dependency
 $cmd="sed 's/ -lGLESv2//ig' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/ -lGLESv2//ig' $basedir/src/Makefile >$basedir/src/Makefile1 ; mv $basedir/src/Makefile1 $basedir/src/Makefile";
 print "$cmd\n";
-system($cmd);
+#system($cmd);
 
-if ($machine eq "arm") {
-    # Reverse the order of these two lines for a source build 
-    $cmd = "cd $basedir && $mad dpkg-buildpackage -rfakeroot -sa -S -uc -us";
-    $cmd = "cd $basedir && $mad dpkg-buildpackage -rfakeroot -nc -uc -us";
-} else {
-    # Reverse the order of these two lines for a source build 
-    $cmd = "cd $basedir && $mad dpkg-buildpackage -sa -S -uc -us";
-    $cmd = "cd $basedir && $mad dpkg-buildpackage -nc -uc -us";
-}
-# Execute the rest of the build command
+# Reverse the order of these two lines for a source build 
+$cmd = "cd $basedir && dpkg-buildpackage -rfakeroot -sa -S -uc -us";
+$cmd = "cd $basedir && dpkg-buildpackage -rfakeroot -nc -uc -us";
 system($cmd);
 
 exit(0);
