@@ -272,20 +272,15 @@ maemo5|contains(MEEGO_EDITION,harmattan) {
 
     message(maemo5 install)
     OPTPREFIX  = $$PREFIX/../opt/qgvdial
-    BINDIR     = $$OPTPREFIX/bin
-    DATADIR    = $$PREFIX/share
-    OPTDATADIR = $$OPTPREFIX/share
-
-    DEFINES += DATADIR=\"$$DATADIR\" PKGDATADIR=\"$$PKGDATADIR\"
+    DATADIR    = /usr/share
 
     INSTALLS += target desktop icon icon48 icon64 icon_scalable dbusservice
 
-    target.path =$$BINDIR
+    target.path = /opt/qgvdial/bin
 
     desktop.path  = $$DATADIR/applications/hildon
     desktop.files = ../build-files/qgvdial/maemo/qgvdial.desktop
 
-    icon.path = $$OPTDATADIR
     icon.files += qgvdial.png
 
     icon48.path = $$DATADIR/icons/hicolor/48x48/hildon
@@ -325,15 +320,12 @@ contains(MEEGO_EDITION,harmattan) {
 
 # Installation for Linux
 unix:!symbian:!maemo5:!contains(MEEGO_EDITION,harmattan) {
-    BINDIR  = $$PREFIX/bin/qgvdial
-    DATADIR = $$PREFIX/share
-    message($$BINDIR is regular Linux install)
-
-    DEFINES += DATADIR=\"$$DATADIR\" PKGDATADIR=\"$$PKGDATADIR\"
+    DATADIR = /usr/share
+    message(Regular Linux install)
 
     INSTALLS += target icon dbusservice
 
-    target.path =$$BINDIR
+    target.path =/usr/bin/qgvdial
 
     icon.path = $$DATADIR/qgvdial/icons
     icon.files += qgvdial.png
