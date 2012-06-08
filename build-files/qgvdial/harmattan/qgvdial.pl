@@ -51,8 +51,7 @@ $qver = "$qver.$svnver";
 my $basedir = "./qgvdial-$qver";
 
 # Delete any previous checkout directories
-system("rm -rf qgvdial*");
-system("rm -rf qgvtp*");
+system("rm -rf qgvdial* qgvtp*");
 
 $cmd = "ssh uv\@userver_x86 \"cd harmattan/export/qgvdial ; svn export $repo $basedir\"";
 system($cmd);
@@ -69,7 +68,7 @@ print "$cmd\n";
 system($cmd);
 
 # Copy the correct pro file
-system("cp $basedir/build-files/pro.qgvdial $basedir/qgvdial.pro");
+system("cp $basedir/build-files/qgvdial/pro.qgvdial $basedir/qgvdial.pro");
 
 # For the moment, forcibly include mqlib
 $cmd = "cd $basedir/src && touch mqlib-build";
@@ -81,22 +80,11 @@ $cmd = "cd $basedir && $mad qmake && $mad dh_make -n --createorig --single -e yu
 print "$cmd\n";
 system($cmd);
 
-# Add a post install file to add the executable bit after installation on the device
-system("mv $basedir/build-files/postinst.harmattan-qgvdial $basedir/debian/postinst");
-system("mv $basedir/build-files/prerm.harmattan-qgvdial $basedir/debian/prerm");
-# Fix the control file
-system("mv $basedir/build-files/control.harmattan-qgvdial $basedir/debian/control");
-# Add the Aegis manifest file
-system("mv $basedir/build-files/aegis.harmattan.qgvdial $basedir/debian/qgvdial.aegis");
-
-# Fix the dbus service file name. The same files as maemo can be used
-system("mv $basedir/build-files/qgvdial.Call.service.maemo $basedir/build-files/qgvdial.Call.service");
-system("mv $basedir/build-files/qgvdial.Text.service.maemo $basedir/build-files/qgvdial.Text.service");
-# Change the name of the desktop file so that it can be directly used in the compilation
-system("mv $basedir/build-files/qgvdial.desktop.harmattan $basedir/build-files/qgvdial.desktop");
+# Put all the debianization files into the debian folder
+system("cd $basedir/build-files/qgvdial/harmattan ; mv postinst prerm control qgvdial.aegis $basedir/debian/");
 
 # Fix the changelog and put it into the correct location
-system("head -1 $basedir/debian/changelog >dest.txt && cat $basedir/build-files/changelog.qgvdial >>dest.txt && tail -2 $basedir/debian/changelog | sed 's/unknown/Yuvraaj Kelkar/g' >>dest.txt && mv dest.txt $basedir/debian/changelog");
+system("head -1 $basedir/debian/changelog >dest.txt && cat $basedir/build-files/qgvdial/changelog.qgvdial >>dest.txt && tail -2 $basedir/debian/changelog | sed 's/unknown/Yuvraaj Kelkar/g' >>dest.txt && mv dest.txt $basedir/debian/changelog");
 
 # Make sure all make files are present before mucking with them.
 system("cd $basedir && make src/Makefile");

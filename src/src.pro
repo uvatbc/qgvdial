@@ -25,7 +25,8 @@ CONFIG  *= precompile_header mobility
 MOBILITY *= systeminfo
 
 symbian|contains(MEEGO_EDITION,harmattan) {
-MOBILITY *= feedback
+    MOBILITY *= feedback
+    OTHER_FILES += ../build-files/qgvdial/harmattan/qgvdial.desktop
 }
 
 include(qtsingleapplication/qtsingleapplication.pri)
@@ -37,7 +38,7 @@ CONFIG *= embed_manifest_exe
 maemo5 {
     message(Maemo5 your world)
     QT *= maemo5
-    OTHER_FILES += ../build-files/qgvdial.desktop
+    OTHER_FILES += ../build-files/qgvdial/maemo/qgvdial.desktop
 }
 
 # In Linux and maemo, add telepathy and openssl
@@ -281,8 +282,8 @@ maemo5|contains(MEEGO_EDITION,harmattan) {
 
     target.path =$$BINDIR
 
-    desktop.path = $$DATADIR/applications/hildon
-    desktop.files += ../build-files/qgvdial.desktop
+    desktop.path  = $$DATADIR/applications/hildon
+    desktop.files = ../build-files/qgvdial/maemo/qgvdial.desktop
 
     icon.path = $$OPTDATADIR
     icon.files += qgvdial.png
@@ -297,15 +298,16 @@ maemo5|contains(MEEGO_EDITION,harmattan) {
     icon_scalable.files = qgvdial.png
 
     dbusservice.path = $$DATADIR/dbus-1/services
-    dbusservice.files += ../build-files/qgvdial.Call.service
-    dbusservice.files += ../build-files/qgvdial.Text.service
+    dbusservice.files = ../build-files/qgvdial/maemo/qgvdial.Call.service \
+                        ../build-files/qgvdial/maemo/qgvdial.Text.service
 }
 
 # Harmattan specific install section
 contains(MEEGO_EDITION,harmattan) {
     INSTALLS += icon80
 
-    desktop.path = $$DATADIR/applications
+    desktop.path  = $$DATADIR/applications
+    desktop.files = ../build-files/qgvdial/harmattan/qgvdial.desktop
 
     icon48.path = $$DATADIR/icons/hicolor/48x48/apps
 
@@ -316,6 +318,9 @@ contains(MEEGO_EDITION,harmattan) {
 
     icon_scalable.path = $$DATADIR/icons/hicolor/scalable/apps
     icon_scalable.files = qgvdial.png
+
+    dbusservice.files = ../build-files/qgvdial/harmattan/qgvdial.Call.service \
+                        ../build-files/qgvdial/harmattan/qgvdial.Text.service
 }
 
 # Installation for Linux
@@ -334,7 +339,7 @@ unix:!symbian:!maemo5:!contains(MEEGO_EDITION,harmattan) {
     icon.files += qgvdial.png
 
     dbusservice.path = $$DATADIR/dbus-1/services
-    dbusservice.files += ../build-files/qgvdial.Call.service
-    dbusservice.files += ../build-files/qgvdial.Text.service
+    dbusservice.files = ../build-files/qgvdial/ubuntu/qgvdial.Call.service \
+                        ../build-files/qgvdial/ubuntu/qgvdial.Text.service
 }
 
