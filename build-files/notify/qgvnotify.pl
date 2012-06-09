@@ -4,6 +4,11 @@ if (($target eq "") || (($target ne "fremantle") && ($target ne "diablo"))) {
     exit();
 }
 
+my $build_file_dir = $target;
+if ($target ne "fremantle") {
+    $build_file_dir = "maemo";
+}
+
 my $repo = "https://qgvdial.googlecode.com/svn/trunk";
 my $cmd;
 my $line;
@@ -48,14 +53,14 @@ print "$cmd\n";
 system($cmd);
 
 # Copy the correct pro file
-system("cp $basedir/build-files/notify/diablo/pro.qgvnotify $basedir/qgvdial.pro");
+system("cp $basedir/build-files/notify/pro.qgvnotify $basedir/qgvdial.pro");
 
 # Do everything upto the preparation of the debian directory. Code is still not compiled.
-$cmd = "cd $basedir ; qmake && echo y | dh_make --createorig --single -e yuvraaj\@gmail.com -c lgpl2 && qmake";
+$cmd = "cd $basedir ; qmake && echo y | dh_make --createorig --single -e yuvraaj\@gmail.com -c lgpl && qmake";
 system($cmd);
 
 # Put all the debianization files into the debian folder
-system("cd $basedir/build-files/qgvnotify/diablo ; mv postinst prerm control rules $basedir/debian/");
+system("cd $basedir/build-files/notify/$build_file_dir ; mv postinst prerm control rules $basedir/debian/");
 
 # Fix the changelog and put it into the correct location
 system("head -1 $basedir/debian/changelog >dest.txt && cat $basedir/build-files/notify/changelog >>dest.txt && tail -2 $basedir/debian/changelog | sed 's/unknown/Yuvraaj Kelkar/g' >>dest.txt && mv dest.txt $basedir/debian/changelog");
