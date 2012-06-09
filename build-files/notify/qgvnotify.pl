@@ -5,7 +5,7 @@ if (($target eq "") || (($target ne "fremantle") && ($target ne "diablo"))) {
 }
 
 my $build_file_dir = $target;
-if ($target ne "fremantle") {
+if ($target eq "fremantle") {
     $build_file_dir = "maemo";
 }
 
@@ -34,7 +34,11 @@ $svnver =~ m/^r(\d+)*/;
 $svnver = $1;
 # Create the version suffix
 $qver = "$qver.$svnver";
-my $basedir = "./qgvnotify-$qver";
+
+# Get the full path of the base diretory
+my $basedir = `pwd`;
+chomp $basedir;
+$basedir = "$basedir/qgvnotify-$qver";
 
 # Delete any previous checkout directories
 system("rm -rf qgvnotify-* qgvnotify_*");
@@ -60,7 +64,9 @@ $cmd = "cd $basedir ; qmake && echo y | dh_make --createorig --single -e yuvraaj
 system($cmd);
 
 # Put all the debianization files into the debian folder
-system("cd $basedir/build-files/notify/$build_file_dir ; mv postinst prerm control rules $basedir/debian/");
+$cmd = "cd $basedir/build-files/notify/$build_file_dir ; mv postinst prerm control rules $basedir/debian/";
+print "$cmd\n";
+system($cmd);
 
 # Fix the changelog and put it into the correct location
 system("head -1 $basedir/debian/changelog >dest.txt && cat $basedir/build-files/notify/changelog >>dest.txt && tail -2 $basedir/debian/changelog | sed 's/unknown/Yuvraaj Kelkar/g' >>dest.txt && mv dest.txt $basedir/debian/changelog");

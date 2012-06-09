@@ -22,7 +22,11 @@ $svnver =~ m/^r(\d+)*/;
 $svnver = $1;
 # Create the version suffix
 $qver = "$qver.$svnver";
-my $basedir = "./qgvdial-$qver";
+
+# Get the full path of the base diretory
+my $basedir = `pwd`;
+chomp $basedir;
+$basedir = "$basedir/qgvnotify-$qver";
 
 # Delete any previous checkout directories
 system("rm -rf qgvdial-* qgvtp-* qgvdial_* qgvtp_*");
