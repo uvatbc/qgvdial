@@ -24,8 +24,8 @@ configure: configure-stamp
 configure-stamp:
 	dh_testdir
 	# Add here commands to configure the package.
-    -$(MAKE) distclean
-    qmake
+	-$(MAKE) distclean
+	qmake
 	touch configure-stamp
 
 
