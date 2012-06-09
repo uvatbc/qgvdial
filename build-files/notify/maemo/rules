@@ -9,7 +9,7 @@ export DH_VERBOSE=1
 
 override_dh_install:
 	echo CURDIR is $(CURDIR)
-	$(MAKE) INSTALL_ROOT="$(CURDIR)"/debian/qgvdial install
+	$(MAKE) INSTALL_ROOT="$(CURDIR)"/debian/qgvnotify install
 
 override_dh_auto_configure:
 	qmake
