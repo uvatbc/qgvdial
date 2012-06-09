@@ -60,11 +60,6 @@ system("cd $basedir/build-files/qgvdial/harmattan ; mv postinst prerm control qg
 # Fix the changelog and put it into the correct location
 system("head -1 $basedir/debian/changelog >dest.txt && cat $basedir/build-files/qgvdial/changelog.qgvdial >>dest.txt && tail -2 $basedir/debian/changelog | sed 's/unknown/Yuvraaj Kelkar/g' >>dest.txt && mv dest.txt $basedir/debian/changelog");
 
-# Remove the GLESv2 dependency
-$cmd="sed 's/ -lGLESv2//ig' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/ -lGLESv2//ig' $basedir/src/Makefile >$basedir/src/Makefile1 ; mv $basedir/src/Makefile1 $basedir/src/Makefile";
-print "$cmd\n";
-#system($cmd);
-
 # Reverse the order of these two lines for a source build 
 $cmd = "cd $basedir && dpkg-buildpackage -rfakeroot -sa -S -uc -us";
 $cmd = "cd $basedir && dpkg-buildpackage -rfakeroot -nc -uc -us";
