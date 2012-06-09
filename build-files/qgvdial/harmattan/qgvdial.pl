@@ -58,7 +58,7 @@ system($cmd);
 system("cd $basedir/build-files/qgvdial/harmattan ; mv postinst prerm control qgvdial.aegis rules $basedir/debian/");
 
 # Fix the changelog and put it into the correct location
-system("head -1 $basedir/debian/changelog >dest.txt && cat $basedir/build-files/qgvdial/changelog.qgvdial >>dest.txt && tail -2 $basedir/debian/changelog | sed 's/unknown/Yuvraaj Kelkar/g' >>dest.txt && mv dest.txt $basedir/debian/changelog");
+system("head -1 $basedir/debian/changelog >dest.txt && cat $basedir/build-files/qgvdial/changelog >>dest.txt && tail -2 $basedir/debian/changelog | sed 's/unknown/Yuvraaj Kelkar/g' >>dest.txt && mv dest.txt $basedir/debian/changelog");
 
 # Reverse the order of these two lines for a source build 
 $cmd = "cd $basedir && dpkg-buildpackage -rfakeroot -sa -S -uc -us";

@@ -1,21 +1,17 @@
-use Cwd;
+my $target = $ARGV[0];
+if (($target eq "") || (($target ne "fremantle") && ($target ne "diablo"))) {
+    print "Need target: Either maemo or diablo\n";
+    exit();
+}
 
-my $asroot;
-my $qtsdk;
 my $repo = "https://qgvdial.googlecode.com/svn/trunk";
 my $cmd;
 my $line;
-my $pathreplace;
-my $curdir = getcwd();
-
-$asroot = "fakeroot";
-$pathreplace = "/targets/FREMANTLE_ARMEL";
-
-$pathreplace =~ s/\//\\\//g;
-$curdir =~ s/\//\\\//g;
 
 # Delete any existing version file
-system("rm -f ver.cfg");
+if (-f ver.cfg) {
+    unlink(ver.cfg);
+}
 # Get the latest version file from the repository
 $cmd = "svn export $repo/build-files/ver.cfg";
 system($cmd);
@@ -33,46 +29,46 @@ $svnver =~ m/^r(\d+)*/;
 $svnver = $1;
 # Create the version suffix
 $qver = "$qver.$svnver";
-my $basedir = "./qgvdial-$qver";
+my $basedir = "./qgvnotify-$qver";
 
 # Delete any previous checkout directories
-system("rm -rf qgvdial-* qgvtp-* qgvdial_* qgvtp_*");
-
+system("rm -rf qgvnotify-* qgvnotify_*");
 $cmd = "svn export $repo $basedir";
 system($cmd);
-system("cp $basedir/icons/64/qgvdial.png $basedir/src/qgvdial.png");
+system("cp $basedir/icons/qgv.png $basedir/src/qgvdial.png");
 
 # Append the version to the pro file
-open(PRO_FILE, ">>$basedir/src/src.pro") || die "Cannot open pro file";
+open(PRO_FILE, ">>$basedir/notify/notify.pro") || die "Cannot open pro file";
 print PRO_FILE "VERSION=__QGVDIAL_VERSION__\n";
 close PRO_FILE;
 
 # Version replacement
-$cmd = "perl $basedir/build-files/version.pl __QGVDIAL_VERSION__ $qver $basedir";
+$cmd = "cd $basedir ; perl ./build-files/version.pl __QGVDIAL_VERSION__ $qver";
 print "$cmd\n";
 system($cmd);
 
 # Copy the correct pro file
-system("cp $basedir/build-files/qgvdial/pro.qgvdial $basedir/qgvdial.pro");
+system("cp $basedir/build-files/notify/diablo/pro.qgvnotify $basedir/qgvdial.pro");
 
 # Do everything upto the preparation of the debian directory. Code is still not compiled.
-$cmd = "cd $basedir && qmake && echo y | dh_make --createorig --single -e yuvraaj\@gmail.com -c lgpl";
-print "$cmd\n";
+$cmd = "cd $basedir ; qmake && echo y | dh_make --createorig --single -e yuvraaj\@gmail.com -c lgpl2 && qmake";
 system($cmd);
 
 # Put all the debianization files into the debian folder
-system("cd $basedir/build-files/qgvdial/maemo ; mv postinst prerm control rules $basedir/debian/");
+system("cd $basedir/build-files/qgvnotify/diablo ; mv postinst prerm control rules $basedir/debian/");
 
 # Fix the changelog and put it into the correct location
-system("head -1 $basedir/debian/changelog >dest.txt && cat $basedir/build-files/qgvdial/changelog >>dest.txt && tail -2 $basedir/debian/changelog | sed 's/unknown/Yuvraaj Kelkar/g' >>dest.txt && mv dest.txt $basedir/debian/changelog");
+system("head -1 $basedir/debian/changelog >dest.txt && cat $basedir/build-files/notify/changelog >>dest.txt && tail -2 $basedir/debian/changelog | sed 's/unknown/Yuvraaj Kelkar/g' >>dest.txt && mv dest.txt $basedir/debian/changelog");
 
 # Reverse the order of these two lines for a complete build 
 $cmd = "cd $basedir && dpkg-buildpackage -rfakeroot";
-$cmd = "cd $basedir && dpkg-buildpackage -rfakeroot -sa -S -uc -us";
+$cmd = "cd $basedir && dpkg-buildpackage -rfakeroot -sa -S";
 # Execute the rest of the build command
 system($cmd);
 
-$cmd = "dput -f fremantle-upload qgvdial*.changes";
+$cmd = "dput -f $target-extras-builder qgvnotify*.changes";
+print "$cmd\n";
 system($cmd);
 
-exit(0);
+exit();
+

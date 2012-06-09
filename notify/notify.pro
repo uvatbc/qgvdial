@@ -16,36 +16,20 @@ unix:!symbian {
     QT *= dbus
     LIBS *= -lmosquitto -lssl -lcrypto
 
-    exists(../../buildit.sh) {
-        PREFIX = ../debian/qgvnotify/usr
-        message(Built using my scripts... probably inside scratchbox)
-    } else {
-        PREFIX = /opt/usr
-    }
-
-    OPTPREFIX  = $$PREFIX/../opt/qgvdial
-    BINDIR     = $$OPTPREFIX/bin
-    DATADIR    = $$PREFIX/share
-    OPTDATADIR = $$OPTPREFIX/share
-    DEFINES += DATADIR=\"$$DATADIR\" PKGDATADIR=\"$$PKGDATADIR\"
-
-    target.path =$$BINDIR
-    INSTALLS += target
-
-maemo5 {
-    message(Maemo or Meego TP)
-    INCLUDEPATH += $$QMAKESPEC/usr/include/telepathy-1.0/
-    DEFINES += TP10
-} else {
-    exists($$QMAKESPEC/usr/include/telepathy-qt4/TelepathyQt/Constants) {
-        message(Brand new TP)
-        INCLUDEPATH += $$QMAKESPEC/usr/include/telepathy-qt4/
-    } else {
-        message(Old TP)
+    maemo5 {
+        message(Maemo or Meego TP)
         INCLUDEPATH += $$QMAKESPEC/usr/include/telepathy-1.0/
         DEFINES += TP10
+    } else {
+        exists($$QMAKESPEC/usr/include/telepathy-qt4/TelepathyQt/Constants) {
+            message(Brand new TP)
+            INCLUDEPATH += $$QMAKESPEC/usr/include/telepathy-qt4/
+        } else {
+            message(Old TP)
+            INCLUDEPATH += $$QMAKESPEC/usr/include/telepathy-1.0/
+            DEFINES += TP10
+        }
     }
-}
 }
 
 PRECOMPILED_HEADER = ../src/global.h
@@ -78,3 +62,30 @@ HEADERS  += ../src/global.h                 \
             ../src/ContactsParserObject.h   \
             ../src/ContactsXmlHandler.h     \
             ../src/MyXmlErrorHandler.h
+
+# Installation for Maemo and Harmattan
+maemo5 {
+    message(maemo5 install)
+    exists(../../buildit.sh) || exists(../../buildit.pl) || exists(.svn) {
+        PREFIX = ../debian/qgvnotify/usr
+        message(Built using my scripts... probably inside scratchbox)
+    } else {
+        PREFIX = ../maemo/debian/qgvnotify/usr
+        message(Build using qtcreator)
+    }
+    
+    OPTPREFIX  = $$PREFIX/../opt
+    DATADIR    = $$PREFIX/share
+}
+
+contains(MEEGO_EDITION,harmattan) {
+    message(Harmattan install)
+    
+    OPTPREFIX  = /opt
+    DATADIR    = /usr/share
+}
+
+maemo5|contains(MEEGO_EDITION,harmattan) {
+    target.path = $$OPTPREFIX/qgvdial/bin
+    INSTALLS += target
+}
