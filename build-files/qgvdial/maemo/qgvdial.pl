@@ -36,7 +36,7 @@ $qver = "$qver.$svnver";
 my $basedir = "./qgvdial-$qver";
 
 # Delete any previous checkout directories
-system("rm -rf qgvdial* qgvtp*");
+system("rm -rf qgvdial-* qgvtp-* qgvdial_* qgvtp_*");
 
 $cmd = "svn export $repo $basedir";
 system($cmd);

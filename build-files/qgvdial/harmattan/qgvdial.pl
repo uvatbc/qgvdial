@@ -25,7 +25,7 @@ $qver = "$qver.$svnver";
 my $basedir = "./qgvdial-$qver";
 
 # Delete any previous checkout directories
-system("rm -rf qgvdial* qgvtp*");
+system("rm -rf qgvdial-* qgvtp-* qgvdial_* qgvtp_*");
 
 $cmd = "ssh uv\@userver_x86 \"cd harmattan/export/qgvdial ; svn export $repo $basedir\"";
 system($cmd);
