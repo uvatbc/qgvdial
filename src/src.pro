@@ -261,7 +261,8 @@ symbian {
 ###############################################################
 
 # Installation for Maemo and Harmattan
-maemo5|contains(MEEGO_EDITION,harmattan) {
+maemo5 {
+    message(maemo5 install)
     exists(../../buildit.sh) || exists(../../buildit.pl) || exists(.svn) {
         PREFIX = ../debian/qgvdial/usr
         message(Built using my scripts... probably inside scratchbox)
@@ -269,14 +270,22 @@ maemo5|contains(MEEGO_EDITION,harmattan) {
         PREFIX = ../maemo/debian/qgvdial/usr
         message(Build using qtcreator)
     }
+    
+    OPTPREFIX  = $$PREFIX/../opt
+    DATADIR    = $$PREFIX/share
+}
 
-    message(maemo5 install)
-    OPTPREFIX  = $$PREFIX/../opt/qgvdial
+contains(MEEGO_EDITION,harmattan) {
+    message(Harmattan install)
+    
+    OPTPREFIX  = /opt
     DATADIR    = /usr/share
+}
 
+maemo5|contains(MEEGO_EDITION,harmattan) {
     INSTALLS += target desktop icon icon48 icon64 icon_scalable dbusservice
 
-    target.path = /opt/qgvdial/bin
+    target.path = $$OPTPREFIX/qgvdial/bin
 
     desktop.path  = $$DATADIR/applications/hildon
     desktop.files = ../build-files/qgvdial/maemo/qgvdial.desktop

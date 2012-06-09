@@ -56,7 +56,7 @@ system($cmd);
 system("cp $basedir/build-files/qgvdial/pro.qgvdial $basedir/qgvdial.pro");
 
 # Do everything upto the preparation of the debian directory. Code is still not compiled.
-$cmd = "cd $basedir && qmake && dh_make --createorig --single -e yuvraaj\@gmail.com -c lgpl";
+$cmd = "cd $basedir && qmake && echo y | dh_make --createorig --single -e yuvraaj\@gmail.com -c lgpl";
 print "$cmd\n";
 system($cmd);
 

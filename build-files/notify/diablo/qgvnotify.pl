@@ -4,16 +4,6 @@ if (($target eq "") || (($target ne "fremantle") && ($target ne "diablo"))) {
     exit();
 }
 
-my $machine = `uname -m`;
-chomp $machine;
-my $mad;
-my $asroot;
-if ($machine ne "arm") {
-    $mad = '/home/uv/apps/mad';
-} else {
-    $asroot = "fakeroot";
-}
-
 my $repo = "https://qgvdial.googlecode.com/svn/trunk";
 my $cmd;
 my $line;
@@ -61,7 +51,7 @@ system($cmd);
 system("cp $basedir/build-files/pro.qgvnotify $basedir/qgvdial.pro");
 
 # Do everything upto the preparation of the debian directory. Code is still not compiled.
-$cmd = "cd $basedir ; $mad qmake && echo y | $mad dh_make --createorig --single -e yuvraaj\@gmail.com -c lgpl && $mad qmake";
+$cmd = "cd $basedir ; qmake && echo y | dh_make --createorig --single -e yuvraaj\@gmail.com -c lgpl && qmake";
 system($cmd);
 
 # Add a post install file to add the executable bit after installation on the device
@@ -74,48 +64,40 @@ system("mv $basedir/build-files/qgvnotify.$target.rules $basedir/debian/rules");
 
 system("head -1 $basedir/debian/changelog >dest.txt ; cat $basedir/build-files/changelog.qgvnotify >>dest.txt ; tail -2 $basedir/debian/changelog | head -1 | sed 's/unknown/Yuvraaj Kelkar/g' >>dest.txt ; mv dest.txt $basedir/debian/changelog");
 
-if ($machine eq "arm") {
-    # Make sure all make files are present before mucking with them.
-    system("cd $basedir ; make notify/Makefile");
+# Make sure all make files are present before mucking with them.
+system("cd $basedir ; make notify/Makefile");
 
-    # Strip out "/targets/DIABLO_ARMEL/"
-    $cmd="sed 's/\\/targets\\/DIABLO_ARMEL//g' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/\\/targets\\/DIABLO_ARMEL//g' $basedir/notify/Makefile >$basedir/notify/Makefile1 ; mv $basedir/notify/Makefile1 $basedir/notify/Makefile";
-    print "$cmd\n";
-    system($cmd);
+# Strip out "/targets/DIABLO_ARMEL/"
+$cmd="sed 's/\\/targets\\/DIABLO_ARMEL//g' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/\\/targets\\/DIABLO_ARMEL//g' $basedir/notify/Makefile >$basedir/notify/Makefile1 ; mv $basedir/notify/Makefile1 $basedir/notify/Makefile";
+print "$cmd\n";
+system($cmd);
 
-    # Strip out "/targets/FREMANTLE_ARMEL/"
-    $cmd="sed 's/\\/targets\\/FREMANTLE_ARMEL//g' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/\\/targets\\/FREMANTLE_ARMEL//g' $basedir/notify/Makefile >$basedir/notify/Makefile1 ; mv $basedir/notify/Makefile1 $basedir/notify/Makefile";
-    print "$cmd\n";
-    system($cmd);
+# Strip out "/targets/FREMANTLE_ARMEL/"
+$cmd="sed 's/\\/targets\\/FREMANTLE_ARMEL//g' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/\\/targets\\/FREMANTLE_ARMEL//g' $basedir/notify/Makefile >$basedir/notify/Makefile1 ; mv $basedir/notify/Makefile1 $basedir/notify/Makefile";
+print "$cmd\n";
+system($cmd);
 
-    $cmd=`pwd`;
-    chomp $cmd;
-    $cmd =~ s/\//\\\//g;
+$cmd=`pwd`;
+chomp $cmd;
+$cmd =~ s/\//\\\//g;
 
-    # Replace hard coded current directory with relative directory.
-    $cmd="sed 's/$cmd\\/qgvnotify-$qver/../g' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/$cmd\\/qgvnotify-$qver/../g' $basedir/notify/Makefile >$basedir/notify/Makefile1 ; mv $basedir/notify/Makefile1 $basedir/notify/Makefile";
-    print "$cmd\n";
-    system($cmd);
+# Replace hard coded current directory with relative directory.
+$cmd="sed 's/$cmd\\/qgvnotify-$qver/../g' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/$cmd\\/qgvnotify-$qver/../g' $basedir/notify/Makefile >$basedir/notify/Makefile1 ; mv $basedir/notify/Makefile1 $basedir/notify/Makefile";
+print "$cmd\n";
+system($cmd);
 
-    # Remove the GLESv2 dependency
-    $cmd="sed 's/ -lGLESv2//g' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/ -lGLESv2//g' $basedir/notify/Makefile >$basedir/notify/Makefile1 ; mv $basedir/notify/Makefile1 $basedir/notify/Makefile";
-    print "$cmd\n";
-    system($cmd);
+# Remove the GLESv2 dependency
+$cmd="sed 's/ -lGLESv2//g' $basedir/Makefile >$basedir/Makefile1 ; mv $basedir/Makefile1 $basedir/Makefile ; sed 's/ -lGLESv2//g' $basedir/notify/Makefile >$basedir/notify/Makefile1 ; mv $basedir/notify/Makefile1 $basedir/notify/Makefile";
+print "$cmd\n";
+system($cmd);
 
-    # Reverse the order of these two lines for a complete build 
-    $cmd = "cd $basedir && dpkg-buildpackage -rfakeroot";
-    $cmd = "cd $basedir && dpkg-buildpackage -rfakeroot -sa -S";
-} else {
-    $cmd = "cd $basedir && $asroot $mad dpkg-buildpackage -rfakeroot";
-}
+# Reverse the order of these two lines for a complete build 
+$cmd = "cd $basedir && dpkg-buildpackage -rfakeroot";
+$cmd = "cd $basedir && dpkg-buildpackage -rfakeroot -sa -S";
 # Execute the rest of the build command
 system($cmd);
 
-if ($machine ne "arm") {
-    $cmd = "dput -f $target-upload qgvnotify*.changes";
-} else {
-    $cmd = "dput -f $target-extras-builder qgvnotify*.changes";
-}
+$cmd = "dput -f $target-extras-builder qgvnotify*.changes";
 print "$cmd\n";
 system($cmd);
 
