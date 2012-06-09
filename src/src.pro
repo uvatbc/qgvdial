@@ -281,6 +281,7 @@ maemo5|contains(MEEGO_EDITION,harmattan) {
     desktop.path  = $$DATADIR/applications/hildon
     desktop.files = ../build-files/qgvdial/maemo/qgvdial.desktop
 
+    icon.path = $$DATADIR/qgvdial/icons
     icon.files += qgvdial.png
 
     icon48.path = $$DATADIR/icons/hicolor/48x48/hildon
