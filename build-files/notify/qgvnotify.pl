@@ -56,6 +56,11 @@ $cmd = "cd $basedir ; perl ./build-files/version.pl __QGVDIAL_VERSION__ $qver";
 print "$cmd\n";
 system($cmd);
 
+# Remove all bak files
+$cmd = "for i in `find . | grep bak` ; do echo $i ; rm $i; done";
+print "$cmd\n";
+system($cmd);
+
 # Copy the correct pro file
 system("cp $basedir/build-files/notify/pro.qgvnotify $basedir/qgvdial.pro");
 
