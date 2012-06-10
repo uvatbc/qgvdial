@@ -57,7 +57,7 @@ print "$cmd\n";
 system($cmd);
 
 # Remove all bak files
-$cmd = "for i in `find . | grep bak` ; do echo $i ; rm $i; done";
+$cmd = "for i in `find . | grep bak` ; do echo Delete \$i ; rm \$i; done";
 print "$cmd\n";
 system($cmd);
 
