@@ -24,7 +24,7 @@ configure: configure-stamp
 configure-stamp:
 	dh_testdir
 	# Add here commands to configure the package.
-	$(MAKE) distclean ; true
+	for i in `find . | grep Makefile` ; do rm $i; done
 	qmake
 	touch configure-stamp
 
