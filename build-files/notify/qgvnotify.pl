@@ -86,5 +86,5 @@ $cmd = "dput -f $target-extras-builder qgvnotify*.changes";
 print "$cmd\n";
 system($cmd);
 
-exit();
+exit(0);
 
