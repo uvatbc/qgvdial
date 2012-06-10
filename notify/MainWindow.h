@@ -8,6 +8,7 @@
 #include "GVApi.h"
 #include "NotifyGVContactsTable.h"
 #include "NotifyGVInbox.h"
+#include "ConsoleThread.h"
 
 class MainWindow : public QObject
 {
@@ -24,6 +25,8 @@ private slots:
     void getContactsDone (bool bChanges, bool bOK);
     void inboxChanged ();
     void dailyTimeout();
+
+    void getOut();
 
 private:
     void doLogin ();
@@ -62,6 +65,9 @@ private:
 
     //! Number of times we checked
     quint64         checkCounter;
+
+    //! Thread to read the Console and quit
+    ConsoleThread  *consoleThread;
 };
 
 #endif //_MAINWINDOW_H_

@@ -11,7 +11,7 @@ int   logCounter = 0; //! Number of log entries since the last log flush
 void
 qgv_LogFlush()
 {
-}
+}//qgv_LogFlush
 
 void
 myMessageOutput(QtMsgType type, const char *msg)

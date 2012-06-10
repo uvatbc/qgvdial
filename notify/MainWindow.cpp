@@ -14,6 +14,7 @@ MainWindow::MainWindow(QObject *parent /*= 0*/)
 , oContacts (this)
 , oInbox (gvApi, this)
 , checkCounter (0)
+, consoleThread (NULL)
 {
     qRegisterMetaType<ContactInfo>("ContactInfo");
 
@@ -37,13 +38,22 @@ MainWindow::MainWindow(QObject *parent /*= 0*/)
         return;
     }
 
+    consoleThread = new ConsoleThread(this);
+    if (NULL == consoleThread) {
+        qApp->quit();
+        return;
+    }
+
+    QObject::connect (consoleThread, SIGNAL(finished()), this, SLOT(getOut()));
+    consoleThread->start ();
+
     QDateTime dtNow = QDateTime::currentDateTime ();
     QDateTime dtTomorrow = dtNow.addDays (1);
     dtTomorrow.setTime (QTime(0, 0));
     int sec = dtTomorrow.toTime_t() - dtNow.toTime_t();
     if (sec < 0) sec = 1;
     QTimer::singleShot (sec * 1000, this, SLOT(dailyTimeout()));
-    qDebug() << "Daily timer first shot after" << sec << "seconds";
+    Q_DEBUG(QString("Daily timer first shot after %1 seconds").arg (sec));
 
     QTimer::singleShot (100, this, SLOT(doWork ()));
 }//MainWindow::MainWindow
@@ -51,7 +61,7 @@ MainWindow::MainWindow(QObject *parent /*= 0*/)
 void
 MainWindow::setStatus(const QString &strText, int /*timeout = 3000*/)
 {
-    qDebug () << strText;
+    Q_DEBUG(strText);
 }//MainWindow::setStatus
 
 void
@@ -64,7 +74,7 @@ MainWindow::doWork ()
 
     checkCounter++;
     if (0 == checkCounter % 100) {
-        qDebug() << "Checked" << checkCounter << "times";
+        Q_DEBUG(QString("Checked %1 times").arg (checkCounter));
     }
 
     // Get the contacts
@@ -95,7 +105,7 @@ MainWindow::checkParams ()
         strIni += "notify.ini";
     }
 
-    qDebug () << "Using ini file at" << strIni;
+    Q_DEBUG(QString("Using ini file at %1").arg (strIni));
 
     bool bUseProxy = false, bUseSystemProxy = false, bProxyAuth = false;
     QString strProxy, strProxyUser, strProxyPass;
@@ -397,7 +407,7 @@ void
 MainWindow::getContactsDone (bool bChanges, bool bOK)
 {
     if (bOK && bChanges) {
-        qDebug ("Contacts changed, update mosquitto");
+        Q_DEBUG("Contacts changed, update mosquitto");
 
         MqPublisher pub(QString("qgvnotify:%1").arg(QHostInfo::localHostName()),
                         m_strMqServer, m_mqPort, m_strMqTopic,
@@ -413,7 +423,7 @@ MainWindow::getContactsDone (bool bChanges, bool bOK)
 void
 MainWindow::inboxChanged ()
 {
-    qDebug ("Inbox changed, update mosquitto");
+    Q_DEBUG("Inbox changed, update mosquitto");
 
     MqPublisher pub(QString("qgvnotify:%1").arg(QHostInfo::localHostName()),
                     m_strMqServer, m_mqPort, m_strMqTopic,
@@ -437,7 +447,15 @@ MainWindow::startTimer ()
 void
 MainWindow::dailyTimeout ()
 {
-    qDebug() << "Daily timer timed out at" << QDateTime::currentDateTime ();
+    Q_DEBUG(QString("Daily timer timed out at %1")
+                .arg (QDateTime::currentDateTime().toString()));
     inboxChanged ();
     QTimer::singleShot (24 * 60 * 60 * 1000, this, SLOT(dailyTimeout()));
 }//MainWindow::dailyTimeout
+
+void
+MainWindow::getOut()
+{
+    Q_DEBUG("quit!!");
+    qApp->quit ();
+}//MainWindow::getOut
