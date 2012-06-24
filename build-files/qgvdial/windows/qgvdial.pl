@@ -55,5 +55,5 @@ $cmd = "copy qgvdial-$qver\\src\\release\\qgvdial.exe J:\\releases\\qgvdial\\win
 system($cmd);
 
 # New setup: Create MSI.
-system("cd qgvdial-$qver/build-files & \"$wixbase/candle.exe\" qgvdial.wxs");
-system("cd qgvdial-$qver/build-files & \"$wixbase/light.exe\" -cultures:en-US -ext WixUIExtension qgvdial.wixobj -o ..\\qgvdial-$qver.msi");
+system("cd qgvdial-$qver/build-files/qgvdial/windows & \"$wixbase/candle.exe\" qgvdial.wxs");
+system("cd qgvdial-$qver/build-files/qgvdial/windows & \"$wixbase/light.exe\" -cultures:en-US -ext WixUIExtension qgvdial.wixobj -o ..\\qgvdial-$qver.msi");
