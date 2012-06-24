@@ -1,11 +1,6 @@
-my $machine = `uname -m`;
-my $mad = '';
 my $repo = "https://qgvdial.googlecode.com/svn/trunk";
 my $cmd;
-my $line;
-my $qtdir = $ENV{'QTDIR'};
 
-# Delete any existing version file
 # Delete any existing version file
 system("rm ver.cfg");
 # Get the latest version file from the repository
@@ -25,10 +20,14 @@ $svnver =~ m/^r(\d+)*/;
 $svnver = $1;
 # Create the version suffix
 $qver = "$qver.$svnver";
-my $basedir = "./qgvdial-$qver";
+
+# Get the full path of the base diretory
+my $basedir = `pwd`;
+chomp $basedir;
+$basedir = "$basedir/qgvnotify-$qver";
 
 # Delete any previous checkout directories
-system("rm -rf qgvdial* qgvtp*");
+system("rm -rf qgvdial-* qgvtp-* qgvdial_* qgvtp_*");
 
 $cmd = "svn export $repo $basedir";
 system($cmd);
@@ -48,31 +47,19 @@ system($cmd);
 system("cp $basedir/build-files/pro.qgvdial $basedir/qgvdial.pro");
 
 # Do everything upto the preparation of the debian directory. Code is still not compiled.
-$cmd = "cd $basedir && $mad qmake && $mad dh_make --createorig --single -e yuvraaj\@gmail.com -c lgpl";
+$cmd = "cd $basedir && echo y | dh_make --createorig --single -e yuvraaj\@gmail.com -c lgpl";
 print "$cmd\n";
 system($cmd);
 
-# Add a post install file to add the executable bit after installation on the device
-system("mv $basedir/build-files/postinst.linux $basedir/debian/postinst");
-system("mv $basedir/build-files/prerm.linux $basedir/debian/prerm");
-# Fix the control file
-system("mv $basedir/build-files/control.linux $basedir/debian/control");
-# Fix the dbus service file name
-system("mv $basedir/build-files/qgvdial.Call.service.linux $basedir/build-files/qgvdial.Call.service");
-system("mv $basedir/build-files/qgvdial.Text.service.linux $basedir/build-files/qgvdial.Text.service");
-system("mv $basedir/qgv-tp/data/org.freedesktop.Telepathy.ConnectionManager.qgvtp.service.linux $basedir/qgv-tp/data/org.freedesktop.Telepathy.ConnectionManager.qgvtp.service");
+# Put all the debianization files into the debian folder
+system("cd $basedir/build-files/qgvdial/ubuntu ; mv postinst prerm control rules $basedir/debian/");
 
 # Fix the changelog and put it into the correct location
-system("cp $basedir/debian/changelog ./saved-changelog");
-$cmd = "head -1 $basedir/debian/changelog >dest.txt && cat $basedir/build-files/changelog.qgvdial >>dest.txt && tail -2 $basedir/debian/changelog >>dest.txt && mv dest.txt $basedir/debian/changelog";
-print("$cmd\n");
+system("head -1 $basedir/debian/changelog >dest.txt && cat $basedir/build-files/qgvdial/changelog >>dest.txt && tail -2 $basedir/debian/changelog | sed 's/unknown/Yuvraaj Kelkar/g' >>dest.txt && mv dest.txt $basedir/debian/changelog");
+
+# Built it all!
+$cmd = "cd $basedir && dpkg-buildpackage -rfakeroot -nc -uc -us";
 system($cmd);
 
-# Make sure all make files are present before mucking with them.
-system("cd $basedir && make src/Makefile");
+exit(0);
 
-# Replace hard coded current directory with relative directory.
-
-# Execute the rest of the build command
-$cmd = "cd $basedir && $mad dpkg-buildpackage --source-option=--auto-commit";
-system($cmd);

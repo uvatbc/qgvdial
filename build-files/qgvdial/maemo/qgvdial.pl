@@ -1,18 +1,5 @@
-use Cwd;
-
-my $asroot;
-my $qtsdk;
 my $repo = "https://qgvdial.googlecode.com/svn/trunk";
 my $cmd;
-my $line;
-my $pathreplace;
-my $curdir = getcwd();
-
-$asroot = "fakeroot";
-$pathreplace = "/targets/FREMANTLE_ARMEL";
-
-$pathreplace =~ s/\//\\\//g;
-$curdir =~ s/\//\\\//g;
 
 # Delete any existing version file
 system("rm -f ver.cfg");
@@ -60,7 +47,7 @@ system($cmd);
 system("cp $basedir/build-files/qgvdial/pro.qgvdial $basedir/qgvdial.pro");
 
 # Do everything upto the preparation of the debian directory. Code is still not compiled.
-$cmd = "cd $basedir && qmake && echo y | dh_make --createorig --single -e yuvraaj\@gmail.com -c lgpl";
+$cmd = "cd $basedir && echo y | dh_make --createorig --single -e yuvraaj\@gmail.com -c lgpl";
 print "$cmd\n";
 system($cmd);
 
@@ -80,3 +67,4 @@ $cmd = "dput -f fremantle-upload qgvdial*.changes";
 system($cmd);
 
 exit(0);
+

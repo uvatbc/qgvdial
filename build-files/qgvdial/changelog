@@ -1,2 +1,3 @@
-  * Changed all the build scripts to work properly.
+  * Long press for full refresh (inbox and contacts)
+  * Login failure at rnr_se: Fixed this code path to work correctly.
 

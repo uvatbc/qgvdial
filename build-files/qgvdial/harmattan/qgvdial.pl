@@ -1,5 +1,3 @@
-use Cwd;
-
 my $repo = "https://qgvdial.googlecode.com/svn/trunk";
 my $cmd;
 
@@ -54,7 +52,7 @@ print "$cmd\n";
 system($cmd);
 
 # Do everything upto the preparation of the debian directory. Code is still not compiled.
-$cmd = "cd $basedir && qmake && echo y | dh_make -n --createorig --single -e yuvraaj\@gmail.com -c lgpl2";
+$cmd = "cd $basedir && echo y | dh_make -n --createorig --single -e yuvraaj\@gmail.com -c lgpl2";
 print "$cmd\n";
 system($cmd);
 
@@ -64,9 +62,9 @@ system("cd $basedir/build-files/qgvdial/harmattan ; mv postinst prerm control qg
 # Fix the changelog and put it into the correct location
 system("head -1 $basedir/debian/changelog >dest.txt && cat $basedir/build-files/qgvdial/changelog >>dest.txt && tail -2 $basedir/debian/changelog | sed 's/unknown/Yuvraaj Kelkar/g' >>dest.txt && mv dest.txt $basedir/debian/changelog");
 
-# Reverse the order of these two lines for a source build 
-$cmd = "cd $basedir && dpkg-buildpackage -rfakeroot -sa -S -uc -us";
+# Built it all!
 $cmd = "cd $basedir && dpkg-buildpackage -rfakeroot -nc -uc -us";
 system($cmd);
 
 exit(0);
+
