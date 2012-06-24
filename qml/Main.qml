@@ -51,7 +51,10 @@ Rectangle {
 
     // From the contacts or inbox page
     signal sigRefreshInbox
+    signal sigRefreshAllInbox
+
     signal sigRefreshContacts
+    signal sigRefreshAllContacts
 
     // Contacts search query changes
     signal sigSearchContacts(string query)
@@ -147,6 +150,7 @@ Rectangle {
                         }
 
                         onSigRefreshContacts: main.sigRefreshContacts();
+                        onSigRefreshAllContacts: main.sigRefreshAllContacts();
                     }
                 }//Tab (Contacts)
                 Tab {
@@ -169,6 +173,7 @@ Rectangle {
                         onSigCloseVmail: main.sigCloseVmail();
 
                         onSigRefreshInbox: main.sigRefreshInbox();
+                        onSigRefreshAllInbox: main.sigRefreshAllInbox();
                     }
                 }//Tab (Inbox)
                 Tab {

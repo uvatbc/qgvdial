@@ -35,6 +35,7 @@ Rectangle {
     signal sigCloseVmail
 
     signal sigRefreshInbox
+    signal sigRefreshAllInbox
 
     property int vmailPlayState: g_vmailPlayerState  // 0=stopped 1=playing 2=paused
 
@@ -386,8 +387,10 @@ Rectangle {
 
             header: ListRefreshComponent {
                 width: listInbox.width
-                onClicked: container.sigRefreshInbox();
                 copyY: listInbox.contentY
+
+                onClicked: container.sigRefreshInbox();
+                onPressAndHold: container.sigRefreshAllInbox();
             }
 
             opacity: 1

@@ -480,10 +480,20 @@ MainWindow::initQML ()
                   &oContacts, SLOT(refreshContacts()));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
+    rv = connect (gObj, SIGNAL (sigRefreshAllContacts()),
+                  &oContacts, SLOT(refreshAllContacts()));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+
     rv = connect (gObj, SIGNAL(sigRefreshInbox()),
                   &oInbox,   SLOT(refresh()));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
+    rv = connect (gObj, SIGNAL(sigRefreshAllInbox()),
+                  &oInbox,  SLOT(refreshFullInbox()));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+
     rv = connect (gObj, SIGNAL(sigHaptic()),
                   this, SLOT(onBtnClickFroHapticFeedback()));
     Q_ASSERT(rv);

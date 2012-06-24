@@ -30,6 +30,7 @@ Rectangle {
     signal sigSearchContacts(string query)
 
     signal sigRefreshContacts
+    signal sigRefreshAllContacts
 
     onSigRefreshContacts: console.debug("ping contacts")
 
@@ -151,8 +152,10 @@ Rectangle {
 
             header: ListRefreshComponent {
                 width: contactsView.width
-                onClicked: container.sigRefreshContacts();
                 copyY: contactsView.contentY
+
+                onClicked: container.sigRefreshContacts();
+                onPressAndHold: container.sigRefreshAllContacts();
             }
 
             model: imgSearch.selection ? g_contactsSearchModel : g_contactsModel
@@ -178,11 +181,11 @@ Rectangle {
                         verticalCenter: parent.verticalCenter
                         leftMargin: 2
                     }
-                    height: contactNameText.height / 0.8
-                    width: height
+
+                    height: listDelegate.height - 3
+                    width: contactImage.height
 
                     source: imagePath ? imagePath : "unknown_contact.png"
-                    fillMode: Image.PreserveAspectFit
 
                     smooth: true
                 }//Image (contact images)

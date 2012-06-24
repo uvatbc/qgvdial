@@ -25,6 +25,7 @@ Item {
     id: container
 
     signal clicked
+    signal pressAndHold
 
     property real copyY: 0
     onCopyYChanged: updateShow(copyY);
@@ -84,6 +85,11 @@ Item {
 
             onClicked: {
                 container.clicked();
+                refreshTime.stop();
+            }
+
+            onPressAndHold:  {
+                container.pressAndHold();
                 refreshTime.stop();
             }
         }//MouseArea

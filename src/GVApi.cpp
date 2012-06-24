@@ -1020,6 +1020,13 @@ void
 GVApi::internalLogoutForReLogin(AsyncTaskToken *token)
 {
     AsyncTaskToken *origToken = (AsyncTaskToken *) token->callerCtx;
+
+    // User is logged out. Make sure all associated cookies are also thrown out
+    // before I re-start login process.
+    if (jar) {
+        QList<QNetworkCookie> cookies;
+        jar->setNewCookies (cookies);
+    }
     login (origToken);
     token->deleteLater ();
 }//GVApi::internalLogoutForReLogin
