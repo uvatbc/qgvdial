@@ -31,7 +31,7 @@
         <!-- Specify the files that need to go to the install location -->
         <DirectoryRef Id="appbins">
             <Component Id="qgvdial.exe" Guid="003F7582-3B03-4FED-8B3B-A21E6AB07D34">
-                <File Id="qgvdial.exe" Source="..\src\release\qgvdial.exe" KeyPath="yes" Checksum="yes"/>
+                <File Id="qgvdial.exe" Source="..\..\..\src\release\qgvdial.exe" KeyPath="yes" Checksum="yes"/>
             </Component>
             <Component Id="libeay32.dll" Guid="85006557-DB29-43E1-B60D-D42457E2293F">
                 <File Id="libeay32.dll" Source="C:\Program Files (x86)\Subversion\bin\libeay32.dll" KeyPath="yes" Checksum="yes"/>
@@ -43,10 +43,10 @@
                 <File Id="mosquitto.dll" Source="__QTDIR__\lib\mosquitto.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
             <Component Id="qt.conf" Guid="F5AA101C-FD8B-4525-9E72-4E32641C11A7">
-                <File Id="qt.conf" Source="..\build-files\qt.conf" KeyPath="yes" Checksum="yes"/>
+                <File Id="qt.conf" Source="..\..\..\build-files\qt.conf" KeyPath="yes" Checksum="yes"/>
             </Component>
             <Component Id="run.bat" Guid="E1642775-4701-48CA-B12F-292EA621DF24">
-                <File Id="run.bat" Source="..\build-files\run.bat" KeyPath="yes" Checksum="yes"/>
+                <File Id="run.bat" Source="..\..\..\build-files\run.bat" KeyPath="yes" Checksum="yes"/>
             </Component>
         </DirectoryRef>
 
