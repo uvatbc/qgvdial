@@ -24,7 +24,7 @@ $qver = "$qver.$svnver";
 # Get the full path of the base diretory
 my $basedir = `pwd`;
 chomp $basedir;
-$basedir = "$basedir/qgvnotify-$qver";
+$basedir = "$basedir/qgvdial-$qver";
 
 # Delete any previous checkout directories
 system("rm -rf qgvdial-* qgvtp-* qgvdial_* qgvtp_*");
