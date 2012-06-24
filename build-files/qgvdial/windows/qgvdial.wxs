@@ -43,10 +43,10 @@
                 <File Id="mosquitto.dll" Source="__QTDIR__\lib\mosquitto.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
             <Component Id="qt.conf" Guid="F5AA101C-FD8B-4525-9E72-4E32641C11A7">
-                <File Id="qt.conf" Source="..\..\..\build-files\qt.conf" KeyPath="yes" Checksum="yes"/>
+                <File Id="qt.conf" Source="..\..\..\build-files\qgvdial\windows\qt.conf" KeyPath="yes" Checksum="yes"/>
             </Component>
             <Component Id="run.bat" Guid="E1642775-4701-48CA-B12F-292EA621DF24">
-                <File Id="run.bat" Source="..\..\..\build-files\run.bat" KeyPath="yes" Checksum="yes"/>
+                <File Id="run.bat" Source="..\..\..\build-files\qgvdial\windows\run.bat" KeyPath="yes" Checksum="yes"/>
             </Component>
         </DirectoryRef>
 
