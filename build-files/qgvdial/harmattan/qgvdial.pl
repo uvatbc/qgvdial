@@ -29,7 +29,7 @@ $basedir = "$basedir/qgvdial-$qver";
 # Delete any previous checkout directories
 system("rm -rf qgvdial-* qgvtp-* qgvdial_* qgvtp_*");
 
-$cmd = "ssh uv\@userver_x86 \"cd harmattan/export/qgvdial ; svn export $repo $basedir\"";
+$cmd = "ssh uv\@userver_x86 \"cd ~/harmattan/export/qgvdial ; svn export $repo qgvdial-$qver\"";
 system($cmd);
 system("cp $basedir/icons/qgv.png $basedir/src/qgvdial.png");
 
