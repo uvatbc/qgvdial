@@ -96,7 +96,7 @@ MainWindow::MainWindow (QWidget *parent)
     if (!rv) { exit(1); }
 
     // Schedule the init a bit later so that the app.exec() can begin executing
-    QTimer::singleShot (100, this, SLOT (init()));
+    QTimer::singleShot (10, this, SLOT (init()));
 }//MainWindow::MainWindow
 
 MainWindow::~MainWindow ()
@@ -405,6 +405,9 @@ MainWindow::initQML ()
     ctx->setContextProperty ("g_hMul", hMul);
     ctx->setContextProperty ("g_wMul", wMul);
     ctx->setContextProperty ("g_fontMul", fontMul);
+
+    ctx->setContextProperty ("g_IsMobilePlatform",
+                             MOBILE_OS ? !bTempFalse : bTempFalse);
 
     // Initialize the QML view
     this->setSource (QUrl(osd.getMainQML()));

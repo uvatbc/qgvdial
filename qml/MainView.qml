@@ -72,8 +72,19 @@ Rectangle {
 
                 MouseArea {
                     anchors.fill: parent
-                    onPressed: txtNum.closeSoftwareInputPanel();
-                    onReleased: txtNum.closeSoftwareInputPanel();
+                    onPressed: {
+                        if (g_IsMobilePlatform) {
+                            console.debug("Foo");
+                            txtNum.closeSoftwareInputPanel();
+                        }
+                    }
+
+                    onReleased: {
+                        if (g_IsMobilePlatform) {
+                            console.debug("bar");
+                            txtNum.closeSoftwareInputPanel();
+                        }
+                    }
                 }
             }// TextEdit
 
@@ -92,7 +103,7 @@ Rectangle {
                 onSigDel: Code.doDel()
                 onSigClear: main.theNumber = ""
             }//ActionButtons (landscape mode - horizontal)
-        }//Column
+        }//Column: text edit for number and action buttons
 
         Keypad {
             color: main.color

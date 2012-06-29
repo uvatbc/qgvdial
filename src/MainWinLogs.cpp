@@ -303,4 +303,10 @@ MainWindow::onLogPosted(bool success, const QByteArray &response,
     if (token) {
         delete token;
     }
+
+    if (nwMgr) {
+        // We're done using the NW mgr. get rid of it.
+        nwMgr->deleteLater ();
+        nwMgr = NULL;
+    }
 }//MainWindow::onLogPosted
