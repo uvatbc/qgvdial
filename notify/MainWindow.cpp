@@ -14,7 +14,6 @@ MainWindow::MainWindow(QObject *parent /*= 0*/)
 , oContacts (this)
 , oInbox (gvApi, this)
 , checkCounter (0)
-, consoleThread (NULL)
 {
     qRegisterMetaType<ContactInfo>("ContactInfo");
 
@@ -37,15 +36,6 @@ MainWindow::MainWindow(QObject *parent /*= 0*/)
         qApp->quit();
         return;
     }
-
-    consoleThread = new ConsoleThread(this);
-    if (NULL == consoleThread) {
-        qApp->quit();
-        return;
-    }
-
-    QObject::connect (consoleThread, SIGNAL(finished()), this, SLOT(getOut()));
-    consoleThread->start ();
 
     QDateTime dtNow = QDateTime::currentDateTime ();
     QDateTime dtTomorrow = dtNow.addDays (1);

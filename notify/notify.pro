@@ -49,9 +49,9 @@ SOURCES  += main.cpp                        \
             ../src/GvXMLParser.cpp          \
             ../src/ContactsParserObject.cpp \
             ../src/ContactsXmlHandler.cpp   \
-            ../src/MyXmlErrorHandler.cpp \
-    ConsoleThread.cpp
-
+            ../src/MyXmlErrorHandler.cpp    \
+            dbusinterface/qgvn_adapter.cpp  \
+            dbusinterface/qgvn_proxy.cpp
 
 HEADERS  += ../src/global.h                 \
             MainWindow.h                    \
@@ -65,8 +65,9 @@ HEADERS  += ../src/global.h                 \
             ../src/GvXMLParser.h            \
             ../src/ContactsParserObject.h   \
             ../src/ContactsXmlHandler.h     \
-            ../src/MyXmlErrorHandler.h \
-    ConsoleThread.h
+            ../src/MyXmlErrorHandler.h      \
+            dbusinterface/qgvn_adapter.h    \
+            dbusinterface/qgvn_proxy.h
 
 # Installation for Maemo and Harmattan
 maemo5 {

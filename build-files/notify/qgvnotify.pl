@@ -64,6 +64,9 @@ system($cmd);
 # Copy the correct pro file
 system("cp $basedir/build-files/notify/pro.qgvnotify $basedir/qgvdial.pro");
 
+# Make sure the DBus control files are generated
+system("cd $basedir/notify/dbusinterface ; ./xml2cpp.sh");
+
 # Do everything upto the preparation of the debian directory. Code is still not compiled.
 $cmd = "cd $basedir ; qmake && echo y | dh_make --createorig --single -e yuvraaj\@gmail.com -c lgpl && qmake";
 system($cmd);
