@@ -1,0 +1,11 @@
+<node>
+    <interface name="net.yuvraaj.qgvnotify.control">
+        <signal name="CommandForClient">
+            <arg type="s" name="command" />
+        </signal>
+        <method name="ReportUser">
+            <arg type="s" name="user" />
+        </method>
+    </interface>
+</node>
+

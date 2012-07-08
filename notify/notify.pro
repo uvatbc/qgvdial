@@ -3,6 +3,9 @@ TARGET   = qgvnotify
 TEMPLATE = app
 INCLUDEPATH=../src
 
+MOC_DIR = moc
+OBJECTS_DIR = obj
+
 CONFIG  *= precompile_header mobility console
 DEFINES += DISABLE_TELEPATHY
 

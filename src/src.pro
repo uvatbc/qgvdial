@@ -21,6 +21,9 @@ QT      *= core gui sql xml xmlpatterns script declarative phonon
 TARGET   = qgvdial
 TEMPLATE = app
 
+MOC_DIR = moc
+OBJECTS_DIR = obj
+
 CONFIG  *= precompile_header mobility
 MOBILITY *= systeminfo
 
