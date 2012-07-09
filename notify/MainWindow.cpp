@@ -14,9 +14,22 @@ MainWindow::MainWindow(QObject *parent /*= 0*/)
 , oContacts (this)
 , oInbox (gvApi, this)
 , checkCounter (0)
+, client (NULL)
 {
     qRegisterMetaType<ContactInfo>("ContactInfo");
 
+    QTimer::singleShot (10, this, SLOT(init()));
+}//MainWindow::MainWindow
+
+void
+MainWindow::setStatus(const QString &strText, int /*timeout = 3000*/)
+{
+    Q_DEBUG(strText);
+}//MainWindow::setStatus
+
+void
+MainWindow::init()
+{
     // Status from contacts object
     QObject::connect (&oContacts, SIGNAL (status   (const QString &, int)),
                        this     , SLOT   (setStatus(const QString &, int)));
@@ -45,14 +58,18 @@ MainWindow::MainWindow(QObject *parent /*= 0*/)
     QTimer::singleShot (sec * 1000, this, SLOT(dailyTimeout()));
     Q_DEBUG(QString("Daily timer first shot after %1 seconds").arg (sec));
 
-    QTimer::singleShot (100, this, SLOT(doWork ()));
-}//MainWindow::MainWindow
+    client = new QGVNotifyProxyIface("net.yuvraaj.qgvnotify.control", "/",
+                                     QDBusConnection::sessionBus(), 0);
+    if (NULL == client) {
+        Q_CRIT("Failed to initialize DBus client");
+        getOut ();
+        return;
+    }
+    connect(client, SIGNAL(CommandForClient(const QString &)),
+            this  , SLOT(onCommandForClient(const QString &)));
 
-void
-MainWindow::setStatus(const QString &strText, int /*timeout = 3000*/)
-{
-    Q_DEBUG(strText);
-}//MainWindow::setStatus
+    doWork ();
+}//MainWindow::init
 
 void
 MainWindow::doWork ()
@@ -449,3 +466,20 @@ MainWindow::getOut()
     Q_DEBUG("quit!!");
     qApp->quit ();
 }//MainWindow::getOut
+
+void
+MainWindow::onCommandForClient(const QString &command)
+{
+    Q_DEBUG(QString("command = %1").arg(command));
+
+    if (NULL == client) {
+        Q_WARN("client is NULL");
+        return;
+    }
+
+    if (command == "getUser") {
+        client->ReportUser(strUser);
+    } else if (command == "quitAll") {
+        getOut ();
+    }
+}//MainWindow::onCommandForClient

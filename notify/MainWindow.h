@@ -8,6 +8,7 @@
 #include "GVApi.h"
 #include "NotifyGVContactsTable.h"
 #include "NotifyGVInbox.h"
+#include "dbusinterface/qgvn_proxy.h"
 
 class MainWindow : public QObject
 {
@@ -17,7 +18,8 @@ public:
     MainWindow(QObject *parent = 0);
 
 private slots:
-    void doWork ();
+    void init();
+    void doWork();
     void setStatus(const QString &strText, int timeout  = 3000);
     void loginCompleted (AsyncTaskToken *token);
     void logoutCompleted (AsyncTaskToken *token);
@@ -26,6 +28,8 @@ private slots:
     void dailyTimeout();
 
     void getOut();
+
+    void onCommandForClient(const QString &command);
 
 private:
     void doLogin ();
@@ -64,6 +68,9 @@ private:
 
     //! Number of times we checked
     quint64         checkCounter;
+
+    //! Object for DBus client
+    QGVNotifyProxyIface *client;
 };
 
 #endif //_MAINWINDOW_H_
