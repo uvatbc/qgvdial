@@ -5,6 +5,9 @@
         </signal>
         <method name="ReportUser">
             <arg type="s" name="user" />
+            <arg type="s" name="settingsFile" />
+            <arg type="s" name="logsFile" />
+            <arg type="t" name="clientPid" />
         </method>
     </interface>
 </node>
