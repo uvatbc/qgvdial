@@ -7,6 +7,7 @@ QtMsgHandler pOldHandler = NULL;
 QStringList arrLogFiles;
 QFile fLogfile;       //! Logfile
 int   logCounter = 0; //! Number of log entries since the last log flush
+QString strLogfile;
 
 void
 qgv_LogFlush()
@@ -72,7 +73,6 @@ baseDir()
 void
 initLogging (const QString &userIni = QString())
 {
-    QString strLogfile;
 
     if (userIni.isEmpty ()) {
         strLogfile = baseDir ();

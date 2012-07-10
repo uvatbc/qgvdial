@@ -28,7 +28,6 @@ private slots:
     void dailyTimeout();
 
     void getOut();
-
     void onCommandForClient(const QString &command);
 
 private:
@@ -43,20 +42,23 @@ private:
     //! THE API
     GVApi           gvApi;
 
+    //! Path for the settings ini
+    QString         strIni;
+
     // Settings parsed from the ini file
-    QString strUser;
-    QString strPass;
+    QString         strUser;
+    QString         strPass;
 
     // Frequency of checking in seconds
-    quint8 checkTimeout;
+    quint8          checkTimeout;
 
     // Mosquitto settings
-    QString m_strMqServer;
-    int m_mqPort;
-    QString m_strMqTopic;
+    QString         m_strMqServer;
+    int             m_mqPort;
+    QString         m_strMqTopic;
 
     //! Are we logged in yet?
-    bool bIsLoggedIn;
+    bool            bIsLoggedIn;
 
     //! GV Contacts object
     GVContactsTable oContacts;

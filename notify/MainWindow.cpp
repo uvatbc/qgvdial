@@ -6,6 +6,7 @@ using namespace std;
 // Forward function declarations
 QString baseDir();
 void initLogging (const QString &userIni);
+extern QString strLogfile;
 
 MainWindow::MainWindow(QObject *parent /*= 0*/)
 : QObject(parent)
@@ -68,6 +69,8 @@ MainWindow::init()
     connect(client, SIGNAL(CommandForClient(const QString &)),
             this  , SLOT(onCommandForClient(const QString &)));
 
+    onCommandForClient("getUser");
+
     doWork ();
 }//MainWindow::init
 
@@ -94,7 +97,6 @@ bool
 MainWindow::checkParams ()
 {
     bool rv = false, bUseDefaultIni = false;
-    QString strIni;
     QStringList args = qApp->arguments ();
     if (args.length () < 2) {
         qWarning ("No ini file specified, using default");
@@ -478,7 +480,7 @@ MainWindow::onCommandForClient(const QString &command)
     }
 
     if (command == "getUser") {
-        client->ReportUser("me@gmail.com", "/tmp/settings", "/tmp/logs",
+        client->ReportUser(strUser, strIni, strLogfile,
                            qApp->applicationPid());
     } else if (command == "quitAll") {
         getOut ();
