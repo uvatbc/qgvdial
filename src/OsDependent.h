@@ -63,7 +63,13 @@ class OsDependent : public QObject
 
 public:
     void init ();
+
     bool isN900 ();
+
+    bool isSymbian();
+    bool isSymbian1();
+    bool isSymbian3();
+
     void initDialServer (QObject *receiver, const char *method);
     void initTextServer (QObject *r1, const char *m1,
                          QObject *r2, const char *m2);

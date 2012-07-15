@@ -85,8 +85,8 @@ MainWindow::MainWindow (QWidget *parent)
         pSystray->show ();
     }
 
-    rv = connect (qApp, SIGNAL (messageReceived (const QString &)),
-                  this, SLOT   (messageReceived (const QString &)));
+    rv = connect (qApp, SIGNAL (messageReceived(const QString &)),
+                  this, SLOT   (messageReceived(const QString &)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
 

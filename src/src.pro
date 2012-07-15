@@ -174,6 +174,7 @@ OTHER_FILES  += ../src/winrsrc.rc           \
                 ../qml/PinSetting.qml       \
                 ../qml/Proxy.qml            \
                 ../qml/RadioButton.qml      \
+                ../qml/S3Main.qml           \
                 ../qml/SaveCancel.qml       \
                 ../qml/Scrollbar.qml        \
                 ../qml/Settings.qml         \
@@ -243,7 +244,7 @@ symbian {
     LIBS += -letel3rdparty -llibcrypto
 
     TARGET.UID3 = 0x2003B499
-    TARGET.CAPABILITY += NetworkServices ReadUserData ReadDeviceData SwEvent WriteDeviceData
+    TARGET.CAPABILITY += NetworkServices ReadUserData ReadDeviceData WriteDeviceData SwEvent
     TARGET.EPOCSTACKSIZE = 0x14000          # 80 KB stack size
     TARGET.EPOCHEAPSIZE = 0x020000 0x2000000 # 128 KB - 20 MB
 
@@ -273,14 +274,14 @@ maemo5 {
         PREFIX = ../maemo/debian/qgvdial/usr
         message(Build using qtcreator)
     }
-    
+
     OPTPREFIX  = $$PREFIX/../opt
     DATADIR    = $$PREFIX/share
 }
 
 contains(MEEGO_EDITION,harmattan) {
     message(Harmattan install)
-    
+
     OPTPREFIX  = /opt
     DATADIR    = /usr/share
 }

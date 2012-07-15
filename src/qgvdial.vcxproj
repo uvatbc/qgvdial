@@ -86,6 +86,7 @@
     <None Include="..\qml\PinSetting.qml" />
     <None Include="..\qml\Proxy.qml" />
     <None Include="..\qml\RadioButton.qml" />
+    <None Include="..\qml\S3Main.qml" />
     <None Include="..\qml\SaveCancel.qml" />
     <None Include="..\qml\Scrollbar.qml" />
     <None Include="..\qml\Settings.qml" />

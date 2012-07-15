@@ -82,6 +82,38 @@ OsDependent::isN900 ()
 #endif
 }//OsDependent::isN900
 
+bool
+OsDependent::isSymbian()
+{
+#if defined(Q_OS_SYMBIAN)
+    return true;
+#else
+    return false;
+#endif
+}//OsDependent::isSymbian
+
+bool
+OsDependent::isSymbian1()
+{
+    bool rv = false;
+#if defined(Q_OS_SYMBIAN)
+    QSysInfo::SymbianVersion symVer = QSysInfo::symbianVersion();
+    rv = (symVer == QSysInfo::SV_SF_1);
+#endif
+    return (rv);
+}//OsDependent::isSymbian1
+
+bool
+OsDependent::isSymbian3()
+{
+    bool rv = false;
+#if defined(Q_OS_SYMBIAN)
+    QSysInfo::SymbianVersion symVer = QSysInfo::symbianVersion();
+    rv = (symVer == QSysInfo::SV_SF_3);
+#endif
+    return (rv);
+}//OsDependent::isSymbian3
+
 void
 OsDependent::initDialServer (QObject *receiver, const char *method)
 {
@@ -323,11 +355,15 @@ OsDependent::getAppDirectory ()
 QString
 OsDependent::getMainQML ()
 {
-    return "qrc:/"
 #if defined(MEEGO_HARMATTAN)
-    "H"
+    return "qrc:/HMain.qml";
+#else
+    if (isSymbian3 ()) {
+        return "qrc:/S3Main.qml";
+    } else {
+        return "qrc:/Main.qml";
+    }
 #endif
-    "Main.qml";
 }//OsDependent::getMainQML
 
 void

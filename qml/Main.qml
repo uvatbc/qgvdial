@@ -102,9 +102,9 @@ Rectangle {
         property bool flipped: false
 
         anchors {
-            top: parent.top
-            left: parent.left
-            right: parent.right
+            top:    parent.top
+            left:   parent.left
+            right:  parent.right
             bottom: barStatus.top
         }
 

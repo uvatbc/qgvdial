@@ -74,11 +74,12 @@ myMessageOutput(QtMsgType type, const char *msg)
         return;
     }
 
-    // Send to standard output
-    cout << strLog.toStdString () << endl;
+    // Send to standard output.
+    // I'm not using endl here because endl causes flushes
+    cout << strLog.toAscii().constData() << "\n";
 
     if ((level <= logLevel) && (NULL != pw)) {
-        pw->log (dt, level, strLog);
+        pw->log(dt, level, strLog);
     }
 
     strLog += '\n';
