@@ -41,8 +41,6 @@ Item {
         if ((-contentY) > threshold) {
             //console.debug("true because threshold > button height");
             shouldShow = true;
-        }
-        if ((-contentY) > (threshold * 2)) {
             refreshTime.start();
         }
     }

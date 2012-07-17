@@ -68,7 +68,7 @@ Rectangle {
 
         Row {
             id: searchRow
-            height: edSearch.height
+            height: edSearch.height + 3
             width: parent.width
             spacing: 1
 
@@ -116,7 +116,6 @@ Rectangle {
                 source: (imgSearch.selection ? "close.png" : "search.png")
                 height: edSearch.height * 0.75
                 width: height
-                fillMode: Image.PreserveAspectFit
 
                 anchors.verticalCenter: parent.verticalCenter
 

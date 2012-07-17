@@ -29,6 +29,15 @@ Singletons::Singletons (QObject *parent/* = 0*/)
 
 Singletons::~Singletons ()
 {
+    if (dbMain) {
+        QStringList connections = QSqlDatabase::connectionNames();
+        for (int i = 0; i < connections.length(); i++) {
+            QSqlDatabase::removeDatabase(connections[i]);
+        }
+
+        delete dbMain;
+        dbMain = NULL;
+    }
 }//Singletons::~Singletons
 
 Singletons &
@@ -49,7 +58,7 @@ CacheDatabase &
 Singletons::getDBMain ()
 {
     if (NULL == dbMain) {
-        dbMain = new CacheDatabase (QSqlDatabase::addDatabase("QSQLITE"));
+        dbMain = new CacheDatabase(QSqlDatabase::addDatabase("QSQLITE"));
     }
     return (*dbMain);
 }//Singletons::getDBMain

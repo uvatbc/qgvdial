@@ -2030,6 +2030,9 @@ GVApi::onVmail(bool success, const QByteArray &response, QNetworkReply *,
         }
 
         file.write(response);
+        // Close it so that data is flushed and the file can then be used by the
+        // vmail player.
+        file.close();
 
         token->status = ATTS_SUCCESS;
         token->emitCompleted ();

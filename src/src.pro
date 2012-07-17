@@ -21,10 +21,17 @@ QT      *= core gui sql xml xmlpatterns script declarative phonon
 TARGET   = qgvdial
 TEMPLATE = app
 
+!win32 {
+# Win32 stores all intermidiate files into the debug and release folders.
+# There's no need to create a separate moc and obj folder for Win32.
 MOC_DIR = moc
 OBJECTS_DIR = obj
+}
 
-CONFIG  *= precompile_header mobility
+CONFIG *= precompile_header
+PRECOMPILED_HEADER = ../src/global.h
+
+CONFIG   *= mobility
 MOBILITY *= systeminfo
 
 symbian|contains(MEEGO_EDITION,harmattan) {
@@ -69,8 +76,6 @@ maemo5 {
 win32 {
     LIBS *= -llibeay32
 }
-
-PRECOMPILED_HEADER = ../src/global.h
 
 SOURCES  += ../src/main.cpp                 \
             ../src/MainApp.cpp              \

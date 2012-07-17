@@ -262,6 +262,7 @@ private:
     //! GV Inbox object
     GVInbox         oInbox;
 
+    bool bBeginPlayAfterLoad;
     //! The Phonon vmail player
     Phonon::MediaObject *vmailPlayer;
 

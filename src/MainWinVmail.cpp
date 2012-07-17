@@ -31,23 +31,25 @@ MainWindow::playVmail (const QString &strFile)
         // Convert it into a file:// url
         QUrl url = QUrl::fromLocalFile(strFile).toString ();
 
-        qDebug() << "Play vmail file:" << strFile << "Url =" << url;
+        Q_DEBUG(QString("Play vmail file: %1").arg(strFile));
 
         createVmailPlayer ();
+        bBeginPlayAfterLoad = true;
         vmailPlayer->setCurrentSource (Phonon::MediaSource(url));
 //        vmailPlayer->setVolume (50);
-        vmailPlayer->play();
     } while (0); // End cleanup block (not a loop)
 }//MainWindow::playVmail
 
 void
 MainWindow::createVmailPlayer()
 {
-    onSigCloseVmail ();
-
+    if (vmailPlayer) {
+        return;
+    }
+    
     vmailPlayer = new Phonon::MediaObject(this);
     Phonon::AudioOutput *audioOutput =
-                new Phonon::AudioOutput(Phonon::MusicCategory, vmailPlayer);
+        new Phonon::AudioOutput(Phonon::MusicCategory, vmailPlayer);
     Phonon::createPath(vmailPlayer, audioOutput);
 
     bool rv = connect (
@@ -65,7 +67,7 @@ void
 MainWindow::onVmailPlayerFinished()
 {
     // Required to make phonon on Maemo work as expected.
-    qDebug("Force stop vmail on finished");
+    Q_DEBUG("Force stop vmail on finished");
     vmailPlayer->stop ();
 }//MainWindow::onVmailPlayerFinished
 
@@ -73,8 +75,8 @@ void
 MainWindow::onSigCloseVmail()
 {
     if (NULL != vmailPlayer) {
-        vmailPlayer->deleteLater ();
-        vmailPlayer = NULL;
+        vmailPlayer->stop();
+        vmailPlayer->clearQueue();
     }
 }//MainWindow::onSigCloseVmail
 
@@ -161,11 +163,25 @@ MainWindow::onVmailPlayerStateChanged(Phonon::State newState,
                                       Phonon::State /*oldState*/)
 {
     int value = -1;
-    qDebug() << "Vmail player state changed to" << newState;
+    Q_DEBUG(QString("Vmail player state changed to %1").arg(newState));
 
     switch (newState) {
-    case Phonon::StoppedState:
+    case Phonon::LoadingState:
+        value = 0;
+        break;
     case Phonon::ErrorState:
+        Q_DEBUG(QString("Phonon error: %1").arg(vmailPlayer->errorString()));
+//        QTimer::singleShot(100, vmailPlayer, SLOT(stop()));
+        value = 0;
+        break;
+    case Phonon::StoppedState:
+        if (bBeginPlayAfterLoad) {
+            bBeginPlayAfterLoad = false;
+            if (vmailPlayer) {
+                Q_DEBUG("Autoplaying at the end of load");
+                QTimer::singleShot(500, vmailPlayer, SLOT(play()));
+            }
+        }
         value = 0;
         break;
     case Phonon::PlayingState:
@@ -187,25 +203,30 @@ void
 MainWindow::onSigVmailPlayback (int newstate)
 {
     if (NULL == vmailPlayer) {
-        qDebug("Vmail object not available.");
+        Q_DEBUG("Vmail object not available.");
+
+        QDeclarativeContext *ctx = this->rootContext();
+        int value = 0;
+        ctx->setContextProperty ("g_vmailPlayerState", value);
+
         return;
     }
 
     switch(newstate) {
     case 0:
-        qDebug ("QML asked us to stop vmail");
+        Q_DEBUG("QML asked us to stop vmail");
         vmailPlayer->stop ();
         break;
     case 1:
-        qDebug ("QML asked us to play vmail");
+        Q_DEBUG("QML asked us to play vmail");
         vmailPlayer->play ();
         break;
     case 2:
-        qDebug ("QML asked us to pause vmail");
+        Q_DEBUG("QML asked us to pause vmail");
         vmailPlayer->pause ();
         break;
     default:
-        qDebug() << "Unknown newstate =" << newstate;
+        Q_DEBUG(QString("Unknown newstate = %1").arg(newstate));
         break;
     }
 }//MainWindow::onSigVmailPlayback
