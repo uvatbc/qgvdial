@@ -102,7 +102,7 @@ MqClientThread::on_connect (int rc)
                 << QString("%1").arg(rc);
         return;
     }
-    Q_DEBUG ("Mosquitto: Connected to") << strHost;
+    Q_DEBUG(QString("Mosquitto: Connected to %1").arg(strHost));
 
     rc = this->subscribe (NULL, strTopic.toLatin1().constData (), 1);
     if (0 != rc) {
@@ -111,7 +111,7 @@ MqClientThread::on_connect (int rc)
         emit status ("Failed to subscribe to Mosquitto server");
         return;
     }
-    Q_DEBUG ("Mosquitto: Subscribed to") << strTopic << "established.";
+    Q_DEBUG(QString("Mosquitto: Subscription %1 established.").arg(strTopic));
 }//MqClientThread::on_connect
 
 void
@@ -123,8 +123,8 @@ MqClientThread::on_message (const struct mosquitto_message *message)
     }
 
     QString strPayload = (char*)message->payload;
-    Q_DEBUG ("Mosquitto: topic = ") << message->topic
-             << ". message = " << strPayload;
+    Q_DEBUG(QString("Mosquitto: topic \"%1\". message \"%2\"")
+                .arg(message->topic, strPayload));
 
     QStringList arrPayload = strPayload.split (' ');
     if (arrPayload.length () < 1) {
@@ -155,32 +155,32 @@ MqClientThread::on_message (const struct mosquitto_message *message)
 void
 MqClientThread::on_disconnect()
 {
-    Q_DEBUG ("Mosquitto: disconnect");
+    Q_DEBUG("Mosquitto: disconnect");
 }//MqClientThread::on_disconnect
 
 void
 MqClientThread::on_publish(uint16_t /*mid*/)
 {
-    Q_DEBUG ("Mosquitto: publish");
+    Q_DEBUG("Mosquitto: publish");
 }//MqClientThread::on_publish
 
 void
 MqClientThread::on_subscribe(uint16_t /*mid*/, int /*qos_count*/,
                              const uint8_t * /*granted_qos*/)
 {
-    Q_DEBUG ("Mosquitto: Subscribed");
+    Q_DEBUG("Mosquitto: Subscribed");
 }//MqClientThread::on_subscribe
 
 void
 MqClientThread::on_unsubscribe(uint16_t /*mid*/)
 {
-    Q_DEBUG ("Mosquitto: unsubscribed");
+    Q_DEBUG("Mosquitto: unsubscribed");
 }//MqClientThread::on_unsubscribe
 
 void
 MqClientThread::on_error()
 {
-    Q_DEBUG ("Mosquitto: error");
+    Q_DEBUG("Mosquitto: error");
 }//MqClientThread::on_error
 
 void
@@ -188,7 +188,7 @@ MqClientThread::run ()
 {
 #define MQTHREAD_MAX_RETRIES 5
     int rv, retries = 0;
-    Q_DEBUG ("Mq thread: Enter thread");
+    Q_DEBUG("Mq thread: Enter thread");
 
     do {
         if (strHost.length () == 0) {
@@ -196,15 +196,15 @@ MqClientThread::run ()
             break;
         }
 
-        Q_DEBUG ("Mq thread: Attempting to connect to") << strHost;
+        Q_DEBUG(QString("Mq thread: Attempting to connect to host %1")
+                    .arg(strHost));
         rv = this->mq_connect (strHost.toLatin1().constData(), port, 60, false);
         if (0 != rv) {
-            Q_WARN ("Mq thread: Failed to connect. Error =")
-                    << QString("%1").arg(rv);
-            emit status ("Failed to connect to Mosquitto server");
+            Q_WARN(QString("Mq thread: Failed to connect. Error = %1").arg(rv));
+            emit status("Failed to connect to Mosquitto server");
             this->sleep(5);
         } else {
-            emit status ("Connected to Mosquitto server!");
+            emit status("Connected to Mosquitto server!");
         }
 
         while (!bQuit) {
@@ -236,20 +236,20 @@ MqClientThread::run ()
             }
         }
 
-        Q_DEBUG ("Mq thread: End Mq loop. Unsubscribe and disconnect");
+        Q_DEBUG("Mq thread: End Mq loop. Unsubscribe and disconnect");
         this->unsubscribe(NULL, strTopic.toLatin1().constData ());
         this->mq_disconnect ();
         this->loop (100);
 
         if (retries > MQTHREAD_MAX_RETRIES) {
-            Q_WARN ("MqThread: Too many retires!");
+            Q_WARN("MqThread: Too many retires!");
             bQuit = true;
         }
     } while (!bQuit);
 
     // Ready for the next time
     bQuit = false;
-    Q_DEBUG ("Mq thread: Exit thread");
+    Q_DEBUG("Mq thread: Exit thread");
 }//MqClientThread::run
 
 void
@@ -287,7 +287,7 @@ void
 MqClientThread::setQuit (bool set)
 {
     bQuit = set;
-    Q_DEBUG ("Mosquitto: Request for quit =") << (set ? "True" : "False");
+    Q_DEBUG(QString("Mosquitto: Request for quit = %1").arg(set));
 }//MqClientThread::setQuit
 
 int

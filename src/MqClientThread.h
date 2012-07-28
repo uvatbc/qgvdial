@@ -56,7 +56,7 @@ signals:
     void status (const QString &strText, int timeout = 3000);
 
 private:
-    void run ();
+    void run();
     int subscribe(uint16_t *mid, const char *sub, int qos=0);
     int unsubscribe(uint16_t *mid, const char *sub);
     int mq_connect(const char *host, int port=1883, int keepalive=60,

@@ -31,8 +31,8 @@ MainWindow::MainWindow (QWidget *parent)
 , gvApi (true, this)
 , icoQgv (":/qgv.png")
 , pSystray (NULL)
-, oContacts (this)
-, oInbox (gvApi, this)
+, oContacts (NULL)
+, oInbox (NULL)
 , bBeginPlayAfterLoad (false)
 , vmailPlayer (NULL)
 , nwMgr (NULL)
@@ -46,7 +46,7 @@ MainWindow::MainWindow (QWidget *parent)
 , actRefresh ("Refresh", this)
 , actExit ("Exit", this)
 , bLoggedIn (false)
-, modelRegNumber (this)
+, modelRegNumber (NULL)
 , indRegPhone (0)
 , mtxDial (QMutex::Recursive)
 , bCallInProgress (false)
@@ -60,6 +60,25 @@ MainWindow::MainWindow (QWidget *parent)
 #endif
 , bQuitPath (false)
 {
+    modelRegNumber = new RegNumberModel(this);
+    if (modelRegNumber == NULL) {
+        Q_WARN("Failed to allocate modelRegNumber");
+        exit(1);
+        return;
+    }
+    oContacts = new GVContactsTable(this);
+    if (oContacts == NULL) {
+        Q_WARN("Failed to allocate oContacts");
+        exit(1);
+        return;
+    }
+    oInbox = new GVInbox(gvApi, this);
+    if (oInbox == NULL) {
+        Q_WARN("Failed to allocate oInbox");
+        exit(1);
+        return;
+    }
+
     initLogging ();
 
     qRegisterMetaType<ContactInfo>("ContactInfo");
@@ -114,6 +133,28 @@ MainWindow::~MainWindow ()
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     QList<QNetworkCookie> cookies = gvApi.getAllCookies ();
     dbMain.saveCookies (cookies);
+
+    if (pSystray != NULL) {
+        delete pSystray;
+        pSystray = NULL;
+    }
+
+    if (modelRegNumber != NULL) {
+        delete modelRegNumber;
+        modelRegNumber = NULL;
+    }
+
+    if (oContacts != NULL) {
+        delete oContacts;
+        oContacts = NULL;
+    }
+
+    if (oInbox != NULL) {
+        delete oInbox;
+        oInbox = NULL;
+    }
+
+    Singletons::getRef().deinit ();
 }//MainWindow::~MainWindow
 
 /** Invoked when the QtSingleApplication sends a message
@@ -255,37 +296,37 @@ MainWindow::init ()
     if (!rv) { exit(1); }
 
     // Status from contacts object
-    rv = connect (&oContacts, SIGNAL (status   (const QString &, int)),
-                   this     , SLOT   (setStatus(const QString &, int)));
+    rv = connect (oContacts, SIGNAL (status   (const QString &, int)),
+                  this     , SLOT   (setStatus(const QString &, int)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
-    // oContacts.allContacts -> this.getContactsDone
-    rv = connect (&oContacts, SIGNAL (allContacts (bool)),
-                   this     , SLOT   (getContactsDone (bool)));
+    // oContacts->allContacts -> this.getContactsDone
+    rv = connect (oContacts, SIGNAL (allContacts (bool)),
+                  this     , SLOT   (getContactsDone (bool)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
     // Status from inbox object
-    rv = connect (&oInbox, SIGNAL (status   (const QString &, int)),
-                   this  , SLOT   (setStatus(const QString &, int)));
+    rv = connect (oInbox, SIGNAL (status   (const QString &, int)),
+                  this  , SLOT   (setStatus(const QString &, int)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
 
     // Inbox Model creation
-    rv = connect (&oInbox, SIGNAL (setInboxModel(QAbstractItemModel *)),
-                   this  , SLOT (onSetInboxModel(QAbstractItemModel *)));
+    rv = connect (oInbox, SIGNAL (setInboxModel(QAbstractItemModel *)),
+                  this  , SLOT (onSetInboxModel(QAbstractItemModel *)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
     // Inbox selector changes
-    rv = connect (&oInbox, SIGNAL (setInboxSelector(const QString &)),
-                   this  , SLOT (onSetInboxSelector(const QString &)));
+    rv = connect (oInbox, SIGNAL (setInboxSelector(const QString &)),
+                  this  , SLOT (onSetInboxSelector(const QString &)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
 
     // Inbox Model creation
-    rv = connect (&oContacts, SIGNAL (setContactsModel(QAbstractItemModel *,
-                                                       QAbstractItemModel *)),
-                   this     , SLOT (onSetContactsModel(QAbstractItemModel *,
-                                                       QAbstractItemModel *)));
+    rv = connect (oContacts, SIGNAL (setContactsModel(QAbstractItemModel *,
+                                                      QAbstractItemModel *)),
+                  this     , SLOT (onSetContactsModel(QAbstractItemModel *,
+                                                      QAbstractItemModel *)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
 
@@ -343,20 +384,20 @@ MainWindow::init ()
     if (!QFileInfo(strTempStore).exists ()) {
         dirApp.mkdir ("temp");
     }
-    oContacts.setTempStore(strTempStore);
+    oContacts->setTempStore(strTempStore);
 
 #if MOSQUITTO_CAPABLE
     // Connect the signals from the Mosquitto thread
-    rv = connect (&mqThread , SIGNAL(sigUpdateInbox(const QDateTime &)),
-                  &oInbox   , SLOT  (refresh(const QDateTime &)));
+    rv = connect (&mqThread, SIGNAL(sigUpdateInbox(const QDateTime &)),
+                  oInbox   , SLOT  (refresh(const QDateTime &)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
-    rv = connect (&mqThread , SIGNAL(sigUpdateContacts(const QDateTime &)),
-                  &oContacts, SLOT  (mqUpdateContacts(const QDateTime &)));
+    rv = connect (&mqThread, SIGNAL(sigUpdateContacts(const QDateTime &)),
+                  oContacts, SLOT  (mqUpdateContacts(const QDateTime &)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
-    rv = connect (&mqThread , SIGNAL(status(QString,int)),
-                   this     , SLOT  (setStatus(QString,int)));
+    rv = connect (&mqThread, SIGNAL(status(QString,int)),
+                   this    , SLOT  (setStatus(QString,int)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
     rv = connect (&mqThread, SIGNAL(finished()),
@@ -429,72 +470,72 @@ MainWindow::initQML ()
 
     bool rv;
     // Connect all signals to slots in this class.
-    rv = connect (gObj, SIGNAL (sigCall (QString)),
-                  this, SLOT   (dialNow (QString)));
+    rv = connect (gObj, SIGNAL(sigCall(QString)),
+                  this, SLOT  (dialNow(QString)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
     rv = connect (
-        gObj, SIGNAL (sigText (const QString &, const QString &)),
-        this, SLOT   (onSigText (const QString &, const QString &)));
+        gObj, SIGNAL (sigText(const QString&,const QString&)),
+        this, SLOT   (onSigText(const QString&,const QString&)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
-    rv = connect (gObj, SIGNAL (sigVoicemail (QString)),
-                  this, SLOT   (retrieveVoicemail (const QString &)));
+    rv = connect (gObj, SIGNAL(sigVoicemail(QString)),
+                  this, SLOT(retrieveVoicemail(const QString &)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
-    rv = connect (gObj, SIGNAL (sigVmailPlayback (int)),
-                  this, SLOT   (onSigVmailPlayback (int)));
+    rv = connect (gObj, SIGNAL(sigVmailPlayback (int)),
+                  this, SLOT(onSigVmailPlayback (int)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
-    rv = connect (gObj, SIGNAL (sigSelChanged (int)),
-                  this, SLOT   (onRegPhoneSelectionChange (int)));
+    rv = connect (gObj, SIGNAL(sigSelChanged(int)),
+                  this, SLOT(onRegPhoneSelectionChange(int)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
-    rv = connect (gObj   , SIGNAL (sigInboxSelect (QString)),
-                  &oInbox, SLOT   (onInboxSelected (const QString &)));
+    rv = connect (gObj  , SIGNAL(sigInboxSelect(QString)),
+                  oInbox, SLOT(onInboxSelected(const QString &)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
-    rv = connect (gObj   , SIGNAL (sigMarkAsRead (QString)),
-                  &oInbox, SLOT   (onSigMarkAsRead (const QString &)));
+    rv = connect (gObj  , SIGNAL(sigMarkAsRead(QString)),
+                  oInbox, SLOT(onSigMarkAsRead(const QString &)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
-    rv = connect (gObj, SIGNAL (sigCloseVmail ()),
-                  this, SLOT   (onSigCloseVmail ()));
+    rv = connect (gObj, SIGNAL(sigCloseVmail ()),
+                  this, SLOT(onSigCloseVmail ()));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
-    rv = connect (gObj, SIGNAL (sigHide ()),
-                  this, SLOT   (onSigHide ()));
+    rv = connect (gObj, SIGNAL(sigHide ()),
+                  this, SLOT(onSigHide ()));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
-    rv = connect (gObj, SIGNAL (sigQuit ()),
-                  this, SLOT   (on_actionE_xit_triggered ()));
+    rv = connect (gObj, SIGNAL(sigQuit ()),
+                  this, SLOT(on_actionE_xit_triggered ()));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
-    rv = connect (gObj, SIGNAL (sigMsgBoxDone(bool)),
-                  this, SLOT (onSigMsgBoxDone(bool)));
+    rv = connect (gObj, SIGNAL(sigMsgBoxDone(bool)),
+                  this, SLOT(onSigMsgBoxDone(bool)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
     rv = connect (
-        gObj      , SIGNAL  (sigSearchContacts(const QString &)),
-        &oContacts, SLOT (onSearchQueryChanged(const QString &)));
+        gObj     , SIGNAL(sigSearchContacts(const QString &)),
+        oContacts, SLOT(onSearchQueryChanged(const QString &)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
 
-    rv = connect (gObj, SIGNAL (sigRefreshContacts()),
-                  &oContacts, SLOT(refreshContacts()));
+    rv = connect (gObj, SIGNAL(sigRefreshContacts()),
+                  oContacts, SLOT(refreshContacts()));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
-    rv = connect (gObj, SIGNAL (sigRefreshAllContacts()),
-                  &oContacts, SLOT(refreshAllContacts()));
+    rv = connect (gObj, SIGNAL(sigRefreshAllContacts()),
+                  oContacts, SLOT(refreshAllContacts()));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
 
     rv = connect (gObj, SIGNAL(sigRefreshInbox()),
-                  &oInbox,   SLOT(refresh()));
+                  oInbox, SLOT(refresh()));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
     rv = connect (gObj, SIGNAL(sigRefreshAllInbox()),
-                  &oInbox,  SLOT(refreshFullInbox()));
+                  oInbox, SLOT(refreshFullInbox()));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
 
@@ -679,32 +720,32 @@ MainWindow::getContactsDone (bool bOk)
 void
 MainWindow::initContacts ()
 {
-    oContacts.setUserPass (strUser, strPass);
-    oContacts.loginSuccess ();
-    oContacts.initModel ();
-    oContacts.refreshContacts ();
+    oContacts->setUserPass (strUser, strPass);
+    oContacts->loginSuccess ();
+    oContacts->initModel ();
+    oContacts->refreshContacts ();
 }//MainWindow::initContacts
 
 void
 MainWindow::deinitContacts ()
 {
-    oContacts.deinitModel ();
-    oContacts.loggedOut ();
+    oContacts->deinitModel ();
+    oContacts->loggedOut ();
 }//MainWindow::deinitContacts
 
 void
 MainWindow::initInbox ()
 {
-    oInbox.loginSuccess ();
-    oInbox.initModel ();
-    oInbox.refresh ();
+    oInbox->loginSuccess ();
+    oInbox->initModel ();
+    oInbox->refresh ();
 }//MainWindow::initInbox
 
 void
 MainWindow::deinitInbox ()
 {
-    oInbox.deinitModel ();
-    oInbox.loggedOut ();
+    oInbox->deinitModel ();
+    oInbox->loggedOut ();
 }//MainWindow::deinitInbox
 
 bool
@@ -788,7 +829,7 @@ MainWindow::onRegPhoneSelectionChange (int index)
     dbMain.putCallback (QString("%1").arg (indRegPhone));
 
     RegNumData data;
-    if (!modelRegNumber.getAt (indRegPhone, data)) {
+    if (!modelRegNumber->getAt (indRegPhone, data)) {
         data.strName = "<Unknown>";
     }
 
@@ -796,8 +837,8 @@ MainWindow::onRegPhoneSelectionChange (int index)
     osd.setLongWork (this, false);
 
     QStringList phones;
-    for (int i = 0; i < modelRegNumber.rowCount (); i++) {
-        if (!modelRegNumber.getAt (i, data)) {
+    for (int i = 0; i < modelRegNumber->rowCount (); i++) {
+        if (!modelRegNumber->getAt (i, data)) {
             phones += "<Unknown>";
         } else {
             phones += data.strName;
@@ -812,8 +853,8 @@ MainWindow::onRefresh ()
     Q_DEBUG ("Refresh all requested.");
 
     refreshRegisteredNumbers ();
-    oInbox.refresh ();
-    oContacts.refreshContacts ();
+    oInbox->refresh ();
+    oContacts->refreshContacts ();
 }//MainWindow::onRefresh
 
 void
@@ -1064,13 +1105,13 @@ MainWindow::onCallInitiatorsChange (bool bSave)
 
     // Clear out all entries in the model...
     QMetaObject::invokeMethod (model, "clear");
-    modelRegNumber.clear ();
+    modelRegNumber->clear ();
 
     for (int i = 0; i < arrNumbers.size (); i++) {
         strCiName = "Dial back: " + arrNumbers[i].strName;
-        modelRegNumber.insertRow (strCiName,
-                                  arrNumbers[i].strNumber,
-                                  arrNumbers[i].chType);
+        modelRegNumber->insertRow (strCiName,
+                                   arrNumbers[i].strNumber,
+                                   arrNumbers[i].chType);
 
         oneEntry.clear ();
         oneEntry["entryText"] = strCiName;
@@ -1087,7 +1128,7 @@ MainWindow::onCallInitiatorsChange (bool bSave)
     foreach (CalloutInitiator *ci, cif.getInitiators ()) {
         if (ci->isValid ()) {
             strCiName = "Dial out: " + ci->name ();
-            modelRegNumber.insertRow (strCiName, ci->selfNumber (), ci);
+            modelRegNumber->insertRow (strCiName, ci->selfNumber (), ci);
 
             oneEntry.clear ();
             oneEntry["entryText"] = strCiName;

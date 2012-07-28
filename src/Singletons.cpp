@@ -29,15 +29,7 @@ Singletons::Singletons (QObject *parent/* = 0*/)
 
 Singletons::~Singletons ()
 {
-    if (dbMain) {
-        QStringList connections = QSqlDatabase::connectionNames();
-        for (int i = 0; i < connections.length(); i++) {
-            QSqlDatabase::removeDatabase(connections[i]);
-        }
-
-        delete dbMain;
-        dbMain = NULL;
-    }
+    //deinit ();
 }//Singletons::~Singletons
 
 Singletons &
@@ -83,3 +75,17 @@ Singletons::getCIFactory ()
     static CallInitiatorFactory callInitiatorFactory(this);
     return (callInitiatorFactory);
 }//Singletons::getCIFactory
+
+void
+Singletons::deinit()
+{
+    if (dbMain) {
+        QStringList connections = QSqlDatabase::connectionNames();
+        for (int i = 0; i < connections.length(); i++) {
+            QSqlDatabase::removeDatabase(connections[i]);
+        }
+
+        delete dbMain;
+        dbMain = NULL;
+    }
+}//Singletons::deinit

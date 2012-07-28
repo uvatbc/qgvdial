@@ -419,7 +419,7 @@ MainWindow::getDialSettings (bool                 &bDialout   ,
     bool rv = false;
     do { // Begin cleanup block (not a loop)
         RegNumData data;
-        if (!modelRegNumber.getAt (indRegPhone, data)) {
+        if (!modelRegNumber->getAt (indRegPhone, data)) {
             Q_WARN("Invalid registered phone index");
             break;
         }

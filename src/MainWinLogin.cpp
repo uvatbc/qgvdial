@@ -242,8 +242,8 @@ MainWindow::doLogout ()
     OsDependent &osd = Singletons::getRef().getOSD ();
     osd.setLongWork (this, true);
 
-    oContacts.deinitModel ();
-    oInbox.deinitModel ();
+    oContacts->deinitModel ();
+    oInbox->deinitModel ();
 
 #if MOSQUITTO_CAPABLE
     mqThread.setQuit ();

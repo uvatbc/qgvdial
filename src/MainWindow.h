@@ -258,9 +258,9 @@ private:
     QIcon           icoQgv;
     QSystemTrayIcon *pSystray;
     //! GV Contacts object
-    GVContactsTable oContacts;
+    GVContactsTable *oContacts;
     //! GV Inbox object
-    GVInbox         oInbox;
+    GVInbox         *oInbox;
 
     bool bBeginPlayAfterLoad;
     //! The Phonon vmail player
@@ -291,7 +291,7 @@ private:
     QString         strPass;
 
     //! Model for registered phone numbers
-    RegNumberModel  modelRegNumber;
+    RegNumberModel *modelRegNumber;
     //! Index of the registered phone currently in use
     int             indRegPhone;
 

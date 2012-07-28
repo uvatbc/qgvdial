@@ -45,6 +45,8 @@ public:
     SkypeClientFactory  & getSkypeFactory ();
     CallInitiatorFactory& getCIFactory ();
 
+    void deinit();
+
 private:
     Singletons (QObject *parent = 0);
     virtual ~Singletons ();
