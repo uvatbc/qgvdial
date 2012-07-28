@@ -1452,6 +1452,18 @@ CacheDatabase::loadCookies(QList<QNetworkCookie> &cookies)
 }//CacheDatabase::saveCookies
 
 bool
+CacheDatabase::clearCookies()
+{
+    QSqlQuery query(dbMain);
+    query.setForwardOnly (true);
+
+    bool rv = query.exec("DELETE FROM " GV_COOKIEJAR_TABLE);
+    Q_ASSERT(rv);
+
+    return (rv);
+}//CacheDatabase::clearCookies
+
+bool
 CacheDatabase::dbgGetAlwaysFailDialing()
 {
     bool rv = false;

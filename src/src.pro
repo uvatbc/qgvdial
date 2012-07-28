@@ -37,6 +37,7 @@ MOBILITY *= systeminfo
 symbian|contains(MEEGO_EDITION,harmattan) {
     MOBILITY *= feedback
     OTHER_FILES += ../build-files/qgvdial/harmattan/qgvdial.desktop
+    CONFIG += qt-components
 }
 
 include(qtsingleapplication/qtsingleapplication.pri)

@@ -135,6 +135,7 @@ public:
     // Serialize cookies in the cookie jar
     bool saveCookies(QList<QNetworkCookie> cookies);
     bool loadCookies(QList<QNetworkCookie> &cookies);
+    bool clearCookies();
 
     bool dbgGetAlwaysFailDialing();
 

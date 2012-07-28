@@ -96,8 +96,13 @@ MainWindow::onUserTextChanged (const QString &strUsername)
         strUser = strUsername;
         this->setUsername (strUser);
 
+        // Clear out cookies so that any existing login credentials are cleared
+        // out of the cache.
         QList<QNetworkCookie> noCookies;
         gvApi.setAllCookies(noCookies);
+
+        CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+        dbMain.clearCookies ();
     }
 }//MainWindow::onUserTextChanged
 
@@ -108,8 +113,14 @@ MainWindow::onPassTextChanged (const QString &strPassword)
         strPass = strPassword;
         this->setPassword (strPass);
 
+        // Clear out cookies so that any existing login credentials are cleared
+        // out of the cache. Do this even if it is just the password because
+        // who knows what may have changes in the credentials? Why take chances?
         QList<QNetworkCookie> noCookies;
         gvApi.setAllCookies(noCookies);
+
+        CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+        dbMain.clearCookies ();
     }
 }//MainWindow::onUserPassTextChanged
 
@@ -161,7 +172,7 @@ MainWindow::loginCompleted (AsyncTaskToken *token)
         }
         this->showMsgBox (strErr);
 
-        Q_WARN("User login failed. Error string: ") << strErr;
+        Q_WARN(QString("User login failed. Error string: %1").arg(strErr));
 
         dbMain.clearUserPass ();
         QTimer::singleShot (500, this, SLOT(onRecreateCookieJar()));
