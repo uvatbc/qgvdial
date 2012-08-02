@@ -86,6 +86,14 @@ Rectangle {
                 }
             }
 
+            Timer {
+                id: searchTimeout
+                interval: (3 * 1000)
+                repeat: false
+
+                onTriggered: searchRow.doSearch();
+            }
+
             Text {
                 id: searchLabel
                 text: "Search:"
@@ -104,6 +112,9 @@ Rectangle {
                     if (imgSearch.selection) {
                         imgSearch.selection = false;
                     }
+
+                    searchTimeout.stop();
+                    searchTimeout.start();
                 }
 
                 onSigEnter: {

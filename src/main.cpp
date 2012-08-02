@@ -42,6 +42,7 @@ qgv_LogFlush()
     if (logCounter) {
         logCounter = 0;
         fLogfile.flush ();
+        cout.flush();
     }
 }
 

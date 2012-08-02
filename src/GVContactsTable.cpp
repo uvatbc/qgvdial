@@ -625,7 +625,7 @@ void
 GVContactsTable::onSearchQueryChanged (const QString &query)
 {
     if (NULL != modelSearchContacts) {
-        modelSearchContacts->refresh (query);
+        modelSearchContacts->refresh(query);
     }
 }//GVContactsTable::onSearchQuerychanged
 

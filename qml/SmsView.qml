@@ -208,7 +208,7 @@ Rectangle {
                     }//Rectangle (bordering the close image)
                 }//delegate (Rectangle)
             }//Repeater
-        }//Column
+        }//Column of all the contacts to send the SMS.
 
         Row {
             id: btnRow

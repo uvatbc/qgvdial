@@ -70,20 +70,14 @@ Rectangle {
 
                 onTextChanged: {main.theNumber = txtNum.text;}
 
+                activeFocusOnPress: true
                 MouseArea {
                     anchors.fill: parent
-                    onPressed: {
-                        if (g_IsMobilePlatform) {
-                            console.debug("Foo");
-                            txtNum.closeSoftwareInputPanel();
-                        }
-                    }
 
-                    onReleased: {
-                        if (g_IsMobilePlatform) {
-                            console.debug("bar");
-                            txtNum.closeSoftwareInputPanel();
-                        }
+                    onClicked: {
+                        console.debug("text area clicked");
+                        focus = true;
+                        txtNum.closeSoftwareInputPanel();
                     }
                 }
             }// TextEdit
