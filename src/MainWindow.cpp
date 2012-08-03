@@ -154,7 +154,7 @@ MainWindow::~MainWindow ()
         oInbox = NULL;
     }
 
-    Singletons::getRef().deinit ();
+    Singletons::getRef().deinit();
 }//MainWindow::~MainWindow
 
 /** Invoked when the QtSingleApplication sends a message

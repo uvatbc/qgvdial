@@ -142,14 +142,18 @@ MqClientThread::on_message (const struct mosquitto_message *message)
     }
     dtUpdate = dtUpdate.toLocalTime();
 
+    QString msg;
     if (arrPayload[0].contains ("inbox")) {
-        emit status ("Mosquitto: New inbox entry");
+        msg = QString("Mosquitto: Inbox changes date %1")
+                        .arg (dtUpdate.toString (Qt::ISODate));
         emit sigUpdateInbox(dtUpdate);
-    }
-    if (arrPayload[0].contains ("contact")) {
-        emit status ("Mosquitto: Contact changes");
+    } else if (arrPayload[0].contains ("contact")) {
+        msg = QString("Mosquitto: Contact changes date %1")
+                        .arg (dtUpdate.toString (Qt::ISODate));
         emit sigUpdateContacts (dtUpdate);
     }
+
+    Q_DEBUG(msg);
 }//MqClientThread::on_message
 
 void
