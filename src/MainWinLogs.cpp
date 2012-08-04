@@ -108,9 +108,9 @@ MainWindow::setStatus(const QString &strText, int timeout /* = 3000*/)
             theLabel = new QLabel (strText, &infoBox);
             theLabel->setAlignment (Qt::AlignHCenter);
             infoBox.setWidget (theLabel);
-            qDebug("Created the Maemo5 yellow banner label");
+            Q_DEBUG("Created the Maemo5 yellow banner label");
         } else {
-            qDebug() << "Display the status banner:" << strText;
+            Q_DEBUG(QString("Display the status banner: %1").arg (strText));
             theLabel->setText (strText);
         }
         infoBox.setTimeout (0 == timeout ? 3000 : timeout);

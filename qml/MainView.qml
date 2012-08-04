@@ -34,9 +34,6 @@ Rectangle {
     property bool landscape: main.width > main.height
     property variant rotationDelta: landscape? -90 : 0
 
-    // initial state is portrait
-    property string theNumber: ""
-
     Flow {
         anchors.fill: parent
 
@@ -60,15 +57,11 @@ Rectangle {
 
                 inputMethodHints: Qt.ImhNoAutoUppercase + Qt.ImhNoPredictiveText
 
-                text: main.theNumber
-
                 font {
                     family: "Nokia Sans"
                     pointSize: (12 * g_fontMul)
                     bold: true
                 }
-
-                onTextChanged: {main.theNumber = txtNum.text;}
 
                 activeFocusOnPress: true
                 MouseArea {
@@ -95,7 +88,7 @@ Rectangle {
                 onSigText: main.sigText(txtNum.text)
 
                 onSigDel: Code.doDel()
-                onSigClear: main.theNumber = ""
+                onSigClear: txtNum.text = ""
             }//ActionButtons (landscape mode - horizontal)
         }//Column: text edit for number and action buttons
 
@@ -121,7 +114,7 @@ Rectangle {
             onSigText: main.sigText(txtNum.text)
 
             onSigDel: Code.doDel()
-            onSigClear: main.theNumber = ""
+            onSigClear: txtNum.text = ""
         }//ActionButtons (portrait mode - vertical)
     }//Flow
 }//main

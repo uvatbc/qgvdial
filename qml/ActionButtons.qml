@@ -29,6 +29,8 @@ Rectangle {
     signal sigDel
     signal sigClear
 
+    onSigClear: console.debug("Clear the number")
+
     Row {
         anchors.fill: parent
         spacing: 1
