@@ -30,6 +30,7 @@ GVInbox::GVInbox (GVApi &gref, QObject *parent)
 , mutex (QMutex::Recursive)
 , bLoggedIn (false)
 , bRefreshInProgress (false)
+, bRetrieveTrash (false)
 , modelInbox (NULL)
 {
     bool rv = connect (
@@ -102,15 +103,29 @@ GVInbox::refresh (const QDateTime &dtUpdate)
     }
 
     if (bRefreshInProgress) {
+        if ((!dtUpdate.isValid()) || (dtUpdate > dateWaterLevel)) {
+            dateWaterLevel = dtUpdate;
+        }
+
         Q_WARN("Refresh in progress. Ignore this one.");
         return;
+    }
+
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    QDateTime latest;
+    dbMain.getLatestInboxEntry (latest);
+
+    if ((!dateWaterLevel.isValid()) || (dateWaterLevel < latest)) {
+        dateWaterLevel = latest;
+    }
+    if ((!dtUpdate.isValid()) || (dtUpdate > dateWaterLevel)) {
+        dateWaterLevel = dtUpdate;
     }
 
     int page = 1;
     AsyncTaskToken *token = new AsyncTaskToken(this);
     token->inParams["type"] = "all";
     token->inParams["page"] = page;
-    dateWaterLevel = dtUpdate;
     passedWaterLevel = false;
 
     Q_DEBUG(QString ("Water level = %1").arg(dateWaterLevel.toString()));
@@ -148,22 +163,29 @@ GVInbox::refreshFullInbox ()
 void
 GVInbox::oneInboxEntry (const GVInboxEntry &hevent)
 {
-    if (GVIE_Unknown == hevent.Type) {
-        Q_WARN("Invalid inbox entry type:")
-                << QString("%1").arg((int)hevent.Type);
-        return;
-    }
+    if (!bRetrieveTrash) {
+        if (GVIE_Unknown == hevent.Type) {
+            Q_WARN("Invalid inbox entry type:")
+                    << QString("%1").arg((int)hevent.Type);
+            return;
+        }
 
-    if (dateWaterLevel.isValid () && (hevent.startTime < dateWaterLevel)) {
-        passedWaterLevel = true;
+        if (dateWaterLevel.isValid () && (dateWaterLevel > hevent.startTime)) {
+            passedWaterLevel = true;
+        } else {
+            newEntries++;
+        }
+
+        CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+        dbMain.setQuickAndDirty ();
+
+        modelInbox->insertEntry (hevent);
     } else {
-        newEntries++;
+        Q_DEBUG(QString("Delete entry with ID %1").arg (hevent.id));
+        passedWaterLevel = true;
+
+        modelInbox->deleteEntry (hevent);
     }
-
-    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    dbMain.setQuickAndDirty ();
-
-    modelInbox->insertEntry (hevent);
 }//GVInbox::oneInboxEntry
 
 void
@@ -219,17 +241,46 @@ GVInbox::getInboxDone (AsyncTaskToken *token)
         token = NULL;
     }
 
-    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    dbMain.setQuickAndDirty (false);
-
-    prepView ();
-
-    emit status (QString("Inbox ready. %1 new %2 retrieved.")
-                 .arg(newEntries).arg (newEntries == 1?"entry":"entries"));
-
     QMutexLocker locker(&mutex);
     bRefreshInProgress = false;
+
+    if (bRetrieveTrash) {
+        bRetrieveTrash = false;
+
+        CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+        dbMain.setQuickAndDirty (false);
+
+        prepView ();
+
+        emit status (QString("Inbox ready. %1 new %2 retrieved.")
+                     .arg(newEntries).arg (newEntries == 1?"entry":"entries"));
+    } else {
+        bRetrieveTrash = true;
+        getTrash ();
+    }
 }//GVInbox::getInboxDone
+
+void
+GVInbox::getTrash()
+{
+    int page = 1;
+    AsyncTaskToken *token = new AsyncTaskToken(this);
+    token->inParams["type"] = "trash";
+    token->inParams["page"] = page;
+    passedWaterLevel = false;
+
+    bool rv = connect(token, SIGNAL(completed(AsyncTaskToken*)),
+                      this, SLOT(getInboxDone(AsyncTaskToken*)));
+    Q_ASSERT(rv); Q_UNUSED(rv);
+
+    bRefreshInProgress = true;
+    newEntries = 0;
+
+    if (!gvApi.getInbox (token)) {
+        getInboxDone (NULL);
+        delete token;
+    }
+}//GVInbox::getTrash
 
 void
 GVInbox::onInboxSelected (const QString &strSelection)

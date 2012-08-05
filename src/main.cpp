@@ -96,12 +96,8 @@ myMessageOutput(QtMsgType type, const char *msg)
         }
     }
 
-    if (NULL == pOldHandler) {
-        if (QtFatalMsg == type) {
-            abort();
-        }
-    } else {
-        pOldHandler (type, strLog.toLatin1 ());
+    if (QtFatalMsg == type) {
+        abort();
     }
 }//myMessageOutput
 

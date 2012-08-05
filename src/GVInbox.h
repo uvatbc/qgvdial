@@ -83,6 +83,9 @@ private slots:
 private:
     void prepView ();
 
+    //! Get trash
+    void getTrash();
+
 private:
     GVApi          &gvApi;
 
@@ -102,6 +105,9 @@ private:
 
     //! Refresh in progress
     bool            bRefreshInProgress;
+
+    //! Is this a trash inbox?
+    bool            bRetrieveTrash;
 
     //! The inbox model
     InboxModel     *modelInbox;

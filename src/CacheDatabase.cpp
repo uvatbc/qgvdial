@@ -855,6 +855,23 @@ CacheDatabase::insertInboxEntry (const GVInboxEntry &hEvent)
 }//CacheDatabase::insertInboxEntry
 
 bool
+CacheDatabase::deleteInboxEntryById (const QString &id)
+{
+    QString scrubId = id;
+    scrubId.replace ("'", "''");
+
+    QSqlQuery query(dbMain);
+    query.setForwardOnly (true);
+
+    bool rv =
+    query.exec (QString ("DELETE FROM " GV_INBOX_TABLE " "
+                         "WHERE " GV_IN_ID "='%1'")
+                .arg (scrubId));
+
+    return (rv);
+}//CacheDatabase::deleteInboxEntryById
+
+bool
 CacheDatabase::markAsRead (const QString &msgId)
 {
     QString scrubId = msgId;

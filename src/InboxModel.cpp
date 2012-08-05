@@ -332,6 +332,23 @@ InboxModel::insertEntry (const GVInboxEntry &hEvent)
 }//InboxModel::insertEntry
 
 bool
+InboxModel::deleteEntry (const GVInboxEntry &hEvent)
+{
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    quint32 rowCount = this->rowCount ();
+
+    bool bExists = dbMain.existsInboxEntry (hEvent);
+
+    if (bExists) {
+        beginRemoveRows (QModelIndex (), rowCount, rowCount);
+        dbMain.deleteInboxEntryById (hEvent.id);
+        endRemoveRows ();
+    }
+
+    return (true);
+}//InboxModel::deleteEntry
+
+bool
 InboxModel::markAsRead (const QString &msgId)
 {
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();

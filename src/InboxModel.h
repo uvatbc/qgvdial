@@ -54,6 +54,7 @@ public:
     bool refresh ();
 
     bool insertEntry (const GVInboxEntry &hEvent);
+    bool deleteEntry (const GVInboxEntry &hEvent);
     bool markAsRead (const QString &msgId);
 
 private:

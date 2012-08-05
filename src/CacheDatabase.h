@@ -96,6 +96,7 @@ public:
     // Single inbox entry
     bool existsInboxEntry (const GVInboxEntry &hEvent);
     bool insertInboxEntry (const GVInboxEntry &hEvent);
+    bool deleteInboxEntryById (const QString &id);
     bool markAsRead (const QString &msgId);
 
     // Collect multiple texts
