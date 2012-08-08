@@ -64,6 +64,14 @@ public:
     bool putUserPass (const QString &strUser, const QString &strPass);
     void clearUserPass ();
 
+    bool getContactsPass(QString &strPass);
+    bool setContactsPass(const QString &strPass);
+    void clearContactsPass();
+
+    void setTFAFlag(bool set);
+    bool getTFAFlag();
+    void clearTFAFlag();
+
     // GV callback / callout method
     bool getCallback (QString &strCallback);
     bool putCallback (const QString &strCallback);

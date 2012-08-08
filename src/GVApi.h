@@ -83,8 +83,6 @@ private slots:
                   QNetworkReply *reply, void *ctx);
     void onLogin2(bool success, const QByteArray &response,
                   QNetworkReply *reply, void *ctx);
-    void onTwoFactorLogin(bool success, const QByteArray &response,
-                          QNetworkReply *reply, void *ctx);
     void onTFAAutoPost(bool success, const QByteArray &response,
                        QNetworkReply *reply, void *ctx);
     void onGotRnr(bool success, const QByteArray &response,
@@ -143,8 +141,6 @@ private:
     bool doLogin1(QUrl url, AsyncTaskToken *token);
     bool postLogin(QUrl url, AsyncTaskToken *token);
     bool parseHiddenLoginFields(const QString &strResponse, QVariantMap &ret);
-    bool beginTwoFactorAuth(QUrl url, AsyncTaskToken *token);
-    bool doTwoFactorAuth(const QString &strResponse, AsyncTaskToken *token);
     bool getRnr(AsyncTaskToken *token);
 
     // Send SMS

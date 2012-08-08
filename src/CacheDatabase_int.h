@@ -33,6 +33,9 @@ Contact: yuvraaj@gmail.com
 #define GV_S_VAR_PIN            "gvpin"
 #define GV_S_VAR_PIN_ENABLE     "gvpin_enable"
 
+#define GV_S_VAR_TFA            "two_factor"
+#define GV_S_VAR_CPASS          "c_password"
+
 #define GV_S_VAR_DB_VER         "db_ver"
 #define GV_S_VAR_VER            "settings_ver"
 ////////////////////////////////////////////////////////////////////////////////
@@ -72,7 +75,9 @@ Contact: yuvraaj@gmail.com
 // There is no longer any need for an updates table.
 //#define GV_SETTINGS_VER     "2011-08-05 12:34:02"
 // Log levels need to be at 5 by default
-#define GV_SETTINGS_VER     "2012-02-08 23:10:19"
+//#define GV_SETTINGS_VER     "2012-02-08 23:10:19"
+// 2 factor authentication requires the app specific password for contacts
+#define GV_SETTINGS_VER     "2012-08-07 21:47:44"
 ////////////////////////////// GV Contacts table ///////////////////////////////
 #define GV_CONTACTS_TABLE   "gvcontacts"
 #define GV_C_ID             "id"

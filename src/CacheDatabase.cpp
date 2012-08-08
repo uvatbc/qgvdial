@@ -290,8 +290,6 @@ CacheDatabase::putUserPass (const QString &strUser, const QString &strPass)
     QByteArray byD;
     OsDependent &osd = Singletons::getRef().getOSD ();
     QString strQ;
-    QSqlQuery query(dbMain);
-    query.setForwardOnly (true);
 
     osd.cipher (strUser.toAscii (), byD, true);
     settings->setValue (GV_S_VAR_USER, QString (byD.toHex ()));
@@ -308,6 +306,61 @@ CacheDatabase::clearUserPass ()
     settings->remove (GV_S_VAR_USER);
     settings->remove (GV_S_VAR_PASS);
 }//CacheDatabase::clearUserPass
+
+bool
+CacheDatabase::getContactsPass(QString &strPass)
+{
+    QByteArray byD;
+    OsDependent &osd = Singletons::getRef().getOSD ();
+    QString strResult;
+
+    if (settings->contains (GV_S_VAR_CPASS)) {
+        strResult = settings->value(GV_S_VAR_CPASS).toString();
+        osd.cipher (QByteArray::fromHex (strResult.toAscii ()), byD, false);
+        strPass = byD;
+
+        return (true);
+    }
+
+    return (false);
+}//CacheDatabase::getContactsPass
+
+bool
+CacheDatabase::setContactsPass(const QString &strPass)
+{
+    QByteArray byD;
+    OsDependent &osd = Singletons::getRef().getOSD ();
+    QString strQ;
+
+    osd.cipher (strPass.toAscii (), byD, true);
+    settings->setValue (GV_S_VAR_CPASS, QString (byD.toHex ()));
+
+    return (true);
+}//CacheDatabase::setContactsPass
+
+void
+CacheDatabase::clearContactsPass()
+{
+    settings->remove (GV_S_VAR_CPASS);
+}//CacheDatabase::clearContactsPass
+
+void
+CacheDatabase::setTFAFlag(bool set)
+{
+    settings->setValue (GV_S_VAR_TFA, set);
+}//CacheDatabase::setTFAFlag
+
+bool
+CacheDatabase::getTFAFlag()
+{
+    return (settings->value(GV_S_VAR_TFA).toBool());
+}//CacheDatabase::getTFAFlag
+
+void
+CacheDatabase::clearTFAFlag()
+{
+    settings->remove (GV_S_VAR_TFA);
+}//CacheDatabase::clearTFAFlag
 
 bool
 CacheDatabase::getCallback (QString &strCallback)

@@ -151,6 +151,9 @@ MainWindow::loginCompleted (AsyncTaskToken *token)
         this->showMsgBox ("Severe internal error");
 
         dbMain.clearUserPass ();
+        dbMain.clearContactsPass ();
+        dbMain.setTFAFlag (false);
+
         QTimer::singleShot (500, this, SLOT(onRecreateCookieJar()));
         return;
     }
@@ -175,6 +178,9 @@ MainWindow::loginCompleted (AsyncTaskToken *token)
         Q_WARN(QString("User login failed. Error string: %1").arg(strErr));
 
         dbMain.clearUserPass ();
+        dbMain.clearContactsPass ();
+        dbMain.setTFAFlag (false);
+
         QTimer::singleShot (500, this, SLOT(onRecreateCookieJar()));
 
         if (token->status == ATTS_LOGIN_FAIL_SHOWURL) {
@@ -193,8 +199,21 @@ MainWindow::loginCompleted (AsyncTaskToken *token)
             dbMain.ensureCache ();
         }
 
+        QString contactsPass = strPass;
+        if (dbMain.getTFAFlag ()) {
+            if (!dbMain.getContactsPass (contactsPass)) {
+                contactsPass = QInputDialog::getText (this,
+                    "Application specific password required for contacts.",
+                    "Two step authentication does not work with the contacts "
+                    "API. Please enter an application specific password for "
+                    "Google contacts.");
+
+                dbMain.setContactsPass (contactsPass);
+            }
+        }
+
         // Prepare then contacts
-        initContacts ();
+        initContacts (contactsPass);
         // Prepare the inbox widget for usage
         initInbox ();
 
@@ -308,3 +327,13 @@ MainWindow::setPassword(const QString &strP)
                                    Q_ARG (QVariant, QVariant(strP)));
     } while (0); // End cleanup block (not a loop)
 }//MainWindow::setPassword
+
+void
+MainWindow::onTwoStepAuthentication(AsyncTaskToken *token)
+{
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    dbMain.setTFAFlag (true);
+
+    int rv = QInputDialog::getInt (this, "Enter security token", "Token: ", 0, 0);
+    token->inParams["user_pin"] = QString("%1").arg (rv);
+}//MainWindow::onTwoStepAuthentication

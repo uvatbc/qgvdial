@@ -216,7 +216,7 @@ private:
     bool connectSettingsSignals();
 
 
-    void initContacts ();
+    void initContacts (const QString &contactsPass);
     void deinitContacts ();
 
     void initInbox ();

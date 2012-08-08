@@ -314,9 +314,7 @@ GVContactsTable::onLoginResponse(bool success, const QByteArray &response,
 
     strGoogleAuth.clear ();
     do { // Begin cleanup block (not a loop)
-        if (!success) {
-            break;
-        }
+        if (!success) break;
 
         QUrl urlMoved = hasMoved(reply);
         if (!urlMoved.isEmpty ()) {

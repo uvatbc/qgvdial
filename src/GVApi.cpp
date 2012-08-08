@@ -598,44 +598,37 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
         // There will be 2-3 moved temporarily redirects.
         QUrl urlMoved = NwReqTracker::hasMoved(reply);
         if (!urlMoved.isEmpty ()) {
-            if (urlMoved.toString().contains ("smsAuth", Qt::CaseInsensitive)) {
-                if (emitLog) {
-                    Q_DEBUG("Two factor AUTH required!");
-                }
-                success = beginTwoFactorAuth (urlMoved, token);
-            } else {
-                QString dest = urlMoved.toString ();
-                if (dest.contains ("voice/help/setupMobile")) {
-                    accountConfigured = false;
-                    success = false;
-                    break;
-                }
+            QString dest = urlMoved.toString ();
+            if (dest.contains ("voice/help/setupMobile")) {
+                accountConfigured = false;
+                success = false;
+                break;
+            }
 
-                if (dest.contains ("AccountRecoveryOptions")) {
-                    token->outParams["nextUrl"] = urlMoved;
-                    accountReviewRequested = true;
-                    success = false;
-                    break;
-                }
+            if (dest.contains ("AccountRecoveryOptions")) {
+                token->outParams["nextUrl"] = urlMoved;
+                accountReviewRequested = true;
+                success = false;
+                break;
+            }
 #if 0
-                if (emitLog) {
-                    Q_DEBUG("Moved to") << dest;
-                }
+            if (emitLog) {
+                Q_DEBUG("Moved to") << dest;
+            }
 #endif
 
-                int foreign = 0;
-                if ((token->outParams.contains ("foreign")) &&
-                    ((dest == GV_HTTPS_M) ||
-                      (foreign = token->outParams["foreign"].toInt()) > 0))
-                {
-                    foreign++;
-                    token->outParams["foreign"] = foreign;
-                    success = doGet (urlMoved, token, this,
-                                     SLOT(onLogin2(bool, const QByteArray &,
-                                                   QNetworkReply *, void *)));
-                } else {
-                    success = postLogin (urlMoved, token);
-                }
+            int foreign = 0;
+            if ((token->outParams.contains ("foreign")) &&
+                ((dest == GV_HTTPS_M) ||
+                  (foreign = token->outParams["foreign"].toInt()) > 0))
+            {
+                foreign++;
+                token->outParams["foreign"] = foreign;
+                success = doGet (urlMoved, token, this,
+                                 SLOT(onLogin2(bool, const QByteArray &,
+                                               QNetworkReply *, void *)));
+            } else {
+                success = postLogin (urlMoved, token);
             }
             break;
         }
@@ -646,7 +639,8 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
                 break;
             }
 
-            QRegExp rxBody("<body>(.*)</body>");
+            QRegExp rxBody("<body.*>(.*)</body>");
+            rxBody.setMinimal(true);
             if (!strResponse.contains (rxBody)) {
                 break;
             }
@@ -662,12 +656,75 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
             }
 
             QString docElemText = docElem.text ();
-            Q_DEBUG("docElem = ") << docElemText;
+            Q_DEBUG(docElemText);
 
             if (docElemText.contains ("The username or password you entered "
                                       "is incorrect."))
             {
                 Q_WARN("Found Google's login failure string.");
+                break;
+            }
+
+            bool needsTwoFactor = false;
+            QDomNodeList formList = docElem.elementsByTagName ("form");
+            QDomElement twoFactorForm;
+            if (!formList.isEmpty ()) {
+                for (uint i = 0; i < formList.length (); i++) {
+                    twoFactorForm = formList.at(i).toElement ();
+                    if (twoFactorForm.isNull ()) {
+                        continue;
+                    }
+
+                    QString formId = twoFactorForm.attribute ("id");
+                    if (formId == "verify-form") {
+                        needsTwoFactor = true;
+                        break;
+                    }
+                }
+            }
+
+            if (needsTwoFactor) {
+                if (emitLog) {
+                    Q_DEBUG("Two factor AUTH required!");
+                }
+
+                QNetworkCookie galx;
+                bool foundgalx = false;
+
+                emit twoStepAuthentication(token);
+                QString smsUserPin = token->inParams["user_pin"].toString();
+                if (smsUserPin.isEmpty ()) {
+                    Q_WARN("User didn't enter 2-step auth pin");
+                    break;
+                }
+
+                foreach (galx, jar->getAllCookies ()) {
+                    if (galx.name () == "GALX") {
+                        foundgalx = true;
+                    }
+                }
+
+                if (!foundgalx) {
+                    Q_WARN("Required 2 step auth but didn't find GALX");
+                    break;
+                }
+
+                QString formAction = twoFactorForm.attribute ("action");
+                QUrl twoFactorUrl =
+                QUrl::fromPercentEncoding(formAction.toLatin1 ());
+
+                QUrl contentUrl = twoFactorUrl;
+                contentUrl.addQueryItem("smsUserPin"      , smsUserPin);
+                contentUrl.addQueryItem("smsVerifyPin"    , "Verify");
+                contentUrl.addQueryItem("PersistentCookie", "yes");
+                contentUrl.addQueryItem("GALX"            , galx.value());
+
+                success =
+                doPostForm(twoFactorUrl, contentUrl.encodedQuery(), token, this,
+                    SLOT(onTFAAutoPost(bool,const QByteArray&,QNetworkReply*,void*)));
+                Q_ASSERT(success);
+
+                foreignUrl = true;
                 break;
             }
 
@@ -755,128 +812,6 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
         }
     }
 }//GVApi::onLogin2
-
-bool
-GVApi::beginTwoFactorAuth(QUrl url, AsyncTaskToken *token)
-{
-    url.addQueryItem("service", "grandcentral");
-
-    bool rv = doGet(url, token, this,
-                    SLOT(onTwoFactorLogin(bool, const QByteArray &,
-                                          QNetworkReply *, void *)));
-    Q_ASSERT(rv);
-
-    return rv;
-}//GVApi::beginTwoFactorAuth
-
-void
-GVApi::onTwoFactorLogin(bool success, const QByteArray &response,
-                        QNetworkReply *reply, void *ctx)
-{
-    AsyncTaskToken *token = (AsyncTaskToken *)ctx;
-    QString strResponse = response;
-
-    do { // Begin cleanup block (not a loop)
-        if (!success) break;
-
-        QUrl urlMoved = NwReqTracker::hasMoved (reply);
-        if (!urlMoved.isEmpty ()) {
-            success = beginTwoFactorAuth (urlMoved, token);
-            break;
-        }
-
-        Q_DEBUG(strResponse);
-
-        // After which we should have completed login. Check for cookie "gvx"
-        success = false;
-        foreach (QNetworkCookie gvx, jar->getAllCookies ()) {
-            if (gvx.name () == "gvx") {
-                success = true;
-                break;
-            }
-        }
-
-        if (success) {
-            Q_DEBUG("Login succeeded");
-            token->status = ATTS_SUCCESS;
-            token->emitCompleted ();
-            token = NULL;
-            break;
-        }
-
-        success = doTwoFactorAuth (strResponse, token);
-    } while (0); // End cleanup block (not a loop)
-
-    if (!success) {
-        Q_WARN("Login failed.") << strResponse;
-
-        if (token) {
-            token->status = ATTS_LOGIN_FAILURE;
-            token->emitCompleted ();
-        }
-    }
-}//GVApi::onTwoFactorLogin
-
-bool
-GVApi::doTwoFactorAuth(const QString &strResponse, AsyncTaskToken *token)
-{
-    QNetworkCookie galx;
-    bool foundgalx = false, rv = false;
-
-    do { // Begin cleanup block (not a loop)
-        foreach (QNetworkCookie cookie, jar->getAllCookies ()) {
-            if (cookie.name () == "GALX") {
-                galx = cookie;
-                foundgalx = true;
-            }
-        }
-
-        QVariantMap ret;
-        if (!parseHiddenLoginFields (strResponse, ret)) {
-            break;
-        }
-
-        if (!ret.contains ("smsToken")) {
-            // It isn't two factor authentication
-            Q_WARN("Username or password is incorrect!");
-            break;
-        }
-
-        if (!foundgalx) {
-            Q_WARN("Cannot proceed with two factor auth. Giving up");
-            break;
-        }
-
-        emit twoStepAuthentication(token);
-        if (!token->inParams.contains ("user_pin")) {
-            Q_WARN("User didn't enter user pin");
-            break;
-        }
-
-        QString smsUserPin = token->inParams["user_pin"].toString();
-
-        QUrl url(GV_ACCOUNT_SMSAUTH), url1(GV_ACCOUNT_SMSAUTH);
-        url.addQueryItem("service"          , "grandcentral");
-
-        url1.addQueryItem("smsUserPin"      , smsUserPin);
-        url1.addQueryItem("smsVerifyPin"    , "Verify");
-        url1.addQueryItem("PersistentCookie", "yes");
-        url1.addQueryItem("service"         , "grandcentral");
-        url1.addQueryItem("GALX"            , galx.value());
-
-        QStringList keys = ret.keys ();
-        foreach (QString key, keys) {
-            url1.addQueryItem(key, ret[key].toString());
-        }
-
-        rv = doPostForm(url, url1.encodedQuery(), token, this,
-                        SLOT(onTFAAutoPost(bool, const QByteArray &,
-                                           QNetworkReply *, void *)));
-        Q_ASSERT(rv);
-    } while (0); // End cleanup block (not a loop)
-
-    return (rv);
-}//GVApi::doTwoFactorAuth
 
 void
 GVApi::onTFAAutoPost(bool success, const QByteArray &response,

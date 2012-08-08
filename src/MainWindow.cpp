@@ -718,9 +718,9 @@ MainWindow::getContactsDone (bool bOk)
 }//MainWindow::getContactsDone
 
 void
-MainWindow::initContacts ()
+MainWindow::initContacts (const QString &contactsPass)
 {
-    oContacts->setUserPass (strUser, strPass);
+    oContacts->setUserPass (strUser, contactsPass);
     oContacts->loginSuccess ();
     oContacts->initModel ();
     oContacts->refreshContacts ();
@@ -1248,13 +1248,6 @@ MainWindow::onRecreateCookieJar()
     QList<QNetworkCookie> empty;
     gvApi.setAllCookies (empty);
 }//MainWindow::onRecreateCookieJar
-
-void
-MainWindow::onTwoStepAuthentication(AsyncTaskToken *token)
-{
-    int rv = QInputDialog::getInt (this, "Enter security token", "Token: ", 0, 0);
-    token->inParams["user_pin"] = QString("%1").arg (rv);
-}//MainWindow::onTwoStepAuthentication
 
 void
 MainWindow::onOrientationChanged(OsIndependentOrientation /*o*/)
