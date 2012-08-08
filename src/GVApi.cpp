@@ -656,7 +656,7 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
             }
 
             QString docElemText = docElem.text ();
-            Q_DEBUG(docElemText);
+//            Q_DEBUG(docElemText);
 
             if (docElemText.contains ("The username or password you entered "
                                       "is incorrect."))
