@@ -354,6 +354,8 @@ MainWindow::doLogin ()
             break;
         }
 
+        //loadCookies ();
+
         bOk = connect(token, SIGNAL(completed(AsyncTaskToken*)),
                       this , SLOT(loginCompleted(AsyncTaskToken*)));
 
@@ -419,7 +421,7 @@ MainWindow::loginCompleted (AsyncTaskToken *token)
             strCPass = strPass;
         }
 
-        Q_DEBUG(QString("cpass = %1").arg (strCPass));
+        //saveCookies ();
 
         oContacts.setUserPass (strUser, strCPass);
         oContacts.loginSuccess ();
@@ -550,3 +552,65 @@ MainWindow::onCommandForClient(const QString &command)
         getOut ();
     }
 }//MainWindow::onCommandForClient
+
+void
+MainWindow::loadCookies()
+{
+    QList<QNetworkCookie> cookies;
+    QSettings settings (strIni, QSettings::IniFormat, this);
+    QByteArray name, value;
+    quint32 expiration;
+    int i;
+
+    int size = settings.beginReadArray ("cookies");
+    for (i = 0; i < size; i++) {
+        name       = settings.value("name").toByteArray();
+        value      = settings.value("value").toByteArray();
+        expiration = settings.value("expiration").toUInt();
+
+        QNetworkCookie cookie(name, value);
+        cookie.setDomain(settings.value("domain").toString());
+
+        if (settings.value("isSession").toBool()) {
+            cookie.setExpirationDate (QDateTime::fromTime_t (expiration));
+        }
+
+        cookie.setHttpOnly(settings.value("isHttpOnly").toBool());
+        cookie.setSecure(settings.value("isSecure").toBool());
+        cookie.setPath(settings.value("path").toString());
+
+        cookies.append (cookie);
+    }
+    settings.endArray ();
+
+    gvApi.setAllCookies (cookies);
+
+    Q_DEBUG(QString("Loaded %1 cookies").arg(i));
+}//MainWindow::loadCookies
+
+void
+MainWindow::saveCookies()
+{
+    QList<QNetworkCookie> cookies = gvApi.getAllCookies ();
+    QSettings settings (strIni, QSettings::IniFormat, this);
+    int i;
+
+    settings.remove ("cookies");
+    settings.beginWriteArray ("cookies");
+
+    for (i = 0; i < cookies.count(); i++) {
+        settings.setArrayIndex (i);
+        settings.setValue ("name",       cookies.at(i).name());
+        settings.setValue ("value",      cookies.at(i).value());
+        settings.setValue ("expiration", cookies.at(i).expirationDate().toTime_t());
+        settings.setValue ("domain",     cookies.at(i).domain());
+        settings.setValue ("isSession",  cookies.at(i).isSessionCookie());
+        settings.setValue ("isSecure",   cookies.at(i).isSecure());
+        settings.setValue ("isHttpOnly", cookies.at(i).isHttpOnly());
+        settings.setValue ("path",       cookies.at(i).path());
+    }
+
+    settings.endArray ();
+
+    Q_DEBUG(QString("Saved %1 cookies").arg(i));
+}//MainWindow::saveCookies

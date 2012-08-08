@@ -42,6 +42,9 @@ private:
     bool checkParams ();
     bool cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt);
 
+    void loadCookies();
+    void saveCookies();
+
 private:
     //! THE API
     GVApi           gvApi;
