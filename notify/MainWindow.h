@@ -21,8 +21,12 @@ private slots:
     void init();
     void doWork();
     void setStatus(const QString &strText, int timeout  = 3000);
+
     void loginCompleted (AsyncTaskToken *token);
     void logoutCompleted (AsyncTaskToken *token);
+
+    void onTwoStepAuthentication(AsyncTaskToken *token);
+
     void getContactsDone (bool bChanges, bool bOK);
     void inboxChanged ();
     void dailyTimeout();
@@ -48,6 +52,9 @@ private:
     // Settings parsed from the ini file
     QString         strUser;
     QString         strPass;
+
+    bool            tfaRequired;
+    QString         strCPass;
 
     // Frequency of checking in seconds
     quint8          checkTimeout;

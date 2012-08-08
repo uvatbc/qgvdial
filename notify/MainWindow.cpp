@@ -31,6 +31,9 @@ MainWindow::setStatus(const QString &strText, int /*timeout = 3000*/)
 void
 MainWindow::init()
 {
+    connect(&gvApi, SIGNAL(twoStepAuthentication(AsyncTaskToken *)),
+             this , SLOT(onTwoStepAuthentication(AsyncTaskToken *)));
+
     // Status from contacts object
     QObject::connect (&oContacts, SIGNAL (status   (const QString &, int)),
                        this     , SLOT   (setStatus(const QString &, int)));
@@ -96,7 +99,7 @@ MainWindow::doWork ()
 bool
 MainWindow::checkParams ()
 {
-    bool rv = false, bUseDefaultIni = false;
+    bool rv = false, bUseDefaultIni = false, tempBool;
     QStringList args = qApp->arguments ();
     if (args.length () < 2) {
         qWarning ("No ini file specified, using default");
@@ -144,6 +147,29 @@ MainWindow::checkParams ()
             byD = settings.value("password").toByteArray();
             cipher (QByteArray::fromHex (byD), byD, false);
             strPass = byD;
+        }
+
+        if (!settings.contains ("tfaRequired")) {
+            tempBool = false;
+            settings.setValue ("tfaRequired", tempBool);
+            tfaRequired = false;
+        } else {
+            tfaRequired = settings.value("tfaRequired").toBool();
+        }
+
+        if (tfaRequired) {
+            if (!settings.contains ("cpass")) {
+                qWarning ("Ini file does not contain an application specific "
+                          "password");
+                cout << "Enter application specific password:";
+                in >> strCPass;
+                cipher (strCPass.toLocal8Bit (), byD, true);
+                settings.setValue ("cpass", QString(byD.toHex ()));
+            } else {
+                byD = settings.value("cpass").toByteArray();
+                cipher (QByteArray::fromHex (byD), byD, false);
+                strCPass = byD;
+            }
         }
 
         checkTimeout = 0;
@@ -373,7 +399,29 @@ MainWindow::loginCompleted (AsyncTaskToken *token)
 
         bIsLoggedIn = true;
 
-        oContacts.setUserPass (strUser, strPass);
+        if (tfaRequired) {
+            Q_DEBUG("TFA");
+
+            if (strCPass.isEmpty ()) {
+                QTextStream in(stdin);
+
+                cout << "Enter application specific password:";
+                in >> strCPass;
+            }
+
+            QByteArray byD;
+            QSettings settings (strIni, QSettings::IniFormat, this);
+
+            cipher (strCPass.toLocal8Bit (), byD, true);
+            settings.setValue ("cpass", QString(byD.toHex ()));
+            settings.setValue ("tfaRequired", tfaRequired);
+        } else {
+            strCPass = strPass;
+        }
+
+        Q_DEBUG(QString("cpass = %1").arg (strCPass));
+
+        oContacts.setUserPass (strUser, strCPass);
         oContacts.loginSuccess ();
         oInbox.loginSuccess ();
 
@@ -411,6 +459,22 @@ MainWindow::logoutCompleted (AsyncTaskToken *token)
         delete token;
     }
 }//MainWindow::logoutCompleted
+
+void
+MainWindow::onTwoStepAuthentication(AsyncTaskToken *token)
+{
+    QTextStream in(stdin);
+
+    qWarning ("Two step authentication PIN required.");
+
+    QString strPIN;
+    cout << "Enter PIN:";
+    in >> strPIN;
+
+    token->inParams["user_pin"] = strPIN;
+
+    tfaRequired = true;
+}//MainWindow::onTwoStepAuthentication
 
 void
 MainWindow::getContactsDone (bool bChanges, bool bOK)

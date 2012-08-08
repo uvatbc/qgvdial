@@ -21,8 +21,7 @@ GVContactsTable::postRequest (QString         strUrl,
                               const char     *method)
 {
     QStringList arrParams;
-    foreach (QStringPair pairParam, arrPairs)
-    {
+    foreach (QStringPair pairParam, arrPairs) {
         arrParams += QString("%1=%2")
                         .arg(pairParam.first)
                         .arg(pairParam.second);
@@ -33,8 +32,7 @@ GVContactsTable::postRequest (QString         strUrl,
     QNetworkRequest request(url);
     request.setHeader (QNetworkRequest::ContentTypeHeader,
                        "application/x-www-form-urlencoded");
-    if (0 != strGoogleAuth.size ())
-    {
+    if (0 != strGoogleAuth.size ()) {
         QByteArray byAuth = QString("GoogleLogin auth=%1")
                                     .arg(strGoogleAuth).toAscii ();
         request.setRawHeader ("Authorization", byAuth);
@@ -56,8 +54,7 @@ GVContactsTable::getRequest (QString         strUrl,
     QNetworkRequest request(url);
     request.setHeader (QNetworkRequest::ContentTypeHeader,
                        "application/x-www-form-urlencoded");
-    if (0 != strGoogleAuth.size ())
-    {
+    if (0 != strGoogleAuth.size ()) {
         QByteArray byAuth = QString("GoogleLogin auth=%1")
                                     .arg(strGoogleAuth).toAscii ();
         request.setRawHeader ("Authorization", byAuth);
@@ -73,8 +70,7 @@ void
 GVContactsTable::refreshContacts ()
 {
     QMutexLocker locker(&mutex);
-    if (!bLoggedIn)
-    {
+    if (!bLoggedIn) {
         bRefreshRequested = true;
         return;
     }
@@ -140,45 +136,35 @@ GVContactsTable::onLoginResponse (QNetworkReply *reply)
     QString strCaptchaToken, strCaptchaUrl;
 
     strGoogleAuth.clear ();
-    do // Begin cleanup block (not a loop)
-    {
+    do { // Begin cleanup block (not a loop)
         QStringList arrParsed = strReply.split ('\n');
-        foreach (QString strPair, arrParsed)
-        {
+        foreach (QString strPair, arrParsed) {
             QStringList arrPair = strPair.split ('=');
-            if (arrPair[0] == "Auth")
-            {
+            if (arrPair[0] == "Auth") {
                 strGoogleAuth = arrPair[1];
-            }
-            else if (arrPair[0] == "CaptchaToken")
-            {
+            } else if (arrPair[0] == "CaptchaToken") {
                 strCaptchaToken = arrPair[1];
-            }
-            else if (arrPair[0] == "CaptchaUrl")
-            {
+            } else if (arrPair[0] == "CaptchaUrl") {
                 strCaptchaUrl = arrPair[1];
             }
         }
 
-        if (0 != strCaptchaUrl.size ())
-        {
-            qCritical ("Google requested CAPTCHA!!");
+        if (0 != strCaptchaUrl.size ()) {
+            Q_CRIT ("Google requested CAPTCHA!!");
             qApp->quit ();
 
             break;
         }
 
-        if (0 == strGoogleAuth.size ())
-        {
-            qWarning ("Failed to login!!");
+        if (0 == strGoogleAuth.size ()) {
+            Q_WARN ("Failed to login!!");
             break;
         }
 
         QMutexLocker locker (&mutex);
         bLoggedIn = true;
 
-        if (bRefreshRequested)
-        {
+        if (bRefreshRequested) {
             refreshContacts ();
         }
     } while (0); // End cleanup block (not a loop)
@@ -191,11 +177,9 @@ GVContactsTable::onGotContacts (QNetworkReply *reply)
     QObject::disconnect (&nwMgr, SIGNAL (finished (QNetworkReply *)),
                           this , SLOT   (onGotContacts (QNetworkReply *)));
 
-    do // Begin cleanup block (not a loop)
-    {
+    do { // Begin cleanup block (not a loop)
         QByteArray byData = reply->readAll ();
-        if (byData.contains ("Authorization required"))
-        {
+        if (byData.contains ("Authorization required")) {
             emit status("Authorization failed.");
             break;
         }
