@@ -202,18 +202,22 @@ MainWindow::loginCompleted (AsyncTaskToken *token)
         QString contactsPass = strPass;
         if (dbMain.getTFAFlag ()) {
             if (!dbMain.getContactsPass (contactsPass)) {
-                contactsPass = QInputDialog::getText (this,
-                    "Application specific password required for contacts.",
-                    "Two step authentication does not work with the contacts "
-                    "API. Please enter an application specific password for "
-                    "Google contacts.");
+                connect(this, SIGNAL(sigMessageBoxDone(bool)),
+                        this, SLOT(onAppPassMsgBoxDone(bool)));
 
-                dbMain.setContactsPass (contactsPass);
+                QObject *obj = getQMLObject ("MsgBox");
+                if (NULL != obj) {
+                    obj->setProperty ("inputText", "");
+                }
+                Q_ASSERT(obj);
+
+                showInputBox ("Enter app specific password for Google contacts");
             }
+        } else {
+            // Prepare the contacts
+            initContacts (contactsPass);
         }
 
-        // Prepare then contacts
-        initContacts (contactsPass);
         // Prepare the inbox widget for usage
         initInbox ();
 
@@ -334,8 +338,79 @@ MainWindow::onTwoStepAuthentication(AsyncTaskToken *token)
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     dbMain.setTFAFlag (true);
 
-    int rv = QInputDialog::getInt (this, "Enter security token", "Token: ", 0, 0);
-    token->inParams["user_pin"] = QString("%1").arg (rv);
+    QObject *obj = getQMLObject ("MsgBox");
+    if (NULL == obj) {
+        gvApi.cancel (token);
+        Q_ASSERT(obj);
+        return;
+    }
 
-    gvApi.resumeTFALogin (token);
+    inputBoxCtx = token;
+    connect(this, SIGNAL(sigMessageBoxDone(bool)),
+            this, SLOT(onPinMsgBoxDone(bool)));
+
+    obj->setProperty ("inputText", "");
+    showInputBox ("Enter security token");
 }//MainWindow::onTwoStepAuthentication
+
+void
+MainWindow::onPinMsgBoxDone(bool ok)
+{
+    disconnect(this, SIGNAL(sigMessageBoxDone(bool)),
+               this, SLOT(onPinMsgBoxDone(bool)));
+
+    AsyncTaskToken *token = (AsyncTaskToken *)inputBoxCtx;
+    inputBoxCtx = NULL;
+
+    QObject *obj = getQMLObject ("MsgBox");
+
+    do {// Begin cleanup block (not a loop)
+
+        if (NULL == obj) {
+            gvApi.cancel (token);
+            Q_ASSERT(obj);
+            break;
+        }
+
+        if (!ok) {
+            gvApi.cancel (token);
+            break;
+        }
+
+        token->inParams["user_pin"] = obj->property("inputText").toString();
+        gvApi.resumeTFALogin (token);
+        token = NULL;
+    } while (0); // End cleanup block (not a loop)
+
+    if (NULL != token) {
+        token->deleteLater ();
+    }
+}//MainWindow::onPinMsgBoxDone
+
+void
+MainWindow::onAppPassMsgBoxDone(bool ok)
+{
+    disconnect(this, SIGNAL(sigMessageBoxDone(bool)),
+               this, SLOT(onAppPassMsgBoxDone(bool)));
+
+    do {// Begin cleanup block (not a loop)
+        QObject *obj = getQMLObject ("MsgBox");
+        if (NULL == obj) {
+            Q_ASSERT(obj);
+            break;
+        }
+
+        if (!ok) {
+            Q_WARN("User refused to enter app specific pass for contacts");
+            break;
+        }
+
+        QString contactsPass = obj->property("inputText").toString();
+
+        CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+        dbMain.setContactsPass (contactsPass);
+
+        // Prepare the contacts
+        initContacts (contactsPass);
+    } while (0); // End cleanup block (not a loop)
+}//MainWindow::onAppPassMsgBoxDone

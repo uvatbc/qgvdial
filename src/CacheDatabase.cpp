@@ -496,31 +496,22 @@ CacheDatabase::insertContact (const ContactInfo &info)
                         .arg (scrubInfo.dtUpdate.toTime_t());
         rv = query.exec (strQ);
         if (!rv) {
-            qWarning () << "Failed to insert row into contacts table. ID:["
-                        << info.strId
-                        << "] name=["
-                        << info.strTitle
-                        << "]";
+            Q_WARN(QString("Failed to insert row into contacts table. "
+                           "ID:[%1] name=[%2]").arg(info.strId, info.strTitle));
             break;
         }
 
         rv = putContactInfo (info);
         if (!rv) {
-            qWarning () << "Failed to insert contact info into contacts table. ID:["
-                        << info.strId
-                        << "] name=["
-                        << info.strTitle
-                        << "]";
+            Q_WARN(QString("Failed to insert contact info into contacts table. "
+                           "ID:[%1] name=[%2]").arg(info.strId, info.strTitle));
             break;
         }
 
         rv = putTempFile (info.hrefPhoto, info.strPhotoPath);
         if (!rv) {
-            qWarning () << "Failed to insert photo into contacts table. ID:["
-                        << info.strId
-                        << "] name=["
-                        << info.strTitle
-                        << "]";
+            Q_WARN(QString("Failed to insert photo into contacts table. "
+                           "ID:[%1] name=[%2]").arg(info.strId, info.strTitle));
             break;
         }
 
@@ -608,7 +599,7 @@ bool
 CacheDatabase::getContactFromLink (ContactInfo &info)
 {
     if (!existsContact (info.strId)) {
-        qWarning() << "Contact with ID" << info.strId << "is not cached.";
+        Q_WARN(QString("Contact with ID %1 is not cached.").arg(info.strId));
         return false;
     }
 
@@ -628,8 +619,7 @@ CacheDatabase::getContactFromLink (ContactInfo &info)
            .arg (scrubId);
     query.exec (strQ);
     if (!query.next ()) {
-        qWarning("Contact not found!!! "
-                 "I thought we confirmed this at the top of the function!!");
+        Q_CRIT("Contact not found!!!");
         return false;
     }
     info.strTitle  = query.value(0).toString ();
@@ -708,7 +698,7 @@ CacheDatabase::getLatestContact (QDateTime &dateTime)
                 "ORDER BY " GV_C_UPDATED " DESC");
     do { // Begin cleanup block (not a loop)
         if (!query.next ()) {
-            qWarning ("Couldn't get the latest contact");
+            Q_WARN("Couldn't get the latest contact");
             break;
         }
 
@@ -716,7 +706,7 @@ CacheDatabase::getLatestContact (QDateTime &dateTime)
         bool bOk = false;
         quint64 dtVal = query.value(0).toULongLong (&bOk);
         if (!bOk) {
-            qWarning ("Could not convert datetime for latest contact");
+            Q_WARN("Could not convert datetime for latest contact");
             break;
         }
 
@@ -809,7 +799,7 @@ CacheDatabase::getLatestInboxEntry (QDateTime &dateTime)
     {
         if (!query.next ())
         {
-            qWarning ("Couldn't get the latest inbox item");
+            Q_WARN("Couldn't get the latest inbox item");
             break;
         }
 
@@ -818,7 +808,7 @@ CacheDatabase::getLatestInboxEntry (QDateTime &dateTime)
         quint64 dtVal = query.value(0).toULongLong (&bOk);
         if (!bOk)
         {
-            qWarning ("Could not convert datetime for latest inbox update");
+            Q_WARN("Could not convert datetime for latest inbox update");
             break;
         }
 
@@ -863,7 +853,7 @@ CacheDatabase::insertInboxEntry (const GVInboxEntry &hEvent)
     scrubEvent.strNote.replace ("'", "''");
 
     if (scrubEvent.strText.contains ("Enter a new or existing contact name")) {
-        qWarning ("WHAA");
+        Q_CRIT("WHAA");
     }
 
     QSqlQuery query(dbMain);
@@ -897,7 +887,7 @@ CacheDatabase::insertInboxEntry (const GVInboxEntry &hEvent)
                             .arg (scrubEvent.strText)
                             .arg (scrubEvent.strNote));
         if (!rv) {
-            qWarning ("Failed to insert row into inbox table");
+            Q_WARN("Failed to insert row into inbox table");
             break;
         }
 
@@ -939,13 +929,13 @@ CacheDatabase::markAsRead (const QString &msgId)
                                  " WHERE " GV_IN_ID "='%1'").arg (scrubId));
         if (!rv || !query.next ()) {
             rv = false;
-            qWarning ("Failed to get the inbox entry to mark as read");
+            Q_WARN("Failed to get the inbox entry to mark as read");
             break;
         }
 
         quint32 flags = query.value (0).toInt (&rv);
         if (!rv) {
-            qWarning ("Failed to convert flags result into integer");
+            Q_WARN("Failed to convert flags result into integer");
             break;
         }
 
@@ -962,7 +952,7 @@ CacheDatabase::markAsRead (const QString &msgId)
                                  "WHERE " GV_IN_ID "='%2'")
                          .arg(flags).arg (scrubId));
         if (!rv) {
-            qWarning ("Failed to update inbox table with a flag marked read");
+            Q_WARN("Failed to update inbox table with a flag marked read");
             break;
         }
 
@@ -1061,7 +1051,8 @@ CacheDatabase::getTextsByContact(const QString &strContact)
 
     // We have all the ID's to look for
     if (arrNums.isEmpty ()) {
-        qWarning() << "Not a single ID matched the search string" << strContact;
+        Q_WARN(QString("Not a single ID matched the search string %1")
+               .arg (strContact));
         return rv;
     }
 
@@ -1167,7 +1158,7 @@ CacheDatabase::getProxySettings (bool &bEnable,
         // are other settings, this method will need to change.
         bEnable = bUseSystemProxy = bRequiresAuth = false;
         if (!settings->contains (GV_P_FLAGS)) {
-            qWarning ("Failed to pull the proxy flags from the DB");
+            Q_WARN("Failed to pull the proxy flags from the DB");
             break;
         }
 
@@ -1465,7 +1456,8 @@ CacheDatabase::saveCookies(QList<QNetworkCookie> cookies)
         query.bindValue (":value", value);
         rv = query.exec ();
         if (!rv) {
-            qWarning() << "Failed to insert cookie into DB" << query.lastError();
+            Q_WARN(QString("Failed to insert cookie into DB. %1")
+                   .arg(query.lastError().text()));
             Q_ASSERT(rv);
         }
     }

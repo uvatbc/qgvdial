@@ -212,6 +212,11 @@ private slots:
     //! Invoked when ANY button is clicked and requires a haptic feedback
     void onBtnClickFroHapticFeedback();
 
+    //! User clicks ok/cancel after entering TFA pin code.
+    void onPinMsgBoxDone(bool ok);
+    //! User clicks ok/cancel after entering application specific password.
+    void onAppPassMsgBoxDone(bool ok);
+
 private:
     void initLogging ();
 
