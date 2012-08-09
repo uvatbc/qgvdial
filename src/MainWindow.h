@@ -61,6 +61,9 @@ signals:
     //! Emitted when the registered phones changes.
     void regPhoneChange(const QStringList &phones, int index);
 
+    // When the user dismisses the message box, we reroute the signal
+    void sigMessageBoxDone(bool ok);
+
 public slots:
     void setStatus (const QString &strText, int timeout = 3000);
 
@@ -163,7 +166,8 @@ private slots:
     void onMqThreadFinished();
 
     //! Invoked when the message box is done
-    void onSigMsgBoxDone(bool ok = true);
+    void onSigMsgBoxOk();
+    void onSigMsgBoxCancel();
 
     //! Invoked when the Call initiators list changes
     void onCallInitiatorsChange(bool bSave = true);
@@ -231,8 +235,6 @@ private:
 
     void playVmail (const QString &strFile);
 
-    void showMsgBox (const QString &strMessage);
-
     void setUsername(const QString &strUsername);
     void setPassword(const QString &strPassword);
 
@@ -250,6 +252,11 @@ private:
     bool ensureNwMgr();
     //! Request quit in the app
     void requestQuit();
+
+    void showMsgBox (const QString &strMessage, bool inputBox);
+    void showMsgBox (const QString &strMessage);
+    void showInputBox (const QString &strMessage);
+    void onSigMsgBoxDone(bool ok = true);
 
 private:
     GVApi           gvApi;
@@ -337,6 +344,9 @@ private:
     //! Use this to format a progress string:
     //  QString("Progress : %1%").arg(progressPercent);
     QString         gvApiProgressString;
+
+    // Context to be passed between invoking the inputbox and dismissing it
+    void           *inputBoxCtx;
 };
 
 #endif // MAINWINDOW_H

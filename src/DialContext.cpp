@@ -33,29 +33,30 @@ DialContext::DialContext (const QString &strMy, const QString &strT,
 , token(NULL)
 , mainView (mV)
 {
-    QObject *pMain = NULL;
+    QObject *pObj = NULL;
     do { // Begin cleanup block (not a loop)
         QObject *pRoot = mainView->rootObject ();
         if (NULL == pRoot) {
-            qWarning ("Couldn't get root object in QML for MainPage");
+            qWarning ("Couldn't get root object in QML for MsgBox");
             break;
         }
 
-        if (pRoot->objectName() == "MainPage") {
-            pMain = pRoot;
+        if (pRoot->objectName() == "MsgBox") {
+            pObj = pRoot;
             break;
         }
 
-        pMain = pRoot->findChild <QObject*> ("MainPage");
-        if (NULL == pMain) {
-            qWarning ("Could not get to MainPage");
+        pObj = pRoot->findChild <QObject*> ("MsgBox");
+        if (NULL == pObj) {
+            qWarning ("Could not get to MsgBox");
             break;
         }
     } while (0); // End cleanup block (not a loop)
 
-    bool rv = connect (pMain, SIGNAL (sigMsgBoxDone(bool)),
-                       this , SLOT (onSigMsgBoxDone(bool)));
+    bool rv = connect (pObj, SIGNAL(sigOk()), this, SLOT(onSigMsgBoxOk()));
     Q_ASSERT(rv); Q_UNUSED(rv);
+    rv = connect (pObj, SIGNAL (sigCancel()), this, SLOT(onSigMsgBoxCancel()));
+    Q_ASSERT(rv);
 }//DialContext::DialContext
 
 QString
@@ -85,3 +86,15 @@ DialContext::onSigMsgBoxDone (bool ok)
 
     emit sigDialComplete (this, ok);
 }//DialContext::onSigMsgBoxDone
+
+void
+DialContext::onSigMsgBoxOk()
+{
+    onSigMsgBoxDone(true);
+}//DialContext::onSigMsgBoxOk
+
+void
+DialContext::onSigMsgBoxCancel()
+{
+    onSigMsgBoxDone(false);
+}//DialContext::onSigMsgBoxCancel

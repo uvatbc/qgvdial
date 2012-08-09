@@ -25,6 +25,8 @@ Item {
     id: container
 
     property string msgText: "Dialing\n+1 000 000 0000"
+    property bool inputBox: false
+    property alias inputText: textEdit.text
 
     signal sigOk
     signal sigCancel
@@ -55,6 +57,21 @@ Item {
 
             horizontalAlignment: Text.AlignHCenter
         }// Item containing the text to display
+
+        TextEdit {
+            id: textEdit
+
+            visible: (container.inputBox == true)
+
+            width: parent.width
+            height: paintedHeight + (5 * g_hMul)
+
+            font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
+            wrapMode: Text.WordWrap
+            color: "white"
+
+            horizontalAlignment: Text.AlignHCenter
+        }
 
         Row { // (ok and cancel buttons)
             id: btnRow

@@ -59,9 +59,6 @@ Rectangle {
     // Contacts search query changes
     signal sigSearchContacts(string query)
 
-    // Signals from the message box
-    signal sigMsgBoxDone (bool ok)
-
     // Hapetic feedback required
     signal sigHaptic
 
@@ -93,8 +90,6 @@ Rectangle {
             main.state = '';
         }
     }
-
-    onSigMsgBoxDone: console.debug ("QML: User requested close on message box. Ok = " + ok);
 
     Flipable {
         id: mainFlipView
@@ -244,9 +239,6 @@ Rectangle {
         msgText: "No message"
 
         anchors.fill: parent
-
-        onSigOk: main.sigMsgBoxDone(true)
-        onSigCancel: main.sigMsgBoxDone(false)
     }//MsgBox
 
     Rectangle {

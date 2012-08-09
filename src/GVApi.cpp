@@ -688,42 +688,9 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
                     Q_DEBUG("Two factor AUTH required!");
                 }
 
-                QNetworkCookie galx;
-                bool foundgalx = false;
+                token->inParams["tfaAction"] = twoFactorForm.attribute("action");
 
                 emit twoStepAuthentication(token);
-                QString smsUserPin = token->inParams["user_pin"].toString();
-                if (smsUserPin.isEmpty ()) {
-                    Q_WARN("User didn't enter 2-step auth pin");
-                    break;
-                }
-
-                foreach (galx, jar->getAllCookies ()) {
-                    if (galx.name () == "GALX") {
-                        foundgalx = true;
-                    }
-                }
-
-                if (!foundgalx) {
-                    Q_WARN("Required 2 step auth but didn't find GALX");
-                    break;
-                }
-
-                QString formAction = twoFactorForm.attribute ("action");
-                QUrl twoFactorUrl =
-                QUrl::fromPercentEncoding(formAction.toLatin1 ());
-
-                QUrl contentUrl = twoFactorUrl;
-                contentUrl.addQueryItem("smsUserPin"      , smsUserPin);
-                contentUrl.addQueryItem("smsVerifyPin"    , "Verify");
-                contentUrl.addQueryItem("PersistentCookie", "yes");
-                contentUrl.addQueryItem("GALX"            , galx.value());
-
-                success =
-                doPostForm(twoFactorUrl, contentUrl.encodedQuery(), token, this,
-                    SLOT(onTFAAutoPost(bool,const QByteArray&,QNetworkReply*,void*)));
-                Q_ASSERT(success);
-
                 foreignUrl = true;
                 break;
             }
@@ -812,6 +779,64 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
         }
     }
 }//GVApi::onLogin2
+
+bool
+GVApi::resumeTFALogin(AsyncTaskToken *token)
+{
+    QNetworkCookie galx;
+    bool foundgalx = false;
+    bool rv = false;
+
+    do { // Begin cleanup block (not a loop)
+        QString smsUserPin = token->inParams["user_pin"].toString();
+        if (smsUserPin.isEmpty ()) {
+            Q_WARN("User didn't enter 2-step auth pin");
+            break;
+        }
+
+        QString formAction = token->inParams["tfaAction"].toString();
+        if (formAction.isEmpty ()) {
+            Q_CRIT("Two factor auth cannot continue without the form action");
+            break;
+        }
+
+        foreach (galx, jar->getAllCookies ()) {
+            if (galx.name () == "GALX") {
+                foundgalx = true;
+            }
+        }
+
+        if (!foundgalx) {
+            Q_WARN("Required 2 step auth but didn't find GALX");
+            break;
+        }
+
+        QUrl twoFactorUrl = QUrl::fromPercentEncoding(formAction.toLatin1 ());
+
+        QUrl content = twoFactorUrl;
+        content.addQueryItem("smsUserPin"      , smsUserPin);
+        content.addQueryItem("smsVerifyPin"    , "Verify");
+        content.addQueryItem("PersistentCookie", "yes");
+        content.addQueryItem("GALX"            , galx.value());
+
+        rv = doPostForm(twoFactorUrl, content.encodedQuery(), token, this,
+              SLOT(onTFAAutoPost(bool,const QByteArray&,QNetworkReply*,void*)));
+        Q_ASSERT(rv);
+    } while (0); // End cleanup block (not a loop)
+
+    if (!rv) {
+        Q_WARN("Two factor authentication failed.");
+
+        if (token->errorString.isEmpty()) {
+            token->errorString = tr("The username or password you entered "
+                                    "is incorrect.");
+        }
+        token->status = ATTS_LOGIN_FAILURE;
+        token->emitCompleted ();
+    }
+
+    return (true);
+}//GVApi::resumeTFALogin
 
 void
 GVApi::onTFAAutoPost(bool success, const QByteArray &response,

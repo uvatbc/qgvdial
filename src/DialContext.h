@@ -57,7 +57,12 @@ public:
 private slots:
     //! Invoked by call observers
     void callStarted ();
+
     //! Invoked when the user clicks on the message box
+    void onSigMsgBoxOk();
+    void onSigMsgBoxCancel();
+
+private:
     void onSigMsgBoxDone(bool ok);
 
 private:

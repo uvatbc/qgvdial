@@ -476,6 +476,8 @@ MainWindow::onTwoStepAuthentication(AsyncTaskToken *token)
     token->inParams["user_pin"] = strPIN;
 
     tfaRequired = true;
+
+    gvApi.resumeTFALogin (token);
 }//MainWindow::onTwoStepAuthentication
 
 void

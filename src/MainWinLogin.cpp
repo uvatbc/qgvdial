@@ -336,4 +336,6 @@ MainWindow::onTwoStepAuthentication(AsyncTaskToken *token)
 
     int rv = QInputDialog::getInt (this, "Enter security token", "Token: ", 0, 0);
     token->inParams["user_pin"] = QString("%1").arg (rv);
+
+    gvApi.resumeTFALogin (token);
 }//MainWindow::onTwoStepAuthentication

@@ -55,6 +55,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 // GV API:
     bool login(AsyncTaskToken *token);
+    bool resumeTFALogin(AsyncTaskToken *token);
     bool logout(AsyncTaskToken *token);
     bool getPhones(AsyncTaskToken *token);
     bool getInbox(AsyncTaskToken *token);

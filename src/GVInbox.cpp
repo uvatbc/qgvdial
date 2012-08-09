@@ -211,6 +211,13 @@ GVInbox::getInboxDone (AsyncTaskToken *token)
             break;
         }
 
+        int messageCount = token->outParams["message_count"].toUInt();
+        if (messageCount == 0) {
+            Q_DEBUG("No more pages to process.");
+            ok = true;
+            break;
+        }
+
         int page = token->inParams["page"].toInt(&ok);
         if (!ok) {
             Q_WARN("Invalid page number");

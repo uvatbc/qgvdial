@@ -259,9 +259,9 @@ MainWindow::init ()
              this , SLOT(onSigGvApiProgress(double)));
     Q_ASSERT(rv);
 
-/*
-    rv = connect ( this       , SIGNAL (dialCanFinish ()),
-                      &webPage    , SLOT   (dialCanFinish ()));
+/* In case I *ever* think of going back to the webPage way of doing things...
+    rv = connect (this    , SIGNAL(dialCanFinish()),
+                  &webPage, SLOT  (dialCanFinish()));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
 */
@@ -511,10 +511,6 @@ MainWindow::initQML ()
                   this, SLOT(on_actionE_xit_triggered ()));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
-    rv = connect (gObj, SIGNAL(sigMsgBoxDone(bool)),
-                  this, SLOT(onSigMsgBoxDone(bool)));
-    Q_ASSERT(rv);
-    if (!rv) { exit(1); }
     rv = connect (
         gObj     , SIGNAL(sigSearchContacts(const QString &)),
         oContacts, SLOT(onSearchQueryChanged(const QString &)));
@@ -552,6 +548,14 @@ MainWindow::initQML ()
     }
     rv = connect (gObj, SIGNAL (sigSelChanged (int)),
                   this, SLOT   (onRegPhoneSelectionChange (int)));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+
+    gObj = getQMLObject ("MsgBox");
+    rv = connect (gObj, SIGNAL(sigOk()), this, SLOT(onSigMsgBoxOk()));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+    rv = connect (gObj, SIGNAL(sigCancel()), this, SLOT(onSigMsgBoxCancel()));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
 
@@ -1062,7 +1066,7 @@ MainWindow::refreshPinSettings()
 }//MainWindow::refreshPinSettings
 
 void
-MainWindow::showMsgBox (const QString &strMessage)
+MainWindow::showMsgBox (const QString &strMessage, bool inputBox)
 {
     QObject *obj = getQMLObject ("MsgBox");
     if (NULL == obj) {
@@ -1071,11 +1075,24 @@ MainWindow::showMsgBox (const QString &strMessage)
     }
 
     obj->setProperty ("msgText", strMessage);
+    obj->setProperty ("inputBox", inputBox);
     obj->setProperty ("opacity", QVariant(1.0));
 }//MainWindow::showMsgBox
 
 void
-MainWindow::onSigMsgBoxDone (bool /*ok = true*/)
+MainWindow::showMsgBox (const QString &strMessage)
+{
+    showMsgBox (strMessage, false);
+}//MainWindow::showMsgBox
+
+void
+MainWindow::showInputBox (const QString &strMessage)
+{
+    showMsgBox (strMessage, true);
+}//MainWindow::showInputBox
+
+void
+MainWindow::onSigMsgBoxDone (bool ok /* = true*/)
 {
     QObject *obj = getQMLObject ("MsgBox");
     if (NULL == obj) {
@@ -1084,7 +1101,21 @@ MainWindow::onSigMsgBoxDone (bool /*ok = true*/)
     }
 
     obj->setProperty ("opacity", QVariant(0.0));
+
+    emit sigMessageBoxDone(ok);
 }//MainWindow::onSigMsgBoxDone
+
+void
+MainWindow::onSigMsgBoxOk()
+{
+    onSigMsgBoxDone(true);
+}//MainWindow::onSigMsgBoxOk
+
+void
+MainWindow::onSigMsgBoxCancel()
+{
+    onSigMsgBoxDone(false);
+}//MainWindow::onSigMsgBoxCancel
 
 void
 MainWindow::onCallInitiatorsChange (bool bSave)
