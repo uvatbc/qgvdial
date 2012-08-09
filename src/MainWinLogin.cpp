@@ -199,6 +199,7 @@ MainWindow::loginCompleted (AsyncTaskToken *token)
             dbMain.ensureCache ();
         }
 
+        bool bInitContacts = true;
         QString contactsPass = strPass;
         if (dbMain.getTFAFlag ()) {
             if (!dbMain.getContactsPass (contactsPass)) {
@@ -212,8 +213,11 @@ MainWindow::loginCompleted (AsyncTaskToken *token)
                 Q_ASSERT(obj);
 
                 showInputBox ("Enter app specific password for Google contacts");
+                bInitContacts = false;
             }
-        } else {
+        }
+
+        if (bInitContacts) {
             // Prepare the contacts
             initContacts (contactsPass);
         }
