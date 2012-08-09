@@ -35,7 +35,14 @@ FocusScope {
     height: textEd.height
 
     function closeSoftwareInputPanel() {
+        textEd.focus = false;
+        container.focus = false;
         textEd.closeSoftwareInputPanel ();
+    }
+
+    function doAccepted() {
+        container.closeSoftwareInputPanel ();
+        container.sigEnter();
     }
 
     Rectangle {
@@ -58,12 +65,11 @@ FocusScope {
 
             inputMethodHints: Qt.ImhNoAutoUppercase + Qt.ImhNoPredictiveText
 
+            onAccepted: container.doAccepted();
+
             Keys.onReturnPressed: {
-                container.closeSoftwareInputPanel ();
+                container.doAccepted();
                 event.accepted = true;
-                container.sigEnter();
-                textEd.focus = false;
-                container.focus = false;
             }
 
             onTextChanged: {

@@ -32,6 +32,9 @@ Item {
     signal sigOk
     signal sigCancel
 
+    onSigOk: textInput.closeSoftwareInputPanel();
+    onSigCancel: textInput.closeSoftwareInputPanel();
+
     Fader {
         anchors.fill: parent
         state: "faded"
@@ -61,10 +64,10 @@ Item {
 
         MyTextEdit {
             id: textInput
-
             visible: (container.inputBox == true)
-
             width: parent.width
+
+            onSigEnter: container.sigOk();
         }
 
         Row { // (ok and cancel buttons)

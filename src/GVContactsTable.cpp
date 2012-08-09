@@ -370,6 +370,11 @@ GVContactsTable::onLoginResponse(bool success, const QByteArray &response,
     if (token) {
         delete token;
     }
+
+    if (!bLoggedIn) {
+        CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+        dbMain.clearContactsPass ();
+    }
 }//GVContactsTable::onLoginResponse
 
 #ifndef NO_CONTACTS_CAPTCHA
