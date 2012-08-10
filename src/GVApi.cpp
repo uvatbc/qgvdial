@@ -371,7 +371,10 @@ GVApi::cancel(AsyncTaskToken *token)
 {
     NwReqTracker *tracker = (NwReqTracker *)token->apiCtx;
     if (tracker) {
-        Q_WARN("API context not valid. Cannot cancel");
+        Q_WARN("API context not valid. Cannot cancel. I can at least fail it");
+
+        token->status = ATTS_FAILURE;
+        token->emitCompleted ();
         return;
     }
 
@@ -405,16 +408,16 @@ GVApi::login(AsyncTaskToken *token)
 bool
 GVApi::doLogin1(QUrl url, AsyncTaskToken *token)
 {
-    url.addQueryItem("nui"      , "5");
-    url.addQueryItem("service"  , "grandcentral");
-    url.addQueryItem("ltmpl"    , "mobile");
-    url.addQueryItem("btmpl"    , "mobile");
-    url.addQueryItem("passive"  , "true");
-    url.addQueryItem("continue" , "https://www.google.com/voice/m");
+    url.addQueryItem("nui"     , "5");
+    url.addQueryItem("service" , "grandcentral");
+    url.addQueryItem("ltmpl"   , "mobile");
+    url.addQueryItem("btmpl"   , "mobile");
+    url.addQueryItem("passive" , "true");
+    url.addQueryItem("continue", "https://www.google.com/voice/m");
 
-    bool rv = doGet (url, token, this,
-                     SLOT(onLogin1(bool, const QByteArray &, QNetworkReply *,
-                                   void *)));
+    bool rv =
+    doGet(url, token, this,
+          SLOT(onLogin1(bool,const QByteArray&,QNetworkReply*,void*)));
     Q_ASSERT(rv);
 
     return rv;
@@ -573,9 +576,9 @@ GVApi::postLogin(QUrl url, AsyncTaskToken *token)
         }
     }
 
-    found = doPostForm(url, url.encodedQuery(), token, this,
-                       SLOT (onLogin2(bool, const QByteArray &,
-                                      QNetworkReply *, void *)));
+    found =
+    doPostForm(url, url.encodedQuery(), token, this,
+               SLOT(onLogin2(bool,const QByteArray&,QNetworkReply*,void*)));
     Q_ASSERT(found);
 
     return found;
@@ -624,9 +627,8 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
             {
                 foreign++;
                 token->outParams["foreign"] = foreign;
-                success = doGet (urlMoved, token, this,
-                                 SLOT(onLogin2(bool, const QByteArray &,
-                                               QNetworkReply *, void *)));
+                success = doGet(urlMoved, token, this,
+                   SLOT(onLogin2(bool,const QByteArray&,QNetworkReply*,void*)));
             } else {
                 success = postLogin (urlMoved, token);
             }
@@ -723,9 +725,8 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
             foreignUrl = true;
 
             urlMoved = QUrl(newLoc);
-            success = doGet (urlMoved, token, this,
-                SLOT(onLogin2(bool, const QByteArray &, QNetworkReply *,
-                              void *)));
+            success = doGet(urlMoved, token, this,
+                   SLOT(onLogin2(bool,const QByteArray&,QNetworkReply*,void*)));
             token->outParams["foreign"] = 0;
         } while (0); // End cleanup block (not a loop)
 
@@ -886,8 +887,7 @@ GVApi::getRnr(AsyncTaskToken *token)
     Q_DEBUG("User authenticated, now looking for RNR.");
 
     bool rv = doGet(GV_HTTPS_M "/i/all", token, this,
-                    SLOT (onGotRnr(bool, const QByteArray &,
-                                   QNetworkReply *, void *)));
+                    SLOT(onGotRnr(bool,const QByteArray&,QNetworkReply*,void*)));
     Q_ASSERT(rv);
 
     return rv;
@@ -1006,8 +1006,7 @@ GVApi::logout(AsyncTaskToken *token)
     }
 
     bool rv = doGet(GV_HTTPS "/account/signout", token, this,
-                    SLOT (onLogout(bool, const QByteArray &, QNetworkReply *,
-                                   void *)));
+                    SLOT(onLogout(bool,const QByteArray&,QNetworkReply*,void*)));
     Q_ASSERT(rv);
 
     return rv;
@@ -1038,9 +1037,9 @@ GVApi::getPhones(AsyncTaskToken *token)
         return true;
     }
 
-    bool rv = doGet (GV_HTTPS "/b/0/settings/tab/phones", token, this,
-                     SLOT (onGetPhones(bool, const QByteArray &,
-                                       QNetworkReply *, void *)));
+    bool rv =
+    doGet(GV_HTTPS "/b/0/settings/tab/phones", token, this,
+          SLOT(onGetPhones(bool,const QByteArray&,QNetworkReply*,void*)));
     Q_ASSERT(rv);
 
     return rv;
@@ -1251,9 +1250,9 @@ GVApi::getInbox(AsyncTaskToken *token)
                         .arg(token->inParams["type"].toString())
                         .arg(token->inParams["page"].toString());
 
-    bool rv = doGet (strLink, token, this,
-                     SLOT(onGetInbox(bool, const QByteArray &, QNetworkReply *,
-                                     void *)));
+    bool rv =
+    doGet(strLink, token, this,
+          SLOT(onGetInbox(bool,const QByteArray&,QNetworkReply*,void*)));
     Q_ASSERT(rv);
 
     return rv;
@@ -1661,9 +1660,9 @@ GVApi::callOut(AsyncTaskToken *token)
         return true;
     }
 
-    bool rv = doPostText (url, content, token, this,
-                          SLOT(onCallout(bool, const QByteArray &,
-                                         QNetworkReply *, void *)));
+    bool rv =
+    doPostText(url, content, token, this,
+               SLOT(onCallout(bool,const QByteArray&,QNetworkReply*,void*)));
     Q_ASSERT(rv);
 
     return rv;
@@ -1767,9 +1766,9 @@ GVApi::callBack(AsyncTaskToken *token)
 
     Q_DEBUG(QString("Call back request = %1").arg(strContent));
 
-    bool rv = doPostForm(url, strContent.toAscii (), token, this,
-                         SLOT(onCallback(bool, const QByteArray &,
-                                         QNetworkReply *, void *)));
+    bool rv =
+    doPostForm(url, strContent.toAscii (), token, this,
+               SLOT(onCallback(bool,const QByteArray&,QNetworkReply*,void*)));
     Q_ASSERT(rv);
 
     return (rv);
@@ -1876,9 +1875,9 @@ GVApi::doSendSms(QUrl url, AsyncTaskToken *token)
         return true;
     }
 
-    bool rv = doPostText (url, content, token, this,
-                          SLOT(onSendSms(bool, const QByteArray &,
-                                         QNetworkReply *, void *)));
+    bool rv =
+    doPostText(url, content, token, this,
+               SLOT(onSendSms(bool,const QByteArray&,QNetworkReply*,void*)));
     Q_ASSERT(rv);
 
     return (rv);
@@ -1961,8 +1960,8 @@ GVApi::getVoicemail(AsyncTaskToken *token)
 
     QString strLink = QString (GV_HTTPS "/b/0/media/send_voicemail/%1")
                         .arg(token->inParams["vmail_link"].toString());
-    return doGet(strLink, token, this, SLOT(onVmail(bool, const QByteArray &,
-                                                    QNetworkReply *, void *)));
+    return doGet(strLink, token, this,
+                 SLOT(onVmail(bool,const QByteArray&,QNetworkReply*,void*)));
 }//GVApi::getVoicemail
 
 void
@@ -2033,13 +2032,12 @@ GVApi::markInboxEntryAsRead(AsyncTaskToken *token)
 
     // This method call needs to also be added as content data
     QString strContent = QString("messages=%1&read=1&_rnr_se=%2")
-                            .arg(token->inParams["id"].toString()).arg(rnr_se);
+                            .arg(token->inParams["id"].toString(), rnr_se);
 
     QUrl url(GV_HTTPS "/b/0/inbox/mark");
     bool rv =
     doPost(url, strContent.toAscii(), POST_FORM, UA_DESKTOP, token, this,
-           SLOT(onMarkAsRead(bool, const QByteArray &, QNetworkReply *,
-                             void *)));
+           SLOT(onMarkAsRead(bool,const QByteArray&,QNetworkReply*,void*)));
     Q_ASSERT(rv);
 
     return (rv);
@@ -2071,8 +2069,8 @@ GVApi::onMarkAsRead(bool success, const QByteArray &response, QNetworkReply *,
         strTemp = QString("var obj = %1; obj.ok;").arg(strTemp);
         strTemp = scriptEngine.evaluate (strTemp).toString ();
         if (scriptEngine.hasUncaughtException ()) {
-            Q_WARN("Failed to parse response: ") << strReply;
-            Q_WARN("Error is: ") << strTemp;
+            Q_WARN(QString("Failed to parse response: %1").arg(strReply));
+            Q_WARN(QString("Error is: %1").arg(strTemp));
             break;
         }
 
@@ -2101,3 +2099,88 @@ GVApi::dbg_alwaysFailDialing(bool set /*= true*/)
 {
     dbgAlwaysFailDialing = set;
 }//GVApi::dbg_alwaysFailDialing
+
+bool
+GVApi::deleteInboxEntry(AsyncTaskToken *token)
+{
+    Q_ASSERT(token);
+    if (!token) {
+        return false;
+    }
+
+    // Ensure that the params  are valid
+    if (!token->inParams.contains ("id")) {
+        token->status = ATTS_INVALID_PARAMS;
+        token->emitCompleted ();
+        return true;
+    }
+
+    if (!loggedIn) {
+        token->status = ATTS_NOT_LOGGED_IN;
+        token->emitCompleted ();
+        return true;
+    }
+
+    // This method call needs to also be added as content data
+    QString strContent = QString("messages=%1&trash=1&_rnr_se=%2")
+                            .arg(token->inParams["id"].toString(), rnr_se);
+
+    QUrl url(GV_HTTPS "/b/0/inbox/delete");
+    bool rv =
+    doPost(url, strContent.toAscii(), POST_FORM, UA_DESKTOP, token, this,
+           SLOT(onEntryDeleted(bool,const QByteArray&,QNetworkReply*,void*)));
+    Q_ASSERT(rv);
+
+    return (rv);
+}//GVApi::deleteInboxEntry
+
+void
+GVApi::onEntryDeleted(bool success, const QByteArray &response, QNetworkReply *,
+                      void *ctx)
+{
+    AsyncTaskToken *token = (AsyncTaskToken *)ctx;
+    QString strReply = response;
+
+    do { // Begin cleanup block (not a loop)
+        if (!success) {
+            Q_WARN("Failed to delete entry");
+            break;
+        }
+        success = false;
+
+#if 1
+        Q_DEBUG(strReply);
+#endif
+
+        QString strTemp = strReply.mid (strReply.indexOf (",\n"));
+        if (strTemp.startsWith (',')) {
+            strTemp = strTemp.mid (strTemp.indexOf ('{'));
+        }
+
+        strTemp = QString("var obj = %1; obj.ok;").arg(strTemp);
+        strTemp = scriptEngine.evaluate (strTemp).toString ();
+        if (scriptEngine.hasUncaughtException ()) {
+            Q_WARN(QString("Failed to parse response: %1").arg(strReply));
+            Q_WARN(QString("Error is: %1").arg(strTemp));
+            break;
+        }
+
+        if (strTemp != "true") {
+            Q_WARN(QString("Failed to delete! response ok = %1").arg(strTemp));
+            break;
+        }
+
+        token->status = ATTS_SUCCESS;
+        token->emitCompleted ();
+        token = NULL;
+
+        success = true;
+    } while (0); // End cleanup block (not a loop)
+
+    if (!success) {
+        if (token) {
+            token->status = ATTS_FAILURE;
+            token->emitCompleted ();
+        }
+    }
+}//GVApi::onEntryDeleted

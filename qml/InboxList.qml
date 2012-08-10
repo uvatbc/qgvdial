@@ -23,7 +23,6 @@ import Qt 4.7
 
 Rectangle {
     id: container
-    objectName: "InboxPage"
     color: "#202020"
 
     signal sigCall(string number)
@@ -33,6 +32,8 @@ Rectangle {
     signal sigVmailPlayback(int playState)
     signal sigMarkAsRead(string msgId)
     signal sigCloseVmail
+
+    signal sigDeleteInboxEntry(string id)
 
     signal sigRefreshInbox
     signal sigRefreshAllInbox
@@ -76,7 +77,7 @@ Rectangle {
                 top: parent.top
                 left: parent.left
                 right: parent.right
-                bottom: backButton.top
+                bottom: buttonRow.top
             }
 
             contentHeight: detailColumn.height
@@ -269,20 +270,39 @@ Rectangle {
             }//Column of all details
         }//Flickable (text / voicemail)
 
-        MeegoButton {
-            id: backButton
-            text: "Back"
-            onClicked: {
-                container.state= ''
-                container.sigVmailPlayback(0);
-                container.sigCloseVmail();
-            }
+        Row {
+            id: buttonRow
 
             anchors {
                 bottom: parent.bottom
                 horizontalCenter: parent.horizontalCenter
             }
-        }// MeegoButton (back button)
+            width: deleteButton.width + backButton.width + spacing
+            height: deleteButton.height + 1
+
+            function doDismiss() {
+                container.state= ''
+                container.sigVmailPlayback(0);
+                container.sigCloseVmail();
+            }
+
+            MeegoButton {
+                id: deleteButton
+                text: "Delete"
+                onClicked: {
+                    buttonRow.doDismiss();
+                    container.sigDeleteInboxEntry(container.strLink);
+                }
+            }// MeegoButton (back button)
+
+            MeegoButton {
+                id: backButton
+                text: "Back"
+                onClicked: {
+                    buttonRow.doDismiss();
+                }
+            }// MeegoButton (back button)
+        }
     }//Rectangle (details)
 
     Item { //  The combined inbox list and selector list

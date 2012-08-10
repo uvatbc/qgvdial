@@ -337,10 +337,42 @@ GVInbox::onInboxEntryMarked (AsyncTaskToken *token)
     QString id = token->inParams["id"].toString();
 
     if (ATTS_SUCCESS != token->status) {
-        Q_WARN("Failed to mark read: ID =") << id;
+        Q_WARN(QString("Failed to mark read: ID =").arg (id));
     } else {
         modelInbox->markAsRead (id);
     }
 
     delete token;
 }//GVInbox::onInboxEntryMarked
+
+void
+GVInbox::onSigDeleteInboxEntry(const QString &id)
+{
+    AsyncTaskToken *token = new AsyncTaskToken(this);
+    token->inParams["id"] = id;
+
+    bool rv = connect (token, SIGNAL(completed(AsyncTaskToken*)),
+                       this , SLOT(onInboxEntryDeleted(AsyncTaskToken*)));
+    Q_ASSERT(rv); Q_UNUSED(rv);
+
+    if (!gvApi.deleteInboxEntry (token)) {
+        token->status = ATTS_FAILURE;
+        onInboxEntryDeleted(token);
+    }
+}//GVInbox::onSigDeleteInboxEntry
+
+void
+GVInbox::onInboxEntryDeleted (AsyncTaskToken *token)
+{
+    QString id = token->inParams["id"].toString();
+
+    if (ATTS_SUCCESS != token->status) {
+        Q_WARN(QString("Failed to delete: ID = %1").arg (id));
+    } else {
+        GVInboxEntry hevent;
+        hevent.id = id;
+        modelInbox->deleteEntry (hevent);
+    }
+
+    delete token;
+}//GVInbox::onInboxEntryDeleted

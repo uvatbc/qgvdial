@@ -75,10 +75,13 @@ public slots:
 
     void onSigMarkAsRead(const QString &msgId);
 
+    void onSigDeleteInboxEntry(const QString &id);
+
 private slots:
     void oneInboxEntry (const GVInboxEntry &hevent);
     void getInboxDone (AsyncTaskToken *token);
     void onInboxEntryMarked (AsyncTaskToken *token);
+    void onInboxEntryDeleted (AsyncTaskToken *token);
 
 private:
     void prepView ();

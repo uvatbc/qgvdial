@@ -35,24 +35,11 @@ Rectangle {
     signal sigText(string numbers, string smsText)
     // Signal from dialpad indicating change of callback / callout
     signal sigSelChanged(int index)
-    // Signal from inbox to play a vmail
-    signal sigVoicemail(string link)
-    // Signal from the inbox to play/pause/stop a vmail
-    signal sigVmailPlayback(int playState)
-    // Signal from inbox to chose the type of inbox entries to show
-    signal sigInboxSelect(string selection)
-    // Signal from the inbox that an entry has been opened and needs to be marked as read
-    signal sigMarkAsRead(string msgId)
-    // Inbox vmail entry has asked to close the vmail
-    signal sigCloseVmail
     // Signals from the Settings page
     signal sigHide
     signal sigQuit
 
-    // From the contacts or inbox page
-    signal sigRefreshInbox
-    signal sigRefreshAllInbox
-
+    // From the contacts page
     signal sigRefreshContacts
     signal sigRefreshAllContacts
 
@@ -153,22 +140,15 @@ Rectangle {
 
                     InboxList {
                         id: inboxList
+                        objectName: "InboxPage"
 
                         anchors.fill: parent
 
                         onSigCall: main.sigCall (number)
-                        onSigInboxSelect: main.sigInboxSelect(selection)
-                        onSigVoicemail: main.sigVoicemail(link)
-                        onSigVmailPlayback: main.sigVmailPlayback(playState)
                         onSigText: {
                             mainFlipView.flipped = true;
                             smsView.addSmsDestination(name, number);
                         }
-                        onSigMarkAsRead: main.sigMarkAsRead(msgId);
-                        onSigCloseVmail: main.sigCloseVmail();
-
-                        onSigRefreshInbox: main.sigRefreshInbox();
-                        onSigRefreshAllInbox: main.sigRefreshAllInbox();
                     }
                 }//Tab (Inbox)
                 Tab {

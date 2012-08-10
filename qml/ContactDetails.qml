@@ -23,8 +23,8 @@ import Qt 4.7
 
 Rectangle { // Contact details
     id: container
-    signal sigCall (string number)
-    signal sigText (string number)
+    signal sigCall(string number)
+    signal sigText(string number)
     signal sigClose
 
     property alias model: contactNumbers.model

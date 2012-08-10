@@ -479,28 +479,8 @@ MainWindow::initQML ()
         this, SLOT   (onSigText(const QString&,const QString&)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
-    rv = connect (gObj, SIGNAL(sigVoicemail(QString)),
-                  this, SLOT(retrieveVoicemail(const QString &)));
-    Q_ASSERT(rv);
-    if (!rv) { exit(1); }
-    rv = connect (gObj, SIGNAL(sigVmailPlayback (int)),
-                  this, SLOT(onSigVmailPlayback (int)));
-    Q_ASSERT(rv);
-    if (!rv) { exit(1); }
     rv = connect (gObj, SIGNAL(sigSelChanged(int)),
                   this, SLOT(onRegPhoneSelectionChange(int)));
-    Q_ASSERT(rv);
-    if (!rv) { exit(1); }
-    rv = connect (gObj  , SIGNAL(sigInboxSelect(QString)),
-                  oInbox, SLOT(onInboxSelected(const QString &)));
-    Q_ASSERT(rv);
-    if (!rv) { exit(1); }
-    rv = connect (gObj  , SIGNAL(sigMarkAsRead(QString)),
-                  oInbox, SLOT(onSigMarkAsRead(const QString &)));
-    Q_ASSERT(rv);
-    if (!rv) { exit(1); }
-    rv = connect (gObj, SIGNAL(sigCloseVmail ()),
-                  this, SLOT(onSigCloseVmail ()));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
     rv = connect (gObj, SIGNAL(sigHide ()),
@@ -526,15 +506,6 @@ MainWindow::initQML ()
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
 
-    rv = connect (gObj, SIGNAL(sigRefreshInbox()),
-                  oInbox, SLOT(refresh()));
-    Q_ASSERT(rv);
-    if (!rv) { exit(1); }
-    rv = connect (gObj, SIGNAL(sigRefreshAllInbox()),
-                  oInbox, SLOT(refreshFullInbox()));
-    Q_ASSERT(rv);
-    if (!rv) { exit(1); }
-
     rv = connect (gObj, SIGNAL(sigHaptic()),
                   this, SLOT(onBtnClickFroHapticFeedback()));
     Q_ASSERT(rv);
@@ -552,10 +523,53 @@ MainWindow::initQML ()
     if (!rv) { exit(1); }
 
     gObj = getQMLObject ("MsgBox");
+    if (NULL == gObj) {
+        Q_WARN("Could not get to MsgBox");
+        requestQuit ();
+        return;
+    }
     rv = connect (gObj, SIGNAL(sigOk()), this, SLOT(onSigMsgBoxOk()));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
     rv = connect (gObj, SIGNAL(sigCancel()), this, SLOT(onSigMsgBoxCancel()));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+
+    gObj = getQMLObject ("InboxPage");
+    if (NULL == gObj) {
+        Q_WARN("Could not get to InboxPage");
+        requestQuit ();
+        return;
+    }
+    rv = connect (gObj  , SIGNAL(sigInboxSelect(QString)),
+                  oInbox, SLOT(onInboxSelected(const QString&)));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+    rv = connect (gObj, SIGNAL(sigVoicemail(QString)),
+                  this, SLOT(retrieveVoicemail(const QString&)));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+    rv = connect (gObj, SIGNAL(sigVmailPlayback(int)),
+                  this, SLOT(onSigVmailPlayback(int)));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+    rv = connect (gObj  , SIGNAL(sigMarkAsRead(QString)),
+                  oInbox, SLOT(onSigMarkAsRead(const QString &)));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+    rv = connect (gObj, SIGNAL(sigRefreshInbox()),
+                  oInbox, SLOT(refresh()));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+    rv = connect (gObj, SIGNAL(sigRefreshAllInbox()),
+                  oInbox, SLOT(refreshFullInbox()));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+    rv = connect(gObj, SIGNAL(sigCloseVmail()), this, SLOT(onSigCloseVmail()));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+    rv = connect(gObj, SIGNAL(sigDeleteInboxEntry(const QString &)),
+                 oInbox, SLOT(onSigDeleteInboxEntry(const QString &)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
 

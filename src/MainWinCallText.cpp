@@ -122,8 +122,8 @@ MainWindow::dialNow (const QString &strTarget)
             Q_WARN ("Failed to malloc DialContext");
             break;
         }
-        success = connect (ctx,     SIGNAL(hideMsgBox()),
-                           this, SLOT(onSigMsgBoxDone()));
+        success = connect(ctx , SIGNAL(hideMsgBox()),
+                          this, SLOT(onSigMsgBoxOk()));
         if (!success) {
             Q_ASSERT(success);
             delete ctx;

@@ -64,6 +64,7 @@ public:
     bool sendSms(AsyncTaskToken *token);
     bool getVoicemail(AsyncTaskToken *token);
     bool markInboxEntryAsRead(AsyncTaskToken *token);
+    bool deleteInboxEntry(AsyncTaskToken *token);
 ////////////////////////////////////////////////////////////////////////////////
 
 signals:
@@ -116,6 +117,10 @@ private slots:
     // Mark inbox entry as "read"
     void onMarkAsRead(bool success, const QByteArray &response,
                       QNetworkReply *reply, void *ctx);
+
+    // Delete inbox entry
+    void onEntryDeleted(bool success, const QByteArray &response,
+                        QNetworkReply *reply, void *ctx);
 
     // Get voicemail
     void onVmail(bool success, const QByteArray &response, QNetworkReply *reply,
