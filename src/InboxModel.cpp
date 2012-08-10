@@ -48,8 +48,7 @@ InboxModel::rowCount (const QModelIndex & /*parent = QModelIndex()*/) const
 }//InboxModel::rowCount
 
 QVariant
-InboxModel::data (const QModelIndex &index,
-                        int          role ) const
+InboxModel::data (const QModelIndex &index, int role) const
 {
     QVariant var;
 

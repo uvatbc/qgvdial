@@ -217,6 +217,10 @@ private slots:
     //! User clicks ok/cancel after entering application specific password.
     void onAppPassMsgBoxDone(bool ok);
 
+    //! User has requested deletion of inbox entry
+    void onSigDeleteInboxEntry(const QString &id);
+    void onUserAllowedDelete(bool ok);
+
 private:
     void initLogging ();
 

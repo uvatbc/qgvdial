@@ -569,7 +569,7 @@ MainWindow::initQML ()
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
     rv = connect(gObj, SIGNAL(sigDeleteInboxEntry(const QString &)),
-                 oInbox, SLOT(onSigDeleteInboxEntry(const QString &)));
+                 this, SLOT(onSigDeleteInboxEntry(const QString &)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
 
@@ -1366,3 +1366,37 @@ MainWindow::onBtnClickFroHapticFeedback()
     OsDependent &osd = Singletons::getRef().getOSD ();
     osd.onBtnClickFroHapticFeedback ();
 }//MainWindow::onBtnClickFroHapticFeedback
+
+void
+MainWindow::onSigDeleteInboxEntry(const QString &id)
+{
+   connect(this, SIGNAL(sigMessageBoxDone(bool)),
+           this, SLOT(onUserAllowedDelete(bool)));
+   inputBoxCtx = new QString(id);   
+   showMsgBox("Are you sure you want to delete this entry?");
+}//MainWindow::onSigDeleteInboxEntry
+
+void
+MainWindow::onUserAllowedDelete(bool ok)
+{
+   disconnect(this, SIGNAL(sigMessageBoxDone(bool)),
+              this, SLOT(onUserAllowedDelete(bool)));
+
+   QString *id = (QString *)inputBoxCtx;
+   inputBoxCtx = NULL;
+
+   if (NULL == id) {
+      Q_CRIT("Context = NULL!!");
+      return;
+   }
+
+   if (ok) {
+      Q_DEBUG("User confirmed deletion");
+      oInbox->onSigDeleteInboxEntry(*id);
+   } else {
+      Q_DEBUG("User canceled deletion");
+   }
+
+   delete id;
+}//MainWindow::onUserAllowedDelete
+
