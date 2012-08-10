@@ -32,6 +32,11 @@ class ContactsModel;
 class InboxModel;
 class CookieJar;
 
+#define INBOX_ENTRY_READ_MASK  (1 << 0)
+#define INBOX_ENTRY_SPAM_MASK  (1 << 1)
+#define INBOX_ENTRY_TRASH_MASK (1 << 2)
+#define INBOX_ENTRY_STAR_MASK  (1 << 3)
+
 class CacheDatabase : public QObject
 {
     Q_OBJECT

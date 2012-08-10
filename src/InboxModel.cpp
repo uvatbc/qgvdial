@@ -198,7 +198,8 @@ InboxModel::data (const QModelIndex &index,
         else if (5 == column)   // GV_IN_FLAGS
         {
             if (IN_ReadFlag == role) {
-                var = QVariant(bool(var.toInt() & (1 << 0) ? true : false));
+                var = QVariant(bool(var.toInt() & INBOX_ENTRY_READ_MASK ?
+                                        true : false));
             } else {
                 var.clear ();
             }
@@ -283,6 +284,22 @@ InboxModel::string_to_type (const QString &strType)
 }//InboxModel::string_to_type
 
 bool
+InboxModel::searchById(const QString &id, quint32 &foundRow)
+{
+    QModelIndex startIndex = this->index (0, 0);
+    QModelIndexList foundList = match (startIndex, Qt::EditRole, id, 1,
+                                       Qt::MatchExactly);
+    bool found = false;
+    if (foundList.count () != 0) {
+        QModelIndex foundIndex = foundList.at (0);
+        foundRow = foundIndex.row ();
+        found = true;
+    }
+
+    return (found);
+}//InboxModel::searchById
+
+bool
 InboxModel::refresh (const QString &strSelected)
 {
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
@@ -335,14 +352,18 @@ bool
 InboxModel::deleteEntry (const GVInboxEntry &hEvent)
 {
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    quint32 rowCount = this->rowCount ();
-
     bool bExists = dbMain.existsInboxEntry (hEvent);
 
     if (bExists) {
-        beginRemoveRows (QModelIndex (), rowCount, rowCount);
+        quint32 rowToDelete;
+        bool found = searchById (hEvent.id, rowToDelete);
+        if (found) {
+            beginRemoveRows (QModelIndex (), rowToDelete, rowToDelete);
+        }
         dbMain.deleteInboxEntryById (hEvent.id);
-        endRemoveRows ();
+        if (found) {
+            endRemoveRows ();
+        }
     }
 
     return (true);
@@ -352,24 +373,23 @@ bool
 InboxModel::markAsRead (const QString &msgId)
 {
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    if (!dbMain.markAsRead (msgId)) {
-        qWarning ("Failed to mark read.");
-        return (false);
+    GVInboxEntry hEvent;
+    hEvent.id = msgId;
+
+    bool bExists = dbMain.existsInboxEntry (hEvent);
+
+    if (bExists) {
+        quint32 rowToMark;
+        bool found = searchById (hEvent.id, rowToMark);
+        //dbMain.markAsRead (msgId);
+        if (found) {
+            dbMain.markAsRead (msgId);
+            QModelIndex foundIndex = index(rowToMark, 5);
+            emit dataChanged (foundIndex, foundIndex);
+
+            this->refresh ();
+        }
     }
-
-/*@@Uv : This works for a single change, but for whatever reason does not get
-         the data through the underlying SQL query. Cached data - that still has
-         the unread flag - is returned.
-
-    QVariant val = msgId;
-    QModelIndexList indexList = match(index(0,0), Qt::EditRole, val);
-
-    foreach (QModelIndex mi, indexList) {
-        emit dataChanged (mi.sibling(mi.row (), 5), mi.sibling(mi.row (), 5));
-    }
-*/
-
-    dbMain.refreshInboxModel (this, strSelectType);
 
     return (true);
 }//InboxModel::markAsRead

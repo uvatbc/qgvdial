@@ -2125,7 +2125,8 @@ GVApi::deleteInboxEntry(AsyncTaskToken *token)
     QString strContent = QString("messages=%1&trash=1&_rnr_se=%2")
                             .arg(token->inParams["id"].toString(), rnr_se);
 
-    QUrl url(GV_HTTPS "/b/0/inbox/delete");
+//    QUrl url(GV_HTTPS "/b/0/inbox/deleteMessages");
+    QUrl url(GV_HTTPS "/inbox/deleteMessages");
     bool rv =
     doPost(url, strContent.toAscii(), POST_FORM, UA_DESKTOP, token, this,
            SLOT(onEntryDeleted(bool,const QByteArray&,QNetworkReply*,void*)));

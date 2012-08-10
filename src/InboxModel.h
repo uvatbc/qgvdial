@@ -59,6 +59,7 @@ public:
 
 private:
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    bool searchById(const QString &id, quint32 &foundRow);
 
     QString strSelectType;
     GVI_Entry_Type eSelectType;

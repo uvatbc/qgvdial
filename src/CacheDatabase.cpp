@@ -841,10 +841,10 @@ CacheDatabase::existsInboxEntry (const GVInboxEntry &hEvent)
 bool
 CacheDatabase::insertInboxEntry (const GVInboxEntry &hEvent)
 {
-    quint32 flags = (hEvent.bRead  ? (1 << 0) : 0)
-                  | (hEvent.bSpam  ? (1 << 1) : 0)
-                  | (hEvent.bTrash ? (1 << 2) : 0)
-                  | (hEvent.bStar  ? (1 << 3) : 0);
+    quint32 flags = (hEvent.bRead  ? INBOX_ENTRY_READ_MASK  : 0)
+                  | (hEvent.bSpam  ? INBOX_ENTRY_SPAM_MASK  : 0)
+                  | (hEvent.bTrash ? INBOX_ENTRY_TRASH_MASK : 0)
+                  | (hEvent.bStar  ? INBOX_ENTRY_STAR_MASK  : 0);
     GVInboxEntry scrubEvent = hEvent;
     scrubEvent.id.replace ("'", "''");
     scrubEvent.strDisplayNumber.replace ("'", "''");
@@ -939,13 +939,13 @@ CacheDatabase::markAsRead (const QString &msgId)
             break;
         }
 
-        if (flags & (1 << 0)) {
+        if (flags & INBOX_ENTRY_READ_MASK) {
             qDebug("Entry was already read. no need to re-mark.");
             rv = false;
             break;
         }
 
-        flags |= (1 << 0);
+        flags |= INBOX_ENTRY_READ_MASK;
 
         rv = query.exec (QString("UPDATE " GV_INBOX_TABLE " "
                                  "SET " GV_IN_FLAGS "=%1 "
