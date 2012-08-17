@@ -182,39 +182,46 @@ Rectangle {
                 radius: 5
 
                 width:  (allContacts.width - border.width)
-                height: contactNameText.height + 4
+                height: contactNameText.height + (2 * g_hMul)
 
-                Image {
-                    id: contactImage
+                Row {
                     anchors {
                         left: parent.left
-                        verticalCenter: parent.verticalCenter
-                        leftMargin: 2
+                        leftMargin: 1 * g_wMul
+                        right: parent.right
+                        rightMargin: 1 * g_wMul
                     }
 
-                    height: listDelegate.height - 3
-                    width: contactImage.height
+                    spacing: 2 * g_wMul
 
-                    source: imagePath ? imagePath : "unknown_contact.png"
+                    Image {
+                        id: contactImage
+                        anchors {
+                            verticalCenter: parent.verticalCenter
+                        }
 
-                    smooth: true
-                }//Image (contact images)
+                        height: contactNameText.height + 1
+                        width: height
 
-                Text {
-                    id: contactNameText
+                        source: imagePath ? imagePath : "unknown_contact.png"
 
-                    anchors {
-                        verticalCenter: parent.verticalCenter
-                        left: contactImage.right
-                        leftMargin: 3
-                    }
-                    width: parent.width - contactImage.width
+                        smooth: true
+                    }//Image (contact images)
 
-                    text: name
-                    color: "white"
+                    Text {
+                        id: contactNameText
 
-                    font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
-                }//Text (contact name)
+                        anchors {
+                            verticalCenter: parent.verticalCenter
+                        }
+                        width: parent.width - contactImage.width
+
+                        text: name
+                        color: "white"
+
+                        font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
+                    }//Text (contact name)
+                }// Row (image and contact name)
 
                 MouseArea {
                     anchors.fill: parent
