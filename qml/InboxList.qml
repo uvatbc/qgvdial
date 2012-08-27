@@ -261,11 +261,14 @@ Rectangle {
                     height: paintedHeight + 2
 
                     text: container.strSmsText
+                    textFormat: Text.RichText
                     wrapMode: Text.Wrap
                     clip: true
 
                     color: "white"
                     font.pixelSize: suggestedPixelSize
+
+                    onLinkActivated: Qt.openUrlExternally(link);
                 }// Text (sms text)
             }//Column of all details
         }//Flickable (text / voicemail)
@@ -527,7 +530,7 @@ Rectangle {
                     text: time
                     color: "white"
                     font { family: "Nokia Sans"; pointSize: (5 * g_fontMul) }
-                }//Text (entry time
+                }//Text (entry time)
 
                 MouseArea {
                     anchors.fill: parent

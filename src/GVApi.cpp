@@ -2149,7 +2149,7 @@ GVApi::onEntryDeleted(bool success, const QByteArray &response, QNetworkReply *,
         }
         success = false;
 
-#if 1
+#if 0
         Q_DEBUG(strReply);
 #endif
 

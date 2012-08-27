@@ -205,7 +205,31 @@ InboxModel::data (const QModelIndex &index, int role) const
         }
         else if (6 == column)   // GV_IN_SMSTEXT
         {
-            // Just return the data as is.
+#define GPLUS_LINK1 "See more: "
+#define GPLUS_LINK2 "http://goo.gl/"
+#define GPLUS_LINK GPLUS_LINK1 GPLUS_LINK2
+            QString strText = var.toString();
+            int pos = strText.indexOf (GPLUS_LINK);
+            if (pos == -1) {
+                // Return the data as is
+                break;
+            }
+
+            int linkend = pos + sizeof(GPLUS_LINK) - 1;
+            QString link = strText.mid(linkend);
+            QString rem;
+
+            linkend = link.indexOf(QRegExp("\\s+"));
+            if (linkend == -1) {
+                // No spaces found... End of text = end of link
+            } else {
+                link = link.mid (0, linkend);
+                rem = strText.mid (pos + sizeof(GPLUS_LINK)-1 + linkend);
+            }
+            link = QString("<a href=http://goo.gl/%1>See more.</a>").arg(link);
+
+            strText = strText.mid (0, pos) + link + rem;
+            var = strText;
         }
         else
         {
@@ -362,6 +386,8 @@ InboxModel::deleteEntry (const GVInboxEntry &hEvent)
         dbMain.deleteInboxEntryById (hEvent.id);
         if (found) {
             endRemoveRows ();
+
+            this->refresh ();
         }
     }
 
