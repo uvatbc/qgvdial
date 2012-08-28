@@ -56,8 +56,8 @@ Item {
             wrapMode: Text.WordWrap
             text: "Project <a href=http://www.code.google.com/p/qgvdial>homepage</a>, " +
                   "<a href=http://www.code.google.com/p/qgvdial/wiki/Changelog>Changelog</a> and " +
-                  "<a href=http://www.code.google.com/p/qgvdial/w/list>Wiki</a>"
+                  "<a href=http://www.code.google.com/p/qgvdial/w/list>Wiki</a> and " +
+                  "<a href=http://yuvraaj.net/qgvdial/privacy.html>privacy policy</a>"
         }//Text (links)
     }//Column
-
 }//Item(container)
