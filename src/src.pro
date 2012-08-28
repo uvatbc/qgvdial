@@ -23,7 +23,7 @@ TEMPLATE = app
 
 !win32 {
 # Win32 stores all intermidiate files into the debug and release folders.
-# There's no need to create a separate moc and obj folder for Win32.
+# There is no need to create a separate moc and obj folder for Win32.
 MOC_DIR = moc
 OBJECTS_DIR = obj
 }
