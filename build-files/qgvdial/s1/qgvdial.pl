@@ -15,8 +15,7 @@ if ((!(-e $dest)) or (!(-d $dest))) {
 }
 
 # Delete any existing version file
-if (-f ver.cfg)
-{
+if (-f ver.cfg) {
     unlink(ver.cfg);
 }
 # Get the latest version file from the repository
@@ -42,7 +41,7 @@ $svnver = $1;
 # Create the version suffix
 $qver = "$qver.$svnver";
 
-system("powershell Remove-Item -Recurse -Force qgvdial*");
+system("powershell Remove-Item -Recurse -Force qgvdial-*");
 
 $cmd = "svn export $repo qgvdial-$qver";
 print("$cmd\n");

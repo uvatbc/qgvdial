@@ -27,7 +27,7 @@ Contact: yuvraaj@gmail.com
 
 OsDependent::OsDependent(QObject *parent) : QObject(parent)
 {
-#if QTM_VERSION >= 0x010200
+#if SYSTEMDISPLAYINFO
     displayInfo = NULL;
 #endif
 #if HAS_FEEDBACK
@@ -47,7 +47,7 @@ OsDependent::init ()
 #endif
 
     bool rv; Q_UNUSED(rv);
-#if QTM_VERSION >= 0x010200
+#if SYSTEMDISPLAYINFO
     displayInfo = new QSystemDisplayInfo(this);
 
     rv =
@@ -244,7 +244,7 @@ OsDependent::getStartingSize ()
     return rect;
 }//OsDependent::getStartingSize
 
-#if QTM_VERSION >= 0x010200
+#if SYSTEMDISPLAYINFO
 void
 OsDependent::onOrientationChanged(QSystemDisplayInfo::DisplayOrientation o)
 {
@@ -298,7 +298,7 @@ OsDependent::getOrientation(void)
 {
     OsIndependentOrientation rv = OIO_Unknown;
 
-#if QTM_VERSION >= 0x010200
+#if SYSTEMDISPLAYINFO
     switch (displayInfo->orientation(0)) {
     case QSystemDisplayInfo::Landscape:
         rv = OIO_Landscape;

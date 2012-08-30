@@ -31,19 +31,19 @@ Contact: yuvraaj@gmail.com
 #include <openssl/aes.h>
 #include <openssl/evp.h>
 
-#if !defined(Q_OS_SYMBIAN)
+#if defined(Q_OS_SYMBIAN)
+#define SYSTEMDISPLAYINFO 0
+#else
 #include <QtSystemInfo/QSystemDisplayInfo>
+#define SYSTEMDISPLAYINFO 1
 QTM_USE_NAMESPACE
-#endif
-
-#ifndef QTM_VERSION
-#define QTM_VERSION 0x010000
 #endif
 
 #if HAS_FEEDBACK
 #include <QFeedbackHapticsEffect>
 QTM_USE_NAMESPACE
 #endif
+
 
 // For some reason the symbian MOC doesn't like it if I don't include QObject
 // even though it is present in QtCore which is included in global.h
@@ -98,7 +98,7 @@ private:
     OsDependent(QObject *parent = 0);
 
 private slots:
-#if QTM_VERSION >= 0x010200
+#if SYSTEMDISPLAYINFO
     //! Invoked when the desktop is resized (useful only on mobile platforms)
     void onOrientationChanged(QSystemDisplayInfo::DisplayOrientation o);
 #else
@@ -106,7 +106,7 @@ private slots:
 #endif
 
 private:
-#if QTM_VERSION >= 0x010200
+#if SYSTEMDISPLAYINFO
     QSystemDisplayInfo *displayInfo;
 #endif
 
