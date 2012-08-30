@@ -33,6 +33,7 @@ PageStackWindow {
     Page {
         id: mainPage
         anchors.fill: parent
+        orientationLock: PageOrientation.LockPortrait
 
         FocusScope {
             anchors.fill: parent

@@ -298,7 +298,12 @@ OsDependent::getOrientation(void)
 {
     OsIndependentOrientation rv = OIO_Unknown;
 
-#if SYSTEMDISPLAYINFO
+#if DESKTOP_OS || defined(Q_OS_SYMBIAN) || defined(MEEGO_HARMATTAN)
+
+    rv = OIO_Portrait;
+
+#elif SYSTEMDISPLAYINFO
+
     switch (displayInfo->orientation(0)) {
     case QSystemDisplayInfo::Landscape:
         rv = OIO_Landscape;
@@ -316,17 +321,16 @@ OsDependent::getOrientation(void)
     default:
         break;
     }
+
 #else
+
     QRect screenGeometry = QApplication::desktop()->screenGeometry();
     if (screenGeometry.width() > screenGeometry.height()) {
         rv = OIO_Landscape;
     } else {
         rv = OIO_Portrait;
     }
-#endif
 
-#if DESKTOP_OS
-    rv = OIO_Portrait;
 #endif
 
     return (rv);
