@@ -92,6 +92,6 @@ FocusScope {
             }
         }//MouseArea
 */
-   }//Rectangle (around the text box)
+    }//Rectangle (around the text box)
 }//FocusScope
 

@@ -23,7 +23,7 @@ void
 NwReqTracker::init(QNetworkReply *r, void *c, bool bEmitlog, bool autoDel)
 {
     reply = r;
-    aborted = false;
+    timedOut = aborted = false;
     autoDelete = autoDel;
     emitLog = bEmitlog;
     ctx = c;
@@ -189,6 +189,7 @@ void
 NwReqTracker::onTimedOut()
 {
     this->abort ();
+    timedOut = true;
 }//NwReqTracker::onTimedOut
 
 void

@@ -459,9 +459,14 @@ GVApi::onLogin1(bool success, const QByteArray &response, QNetworkReply *,
     } while (0); // End cleanup block (not a loop)
 
     if (!success) {
-        Q_WARN("Login failed.") << strResponse;
+        Q_WARN(QString("Login failed: %1").arg(strResponse));
 
-        token->status = ATTS_LOGIN_FAILURE;
+        NwReqTracker *tracker = (NwReqTracker *) this->sender ();
+        if (tracker->isTimedOut ()) {
+            token->status = ATTS_TIMEDOUT;
+        } else {
+            token->status = ATTS_LOGIN_FAILURE;
+        }
         token->emitCompleted ();
     }
 }//GVApi::onLogin1
@@ -593,6 +598,7 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
     bool accountConfigured = true;
     bool accountReviewRequested = false;
     bool foreignUrl = false;
+    NwReqTracker *tracker = (NwReqTracker *) this->sender ();
 
     token->errorString.clear();
     do { // Begin cleanup block (not a loop)
@@ -759,7 +765,11 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
                 token->errorString = tr("The username or password you entered "
                                         "is incorrect.");
             }
-            token->status = ATTS_LOGIN_FAILURE;
+            if (tracker->isTimedOut ()) {
+                token->status = ATTS_TIMEDOUT;
+            } else {
+                token->status = ATTS_LOGIN_FAILURE;
+            }
             token->emitCompleted ();
         }
         else if (accountReviewRequested) {
@@ -970,7 +980,12 @@ GVApi::onGotRnr(bool success, const QByteArray &response, QNetworkReply *reply,
         Q_WARN(msg);
 
         if (token) {
-            token->status = ATTS_LOGIN_FAILURE;
+            NwReqTracker *tracker = (NwReqTracker *) this->sender ();
+            if (tracker->isTimedOut ()) {
+                token->status = ATTS_TIMEDOUT;
+            } else {
+                token->status = ATTS_LOGIN_FAILURE;
+            }
             token->emitCompleted ();
         }
     }

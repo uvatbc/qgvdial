@@ -150,7 +150,8 @@ MainWindow::loginCompleted (AsyncTaskToken *token)
         setStatus ("Severe internal error");
         this->showMsgBox ("Severe internal error");
 
-        dbMain.clearUserPass ();
+        dbMain.clearUser ();
+        dbMain.clearPass ();
         dbMain.clearContactsPass ();
         dbMain.setTFAFlag (false);
 
@@ -177,9 +178,12 @@ MainWindow::loginCompleted (AsyncTaskToken *token)
 
         Q_WARN(QString("User login failed. Error string: %1").arg(strErr));
 
-        dbMain.clearUserPass ();
-        dbMain.clearContactsPass ();
-        dbMain.setTFAFlag (false);
+        if (token->status != ATTS_TIMEDOUT) {
+            dbMain.clearUser ();
+            dbMain.clearPass ();
+            dbMain.clearContactsPass ();
+            dbMain.setTFAFlag (false);
+        }
 
         QTimer::singleShot (500, this, SLOT(onRecreateCookieJar()));
 

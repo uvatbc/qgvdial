@@ -301,11 +301,16 @@ CacheDatabase::putUserPass (const QString &strUser, const QString &strPass)
 }//CacheDatabase::putUserPass
 
 void
-CacheDatabase::clearUserPass ()
+CacheDatabase::clearUser ()
 {
     settings->remove (GV_S_VAR_USER);
+}//CacheDatabase::clearUser
+
+void
+CacheDatabase::clearPass ()
+{
     settings->remove (GV_S_VAR_PASS);
-}//CacheDatabase::clearUserPass
+}//CacheDatabase::clearPass
 
 bool
 CacheDatabase::getContactsPass(QString &strPass)

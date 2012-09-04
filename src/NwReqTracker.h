@@ -18,6 +18,10 @@ public:
     void setTimeout(quint32 timeout);
 
     void setAutoRedirect(QNetworkCookieJar *j, const QByteArray &ua, bool set);
+
+    inline bool isAborted() { return aborted; }
+    inline bool isTimedOut() { return timedOut; }
+
     static void setCookies(QNetworkCookieJar *jar, QNetworkRequest &req);
     static QUrl hasMoved(QNetworkReply *reply);
 
@@ -46,6 +50,7 @@ protected:
     bool            aborted;
     bool            autoDelete;
     bool            emitLog;
+    bool            timedOut;
 
     void           *ctx;
 

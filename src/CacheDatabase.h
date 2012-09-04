@@ -67,7 +67,8 @@ public:
     // username and password
     bool getUserPass (QString &strUser, QString &strPass);
     bool putUserPass (const QString &strUser, const QString &strPass);
-    void clearUserPass ();
+    void clearPass ();
+    void clearUser ();
 
     bool getContactsPass(QString &strPass);
     bool setContactsPass(const QString &strPass);
