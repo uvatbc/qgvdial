@@ -169,6 +169,7 @@ OTHER_FILES  += ../src/winrsrc.rc           \
                 ../qml/Keypad.qml           \
                 ../qml/ListRefreshComponent.qml \
                 ../qml/LoginDetails.qml     \
+                ../qml/LoginPage.qml        \
                 ../qml/LogView.qml          \
                 ../qml/Main.qml             \
                 ../qml/MainView.qml         \

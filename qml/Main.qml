@@ -221,6 +221,13 @@ Rectangle {
         anchors.fill: parent
     }//MsgBox
 
+    LoginPage {
+        id: loginPage
+        objectName: "LoginPage"
+        anchors.fill: parent
+        opacity: 0
+    }
+
     Rectangle {
         id: barStatus
         width: parent.width

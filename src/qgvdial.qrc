@@ -38,6 +38,7 @@
         <file alias="Keypad.qml">../qml/Keypad.qml</file>
         <file alias="ListRefreshComponent.qml">../qml/ListRefreshComponent.qml</file>
         <file alias="LoginDetails.qml">../qml/LoginDetails.qml</file>
+        <file alias="LoginPage.qml">../qml/LoginPage.qml</file>
         <file alias="LogView.qml">../qml/LogView.qml</file>
         <file alias="Main.qml">../qml/Main.qml</file>
         <file alias="MainView.qml">../qml/MainView.qml</file>
