@@ -623,6 +623,7 @@ MainWindow::connectSettingsSignals()
                       this, SLOT   (doLogout ()));
         Q_ASSERT(rv);
         if (!rv) { break; }
+
         rv = connect (obj , SIGNAL (sigLinkActivated (const QString &)),
                       this, SLOT   (onLinkActivated (const QString &)));
         Q_ASSERT(rv);
@@ -664,6 +665,28 @@ MainWindow::connectSettingsSignals()
 
         rv = connect (obj , SIGNAL (sigSendLogs ()),
                       this, SLOT   (onSigSendLogs ()));
+        Q_ASSERT(rv);
+        if (!rv) { break; }
+
+        obj = getQMLObject ("LoginPage");
+        if (obj == NULL) {
+            Q_WARN("Could not find LoginPage");
+            break;
+        }
+        rv = connect (obj , SIGNAL (sigUserChanged (const QString &)),
+                      this, SLOT   (onUserTextChanged (const QString &)));
+        Q_ASSERT(rv);
+        if (!rv) { break; }
+        rv = connect (obj , SIGNAL (sigPassChanged (const QString &)),
+                      this, SLOT   (onPassTextChanged (const QString &)));
+        Q_ASSERT(rv);
+        if (!rv) { break; }
+        rv = connect (obj , SIGNAL (sigLogin ()),
+                      this, SLOT   (doLogin ()));
+        Q_ASSERT(rv);
+        if (!rv) { break; }
+        rv = connect (obj , SIGNAL (sigLogout ()),
+                      this, SLOT   (doLogout ()));
         Q_ASSERT(rv);
         if (!rv) { break; }
     } while (0); // End cleanup block (not a loop)
@@ -1372,7 +1395,7 @@ MainWindow::onSigDeleteInboxEntry(const QString &id)
 {
    connect(this, SIGNAL(sigMessageBoxDone(bool)),
            this, SLOT(onUserAllowedDelete(bool)));
-   inputBoxCtx = new QString(id);   
+   inputBoxCtx = new QString(id);
    showMsgBox("Are you sure you want to delete this entry?");
 }//MainWindow::onSigDeleteInboxEntry
 

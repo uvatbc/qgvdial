@@ -327,8 +327,7 @@ InboxModel::refresh (const QString &strSelected)
 {
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
 
-    if (strSelected != strSelectType)
-    {
+    if (strSelected != strSelectType) {
         strSelectType = strSelected;
         eSelectType = string_to_type (strSelected);
     }

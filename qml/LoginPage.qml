@@ -32,7 +32,7 @@ Item {
     property real pointSize: (8 * g_fontMul)
     property alias username: textUsername.text
     property alias password: textPassword.text
-    property bool showLoginInput: true
+    property bool showLoginInputFields: true
 
     onSigLogin: console.debug("User clicked login");
     onSigLogout: console.debug("Login canceled.");
@@ -40,15 +40,15 @@ Item {
     Column {
        id: loginProgressItems
 
-       visible: showLoginInput ? false : true
+       visible: !showLoginInputFields
 
-       anchors {
-           width: parent.width
-           horizontalCenter: parent.horizontalCenter
-       }
+       width: parent.width
+       anchors.centerIn: parent
+       spacing: 2 * g_hMul
 
        Text {
            text: "Using the user name:"
+           color: "white"
            font { family: "Nokia Sans"; pointSize: container.pointSize }
            width: paintedWidth
            anchors.horizontalCenter: parent.horizontalCenter
@@ -56,6 +56,7 @@ Item {
 
        Text {
            text: username
+           color: "white"
            font { family: "Nokia Sans"; pointSize: container.pointSize }
            width: paintedWidth
            anchors.horizontalCenter: parent.horizontalCenter
@@ -63,6 +64,7 @@ Item {
 
        Text {
            text: "Logging in..."
+           color: "white"
            font { family: "Nokia Sans"; pointSize: container.pointSize }
            width: paintedWidth
            anchors.horizontalCenter: parent.horizontalCenter
@@ -82,69 +84,53 @@ Item {
     Column {
         id: loginInputItems
 
-        visible: showLoginInput ? true : false
+        visible: showLoginInputFields
 
-        anchors {
-            width: parent.width
-            horizontalCenter: parent.horizontalCenter
+        width: parent.width
+        anchors.centerIn: parent
+        spacing: 2 * g_hMul
+
+        Text {
+            id: lblEmail
+            text: "Username:"
+            color: "white"
+            anchors.horizontalCenter: parent.horizontalCenter
+            font { family: "Nokia Sans"; pointSize: container.pointSize }
+        }//Text: Label "Username:"
+
+        MyTextEdit {
+            id: textUsername
+
+            width: parent.width * 0.75
+            pointSize: container.pointSize
+            anchors.horizontalCenter: parent.horizontalCenter
+
+            KeyNavigation.tab: textPassword
+            onSigTextChanged: container.sigUserChanged(strText);
+            onSigEnter: btnLogin.doClick();
+        }//MyTextEdit: username
+
+        Text {
+            id: lblPass
+            text: "Password:"
+            color: "white"
+            anchors.horizontalCenter: parent.horizontalCenter
+            font { family: "Nokia Sans"; pointSize: container.pointSize }
         }
 
-        Row {
-            id: rowUser
+        MyTextEdit {
+            id: textPassword
 
-            width: parent.width
-            height: lblEmail.height
-            spacing: 2
+            width: parent.width * 0.75
+            pointSize: container.pointSize
+            anchors.horizontalCenter: parent.horizontalCenter
 
-            Text {
-                id: lblEmail
-                text: "Email:"
-                color: "white"
-                anchors.verticalCenter: parent.verticalCenter
-                height: paintedHeight + 2
-                font { family: "Nokia Sans"; pointSize: container.pointSize }
-            }
+            echoMode: TextInput.Password
 
-            MyTextEdit {
-                id: textUsername
-                height: lblEmail.height
-                width: parent.width - lblEmail.width - (parent.spacing * 2)
-                pointSize: container.pointSize
-
-                KeyNavigation.tab: textPassword
-                onSigTextChanged: container.sigUserChanged(strText);
-                onSigEnter: btnLogin.doClick();
-            }
-        }//Row (username)
-
-        Row {
-            id: rowPass
-
-            width: parent.width
-            height: lblPass.height
-            spacing: 2
-
-            Text {
-                id: lblPass
-                text: "Password:"
-                color: "white"
-                anchors.verticalCenter: parent.verticalCenter
-                height: paintedHeight + 2
-                font { family: "Nokia Sans"; pointSize: container.pointSize }
-            }
-
-            MyTextEdit {
-                id: textPassword
-                height: lblPass.height
-                width: parent.width - lblPass.width - (parent.spacing * 2)
-                echoMode: TextInput.Password
-                pointSize: container.pointSize
-
-                KeyNavigation.tab: textUsername
-                onSigTextChanged: container.sigPassChanged(strText);
-                onSigEnter: btnLogin.doClick();
-            }
-        }//Row (password)
+            KeyNavigation.tab: textUsername
+            onSigTextChanged: container.sigPassChanged(strText);
+            onSigEnter: btnLogin.doClick();
+        }
 
         MeegoButton {
             id: btnLogin

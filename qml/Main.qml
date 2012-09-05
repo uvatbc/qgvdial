@@ -83,6 +83,8 @@ Rectangle {
 
         property bool flipped: false
 
+        opacity: (1 - loginPage.opacity)
+
         anchors {
             top:    parent.top
             left:   parent.left
@@ -211,6 +213,13 @@ Rectangle {
         }
     }//Flipable
 
+    LoginPage {
+        id: loginPage
+        objectName: "LoginPage"
+        anchors.fill: parent
+        opacity: 1
+    }//LoginPage
+
     MsgBox {
         id: msgBox
         objectName: "MsgBox"
@@ -220,13 +229,6 @@ Rectangle {
 
         anchors.fill: parent
     }//MsgBox
-
-    LoginPage {
-        id: loginPage
-        objectName: "LoginPage"
-        anchors.fill: parent
-        opacity: 0
-    }
 
     Rectangle {
         id: barStatus

@@ -33,6 +33,11 @@ MainWindow::doLogin ()
     AsyncTaskToken *token = NULL;
     bool bOk = false;
 
+    QObject *pLoginPage = getQMLObject ("LoginPage");
+    if (pLoginPage != NULL) {
+        pLoginPage->setProperty ("showLoginInputFields", bOk);
+    }
+
     do { // Begin cleanup block (not a loop)
         strUser = strUser.simplified ();
         strUser = strUser.remove (QChar(' '));
@@ -243,6 +248,13 @@ MainWindow::loginCompleted (AsyncTaskToken *token)
         bool bTemp = false;
         ctx->setContextProperty ("g_bShowLoginSettings", bTemp);
 
+        QObject *pLoginPage = getQMLObject ("LoginPage");
+        if (pLoginPage != NULL) {
+            bTemp = bLoggedIn ? false : true;
+            pLoginPage->setProperty ("showLoginInputFields", bTemp);
+            pLoginPage->setProperty ("opacity", bLoggedIn ? 0.0 : 1.0);
+        }
+
         // Fill up the combobox on the main page
         refreshRegisteredNumbers ();
 
@@ -297,6 +309,13 @@ MainWindow::logoutCompleted (AsyncTaskToken *token)
     QDeclarativeContext *ctx = this->rootContext();
     ctx->setContextProperty ("g_bIsLoggedIn", bLoggedIn);
 
+    QObject *pLoginPage = getQMLObject ("LoginPage");
+    if (pLoginPage != NULL) {
+        bool bTemp = bLoggedIn ? false : true;
+        pLoginPage->setProperty ("showLoginInputFields", bTemp);
+        pLoginPage->setProperty ("opacity", 1.0);
+    }
+
     setStatus ("Logout complete");
     Q_DEBUG ("Logout complete");
 
@@ -321,6 +340,14 @@ MainWindow::setUsername(const QString &strU)
 
         QMetaObject::invokeMethod (pSettingsPage, "setUsername",
                                    Q_ARG (QVariant, QVariant(strU)));
+
+        pSettingsPage = getQMLObject ("LoginPage");
+        if (NULL == pSettingsPage) {
+            Q_WARN("Could not get to LoginPage for setUsername");
+            break;
+        }
+
+        pSettingsPage->setProperty ("username", strU);
     } while (0); // End cleanup block (not a loop)
 }//MainWindow::setUsername
 
@@ -337,6 +364,14 @@ MainWindow::setPassword(const QString &strP)
 
         QMetaObject::invokeMethod (pSettingsPage, "setPassword",
                                    Q_ARG (QVariant, QVariant(strP)));
+
+        pSettingsPage = getQMLObject ("LoginPage");
+        if (NULL == pSettingsPage) {
+            Q_WARN("Could not get to LoginPage for setPassword");
+            break;
+        }
+
+        pSettingsPage->setProperty ("password", strP);
     } while (0); // End cleanup block (not a loop)
 }//MainWindow::setPassword
 
@@ -359,6 +394,11 @@ MainWindow::onTwoStepAuthentication(AsyncTaskToken *token)
 
     obj->setProperty ("inputText", "");
     showInputBox ("Enter security token");
+
+    obj = getQMLObject ("LoginPage");
+    if (obj != NULL) {
+        obj->setProperty ("opacity", 0.5);
+    }
 }//MainWindow::onTwoStepAuthentication
 
 void
@@ -370,8 +410,12 @@ MainWindow::onPinMsgBoxDone(bool ok)
     AsyncTaskToken *token = (AsyncTaskToken *)inputBoxCtx;
     inputBoxCtx = NULL;
 
-    QObject *obj = getQMLObject ("MsgBox");
+    QObject *obj = getQMLObject ("LoginPage");
+    if (obj != NULL) {
+        obj->setProperty ("opacity", 1.0);
+    }
 
+    obj = getQMLObject ("MsgBox");
     do {// Begin cleanup block (not a loop)
 
         if (NULL == obj) {
