@@ -263,7 +263,13 @@ symbian {
     vendorinfo = "%{\"Yuvraaj Kelkar\"}" \
                  ":\"Yuvraaj Kelkar\""
 
+# This makes the smart installer get qt-components.... I think
+    DEPLOYMENT.installer_header = 0x2002CCCF
+    
     my_deployment.pkg_prerules = vendorinfo
+    my_deployment.pkg_prerules += \
+        "; Dependency to Symbian Qt Quick components" \
+        "(0x200346DE), 1, 0, 0, {\"Qt Quick components\"}"
     DEPLOYMENT += my_deployment
 }
 
