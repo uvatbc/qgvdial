@@ -68,7 +68,7 @@ Item {
 
         Text {
             id: refreshText
-            text: "Refresh..."
+            text: "Click to refresh"
             anchors {
                 horizontalCenter: parent.horizontalCenter
             }
