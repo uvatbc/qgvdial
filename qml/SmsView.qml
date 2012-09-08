@@ -81,7 +81,7 @@ Rectangle {
                 horizontalCenter: parent.horizontalCenter
             }
 
-            text: "SMS Text"
+            text: "Enter the Text to send"
             color: "white"
 
             font { family: "Nokia Sans"; bold: true; pointSize: (7 * g_fontMul) }
