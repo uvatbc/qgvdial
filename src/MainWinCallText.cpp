@@ -107,8 +107,8 @@ MainWindow::dialNow (const QString &strTarget)
         }
 
         QString strTest = strTarget;
-        strTest.remove(QRegExp ("\\d*")).remove(QRegExp ("\\s"))
-               .remove('+').remove('-');
+        strTest.remove(QRegExp ("\\d*")).remove(QRegExp ("\\s*"))
+               .remove('+').remove('-').remove('(').remove(')');
         if (!strTest.isEmpty ()) {
             setStatus ("Cannot use numbers with special symbols or characters");
             Q_WARN (QString("Failed to dial the user entered number \"%1\"")

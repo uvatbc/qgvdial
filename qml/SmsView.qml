@@ -107,6 +107,9 @@ Rectangle {
                 TextEdit {
                     id: smsText
 
+                    // This item gets the focus
+                    focus: true
+
                     anchors {
                         left: parent.left
                         top: parent.top
@@ -169,7 +172,7 @@ Rectangle {
                         }
 
                         text: name + " (" + number + ")"
-                        font { family: "Nokia Sans"; pointSize: (7 * g_fontMul) }
+                        font { family: "Nokia Sans"; pointSize: (8 * g_fontMul) }
                         color: "white"
                     }//Text
 
@@ -182,7 +185,7 @@ Rectangle {
                             bottom: parent.bottom
                         }
                         width: height
-                        height: entryRepeater.height - 1
+                        height: entryText.height - 1
 
                         color: "black"
                         border.color: "slategrey"
@@ -192,6 +195,7 @@ Rectangle {
 
                             source: "close.png"
                             fillMode: Image.PreserveAspectFit
+                            smooth: true
 
                             MouseArea {
                                 anchors.fill: parent
