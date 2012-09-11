@@ -25,4 +25,39 @@ Item {
     id: container
 
     signal sigDone(bool bSave)
+
+    Column {
+        id: mainColumn
+        anchors {
+            top: parent.top
+            left: parent.left
+        }
+        spacing: 2
+        width: parent.width
+
+        SaveCancel {
+            anchors {
+                left: parent.left
+                leftMargin: 1
+            }
+            width: parent.width - 1
+
+            RadioButton {
+                id: mqSupport
+                width: parent.width
+
+                text: "Enable mosquitto"
+            }// RadioButton (mqSupport)
+
+            onSigSave: {
+                container.sigMosquittoChanges (bEnable,
+                                               textMqServer.text,
+                                               textMqPort.text,
+                                               textMqTopic.text);
+                container.sigDone(true);
+            }
+
+            onSigCancel: container.sigDone(false);
+        }// Save and cancel buttons
+    }// Column
 }// Item (top level)
