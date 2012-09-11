@@ -181,6 +181,7 @@ OTHER_FILES  += ../src/winrsrc.rc           \
                 ../qml/PinSetting.qml       \
                 ../qml/Proxy.qml            \
                 ../qml/RadioButton.qml      \
+                ../qml/RefreshSettings.qml  \
                 ../qml/S3Main.qml           \
                 ../qml/SaveCancel.qml       \
                 ../qml/Scrollbar.qml        \

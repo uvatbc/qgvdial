@@ -177,8 +177,9 @@ Flickable {
 
         Mosquitto {
             id: mqSettings
-            y: parent.startY
+            objectName: "MosquittoPage"
 
+            y: parent.startY
             width: parent.width - 1
             opacity: parent.containedOpacity
 

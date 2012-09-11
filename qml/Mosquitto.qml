@@ -23,7 +23,6 @@ import Qt 4.7
 
 Item {
     id: container
-    objectName: "MosquittoPage"
 
     height: mainColumn.height + 2
 
