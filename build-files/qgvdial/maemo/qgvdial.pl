@@ -29,8 +29,7 @@ $basedir = "$basedir/qgvdial-$qver";
 # Delete any previous checkout directories
 system("rm -rf qgvdial-* qgvtp-* qgvdial_* qgvtp_*");
 
-$cmd = "svn export $repo $basedir";
-system($cmd);
+system("svn export $repo $basedir");
 system("cp $basedir/icons/64/qgvdial.png $basedir/src/qgvdial.png");
 
 # Append the version to the pro file

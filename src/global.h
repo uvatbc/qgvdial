@@ -297,6 +297,16 @@ void qgv_LogFlush();
 #define MOBILE_OS 0
 #endif
 
+#if defined(QT_COMPONENTS_ADDED)
+#define USE_QT_COMPONENTS 1
+#else
+#define USE_QT_COMPONENTS 0
+#endif
+#if !(defined(Q_OS_SYMBIAN) || defined(MEEGO_HARMATTAN))
+#undef USE_QT_COMPONENTS
+#define USE_QT_COMPONENTS 0
+#endif
+
 #if defined(Q_WS_X11) && !defined(DISABLE_TELEPATHY)
 #define TELEPATHY_CAPABLE 1
 #else

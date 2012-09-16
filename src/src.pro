@@ -37,7 +37,10 @@ MOBILITY *= systeminfo
 symbian|contains(MEEGO_EDITION,harmattan) {
     MOBILITY *= feedback
     OTHER_FILES += ../build-files/qgvdial/harmattan/qgvdial.desktop
-    CONFIG += qt-components
+    !exists(no-qt-components) {
+        CONFIG  += qt-components
+        DEFINES += QT_COMPONENTS_ADDED
+    }
 }
 
 include(qtsingleapplication/qtsingleapplication.pri)
@@ -266,7 +269,7 @@ symbian {
 
 # This makes the smart installer get qt-components.... I think
     DEPLOYMENT.installer_header = 0x2002CCCF
-    
+
     my_deployment.pkg_prerules = vendorinfo
     my_deployment.pkg_prerules += \
         "; Dependency to Symbian Qt Quick components" \

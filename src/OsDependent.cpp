@@ -362,7 +362,7 @@ OsDependent::getMainQML ()
 #if defined(MEEGO_HARMATTAN)
     return "qrc:/HMain.qml";
 #else
-    if (isSymbian3 ()) {
+    if (USE_QT_COMPONENTS && isSymbian3()) {
         return "qrc:/S3Main.qml";
     } else {
         return "qrc:/Main.qml";
