@@ -57,8 +57,13 @@ $cmd = "cd qgvdial-$qver & perl ./build-files/version.pl __QGVDIAL_VERSION__ $qv
 print("$cmd\n");
 system($cmd);
 
-# # Fix the QML files
+# Mosquitto is merged straight into the build
 $cmd = "cd qgvdial-$qver/src & echo something>mqlib-build";
+print "$cmd\n";
+system($cmd);
+
+# Symbian 3 (to including Belle)  should not have qt-components
+$cmd = "cd qgvdial-$qver/src & touch no-qt-components";
 print "$cmd\n";
 system($cmd);
 

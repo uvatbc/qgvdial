@@ -62,6 +62,11 @@ $cmd = "cd qgvdial-$qver/src & echo something>mqlib-build";
 print "$cmd\n";
 system($cmd);
 
+# Symbian 1 should not have qt-components
+$cmd = "cd qgvdial-$qver/src & touch no-qt-components";
+print "$cmd\n";
+system($cmd);
+
 # This is the way to enter a directory and setup the remainder variables
 my $enterdir = "cd qgvdial-$qver/src & set BUILDDIR=%CD% & set SOURCEDIR=%CD%";
 

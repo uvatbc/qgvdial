@@ -62,8 +62,7 @@ $cmd = "cd $basedir && dpkg-buildpackage -rfakeroot -sa -S -uc -us";
 # Execute the rest of the build command
 system($cmd);
 
-$cmd = "dput -f fremantle-upload qgvdial*.changes";
-system($cmd);
+system("dput -f fremantle-upload qgvdial*.changes");
 
 exit(0);
 
