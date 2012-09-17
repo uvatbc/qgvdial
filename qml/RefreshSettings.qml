@@ -35,6 +35,156 @@ Item {
         spacing: 2
         width: parent.width
 
+        RadioButton {
+            id: periodicRefresh
+            width: parent.width
+
+            text: "Enable periodic refresh"
+        }
+
+        Row {
+            width: parent.width
+            height: lblMinRefreshPeriod.height
+            spacing: 2
+
+            opacity: (mqSupport.check ? 1 : 0)
+
+            Text {
+                id: lblMinRefreshPeriod
+                text: "Min period in sec:"
+                color: "white"
+                anchors.verticalCenter: parent.verticalCenter
+                font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
+                height: paintedHeight + 2
+            }
+
+            MyTextEdit {
+                id: textMinRefreshPeriod
+                width: parent.width - lblMinRefreshPeriod.width
+                height: lblMinRefreshPeriod.height
+                anchors.verticalCenter: parent.verticalCenter
+                text: "30"
+                validator: IntValidator { bottom: 0; top: 3600 }
+                KeyNavigation.tab: textMaxRefreshPeriod
+                KeyNavigation.backtab: textMaxRefreshPeriod
+            }
+        }// Row (Minimum period)
+
+        Row {
+            width: parent.width
+            height: lblMaxRefreshPeriod.height
+            spacing: 2
+
+            opacity: (mqSupport.check ? 1 : 0)
+
+            Text {
+                id: lblMaxRefreshPeriod
+                text: "Max period in sec:"
+                color: "white"
+                anchors.verticalCenter: parent.verticalCenter
+                font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
+                height: paintedHeight + 2
+            }
+
+            MyTextEdit {
+                id: textMaxRefreshPeriod
+                width: parent.width - lblMaxRefreshPeriod.width
+                height: lblMaxRefreshPeriod.height
+                anchors.verticalCenter: parent.verticalCenter
+                text: "300"
+                validator: IntValidator { bottom: 0; top: 3600 }
+                KeyNavigation.tab: textMinRefreshPeriod
+                KeyNavigation.backtab: textMinRefreshPeriod
+            }
+        }// Row (Maximum period)
+
+        RadioButton {
+            id: mqSupport
+            width: parent.width
+
+            text: "Enable mosquitto"
+        }// RadioButton (mqSupport)
+
+        Row {
+            width: parent.width
+            height: lblHost.height
+            spacing: 2
+            opacity: (mqSupport.check ? 1 : 0)
+
+            Text {
+                id: lblHost
+                text: "Host:"
+                color: "white"
+                anchors.verticalCenter: parent.verticalCenter
+                font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
+                height: paintedHeight + 2
+            }
+
+            MyTextEdit {
+                id: textMqServer
+                width: parent.width - lblHost.width
+                height: lblHost.height
+                anchors.verticalCenter: parent.verticalCenter
+                text: "mosquitto.example.com"
+                KeyNavigation.tab: textMqPort
+                KeyNavigation.backtab: textMqTopic
+            }
+        }// Row (Mq server)
+
+        Row {
+            width: parent.width
+            height: lblPort.height
+            spacing: 2
+
+            opacity: (mqSupport.check ? 1 : 0)
+
+            Text {
+                id: lblPort
+                text: "Port:"
+                color: "white"
+                anchors.verticalCenter: parent.verticalCenter
+                font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
+                height: paintedHeight + 2
+            }
+
+            MyTextEdit {
+                id: textMqPort
+                width: parent.width - lblPort.width
+                height: lblPort.height
+                anchors.verticalCenter: parent.verticalCenter
+                text: "1883"
+                validator: IntValidator { bottom: 0; top: 65535 }
+                KeyNavigation.tab: textMqTopic
+                KeyNavigation.backtab: textMqServer
+            }
+        }// Row (Mq port)
+
+        Row {
+            width: parent.width
+            height: lblTopic.height
+            spacing: 2
+            opacity: (mqSupport.check ? 1 : 0)
+
+            Text {
+                id: lblTopic
+                text: "Topic to sub:"
+                color: "white"
+                anchors.verticalCenter: parent.verticalCenter
+                font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
+                height: paintedHeight + 2
+            }
+
+            MyTextEdit {
+                id: textMqTopic
+                width: parent.width - lblTopic.width
+                height: lblTopic.height
+                anchors.verticalCenter: parent.verticalCenter
+                text: "gv_notify"
+                KeyNavigation.tab: textMqServer
+                KeyNavigation.backtab: textMqPort
+            }
+        }// Row (Mq topic to subscribe to)
+
         SaveCancel {
             anchors {
                 left: parent.left
@@ -42,15 +192,8 @@ Item {
             }
             width: parent.width - 1
 
-            RadioButton {
-                id: mqSupport
-                width: parent.width
-
-                text: "Enable mosquitto"
-            }// RadioButton (mqSupport)
-
             onSigSave: {
-                container.sigMosquittoChanges (bEnable,
+                container.sigMosquittoChanges (mqSupport.check,
                                                textMqServer.text,
                                                textMqPort.text,
                                                textMqTopic.text);
