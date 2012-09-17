@@ -25,6 +25,19 @@ Item {
     id: container
 
     signal sigDone(bool bSave)
+    signal sigRefreshChanges(bool bRefreshEnable, string minPeriod, string maxPeriod,
+                             bool bMqEnable, string host, int port, string topic)
+
+    function setValues(bPeriodicEnable, minPeriod, maxPeriod, bMqEnable, host, port, topic) {
+        console.debug ("QML: Setting Refresh settings")
+        periodicRefresh.check = bPeriodicEnable;
+        textMinRefreshPeriod.text = minPeriod;
+        textMaxRefreshPeriod.text = maxPeriod;
+        mqSupport.check = bMqEnable;
+        textMqServer.text = host;
+        textMqPort.text = port;
+        textMqTopic.text = topic;
+    }
 
     Column {
         id: mainColumn
@@ -40,7 +53,7 @@ Item {
             width: parent.width
 
             text: "Enable periodic refresh"
-        }
+        }//RadioButton (enable periodicRefresh)
 
         Row {
             width: parent.width
@@ -103,7 +116,7 @@ Item {
             width: parent.width
 
             text: "Enable mosquitto"
-        }// RadioButton (mqSupport)
+        }// RadioButton (enable mqSupport)
 
         Row {
             width: parent.width
@@ -193,10 +206,13 @@ Item {
             width: parent.width - 1
 
             onSigSave: {
-                container.sigMosquittoChanges (mqSupport.check,
-                                               textMqServer.text,
-                                               textMqPort.text,
-                                               textMqTopic.text);
+                container.sigRefreshChanges (periodicRefresh.check,
+                                             textMinRefreshPeriod.text,
+                                             textMaxRefreshPeriod.text,
+                                             mqSupport.check,
+                                             textMqServer.text,
+                                             textMqPort.text,
+                                             textMqTopic.text);
                 container.sigDone(true);
             }
 
