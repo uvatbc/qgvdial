@@ -63,7 +63,7 @@ print "$cmd\n";
 system($cmd);
 
 # Symbian 3 (to including Belle)  should not have qt-components
-$cmd = "cd qgvdial-$qver/src & touch no-qt-components";
+$cmd = "cd qgvdial-$qver/src & echo something>no-qt-components";
 print "$cmd\n";
 system($cmd);
 
