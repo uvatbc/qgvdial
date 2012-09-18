@@ -221,6 +221,14 @@ private slots:
     void onSigDeleteInboxEntry(const QString &id);
     void onUserAllowedDelete(bool ok);
 
+    // Signal for periodic refresh settings changes
+    void
+    onSigRefreshChanges(bool bRefreshEnable, const QString &minPeriod,
+                        const QString &maxPeriod, bool bMqEnable,
+                        const QString &host, int port,
+                        const QString &topic);
+    void refreshPeriodSettings(bool bForceShut = false);
+
 private:
     void initLogging ();
 

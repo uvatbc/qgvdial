@@ -172,10 +172,10 @@ void
 MainWindow::messageReceived (const QString &message)
 {
     if (message == "show") {
-        qDebug ("Second instance asked us to show");
+        Q_DEBUG ("Second instance asked us to show");
         this->show ();
     } else if (message == "quit") {
-        qDebug ("Second instance asked us to quit");
+        Q_DEBUG ("Second instance asked us to quit");
         this->on_actionE_xit_triggered ();
     }
 }//MainWindow::messageReceived
@@ -689,6 +689,21 @@ MainWindow::connectSettingsSignals()
                       this, SLOT   (doLogout ()));
         Q_ASSERT(rv);
         if (!rv) { break; }
+
+        obj = getQMLObject ("RefreshSettingsPage");
+        if (obj == NULL) {
+            Q_WARN("Could not find RefreshSettingsPage");
+            break;
+        }
+        rv = connect(obj, SIGNAL(sigRefreshChanges(bool,const QString&,const QString&,bool,const QString&,int,const QString&)),
+                     this,SLOT(onSigRefreshChanges(bool,const QString&,const QString&,bool,const QString&,int,const QString&)));
+        Q_ASSERT(rv);
+        if (!rv) { break; }
+
+        rv = connect (obj , SIGNAL (sigRefreshPeriodSettings()),
+                      this, SLOT   (refreshPeriodSettings()));
+        Q_ASSERT(rv);
+        if (!rv) { break; }
     } while (0); // End cleanup block (not a loop)
 
     return (rv);
@@ -721,7 +736,7 @@ MainWindow::on_actionE_xit_triggered ()
                                          i != mapVmail.end ();
                                          i++)
     {
-        qDebug() << "Delete vmail cached at" << i.value ();
+        Q_DEBUG(QString("Delete vmail cached at %1").arg (i.value ()));
         QFile::remove (i.value ());
     }
     mapVmail.clear ();
@@ -948,7 +963,7 @@ MainWindow::onSigProxyRefresh(bool bSet)
 void
 MainWindow::onLinkActivated (const QString &strLink)
 {
-    qDebug() << "MainWindow: Link activated" << strLink;
+    Q_DEBUG(QString("MainWindow: Link activated: %1").arg (strLink));
     QDesktopServices::openUrl (QUrl::fromUserInput (strLink));
 }//MainWindow::onLinkActivated
 
@@ -987,9 +1002,9 @@ MainWindow::refreshMqSettings (bool bForceShut /*= false*/)
     }
 
     do { // Begin cleanup block (not a loop)
-        QObject *pMqSettings = getQMLObject ("MosquittoPage");
-        if (NULL == pMqSettings) {
-            Q_WARN("Could not get to MosquittoPage");
+        QObject *obj = getQMLObject ("RefreshSettingsPage");
+        if (NULL == obj) {
+            Q_WARN("Could not get to RefreshSettingsPage");
             break;
         }
 
@@ -1007,7 +1022,7 @@ MainWindow::refreshMqSettings (bool bForceShut /*= false*/)
             strTopic = "gv_notify";
         }
 
-        QMetaObject::invokeMethod (pMqSettings, "setValues",
+        QMetaObject::invokeMethod (obj, "setMqValues",
                                    Q_ARG (QVariant, QVariant(bEnable)),
                                    Q_ARG (QVariant, QVariant(strHost)),
                                    Q_ARG (QVariant, QVariant(port)),
@@ -1030,11 +1045,11 @@ MainWindow::initMq()
 
     refreshMqSettings ();
 
-    qDebug() << "Initially Mq is" << (bEnable ? "enabled" : "disabled");
+    Q_DEBUG(QString("Initially Mq is %1").arg(bEnable ? "enabled":"disabled"));
 
 #if MOSQUITTO_CAPABLE
     if (bEnable) {
-        qDebug ("Start Mq thread.");
+        Q_DEBUG ("Start Mq thread.");
         mqThread.setSettings (bEnable, host, port);
         mqThread.start();
     }
@@ -1423,3 +1438,46 @@ MainWindow::onUserAllowedDelete(bool ok)
    delete id;
 }//MainWindow::onUserAllowedDelete
 
+void
+MainWindow::onSigRefreshChanges(bool bRefreshEnable, const QString &minPeriod,
+                                const QString &maxPeriod, bool bMqEnable,
+                                const QString &host, int port,
+                                const QString &topic)
+{
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    dbMain.setRefreshSettings (bRefreshEnable, minPeriod.toInt (),
+                               maxPeriod.toInt ());
+
+    onSigMosquittoChanges (bMqEnable, host, port, topic);
+}//MainWindow::onSigRefreshChanges
+
+void
+MainWindow::refreshPeriodSettings(bool bForceShut /*= false*/)
+{
+    refreshMqSettings (bForceShut);
+
+    bool bEnable = bForceShut;
+    quint32 minPeriod, maxPeriod;
+
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    if (!dbMain.getRefreshSettings (bEnable, minPeriod, maxPeriod)) {
+        return;
+    }
+
+    if (bForceShut) {
+        bEnable = false;
+    }
+
+    do { // Begin cleanup block (not a loop)
+        QObject *obj = getQMLObject ("RefreshSettingsPage");
+        if (NULL == obj) {
+            Q_WARN("Could not get to RefreshSettingsPage");
+            break;
+        }
+
+        QMetaObject::invokeMethod (obj, "setRefreshValues",
+                                   Q_ARG (QVariant, QVariant(bEnable)),
+                                   Q_ARG (QVariant, QVariant(minPeriod)),
+                                   Q_ARG (QVariant, QVariant(maxPeriod)));
+    } while (0); // End cleanup block (not a loop)
+}//MainWindow::refreshPeriodSettings

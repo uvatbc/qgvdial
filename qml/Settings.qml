@@ -46,7 +46,7 @@ Flickable {
 
     // Cannot use childrenRect.height because it causes a binding loop
     contentHeight: expandLoginDetails.height + expandProxySettings.height +
-                   expandDialSettings.height + expandMqSettings.height +
+                   expandDialSettings.height + expandRefreshSettings.height +
                    expandPinSettings.height + expandLogView.height +
                    expandAbout.height
     contentWidth: width
@@ -162,17 +162,20 @@ Flickable {
     }//ExpandView (proxy)
 
     ExpandView {
-        id: expandMqSettings
+        id: expandRefreshSettings
         anchors {
             top: expandProxySettings.bottom
             left: parent.left
         }
 
         width: parent.width
-        contentHeight: mqSettings.height;
+        contentHeight: refreshSettings.height;
 
         onClicked: if (isExpanded) yAdjustTimer.setY = y;
 
+        mainTitle: "Auto-Refresh"
+
+/*
         mainTitle: "Mosquitto"
 
         Mosquitto {
@@ -191,12 +194,24 @@ Flickable {
             }
             onSigMosquittoChanges: container.sigMosquittoChanges(bEnable, host, port, topic)
         }//Mosquitto
+*/
+        RefreshSettings {
+            id: refreshSettings
+            objectName: "RefreshSettingsPage"
+
+            y: parent.startY
+            width: parent.width - 1
+            opacity: parent.containedOpacity
+
+            onSigDone: parent.isExpanded = false;
+        }//Mosquitto
+
     }//ExpandView (mosquitto)
 
     ExpandView {
         id: expandPinSettings
         anchors {
-            top: expandMqSettings.bottom
+            top: expandRefreshSettings.bottom
             left: parent.left
         }
 

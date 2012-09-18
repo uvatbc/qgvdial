@@ -144,5 +144,10 @@ Contact: yuvraaj@gmail.com
 #define GV_DEBUG_TABLE      "debug"
 #define GV_S_DBG_FAILDIAL   "AlwaysFailDialing"
 ////////////////////////////////////////////////////////////////////////////////
+#define GV_REFRESH_TABLE    "refresh_period_settings"
+#define GV_RP_ENABLED       "enabled"
+#define GV_RP_MIN           "minPeriod"
+#define GV_RP_MAX           "maxPeriod"
+////////////////////////////////////////////////////////////////////////////////
 
 #endif //__CACHEDATABASE_INT_H__

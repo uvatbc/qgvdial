@@ -27,17 +27,24 @@ Item {
     signal sigDone(bool bSave)
     signal sigRefreshChanges(bool bRefreshEnable, string minPeriod, string maxPeriod,
                              bool bMqEnable, string host, int port, string topic)
+    signal sigRefreshPeriodSettings
 
-    function setValues(bPeriodicEnable, minPeriod, maxPeriod, bMqEnable, host, port, topic) {
-        console.debug ("QML: Setting Refresh settings")
-        periodicRefresh.check = bPeriodicEnable;
-        textMinRefreshPeriod.text = minPeriod;
-        textMaxRefreshPeriod.text = maxPeriod;
-        mqSupport.check = bMqEnable;
+    function setMqValues(bEnable, host, port, topic) {
+        console.debug ("QML: Setting Mq settings")
+        mqSupport.check = bEnable;
         textMqServer.text = host;
         textMqPort.text = port;
         textMqTopic.text = topic;
     }
+
+    function setRefreshValues(bEnable, minPeriod, maxPeriod) {
+        console.debug ("QML: Setting Refresh settings")
+        periodicRefresh.check = bEnable;
+        textMinRefreshPeriod.text = minPeriod;
+        textMaxRefreshPeriod.text = maxPeriod;
+    }
+
+    height: mainColumn.height
 
     Column {
         id: mainColumn
@@ -48,11 +55,16 @@ Item {
         spacing: 2
         width: parent.width
 
+        // Internal property
+        property real subTextPointSize: (8 * g_fontMul)
+
         RadioButton {
             id: periodicRefresh
             width: parent.width
 
             text: "Enable periodic refresh"
+
+            pointSize: (8 * g_fontMul)
         }//RadioButton (enable periodicRefresh)
 
         Row {
@@ -60,14 +72,14 @@ Item {
             height: lblMinRefreshPeriod.height
             spacing: 2
 
-            opacity: (mqSupport.check ? 1 : 0)
+            opacity: (periodicRefresh.check ? 1 : 0)
 
             Text {
                 id: lblMinRefreshPeriod
                 text: "Min period in sec:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
+                font { family: "Nokia Sans"; pointSize: mainColumn.subTextPointSize }
                 height: paintedHeight + 2
             }
 
@@ -80,6 +92,7 @@ Item {
                 validator: IntValidator { bottom: 0; top: 3600 }
                 KeyNavigation.tab: textMaxRefreshPeriod
                 KeyNavigation.backtab: textMaxRefreshPeriod
+                pointSize: mainColumn.subTextPointSize
             }
         }// Row (Minimum period)
 
@@ -88,14 +101,14 @@ Item {
             height: lblMaxRefreshPeriod.height
             spacing: 2
 
-            opacity: (mqSupport.check ? 1 : 0)
+            opacity: (periodicRefresh.check ? 1 : 0)
 
             Text {
                 id: lblMaxRefreshPeriod
                 text: "Max period in sec:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
+                font { family: "Nokia Sans"; pointSize: mainColumn.subTextPointSize }
                 height: paintedHeight + 2
             }
 
@@ -108,6 +121,7 @@ Item {
                 validator: IntValidator { bottom: 0; top: 3600 }
                 KeyNavigation.tab: textMinRefreshPeriod
                 KeyNavigation.backtab: textMinRefreshPeriod
+                pointSize: mainColumn.subTextPointSize
             }
         }// Row (Maximum period)
 
@@ -116,6 +130,7 @@ Item {
             width: parent.width
 
             text: "Enable mosquitto"
+            pointSize: mainColumn.subTextPointSize
         }// RadioButton (enable mqSupport)
 
         Row {
@@ -129,7 +144,7 @@ Item {
                 text: "Host:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
+                font { family: "Nokia Sans"; pointSize: mainColumn.subTextPointSize }
                 height: paintedHeight + 2
             }
 
@@ -141,6 +156,7 @@ Item {
                 text: "mosquitto.example.com"
                 KeyNavigation.tab: textMqPort
                 KeyNavigation.backtab: textMqTopic
+                pointSize: mainColumn.subTextPointSize
             }
         }// Row (Mq server)
 
@@ -156,7 +172,7 @@ Item {
                 text: "Port:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
+                font { family: "Nokia Sans"; pointSize: mainColumn.subTextPointSize }
                 height: paintedHeight + 2
             }
 
@@ -169,6 +185,7 @@ Item {
                 validator: IntValidator { bottom: 0; top: 65535 }
                 KeyNavigation.tab: textMqTopic
                 KeyNavigation.backtab: textMqServer
+                pointSize: mainColumn.subTextPointSize
             }
         }// Row (Mq port)
 
@@ -183,7 +200,7 @@ Item {
                 text: "Topic to sub:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
+                font { family: "Nokia Sans"; pointSize: mainColumn.subTextPointSize }
                 height: paintedHeight + 2
             }
 
@@ -195,6 +212,7 @@ Item {
                 text: "gv_notify"
                 KeyNavigation.tab: textMqServer
                 KeyNavigation.backtab: textMqPort
+                pointSize: mainColumn.subTextPointSize
             }
         }// Row (Mq topic to subscribe to)
 
@@ -216,7 +234,10 @@ Item {
                 container.sigDone(true);
             }
 
-            onSigCancel: container.sigDone(false);
+            onSigCancel: {
+                container.sigRefreshPeriodSettings();
+                container.sigDone(false);
+            }
         }// Save and cancel buttons
     }// Column
 }// Item (top level)

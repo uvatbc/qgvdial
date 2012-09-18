@@ -154,6 +154,11 @@ public:
 
     bool dbgGetAlwaysFailDialing();
 
+    // Periodic update settings get and set
+    bool setRefreshSettings (bool enable, quint32 minPeriod, quint32 maxPeriod);
+    bool getRefreshSettings (bool &enable, quint32 &minPeriod,
+                             quint32 &maxPeriod);
+
 private:
     bool putContactInfo (const ContactInfo &info);
     bool deleteContactInfo (const QString &strId);

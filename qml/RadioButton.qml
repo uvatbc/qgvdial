@@ -31,6 +31,7 @@ Rectangle {
     property string text: "Yes or no question?"
     property bool check: false
     property bool autoChange: true
+    property real pointSize: (10 * g_fontMul)
 
     signal clicked
 
@@ -65,7 +66,7 @@ Rectangle {
             id: textLabel
             text: container.text
             anchors.verticalCenter: parent.verticalCenter
-            font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
+            font { family: "Nokia Sans"; pointSize: container.pointSize }
 
             color: "white"
         }//Text

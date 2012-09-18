@@ -1539,3 +1539,50 @@ CacheDatabase::dbgGetAlwaysFailDialing()
     settings->endGroup ();
     return (rv);
 }//CacheDatabase::dbgGetAlwaysFailDialing
+
+bool
+CacheDatabase::setRefreshSettings (bool enable, quint32 minPeriod,
+                                   quint32 maxPeriod)
+{
+    settings->beginGroup (GV_REFRESH_TABLE);
+    settings->setValue (GV_RP_ENABLED, enable);
+    settings->setValue (GV_RP_MIN, minPeriod);
+    settings->setValue (GV_RP_MAX, maxPeriod);
+    settings->endGroup ();
+
+    return true;
+}//CacheDatabase::setRefreshSettings
+
+bool
+CacheDatabase::getRefreshSettings (bool &enable, quint32 &minPeriod,
+                                   quint32 &maxPeriod)
+{
+    bool ok;
+
+    settings->beginGroup (GV_REFRESH_TABLE);
+    do  {// Begin cleanup block (not a loop)
+        enable = false;
+        if (settings->contains (GV_RP_ENABLED)) {
+            enable = settings->value (GV_RP_ENABLED).toBool ();
+        }
+
+        ok = false;
+        if (settings->contains (GV_RP_MIN)) {
+            minPeriod = settings->value (GV_RP_MIN).toInt (&ok);
+        }
+        if (!ok) {
+            minPeriod = 30;
+        }
+
+        ok = false;
+        if (settings->contains (GV_RP_MAX)) {
+            maxPeriod = settings->value (GV_RP_MAX).toInt (&ok);
+        }
+        if (!ok) {
+            maxPeriod = 30;
+        }
+    } while (0); // End cleanup block (not a loop)
+    settings->endGroup ();
+
+    return true;
+}//CacheDatabase::getRefreshSettings
