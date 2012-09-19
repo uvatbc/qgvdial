@@ -113,7 +113,8 @@ SOURCES  += ../src/main.cpp                 \
             ../src/NwReqTracker.cpp         \
             ../src/AsyncTaskToken.cpp       \
             ../src/GVApi.cpp                \
-            ../src/MyXmlErrorHandler.cpp
+            ../src/MyXmlErrorHandler.cpp    \
+            ../src/FuzzyTimer.cpp
 
 HEADERS  += ../src/global.h                 \
             ../src/TpHeaders.h              \
@@ -146,7 +147,16 @@ HEADERS  += ../src/global.h                 \
             ../src/NwReqTracker.h           \
             ../src/AsyncTaskToken.h         \
             ../src/GVApi.h                  \
-            ../src/MyXmlErrorHandler.h
+            ../src/MyXmlErrorHandler.h      \
+            ../src/FuzzyTimer.h
+
+maemo5 {
+SOURCES += ../src/FuzzyTimerDefault.cpp
+HEADERS += ../src/FuzzyTimerDefault.h
+} else {
+SOURCES += ../src/FuzzyTimerMobility.cpp
+HEADERS += ../src/FuzzyTimerMobility.h
+}
 
 !contains (DEFINES, NO_CONTACTS_CAPTCHA) {
 QT *= webkit

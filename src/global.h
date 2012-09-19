@@ -331,6 +331,12 @@ void qgv_LogFlush();
 #define HAS_FEEDBACK 0
 #endif
 
+#if !defined(Q_WS_MAEMO_5)
+#define HAS_FUZZY_TIMER 1
+#else
+#define HAS_FUZZY_TIMER 0
+#endif
+
 #if defined(Q_WS_X11)
 #define __FULLFUNC__ __PRETTY_FUNCTION__
 #else
