@@ -77,7 +77,9 @@ Contact: yuvraaj@gmail.com
 // Log levels need to be at 5 by default
 //#define GV_SETTINGS_VER     "2012-02-08 23:10:19"
 // 2 factor authentication requires the app specific password for contacts
-#define GV_SETTINGS_VER     "2012-08-07 21:47:44"
+//#define GV_SETTINGS_VER     "2012-08-07 21:47:44"
+// Inbox and contacts refresh period
+#define GV_SETTINGS_VER     "2012-09-20 00:09:51"
 ////////////////////////////// GV Contacts table ///////////////////////////////
 #define GV_CONTACTS_TABLE   "gvcontacts"
 #define GV_C_ID             "id"
@@ -146,8 +148,8 @@ Contact: yuvraaj@gmail.com
 ////////////////////////////////////////////////////////////////////////////////
 #define GV_REFRESH_TABLE    "refresh_period_settings"
 #define GV_RP_ENABLED       "enabled"
-#define GV_RP_MIN           "minPeriod"
-#define GV_RP_MAX           "maxPeriod"
+#define GV_RP_CONTACTS      "contactsPeriod"
+#define GV_RP_INBOX         "inboxPeriod"
 ////////////////////////////////////////////////////////////////////////////////
 
 #endif //__CACHEDATABASE_INT_H__

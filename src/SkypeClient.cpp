@@ -845,7 +845,6 @@ SkypeClient::onCI_GetTarget (uint incomingCallId, const QString &strOutput,
     bool rv = disconnect (
         this, SIGNAL (callStatusChanged (uint, const QString &)),
         this, SLOT   (onCI_GetTarget    (uint, const QString &)));
-    Q_ASSERT(rv);
 
     rv = false;
     do // Begin cleanup block (not a loop)

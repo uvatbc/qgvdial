@@ -20,15 +20,16 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "FuzzyTimerMobility.h"
+#include <QSystemAlignedTimer>
+QTM_USE_NAMESPACE
 
 FuzzyTimerPrivate::FuzzyTimerPrivate(QObject *p)
 : QObject(p)
-, timer(this)
 {
 }//FuzzyTimerPrivate::FuzzyTimerPrivate
 
 void
 FuzzyTimerPrivate::singleShot(int timeout, QObject *receiver, const char *method)
 {
-    timer.singleShot (timeout, timeout * 10, receiver, method);
+    QSystemAlignedTimer::singleShot (timeout, timeout * 2, receiver, method);
 }//FuzzyTimerPrivate::singleShot

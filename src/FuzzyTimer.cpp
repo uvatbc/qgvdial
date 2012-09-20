@@ -30,6 +30,7 @@ Contact: yuvraaj@gmail.com
 FuzzyTimer::FuzzyTimer(QObject *p)
 : QObject (p)
 , d_ptr (NULL)
+, bEnabled (false)
 {
     d_ptr = new FuzzyTimerPrivate(this);
 }//FuzzyTimer::FuzzyTimer

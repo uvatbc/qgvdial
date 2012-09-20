@@ -28,6 +28,7 @@ Contact: yuvraaj@gmail.com
 #include "RegNumberModel.h"
 #include "DialContext.h"
 #include "GVApi.h"
+#include "FuzzyTimer.h"
 
 #include <QtDeclarative>
 #include <phonon/MediaObject>
@@ -223,11 +224,14 @@ private slots:
 
     // Signal for periodic refresh settings changes
     void
-    onSigRefreshChanges(bool bRefreshEnable, const QString &minPeriod,
-                        const QString &maxPeriod, bool bMqEnable,
+    onSigRefreshChanges(bool bRefreshEnable, const QString &contactsPeriod,
+                        const QString &inboxPeriod, bool bMqEnable,
                         const QString &host, int port,
                         const QString &topic);
     void refreshPeriodSettings(bool bForceShut = false);
+
+    void onPeriodicContactsRefresh();
+    void onPeriodicInboxRefresh();
 
 private:
     void initLogging ();
@@ -364,6 +368,11 @@ private:
 
     // Context to be passed between invoking the inputbox and dismissing it
     void           *inputBoxCtx;
+
+    //! Contacts refresh fuzzy timer
+    FuzzyTimer      contactsTimer;
+    //! Inbox refresh fuzzy timer
+    FuzzyTimer      inboxTimer;
 };
 
 #endif // MAINWINDOW_H

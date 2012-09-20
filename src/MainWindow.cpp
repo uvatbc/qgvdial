@@ -59,6 +59,8 @@ MainWindow::MainWindow (QWidget *parent)
             .toLatin1().constData (), this)
 #endif
 , bQuitPath (false)
+, contactsTimer (this)
+, inboxTimer (this)
 {
     modelRegNumber = new RegNumberModel(this);
     if (modelRegNumber == NULL) {
@@ -1043,7 +1045,7 @@ MainWindow::initMq()
         return;
     }
 
-    refreshMqSettings ();
+    refreshPeriodSettings ();
 
     Q_DEBUG(QString("Initially Mq is %1").arg(bEnable ? "enabled":"disabled"));
 
@@ -1439,14 +1441,29 @@ MainWindow::onUserAllowedDelete(bool ok)
 }//MainWindow::onUserAllowedDelete
 
 void
-MainWindow::onSigRefreshChanges(bool bRefreshEnable, const QString &minPeriod,
-                                const QString &maxPeriod, bool bMqEnable,
+MainWindow::onSigRefreshChanges(bool bRefreshEnable,
+                                const QString &contactsPeriod,
+                                const QString &inboxPeriod, bool bMqEnable,
                                 const QString &host, int port,
                                 const QString &topic)
 {
+    bool bOldEnable = contactsTimer.isEnabled ();
+    quint32 contactsSec = contactsPeriod.toInt ();
+    quint32 inboxSec = inboxPeriod.toInt ();
+
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    dbMain.setRefreshSettings (bRefreshEnable, minPeriod.toInt (),
-                               maxPeriod.toInt ());
+    dbMain.setRefreshSettings (bRefreshEnable, contactsSec, inboxSec);
+
+    Q_ASSERT(bOldEnable == inboxTimer.isEnabled ());
+
+    contactsTimer.enable (bRefreshEnable);
+    inboxTimer.enable (bRefreshEnable);
+    if (bRefreshEnable && !bOldEnable) {
+        contactsTimer.singleShot (contactsSec, this,
+                                  SLOT(onPeriodicContactsRefresh()));
+        inboxTimer.singleShot (inboxSec, this,
+                               SLOT(onPeriodicContactsRefresh()));
+    }
 
     onSigMosquittoChanges (bMqEnable, host, port, topic);
 }//MainWindow::onSigRefreshChanges
@@ -1457,10 +1474,10 @@ MainWindow::refreshPeriodSettings(bool bForceShut /*= false*/)
     refreshMqSettings (bForceShut);
 
     bool bEnable = bForceShut;
-    quint32 minPeriod, maxPeriod;
+    quint32 contactsPeriod, inboxPeriod;
 
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    if (!dbMain.getRefreshSettings (bEnable, minPeriod, maxPeriod)) {
+    if (!dbMain.getRefreshSettings (bEnable, contactsPeriod, inboxPeriod)) {
         return;
     }
 
@@ -1477,7 +1494,43 @@ MainWindow::refreshPeriodSettings(bool bForceShut /*= false*/)
 
         QMetaObject::invokeMethod (obj, "setRefreshValues",
                                    Q_ARG (QVariant, QVariant(bEnable)),
-                                   Q_ARG (QVariant, QVariant(minPeriod)),
-                                   Q_ARG (QVariant, QVariant(maxPeriod)));
+                                   Q_ARG (QVariant, QVariant(contactsPeriod)),
+                                   Q_ARG (QVariant, QVariant(inboxPeriod)));
     } while (0); // End cleanup block (not a loop)
 }//MainWindow::refreshPeriodSettings
+
+void
+MainWindow::onPeriodicContactsRefresh()
+{
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    bool bEnable;
+    quint32 contactsPeriod, inboxPeriod;
+
+    if (!dbMain.getRefreshSettings (bEnable, contactsPeriod, inboxPeriod)) {
+        return;
+    }
+
+    contactsTimer.enable (bEnable);
+
+    if (contactsTimer.isEnabled ()) {
+        contactsTimer.singleShot (contactsPeriod, this,
+                                  SLOT(onPeriodicContactsRefresh()));
+    }
+}//MainWindow::onPeriodicContactsRefresh
+
+void
+MainWindow::onPeriodicInboxRefresh()
+{
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    bool bEnable;
+    quint32 contactsPeriod, inboxPeriod;
+
+    if (!dbMain.getRefreshSettings (bEnable, contactsPeriod, inboxPeriod)) {
+        return;
+    }
+
+    if (inboxTimer.isEnabled ()) {
+        inboxTimer.singleShot (inboxPeriod, this,
+                               SLOT(onPeriodicContactsRefresh()));
+    }
+}//MainWindow::onPeriodicInboxRefresh

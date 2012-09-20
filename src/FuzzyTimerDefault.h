@@ -32,9 +32,6 @@ class FuzzyTimerPrivate : QObject
 public:
     FuzzyTimerPrivate(QObject *p = NULL);
     void singleShot(int timeout, QObject *receiver, const char *method);
-
-private:
-    QTimer timer;
 };
 
 #endif//__FUZZYTIMER_DEFAULT_H__

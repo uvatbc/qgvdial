@@ -33,8 +33,12 @@ public:
     FuzzyTimer(QObject *p = NULL);
     void singleShot(int timeout, QObject *receiver, const char *method);
 
+    inline bool isEnabled() { return bEnabled; }
+    inline void enable(bool set) { bEnabled = set; }
+
 private:
     FuzzyTimerPrivate *d_ptr;
+    bool bEnabled;
 };
 
 #endif//__FUZZYTIMER_H__

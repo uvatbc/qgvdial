@@ -23,12 +23,11 @@ Contact: yuvraaj@gmail.com
 
 FuzzyTimerPrivate::FuzzyTimerPrivate(QObject *p)
 : QObject(p)
-, timer(this)
 {
 }//FuzzyTimerPrivate::FuzzyTimerPrivate
 
 void
 FuzzyTimerPrivate::singleShot(int timeout, QObject *receiver, const char *method)
 {
-    timer.singleShot (timeout * 1000, receiver, method);
+    QTimer::singleShot (timeout * 1000, receiver, method);
 }//FuzzyTimerPrivate::singleShot

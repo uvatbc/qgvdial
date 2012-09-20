@@ -25,7 +25,8 @@ Item {
     id: container
 
     signal sigDone(bool bSave)
-    signal sigRefreshChanges(bool bRefreshEnable, string minPeriod, string maxPeriod,
+    signal sigRefreshChanges(bool bRefreshEnable,
+                             string contactsPeriod, string inboxPeriod,
                              bool bMqEnable, string host, int port, string topic)
     signal sigRefreshPeriodSettings
 
@@ -37,11 +38,11 @@ Item {
         textMqTopic.text = topic;
     }
 
-    function setRefreshValues(bEnable, minPeriod, maxPeriod) {
+    function setRefreshValues(bEnable, contactsPeriod, inboxPeriod) {
         console.debug ("QML: Setting Refresh settings")
         periodicRefresh.check = bEnable;
-        textMinRefreshPeriod.text = minPeriod;
-        textMaxRefreshPeriod.text = maxPeriod;
+        textContactsRefreshPeriod.text = contactsPeriod;
+        textInboxRefreshPeriod.text = inboxPeriod;
     }
 
     height: mainColumn.height
@@ -69,14 +70,14 @@ Item {
 
         Row {
             width: parent.width
-            height: lblMinRefreshPeriod.height
+            height: lblContactsRefreshPeriod.height
             spacing: 2
 
             opacity: (periodicRefresh.check ? 1 : 0)
 
             Text {
-                id: lblMinRefreshPeriod
-                text: "Min period in sec:"
+                id: lblContactsRefreshPeriod
+                text: "Refresh contacts every"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
                 font { family: "Nokia Sans"; pointSize: mainColumn.subTextPointSize }
@@ -84,28 +85,36 @@ Item {
             }
 
             MyTextEdit {
-                id: textMinRefreshPeriod
-                width: parent.width - lblMinRefreshPeriod.width
-                height: lblMinRefreshPeriod.height
+                id: textContactsRefreshPeriod
+                width: parent.width - lblContactsRefreshPeriod.width
+                height: lblContactsRefreshPeriod.height
                 anchors.verticalCenter: parent.verticalCenter
                 text: "30"
                 validator: IntValidator { bottom: 0; top: 3600 }
-                KeyNavigation.tab: textMaxRefreshPeriod
-                KeyNavigation.backtab: textMaxRefreshPeriod
+                KeyNavigation.tab: textInboxRefreshPeriod
+                KeyNavigation.backtab: textInboxRefreshPeriod
                 pointSize: mainColumn.subTextPointSize
             }
-        }// Row (Minimum period)
+
+            Text {
+                text: "sec"
+                color: "white"
+                anchors.verticalCenter: parent.verticalCenter
+                font { family: "Nokia Sans"; pointSize: mainColumn.subTextPointSize }
+                height: paintedHeight + 2
+            }
+        }// Row (Contacts refresh period)
 
         Row {
             width: parent.width
-            height: lblMaxRefreshPeriod.height
+            height: lblInboxRefreshPeriod.height
             spacing: 2
 
             opacity: (periodicRefresh.check ? 1 : 0)
 
             Text {
-                id: lblMaxRefreshPeriod
-                text: "Max period in sec:"
+                id: lblInboxRefreshPeriod
+                text: "Refresh inbox every"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
                 font { family: "Nokia Sans"; pointSize: mainColumn.subTextPointSize }
@@ -113,17 +122,17 @@ Item {
             }
 
             MyTextEdit {
-                id: textMaxRefreshPeriod
-                width: parent.width - lblMaxRefreshPeriod.width
-                height: lblMaxRefreshPeriod.height
+                id: textInboxRefreshPeriod
+                width: parent.width - lblInboxRefreshPeriod.width
+                height: lblInboxRefreshPeriod.height
                 anchors.verticalCenter: parent.verticalCenter
-                text: "300"
+                text: "30"
                 validator: IntValidator { bottom: 0; top: 3600 }
-                KeyNavigation.tab: textMinRefreshPeriod
-                KeyNavigation.backtab: textMinRefreshPeriod
+                KeyNavigation.tab: textContactsRefreshPeriod
+                KeyNavigation.backtab: textContactsRefreshPeriod
                 pointSize: mainColumn.subTextPointSize
             }
-        }// Row (Maximum period)
+        }// Row (Inbox refresh period)
 
         RadioButton {
             id: mqSupport
@@ -225,8 +234,8 @@ Item {
 
             onSigSave: {
                 container.sigRefreshChanges (periodicRefresh.check,
-                                             textMinRefreshPeriod.text,
-                                             textMaxRefreshPeriod.text,
+                                             textContactsRefreshPeriod.text,
+                                             textInboxRefreshPeriod.text,
                                              mqSupport.check,
                                              textMqServer.text,
                                              textMqPort.text,

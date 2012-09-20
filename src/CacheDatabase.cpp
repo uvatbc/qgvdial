@@ -1541,21 +1541,21 @@ CacheDatabase::dbgGetAlwaysFailDialing()
 }//CacheDatabase::dbgGetAlwaysFailDialing
 
 bool
-CacheDatabase::setRefreshSettings (bool enable, quint32 minPeriod,
-                                   quint32 maxPeriod)
+CacheDatabase::setRefreshSettings (bool enable, quint32 contactsPeriod,
+                                   quint32 inboxPeriod)
 {
     settings->beginGroup (GV_REFRESH_TABLE);
     settings->setValue (GV_RP_ENABLED, enable);
-    settings->setValue (GV_RP_MIN, minPeriod);
-    settings->setValue (GV_RP_MAX, maxPeriod);
+    settings->setValue (GV_RP_CONTACTS, contactsPeriod);
+    settings->setValue (GV_RP_INBOX, inboxPeriod);
     settings->endGroup ();
 
     return true;
 }//CacheDatabase::setRefreshSettings
 
 bool
-CacheDatabase::getRefreshSettings (bool &enable, quint32 &minPeriod,
-                                   quint32 &maxPeriod)
+CacheDatabase::getRefreshSettings (bool &enable, quint32 &contactsPeriod,
+                                   quint32 &inboxPeriod)
 {
     bool ok;
 
@@ -1567,19 +1567,19 @@ CacheDatabase::getRefreshSettings (bool &enable, quint32 &minPeriod,
         }
 
         ok = false;
-        if (settings->contains (GV_RP_MIN)) {
-            minPeriod = settings->value (GV_RP_MIN).toInt (&ok);
+        if (settings->contains (GV_RP_CONTACTS)) {
+            contactsPeriod = settings->value (GV_RP_CONTACTS).toInt (&ok);
         }
         if (!ok) {
-            minPeriod = 30;
+            contactsPeriod = 3600;
         }
 
         ok = false;
-        if (settings->contains (GV_RP_MAX)) {
-            maxPeriod = settings->value (GV_RP_MAX).toInt (&ok);
+        if (settings->contains (GV_RP_INBOX)) {
+            inboxPeriod = settings->value (GV_RP_INBOX).toInt (&ok);
         }
         if (!ok) {
-            maxPeriod = 30;
+            inboxPeriod = 120;
         }
     } while (0); // End cleanup block (not a loop)
     settings->endGroup ();
