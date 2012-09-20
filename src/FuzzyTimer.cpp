@@ -31,9 +31,11 @@ FuzzyTimer::FuzzyTimer(QObject *p)
 : QObject (p)
 , d_ptr (NULL)
 {
+    d_ptr = new FuzzyTimerPrivate(this);
 }//FuzzyTimer::FuzzyTimer
 
 void
 FuzzyTimer::singleShot(int timeout, QObject *receiver, const char *method)
 {
+    d_ptr->singleShot (timeout, receiver, method);
 }//FuzzyTimer::singleShot

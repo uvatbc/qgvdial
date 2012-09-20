@@ -33,9 +33,6 @@ public:
     FuzzyTimer(QObject *p = NULL);
     void singleShot(int timeout, QObject *receiver, const char *method);
 
-signals:
-    void timeout();
-
 private:
     FuzzyTimerPrivate *d_ptr;
 };

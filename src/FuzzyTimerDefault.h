@@ -23,6 +23,7 @@ Contact: yuvraaj@gmail.com
 #define __FUZZYTIMER_DEFAULT_H__
 
 #include "global.h"
+#include "FuzzyTimer.h"
 
 class FuzzyTimerPrivate : QObject
 {
@@ -32,11 +33,8 @@ public:
     FuzzyTimerPrivate(QObject *p = NULL);
     void singleShot(int timeout, QObject *receiver, const char *method);
 
-signals:
-    void timeout();
-
 private:
-
+    QTimer timer;
 };
 
 #endif//__FUZZYTIMER_DEFAULT_H__

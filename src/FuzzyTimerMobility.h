@@ -23,6 +23,8 @@ Contact: yuvraaj@gmail.com
 #define __FUZZYTIMER_MOBILITY_H__
 
 #include "global.h"
+#include <QSystemAlignedTimer>
+QTM_USE_NAMESPACE
 
 class FuzzyTimerPrivate : QObject
 {
@@ -32,11 +34,8 @@ public:
     FuzzyTimerPrivate(QObject *p = NULL);
     void singleShot(int timeout, QObject *receiver, const char *method);
 
-signals:
-    void timeout();
-
 private:
-
+    QSystemAlignedTimer timer;
 };
 
 #endif//__FUZZYTIMER_MOBILITY_H__
