@@ -331,7 +331,7 @@ void qgv_LogFlush();
 #define HAS_FEEDBACK 0
 #endif
 
-#if !defined(Q_WS_MAEMO_5)
+#if defined(ENABLE_FUZZY_TIMER)
 #define HAS_FUZZY_TIMER 1
 #else
 #define HAS_FUZZY_TIMER 0

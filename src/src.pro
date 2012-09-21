@@ -150,12 +150,18 @@ HEADERS  += ../src/global.h                 \
             ../src/MyXmlErrorHandler.h      \
             ../src/FuzzyTimer.h
 
-maemo5 {
-SOURCES += ../src/FuzzyTimerDefault.cpp
-HEADERS += ../src/FuzzyTimerDefault.h
+contains(MEEGO_EDITION,harmattan) | symbian {
+    !exist(no-system-aligned-timer) {
+        DEFINES += ENABLE_FUZZY_TIMER
+    }
+}
+
+contains (DEFINES, ENABLE_FUZZY_TIMER) {
+    SOURCES += ../src/FuzzyTimerMobility.cpp
+    HEADERS += ../src/FuzzyTimerMobility.h
 } else {
-SOURCES += ../src/FuzzyTimerMobility.cpp
-HEADERS += ../src/FuzzyTimerMobility.h
+    SOURCES += ../src/FuzzyTimerDefault.cpp
+    HEADERS += ../src/FuzzyTimerDefault.h
 }
 
 !contains (DEFINES, NO_CONTACTS_CAPTCHA) {

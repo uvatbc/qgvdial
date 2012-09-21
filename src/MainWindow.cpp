@@ -1510,6 +1510,8 @@ MainWindow::onPeriodicContactsRefresh()
     bool bEnable;
     quint32 contactsPeriod, inboxPeriod;
 
+    oContacts->refreshContacts ();
+
     if (!dbMain.getRefreshSettings (bEnable, contactsPeriod, inboxPeriod)) {
         return;
     }
@@ -1523,6 +1525,8 @@ MainWindow::onPeriodicInboxRefresh()
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     bool bEnable;
     quint32 contactsPeriod, inboxPeriod;
+
+    oInbox->refresh ();
 
     if (!dbMain.getRefreshSettings (bEnable, contactsPeriod, inboxPeriod)) {
         return;
