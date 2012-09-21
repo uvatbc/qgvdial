@@ -117,6 +117,15 @@ MainWindow::MainWindow (QWidget *parent)
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
 
+    rv = connect (&contactsTimer, SIGNAL(timeout()),
+                  this, SLOT(onPeriodicContactsRefresh()));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+    rv = connect (&inboxTimer, SIGNAL(timeout()),
+                  this, SLOT(onPeriodicInboxRefresh()));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+
     // Schedule the init a bit later so that the app.exec() can begin executing
     QTimer::singleShot (10, this, SLOT (init()));
 }//MainWindow::MainWindow
@@ -1447,22 +1456,17 @@ MainWindow::onSigRefreshChanges(bool bRefreshEnable,
                                 const QString &host, int port,
                                 const QString &topic)
 {
-    bool bOldEnable = contactsTimer.isEnabled ();
     quint32 contactsSec = contactsPeriod.toInt ();
     quint32 inboxSec = inboxPeriod.toInt ();
 
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     dbMain.setRefreshSettings (bRefreshEnable, contactsSec, inboxSec);
 
-    Q_ASSERT(bOldEnable == inboxTimer.isEnabled ());
+    Q_ASSERT(contactsTimer.isActive() == inboxTimer.isActive());
 
-    contactsTimer.enable (bRefreshEnable);
-    inboxTimer.enable (bRefreshEnable);
-    if (bRefreshEnable && !bOldEnable) {
-        contactsTimer.singleShot (contactsSec, this,
-                                  SLOT(onPeriodicContactsRefresh()));
-        inboxTimer.singleShot (inboxSec, this,
-                               SLOT(onPeriodicContactsRefresh()));
+    if (bRefreshEnable && !contactsTimer.isActive()) {
+        contactsTimer.start (contactsSec);
+        inboxTimer.start (inboxSec);
     }
 
     onSigMosquittoChanges (bMqEnable, host, port, topic);
@@ -1510,12 +1514,7 @@ MainWindow::onPeriodicContactsRefresh()
         return;
     }
 
-    contactsTimer.enable (bEnable);
-
-    if (contactsTimer.isEnabled ()) {
-        contactsTimer.singleShot (contactsPeriod, this,
-                                  SLOT(onPeriodicContactsRefresh()));
-    }
+    contactsTimer.start (contactsPeriod);
 }//MainWindow::onPeriodicContactsRefresh
 
 void
@@ -1529,8 +1528,5 @@ MainWindow::onPeriodicInboxRefresh()
         return;
     }
 
-    if (inboxTimer.isEnabled ()) {
-        inboxTimer.singleShot (inboxPeriod, this,
-                               SLOT(onPeriodicContactsRefresh()));
-    }
+    inboxTimer.start (inboxPeriod);
 }//MainWindow::onPeriodicInboxRefresh

@@ -25,13 +25,22 @@ Contact: yuvraaj@gmail.com
 #include "global.h"
 #include "FuzzyTimer.h"
 
-class FuzzyTimerPrivate : QObject
+class FuzzyTimerPrivate : public QObject
 {
     Q_OBJECT
 
 public:
     FuzzyTimerPrivate(QObject *p = NULL);
-    void singleShot(int timeout, QObject *receiver, const char *method);
+
+    void start(int sec);
+    inline void stop() { timer.stop(); }
+    inline bool isActive() const { return timer.isActive (); }
+
+signals:
+    void timeout();
+
+private:
+    QTimer timer;
 };
 
 #endif//__FUZZYTIMER_DEFAULT_H__

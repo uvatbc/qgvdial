@@ -30,13 +30,31 @@ Contact: yuvraaj@gmail.com
 FuzzyTimer::FuzzyTimer(QObject *p)
 : QObject (p)
 , d_ptr (NULL)
-, bEnabled (false)
 {
     d_ptr = new FuzzyTimerPrivate(this);
+    connect(d_ptr, SIGNAL(timeout()), this, SIGNAL(timeout()));
 }//FuzzyTimer::FuzzyTimer
 
 void
-FuzzyTimer::singleShot(int timeout, QObject *receiver, const char *method)
+FuzzyTimer::start(int sec)
 {
-    d_ptr->singleShot (timeout, receiver, method);
-}//FuzzyTimer::singleShot
+    if (d_ptr == NULL) return;
+
+    d_ptr->start (sec);
+}//FuzzyTimer::start
+
+void
+FuzzyTimer::stop()
+{
+    if (d_ptr == NULL) return;
+
+    d_ptr->stop ();
+}//FuzzyTimer::stop
+
+bool
+FuzzyTimer::isActive()
+{
+    if (d_ptr == NULL) return false;
+
+    return (d_ptr->isActive());
+}//FuzzyTimer::isActive
