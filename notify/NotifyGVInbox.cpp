@@ -26,21 +26,13 @@ GVInbox::refresh ()
         return;
     }
 
-    int page = 1;
     AsyncTaskToken *token = new AsyncTaskToken(this);
-    token->inParams["type"] = "all";
-    token->inParams["page"] = page;
-
-    bool rv = connect(token, SIGNAL(completed(AsyncTaskToken*)),
-                      this, SLOT(getInboxDone(AsyncTaskToken*)));
-    Q_ASSERT(rv);
-    if (!rv) {
-        qApp->quit ();
+    if (token == NULL) {
+        Q_WARN("Failed to allocate token for gvapi call");
         return;
     }
-
-    rv = connect(&gvApi, SIGNAL(oneInboxEntry(const GVInboxEntry &)),
-                  this , SLOT  (oneInboxEntry(const GVInboxEntry &)));
+    bool rv = connect(token, SIGNAL(completed(AsyncTaskToken*)),
+                      this, SLOT(onCheckInboxDone(AsyncTaskToken*)));
     Q_ASSERT(rv);
     if (!rv) {
         qApp->quit ();
@@ -49,22 +41,14 @@ GVInbox::refresh ()
 
     bRefreshInProgress = true;
 
-    if (!gvApi.getInbox (token)) {
-        getInboxDone (NULL);
+    if (!gvApi.checkRecentInbox (token)) {
+        onCheckInboxDone (NULL);
         delete token;
     }
 }//GVInbox::refresh
 
 void
-GVInbox::oneInboxEntry (const GVInboxEntry &hevent)
-{
-    if (!dtLatest.isValid() || (hevent.startTime > dtLatest)) {
-        dtLatest = hevent.startTime;
-    }
-}//GVInbox::oneInboxEntry
-
-void
-GVInbox::getInboxDone (AsyncTaskToken *token)
+GVInbox::onCheckInboxDone (AsyncTaskToken *token)
 {
     do { // Begin cleanup block (not a loop)
         if (!token) {
@@ -73,31 +57,29 @@ GVInbox::getInboxDone (AsyncTaskToken *token)
         }
 
         if (ATTS_SUCCESS != token->status) {
-            Q_WARN("Inbox fetch failed for page")
-                << token->inParams["page"].toString();
+            Q_WARN("Inbox fetch failed for most recent entry");
             break;
         }
+
+        QDateTime latestOnServer = token->outParams["serverLatest"].toDateTime();
 
         delete token;
         token = NULL;
 
-        if (!dtLatest.isValid ()) {
-            Q_DEBUG("Invalid latest date");
-            dtLatest = QDateTime::currentDateTime ();
-        }
         if (!dtPrevLatest.isValid ()) {
-            dtPrevLatest = dtLatest.addDays (-1);
+            dtPrevLatest = latestOnServer.addDays (-1);
         }
 
-        if (dtLatest > dtPrevLatest) {
-            dtPrevLatest = dtLatest;
+        if (latestOnServer > dtPrevLatest) {
             emit inboxChanged ();
         }
+
+        dtPrevLatest = latestOnServer;
     } while (0); // End cleanup block (not a loop)
 
     QMutexLocker locker(&mutex);
     bRefreshInProgress = false;
-}//GVInbox::getInboxDone
+}//GVInbox::onCheckInboxDone
 
 void
 GVInbox::loginSuccess ()

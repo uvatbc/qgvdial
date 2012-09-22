@@ -65,6 +65,7 @@ public:
     bool getVoicemail(AsyncTaskToken *token);
     bool markInboxEntryAsRead(AsyncTaskToken *token);
     bool deleteInboxEntry(AsyncTaskToken *token);
+    bool checkRecentInbox(AsyncTaskToken *token);
 ////////////////////////////////////////////////////////////////////////////////
 
 signals:
@@ -125,6 +126,10 @@ private slots:
     // Get voicemail
     void onVmail(bool success, const QByteArray &response, QNetworkReply *reply,
                  void *ctx);
+
+    void onCheckRecentInbox(bool success, const QByteArray &response,
+                            QNetworkReply *reply, void *ctx);
+
 private:
     bool getSystemProxies (QNetworkProxy &http, QNetworkProxy &https);
 

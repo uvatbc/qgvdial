@@ -49,7 +49,7 @@ Item {
     property bool bEnableProxy: proxySupport.check
     property bool bSystemProxy: proxySystem.check
     property bool bProxyUserPass: proxyUserPassRequired.check
-
+    property real internalPointSize: (8 * g_fontMul)
 
     onSigDone: {
         textUserProxyHost.closeSoftwareInputPanel();
@@ -97,7 +97,7 @@ Item {
                 text: "Host:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
+                font { family: "Nokia Sans"; pointSize: container.internalPointSize }
             }
 
             MyTextEdit {
@@ -124,7 +124,7 @@ Item {
                 text: "Port:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
+                font { family: "Nokia Sans"; pointSize: container.internalPointSize }
             }
 
             MyTextEdit {
@@ -160,7 +160,7 @@ Item {
                 text: "Proxy user:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
+                font { family: "Nokia Sans"; pointSize: container.internalPointSize }
             }
 
             MyTextEdit {
@@ -187,7 +187,7 @@ Item {
                 text: "Proxy password:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
+                font { family: "Nokia Sans"; pointSize: container.internalPointSize }
             }
 
             MyTextEdit {

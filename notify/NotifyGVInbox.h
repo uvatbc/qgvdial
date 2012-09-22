@@ -25,8 +25,7 @@ public slots:
     void loggedOut ();
 
 private slots:
-    void oneInboxEntry (const GVInboxEntry &hevent);
-    void getInboxDone (AsyncTaskToken *token);
+    void onCheckInboxDone (AsyncTaskToken *token);
 
 private:
     GVApi          &gvApi;
@@ -41,7 +40,6 @@ private:
     bool            bRefreshInProgress;
 
     //! Date time of latest update
-    QDateTime       dtLatest;
     QDateTime       dtPrevLatest;
 };
 

@@ -1,1 +1,1 @@
-  * Recompile to get latest gvapi
+  * Added a refresh GV API. Updated notify to use it.

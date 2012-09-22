@@ -68,6 +68,8 @@ public slots:
     //! Invoked when the user requests a full inbox refresh
     void refreshFullInbox ();
 
+    void checkRecent();
+
     void onInboxSelected (const QString &strSelection);
 
     void loginSuccess ();
@@ -82,6 +84,7 @@ private slots:
     void getInboxDone (AsyncTaskToken *token);
     void onInboxEntryMarked (AsyncTaskToken *token);
     void onInboxEntryDeleted (AsyncTaskToken *token);
+    void onCheckRecentCompleted(AsyncTaskToken *token);
 
 private:
     void prepView ();
@@ -114,6 +117,9 @@ private:
 
     //! The inbox model
     InboxModel     *modelInbox;
+
+    //! Are we currently checking for recent items?
+    bool            bRecentCheckInProgress;
 };
 
 #endif //__GVINBOX_H__

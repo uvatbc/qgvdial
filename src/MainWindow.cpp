@@ -1045,26 +1045,30 @@ MainWindow::refreshMqSettings (bool bForceShut /*= false*/)
 void
 MainWindow::initMq()
 {
-    bool bEnable = false;
+    bool bEnable = false, bRefreshEnable, ok;
     QString host, topic;
     int port;
-
+    quint32 contactsSec, inboxSec;
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    if (!dbMain.getMqSettings (bEnable, host, port, topic)) {
-        return;
-    }
 
     refreshPeriodSettings ();
 
-    Q_DEBUG(QString("Initially Mq is %1").arg(bEnable ? "enabled":"disabled"));
-
+    ok = dbMain.getMqSettings (bEnable, host, port, topic);
 #if MOSQUITTO_CAPABLE
-    if (bEnable) {
+    Q_DEBUG(QString("Initially Mq is %1").arg(bEnable ? "enabled":"disabled"));
+    if (ok && bEnable) {
         Q_DEBUG ("Start Mq thread.");
         mqThread.setSettings (bEnable, host, port);
         mqThread.start();
     }
 #endif
+
+    ok = dbMain.getRefreshSettings (bRefreshEnable, contactsSec, inboxSec);
+    Q_ASSERT(contactsTimer.isActive() == inboxTimer.isActive());
+    if (ok && bRefreshEnable && !contactsTimer.isActive()) {
+        contactsTimer.start (contactsSec);
+        inboxTimer.start (inboxSec);
+    }
 }//MainWindow::initMq
 
 void
@@ -1526,7 +1530,7 @@ MainWindow::onPeriodicInboxRefresh()
     bool bEnable;
     quint32 contactsPeriod, inboxPeriod;
 
-    oInbox->refresh ();
+    oInbox->checkRecent ();
 
     if (!dbMain.getRefreshSettings (bEnable, contactsPeriod, inboxPeriod)) {
         return;

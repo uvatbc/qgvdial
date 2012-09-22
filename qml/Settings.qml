@@ -173,28 +173,8 @@ Flickable {
 
         onClicked: if (isExpanded) yAdjustTimer.setY = y;
 
-        mainTitle: "Auto-Refresh"
+        mainTitle: "Auto refresh"
 
-/*
-        mainTitle: "Mosquitto"
-
-        Mosquitto {
-            id: mqSettings
-            objectName: "MosquittoPage"
-
-            y: parent.startY
-            width: parent.width - 1
-            opacity: parent.containedOpacity
-
-            onSigDone: {
-                if (!bSave) {
-                    container.sigMosquittoRefresh();
-                }
-                parent.isExpanded = false;
-            }
-            onSigMosquittoChanges: container.sigMosquittoChanges(bEnable, host, port, topic)
-        }//Mosquitto
-*/
         RefreshSettings {
             id: refreshSettings
             objectName: "RefreshSettingsPage"
@@ -204,8 +184,7 @@ Flickable {
             opacity: parent.containedOpacity
 
             onSigDone: parent.isExpanded = false;
-        }//Mosquitto
-
+        }//RefreshSettings
     }//ExpandView (mosquitto)
 
     ExpandView {

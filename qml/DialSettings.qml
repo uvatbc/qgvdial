@@ -26,8 +26,12 @@ Item {
 
     height: mainColumn.height + 2
 
+    // Font size
+    property real internalPointSize: (8 * g_fontMul)
+
     Column {
         id: mainColumn
+
 
         anchors {
             top: parent.top
@@ -62,6 +66,7 @@ Item {
                 text: entryText
                 check: isChecked
                 autoChange: false
+                pointSize: container.internalPointSize
                 onClicked: {
                     registeredPhonesView.sigSelChanged(index);
                 }
@@ -76,5 +81,6 @@ Item {
         text: "entryText"
         visible: false
         opacity: 0
+        pointSize: container.internalPointSize
     }
 }//Item(container)

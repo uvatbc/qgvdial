@@ -27,6 +27,7 @@ Item {
     signal sigLinkActivated(string strLink)
 
     height: mainColumn.height
+    property real internalPointSize: (8 * g_fontMul)
 
     Column {
         id: mainColumn
@@ -41,14 +42,14 @@ Item {
             text: "Version: __QGVDIAL_VERSION__"
             width: parent.width
             height: paintedHeight + 2
-            font { family: "Nokia Sans"; pointSize: (8 * g_fontMul) }
+            font { family: "Nokia Sans"; pointSize: container.internalPointSize }
             color: "white"
         }//Text (version)
 
         Text {
             width: parent.width
             height: paintedHeight + 2
-            font { family: "Nokia Sans"; pointSize: (8 * g_fontMul) }
+            font { family: "Nokia Sans"; pointSize: container.internalPointSize }
             color: "white"
 
             onLinkActivated: container.sigLinkActivated(link)

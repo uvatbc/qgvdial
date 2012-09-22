@@ -2200,3 +2200,128 @@ GVApi::onEntryDeleted(bool success, const QByteArray &response, QNetworkReply *,
         }
     }
 }//GVApi::onEntryDeleted
+
+bool
+GVApi::checkRecentInbox(AsyncTaskToken *token)
+{
+    Q_ASSERT(token);
+    if (!token) {
+        return false;
+    }
+
+    if (!loggedIn) {
+        token->status = ATTS_NOT_LOGGED_IN;
+        token->emitCompleted ();
+        return true;
+    }
+
+    bool rv =
+    doGet(GV_HTTPS "/b/0/inbox/recent/all", token, this,
+          SLOT(onCheckRecentInbox(bool,const QByteArray&,QNetworkReply*,void*)));
+    Q_ASSERT(rv);
+
+    return rv;
+}//GVApi::checkRecentInbox
+
+void
+GVApi::onCheckRecentInbox(bool success, const QByteArray &response,
+                          QNetworkReply *, void *ctx)
+{
+    AsyncTaskToken *token = (AsyncTaskToken *)ctx;
+    QString strReply = response;
+
+    do { // Begin cleanup block (not a loop)
+        if (!success) {
+            Q_WARN("Failed to get recent inbox");
+            break;
+        }
+        success = false;
+
+        QXmlInputSource inputSource;
+        QXmlSimpleReader simpleReader;
+        inputSource.setData (strReply);
+        GvXMLParser xmlHandler;
+        xmlHandler.setEmitLog (emitLog);
+
+        simpleReader.setContentHandler (&xmlHandler);
+        simpleReader.setErrorHandler (&xmlHandler);
+
+        if (!simpleReader.parse (&inputSource, false)) {
+            Q_WARN("Failed to parse GV Inbox XML. Data =") << strReply;
+            break;
+        }
+
+        QString strTemp;
+        strTemp = "var obj = " + xmlHandler.strJson;
+        scriptEngine.evaluate (strTemp);
+        if (scriptEngine.hasUncaughtException ()) {
+            Q_WARN("Failed to assign json to obj. error =")
+               << scriptEngine.uncaughtException().toString ()
+               << "JSON =" << xmlHandler.strJson;
+            break;
+        }
+
+        strTemp = "var msgList = []; "
+                  "for (var msgId in obj[\"messages\"]) { "
+                  "    msgList.push(msgId); "
+                  "}"
+                  "var msgParams = obj[\"messages\"][msgList[0]];";
+        scriptEngine.evaluate (strTemp);
+        if (scriptEngine.hasUncaughtException ()) {
+            Q_WARN("Uncaught exception executing script :")
+                << scriptEngine.uncaughtException().toString()
+                << "JSON =" << xmlHandler.strJson;
+            break;
+        }
+
+        strTemp = scriptEngine.evaluate("msgParams[\"startTime\"]").toString();
+        if (scriptEngine.hasUncaughtException ()) {
+            Q_WARN("Uncaught exception executing script :")
+                << scriptEngine.uncaughtException().toString()
+                << "JSON =" << xmlHandler.strJson;
+            break;
+        }
+
+        quint64 iVal = strTemp.toULongLong (&success) / 1000;
+        if (!success) {
+            Q_WARN("Failed to get a start time.");
+            break;
+        }
+
+        QDateTime serverLatest = QDateTime::fromTime_t (iVal);
+        if (!token->outParams.contains ("serverLatest")) {
+            token->outParams["serverLatest"] = serverLatest;
+
+            success = doGet(GV_HTTPS "/b/0/inbox/recent/trash", token, this,
+                            SLOT(onCheckRecentInbox(bool,const QByteArray&,QNetworkReply*,void*)));
+            Q_ASSERT(success);
+
+            if (!success) {
+                token->status = ATTS_SUCCESS;
+                token->emitCompleted ();
+                token = NULL;
+            }
+
+            success = true;
+            break;
+        }
+
+        QDateTime allEntryTime = token->outParams["serverLatest"].toDateTime();
+        if (serverLatest > allEntryTime) {
+            token->outParams["serverLatest"] = serverLatest;
+        }
+
+        token->status = ATTS_SUCCESS;
+        token->emitCompleted ();
+        token = NULL;
+
+        success = true;
+    } while (0); // End cleanup block (not a loop)
+
+    if (!success) {
+        if (token) {
+            token->status = ATTS_FAILURE;
+            token->emitCompleted ();
+        }
+    }
+}//GVApi::onCheckRecentInbox

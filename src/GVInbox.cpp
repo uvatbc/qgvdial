@@ -32,6 +32,7 @@ GVInbox::GVInbox (GVApi &gref, QObject *parent)
 , bRefreshInProgress (false)
 , bRetrieveTrash (false)
 , modelInbox (NULL)
+, bRecentCheckInProgress(false)
 {
     bool rv = connect (
         &gvApi, SIGNAL (oneInboxEntry (const GVInboxEntry &)),
@@ -159,6 +160,54 @@ GVInbox::refreshFullInbox ()
     QDateTime dtUpdate;
     refresh(dtUpdate);
 }//GVInbox::refreshFullInbox
+
+void
+GVInbox::checkRecent()
+{
+    if (bRecentCheckInProgress) {
+        Q_WARN("Current check inbox in process");
+        return;
+    }
+    bRecentCheckInProgress = true;
+
+    AsyncTaskToken *token = new AsyncTaskToken(this);
+    bool rv = connect(token, SIGNAL(completed(AsyncTaskToken*)),
+                      this, SLOT(onCheckRecentCompleted(AsyncTaskToken*)));
+    Q_ASSERT(rv); Q_UNUSED(rv);
+
+    if (!gvApi.checkRecentInbox (token)) {
+        onCheckRecentCompleted (NULL);
+        delete token;
+    }
+}//GVInbox::checkRecent
+
+void
+GVInbox::onCheckRecentCompleted(AsyncTaskToken *token)
+{
+    do { // Begin cleanup block (not a loop)
+        if (!token) {
+            Q_WARN("No token provided. Failure!!");
+            break;
+        }
+
+        QDateTime latestOnServer = token->outParams["serverLatest"].toDateTime();
+
+        CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+        QDateTime latestInCache;
+        dbMain.getLatestInboxEntry (latestInCache);
+
+        if (latestOnServer > latestInCache) {
+            refresh ();
+        }
+    } while (0); // End cleanup block (not a loop)
+
+    if (token) {
+        delete token;
+        token = NULL;
+    }
+
+    bRecentCheckInProgress = false;
+}//GVInbox::onCheckRecentCompleted
 
 void
 GVInbox::oneInboxEntry (const GVInboxEntry &hevent)

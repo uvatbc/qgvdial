@@ -37,6 +37,7 @@ Item {
     signal sigPinSettingChanges(bool bEnable, string pin)
 
     property bool bEnable: pinSupport.check
+    property real internalPointSize: (8 * g_fontMul)
 
     onSigDone: {
         textPin.closeSoftwareInputPanel();
@@ -69,7 +70,7 @@ Item {
                 text: "Pin:"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
+                font { family: "Nokia Sans"; pointSize: container.internalPointSize }
                 height: paintedHeight + 2
             }
 
@@ -80,6 +81,7 @@ Item {
                 text: "0000"
                 validator: IntValidator { bottom: 0; top: 9999 }
                 height: lblPin.height
+                pointSize: container.internalPointSize
             }
         }// Row (pin)
 
