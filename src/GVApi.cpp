@@ -2264,9 +2264,9 @@ GVApi::onCheckRecentInbox(bool success, const QByteArray &response,
         strTemp = "var msgList = []; "
                   "for (var msgId in obj[\"messages\"]) { "
                   "    msgList.push(msgId); "
-                  "}"
-                  "var msgParams = obj[\"messages\"][msgList[0]];";
-        scriptEngine.evaluate (strTemp);
+                  "} "
+                  "msgList.length;";
+        quint32 msgCount = scriptEngine.evaluate(strTemp).toInt32 ();
         if (scriptEngine.hasUncaughtException ()) {
             Q_WARN("Uncaught exception executing script :")
                 << scriptEngine.uncaughtException().toString()
@@ -2274,21 +2274,30 @@ GVApi::onCheckRecentInbox(bool success, const QByteArray &response,
             break;
         }
 
-        strTemp = scriptEngine.evaluate("msgParams[\"startTime\"]").toString();
-        if (scriptEngine.hasUncaughtException ()) {
-            Q_WARN("Uncaught exception executing script :")
-                << scriptEngine.uncaughtException().toString()
-                << "JSON =" << xmlHandler.strJson;
-            break;
+        QDateTime serverLatest;
+        if (msgCount != 0) {
+            strTemp = "var msgParams = obj[\"messages\"][msgList[0]];"
+                      "msgParams[\"startTime\"]";
+            strTemp = scriptEngine.evaluate(strTemp).toString();
+            if (scriptEngine.hasUncaughtException ()) {
+                Q_WARN("Uncaught exception executing script :")
+                    << scriptEngine.uncaughtException().toString()
+                    << "JSON =" << xmlHandler.strJson;
+                break;
+            }
+
+            quint64 iVal = strTemp.toULongLong (&success) / 1000;
+            if (!success) {
+                Q_WARN("Failed to get a start time.");
+                break;
+            }
+
+            serverLatest = QDateTime::fromTime_t (iVal);
+        } else {
+            Q_DEBUG("Empty list");
+            serverLatest = QDateTime::fromMSecsSinceEpoch (0);
         }
 
-        quint64 iVal = strTemp.toULongLong (&success) / 1000;
-        if (!success) {
-            Q_WARN("Failed to get a start time.");
-            break;
-        }
-
-        QDateTime serverLatest = QDateTime::fromTime_t (iVal);
         if (!token->outParams.contains ("serverLatest")) {
             token->outParams["serverLatest"] = serverLatest;
 

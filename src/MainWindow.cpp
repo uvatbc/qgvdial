@@ -1520,6 +1520,10 @@ MainWindow::onPeriodicContactsRefresh()
         return;
     }
 
+    if (!bEnable) {
+        return;
+    }
+
     contactsTimer.start (contactsPeriod);
 }//MainWindow::onPeriodicContactsRefresh
 
@@ -1533,6 +1537,10 @@ MainWindow::onPeriodicInboxRefresh()
     oInbox->checkRecent ();
 
     if (!dbMain.getRefreshSettings (bEnable, contactsPeriod, inboxPeriod)) {
+        return;
+    }
+
+    if (!bEnable) {
         return;
     }
 
