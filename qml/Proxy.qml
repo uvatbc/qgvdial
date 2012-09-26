@@ -73,6 +73,7 @@ Item {
             width: parent.width
 
             text: "Enable proxy support"
+            pointSize: container.internalPointSize
         }// RadioButton (proxySupport)
 
         RadioButton {
@@ -81,6 +82,7 @@ Item {
             opacity: (bEnableProxy? 1 : 0)
 
             text: "Use system proxy settings"
+            pointSize: container.internalPointSize
         }// RadioButton (proxySystem)
 
         Row {
@@ -107,6 +109,7 @@ Item {
                 text: "proxy.example.com"
                 KeyNavigation.tab: textUserProxyPort
                 KeyNavigation.backtab: (bEnableProxy && !bSystemProxy && bProxyUserPass ? textUserProxyPass : textUserProxyPort)
+                pointSize: container.internalPointSize
             }
         }// Row (user proxy host)
 
@@ -135,6 +138,7 @@ Item {
                 validator: IntValidator { bottom: 0; top: 65535 }
                 KeyNavigation.tab: (bEnableProxy && !bSystemProxy && bProxyUserPass ? textUserProxyUser : textUserProxyHost)
                 KeyNavigation.backtab: textUserProxyHost
+                pointSize: container.internalPointSize
             }
         }// Row (user proxy port)
 
@@ -144,6 +148,7 @@ Item {
             opacity: (bEnableProxy && !bSystemProxy ? 1 : 0)
 
             text: "Requires username and password"
+            pointSize: container.internalPointSize
         }// RadioButton (proxyUserPassRequired)
 
         Row {
@@ -170,6 +175,7 @@ Item {
                 text: "exampleuser"
                 KeyNavigation.tab: textUserProxyPass
                 KeyNavigation.backtab: textUserProxyPort
+                pointSize: container.internalPointSize
             }
         }// Row (user proxy user name)
 
@@ -198,6 +204,7 @@ Item {
                 echoMode: TextInput.Password
                 KeyNavigation.tab: textUserProxyHost
                 KeyNavigation.backtab: textUserProxyUser
+                pointSize: container.internalPointSize
             }
         }// Row (user proxy password)
 
