@@ -273,6 +273,10 @@ extern QFile fLogfile;   //! Logfile
 extern int   logLevel;   //! Log level
 void qgv_LogFlush();
 
+#if defined(INVALID_TARGET)
+#error Invalid target
+#endif
+
 #if defined(Q_WS_HILDON) && !defined(Q_WS_MAEMO_5)
 #define DIABLO_OS 1
 #else

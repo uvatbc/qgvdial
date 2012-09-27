@@ -11,6 +11,22 @@ contains(MEEGO_EDITION,harmattan) {
   DEFINES += MEEGO_HARMATTAN
 }
 
+symbian {
+exists(isS1) {
+  DEFINES += IS_S1
+}
+exists(isS3) {
+  DEFINES += IS_S3
+}
+exists(isS3Belle) {
+  DEFINES += IS_S3_BELLE
+}
+
+!exists(IS_S1) : !exists(IS_S3) : !exists(IS_S3_BELLE) {
+  DEFINES += INVALID_TARGET
+}
+}
+
 DEFINES += NO_CONTACTS_CAPTCHA
 
 # For verbose debugging
