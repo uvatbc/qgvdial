@@ -383,7 +383,7 @@ OsDependent::getMultipliers(double &hMul, double &wMul, double &fontMul)
     hMul = wMul = 2;
     fontMul = 3;
 #elif defined(Q_OS_SYMBIAN)
-    hMul = wMul = 1.5;
+    hMul = wMul = 1.2;
 #endif
 }//OsDependent::getMultipliers
 

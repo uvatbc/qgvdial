@@ -21,7 +21,6 @@ exists(isS3) {
 exists(isS3Belle) {
   DEFINES += IS_S3_BELLE
 }
-
 !exists(IS_S1) : !exists(IS_S3) : !exists(IS_S3_BELLE) {
   DEFINES += INVALID_TARGET
 }
