@@ -1429,6 +1429,8 @@ GVApi::parseInboxJson(const QString &strJson, const QString &strHtml,
                         inboxEntry.Type = GVIE_Voicemail;
                     } else if (strVal.contains ("sms")) {
                         inboxEntry.Type = GVIE_TextMessage;
+                    } else if (strVal.contains ("trash")) {
+                        inboxEntry.bTrash = true;
                     } else {
                         if (emitLog) {
                             Q_WARN("Unknown label") << strVal;
