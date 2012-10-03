@@ -2296,7 +2296,7 @@ GVApi::onCheckRecentInbox(bool success, const QByteArray &response,
 
             serverLatest = QDateTime::fromTime_t (iVal);
         } else {
-            Q_DEBUG("Empty list");
+            //Q_DEBUG("Empty list");
             serverLatest = QDateTime::fromMSecsSinceEpoch (0);
         }
 
