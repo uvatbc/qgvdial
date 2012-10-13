@@ -2263,7 +2263,7 @@ GVApi::onCheckRecentInbox(bool success, const QByteArray &response,
     do { // Begin cleanup block (not a loop)
         if (!success) {
             Q_WARN("Failed to get recent inbox");
-            token->status = ATTS_SUCCESS;
+            token->status = ATTS_NW_ERROR;
             break;
         }
         success = false;
