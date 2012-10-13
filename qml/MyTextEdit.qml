@@ -35,13 +35,13 @@ FocusScope {
     height: textEd.height
 
     function closeSoftwareInputPanel() {
-        textEd.focus = false;
-        container.focus = false;
-        textEd.closeSoftwareInputPanel ();
+//        textEd.focus = false;
+//        container.focus = false;
+        textEd.closeSoftwareInputPanel();
     }
 
     function doAccepted() {
-        container.closeSoftwareInputPanel ();
+        container.closeSoftwareInputPanel();
         container.sigEnter();
     }
 

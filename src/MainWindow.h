@@ -45,6 +45,14 @@ Contact: yuvraaj@gmail.com
 // even though it is present in QtCore which is included in global.h
 #include <QObject>
 
+enum LoginStatus {
+    LS_NotLoggedIn = 0,
+    LS_InProgress,      // = 1
+    LS_LoggedIn,        // = 2
+    LS_LoginFailure,    // = 3
+    LS_TimedOut
+};
+
 class MainWindow : public QDeclarativeView
 {
     Q_OBJECT
@@ -312,7 +320,7 @@ private:
     QAction         actExit;
 
     //! Are we logged in?
-    bool            bLoggedIn;
+    LoginStatus     loginStatus;
     //! User name
     QString         strUser;
     //! Password

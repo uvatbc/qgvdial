@@ -105,11 +105,13 @@ NwReqTracker::onReplyFinished()
 {
     replyTimer.stop ();
 
-    bool rv = false, done = false;
+    bool rv, done;
     QByteArray response;
     QNetworkReply *origReply = reply;
 
     do { // Begin cleanup block (not a loop)
+        rv = done = false;
+
         if (aborted) {
             Q_WARN("Reply was aborted");
             break;

@@ -220,6 +220,7 @@ GVApi::doGet(QUrl url, AsyncTaskToken *token, QObject *receiver, const char *met
 
     tracker->setAutoRedirect (jar, UA_IPHONE4, true);
     token->apiCtx = tracker;
+    token->status = ATTS_SUCCESS;
 
     bool rv =
     connect(tracker, SIGNAL (sigDone(bool, const QByteArray &, QNetworkReply *,
@@ -270,6 +271,7 @@ GVApi::doPost(QUrl url, QByteArray postData, const char *contentType,
 
     tracker->setAutoRedirect (jar, ua, true);
     token->apiCtx = tracker;
+    token->status = ATTS_SUCCESS;
 
     bool rv = connect(tracker, SIGNAL(sigDone(bool, const QByteArray &,
                                               QNetworkReply *, void *)),
@@ -370,10 +372,10 @@ void
 GVApi::cancel(AsyncTaskToken *token)
 {
     NwReqTracker *tracker = (NwReqTracker *)token->apiCtx;
-    if (tracker) {
+    if (tracker == NULL) {
         Q_WARN("API context not valid. Cannot cancel. I can at least fail it");
 
-        token->status = ATTS_FAILURE;
+        token->status = ATTS_USER_CANCEL;
         token->emitCompleted ();
         return;
     }
@@ -431,7 +433,10 @@ GVApi::onLogin1(bool success, const QByteArray &response, QNetworkReply *,
     QString strResponse = response;
 
     do { // Begin cleanup block (not a loop)
-        if (!success) break;
+        if (!success) {
+            token->status = ATTS_NW_ERROR;
+            break;
+        }
 
         // We may have completed login already. Check for cookie "gvx"
         foreach (QNetworkCookie cookie, jar->getAllCookies ()) {
@@ -461,10 +466,7 @@ GVApi::onLogin1(bool success, const QByteArray &response, QNetworkReply *,
     if (!success) {
         Q_WARN(QString("Login failed: %1").arg(strResponse));
 
-        NwReqTracker *tracker = (NwReqTracker *) this->sender ();
-        if (tracker->isTimedOut ()) {
-            token->status = ATTS_TIMEDOUT;
-        } else {
+        if (token->status == ATTS_SUCCESS) {
             token->status = ATTS_LOGIN_FAILURE;
         }
         token->emitCompleted ();
@@ -598,11 +600,13 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
     bool accountConfigured = true;
     bool accountReviewRequested = false;
     bool foreignUrl = false;
-    NwReqTracker *tracker = (NwReqTracker *) this->sender ();
 
     token->errorString.clear();
     do { // Begin cleanup block (not a loop)
-        if (!success) break;
+        if (!success) {
+            token->status = ATTS_NW_ERROR;
+            break;
+        }
 
         // There will be 2-3 moved temporarily redirects.
         QUrl urlMoved = NwReqTracker::hasMoved(reply);
@@ -758,25 +762,20 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
     } while (0); // End cleanup block (not a loop)
 
     if (!success) {
-        if (accountConfigured) {
+        if (token->status == ATTS_NW_ERROR) {
+        } else if (accountConfigured) {
             Q_WARN("Login failed.") << strResponse;
 
             if (token->errorString.isEmpty()) {
                 token->errorString = tr("The username or password you entered "
                                         "is incorrect.");
             }
-            if (tracker->isTimedOut ()) {
-                token->status = ATTS_TIMEDOUT;
-            } else {
-                token->status = ATTS_LOGIN_FAILURE;
-            }
-            token->emitCompleted ();
+            token->status = ATTS_LOGIN_FAILURE;
         }
         else if (accountReviewRequested) {
             token->errorString = "User login failed: Account recovery "
                                  "requested by Google";
             token->status = ATTS_LOGIN_FAIL_SHOWURL;
-            token->emitCompleted ();
         } else {
             Q_WARN("Login failed because user account was not configured.");
 
@@ -786,8 +785,10 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
                                     "browser and complete the setup of your "
                                     "Google Voice account.");
             token->status = ATTS_AC_NOT_CONFIGURED;
-            token->emitCompleted ();
         }
+
+        // In all cases, emit completed
+        token->emitCompleted ();
     }
 }//GVApi::onLogin2
 
@@ -857,7 +858,10 @@ GVApi::onTFAAutoPost(bool success, const QByteArray &response,
     QString strResponse = response;
 
     do { // Begin cleanup block (not a loop)
-        if (!success) break;
+        if (!success) {
+            token->status = ATTS_NW_ERROR;
+            break;
+        }
 
         success = false;
         QRegExp rx("<form\\s*action\\s*=\\s*\"(.*)\"\\s*method\\s*=\\s*\"POST\"");
@@ -886,7 +890,9 @@ GVApi::onTFAAutoPost(bool success, const QByteArray &response,
     if (!success) {
         Q_WARN("Login failed.") << strResponse;
 
-        token->status = ATTS_LOGIN_FAILURE;
+        if (token->status == ATTS_SUCCESS) {
+            token->status = ATTS_LOGIN_FAILURE;
+        }
         token->emitCompleted ();
     }
 }//GVApi::onTFAAutoPost
@@ -912,7 +918,10 @@ GVApi::onGotRnr(bool success, const QByteArray &response, QNetworkReply *reply,
     QString strReplyUrl = reply->url().toString();
 
     do { // Begin cleanup block (not a loop)
-        if (!success) break;
+        if (!success) {
+            token->status = ATTS_NW_ERROR;
+            break;
+        }
 
         success = false;
         int pos = strResponse.indexOf ("_rnr_se");
@@ -980,10 +989,7 @@ GVApi::onGotRnr(bool success, const QByteArray &response, QNetworkReply *reply,
         Q_WARN(msg);
 
         if (token) {
-            NwReqTracker *tracker = (NwReqTracker *) this->sender ();
-            if (tracker->isTimedOut ()) {
-                token->status = ATTS_TIMEDOUT;
-            } else {
+            if (token->status == ATTS_SUCCESS) {
                 token->status = ATTS_LOGIN_FAILURE;
             }
             token->emitCompleted ();
@@ -1069,7 +1075,7 @@ GVApi::onGetPhones(bool success, const QByteArray &response, QNetworkReply *,
 
     do { // Begin cleanup block (not a loop)
         if (!success) {
-            Q_WARN("Failed to get phones");
+            token->status = ATTS_NW_ERROR;
             break;
         }
         success = false;
@@ -1232,7 +1238,9 @@ GVApi::onGetPhones(bool success, const QByteArray &response, QNetworkReply *,
 
     if (!success) {
         if (token) {
-            token->status = ATTS_FAILURE;
+            if (token->status == ATTS_SUCCESS) {
+                token->status = ATTS_FAILURE;
+            }
             token->emitCompleted ();
         }
     }
@@ -1282,7 +1290,7 @@ GVApi::onGetInbox(bool success, const QByteArray &response, QNetworkReply *,
 
     do { // Begin cleanup block (not a loop)
         if (!success) {
-            Q_WARN("Failed to get inbox");
+            token->status = ATTS_NW_ERROR;
             break;
         }
         success = false;
@@ -1318,7 +1326,9 @@ GVApi::onGetInbox(bool success, const QByteArray &response, QNetworkReply *,
 
     if (!success) {
         if (token) {
-            token->status = ATTS_FAILURE;
+            if (token->status == ATTS_SUCCESS) {
+                token->status = ATTS_FAILURE;
+            }
             token->emitCompleted ();
         }
     }
@@ -1695,6 +1705,7 @@ GVApi::onCallout(bool success, const QByteArray &response, QNetworkReply *,
     do { // Begin cleanup block (not a loop)
         if (!success) {
             Q_WARN("Failed to call out");
+            token->status = ATTS_NW_ERROR;
             break;
         }
         success = false;
@@ -1729,7 +1740,9 @@ GVApi::onCallout(bool success, const QByteArray &response, QNetworkReply *,
 
     if (!success) {
         if (token) {
-            token->status = ATTS_FAILURE;
+            if (token->status == ATTS_SUCCESS) {
+                token->status = ATTS_FAILURE;
+            }
             token->emitCompleted ();
         }
     }
@@ -1801,6 +1814,7 @@ GVApi::onCallback(bool success, const QByteArray &response, QNetworkReply *,
     do { // Begin cleanup block (not a loop)
         if (!success) {
             Q_WARN("Failed to call back");
+            token->status = ATTS_NW_ERROR;
             break;
         }
         success = false;
@@ -1836,7 +1850,9 @@ GVApi::onCallback(bool success, const QByteArray &response, QNetworkReply *,
 
     if (!success) {
         if (token) {
-            token->status = ATTS_FAILURE;
+            if (token->status == ATTS_SUCCESS) {
+                token->status = ATTS_FAILURE;
+            }
             token->emitCompleted ();
         }
     }
@@ -1910,6 +1926,7 @@ GVApi::onSendSms(bool success, const QByteArray &response, QNetworkReply *,
     do { // Begin cleanup block (not a loop)
         if (!success) {
             Q_WARN("Failed to send text");
+            token->status = ATTS_NW_ERROR;
             break;
         }
         success = false;
@@ -1946,7 +1963,9 @@ GVApi::onSendSms(bool success, const QByteArray &response, QNetworkReply *,
 
     if (!success) {
         if (token) {
-            token->status = ATTS_FAILURE;
+            if (token->status == ATTS_SUCCESS) {
+                token->status = ATTS_FAILURE;
+            }
             token->emitCompleted ();
         }
     }
@@ -1990,7 +2009,8 @@ GVApi::onVmail(bool success, const QByteArray &response, QNetworkReply *,
 
     do { // Begin cleanup block (not a loop)
         if (!success) {
-            Q_WARN("Failed to send text");
+            Q_WARN("Failed to get voicemail");
+            token->status = ATTS_NW_ERROR;
             break;
         }
         success = false;
@@ -2019,7 +2039,9 @@ GVApi::onVmail(bool success, const QByteArray &response, QNetworkReply *,
 
     if (!success) {
         if (token) {
-            token->status = ATTS_FAILURE;
+            if (token->status == ATTS_SUCCESS) {
+                token->status = ATTS_FAILURE;
+            }
             token->emitCompleted ();
         }
     }
@@ -2070,6 +2092,7 @@ GVApi::onMarkAsRead(bool success, const QByteArray &response, QNetworkReply *,
     do { // Begin cleanup block (not a loop)
         if (!success) {
             Q_WARN("Failed to mark entry as read");
+            token->status = ATTS_NW_ERROR;
             break;
         }
         success = false;
@@ -2105,7 +2128,9 @@ GVApi::onMarkAsRead(bool success, const QByteArray &response, QNetworkReply *,
 
     if (!success) {
         if (token) {
-            token->status = ATTS_FAILURE;
+            if (token->status == ATTS_SUCCESS) {
+                token->status = ATTS_FAILURE;
+            }
             token->emitCompleted ();
         }
     }
@@ -2162,6 +2187,7 @@ GVApi::onEntryDeleted(bool success, const QByteArray &response, QNetworkReply *,
     do { // Begin cleanup block (not a loop)
         if (!success) {
             Q_WARN("Failed to delete entry");
+            token->status = ATTS_NW_ERROR;
             break;
         }
         success = false;
@@ -2197,7 +2223,9 @@ GVApi::onEntryDeleted(bool success, const QByteArray &response, QNetworkReply *,
 
     if (!success) {
         if (token) {
-            token->status = ATTS_FAILURE;
+            if (token->status == ATTS_SUCCESS) {
+                token->status = ATTS_FAILURE;
+            }
             token->emitCompleted ();
         }
     }
@@ -2235,6 +2263,7 @@ GVApi::onCheckRecentInbox(bool success, const QByteArray &response,
     do { // Begin cleanup block (not a loop)
         if (!success) {
             Q_WARN("Failed to get recent inbox");
+            token->status = ATTS_SUCCESS;
             break;
         }
         success = false;
@@ -2331,7 +2360,9 @@ GVApi::onCheckRecentInbox(bool success, const QByteArray &response,
 
     if (!success) {
         if (token) {
-            token->status = ATTS_FAILURE;
+            if (token->status == ATTS_SUCCESS) {
+                token->status = ATTS_FAILURE;
+            }
             token->emitCompleted ();
         }
     }

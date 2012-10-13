@@ -135,7 +135,7 @@ MainWindow::onPassTextChanged (const QString &strPassword)
 void
 MainWindow::on_action_Login_triggered ()
 {
-    if (!bLoggedIn) {
+    if (loginStatus != LS_LoggedIn) {
         QDeclarativeContext *ctx = this->rootContext();
         ctx->setContextProperty ("g_bShowLoginSettings", true);
     } else {
@@ -183,7 +183,9 @@ MainWindow::loginCompleted (AsyncTaskToken *token)
 
         Q_WARN(QString("User login failed. Error string: %1").arg(strErr));
 
-        if (token->status != ATTS_TIMEDOUT) {
+        if (token->status == ATTS_NW_ERROR) {
+            loginStatus = LS_TimedOut;
+        } else {
             dbMain.clearUser ();
             dbMain.clearPass ();
             dbMain.clearContactsPass ();
@@ -236,7 +238,7 @@ MainWindow::loginCompleted (AsyncTaskToken *token)
 
         // Allow access to buttons and widgets
         actLogin.setText ("Logout");
-        bLoggedIn = true;
+        loginStatus = LS_LoggedIn;
 
         // Save the user name and password that was used to login
         dbMain.putUserPass (strUser, strPass);
@@ -244,15 +246,17 @@ MainWindow::loginCompleted (AsyncTaskToken *token)
         this->setUsername (strUser);
         this->setPassword (strPass);
         QDeclarativeContext *ctx = this->rootContext();
-        ctx->setContextProperty ("g_bIsLoggedIn", bLoggedIn);
-        bool bTemp = false;
+        bool bTemp = (loginStatus == LS_LoggedIn);
+        ctx->setContextProperty ("g_bIsLoggedIn", bTemp);
+        bTemp = false;
         ctx->setContextProperty ("g_bShowLoginSettings", bTemp);
 
         QObject *pLoginPage = getQMLObject ("LoginPage");
         if (pLoginPage != NULL) {
-            bTemp = bLoggedIn ? false : true;
+            bTemp = (loginStatus != LS_LoggedIn);
             pLoginPage->setProperty ("showLoginInputFields", bTemp);
-            pLoginPage->setProperty ("opacity", bLoggedIn ? 0.0 : 1.0);
+            pLoginPage->setProperty ("opacity",
+                                     (loginStatus == LS_LoggedIn) ? 0.0 : 1.0);
         }
 
         // Fill up the combobox on the main page
@@ -304,14 +308,15 @@ MainWindow::logoutCompleted (AsyncTaskToken *token)
 
     actLogin.setText ("Login...");
 
-    bLoggedIn = false;
+    loginStatus = LS_NotLoggedIn;
 
     QDeclarativeContext *ctx = this->rootContext();
-    ctx->setContextProperty ("g_bIsLoggedIn", bLoggedIn);
+    bool bTemp = (loginStatus == LS_LoggedIn);
+    ctx->setContextProperty ("g_bIsLoggedIn", bTemp);
 
     QObject *pLoginPage = getQMLObject ("LoginPage");
     if (pLoginPage != NULL) {
-        bool bTemp = bLoggedIn ? false : true;
+        bool bTemp = (loginStatus != LS_LoggedIn);
         pLoginPage->setProperty ("showLoginInputFields", bTemp);
         pLoginPage->setProperty ("opacity", 1.0);
     }

@@ -72,7 +72,7 @@ MainWindow::dialNow (const QString &strTarget)
     AsyncTaskToken *token = NULL;
 
     do { // Begin cleanup block (not a loop)
-        if (!bLoggedIn) {
+        if (loginStatus != LS_LoggedIn) {
             setStatus ("User is not logged in yet. Cannot make any calls.");
             Q_WARN("User is not logged in yet. Cannot make any calls.");
             break;

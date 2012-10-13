@@ -45,7 +45,7 @@ MainWindow::MainWindow (QWidget *parent)
 , actDismiss ("Dismiss", this)
 , actRefresh ("Refresh", this)
 , actExit ("Exit", this)
-, bLoggedIn (false)
+, loginStatus (LS_NotLoggedIn)
 , modelRegNumber (NULL)
 , indRegPhone (0)
 , mtxDial (QMutex::Recursive)
@@ -822,7 +822,7 @@ MainWindow::refreshRegisteredNumbers ()
 
     bool rv = false;
     do { // Begin cleanup block (not a loop)
-        if (!bLoggedIn) {
+        if (loginStatus != LS_LoggedIn) {
             Q_WARN("Not logged in. Will not refresh registered numbers.");
             break;
         }

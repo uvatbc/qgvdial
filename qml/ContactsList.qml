@@ -77,8 +77,9 @@ Rectangle {
                 if (searchRow.lastSearchValue != edSearch.text) {
                     container.sigSearchContacts(edSearch.text);
                     searchRow.lastSearchValue = edSearch.text;
-                    edSearch.closeSoftwareInputPanel();
                 }
+                edSearch.closeSoftwareInputPanel();
+
                 if (edSearch.text != "") {
                     imgSearch.selection = true;
                 } else {
@@ -88,7 +89,7 @@ Rectangle {
 
             Timer {
                 id: searchTimeout
-                interval: (3 * 1000)
+                interval: (1.2 * 1000)
                 repeat: false
 
                 onTriggered: searchRow.doSearch();
