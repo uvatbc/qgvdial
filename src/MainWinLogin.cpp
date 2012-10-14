@@ -172,34 +172,33 @@ MainWindow::loginCompleted (AsyncTaskToken *token)
         OsDependent &osd = Singletons::getRef().getOSD ();
         osd.setLongWork (this, false);
 
-        setStatus ("User login failed", 30*1000);
-
-        QString strErr;
-        if (token) {
-            strErr = token->errorString;
-        }
-        if (strErr.isEmpty ()) {
-            strErr = "User login failed";
-        }
-        this->showMsgBox (strErr);
-
-        Q_WARN(QString("User login failed. Error string: %1").arg(strErr));
+        QString strErr = token->errorString;
 
         if (token->status == ATTS_NW_ERROR) {
-            loginStatus = LS_TimedOut;
+            loginStatus = LS_NwError;
+            if (strErr.isEmpty ()) {
+                strErr = "Network error";
+            }
         } else {
             dbMain.clearUser ();
             dbMain.clearPass ();
             dbMain.clearContactsPass ();
             dbMain.setTFAFlag (false);
+            QTimer::singleShot (500, this, SLOT(onRecreateCookieJar()));
         }
-
-        QTimer::singleShot (500, this, SLOT(onRecreateCookieJar()));
 
         if (token->status == ATTS_LOGIN_FAIL_SHOWURL) {
             QUrl url = token->outParams["nextUrl"].toUrl ();
             QDesktopServices::openUrl (url);
         }
+
+        if (strErr.isEmpty ()) {
+            strErr = "User login failed";
+            setStatus ("User login failed", 30*1000);
+        }
+        this->showMsgBox (strErr);
+
+        Q_WARN(QString("User login failed. Error string: %1").arg(strErr));
     } else {
         setStatus ("User logged in");
         Q_DEBUG ("User logged in");

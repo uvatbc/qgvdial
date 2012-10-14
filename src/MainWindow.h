@@ -50,7 +50,7 @@ enum LoginStatus {
     LS_InProgress,      // = 1
     LS_LoggedIn,        // = 2
     LS_LoginFailure,    // = 3
-    LS_TimedOut
+    LS_NwError
 };
 
 class MainWindow : public QDeclarativeView
