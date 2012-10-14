@@ -28,6 +28,7 @@ Item {
     signal sigPassChanged(string pass)
     signal sigLogin
     signal sigLogout
+    signal sigCancelLogin
 
     property real pointSize: (8 * g_fontMul)
     property alias username: textUsername.text
@@ -35,7 +36,7 @@ Item {
     property bool showLoginInputFields: true
 
     onSigLogin: console.debug("User clicked login");
-    onSigLogout: console.debug("Login canceled.");
+    onSigCancelLogin: console.debug("Login canceled.");
 
     Column {
        id: loginProgressItems
@@ -76,7 +77,7 @@ Item {
            anchors.horizontalCenter: parent.horizontalCenter
            text: "Cancel"
 
-           onClicked: container.sigLogout();
+           onClicked: container.sigCancelLogin();
 
        }//MyButton (login/logout)
     }//Column of login progress items

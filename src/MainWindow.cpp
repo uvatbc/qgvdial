@@ -46,6 +46,7 @@ MainWindow::MainWindow (QWidget *parent)
 , actRefresh ("Refresh", this)
 , actExit ("Exit", this)
 , loginStatus (LS_NotLoggedIn)
+, loginTask(NULL)
 , modelRegNumber (NULL)
 , indRegPhone (0)
 , mtxDial (QMutex::Recursive)
@@ -698,6 +699,10 @@ MainWindow::connectSettingsSignals()
         if (!rv) { break; }
         rv = connect (obj , SIGNAL (sigLogout ()),
                       this, SLOT   (doLogout ()));
+        Q_ASSERT(rv);
+        if (!rv) { break; }
+        rv = connect (obj , SIGNAL (sigCancelLogin ()),
+                      this, SLOT   (doCancelLogin ()));
         Q_ASSERT(rv);
         if (!rv) { break; }
 

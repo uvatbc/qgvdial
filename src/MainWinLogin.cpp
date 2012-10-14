@@ -76,6 +76,7 @@ MainWindow::doLogin ()
             osd.setLongWork (this, false);
             break;
         }
+        loginTask = token;
 
         bOk = true;
     } while (0); // End cleanup block (not a loop)
@@ -146,6 +147,7 @@ MainWindow::on_action_Login_triggered ()
 void
 MainWindow::loginCompleted (AsyncTaskToken *token)
 {
+    loginTask = NULL;
     gvApiProgressString.clear ();
 
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
@@ -273,6 +275,15 @@ MainWindow::loginCompleted (AsyncTaskToken *token)
         delete token;
     }
 }//MainWindow::loginCompleted
+
+void
+MainWindow::doCancelLogin ()
+{
+    if (loginTask != NULL) {
+        gvApi.cancel (loginTask);
+        Q_DEBUG("Login task canceled!!");
+    }
+}//MainWindow::doCancelLogin
 
 void
 MainWindow::doLogout ()

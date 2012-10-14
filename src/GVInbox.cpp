@@ -82,6 +82,10 @@ GVInbox::initModel ()
 void
 GVInbox::prepView ()
 {
+    if (modelInbox == NULL) {
+        return;
+    }
+
     emit status ("Re-selecting inbox entries. This will take some time", 0);
     modelInbox->refresh (strSelectedMessages);
     emit status ("Inbox entries selected.");

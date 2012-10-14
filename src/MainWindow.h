@@ -101,9 +101,12 @@ private slots:
     void loginCompleted (AsyncTaskToken *token);
 
     //! Called when the logout button is clicked
+    void doCancelLogin ();
+    //! Called when the logout button is clicked
     void doLogout ();
     //! Called when the GV Api completes logoff - with success or failure
     void logoutCompleted (AsyncTaskToken *token);
+
     //! Invoked when the system ray is clicked
     void systray_activated (QSystemTrayIcon::ActivationReason reason);
 
@@ -325,6 +328,8 @@ private:
     QString         strUser;
     //! Password
     QString         strPass;
+
+    AsyncTaskToken *loginTask;
 
     //! Model for registered phone numbers
     RegNumberModel *modelRegNumber;
