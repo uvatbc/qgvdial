@@ -25,6 +25,10 @@ Contact: yuvraaj@gmail.com
 #include "global.h"
 #include "FuzzyTimer.h"
 
+// For some reason the symbian MOC doesn't like it if I don't include QObject
+// even though it is present in QtCore which is included in global.h
+#include <QObject>
+
 class FuzzyTimerPrivate : public QObject
 {
     Q_OBJECT
