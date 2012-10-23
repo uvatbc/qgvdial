@@ -1,2 +1,3 @@
-  * Added a refresh GV API. Updated notify to use it.
+  * Rewrote the sms/vmail parse routine to fix blank inbox entries.
+  * Also fixed unicode characters in texts and voicemail
 

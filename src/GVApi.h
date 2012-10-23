@@ -161,7 +161,7 @@ private:
     bool parseInboxJson(const QString &strJson, const QString &strHtml,
                         qint32 &msgCount);
     bool execXQuery(const QString &strQuery, QString &result);
-    bool parseMessageRow(QString &strRow, GVInboxEntry &entry);
+    bool parseMessageRow(QString strRow, GVInboxEntry &entry);
 
 private:
     bool emitLog;

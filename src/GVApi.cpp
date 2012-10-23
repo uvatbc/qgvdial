@@ -1286,7 +1286,7 @@ GVApi::onGetInbox(bool success, const QByteArray &response, QNetworkReply *,
                   void *ctx)
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
-    QString strReply = response;
+    QString strReply = QString::fromUtf8(response.constData(),response.length());
 
     do { // Begin cleanup block (not a loop)
         if (!success) {
@@ -1294,6 +1294,10 @@ GVApi::onGetInbox(bool success, const QByteArray &response, QNetworkReply *,
             break;
         }
         success = false;
+
+#if 0
+        Q_DEBUG(strReply);
+#endif
 
         QXmlInputSource inputSource;
         QXmlSimpleReader simpleReader;
@@ -1310,8 +1314,7 @@ GVApi::onGetInbox(bool success, const QByteArray &response, QNetworkReply *,
         }
 
         qint32 msgCount = 0;
-        if (!parseInboxJson (xmlHandler.strJson, xmlHandler.strHtml, msgCount))
-        {
+        if (!parseInboxJson(xmlHandler.strJson, xmlHandler.strHtml, msgCount)) {
             Q_WARN("Failed to parse GV Inbox JSON. Data =") << strReply;
             break;
         }
@@ -1486,8 +1489,8 @@ GVApi::parseInboxJson(const QString &strJson, const QString &strHtml,
             }
 
             // Pick up the text from the parsed HTML
-            if (((GVIE_TextMessage == inboxEntry.Type) ||
-                 (GVIE_Voicemail == inboxEntry.Type)))
+            if ((GVIE_TextMessage == inboxEntry.Type) ||
+                (GVIE_Voicemail   == inboxEntry.Type))
             {
                 QString strQuery =
                     QString("for $i in doc('%1')//div[@id=\"%2\"]\n"
@@ -1509,7 +1512,7 @@ GVApi::parseInboxJson(const QString &strJson, const QString &strHtml,
                         "  return $i")
                         .arg (fSms.fileName ());
                 if (!execXQuery (strQuery, resultSms)) {
-                    Q_WARN("XQuery failed for Text :") << strQuery;
+                    Q_WARN(QString("XQuery failed for Text: %1").arg(strQuery));
                 }
                 resultSms = resultSms.trimmed ();
 
@@ -1552,13 +1555,35 @@ GVApi::execXQuery(const QString &strQuery, QString &result)
     if (!xQuery.isValid() || !xQuery.evaluateTo (&formatter)) {
         return false;
     }
-    result = outArray;
+    result = QString::fromUtf8(outArray.constData(),outArray.length());
 
     return true;
 }//GVApi::execXQuery
 
+static void
+fixAmpersandEncoded(QString &strTemp)
+{
+    strTemp.replace ("&amp", "&");
+    QRegExp rx("&#(.*)\\;");
+    rx.setMinimal (true);
+    while (strTemp.contains (rx)) {
+        bool bOk;
+        QString strHex = rx.cap(0).remove("#").remove(";")
+                .remove("&");
+        char iVal = strHex.toInt (&bOk);
+        strTemp.replace (rx.cap (0), QString(iVal));
+    }
+}//fixAmpersandEncoded
+
+/** Parse the HTML document for a message row
+ * @param strRow The text of the html
+ * @param entry The inbox entry generated out of this function (OUT).
+ *
+ * strRow should have
+ *  <div class="gc-message-message-display" ...> ... </div>
+ */
 bool
-GVApi::parseMessageRow(QString &strRow, GVInboxEntry &entry)
+GVApi::parseMessageRow(QString strRow, GVInboxEntry &entry)
 {
     bool rv = false;
     QString strSmsRow;
@@ -1567,68 +1592,135 @@ GVApi::parseMessageRow(QString &strRow, GVInboxEntry &entry)
     do { // Begin cleanup block (not a loop)
         QDomDocument doc;
         doc.setContent (strRow);
-        QDomElement topElement = doc.childNodes ().at (0).toElement ();
-        if (topElement.isNull ()) {
-            Q_WARN ("Top element is null");
+        QDomElement rootElement = doc.documentElement();
+        if (rootElement.isNull ()) {
+            Q_WARN("Top element is null");
             break;
         }
 
-        // Children could be either SMS rows or vmail transcription
         QDomNamedNodeMap attrs;
-        strSmsRow.clear ();
+        QDomNodeList divNodes, spanNodes;
+        QDomNode oneSpan;
+        QDomAttr oneAttr;
+        QString attrValue, strTemp;
 
-        QDomNodeList smsRow = topElement.childNodes();
-        for (int j = 0; j < smsRow.size (); j++) {
-            if (!smsRow.at(j).isElement()) {
+        // Pick up all "span"s to look for voicemail translations
+        spanNodes = rootElement.elementsByTagName ("span");
+        if (spanNodes.isEmpty ()) {
+            Q_WARN("No span nodes!");
+            break;
+        }
+
+        // Loop through all spans looking for the attribute "class"
+        rv = false;
+        for (int i = 0; i < spanNodes.count(); i++) {
+            oneSpan = spanNodes.at(i);
+
+            attrs = oneSpan.attributes ();
+            if (!attrs.contains ("class")) {
                 continue;
             }
 
-            QDomElement smsSpan = smsRow.at(j).toElement();
-            if (smsSpan.tagName () != "span") {
+            oneAttr = attrs.namedItem("class").toAttr();
+            if (!oneAttr.isAttr ()) {
+                Q_WARN("Invalid attribute");
+                continue;
+            }
+
+            attrValue = oneAttr.value();
+            if (attrValue == "gc-edited-trans-text") {
+                //Q_DEBUG("Found a voicemail translation!");
+                convEntry.init ();
+                convEntry.text = oneSpan.toElement().text().simplified();
+                entry.conversation.append (convEntry);
+                rv = true;
+                break;
+            }
+        }
+
+        if (rv) {
+            break;
+        }
+
+        // Now look for "div"s with class="gc-message-sms-row"
+        divNodes = rootElement.elementsByTagName ("div");
+        strSmsRow.clear ();
+
+        // Loop through all divs looking for the attribute "class"
+        rv = false;
+        for (int i = 0; i < divNodes.count(); i++) {
+            QDomNode oneDiv = divNodes.at(i);
+
+            attrs = oneDiv.attributes ();
+            if (!attrs.contains ("class")) {
+                continue;
+            }
+
+            oneAttr = attrs.namedItem("class").toAttr();
+            if (!oneAttr.isAttr ()) {
+                Q_WARN("Invalid attribute");
+                continue;
+            }
+
+            attrValue = oneAttr.value();
+            if (attrValue != "gc-message-sms-row") {
+                Q_DEBUG(QString("Uninteresting div class: %1").arg(attrValue));
+                continue;
+            }
+
+            spanNodes = oneDiv.toElement().elementsByTagName ("span");
+            if (spanNodes.isEmpty ()) {
+                //Q_WARN("No span nodes!");
                 continue;
             }
 
             convEntry.init();
 
-            attrs = smsSpan.attributes();
-            for (int m = 0; m < attrs.size (); m++) {
-                QString strTemp = smsSpan.text ().simplified ();
-                QDomAttr attr = attrs.item(m).toAttr();
-                if (attr.value() == "gc-message-sms-from") {
+            // Loop through all spans looking for the attribute "class"
+            rv = false;
+            for (int i = 0; i < spanNodes.count(); i++) {
+                oneSpan = spanNodes.at(i);
+
+                attrs = oneSpan.attributes ();
+                if (!attrs.contains ("class")) {
+                    continue;
+                }
+
+                oneAttr = attrs.namedItem("class").toAttr();
+                if (!oneAttr.isAttr ()) {
+                    Q_WARN("Invalid attribute");
+                    continue;
+                }
+
+                strTemp = oneSpan.toElement().text().simplified ();
+                attrValue = oneAttr.value();
+                if (attrValue == "gc-message-sms-from") {
                     strSmsRow += "<b>" + strTemp + "</b> ";
                     convEntry.from = strTemp;
-                } else if (attr.value() == "gc-message-sms-text") {
+                } else if (attrValue == "gc-message-sms-text") {
                     strSmsRow += strTemp;
                     convEntry.text += strTemp;
-                } else if (attr.value() == "gc-message-sms-time") {
+                } else if (attrValue == "gc-message-sms-time") {
                     strSmsRow += " <i>(" + strTemp + ")</i><br>";
                     convEntry.time = strTemp;
-                } else if (attr.value().startsWith ("gc-word-")) {
+                } else if (attrValue.startsWith ("gc-word-")) {
                     if (!strSmsRow.isEmpty ()) {
                         strSmsRow += ' ';
                         convEntry.text += ' ';
                     }
 
-                    strTemp.replace ("&amp", "&");
-                    QRegExp rx("&#(.*)\\;");
-                    rx.setMinimal (true);
-                    while (strTemp.contains (rx)) {
-                        bool bOk;
-                        QString strHex = rx.cap(0).remove("#").remove(";")
-                                                  .remove("&");
-                        char iVal = strHex.toInt (&bOk);
-                        strTemp.replace (rx.cap (0), QString(iVal));
-                    }
                     strSmsRow += strTemp;
                     convEntry.text += strTemp;
                 }
-            }// loop thru the parts of a single sms
+            }// for loop thru all spans in the div
 
+            fixAmpersandEncoded (convEntry.text);
             entry.conversation.append (convEntry);
-        }//loop through sms row
+        }//for loop thru all divs with class="gc-message-sms-row"
+
+        fixAmpersandEncoded (strSmsRow);
 
         entry.strText = strSmsRow;
-
         rv = true;
     } while (0); // End cleanup block (not a loop)
 
