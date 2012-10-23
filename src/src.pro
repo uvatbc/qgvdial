@@ -165,7 +165,7 @@ HEADERS  += ../src/global.h                 \
             ../src/MyXmlErrorHandler.h      \
             ../src/FuzzyTimer.h
 
-contains(MEEGO_EDITION,harmattan) | symbian {
+contains(MEEGO_EDITION,harmattan) | contains(DEFINES,IS_S3) | contains(DEFINES,IS_S3_BELLE) {
     DEFINES += ENABLE_FUZZY_TIMER
 }
 
