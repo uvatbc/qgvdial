@@ -21,7 +21,7 @@ symbian {
     exists(isS3Belle) {
         DEFINES += IS_S3_BELLE
     }
-    !exists(IS_S1) : !exists(IS_S3) : !exists(IS_S3_BELLE) {
+    !exists(isS1) : !exists(isS3) : !exists(isS3Belle) {
         DEFINES += INVALID_TARGET
     }
 }
@@ -166,9 +166,7 @@ HEADERS  += ../src/global.h                 \
             ../src/FuzzyTimer.h
 
 contains(MEEGO_EDITION,harmattan) | symbian {
-    !exists(no-system-aligned-timer) {
-        DEFINES += ENABLE_FUZZY_TIMER
-    }
+    DEFINES += ENABLE_FUZZY_TIMER
 }
 
 contains (DEFINES, ENABLE_FUZZY_TIMER) {

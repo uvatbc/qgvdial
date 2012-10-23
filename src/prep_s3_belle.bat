@@ -1,3 +1,3 @@
-del /q IS_S1 IS_S3
-echo stuff>../src/IS_S3_BELLE
+del /f /q isS1 isS3
+echo stuff>../src/isS3Belle
 echo stuff>../src/mqlib-build
