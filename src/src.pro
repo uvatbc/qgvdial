@@ -12,18 +12,18 @@ contains(MEEGO_EDITION,harmattan) {
 }
 
 symbian {
-exists(isS1) {
-  DEFINES += IS_S1
-}
-exists(isS3) {
-  DEFINES += IS_S3
-}
-exists(isS3Belle) {
-  DEFINES += IS_S3_BELLE
-}
-!exists(IS_S1) : !exists(IS_S3) : !exists(IS_S3_BELLE) {
-  DEFINES += INVALID_TARGET
-}
+    exists(isS1) {
+        DEFINES += IS_S1
+    }
+    exists(isS3) {
+        DEFINES += IS_S3
+    }
+    exists(isS3Belle) {
+        DEFINES += IS_S3_BELLE
+    }
+    !exists(IS_S1) : !exists(IS_S3) : !exists(IS_S3_BELLE) {
+        DEFINES += INVALID_TARGET
+    }
 }
 
 DEFINES += NO_CONTACTS_CAPTCHA
@@ -46,8 +46,8 @@ OBJECTS_DIR = obj
 CONFIG *= precompile_header
 PRECOMPILED_HEADER = ../src/global.h
 
-CONFIG   *= mobility
-MOBILITY *= systeminfo
+CONFIG   += mobility
+MOBILITY += systeminfo
 
 symbian|contains(MEEGO_EDITION,harmattan) {
     MOBILITY *= feedback

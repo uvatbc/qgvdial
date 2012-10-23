@@ -58,7 +58,7 @@ print("$cmd\n");
 system($cmd);
 
 # # Fix the QML files
-$cmd = "cd qgvdial-$qver/src & echo something>mqlib-build";
+$cmd = "cd qgvdial-$qver/src & prep_s3_belle.bat";
 print "$cmd\n";
 system($cmd);
 

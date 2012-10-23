@@ -58,7 +58,7 @@ print("$cmd\n");
 system($cmd);
 
 # Mosquitto is merged straight into the build
-$cmd = "cd qgvdial-$qver/src & echo something>mqlib-build";
+$cmd = "cd qgvdial-$qver/src & prep_s1.bat";
 print "$cmd\n";
 system($cmd);
 
