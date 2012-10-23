@@ -1,3 +1,2 @@
-  * Rewrote the sms/vmail parse routine to fix blank inbox entries.
-  * Also fixed unicode characters in texts and voicemail
+  * Fix the refresh period fields
 

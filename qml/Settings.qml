@@ -185,7 +185,7 @@ Flickable {
 
             onSigDone: parent.isExpanded = false;
         }//RefreshSettings
-    }//ExpandView (mosquitto)
+    }//ExpandView (refresh)
 
     ExpandView {
         id: expandPinSettings

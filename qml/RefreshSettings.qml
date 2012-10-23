@@ -77,7 +77,7 @@ Item {
 
             Text {
                 id: lblContactsRefreshPeriod
-                text: "Refresh contacts every"
+                text: "Refresh contacts (min)"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
                 font { family: "Nokia Sans"; pointSize: mainColumn.subTextPointSize }
@@ -90,7 +90,7 @@ Item {
                 height: lblContactsRefreshPeriod.height
                 anchors.verticalCenter: parent.verticalCenter
                 text: "30"
-                validator: IntValidator { bottom: 0; top: 3600 }
+                validator: IntValidator { bottom: 0; top: 65535 }
                 KeyNavigation.tab: textInboxRefreshPeriod
                 KeyNavigation.backtab: textInboxRefreshPeriod
                 pointSize: mainColumn.subTextPointSize
@@ -114,7 +114,7 @@ Item {
 
             Text {
                 id: lblInboxRefreshPeriod
-                text: "Refresh inbox every"
+                text: "Refresh inbox (min)"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
                 font { family: "Nokia Sans"; pointSize: mainColumn.subTextPointSize }
@@ -127,7 +127,7 @@ Item {
                 height: lblInboxRefreshPeriod.height
                 anchors.verticalCenter: parent.verticalCenter
                 text: "30"
-                validator: IntValidator { bottom: 0; top: 3600 }
+                validator: IntValidator { bottom: 0; top: 65535 }
                 KeyNavigation.tab: textContactsRefreshPeriod
                 KeyNavigation.backtab: textContactsRefreshPeriod
                 pointSize: mainColumn.subTextPointSize

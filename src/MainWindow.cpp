@@ -1465,9 +1465,19 @@ MainWindow::onSigRefreshChanges(bool bRefreshEnable,
                                 const QString &host, int port,
                                 const QString &topic)
 {
-    quint32 contactsSec = contactsPeriod.toInt ();
-    quint32 inboxSec = inboxPeriod.toInt ();
+    quint32 contactsSec = contactsPeriod.toInt();
+    quint32 inboxSec = inboxPeriod.toInt();
 
+    if (contactsSec == 0) {
+        contactsSec++;
+    }
+    if (inboxSec == 0) {
+        inboxSec++;
+    }
+    contactsSec *= 60;
+    inboxSec *= 60;
+
+    // Save settings in seconds
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     dbMain.setRefreshSettings (bRefreshEnable, contactsSec, inboxSec);
 
@@ -1492,6 +1502,16 @@ MainWindow::refreshPeriodSettings(bool bForceShut /*= false*/)
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     if (!dbMain.getRefreshSettings (bEnable, contactsPeriod, inboxPeriod)) {
         return;
+    }
+
+    // Convert to minutes before giving to the UI
+    contactsPeriod /= 60;
+    inboxPeriod /= 60;
+    if (contactsPeriod == 0) {
+        contactsPeriod++;
+    }
+    if (contactsPeriod == 0) {
+        contactsPeriod++;
     }
 
     if (bForceShut) {
