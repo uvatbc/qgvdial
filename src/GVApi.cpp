@@ -1518,7 +1518,8 @@ GVApi::parseInboxJson(const QString &strJson, const QString &strHtml,
 
                 QString strSmsRow;
                 if (!resultSms.isEmpty ()) {
-                    result = "<div>" + resultSms + "</div>";
+                    result = "<div><div class=\"gc-message-sms-row\">" + resultSms
+                           + "</div></div>";
                 }
 
                 if ((parseMessageRow (result, inboxEntry)) &&
