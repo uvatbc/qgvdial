@@ -166,7 +166,7 @@ HEADERS  += ../src/global.h                 \
             ../src/FuzzyTimer.h
 
 contains(MEEGO_EDITION,harmattan) | symbian {
-    !exist(no-system-aligned-timer) {
+    !exists(no-system-aligned-timer) {
         DEFINES += ENABLE_FUZZY_TIMER
     }
 }
