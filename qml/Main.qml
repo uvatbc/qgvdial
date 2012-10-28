@@ -218,6 +218,8 @@ Rectangle {
         objectName: "LoginPage"
         anchors.fill: parent
         opacity: 1
+
+        onSigHide: opacity = 0;
     }//LoginPage
 
     MsgBox {

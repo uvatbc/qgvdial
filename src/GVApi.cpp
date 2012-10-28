@@ -27,12 +27,13 @@ GVApi::GVApi(bool bEmitLog, QObject *parent)
 : QObject(parent)
 , emitLog(bEmitLog)
 , loggedIn(false)
-, nwMgr(this)
+, nwMgr(NULL)
 , jar(new CookieJar(NULL))
 , dbgAlwaysFailDialing (false)
 , scriptEngine (this)
 {
-    nwMgr.setCookieJar (jar);
+    nwMgr = new QNetworkAccessManager(this);
+    nwMgr->setCookieJar (jar);
 }//GVApi::GVApi
 
 bool
@@ -194,7 +195,8 @@ GVApi::beautify_number (QString &strNumber)
 }//GVApi::beautify_number
 
 bool
-GVApi::doGet(QUrl url, AsyncTaskToken *token, QObject *receiver, const char *method)
+GVApi::doGet(QUrl url, AsyncTaskToken *token, QObject *receiver,
+             const char *method)
 {
     if (!token) {
         return false;
@@ -205,12 +207,12 @@ GVApi::doGet(QUrl url, AsyncTaskToken *token, QObject *receiver, const char *met
 
     NwReqTracker::setCookies (jar, req);
 
-    QNetworkReply *reply = nwMgr.get(req);
+    QNetworkReply *reply = nwMgr->get(req);
     if (!reply) {
         return false;
     }
 
-    NwReqTracker *tracker = new NwReqTracker(reply, nwMgr, token,
+    NwReqTracker *tracker = new NwReqTracker(reply, *nwMgr, token,
                                         NW_REPLY_TIMEOUT, emitLog, true, this);
     if (!tracker) {
         reply->abort ();
@@ -256,13 +258,13 @@ GVApi::doPost(QUrl url, QByteArray postData, const char *contentType,
 
     NwReqTracker::setCookies (jar, req);
 
-    QNetworkReply *reply = nwMgr.post(req, postData);
+    QNetworkReply *reply = nwMgr->post(req, postData);
     if (!reply) {
         return false;
     }
 
     NwReqTracker *tracker =
-    new NwReqTracker(reply, nwMgr, token, NW_REPLY_TIMEOUT, emitLog, this);
+    new NwReqTracker(reply, *nwMgr, token, NW_REPLY_TIMEOUT, emitLog, this);
     if (!tracker) {
         reply->abort ();
         reply->deleteLater ();

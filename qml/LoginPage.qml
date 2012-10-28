@@ -29,6 +29,7 @@ Item {
     signal sigLogin
     signal sigLogout
     signal sigCancelLogin
+    signal sigHide
 
     property real pointSize: (8 * g_fontMul)
     property alias username: textUsername.text
@@ -48,7 +49,7 @@ Item {
        spacing: 2 * g_hMul
 
        Text {
-           text: "Using the user name:"
+           text: "Logging in as:"
            color: "white"
            font { family: "Nokia Sans"; pointSize: container.pointSize }
            width: paintedWidth
@@ -57,14 +58,6 @@ Item {
 
        Text {
            text: username
-           color: "white"
-           font { family: "Nokia Sans"; pointSize: container.pointSize }
-           width: paintedWidth
-           anchors.horizontalCenter: parent.horizontalCenter
-       }
-
-       Text {
-           text: "Logging in..."
            color: "white"
            font { family: "Nokia Sans"; pointSize: container.pointSize }
            width: paintedWidth
@@ -133,17 +126,33 @@ Item {
             onSigEnter: btnLogin.doClick();
         }
 
-        MeegoButton {
-            id: btnLogin
-
+        Row {
             anchors.horizontalCenter: parent.horizontalCenter
-            text: "Login"
+            width: btnHide.width + btnLogin.width + spacing
 
-            onClicked: {
-                container.sigLogin();
-                textUsername.closeSoftwareInputPanel();
-                textPassword.closeSoftwareInputPanel();
-            }
-        }//MyButton (login/logout)
+            MeegoButton {
+                id: btnHide
+
+                text: "Hide"
+
+                onClicked: {
+                    textUsername.closeSoftwareInputPanel();
+                    textPassword.closeSoftwareInputPanel();
+                    container.sigHide();
+                }
+            }//MyButton (login/logout)
+
+            MeegoButton {
+                id: btnLogin
+
+                text: "Login"
+
+                onClicked: {
+                    textUsername.closeSoftwareInputPanel();
+                    textPassword.closeSoftwareInputPanel();
+                    container.sigLogin();
+                }
+            }//MyButton (login/logout)
+        }
     }//Column of username and password fields. Also the login button
 }//Item (container)

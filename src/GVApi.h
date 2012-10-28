@@ -171,7 +171,7 @@ private:
     //! The users Google Voice number
     QString strSelfNumber;
 
-    QNetworkAccessManager nwMgr;
+    QNetworkAccessManager *nwMgr;
     CookieJar *jar;
     QVariantMap hiddenLoginFields;
 
