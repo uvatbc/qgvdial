@@ -418,6 +418,13 @@ MainWindow::init ()
     if (!rv) { exit(1); }
 #endif
 
+    // When there is a real change in the NW configuration, reset the nw access
+    // manager on the GvAPI class object
+    rv = connect(&Singletons::getRef().getNwInfo(), SIGNAL(realChange()),
+                 &gvApi, SLOT(resetNwMgr()));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+
     // If the cache has the username and password, begin login
     if (dbMain.getUserPass (strUser, strPass)) {
         this->setUsername (strUser);

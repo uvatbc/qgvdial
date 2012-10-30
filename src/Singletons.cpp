@@ -21,9 +21,11 @@ Contact: yuvraaj@gmail.com
 
 #include "Singletons.h"
 
+static CacheDatabase *dbMain = NULL;
+static NwInfo *nwInfo = NULL;
+
 Singletons::Singletons (QObject *parent/* = 0*/)
 : QObject (parent)
-, dbMain (NULL)
 {
 }//Singletons::Singletons
 
@@ -76,10 +78,19 @@ Singletons::getCIFactory ()
     return (callInitiatorFactory);
 }//Singletons::getCIFactory
 
+NwInfo &
+Singletons::getNwInfo ()
+{
+    if (NULL == nwInfo) {
+        nwInfo = new NwInfo(this);
+    }
+    return (*nwInfo);
+}//Singletons::getNwInfo
+
 void
 Singletons::deinit()
 {
-    if (dbMain) {
+    if (NULL != dbMain) {
         QStringList connections = QSqlDatabase::connectionNames();
         for (int i = 0; i < connections.length(); i++) {
             QSqlDatabase::removeDatabase(connections[i]);
@@ -87,5 +98,10 @@ Singletons::deinit()
 
         delete dbMain;
         dbMain = NULL;
+    }
+
+    if (NULL != nwInfo) {
+        delete nwInfo;
+        nwInfo = NULL;
     }
 }//Singletons::deinit

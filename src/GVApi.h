@@ -44,7 +44,6 @@ public:
     void dbg_alwaysFailDialing(bool set = true);
 
     QString getSelfNumber();
-
     void cancel(AsyncTaskToken *token);
 
     static void
@@ -78,6 +77,9 @@ signals:
 
     //! Emitted by the nw class to give updates about the current progress
     void sigProgress(double percent);
+
+public slots:
+    void resetNwMgr();
 
 private slots:
 

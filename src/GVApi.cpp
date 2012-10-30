@@ -32,7 +32,7 @@ GVApi::GVApi(bool bEmitLog, QObject *parent)
 , dbgAlwaysFailDialing (false)
 , scriptEngine (this)
 {
-    nwMgr = new QNetworkAccessManager(this);
+    resetNwMgr ();
     nwMgr->setCookieJar (jar);
 }//GVApi::GVApi
 
@@ -225,8 +225,7 @@ GVApi::doGet(QUrl url, AsyncTaskToken *token, QObject *receiver,
     token->status = ATTS_SUCCESS;
 
     bool rv =
-    connect(tracker, SIGNAL (sigDone(bool, const QByteArray &, QNetworkReply *,
-                                     void *)),
+    connect(tracker, SIGNAL(sigDone(bool,const QByteArray&,QNetworkReply*,void*)),
             receiver, method);
     Q_ASSERT(rv);
     rv = connect(tracker, SIGNAL(sigProgress(double)),
@@ -2462,3 +2461,14 @@ GVApi::onCheckRecentInbox(bool success, const QByteArray &response,
         }
     }
 }//GVApi::onCheckRecentInbox
+
+void
+GVApi::resetNwMgr()
+{
+    if (NULL != nwMgr) {
+        nwMgr->deleteLater ();
+        nwMgr = NULL;
+    }
+
+    nwMgr = new QNetworkAccessManager(this);
+}//GVApi::resetNwMgr

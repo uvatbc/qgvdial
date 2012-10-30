@@ -129,7 +129,8 @@ SOURCES  += ../src/main.cpp                 \
             ../src/AsyncTaskToken.cpp       \
             ../src/GVApi.cpp                \
             ../src/MyXmlErrorHandler.cpp    \
-            ../src/FuzzyTimer.cpp
+            ../src/FuzzyTimer.cpp           \
+            ../src/NwInfo.cpp
 
 HEADERS  += ../src/global.h                 \
             ../src/TpHeaders.h              \
@@ -163,7 +164,8 @@ HEADERS  += ../src/global.h                 \
             ../src/AsyncTaskToken.h         \
             ../src/GVApi.h                  \
             ../src/MyXmlErrorHandler.h      \
-            ../src/FuzzyTimer.h
+            ../src/FuzzyTimer.h             \
+            ../src/NwInfo.h
 
 contains(MEEGO_EDITION,harmattan) | contains(DEFINES,IS_S3) | contains(DEFINES,IS_S3_BELLE) {
     DEFINES += ENABLE_FUZZY_TIMER

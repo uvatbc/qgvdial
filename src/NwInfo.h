@@ -19,47 +19,33 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#ifndef __SINGLETONS_H__
-#define __SINGLETONS_H__
+#ifndef NWINFO_H
+#define NWINFO_H
 
 #include "global.h"
-
-class OsDependent;
-class CacheDatabase;
-class SkypeClientFactory;
-class ObserverFactory;
-class CallInitiatorFactory;
-class NwInfo;
 
 // For some reason the symbian MOC doesn't like it if I don't include QObject
 // even though it is present in QtCore which is included in global.h
 #include <QObject>
 
-class Singletons : public QObject
+class NwInfo : public QObject
 {
+    Q_OBJECT
+
 public:
-    static Singletons & getRef ();
+    NwInfo(QObject *parent = 0);
 
-    OsDependent         & getOSD ();
-    CacheDatabase       & getDBMain ();
-    ObserverFactory     & getObserverFactory ();
-    SkypeClientFactory  & getSkypeFactory ();
-    CallInitiatorFactory& getCIFactory ();
-    NwInfo              & getNwInfo ();
+signals:
+    void realChange();
 
-    void deinit();
+private slots:
+    void ensureMgr();
+    void onCfgChanged(const QNetworkConfiguration &config);
+    void onCfgOnlineStateChanged(bool isOnline);
+    void onCfgUpdateCompleted();
 
 private:
-    Singletons (QObject *parent = 0);
-    virtual ~Singletons ();
+    QNetworkConfigurationManager *cfgMgr;
 };
 
-#include "GVDataAccess.h"
-#include "OsDependent.h"
-#include "CacheDatabase.h"
-#include "ObserverFactory.h"
-#include "SkypeClientFactory.h"
-#include "CallInitiatorFactory.h"
-#include "NwInfo.h"
-
-#endif //__SINGLETONS_H__
+#endif // NWINFO_H
