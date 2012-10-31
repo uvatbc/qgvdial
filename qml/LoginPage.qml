@@ -48,19 +48,15 @@ Item {
        anchors.centerIn: parent
        spacing: 2 * g_hMul
 
-       Text {
+       QGVLabel {
            text: "Logging in as:"
-           color: "white"
-           font { family: "Nokia Sans"; pointSize: container.pointSize }
-           width: paintedWidth
+           //width: paintedWidth
            anchors.horizontalCenter: parent.horizontalCenter
        }
 
-       Text {
+       QGVLabel {
            text: username
-           color: "white"
-           font { family: "Nokia Sans"; pointSize: container.pointSize }
-           width: paintedWidth
+           //width: paintedWidth
            anchors.horizontalCenter: parent.horizontalCenter
        }
 
@@ -83,13 +79,11 @@ Item {
         anchors.centerIn: parent
         spacing: 2 * g_hMul
 
-        Text {
+        QGVLabel {
             id: lblEmail
             text: "Username:"
-            color: "white"
             anchors.horizontalCenter: parent.horizontalCenter
-            font { family: "Nokia Sans"; pointSize: container.pointSize }
-        }//Text: Label "Username:"
+        }//QGVLabel: Label "Username:"
 
         MyTextEdit {
             id: textUsername
@@ -103,12 +97,10 @@ Item {
             onSigEnter: btnLogin.doClick();
         }//MyTextEdit: username
 
-        Text {
+        QGVLabel {
             id: lblPass
             text: "Password:"
-            color: "white"
             anchors.horizontalCenter: parent.horizontalCenter
-            font { family: "Nokia Sans"; pointSize: container.pointSize }
         }
 
         MyTextEdit {
