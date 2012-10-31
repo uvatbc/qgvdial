@@ -48,15 +48,17 @@ Rectangle {
             leftMargin: 3
         }
         width: parent.width
-        height: titleText.height
+        height: imgArrow.height + (2 * g_hMul)
         spacing: 2
 
         Image {
             id: imgArrow
             source: "play.svg"
 
-            height: titleText.height
+            height: 24 * g_hMul
             width: height
+            smooth: true
+            anchors.verticalCenter: parent.verticalCenter
 
             transform: Rotation {
                 id: arrowRotation
@@ -74,7 +76,6 @@ Rectangle {
             text: container.mainTitle
 
             fontPointMultiplier: (10.0/8.0)
-
             width: parent.width - imgArrow.width - parent.spacing
         }//QGVLabel (text)
     }//Row (arrow and text)

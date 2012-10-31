@@ -28,5 +28,6 @@ Label {
     id: container
 
     property real fontPointMultiplier: 1.0
-    font.pixelSize: (platformStyle.fontPixelSize * fontPointMultiplier)
+    font.pixelSize: (platformStyle.fontPixelSize * fontPointMultiplier * 1.3)
+    color: "white"
 }//Label

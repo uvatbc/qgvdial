@@ -280,7 +280,7 @@ Rectangle {
                 bottom: parent.bottom
                 horizontalCenter: parent.horizontalCenter
             }
-            width: deleteButton.width + backButton.width + spacing
+            width: parent.width
             height: deleteButton.height + 1
 
             function doDismiss() {
@@ -296,6 +296,7 @@ Rectangle {
                     buttonRow.doDismiss();
                     container.sigDeleteInboxEntry(container.strLink);
                 }
+                width: (parent.width / 2) - spacing
             }// QGVButton (back button)
 
             QGVButton {
@@ -304,6 +305,7 @@ Rectangle {
                 onClicked: {
                     buttonRow.doDismiss();
                 }
+                width: (parent.width / 2) - spacing
             }// QGVButton (back button)
         }
     }//Rectangle (details)

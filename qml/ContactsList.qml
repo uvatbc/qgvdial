@@ -182,7 +182,7 @@ Rectangle {
                 radius: 5
 
                 width:  (allContacts.width - border.width)
-                height: contactNameText.height + (2 * g_hMul)
+                height: contactImage.height + (2 * g_hMul)
 
                 Row {
                     anchors {
@@ -196,15 +196,12 @@ Rectangle {
 
                     Image {
                         id: contactImage
-                        anchors {
-                            verticalCenter: parent.verticalCenter
-                        }
+                        anchors.verticalCenter: parent.verticalCenter
 
-                        height: contactNameText.height + 1
+                        height: 24 * g_hMul
                         width: height
 
                         source: imagePath ? imagePath : "unknown_contact.png"
-
                         smooth: true
                     }//Image (contact images)
 
@@ -214,7 +211,7 @@ Rectangle {
                         anchors {
                             verticalCenter: parent.verticalCenter
                         }
-                        width: parent.width - contactImage.width
+                        //width: parent.width - contactImage.width
 
                         text: name
                         fontPointMultiplier: (10.0/8.0)
