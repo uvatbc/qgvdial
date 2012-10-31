@@ -289,22 +289,22 @@ Rectangle {
                 container.sigCloseVmail();
             }
 
-            MeegoButton {
+            QGVButton {
                 id: deleteButton
                 text: "Delete"
                 onClicked: {
                     buttonRow.doDismiss();
                     container.sigDeleteInboxEntry(container.strLink);
                 }
-            }// MeegoButton (back button)
+            }// QGVButton (back button)
 
-            MeegoButton {
+            QGVButton {
                 id: backButton
                 text: "Back"
                 onClicked: {
                     buttonRow.doDismiss();
                 }
-            }// MeegoButton (back button)
+            }// QGVButton (back button)
         }
     }//Rectangle (details)
 

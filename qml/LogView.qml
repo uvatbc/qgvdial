@@ -65,7 +65,7 @@ Item {
 
         spacing: 1
 
-        MeegoButton {
+        QGVButton {
             id: btnSendLogs
 
             text: "Send logs"
@@ -74,7 +74,7 @@ Item {
             onClicked: container.sigSendLogs();
         }//MyButton (Send logs)
 
-        MeegoButton {
+        QGVButton {
             id: btnBack
 
             text: "Back"

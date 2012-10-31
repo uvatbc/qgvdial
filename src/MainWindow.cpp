@@ -1381,7 +1381,8 @@ MainWindow::getQMLObject(const char *pageName)
     do { // Begin cleanup block (not a loop)
         QObject *pRoot = this->rootObject ();
         if (NULL == pRoot) {
-            Q_WARN("Couldn't get root object in QML for ") << pageName;
+            Q_WARN(QString("Couldn't get root object in QML for %1")
+                    .arg(pageName));
             break;
         }
 
@@ -1392,7 +1393,7 @@ MainWindow::getQMLObject(const char *pageName)
 
         pObj = pRoot->findChild <QObject*> (pageName);
         if (NULL == pObj) {
-            Q_WARN("Could not get to ") << pageName;
+            Q_WARN(QString("Could not find page %1").arg (pageName));
             break;
         }
     } while (0); // End cleanup block (not a loop)

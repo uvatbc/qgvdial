@@ -127,7 +127,7 @@ Item {
         }
     }//Row (password)
 
-    MeegoButton {
+    QGVButton {
         id: btnLogin
 
         anchors {

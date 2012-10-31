@@ -237,7 +237,7 @@ Rectangle { // Contact details
         }// Column (all the details in one column)
     }//Flickable (mainFlick)
 
-    MeegoButton {
+    QGVButton {
         id: backButton
         text: "Back"
         onClicked: container.sigClose();

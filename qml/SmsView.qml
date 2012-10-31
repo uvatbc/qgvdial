@@ -228,7 +228,7 @@ Rectangle {
             }
             height: btnBack.height + 2
 
-            MeegoButton {
+            QGVButton {
                 id: btnBack
 
                 text: "Back"
@@ -238,7 +238,7 @@ Rectangle {
                 onClicked: container.sigBack();
             }// Back button
 
-            MeegoButton {
+            QGVButton {
                 id: btnSend
 
                 text: "Send"

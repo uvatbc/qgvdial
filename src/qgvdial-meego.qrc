@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="QGVButton.qml">../qml/meego/QGVButton.qml</file>
+    </qresource>
+</RCC>

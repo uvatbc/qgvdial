@@ -49,7 +49,7 @@ PRECOMPILED_HEADER = ../src/global.h
 CONFIG   += mobility
 MOBILITY += systeminfo
 
-symbian|contains(MEEGO_EDITION,harmattan) {
+symbian | contains(DEFINES,MEEGO_HARMATTAN) {
     MOBILITY *= feedback
     OTHER_FILES += ../build-files/qgvdial/harmattan/qgvdial.desktop
     !exists(no-qt-components) {
@@ -167,7 +167,7 @@ HEADERS  += ../src/global.h                 \
             ../src/FuzzyTimer.h             \
             ../src/NwInfo.h
 
-contains(MEEGO_EDITION,harmattan) | contains(DEFINES,IS_S3) | contains(DEFINES,IS_S3_BELLE) {
+contains(DEFINES,MEEGO_HARMATTAN) | contains(DEFINES,IS_S3) | contains(DEFINES,IS_S3_BELLE) {
     DEFINES += ENABLE_FUZZY_TIMER
 }
 
@@ -186,6 +186,12 @@ HEADERS +=  ../src/CaptchaWidget.h
 }
 
 RESOURCES += ../src/qgvdial.qrc
+contains(DEFINES,MEEGO_HARMATTAN) {
+    RESOURCES += ../src/qgvdial-meego.qrc
+} else {
+    RESOURCES += ../src/qgvdial-generic.qrc
+}
+
 
 # This is so that QtCreator can show these files in the files list.
 OTHER_FILES  += ../src/winrsrc.rc           \
@@ -208,7 +214,6 @@ OTHER_FILES  += ../src/winrsrc.rc           \
                 ../qml/Main.qml             \
                 ../qml/MainView.qml         \
                 ../qml/Mosquitto.qml        \
-                ../qml/MeegoButton.qml      \
                 ../qml/MsgBox.qml           \
                 ../qml/MyButton.qml         \
                 ../qml/MyTextEdit.qml       \
@@ -223,6 +228,8 @@ OTHER_FILES  += ../src/winrsrc.rc           \
                 ../qml/SmsView.qml          \
                 ../qml/Tab.qml              \
                 ../qml/TabbedUI.qml         \
+                ../qml/generic/QGVButton.qml \
+                ../qml/meego/QGVButton.qml  \
                 readme.txt
 
 # In Linux and maemo, add the telepathy related sources and headers.
@@ -330,14 +337,14 @@ maemo5 {
     DATADIR    = $$PREFIX/share
 }
 
-contains(MEEGO_EDITION,harmattan) {
+contains(DEFINES,MEEGO_HARMATTAN) {
     message(Harmattan install)
 
     OPTPREFIX  = /opt
     DATADIR    = /usr/share
 }
 
-maemo5|contains(MEEGO_EDITION,harmattan) {
+maemo5|contains(DEFINES,MEEGO_HARMATTAN) {
     INSTALLS += target desktop icon icon48 icon64 icon_scalable dbusservice
 
     target.path = $$OPTPREFIX/qgvdial/bin
@@ -363,7 +370,7 @@ maemo5|contains(MEEGO_EDITION,harmattan) {
 }
 
 # Harmattan specific install section
-contains(MEEGO_EDITION,harmattan) {
+contains(DEFINES,MEEGO_HARMATTAN) {
     INSTALLS += icon80
 
     desktop.path  = $$DATADIR/applications
@@ -384,7 +391,7 @@ contains(MEEGO_EDITION,harmattan) {
 }
 
 # Installation for Linux
-unix:!symbian:!maemo5:!contains(MEEGO_EDITION,harmattan) {
+unix:!symbian:!maemo5:!contains(DEFINES,MEEGO_HARMATTAN) {
     DATADIR = /usr/share
     message(Regular Linux install)
 

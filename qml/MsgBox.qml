@@ -80,20 +80,20 @@ Item {
 
             spacing: 5 * g_wMul
 
-            MeegoButton {
+            QGVButton {
                 text: "Ok"
                 focus: true
 
                 onClicked: container.sigOk();
                 onPressHold: container.sigOk();
-            }// MeegoButton (ok)
+            }// QGVButton (ok)
 
-            MeegoButton {
+            QGVButton {
                 text: "Cancel"
 
                 onClicked: container.sigCancel();
                 onPressHold: container.sigCancel();
-            }// MeegoButton (cancel)
+            }// QGVButton (cancel)
         }// Row (ok and cancel)
     }// Column with the text and the two buttons
 }// Rectangle (container)

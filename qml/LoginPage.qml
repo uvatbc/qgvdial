@@ -64,7 +64,7 @@ Item {
            anchors.horizontalCenter: parent.horizontalCenter
        }
 
-       MeegoButton {
+       QGVButton {
            id: btnCancelLogin
 
            anchors.horizontalCenter: parent.horizontalCenter
@@ -72,7 +72,7 @@ Item {
 
            onClicked: container.sigCancelLogin();
 
-       }//MyButton (login/logout)
+       }//QGVButton (login/logout)
     }//Column of login progress items
 
     Column {
@@ -130,7 +130,7 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             width: btnHide.width + btnLogin.width + spacing
 
-            MeegoButton {
+            QGVButton {
                 id: btnHide
 
                 text: "Hide"
@@ -140,9 +140,9 @@ Item {
                     textPassword.closeSoftwareInputPanel();
                     container.sigHide();
                 }
-            }//MyButton (login/logout)
+            }//QGVButton (login/logout)
 
-            MeegoButton {
+            QGVButton {
                 id: btnLogin
 
                 text: "Login"
@@ -152,7 +152,7 @@ Item {
                     textPassword.closeSoftwareInputPanel();
                     container.sigLogin();
                 }
-            }//MyButton (login/logout)
+            }//QGVButton (login/logout)
         }
     }//Column of username and password fields. Also the login button
 }//Item (container)

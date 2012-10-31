@@ -29,18 +29,18 @@ Row {
     spacing: 2
     height: btnSave.height
 
-    MeegoButton {
+    QGVButton {
         id: btnSave
         text: "Save"
         width: (parent.width / 2) - parent.spacing
 
         onClicked: container.sigSave();
-    }//MyButton (Save)
+    }//QGVButton (Save)
 
-    MeegoButton {
+    QGVButton {
         text: "Cancel"
         width: (parent.width / 2) - parent.spacing
 
         onClicked: container.sigCancel();
-    }//MyButton (Cancel)
+    }//QGVButton (Cancel)
 }// Save and cancel buttons
