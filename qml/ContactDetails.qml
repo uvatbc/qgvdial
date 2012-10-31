@@ -85,24 +85,21 @@ Rectangle { // Contact details
                 }//Image (contact icon)
 
                 Item {
-                    anchors {
-                        verticalCenter: parent.verticalCenter
-                    }
+                    anchors.verticalCenter: parent.verticalCenter
                     width: parent.width - contactImage.width
                     height: parent.height
 
-                    Text {
+                    QGVLabel {
                         id: txtContactName
                         anchors.centerIn: parent
 
                         text: "Contact name"
-                        color: "white"
-                        font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
-                    }
+                        fontPointMultiplier: (10.0 / 8.0)
+                    }//QGVLabel
                 }//Item (contact name)
             }//Row (image and name)
 
-            Text {
+            QGVLabel {
                 id: notes
                 text: "some notes"
                 anchors {
@@ -111,13 +108,9 @@ Rectangle { // Contact details
 
                 // Must have width if word wrap is to work.
                 width: parent.width
-                height: paintedHeight+2
 
                 wrapMode: Text.WordWrap
-
-                font { family: "Nokia Sans"; pointSize: (8 * g_fontMul) }
-                color: "white"
-            }// Text (contact notes)
+            }//QGVLabel (contact notes)
 
             Repeater {  // All phone numbers for this contact
                 id: contactNumbers
@@ -139,25 +132,21 @@ Rectangle { // Contact details
 
                         spacing: 1
 
-                        Text { // The phone number
+                        QGVLabel {
                             id: textType
                             height: paintedHeight + 2
                             width: parent.width
 
                             text: type
-                            color: "white"
-                            font { family: "Nokia Sans"; pointSize: (8 * g_fontMul) }
-                        }// Item (phone type)
+                        }//QGVLabel (phone type)
 
-                        Text { // The phone number
+                        QGVLabel {
                             id: textNumber
                             height: paintedHeight + 2
                             width: parent.width
 
                             text: number
-                            color: "white"
-                            font { family: "Nokia Sans"; pointSize: (8 * g_fontMul) }
-                        }// Item (phone number)
+                        }//QGVLabel (phone number)
                     }//Column (type and number)
 
                     Row {

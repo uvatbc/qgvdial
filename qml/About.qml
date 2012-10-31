@@ -27,7 +27,6 @@ Item {
     signal sigLinkActivated(string strLink)
 
     height: mainColumn.height
-    property real internalPointSize: (8 * g_fontMul)
 
     Column {
         id: mainColumn
@@ -38,19 +37,13 @@ Item {
         spacing: 2
         width: parent.width
 
-        Text {
+        QGVLabel {
             text: "Version: __QGVDIAL_VERSION__"
             width: parent.width
-            height: paintedHeight + 2
-            font { family: "Nokia Sans"; pointSize: container.internalPointSize }
-            color: "white"
-        }//Text (version)
+        }//QGVLabel (version)
 
-        Text {
+        QGVLabel {
             width: parent.width
-            height: paintedHeight + 2
-            font { family: "Nokia Sans"; pointSize: container.internalPointSize }
-            color: "white"
 
             onLinkActivated: container.sigLinkActivated(link)
             textFormat: Text.RichText
@@ -59,6 +52,6 @@ Item {
                   "<a href=http://www.code.google.com/p/qgvdial/wiki/Changelog>Changelog</a> and " +
                   "<a href=http://www.code.google.com/p/qgvdial/w/list>Wiki</a> and " +
                   "<a href=http://yuvraaj.net/qgvdial/privacy.html>privacy policy</a>"
-        }//Text (links)
+        }//QGVLabel (links)
     }//Column
 }//Item(container)

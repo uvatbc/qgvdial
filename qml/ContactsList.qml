@@ -95,13 +95,12 @@ Rectangle {
                 onTriggered: searchRow.doSearch();
             }
 
-            Text {
+            QGVLabel {
                 id: searchLabel
                 text: "Search:"
-                color: "white"
-                font { family: "Nokia Sans"; pointSize: (6 * g_fontMul); }
+                fontPointMultiplier: (6.0/8.0)
                 anchors.verticalCenter: parent.verticalCenter
-            }//Text ("Search")
+            }//QGVLabel ("Search")
 
             MyTextEdit {
                 id: edSearch
@@ -209,7 +208,7 @@ Rectangle {
                         smooth: true
                     }//Image (contact images)
 
-                    Text {
+                    QGVLabel {
                         id: contactNameText
 
                         anchors {
@@ -218,9 +217,7 @@ Rectangle {
                         width: parent.width - contactImage.width
 
                         text: name
-                        color: "white"
-
-                        font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
+                        fontPointMultiplier: (10.0/8.0)
                     }//Text (contact name)
                 }// Row (image and contact name)
 

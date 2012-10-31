@@ -68,17 +68,15 @@ Rectangle {
             }
         }//Image
 
-        Text {
+        QGVLabel {
             id: titleText
 
             text: container.mainTitle
-            color: "white"
 
-            font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
+            fontPointMultiplier: (10.0/8.0)
 
             width: parent.width - imgArrow.width - parent.spacing
-            height: paintedHeight
-        }
+        }//QGVLabel (text)
     }//Row (arrow and text)
 
     Rectangle {
