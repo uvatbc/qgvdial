@@ -26,4 +26,5 @@ import com.nokia.meego 1.0
 
 Button {
     id: container
+    platformInverted: true
 }//Button
