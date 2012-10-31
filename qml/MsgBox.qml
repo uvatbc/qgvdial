@@ -85,14 +85,12 @@ Item {
                 focus: true
 
                 onClicked: container.sigOk();
-                onPressHold: container.sigOk();
             }// QGVButton (ok)
 
             QGVButton {
                 text: "Cancel"
 
                 onClicked: container.sigCancel();
-                onPressHold: container.sigCancel();
             }// QGVButton (cancel)
         }// Row (ok and cancel)
     }// Column with the text and the two buttons

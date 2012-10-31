@@ -246,5 +246,5 @@ Rectangle { // Contact details
             bottom: parent.bottom
             horizontalCenter: parent.horizontalCenter
         }
-    }//MyButton (close details window)
+    }//QGVButton (close details window)
 }// Rectangle (Contact details)

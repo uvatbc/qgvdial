@@ -1,2 +1,3 @@
-  * Fix text parsing for GV two-phase notifications
+  * Buttons for Meego are different from generic
+  * When the NW configuratio changes, recreate the access manager so that the default connection is re-created.
 

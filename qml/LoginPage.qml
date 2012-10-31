@@ -71,7 +71,6 @@ Item {
            text: "Cancel"
 
            onClicked: container.sigCancelLogin();
-
        }//QGVButton (login/logout)
     }//Column of login progress items
 

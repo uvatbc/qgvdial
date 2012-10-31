@@ -73,5 +73,5 @@ Item {
             anchors.bottom: parent.bottom
             font.pixelSize: btn.mainPixelSize / 3
         }// Text
-    }
+    }//MyButton
 }// Item

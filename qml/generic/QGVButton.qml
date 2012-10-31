@@ -39,12 +39,8 @@ BorderImage {
     // Main text in the button
     property string text: "Button"
 
-    // Aliases to the mText
-    property alias aliasTextElide: mText.elide
-
     // Button emits clicks, but we also mention what is the text to display
     signal clicked
-    signal pressHold
 
     onWidthChanged: updateTextWidth();
     function updateTextWidth() {

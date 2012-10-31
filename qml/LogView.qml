@@ -72,7 +72,7 @@ Item {
             width: (parent.width / 2) - parent.spacing
 
             onClicked: container.sigSendLogs();
-        }//MyButton (Send logs)
+        }//QGVButton (Send logs)
 
         QGVButton {
             id: btnBack
@@ -81,6 +81,6 @@ Item {
             width: (parent.width / 2) - parent.spacing
 
             onClicked: container.sigBack();
-        }//MyButton (Back)
+        }//QGVButton (Back)
     }//Button row (Send logs and Back)
 }//Item (container)

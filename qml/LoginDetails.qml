@@ -150,5 +150,5 @@ Item {
         }
 
         onClicked: btnLogin.doClick();
-    }//MyButton (login/logout)
+    }//QGVButton (login/logout)
 }//Item (container)
