@@ -27,7 +27,7 @@ Rectangle {
     signal sigTextChanged(string strText)
     signal sigEnter
 
-    property string text: "You should have changed this text"
+    property alias text: textEd.text
     property real fontPointMultiplier: 1.0
 
     height: textEd.height + (2 * g_hMul)
@@ -46,7 +46,7 @@ Rectangle {
 
     TextEdit {
         id: textEd
-        text: container.text
+        text: "You should have changed this text!!"
 
         anchors {
             left: parent.left
