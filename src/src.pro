@@ -213,10 +213,8 @@ OTHER_FILES  += ../src/winrsrc.rc           \
                 ../qml/LogView.qml          \
                 ../qml/Main.qml             \
                 ../qml/MainView.qml         \
-                ../qml/Mosquitto.qml        \
                 ../qml/MsgBox.qml           \
                 ../qml/MyButton.qml         \
-                ../qml/MyTextEdit.qml       \
                 ../qml/PinSetting.qml       \
                 ../qml/Proxy.qml            \
                 ../qml/RadioButton.qml      \
@@ -228,10 +226,12 @@ OTHER_FILES  += ../src/winrsrc.rc           \
                 ../qml/SmsView.qml          \
                 ../qml/Tab.qml              \
                 ../qml/TabbedUI.qml         \
-                ../qml/generic/QGVButton.qml \
-                ../qml/generic/QGVLabel.qml \
-                ../qml/meego/QGVButton.qml  \
-                ../qml/meego/QGVLabel.qml   \
+                ../qml/generic/QGVButton.qml    \
+                ../qml/generic/QGVLabel.qml     \
+                ../qml/generic/QGVTextEdit.qml  \
+                ../qml/meego/QGVButton.qml      \
+                ../qml/meego/QGVLabel.qml       \
+                ../qml/meego/QGVTextEdit.qml    \
                 readme.txt
 
 # In Linux and maemo, add the telepathy related sources and headers.

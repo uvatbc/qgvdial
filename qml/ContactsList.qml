@@ -102,11 +102,10 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
             }//QGVLabel ("Search")
 
-            MyTextEdit {
+            QGVTextEdit {
                 id: edSearch
                 width: parent.width - imgSearch.width - searchLabel.width - (parent.spacing * 2)
                 anchors.verticalCenter: parent.verticalCenter
-                pointSize: 10 * g_fontMul
                 text: ""
                 onTextChanged: {
                     if (imgSearch.selection) {
@@ -120,7 +119,7 @@ Rectangle {
                 onSigEnter: {
                     searchRow.doSearch();
                 }
-            }//MyTextEdit (search box text edit)
+            }//QGVTextEdit (search box text edit)
 
             Image {
                 id: imgSearch

@@ -37,7 +37,6 @@ Item {
     signal sigPinSettingChanges(bool bEnable, string pin)
 
     property bool bEnable: pinSupport.check
-    property real internalPointSize: (8 * g_fontMul)
 
     onSigDone: {
         textPin.closeSoftwareInputPanel();
@@ -72,15 +71,15 @@ Item {
                 height: paintedHeight + 2
             }//QGVLabel ("Pin:")
 
-            MyTextEdit {
+            QGVTextEdit {
                 id: textPin
                 width: parent.width - lblPin.width
                 anchors.verticalCenter: parent.verticalCenter
                 text: "0000"
                 validator: IntValidator { bottom: 0; top: 9999 }
                 height: lblPin.height
-                pointSize: container.internalPointSize
-            }
+                fontPointMultiplier: 8.0 / 10.0
+            }//QGVTextEdit (pin)
         }// Row (pin)
 
         SaveCancel {

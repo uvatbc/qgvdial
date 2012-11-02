@@ -22,9 +22,36 @@ Contact: yuvraaj@gmail.com
 import QtQuick 1.1
 import com.nokia.meego 1.0
 
-// QGVButton is just a one-to-one map to the Meego qt-components Button item
+TextField {
+    id:  container
 
-Button {
-    id: container
-    platformStyle: ButtonStyle { inverted: true }
-}//Button
+    signal sigTextChanged(string strText)
+    signal sigEnter
+
+    text: "You should have changed this text"
+    property int pointSize: (10 * g_fontMul)
+    property real fontPointMultiplier: 1.0
+
+    inputMethodHints: Qt.ImhNoAutoUppercase + Qt.ImhNoPredictiveText
+
+    function closeSoftwareInputPanel() {
+        textEd.closeSoftwareInputPanel();
+    }
+
+    function doAccepted() {
+        container.closeSoftwareInputPanel();
+        container.sigEnter();
+    }
+
+    onAccepted: container.doAccepted();
+
+    Keys.onReturnPressed: {
+        container.doAccepted();
+        event.accepted = true;
+    }
+
+    onTextChanged: {
+        container.sigTextChanged(text);
+        container.text = textEd.text;
+    }
+}//Rectangle

@@ -29,7 +29,6 @@ Item {
     signal sigLogin
     signal sigLogout
 
-    property real pointSize: (8 * g_fontMul)
     property alias username: textUsername.text
     property alias password: textPassword.text
 
@@ -54,17 +53,17 @@ Item {
             height: paintedHeight + 2
         }//QGVLabel ("Email:")
 
-        MyTextEdit {
+        QGVTextEdit {
             id: textUsername
             height: lblEmail.height
             width: parent.width - lblEmail.width - (parent.spacing * 2)
             opacity: (g_bIsLoggedIn == true ? 0 : 1)
-            pointSize: container.pointSize
+            fontPointMultiplier: 8.0 / 10.0
 
             KeyNavigation.tab: textPassword
             onSigTextChanged: container.sigUserChanged(strText);
             onSigEnter: btnLogin.doClick();
-        }
+        }//QGVTextEdit
 
         QGVLabel {
             id: lblUsername
@@ -95,18 +94,18 @@ Item {
             height: paintedHeight + 2
         }//QGVLabel ("Password:")
 
-        MyTextEdit {
+        QGVTextEdit {
             id: textPassword
             height: lblPass.height
             width: parent.width - lblPass.width - (parent.spacing * 2)
             opacity: (g_bIsLoggedIn == true ? 0 : 1)
             echoMode: TextInput.Password
-            pointSize: container.pointSize
+            fontPointMultiplier: 8.0 / 10.0
 
             KeyNavigation.tab: textUsername
             onSigTextChanged: container.sigPassChanged(strText);
             onSigEnter: btnLogin.doClick();
-        }
+        }//QGVTextEdit
 
         QGVLabel {
             id: lblPassword

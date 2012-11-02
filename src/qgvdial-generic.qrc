@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file alias="QGVButton.qml">../qml/generic/QGVButton.qml</file>
         <file alias="QGVLabel.qml">../qml/generic/QGVLabel.qml</file>
+        <file alias="QGVTextEdit.qml">../qml/generic/QGVTextEdit.qml</file>
     </qresource>
 </RCC>

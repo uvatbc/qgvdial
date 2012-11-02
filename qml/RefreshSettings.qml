@@ -58,6 +58,7 @@ Item {
 
         // Internal property
         property real subTextPointSize: (8 * g_fontMul)
+        property real fontPointMultiplier: 8.0 / 10.0
 
         RadioButton {
             id: periodicRefresh
@@ -82,7 +83,7 @@ Item {
                 height: paintedHeight + 2
             }//QGVLabel ("Refresh contacts (min)")
 
-            MyTextEdit {
+            QGVTextEdit {
                 id: textContactsRefreshPeriod
                 width: parent.width - lblContactsRefreshPeriod.width
                 height: lblContactsRefreshPeriod.height
@@ -91,8 +92,8 @@ Item {
                 validator: IntValidator { bottom: 0; top: 65535 }
                 KeyNavigation.tab: textInboxRefreshPeriod
                 KeyNavigation.backtab: textInboxRefreshPeriod
-                pointSize: mainColumn.subTextPointSize
-            }
+                fontPointMultiplier: mainColumn.fontPointMultiplier
+            }//QGVTextEdit (contact refresh period)
 
             QGVLabel {
                 text: "sec"
@@ -115,7 +116,7 @@ Item {
                 height: paintedHeight + 2
             }//QGVLabel ("Refresh inbox (min)")
 
-            MyTextEdit {
+            QGVTextEdit {
                 id: textInboxRefreshPeriod
                 width: parent.width - lblInboxRefreshPeriod.width
                 height: lblInboxRefreshPeriod.height
@@ -124,8 +125,8 @@ Item {
                 validator: IntValidator { bottom: 0; top: 65535 }
                 KeyNavigation.tab: textContactsRefreshPeriod
                 KeyNavigation.backtab: textContactsRefreshPeriod
-                pointSize: mainColumn.subTextPointSize
-            }
+                fontPointMultiplier: mainColumn.fontPointMultiplier
+            }//QGVTextEdit (inbox refresh period)
         }// Row (Inbox refresh period)
 
         RadioButton {
@@ -149,7 +150,7 @@ Item {
                 height: paintedHeight + 2
             }//QGVLabel ("Host:")
 
-            MyTextEdit {
+            QGVTextEdit {
                 id: textMqServer
                 width: parent.width - lblHost.width
                 height: lblHost.height
@@ -157,8 +158,8 @@ Item {
                 text: "mosquitto.example.com"
                 KeyNavigation.tab: textMqPort
                 KeyNavigation.backtab: textMqTopic
-                pointSize: mainColumn.subTextPointSize
-            }
+                fontPointMultiplier: mainColumn.fontPointMultiplier
+            }//QGVTextEdit (mq server)
         }// Row (Mq server)
 
         Row {
@@ -175,7 +176,7 @@ Item {
                 height: paintedHeight + 2
             }//QGVLabel ("Port:")
 
-            MyTextEdit {
+            QGVTextEdit {
                 id: textMqPort
                 width: parent.width - lblPort.width
                 height: lblPort.height
@@ -184,8 +185,8 @@ Item {
                 validator: IntValidator { bottom: 0; top: 65535 }
                 KeyNavigation.tab: textMqTopic
                 KeyNavigation.backtab: textMqServer
-                pointSize: mainColumn.subTextPointSize
-            }
+                fontPointMultiplier: mainColumn.fontPointMultiplier
+            }//QGVTextEdit (mq port)
         }// Row (Mq port)
 
         Row {
@@ -201,7 +202,7 @@ Item {
                 height: paintedHeight + 2
             }//QGVLabel ("Topic to sub:")
 
-            MyTextEdit {
+            QGVTextEdit {
                 id: textMqTopic
                 width: parent.width - lblTopic.width
                 height: lblTopic.height
@@ -209,8 +210,8 @@ Item {
                 text: "gv_notify"
                 KeyNavigation.tab: textMqServer
                 KeyNavigation.backtab: textMqPort
-                pointSize: mainColumn.subTextPointSize
-            }
+                fontPointMultiplier: mainColumn.fontPointMultiplier
+            }//QGVTextEdit (mq topic)
         }// Row (Mq topic to subscribe to)
 
         SaveCancel {

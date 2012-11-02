@@ -61,13 +61,13 @@ Item {
             horizontalAlignment: Text.AlignHCenter
         }//QGVLabel containing the text to display
 
-        MyTextEdit {
+        QGVTextEdit {
             id: textInput
             visible: (container.inputBox == true)
             width: parent.width
 
             onSigEnter: container.sigOk();
-        }
+        }//QGVTextEdit (user input box)
 
         Row { // (ok and cancel buttons)
             id: btnRow
