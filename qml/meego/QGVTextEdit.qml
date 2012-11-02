@@ -34,12 +34,8 @@ TextField {
 
     inputMethodHints: Qt.ImhNoAutoUppercase + Qt.ImhNoPredictiveText
 
-    function closeSoftwareInputPanel() {
-        textEd.closeSoftwareInputPanel();
-    }
-
     function doAccepted() {
-        container.closeSoftwareInputPanel();
+        container.platformCloseSoftwareInputPanel();
         container.sigEnter();
     }
 
@@ -52,6 +48,5 @@ TextField {
 
     onTextChanged: {
         container.sigTextChanged(text);
-        container.text = textEd.text;
     }
 }//Rectangle

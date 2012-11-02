@@ -43,8 +43,14 @@ Item {
     }//Fader (to fade out the back ground)
 
     Column {
-        height: textItem.height + btnRow.height + spacing
         width: parent.width * 0.8
+        height: {
+            var h = textItem.height + btnColumn.height + spacing;
+            if (textInput.visible) {
+                h += textInput.height + spacing;
+            }
+            return h;
+        }
 
         anchors.centerIn: parent
         spacing: 5 * g_hMul
@@ -69,8 +75,8 @@ Item {
             onSigEnter: container.sigOk();
         }//QGVTextEdit (user input box)
 
-        Row { // (ok and cancel buttons)
-            id: btnRow
+        Column { // (ok and cancel buttons)
+            id: btnColumn
 
             height: childrenRect.height
             width: childrenRect.width

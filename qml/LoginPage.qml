@@ -116,33 +116,28 @@ Item {
             onSigEnter: btnLogin.doClick();
         }//QGVTextEdit (password)
 
-        Row {
+        QGVButton {
+            id: btnHide
             anchors.horizontalCenter: parent.horizontalCenter
-            width: btnHide.width + btnLogin.width + spacing
+            text: "Hide"
 
-            QGVButton {
-                id: btnHide
+            onClicked: {
+                textUsername.closeSoftwareInputPanel();
+                textPassword.closeSoftwareInputPanel();
+                container.sigHide();
+            }
+        }//QGVButton (login/logout)
 
-                text: "Hide"
+        QGVButton {
+            id: btnLogin
+            anchors.horizontalCenter: parent.horizontalCenter
+            text: "Login"
 
-                onClicked: {
-                    textUsername.closeSoftwareInputPanel();
-                    textPassword.closeSoftwareInputPanel();
-                    container.sigHide();
-                }
-            }//QGVButton (login/logout)
-
-            QGVButton {
-                id: btnLogin
-
-                text: "Login"
-
-                onClicked: {
-                    textUsername.closeSoftwareInputPanel();
-                    textPassword.closeSoftwareInputPanel();
-                    container.sigLogin();
-                }
-            }//QGVButton (login/logout)
-        }
+            onClicked: {
+                textUsername.closeSoftwareInputPanel();
+                textPassword.closeSoftwareInputPanel();
+                container.sigLogin();
+            }
+        }//QGVButton (login/logout)
     }//Column of username and password fields. Also the login button
 }//Item (container)

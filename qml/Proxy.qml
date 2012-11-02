@@ -88,7 +88,7 @@ Item {
         Row {
             id: rowUserProxyHost
 
-            height: lblHost.height
+            height: lblHost.height > textUserProxyHost.height ? lblHost.height : textUserProxyHost.height
             width: parent.width
             spacing: 2
 
@@ -114,7 +114,7 @@ Item {
         Row {
             id: rowUserProxyPort
 
-            height: lblPort.height
+            height: lblPort.height > textUserProxyPort.height ? lblPort.height : textUserProxyPort.height
             width: parent.width
             spacing: 2
 
@@ -143,14 +143,14 @@ Item {
             width: parent.width
             opacity: (bEnableProxy && !bSystemProxy ? 1 : 0)
 
-            text: "Requires username and password"
+            text: "Requires user and pass"
             pointSize: container.internalPointSize
         }// RadioButton (proxyUserPassRequired)
 
         Row {
             id: rowProxyUsername
 
-            height: lblProxyUser.height
+            height: lblProxyUser.height > textUserProxyUser.height ? lblProxyUser.height : textUserProxyUser.height
             width: parent.width
             spacing: 2
 
@@ -176,7 +176,7 @@ Item {
         Row {
             id: rowProxyPassword
 
-            height: lblProxyPass.height
+            height: lblProxyPass.height > textUserProxyPass.height ? lblProxyPass.height : textUserProxyPass.height
             width: parent.width
             spacing: 2
 

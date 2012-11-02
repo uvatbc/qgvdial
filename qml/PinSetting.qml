@@ -56,7 +56,8 @@ Item {
             width: parent.width
 
             text: "Use PIN for GV dial"
-        }// RadioButton (pinSupport)
+            pointSize: (8 * g_fontMul)
+        }//RadioButton (pinSupport)
 
         Row {
             width: parent.width
