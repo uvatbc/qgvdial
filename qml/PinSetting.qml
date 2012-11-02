@@ -72,7 +72,7 @@ Item {
                 height: paintedHeight + 2
             }//QGVLabel ("Pin:")
 
-            QGVTextEdit {
+            QGVTextInput {
                 id: textPin
                 width: parent.width - lblPin.width
                 anchors.verticalCenter: parent.verticalCenter
@@ -80,7 +80,7 @@ Item {
                 validator: IntValidator { bottom: 0; top: 9999 }
                 height: lblPin.height
                 fontPointMultiplier: 8.0 / 10.0
-            }//QGVTextEdit (pin)
+            }//QGVTextInput (pin)
         }// Row (pin)
 
         SaveCancel {

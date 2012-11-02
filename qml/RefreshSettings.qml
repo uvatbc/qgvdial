@@ -83,7 +83,7 @@ Item {
                 height: paintedHeight + 2
             }//QGVLabel ("Refresh contacts (min)")
 
-            QGVTextEdit {
+            QGVTextInput {
                 id: textContactsRefreshPeriod
                 width: parent.width - lblContactsRefreshPeriod.width
                 height: lblContactsRefreshPeriod.height
@@ -93,7 +93,7 @@ Item {
                 KeyNavigation.tab: textInboxRefreshPeriod
                 KeyNavigation.backtab: textInboxRefreshPeriod
                 fontPointMultiplier: mainColumn.fontPointMultiplier
-            }//QGVTextEdit (contact refresh period)
+            }//QGVTextInput (contact refresh period)
 
             QGVLabel {
                 text: "sec"
@@ -116,7 +116,7 @@ Item {
                 height: paintedHeight + 2
             }//QGVLabel ("Refresh inbox (min)")
 
-            QGVTextEdit {
+            QGVTextInput {
                 id: textInboxRefreshPeriod
                 width: parent.width - lblInboxRefreshPeriod.width
                 height: lblInboxRefreshPeriod.height
@@ -126,7 +126,7 @@ Item {
                 KeyNavigation.tab: textContactsRefreshPeriod
                 KeyNavigation.backtab: textContactsRefreshPeriod
                 fontPointMultiplier: mainColumn.fontPointMultiplier
-            }//QGVTextEdit (inbox refresh period)
+            }//QGVTextInput (inbox refresh period)
         }// Row (Inbox refresh period)
 
         RadioButton {
@@ -150,7 +150,7 @@ Item {
                 height: paintedHeight + 2
             }//QGVLabel ("Host:")
 
-            QGVTextEdit {
+            QGVTextInput {
                 id: textMqServer
                 width: parent.width - lblHost.width
                 height: lblHost.height
@@ -159,7 +159,7 @@ Item {
                 KeyNavigation.tab: textMqPort
                 KeyNavigation.backtab: textMqTopic
                 fontPointMultiplier: mainColumn.fontPointMultiplier
-            }//QGVTextEdit (mq server)
+            }//QGVTextInput (mq server)
         }// Row (Mq server)
 
         Row {
@@ -176,7 +176,7 @@ Item {
                 height: paintedHeight + 2
             }//QGVLabel ("Port:")
 
-            QGVTextEdit {
+            QGVTextInput {
                 id: textMqPort
                 width: parent.width - lblPort.width
                 height: lblPort.height
@@ -186,7 +186,7 @@ Item {
                 KeyNavigation.tab: textMqTopic
                 KeyNavigation.backtab: textMqServer
                 fontPointMultiplier: mainColumn.fontPointMultiplier
-            }//QGVTextEdit (mq port)
+            }//QGVTextInput (mq port)
         }// Row (Mq port)
 
         Row {
@@ -202,7 +202,7 @@ Item {
                 height: paintedHeight + 2
             }//QGVLabel ("Topic to sub:")
 
-            QGVTextEdit {
+            QGVTextInput {
                 id: textMqTopic
                 width: parent.width - lblTopic.width
                 height: lblTopic.height
@@ -211,7 +211,7 @@ Item {
                 KeyNavigation.tab: textMqServer
                 KeyNavigation.backtab: textMqPort
                 fontPointMultiplier: mainColumn.fontPointMultiplier
-            }//QGVTextEdit (mq topic)
+            }//QGVTextInput (mq topic)
         }// Row (Mq topic to subscribe to)
 
         SaveCancel {

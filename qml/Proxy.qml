@@ -100,7 +100,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
             }//QGVLabel ("Host:")
 
-            QGVTextEdit {
+            QGVTextInput {
                 id: textUserProxyHost
                 width: parent.width - lblHost.width
                 anchors.verticalCenter: parent.verticalCenter
@@ -108,7 +108,7 @@ Item {
                 KeyNavigation.tab: textUserProxyPort
                 KeyNavigation.backtab: (bEnableProxy && !bSystemProxy && bProxyUserPass ? textUserProxyPass : textUserProxyPort)
                 fontPointMultiplier: 8.0 / 10.0
-            }//QGVTextEdit (proxy host)
+            }//QGVTextInput (proxy host)
         }// Row (user proxy host)
 
         Row {
@@ -126,7 +126,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
             }//QGVLabel ("Port:")
 
-            QGVTextEdit {
+            QGVTextInput {
                 id: textUserProxyPort
                 width: parent.width - lblPort.width
                 anchors.verticalCenter: parent.verticalCenter
@@ -135,7 +135,7 @@ Item {
                 KeyNavigation.tab: (bEnableProxy && !bSystemProxy && bProxyUserPass ? textUserProxyUser : textUserProxyHost)
                 KeyNavigation.backtab: textUserProxyHost
                 fontPointMultiplier: 8.0 / 10.0
-            }//QGVTextEdit (proxy port)
+            }//QGVTextInput (proxy port)
         }// Row (user proxy port)
 
         RadioButton {
@@ -162,7 +162,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
             }//QGVLabel ("Proxy user:")
 
-            QGVTextEdit {
+            QGVTextInput {
                 id: textUserProxyUser
                 anchors.verticalCenter: parent.verticalCenter
                 width: parent.width - lblProxyUser.width
@@ -170,7 +170,7 @@ Item {
                 KeyNavigation.tab: textUserProxyPass
                 KeyNavigation.backtab: textUserProxyPort
                 fontPointMultiplier: 8.0 / 10.0
-            }//QGVTextEdit (proxy user)
+            }//QGVTextInput (proxy user)
         }// Row (user proxy user name)
 
         Row {
@@ -188,7 +188,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
             }//QGVLabel ("Proxy password:")
 
-            QGVTextEdit {
+            QGVTextInput {
                 id: textUserProxyPass
                 anchors.verticalCenter: parent.verticalCenter
                 width: parent.width - lblProxyPass.width
@@ -197,7 +197,7 @@ Item {
                 KeyNavigation.tab: textUserProxyHost
                 KeyNavigation.backtab: textUserProxyUser
                 fontPointMultiplier: 8.0 / 10.0
-            }//QGVTextEdit (proxy password)
+            }//QGVTextInput (proxy password)
         }// Row (user proxy password)
 
         SaveCancel {

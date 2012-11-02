@@ -102,7 +102,7 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
             }//QGVLabel ("Search")
 
-            QGVTextEdit {
+            QGVTextInput {
                 id: edSearch
                 width: parent.width - imgSearch.width - searchLabel.width - (parent.spacing * 2)
                 anchors.verticalCenter: parent.verticalCenter
@@ -119,7 +119,7 @@ Rectangle {
                 onSigEnter: {
                     searchRow.doSearch();
                 }
-            }//QGVTextEdit (search box text edit)
+            }//QGVTextInput (search box text edit)
 
             Image {
                 id: imgSearch

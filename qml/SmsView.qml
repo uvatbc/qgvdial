@@ -86,7 +86,6 @@ Rectangle {
             QGVTextEdit {
                 id: smsText
                 width: parent.width
-                multiLine: true
             }//QGVTextEdit (the entire SMS text)
 
             QGVLabel {

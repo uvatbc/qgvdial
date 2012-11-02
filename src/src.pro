@@ -229,9 +229,11 @@ OTHER_FILES  += ../src/winrsrc.rc           \
                 ../qml/generic/QGVButton.qml    \
                 ../qml/generic/QGVLabel.qml     \
                 ../qml/generic/QGVTextEdit.qml  \
+                ../qml/generic/QGVTextInput.qml \
                 ../qml/meego/QGVButton.qml      \
                 ../qml/meego/QGVLabel.qml       \
                 ../qml/meego/QGVTextEdit.qml    \
+                ../qml/meego/QGVTextInput.qml   \
                 readme.txt
 
 # In Linux and maemo, add the telepathy related sources and headers.

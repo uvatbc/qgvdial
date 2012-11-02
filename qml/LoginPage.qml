@@ -84,7 +84,7 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
         }//QGVLabel: Label "Username:"
 
-        QGVTextEdit {
+        QGVTextInput {
             id: textUsername
 
             width: parent.width * 0.75
@@ -94,7 +94,7 @@ Item {
             KeyNavigation.tab: textPassword
             onSigTextChanged: container.sigUserChanged(strText);
             onSigEnter: btnLogin.doClick();
-        }//QGVTextEdit: username
+        }//QGVTextInput: username
 
         QGVLabel {
             id: lblPass
@@ -102,7 +102,7 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
         }
 
-        QGVTextEdit {
+        QGVTextInput {
             id: textPassword
 
             width: parent.width * 0.75
@@ -114,7 +114,7 @@ Item {
             KeyNavigation.tab: textUsername
             onSigTextChanged: container.sigPassChanged(strText);
             onSigEnter: btnLogin.doClick();
-        }//QGVTextEdit (password)
+        }//QGVTextInput (password)
 
         QGVButton {
             id: btnHide

@@ -22,11 +22,8 @@ Contact: yuvraaj@gmail.com
 import QtQuick 1.1
 import com.nokia.meego 1.0
 
-TextField {
+TextArea {
     id:  container
-
-    signal sigTextChanged(string strText)
-    signal sigEnter
 
     text: "You should have changed this text"
     property int pointSize: (10 * g_fontMul)
@@ -34,19 +31,7 @@ TextField {
 
     inputMethodHints: Qt.ImhNoAutoUppercase + Qt.ImhNoPredictiveText
 
-    function doAccepted() {
+    function closeSoftwareInputPanel() {
         container.platformCloseSoftwareInputPanel();
-        container.sigEnter();
-    }
-
-    onAccepted: container.doAccepted();
-
-    Keys.onReturnPressed: {
-        container.doAccepted();
-        event.accepted = true;
-    }
-
-    onTextChanged: {
-        container.sigTextChanged(text);
     }
 }//Rectangle

@@ -53,7 +53,7 @@ Item {
             height: paintedHeight + 2
         }//QGVLabel ("Email:")
 
-        QGVTextEdit {
+        QGVTextInput {
             id: textUsername
             height: lblEmail.height
             width: parent.width - lblEmail.width - (parent.spacing * 2)
@@ -63,7 +63,7 @@ Item {
             KeyNavigation.tab: textPassword
             onSigTextChanged: container.sigUserChanged(strText);
             onSigEnter: btnLogin.doClick();
-        }//QGVTextEdit
+        }//QGVTextInput
 
         QGVLabel {
             id: lblUsername
@@ -94,7 +94,7 @@ Item {
             height: paintedHeight + 2
         }//QGVLabel ("Password:")
 
-        QGVTextEdit {
+        QGVTextInput {
             id: textPassword
             height: lblPass.height
             width: parent.width - lblPass.width - (parent.spacing * 2)
@@ -105,7 +105,7 @@ Item {
             KeyNavigation.tab: textUsername
             onSigTextChanged: container.sigPassChanged(strText);
             onSigEnter: btnLogin.doClick();
-        }//QGVTextEdit
+        }//QGVTextInput
 
         QGVLabel {
             id: lblPassword

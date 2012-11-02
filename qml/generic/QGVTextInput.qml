@@ -28,15 +28,17 @@ Rectangle {
     signal sigEnter
 
     property string text: "You should have changed this text"
+    property alias echoMode: textIn.echoMode
+    property alias validator: textIn.validator
     property real fontPointMultiplier: 1.0
 
-    height: textEd.height + (2 * g_hMul)
+    height: textIn.height + (2 * g_hMul)
 
-    border.color: textEd.activeFocus ? "orange" : "blue"
+    border.color: textIn.activeFocus ? "orange" : "blue"
     color: "slategray"
 
     function closeSoftwareInputPanel() {
-        textEd.closeSoftwareInputPanel();
+        textIn.closeSoftwareInputPanel();
     }
 
     function doAccepted() {
@@ -44,8 +46,8 @@ Rectangle {
         container.sigEnter();
     }
 
-    TextEdit {
-        id: textEd
+    TextInput {
+        id: textIn
         text: container.text
 
         anchors {
@@ -60,6 +62,17 @@ Rectangle {
         font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) * container.fontPointMultiplier; }
 
         inputMethodHints: Qt.ImhNoAutoUppercase + Qt.ImhNoPredictiveText
-        wrapMode: TextEdit.WordWrap
-    }
+
+        onAccepted: container.doAccepted();
+
+        Keys.onReturnPressed: {
+            container.doAccepted();
+            event.accepted = true;
+        }
+
+        onTextChanged: {
+            container.sigTextChanged(text);
+            container.text = textIn.text;
+        }
+    }//TextInput
 }//Rectangle

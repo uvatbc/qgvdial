@@ -19,24 +19,23 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-import Qt 4.7
+import QtQuick 1.1
+import com.nokia.meego 1.0
 
-Rectangle {
+TextField {
     id:  container
 
     signal sigTextChanged(string strText)
     signal sigEnter
 
-    property string text: "You should have changed this text"
+    text: "You should have changed this text"
+    property int pointSize: (10 * g_fontMul)
     property real fontPointMultiplier: 1.0
 
-    height: textEd.height + (2 * g_hMul)
-
-    border.color: textEd.activeFocus ? "orange" : "blue"
-    color: "slategray"
+    inputMethodHints: Qt.ImhNoAutoUppercase + Qt.ImhNoPredictiveText
 
     function closeSoftwareInputPanel() {
-        textEd.closeSoftwareInputPanel();
+        container.platformCloseSoftwareInputPanel();
     }
 
     function doAccepted() {
@@ -44,22 +43,14 @@ Rectangle {
         container.sigEnter();
     }
 
-    TextEdit {
-        id: textEd
-        text: container.text
+    onAccepted: container.doAccepted();
 
-        anchors {
-            left: parent.left
-            leftMargin: 1
-            top: parent.top
-            topMargin: 1
-        }
-        width: parent.width - 2
+    Keys.onReturnPressed: {
+        container.doAccepted();
+        event.accepted = true;
+    }
 
-        color: "white"
-        font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) * container.fontPointMultiplier; }
-
-        inputMethodHints: Qt.ImhNoAutoUppercase + Qt.ImhNoPredictiveText
-        wrapMode: TextEdit.WordWrap
+    onTextChanged: {
+        container.sigTextChanged(text);
     }
 }//Rectangle
