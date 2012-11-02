@@ -240,14 +240,13 @@ Rectangle {
 
         color: "black"
 
-        Text {
+        QGVLabel {
             text: g_strStatus
-            font { family: "Nokia Sans"; pointSize: (7 * g_fontMul) }
+            fontPointMultiplier: 7.0 / 8.0
             anchors {
                 verticalCenter: parent.verticalCenter
                 horizontalCenter: parent.horizontalCenter
             }
-            color: "white"
-        }
+        }//QGVLabel (status text)
     }//Rectangle (status bar)
 }//Rectangle (main)

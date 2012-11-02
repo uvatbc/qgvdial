@@ -75,14 +75,12 @@ Item {
 
             opacity: (periodicRefresh.check ? 1 : 0)
 
-            Text {
+            QGVLabel {
                 id: lblContactsRefreshPeriod
                 text: "Refresh contacts (min)"
-                color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font { family: "Nokia Sans"; pointSize: mainColumn.subTextPointSize }
                 height: paintedHeight + 2
-            }
+            }//QGVLabel ("Refresh contacts (min)")
 
             MyTextEdit {
                 id: textContactsRefreshPeriod
@@ -96,13 +94,11 @@ Item {
                 pointSize: mainColumn.subTextPointSize
             }
 
-            Text {
+            QGVLabel {
                 text: "sec"
-                color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font { family: "Nokia Sans"; pointSize: mainColumn.subTextPointSize }
                 height: paintedHeight + 2
-            }
+            }//QGVLabel ("sec")
         }// Row (Contacts refresh period)
 
         Row {
@@ -112,14 +108,12 @@ Item {
 
             opacity: (periodicRefresh.check ? 1 : 0)
 
-            Text {
+            QGVLabel {
                 id: lblInboxRefreshPeriod
                 text: "Refresh inbox (min)"
-                color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font { family: "Nokia Sans"; pointSize: mainColumn.subTextPointSize }
                 height: paintedHeight + 2
-            }
+            }//QGVLabel ("Refresh inbox (min)")
 
             MyTextEdit {
                 id: textInboxRefreshPeriod
@@ -148,14 +142,12 @@ Item {
             spacing: 2
             opacity: (mqSupport.check ? 1 : 0)
 
-            Text {
+            QGVLabel {
                 id: lblHost
                 text: "Host:"
-                color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font { family: "Nokia Sans"; pointSize: mainColumn.subTextPointSize }
                 height: paintedHeight + 2
-            }
+            }//QGVLabel ("Host:")
 
             MyTextEdit {
                 id: textMqServer
@@ -176,14 +168,12 @@ Item {
 
             opacity: (mqSupport.check ? 1 : 0)
 
-            Text {
+            QGVLabel {
                 id: lblPort
                 text: "Port:"
-                color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font { family: "Nokia Sans"; pointSize: mainColumn.subTextPointSize }
                 height: paintedHeight + 2
-            }
+            }//QGVLabel ("Port:")
 
             MyTextEdit {
                 id: textMqPort
@@ -204,14 +194,12 @@ Item {
             spacing: 2
             opacity: (mqSupport.check ? 1 : 0)
 
-            Text {
+            QGVLabel {
                 id: lblTopic
                 text: "Topic to sub:"
-                color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font { family: "Nokia Sans"; pointSize: mainColumn.subTextPointSize }
                 height: paintedHeight + 2
-            }
+            }//QGVLabel ("Topic to sub:")
 
             MyTextEdit {
                 id: textMqTopic

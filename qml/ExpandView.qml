@@ -26,7 +26,7 @@ Rectangle {
 
     color: "black"
     border.color: "dimgray"
-    height: titleText.height + 1
+    height: textRow.height + (1 * g_hMul)
 
     property string mainTitle: "Main title"
     property real containedOpacity: 0
@@ -48,14 +48,14 @@ Rectangle {
             leftMargin: 3
         }
         width: parent.width
-        height: imgArrow.height + (2 * g_hMul)
+        height: imgArrow.height
         spacing: 2
 
         Image {
             id: imgArrow
             source: "play.svg"
 
-            height: 24 * g_hMul
+            height: 20 * g_hMul
             width: height
             smooth: true
             anchors.verticalCenter: parent.verticalCenter
@@ -77,6 +77,7 @@ Rectangle {
 
             fontPointMultiplier: (10.0/8.0)
             width: parent.width - imgArrow.width - parent.spacing
+            anchors.verticalCenter: parent.verticalCenter
         }//QGVLabel (text)
     }//Row (arrow and text)
 

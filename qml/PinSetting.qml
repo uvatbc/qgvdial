@@ -65,14 +65,12 @@ Item {
 
             opacity: (bEnable ? 1 : 0)
 
-            Text {
+            QGVLabel {
                 id: lblPin
                 text: "Pin:"
-                color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font { family: "Nokia Sans"; pointSize: container.internalPointSize }
                 height: paintedHeight + 2
-            }
+            }//QGVLabel ("Pin:")
 
             MyTextEdit {
                 id: textPin

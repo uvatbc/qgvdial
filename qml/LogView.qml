@@ -43,14 +43,13 @@ Item {
             height: logText.height + 2
             width: mainColumn.width
             color: "black"
-            Text {
+            QGVLabel {
                 id: logText
                 text: modelData
-                color: "white"
                 width: parent.width
                 wrapMode: Text.Wrap
-                font { family: "Nokia Sans"; pointSize: (6 * g_fontMul) }
-            }
+                fontPointMultiplier: 7.0 / 8.0
+            }//QGVLabel (each line of log text)
         }
     }//ListView (rotating logs)
 

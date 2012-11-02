@@ -73,7 +73,7 @@ Rectangle {
                        repeaterColumn.height + btnRow.height + 8
         contentWidth: width
 
-        Text {
+        QGVLabel {
             id: smsLabel
             anchors {
                 top: parent.top
@@ -82,10 +82,9 @@ Rectangle {
             }
 
             text: "Enter the Text to send"
-            color: "white"
 
-            font { family: "Nokia Sans"; bold: true; pointSize: (7 * g_fontMul) }
-        }
+            fontPointMultiplier: 7.0 / 8.0
+        }//QGVLabel ("Enter the Text to send")
 
         FocusScope {
             id: smsTextRect
@@ -128,11 +127,10 @@ Rectangle {
             }//Rectangle (bounding the sms text edit)
         }//FocusScope
 
-        Text {
+        QGVLabel {
             id: remainingCharsText
             text: "Remaining characters = " + (140 - smsText.text.length)
-            color: "white"
-            font { family: "Nokia Sans"; pointSize: (6 * g_fontMul) }
+            fontPointMultiplier: 6.0 / 8.0
 
             anchors {
                 top: smsTextRect.bottom
@@ -140,7 +138,7 @@ Rectangle {
                 left: parent.left
                 right: parent.right
             }
-        }// Text (remaining characters)
+        }//QGVLabel (remaining characters)
 
         Column {
             id: repeaterColumn
@@ -163,7 +161,7 @@ Rectangle {
                     height: entryText.height
                     width: mainFlick.width
 
-                    Text {
+                    QGVLabel {
                         id: entryText
 
                         anchors {
@@ -172,9 +170,7 @@ Rectangle {
                         }
 
                         text: name + " (" + number + ")"
-                        font { family: "Nokia Sans"; pointSize: (8 * g_fontMul) }
-                        color: "white"
-                    }//Text
+                    }//QGVLabel (name + number)
 
                     Rectangle {
                         id: imageRect

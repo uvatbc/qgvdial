@@ -47,14 +47,12 @@ Item {
         height: lblEmail.height
         spacing: 2
 
-        Text {
+        QGVLabel {
             id: lblEmail
             text: "Email:"
-            color: "white"
             anchors.verticalCenter: parent.verticalCenter
             height: paintedHeight + 2
-            font { family: "Nokia Sans"; pointSize: container.pointSize }
-        }
+        }//QGVLabel ("Email:")
 
         MyTextEdit {
             id: textUsername
@@ -68,16 +66,13 @@ Item {
             onSigEnter: btnLogin.doClick();
         }
 
-        Text {
+        QGVLabel {
             id: lblUsername
             anchors.verticalCenter: parent.verticalCenter
-            color: "white"
             height: paintedHeight + 2
             opacity: (g_bIsLoggedIn == true ? 1 : 0)
-            font { family: "Nokia Sans"; pointSize: container.pointSize }
-
             text: container.username
-        }
+        }//QGVLabel (username)
     }//Row (username)
 
     Row {
@@ -93,14 +88,12 @@ Item {
         height: lblPass.height
         spacing: 2
 
-        Text {
+        QGVLabel {
             id: lblPass
             text: "Password:"
-            color: "white"
             anchors.verticalCenter: parent.verticalCenter
             height: paintedHeight + 2
-            font { family: "Nokia Sans"; pointSize: container.pointSize }
-        }
+        }//QGVLabel ("Password:")
 
         MyTextEdit {
             id: textPassword
@@ -115,16 +108,13 @@ Item {
             onSigEnter: btnLogin.doClick();
         }
 
-        Text {
+        QGVLabel {
             id: lblPassword
             anchors.verticalCenter: parent.verticalCenter
-            color: "white"
             height: paintedHeight + 2
-            font { family: "Nokia Sans"; pointSize: container.pointSize }
             opacity: (g_bIsLoggedIn == true ? 1 : 0)
-
             text: Array(container.password.length+1).join("*")
-        }
+        }//QGVLabel (password)
     }//Row (password)
 
     QGVButton {

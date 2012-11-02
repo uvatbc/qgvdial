@@ -49,18 +49,17 @@ Item {
         anchors.centerIn: parent
         spacing: 5 * g_hMul
 
-        Text {
+        QGVLabel {
             id: textItem
             text: container.msgText
             width: parent.width
             height: paintedHeight + (5 * g_hMul)
 
-            font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
+            fontPointMultiplier: 10.0 / 8.0
             wrapMode: Text.WordWrap
-            color: "white"
 
             horizontalAlignment: Text.AlignHCenter
-        }// Item containing the text to display
+        }//QGVLabel containing the text to display
 
         MyTextEdit {
             id: textInput

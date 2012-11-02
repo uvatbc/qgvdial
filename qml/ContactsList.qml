@@ -215,7 +215,7 @@ Rectangle {
 
                         text: name
                         fontPointMultiplier: (10.0/8.0)
-                    }//Text (contact name)
+                    }//QGVLabel (contact name)
                 }// Row (image and contact name)
 
                 MouseArea {

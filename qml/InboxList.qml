@@ -98,44 +98,39 @@ Rectangle {
                 height: detailName.height + theTime.height + theNumber.height +
                         btnRow.height + theSmsText.height + (spacing * 6)
 
-                Text {
+                QGVLabel {
                     id: detailName
                     text: container.strDetailsName
-                    color: "white"
                     anchors.horizontalCenter: parent.horizontalCenter
-                    font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
-                }// Text (name)
+                    fontPointMultiplier: 10.0 / 8.0
+                }//QGVLabel (name)
 
-                Text {
+                QGVLabel {
                     id: theTime
 
                     anchors {
                         left: parent.left
                         leftMargin: 5 * g_wMul
                     }
-                    font { family: "Nokia Sans"; pointSize: (8 * g_fontMul) }
 
-                    color: "white"
                     wrapMode: Text.Wrap
 
                     text: strDetailsTime
-                }// Text (the time)
+                }//QGVLabel (the time)
 
-                Text {
+                QGVLabel {
                     id: theNumber
 
                     anchors {
                         left: parent.left
                         leftMargin: 5 * g_wMul
                     }
-                    font { family: "Nokia Sans"; pointSize: (8 * g_fontMul) }
 
                     width: parent.width
-                    color: "white"
                     wrapMode: Text.Wrap
 
                     text: container.strNumber
-                }// Text (the number)
+                }//QGVLabel (the number)
 
                 Item {
                     id: btnRow
@@ -252,7 +247,7 @@ Rectangle {
                     }// Row (call, text and play buttons)
                 }// Item (the row of buttons in horiz centre)
 
-                Text {
+                QGVLabel {
                     id: theSmsText
 
                     // Must set the width so that the wrap mode is activated
@@ -265,11 +260,8 @@ Rectangle {
                     wrapMode: Text.Wrap
                     clip: true
 
-                    color: "white"
-                    font.pixelSize: suggestedPixelSize
-
                     onLinkActivated: Qt.openUrlExternally(link);
-                }// Text (sms text)
+                }//QGVLabel (sms text)
             }//Column of all details
         }//Flickable (text / voicemail)
 
@@ -326,15 +318,14 @@ Rectangle {
 
             signal clickedTopBar
 
-            Text {
+            QGVLabel {
                 id: txtInboxFilter
                 text: strInboxFilter
-                font { family: "Nokia Sans"; pointSize: (9 * g_fontMul); }
                 anchors {
                     horizontalCenter: parent.horizontalCenter
                 }
-                color: "white"
-            }
+                fontPointMultiplier: 9.0 / 8.0
+            }//QGVLabel
 
             MouseArea {
                 id: mouseAreaTopBar
@@ -379,16 +370,14 @@ Rectangle {
                 color: "black"
                 border.color: "orange"
 
-                Text {
+                QGVLabel {
                     id: lblSelector
                     anchors {
                         verticalCenter: parent.verticalCenter
                         horizontalCenter: parent.horizontalCenter
                     }
                     text: modelData
-                    color: "white"
-                    font { family: "Nokia Sans"; pointSize: (8 * g_fontMul) }
-                }
+                }//QGVLabel
 
                 MouseArea {
                     anchors.fill: parent
@@ -502,7 +491,7 @@ Rectangle {
                     }// SMS icon
                 }//Item (the inbox entry image)
 
-                Text {
+                QGVLabel {
                     id: entryName
                     height: (listInbox.height + listInbox.width) / 20
                     anchors {
@@ -513,11 +502,10 @@ Rectangle {
 
                     clip: true
                     text: name
-                    color: "white"
-                    font { family: "Nokia Sans"; pointSize: (9 * g_fontMul) }
-                }//Text (name)
+                    fontPointMultiplier: 9.0 / 8.0
+                }//QGVLabel (name)
 
-                Text {
+                QGVLabel {
                     id: entryTime
                     height: (listInbox.height + listInbox.width) / 20
                     horizontalAlignment: Text.AlignRight
@@ -530,9 +518,8 @@ Rectangle {
 
 
                     text: time
-                    color: "white"
-                    font { family: "Nokia Sans"; pointSize: (5 * g_fontMul) }
-                }//Text (entry time)
+                    fontPointMultiplier: 5.0 / 8.0
+                }//QGVLabel (entry time)
 
                 MouseArea {
                     anchors.fill: parent

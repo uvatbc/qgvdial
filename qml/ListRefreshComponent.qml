@@ -66,16 +66,14 @@ Item {
 
         color: "slategray"
 
-        Text {
+        QGVLabel {
             id: refreshText
             text: "Tap to refresh"
             anchors {
                 horizontalCenter: parent.horizontalCenter
             }
-            color: "white"
-            font { family: "Nokia Sans"; pointSize: (8 * g_fontMul) }
             smooth: true
-        }
+        }//QGVLabel ("Tap to refresh")
 
         MouseArea {
             id: mouseArea

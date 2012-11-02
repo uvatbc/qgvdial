@@ -94,13 +94,11 @@ Item {
 
             opacity: (bEnableProxy && !bSystemProxy ? 1 : 0)
 
-            Text {
+            QGVLabel {
                 id: lblHost
                 text: "Host:"
-                color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font { family: "Nokia Sans"; pointSize: container.internalPointSize }
-            }
+            }//QGVLabel ("Host:")
 
             MyTextEdit {
                 id: textUserProxyHost
@@ -122,13 +120,11 @@ Item {
 
             opacity: (bEnableProxy && !bSystemProxy ? 1 : 0)
 
-            Text {
+            QGVLabel {
                 id: lblPort
                 text: "Port:"
-                color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font { family: "Nokia Sans"; pointSize: container.internalPointSize }
-            }
+            }//QGVLabel ("Port:")
 
             MyTextEdit {
                 id: textUserProxyPort
@@ -160,13 +156,11 @@ Item {
 
             opacity: (bEnableProxy && !bSystemProxy && bProxyUserPass ? 1 : 0)
 
-            Text {
+            QGVLabel {
                 id: lblProxyUser
                 text: "Proxy user:"
-                color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font { family: "Nokia Sans"; pointSize: container.internalPointSize }
-            }
+            }//QGVLabel ("Proxy user:")
 
             MyTextEdit {
                 id: textUserProxyUser
@@ -188,13 +182,11 @@ Item {
 
             opacity: (bEnableProxy && !bSystemProxy && bProxyUserPass ? 1 : 0)
 
-            Text {
+            QGVLabel {
                 id: lblProxyPass
                 text: "Proxy password:"
-                color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font { family: "Nokia Sans"; pointSize: container.internalPointSize }
-            }
+            }//QGVLabel ("Proxy password:")
 
             MyTextEdit {
                 id: textUserProxyPass

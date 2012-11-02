@@ -67,14 +67,13 @@ Item {
             spacing: 2
             opacity: (bEnable ? 1 : 0)
 
-            Text {
+            QGVLabel {
                 id: lblHost
                 text: "Host:"
-                color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
                 height: paintedHeight + 2
-            }
+                fontPointMultiplier: 10.0 / 8.0
+            }//QGVLabel ("Host:")
 
             MyTextEdit {
                 id: textMqServer
@@ -94,14 +93,13 @@ Item {
 
             opacity: (bEnable ? 1 : 0)
 
-            Text {
+            QGVLabel {
                 id: lblPort
                 text: "Port:"
-                color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
                 height: paintedHeight + 2
-            }
+                fontPointMultiplier: 10.0 / 8.0
+            }//QGVLabel ("Port:")
 
             MyTextEdit {
                 id: textMqPort
@@ -121,14 +119,13 @@ Item {
             spacing: 2
             opacity: (bEnable ? 1 : 0)
 
-            Text {
+            QGVLabel {
                 id: lblTopic
                 text: "Topic to sub:"
-                color: "white"
                 anchors.verticalCenter: parent.verticalCenter
-                font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) }
                 height: paintedHeight + 2
-            }
+                fontPointMultiplier: 10.0 / 8.0
+            }//QGVLabel ("Topic to sub")
 
             MyTextEdit {
                 id: textMqTopic
