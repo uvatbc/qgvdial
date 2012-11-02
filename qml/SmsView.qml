@@ -30,9 +30,6 @@ Rectangle {
     signal sigBack
     signal sigText(string strNumbers, string strText)
 
-    onSigBack: smsText.closeSoftwareInputPanel()
-    onSigText: smsText.closeSoftwareInputPanel()
-
     function addSmsDestination(name, number) {
         modelDestinations.append({"name": name, "number": number});
     }
@@ -67,83 +64,43 @@ Rectangle {
         id: mainFlick
         anchors.fill: parent
 
-        contentHeight: smsLabel.height + smsLabel.anchors.topMargin +
-                       smsTextRect.height + smsTextRect.anchors.topMargin +
-                       remainingCharsText.height + remainingCharsText.anchors.topMargin +
-                       repeaterColumn.height + btnRow.height + 8
+        contentHeight: textColumn.height + repeaterColumn.height + btnRow.height + 8
         contentWidth: width
 
-        QGVLabel {
-            id: smsLabel
+        Column {
+            id: textColumn
             anchors {
                 top: parent.top
-                topMargin: 5
-                horizontalCenter: parent.horizontalCenter
-            }
-
-            text: "Enter the Text to send"
-
-            fontPointMultiplier: 7.0 / 8.0
-        }//QGVLabel ("Enter the Text to send")
-
-        FocusScope {
-            id: smsTextRect
-
-            anchors {
-                top: smsLabel.bottom
-                topMargin: 2
                 left: parent.left
             }
-            height: smsText.paintedHeight
-            width: parent.width - 1
+            width: parent.width
+            height: smsLabel.height + smsText.height + remainingCharsText.height + (spacing*2)
 
-            Rectangle {
-                anchors.fill: parent
+            QGVLabel {
+                id: smsLabel
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: "Enter the Text to send"
+                fontPointMultiplier: 7.0 / 8.0
+            }//QGVLabel ("Enter the Text to send")
 
-                border.color: smsText ? "orange" : "blue"
-                color: "slategray"
+            QGVTextEdit {
+                id: smsText
+                width: parent.width
+                multiLine: true
+            }//QGVTextEdit (the entire SMS text)
 
-                TextEdit {
-                    id: smsText
-
-                    // This item gets the focus
-                    focus: true
-
-                    anchors {
-                        left: parent.left
-                        top: parent.top
-                    }
-
-                    // Forcibly set width so that wrap mode can work
-                    width: parent.width
-                    wrapMode: Text.WordWrap
-                    textFormat: TextEdit.PlainText
-
-                    inputMethodHints: Qt.ImhNoAutoUppercase + Qt.ImhNoPredictiveText
-
-                    font { family: "Nokia Sans"; pointSize: (8 * g_fontMul) }
-                    color: "white"
-                }//TextEdit (with all the SMS text)
-            }//Rectangle (bounding the sms text edit)
-        }//FocusScope
-
-        QGVLabel {
-            id: remainingCharsText
-            text: "Remaining characters = " + (140 - smsText.text.length)
-            fontPointMultiplier: 6.0 / 8.0
-
-            anchors {
-                top: smsTextRect.bottom
-                topMargin: 5
-                left: parent.left
-                right: parent.right
-            }
-        }//QGVLabel (remaining characters)
+            QGVLabel {
+                id: remainingCharsText
+                text: "Remaining characters = " + (140 - smsText.text.length)
+                fontPointMultiplier: 6.0 / 8.0
+                anchors.horizontalCenter: parent.horizontalCenter
+            }//QGVLabel (remaining characters)
+        }//Column
 
         Column {
             id: repeaterColumn
             anchors {
-                top: remainingCharsText.bottom
+                top: textColumn.bottom
                 topMargin: 2
                 left: parent.left
                 right: parent.right

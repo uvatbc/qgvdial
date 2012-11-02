@@ -28,16 +28,18 @@ Rectangle {
     signal sigEnter
 
     property string text: "You should have changed this text"
-    property alias echoMode: textEd.echoMode
-    property alias validator: textEd.validator
+    property bool multiLine: false
+    property alias echoMode: textIn.echoMode
+    property alias validator: textIn.validator
     property real fontPointMultiplier: 1.0
 
-    height: textEd.height
-    border.color: textEd.activeFocus ? "orange" : "blue"
+    height: (multiLine ? textEd.height : textIn.height) + (2 * g_hMul)
+
+    border.color: (multiLine ? textEd.activeFocus : textIn.activeFocus) ? "orange" : "blue"
     color: "slategray"
 
     function closeSoftwareInputPanel() {
-        textEd.closeSoftwareInputPanel();
+        textIn.closeSoftwareInputPanel();
     }
 
     function doAccepted() {
@@ -46,18 +48,17 @@ Rectangle {
     }
 
     TextInput {
-        id: textEd
+        id: textIn
         text: container.text
+        visible: !container.multiLine
 
         anchors {
             left: parent.left
             leftMargin: 1
             top: parent.top
             topMargin: 1
-            verticalCenter: parent.verticalCenter
         }
         width: parent.width - 2
-        height: parent.height - 2
 
         color: "white"
         font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) * container.fontPointMultiplier; }
@@ -73,7 +74,27 @@ Rectangle {
 
         onTextChanged: {
             container.sigTextChanged(text);
-            container.text = textEd.text;
+            container.text = textIn.text;
         }
     }//TextInput
+
+    TextEdit {
+        id: textEd
+        text: container.text
+        visible: container.multiLine
+
+        anchors {
+            left: parent.left
+            leftMargin: 1
+            top: parent.top
+            topMargin: 1
+        }
+        width: parent.width - 2
+
+        color: "white"
+        font { family: "Nokia Sans"; pointSize: (10 * g_fontMul) * container.fontPointMultiplier; }
+
+        inputMethodHints: Qt.ImhNoAutoUppercase + Qt.ImhNoPredictiveText
+        wrapMode: TextEdit.WordWrap
+    }
 }//Rectangle
