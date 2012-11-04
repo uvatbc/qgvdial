@@ -70,6 +70,8 @@ public:
     bool isSymbian1();
     bool isSymbian3();
 
+    bool ensureDBusObject();
+
     void initDialServer (QObject *receiver, const char *method);
     void initTextServer (QObject *r1, const char *m1,
                          QObject *r2, const char *m2);
@@ -113,6 +115,8 @@ private:
 #if HAS_FEEDBACK
     QFeedbackHapticsEffect *btnClickBuzz;
 #endif
+
+    bool bDBusObjectRegistered;
 
     friend class Singletons;
 };

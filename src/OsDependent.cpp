@@ -25,7 +25,9 @@ Contact: yuvraaj@gmail.com
 #include "QGVDbusServer.h"
 #endif
 
-OsDependent::OsDependent(QObject *parent) : QObject(parent)
+OsDependent::OsDependent(QObject *parent)
+: QObject(parent)
+, bDBusObjectRegistered(false)
 {
 #if SYSTEMDISPLAYINFO
     displayInfo = NULL;
@@ -114,21 +116,39 @@ OsDependent::isSymbian3()
     return (rv);
 }//OsDependent::isSymbian3
 
+bool
+OsDependent::ensureDBusObject()
+{
+#if TELEPATHY_CAPABLE
+    if (!bDBusObjectRegistered) {
+        QDBusConnection sessionBus = QDBusConnection::sessionBus();
+        if (!sessionBus.registerObject ("/org/QGVDial/APIServer", this) ||
+            !sessionBus.registerService("org.QGVDial.APIServer")) {
+            qWarning ("Failed to register Dbus Settings server. Aborting!");
+            qApp->quit ();
+        }
+
+        bDBusObjectRegistered = true;
+    }
+
+#endif
+    return bDBusObjectRegistered;
+}//OsDependent::ensureDBusObject
+
 void
 OsDependent::initDialServer (QObject *receiver, const char *method)
 {
 #if TELEPATHY_CAPABLE
+    if (!ensureDBusObject ()) {
+        Q_WARN("Failed to register Dbus API server. Aborting!");
+        qApp->quit ();
+        return;
+    }
+
     static QGVDbusCallServer *pDialServer = NULL;
     if (NULL == pDialServer) {
         pDialServer = new QGVDbusCallServer (this);
         pDialServer->addCallReceiver (receiver, method);
-
-        QDBusConnection sessionBus = QDBusConnection::sessionBus();
-        if (!sessionBus.registerObject ("/org/QGVDial/CallServer", this) ||
-            !sessionBus.registerService("org.QGVDial.CallServer")) {
-            qWarning ("Failed to register Dbus Call server. Aborting!");
-            qApp->quit ();
-        }
     }
 #else
     Q_UNUSED (receiver);
@@ -141,17 +161,16 @@ OsDependent::initTextServer (QObject *r1, const char *m1,
                              QObject *r2, const char *m2)
 {
 #if TELEPATHY_CAPABLE
+    if (!ensureDBusObject ()) {
+        Q_WARN("Failed to register Dbus API server. Aborting!");
+        qApp->quit ();
+        return;
+    }
+
     static QGVDbusTextServer *pTextServer = NULL;
     if (NULL == pTextServer) {
         pTextServer = new QGVDbusTextServer (this);
         pTextServer->addTextReceivers (r1, m1, r2, m2);
-
-        QDBusConnection sessionBus = QDBusConnection::sessionBus();
-        if (!sessionBus.registerObject ("/org/QGVDial/TextServer", this) ||
-            !sessionBus.registerService("org.QGVDial.TextServer")) {
-            qWarning ("Failed to register Dbus Text server. Aborting!");
-            qApp->quit ();
-        }
     }
 #else
     Q_UNUSED (r1);
@@ -166,17 +185,16 @@ OsDependent::initSettingsServer(QObject *r1, const char *m1,
                                 QObject *r2, const char *m2)
 {
 #if TELEPATHY_CAPABLE
+    if (!ensureDBusObject ()) {
+        Q_WARN("Failed to register Dbus API server. Aborting!");
+        qApp->quit ();
+        return;
+    }
+
     static QGVDbusSettingsServer *pServer = NULL;
     if (NULL == pServer) {
         pServer = new QGVDbusSettingsServer (this);
         pServer->addSettingsReceiver (r1, m1, r2, m2);
-
-        QDBusConnection sessionBus = QDBusConnection::sessionBus();
-        if (!sessionBus.registerObject ("/org/QGVDial/SettingsServer", this) ||
-            !sessionBus.registerService("org.QGVDial.SettingsServer")) {
-            qWarning ("Failed to register Dbus Settings server. Aborting!");
-            qApp->quit ();
-        }
     }
 #else
     Q_UNUSED (r1);

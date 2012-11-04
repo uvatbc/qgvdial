@@ -21,6 +21,7 @@ Contact: yuvraaj@gmail.com
 
 #include "QGVDbusServer.h"
 #include "Singletons.h"
+#include "global.h"
 
 QGVDbusServerHelper::QGVDbusServerHelper (QGVDbusSettingsServer *s,
                                           QObject *parent)
@@ -110,6 +111,8 @@ void
 QGVDbusTextServer::Text (const QStringList &arrNumbers,
                          const QString     &strData)
 {
+    Q_DEBUG(QString("DBus request to send text to %1")
+                    .arg (arrNumbers.join(", ")));
     // Send a text
     helper.emitText (arrNumbers, strData);
 }//QGVDbusTextServer::Text
@@ -117,6 +120,8 @@ QGVDbusTextServer::Text (const QStringList &arrNumbers,
 void
 QGVDbusTextServer::TextWithoutData (const QStringList &arrNumbers)
 {
+    Q_DEBUG(QString("DBus request to open a text dialog to send text to %1")
+                    .arg (arrNumbers.join(", ")));
     // Signal that a text is to be sent to this list of numbers
     helper.emitTextWithoutData (arrNumbers);
 }//QGVDbusTextServer::TextWithoutData
@@ -145,6 +150,11 @@ QGVDbusTextServer::getTextsByDate(const QString &strStart, const QString &strEnd
 
         // Send request
         rv = dbMain.getTextsByDate (dtStart, dtEnd);
+
+
+        Q_DEBUG(QString("Got dbus request to get texts between %1 and %2. "
+                        "Returning %3 texts")
+                .arg(strStart, strEnd).arg (rv.count ()));
     } while(0); // End cleanup block (not a loop)
 
     return rv;
@@ -154,8 +164,13 @@ QStringList
 QGVDbusTextServer::getTextsByContact(const QString &strContact)
 {
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    QStringList rv = dbMain.getTextsByContact(strContact);
 
-    return dbMain.getTextsByContact(strContact);
+    Q_DEBUG(QString("Got dbus request to get texts from contact matching "
+                    "\"%1\". Returning %2 texts")
+            .arg(strContact).arg (rv.count ()));
+
+    return rv;
 }//QGVDbusTextServer::getTextsByContact
 
 void
@@ -211,20 +226,20 @@ QGVDbusSettingsServer::emitCallbacksChanged ()
 QStringList
 QGVDbusSettingsServer::GetPhoneNames ()
 {
-    qDebug ("DBus request to get phone names");
+    Q_DEBUG("DBus request to get phone names");
     return callbacks;
 }//QGVDbusSettingsServer::GetPhoneNames
 
 int
 QGVDbusSettingsServer::GetCurrentPhone ()
 {
-    qDebug ("DBus request to get current phone");
+    Q_DEBUG("DBus request to get current phone");
     return phoneIndex;
 }//QGVDbusSettingsServer::GetCurrentPhone
 
 void
 QGVDbusSettingsServer::SetCurrentPhone (int index)
 {
-    qDebug ("DBus request to set current phone");
+    Q_DEBUG(QString("DBus request to set current phone to index %1").arg(index));
     helper.emitPhoneIndexChange (index);
 }//QGVDbusSettingsServer::SetCurrentPhone

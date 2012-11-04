@@ -898,17 +898,22 @@ MainWindow::gotAllRegisteredPhones (AsyncTaskToken *token)
 void
 MainWindow::onRegPhoneSelectionChange (int index)
 {
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    if (index > modelRegNumber->rowCount()) {
+        Q_WARN("Attempting to go out of bounds on the registered phones");
+        return;
+    }
+
+    indRegPhone = index;
+
     QObject *regView = getQMLObject ("RegisteredPhonesView");
     Q_ASSERT(regView);
     QMetaObject::invokeMethod (regView, "setSelected", Q_ARG(QVariant, index));
 
-    indRegPhone = index;
-
-    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    dbMain.putCallback (QString("%1").arg (indRegPhone));
+    dbMain.putCallback (QString("%1").arg (index));
 
     RegNumData data;
-    if (!modelRegNumber->getAt (indRegPhone, data)) {
+    if (!modelRegNumber->getAt (index, data)) {
         data.strName = "<Unknown>";
     }
 
