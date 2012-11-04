@@ -248,12 +248,17 @@ unix:!symbian {
 
 # In desktop Linux, add the Skype client
 unix:!symbian:!maemo5 {
-    HEADERS  += ../src/SkypeLinuxClient.h              \
-                ../src/SkypeObserver.h                 \
-                ../src/DesktopSkypeCallInitiator.h
-    SOURCES  += ../src/SkypeLinuxClient.cpp            \
-                ../src/SkypeObserver.cpp               \
-                ../src/DesktopSkypeCallInitiator.cpp
+    HEADERS  += ../src/SkypeLinuxClient.h               \
+                ../src/SkypeObserver.h                  \
+                ../src/DesktopSkypeCallInitiator.h      \
+                ../src/gen/api_adapter.h                \
+                ../src/DBusApi.h
+
+    SOURCES  += ../src/SkypeLinuxClient.cpp             \
+                ../src/SkypeObserver.cpp                \
+                ../src/DesktopSkypeCallInitiator.cpp    \
+                ../src/gen/api_adapter.cpp              \
+                ../src/DBusApi.cpp
 }
 
 win32 {
