@@ -44,6 +44,9 @@ QTM_USE_NAMESPACE
 QTM_USE_NAMESPACE
 #endif
 
+#if TELEPATHY_CAPABLE
+#include "DBusApi.h"
+#endif
 
 // For some reason the symbian MOC doesn't like it if I don't include QObject
 // even though it is present in QtCore which is included in global.h
@@ -72,11 +75,8 @@ public:
 
     bool ensureDBusObject();
 
-    void initDialServer (QObject *receiver, const char *method);
-    void initTextServer (QObject *r1, const char *m1,
-                         QObject *r2, const char *m2);
-    void initSettingsServer(QObject *r1, const char *m1,
-                            QObject *r2, const char *m2);
+    void initApiServer();
+
     void setDefaultWindowAttributes (QWidget *pWidget);
     void setLongWork (QWidget *window, bool bSet = false);
 
@@ -95,6 +95,18 @@ public:
 
 signals:
     void orientationChanged (OsIndependentOrientation o);
+
+////////////////////////////////////////////////////////////////////////////////
+    // Signals from the dial, text and settings servers -> mainwindow
+    void dialNow (const QString &strNumber);
+    void sendText (const QStringList &arrNumbers,
+                   const QString     &strData);
+    void sendTextWithoutData (const QStringList &arrNumbers);
+    bool phoneIndexChange(int index);
+
+    // Signals from mainwindow -> dial, text and settings servers
+    void phoneChanges(const QStringList &phones, int index);
+////////////////////////////////////////////////////////////////////////////////
 
 private:
     OsDependent(QObject *parent = 0);
@@ -117,6 +129,11 @@ private:
 #endif
 
     bool bDBusObjectRegistered;
+#if TELEPATHY_CAPABLE
+    QGVDBusCallApi     *dbusCallApi;
+    QGVDBusTextApi     *dbusTextApi;
+    QGVDBusSettingsApi *dbusSettingsApi;
+#endif
 
     friend class Singletons;
 };

@@ -241,13 +241,30 @@ MainWindow::init ()
 
     // Initialize the DBUS interface to allow other applications (and qgv-tp) to
     // initiate calls and send texts through us.
-    osd.initDialServer (this, SLOT (dialNow (const QString &)));
-    osd.initTextServer (
-        this, SLOT (sendSMS (const QStringList &, const QString &)),
-        this, SLOT (onSendTextWithoutData (const QStringList &)));
-    osd.initSettingsServer (
-        this, SLOT(onRegPhoneSelectionChange(int)),
-        this, SIGNAL(regPhoneChange(const QStringList &,int)));
+    osd.initApiServer ();
+
+    // Connect the externally visible signals
+    rv = connect (&osd, SIGNAL(dialNow(const QString &)),
+                  this, SLOT(dialNow(const QString &)));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+    rv = connect (&osd,
+                  SIGNAL(sendText(const QStringList &,const QString &)),
+                  this, SLOT(sendSMS(const QStringList &,const QString &)));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+    rv = connect (&osd, SIGNAL(sendTextWithoutData(const QStringList &)),
+                  this, SLOT(onSendTextWithoutData (const QStringList &)));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+    rv = connect (&osd, SIGNAL(phoneIndexChange(int)),
+                  this, SLOT(onRegPhoneSelectionChange(int)));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+    rv = connect (this, SIGNAL(regPhoneChange(const QStringList &,int)),
+                  &osd, SIGNAL(phoneChanges(const QStringList &,int)));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
 
     // Set up cookies
     QList<QNetworkCookie> cookies;

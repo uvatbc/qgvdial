@@ -73,7 +73,14 @@ public:
     bool registerObject();
 
 signals:
-    void phoneIndexChange(int index);
+    bool phoneIndexChange(int index);
+
+public Q_SLOTS:
+    void onPhoneChanges(const QStringList &phones, int index);
+
+private:
+    QStringList m_phones;
+    int m_phoneIndex;
 
 /////////////////////////////// DBus connections ///////////////////////////////
 public Q_SLOTS: // METHODS

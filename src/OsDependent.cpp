@@ -21,13 +21,14 @@ Contact: yuvraaj@gmail.com
 
 #include "OsDependent.h"
 
-#if TELEPATHY_CAPABLE
-#include "QGVDbusServer.h"
-#endif
-
 OsDependent::OsDependent(QObject *parent)
 : QObject(parent)
 , bDBusObjectRegistered(false)
+#if TELEPATHY_CAPABLE
+, dbusCallApi(NULL)
+, dbusTextApi(NULL)
+, dbusSettingsApi(NULL)
+#endif
 {
 #if SYSTEMDISPLAYINFO
     displayInfo = NULL;
@@ -122,8 +123,7 @@ OsDependent::ensureDBusObject()
 #if TELEPATHY_CAPABLE
     if (!bDBusObjectRegistered) {
         QDBusConnection sessionBus = QDBusConnection::sessionBus();
-        if (!sessionBus.registerObject ("/org/QGVDial/APIServer", this) ||
-            !sessionBus.registerService("org.QGVDial.APIServer")) {
+        if (!sessionBus.registerService("org.QGVDial.APIServer")) {
             qWarning ("Failed to register Dbus Settings server. Aborting!");
             qApp->quit ();
         }
@@ -136,7 +136,7 @@ OsDependent::ensureDBusObject()
 }//OsDependent::ensureDBusObject
 
 void
-OsDependent::initDialServer (QObject *receiver, const char *method)
+OsDependent::initApiServer()
 {
 #if TELEPATHY_CAPABLE
     if (!ensureDBusObject ()) {
@@ -145,64 +145,104 @@ OsDependent::initDialServer (QObject *receiver, const char *method)
         return;
     }
 
-    static QGVDbusCallServer *pDialServer = NULL;
-    if (NULL == pDialServer) {
-        pDialServer = new QGVDbusCallServer (this);
-        pDialServer->addCallReceiver (receiver, method);
+    bool rv = false;
+    do {
+        if (NULL == dbusCallApi) {
+            dbusCallApi = new QGVDBusCallApi(this);
+            if (NULL == dbusCallApi) {
+                Q_WARN("Couldn't allocate call api");
+                break;
+            }
+            if (!dbusCallApi->registerObject ()) {
+                Q_WARN("Failed to register call api");
+                break;
+            }
+            rv = connect(dbusCallApi, SIGNAL(dialNow(const QString &)),
+                         this, SIGNAL(dialNow(const QString &)));
+            if (!rv) {
+                Q_WARN("Failed to connect call signal");
+                break;
+            }
+            rv = false;
+        }
+
+        if (NULL == dbusTextApi) {
+            dbusTextApi = new QGVDBusTextApi(this);
+            if (NULL == dbusTextApi) {
+                Q_WARN("Couldn't allocate text api");
+                break;
+            }
+            if (!dbusTextApi->registerObject ()) {
+                Q_WARN("Failed to register text api");
+                break;
+            }
+            rv = connect(dbusTextApi,
+                         SIGNAL(sendText(const QStringList&,const QString&)),
+                         this,
+                         SIGNAL(sendText(const QStringList&,const QString&)));
+            if (!rv) {
+                Q_WARN("Failed to connect text signal");
+                break;
+            }
+            rv = connect(dbusTextApi,
+                         SIGNAL(sendTextWithoutData(const QStringList&)),
+                         this, SIGNAL(sendTextWithoutData(const QStringList&)));
+            if (!rv) {
+                Q_WARN("Failed to connect second text signal");
+                break;
+            }
+            rv = false;
+        }
+
+        if (NULL == dbusSettingsApi) {
+            dbusSettingsApi = new QGVDBusSettingsApi(this);
+            if (NULL == dbusSettingsApi) {
+                Q_WARN("Couldn't allocate text api");
+                break;
+            }
+            if (!dbusSettingsApi->registerObject ()) {
+                Q_WARN("Failed to register settings api");
+                break;
+            }
+            rv = connect(dbusSettingsApi, SIGNAL(phoneIndexChange(int)),
+                         this, SIGNAL(phoneIndexChange(int)));
+            if (!rv) {
+                Q_WARN("Failed to connect second text signal");
+                break;
+            }
+            rv = connect(this, SIGNAL(phoneChanges(const QStringList&,int)),
+                         dbusSettingsApi,
+                         SLOT(onPhoneChanges(const QStringList&,int)));
+            if (!rv) {
+                Q_WARN("Failed to connect second text signal");
+                break;
+            }
+            rv = false;
+        }
+
+        rv = true;
+    } while(0);
+
+    if (!rv) {
+        if (NULL != dbusCallApi) {
+            delete dbusCallApi;
+            dbusCallApi = NULL;
+        }
+        if (NULL != dbusTextApi) {
+            delete dbusTextApi;
+            dbusTextApi = NULL;
+        }
+        if (NULL != dbusSettingsApi) {
+            delete dbusSettingsApi;
+            dbusSettingsApi = NULL;
+        }
     }
+
 #else
     Q_UNUSED (receiver);
     Q_UNUSED (method);
 #endif
-}//OsDependent::initDialServer
-
-void
-OsDependent::initTextServer (QObject *r1, const char *m1,
-                             QObject *r2, const char *m2)
-{
-#if TELEPATHY_CAPABLE
-    if (!ensureDBusObject ()) {
-        Q_WARN("Failed to register Dbus API server. Aborting!");
-        qApp->quit ();
-        return;
-    }
-
-    static QGVDbusTextServer *pTextServer = NULL;
-    if (NULL == pTextServer) {
-        pTextServer = new QGVDbusTextServer (this);
-        pTextServer->addTextReceivers (r1, m1, r2, m2);
-    }
-#else
-    Q_UNUSED (r1);
-    Q_UNUSED (m1);
-    Q_UNUSED (r2);
-    Q_UNUSED (m2);
-#endif
-}//OsDependent::initDialServer
-
-void
-OsDependent::initSettingsServer(QObject *r1, const char *m1,
-                                QObject *r2, const char *m2)
-{
-#if TELEPATHY_CAPABLE
-    if (!ensureDBusObject ()) {
-        Q_WARN("Failed to register Dbus API server. Aborting!");
-        qApp->quit ();
-        return;
-    }
-
-    static QGVDbusSettingsServer *pServer = NULL;
-    if (NULL == pServer) {
-        pServer = new QGVDbusSettingsServer (this);
-        pServer->addSettingsReceiver (r1, m1, r2, m2);
-    }
-#else
-    Q_UNUSED (r1);
-    Q_UNUSED (m1);
-    Q_UNUSED (r2);
-    Q_UNUSED (m2);
-#endif
-}
+}//OsDependent::initApiServer
 
 void
 OsDependent::setDefaultWindowAttributes (QWidget *pWidget)

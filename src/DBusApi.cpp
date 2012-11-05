@@ -15,15 +15,23 @@ bool
 QGVDBusCallApi::registerObject()
 {
     CallServerAdaptor *obj = new CallServerAdaptor(this);
-    if (NULL != obj) {
-        return true;
+    if (NULL == obj) {
+        return false;
     }
-    return false;
+
+    QDBusConnection sessionBus = QDBusConnection::sessionBus();
+    if (!sessionBus.registerObject ("/org/QGVDial/CallServer", this)) {
+        delete obj;
+        return false;
+    }
+
+    return true;
 }//QGVDBusCallApi::registerObject
 
 void
 QGVDBusCallApi::Call(const QString &strNumber)
 {
+    Q_DEBUG(QString("Make a call to %1").arg (strNumber));
     emit dialNow (strNumber);
 }//QGVDBusCallApi::Call
 
@@ -40,21 +48,33 @@ bool
 QGVDBusTextApi::registerObject()
 {
     TextServerAdaptor *obj = new TextServerAdaptor(this);
-    if (NULL != obj) {
-        return true;
+    if (NULL == obj) {
+        return false;
     }
-    return false;
+
+    QDBusConnection sessionBus = QDBusConnection::sessionBus();
+    if (!sessionBus.registerObject ("/org/QGVDial/TextServer", this)) {
+        delete obj;
+        return false;
+    }
+
+    return true;
 }//QGVDBusTextApi::registerObject
 
 void
 QGVDBusTextApi::Text(const QStringList &arrNumbers, const QString &strData)
 {
+    Q_DEBUG(QString("Send text \"%1\" to (%2)")
+            .arg (strData)
+            .arg (arrNumbers.join (", ")));
     emit sendText (arrNumbers, strData);
 }//QGVDBusTextApi::Text
 
 void
 QGVDBusTextApi::TextWithoutData(const QStringList &arrNumbers)
 {
+    Q_DEBUG(QString("Send text without data to (%1)")
+            .arg (arrNumbers.join (", ")));
     emit sendTextWithoutData (arrNumbers);
 }//QGVDBusTextApi::TextWithoutData
 
@@ -107,6 +127,7 @@ QGVDBusTextApi::getTextsByDate(const QString &strStart, const QString &strEnd)
 
 QGVDBusSettingsApi::QGVDBusSettingsApi(QObject *parent)
 : QObject(parent)
+, m_phoneIndex(-1)
 {
 }//QGVDBusSettingsApi::QGVDBusSettingsApi
 
@@ -118,29 +139,43 @@ bool
 QGVDBusSettingsApi::registerObject()
 {
     SettingsServerAdaptor *obj = new SettingsServerAdaptor(this);
-    if (NULL != obj) {
-        return true;
+    if (NULL == obj) {
+        return false;
     }
-    return false;
+
+    QDBusConnection sessionBus = QDBusConnection::sessionBus();
+    if (!sessionBus.registerObject ("/org/QGVDial/SettingsServer", this)) {
+        delete obj;
+        return false;
+    }
+
+    return true;
 }//QGVDBusSettingsApi::registerObject
 
 int
 QGVDBusSettingsApi::GetCurrentPhone()
 {
-    int rv = 0;
-    return rv;
+    Q_DEBUG("DBus request to get current phone index");
+    return m_phoneIndex;
 }//QGVDBusSettingsApi::GetCurrentPhone
 
 QStringList
 QGVDBusSettingsApi::GetPhoneNames()
 {
-    QStringList rv;
-    return rv;
+    Q_DEBUG("DBus request to get phone names");
+    return m_phones;
 }//QGVDBusSettingsApi::GetPhoneNames
 
 bool
 QGVDBusSettingsApi::SetCurrentPhone(int index)
 {
-    bool rv = false;
-    return rv;
+    return (emit phoneIndexChange(index));
 }//QGVDBusSettingsApi::SetCurrentPhone
+
+void
+QGVDBusSettingsApi::onPhoneChanges(const QStringList &phones, int index)
+{
+    m_phones = phones;
+    m_phoneIndex = index;
+    emit CallbacksChanged();
+}//QGVDBusSettingsApi::onPhoneChanges
