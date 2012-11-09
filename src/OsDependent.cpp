@@ -99,7 +99,7 @@ bool
 OsDependent::isSymbian1()
 {
     bool rv = false;
-#if defined(Q_OS_SYMBIAN)
+#if defined(IS_S1)
     QSysInfo::SymbianVersion symVer = QSysInfo::symbianVersion();
     rv = (symVer == QSysInfo::SV_SF_1);
 #endif
@@ -110,9 +110,10 @@ bool
 OsDependent::isSymbian3()
 {
     bool rv = false;
-#if defined(Q_OS_SYMBIAN)
-    QSysInfo::SymbianVersion symVer = QSysInfo::symbianVersion();
-    rv = (symVer == QSysInfo::SV_SF_3);
+#if defined(IS_S3) || defined(IS_S3_BELLE)
+//    QSysInfo::SymbianVersion symVer = QSysInfo::symbianVersion();
+//    rv = (symVer == QSysInfo::SV_SF_3);
+    rv = true;
 #endif
     return (rv);
 }//OsDependent::isSymbian3
@@ -420,7 +421,7 @@ OsDependent::getMainQML ()
 #if defined(MEEGO_HARMATTAN)
     return "qrc:/HMain.qml";
 #else
-    if (USE_QT_COMPONENTS && isSymbian3()) {
+    if (isSymbian3()) {
         return "qrc:/S3Main.qml";
     } else {
         return "qrc:/Main.qml";

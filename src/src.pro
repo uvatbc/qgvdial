@@ -39,8 +39,8 @@ TEMPLATE = app
 !win32 {
 # Win32 stores all intermidiate files into the debug and release folders.
 # There is no need to create a separate moc and obj folder for Win32.
-MOC_DIR = moc
-OBJECTS_DIR = obj
+    MOC_DIR = moc
+    OBJECTS_DIR = obj
 }
 
 CONFIG *= precompile_header
@@ -49,13 +49,14 @@ PRECOMPILED_HEADER = ../src/global.h
 CONFIG   += mobility
 MOBILITY += systeminfo
 
+# Qt-Components required for Harmattan, S3 and Belle.
+contains(DEFINES,IS_S3) | contains(DEFINES,IS_S3_BELLE) | contains(DEFINES,MEEGO_HARMATTAN) {
+    CONFIG += qt-components
+}
+
+# Symbian and Harmattan need feedback
 symbian | contains(DEFINES,MEEGO_HARMATTAN) {
     MOBILITY *= feedback
-    OTHER_FILES += ../build-files/qgvdial/harmattan/qgvdial.desktop
-    !exists(no-qt-components) {
-        CONFIG  += qt-components
-        DEFINES += QT_COMPONENTS_ADDED
-    }
 }
 
 include(qtsingleapplication/qtsingleapplication.pri)
@@ -68,6 +69,11 @@ maemo5 {
     message(Maemo5 your world)
     QT *= maemo5
     OTHER_FILES += ../build-files/qgvdial/maemo/qgvdial.desktop
+}
+
+# Harmattan has its own desktop file
+contains(DEFINES,MEEGO_HARMATTAN) {
+    OTHER_FILES += ../build-files/qgvdial/harmattan/qgvdial.desktop
 }
 
 # In Linux and maemo, add telepathy and openssl
@@ -314,7 +320,7 @@ symbian {
 
     my_deployment.pkg_prerules = vendorinfo
 
-    !exists(no-qt-components) {
+    contains(CONFIG,qt-components) {
 # This makes the smart installer get qt-components.... I think
     DEPLOYMENT.installer_header = 0x2002CCCF
     my_deployment.pkg_prerules += \
