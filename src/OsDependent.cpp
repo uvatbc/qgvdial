@@ -238,10 +238,6 @@ OsDependent::initApiServer()
             dbusSettingsApi = NULL;
         }
     }
-
-#else
-    Q_UNUSED (receiver);
-    Q_UNUSED (method);
 #endif
 }//OsDependent::initApiServer
 
