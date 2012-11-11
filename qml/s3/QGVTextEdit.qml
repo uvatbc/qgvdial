@@ -22,21 +22,17 @@ Contact: yuvraaj@gmail.com
 import QtQuick 1.1
 import com.nokia.symbian 1.0
 
-PageStack {
-    width: 250
-    height: 400
+TextArea {
+    id:  container
 
-    Component.onCompleted: {
-        pageStack.push(mainPage, true);
+    text: "You should have changed this text"
+    property int pointSize: (10 * g_fontMul)
+    property real fontPointMultiplier: 1.0
+
+    inputMethodHints: Qt.ImhNoAutoUppercase + Qt.ImhNoPredictiveText
+
+    function closeSoftwareInputPanel() {
+        // Symbian doesn't have a cloe software input panel function...
+        console.debug("User requested closeSoftwareInputPanel");
     }
-
-    Page {
-        id: mainPage
-        anchors.fill: parent
-        orientationLock: PageOrientation.LockPortrait
-
-        Main {
-            anchors.fill: parent
-        }
-    }//Page
-}//PageStack (main)
+}//Rectangle

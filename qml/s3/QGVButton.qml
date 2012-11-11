@@ -22,21 +22,8 @@ Contact: yuvraaj@gmail.com
 import QtQuick 1.1
 import com.nokia.symbian 1.0
 
-PageStack {
-    width: 250
-    height: 400
+// QGVButton is just a one-to-one map to the Symbian qt-components Button item
 
-    Component.onCompleted: {
-        pageStack.push(mainPage, true);
-    }
-
-    Page {
-        id: mainPage
-        anchors.fill: parent
-        orientationLock: PageOrientation.LockPortrait
-
-        Main {
-            anchors.fill: parent
-        }
-    }//Page
-}//PageStack (main)
+Button {
+    id: container
+}//Button

@@ -173,7 +173,7 @@ HEADERS  += ../src/global.h                 \
             ../src/FuzzyTimer.h             \
             ../src/NwInfo.h
 
-contains(DEFINES,MEEGO_HARMATTAN) | contains(DEFINES,IS_S3) | contains(DEFINES,IS_S3_BELLE) {
+contains(DEFINES,MEEGO_HARMATTAN) | contains(DEFINES,IS_S3_BELLE) {
     DEFINES += ENABLE_FUZZY_TIMER
 }
 
@@ -195,8 +195,11 @@ RESOURCES += ../src/qgvdial.qrc
 contains(DEFINES,MEEGO_HARMATTAN) {
     RESOURCES += ../src/qgvdial-meego.qrc
 } else {
+contains(DEFINES,IS_S3) | contains(DEFINES,IS_S3_BELLE) {
+    RESOURCES += ../src/qgvdial-s3.qrc
+} else {
     RESOURCES += ../src/qgvdial-generic.qrc
-}
+} }
 
 
 # This is so that QtCreator can show these files in the files list.
@@ -240,6 +243,9 @@ OTHER_FILES  += ../src/winrsrc.rc           \
                 ../qml/meego/QGVLabel.qml       \
                 ../qml/meego/QGVTextEdit.qml    \
                 ../qml/meego/QGVTextInput.qml   \
+                ../qml/s3/QGVButton.qml         \
+                ../qml/s3/QGVTextEdit.qml       \
+                ../qml/s3/QGVTextInput.qml      \
                 readme.txt
 
 # In Linux and maemo, add the telepathy related sources and headers.
