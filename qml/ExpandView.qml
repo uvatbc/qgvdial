@@ -48,7 +48,7 @@ Rectangle {
             leftMargin: 3
         }
         width: parent.width
-        height: imgArrow.height
+        height: imgArrow.height > titleText.height ? imgArrow.height : titleText.height
         spacing: 2
 
         Image {

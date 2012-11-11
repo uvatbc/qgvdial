@@ -62,6 +62,12 @@ Item {
        QGVButton {
            id: btnCancelLogin
 
+           Component.onCompleted: {
+               if (width < (parent.width / 2)) {
+                   width = (parent.width / 2);
+               }
+           }
+
            anchors.horizontalCenter: parent.horizontalCenter
            text: "Cancel"
 
@@ -121,6 +127,12 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             text: "Hide"
 
+            Component.onCompleted: {
+                if (width < (parent.width / 2)) {
+                    width = (parent.width / 2);
+                }
+            }
+
             onClicked: {
                 textUsername.closeSoftwareInputPanel();
                 textPassword.closeSoftwareInputPanel();
@@ -132,6 +144,12 @@ Item {
             id: btnLogin
             anchors.horizontalCenter: parent.horizontalCenter
             text: "Login"
+
+            Component.onCompleted: {
+                if (width < (parent.width / 2)) {
+                    width = (parent.width / 2);
+                }
+            }
 
             onClicked: {
                 textUsername.closeSoftwareInputPanel();

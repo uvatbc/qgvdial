@@ -22,7 +22,7 @@ Contact: yuvraaj@gmail.com
 import QtQuick 1.1
 import com.nokia.symbian 1.0
 
-PageStack {
+ApplicationWindow {
     width: 250
     height: 400
 
@@ -39,4 +39,4 @@ PageStack {
             anchors.fill: parent
         }
     }//Page
-}//PageStack (main)
+}//ApplicationWindow (main)
