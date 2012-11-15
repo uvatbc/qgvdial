@@ -98,6 +98,8 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
 
             KeyNavigation.tab: textPassword
+            KeyNavigation.backtab: textPassword
+
             onSigTextChanged: container.sigUserChanged(strText);
             onSigEnter: btnLogin.doClick();
         }//QGVTextInput: username
@@ -118,6 +120,8 @@ Item {
             echoMode: TextInput.Password
 
             KeyNavigation.tab: textUsername
+            KeyNavigation.backtab: textUsername
+
             onSigTextChanged: container.sigPassChanged(strText);
             onSigEnter: btnLogin.doClick();
         }//QGVTextInput (password)
@@ -151,11 +155,13 @@ Item {
                 }
             }
 
-            onClicked: {
+            function doClick() {
                 textUsername.closeSoftwareInputPanel();
                 textPassword.closeSoftwareInputPanel();
                 container.sigLogin();
             }
+
+            onClicked: doClick();
         }//QGVButton (login/logout)
     }//Column of username and password fields. Also the login button
 }//Item (container)

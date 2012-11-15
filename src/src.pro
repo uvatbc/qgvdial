@@ -50,7 +50,7 @@ CONFIG   += mobility
 MOBILITY += systeminfo
 
 # Qt-Components required for Harmattan, S3 and Belle.
-contains(DEFINES,IS_S3) | contains(DEFINES,IS_S3_BELLE) | contains(DEFINES,MEEGO_HARMATTAN) {
+symbian | contains(DEFINES,MEEGO_HARMATTAN) {
     CONFIG += qt-components
 }
 
@@ -331,7 +331,7 @@ symbian {
     DEPLOYMENT.installer_header = 0x2002CCCF
     my_deployment.pkg_prerules += \
         "; Dependency to Symbian Qt Quick components" \
-        "(0x200346DE), 1, 0, 0, {\"Qt Quick components\"}"
+        "(0x200346DE), 1, 0, 0, {\"Qt Quick components for Symbian\"}"
     }
 
     DEPLOYMENT += my_deployment
