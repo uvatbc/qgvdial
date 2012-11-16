@@ -331,6 +331,12 @@ void qgv_LogFlush();
 #define HAS_FUZZY_TIMER 0
 #endif
 
+#if defined(IS_S3) || defined(IS_S3_BELLE)
+#define HAS_SINGLE_APP 0
+#else
+#define HAS_SINGLE_APP 1
+#endif
+
 #if defined(Q_WS_X11)
 #define __FULLFUNC__ __PRETTY_FUNCTION__
 #else

@@ -42,7 +42,11 @@ enum {
 #endif
 
 MainApp::MainApp (int &argc, char **argv)
+#if HAS_SINGLE_APP
 : QtSingleApplication (argc, argv)
+#else
+: QApplication (argc, argv)
+#endif
 {
 #ifdef Q_WS_WIN32
     uidDiscover  = RegisterWindowMessageA ("SkypeControlAPIDiscover");

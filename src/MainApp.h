@@ -22,7 +22,11 @@ Contact: yuvraaj@gmail.com
 #ifndef __MAINAPP_H__
 #define __MAINAPP_H__
 
+#include "global.h"
+
+#if HAS_SINGLE_APP
 #include "qtsingleapplication/inc/QtSingleApplication"
+#endif
 
 #ifdef Q_WS_WIN32
 #include <windows.h>
@@ -32,12 +36,25 @@ Contact: yuvraaj@gmail.com
 // even though it is present in QtCore which is included in global.h
 #include <QObject>
 
-class MainApp : public QtSingleApplication
+class MainApp
+#if HAS_SINGLE_APP
+: public QtSingleApplication
+#else
+: public QApplication
+#endif
 {
     Q_OBJECT
 
 public:
     MainApp (int &argc, char **argv);
+
+#if !HAS_SINGLE_APP
+    inline bool isRunning() { return false; }
+    inline bool sendMessage(const QString &message, int timeout = 5000) {
+        return false;
+    }
+    inline void setActivationWindow(QWidget *w, bool activateOnMessage = true){}
+#endif
 
 #ifdef Q_WS_WIN32
 signals:
