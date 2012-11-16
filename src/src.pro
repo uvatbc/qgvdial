@@ -60,7 +60,7 @@ symbian | contains(DEFINES,MEEGO_HARMATTAN) {
 }
 
 # Except for Symbian S3 and S3 Belle add single application
-contains(DEFINES,IS_S3) | contains(DEFINES,IS_S3_BELLE){
+!contains(DEFINES,IS_S3) | !contains(DEFINES,IS_S3_BELLE){
     include(qtsingleapplication/qtsingleapplication.pri)
 }
 
