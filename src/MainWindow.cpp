@@ -108,10 +108,12 @@ MainWindow::MainWindow (QWidget *parent)
         pSystray->show ();
     }
 
+#if HAS_SINGLE_APP
     rv = connect (qApp, SIGNAL (messageReceived(const QString &)),
                   this, SLOT   (messageReceived(const QString &)));
-    Q_ASSERT(rv);
+    // This *may* fail
     if (!rv) { exit(1); }
+#endif
 
     rv = connect (&statusTimer, SIGNAL (timeout()),
                    this       , SLOT   (onStatusTimerTick ()));
