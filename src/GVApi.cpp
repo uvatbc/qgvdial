@@ -602,6 +602,13 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
     bool accountReviewRequested = false;
     bool foreignUrl = false;
 
+#if 0
+    QFile fTemp("login2.html");
+    fTemp.open (QFile::ReadWrite);
+    fTemp.write (response);
+    fTemp.close ();
+#endif
+
     token->errorString.clear();
     do { // Begin cleanup block (not a loop)
         if (!success) {
@@ -648,7 +655,8 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
 
         do { // Begin cleanup block (not a loop)
             QUrl replyUrl = reply->url ();
-            if (!replyUrl.toString().contains (GOOGLE_ACCOUNTS)) {
+            QString strReplyUrl = replyUrl.toString();
+            if (!strReplyUrl.contains (GOOGLE_ACCOUNTS)) {
                 break;
             }
 
@@ -658,7 +666,7 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
                 break;
             }
 
-            QString cap = rxBody.cap (0);
+            QString cap = rxBody.cap (1);
 
             QDomDocument doc("foreign");
             doc.setContent (cap);
@@ -669,7 +677,10 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
             }
 
             QString docElemText = docElem.text ();
-//            Q_DEBUG(docElemText);
+#if 0
+            Q_DEBUG(docElemText);
+            Q_DEBUG(docElem.tagName ());
+#endif
 
             if (docElemText.contains ("The username or password you entered "
                                       "is incorrect."))
@@ -679,21 +690,26 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
             }
 
             bool needsTwoFactor = false;
-            QDomNodeList formList = docElem.elementsByTagName ("form");
             QDomElement twoFactorForm;
-            if (!formList.isEmpty ()) {
-                for (uint i = 0; i < formList.length (); i++) {
-                    twoFactorForm = formList.at(i).toElement ();
-                    if (twoFactorForm.isNull ()) {
-                        continue;
-                    }
 
-                    QString formId = twoFactorForm.attribute ("id");
-                    if (formId == "verify-form") {
-                        needsTwoFactor = true;
-                        break;
-                    }
+            QRegExp rxForm("<form.*>(.*)</form>");
+            rxForm.setMinimal(true);
+            int pos = cap.indexOf (rxForm);
+            while (-1 != pos) {
+                QDomDocument doc1("foreign");
+                QString cap1 = rxForm.cap (0);
+                doc1.setContent (cap1);
+                twoFactorForm = doc1.documentElement();
+                if (twoFactorForm.isNull ()) {
+                    break;
                 }
+                QString formId = twoFactorForm.attribute ("id");
+                if (formId == "verify-form") {
+                    needsTwoFactor = true;
+                    break;
+                }
+
+                pos = cap.indexOf (rxForm, pos + cap1.length ());
             }
 
             if (needsTwoFactor) {

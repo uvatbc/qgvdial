@@ -46,8 +46,11 @@ Contact: yuvraaj@gmail.com
 #define GV_HTTPS_M      "https://www.google.com/voice/m"
 
 #define GOOGLE_ACCOUNTS         "https://accounts.google.com"
+// "https://accounts.google.com/ServiceLogin"
 #define GV_ACCOUNT_SERVICELOGIN GOOGLE_ACCOUNTS "/ServiceLogin"
+// "https://accounts.google.com/SmsAuth"
 #define GV_ACCOUNT_SMSAUTH      GOOGLE_ACCOUNTS "/SmsAuth"
+// "https://accounts.google.com/ClientLogin"
 #define GV_CLIENTLOGIN          GOOGLE_ACCOUNTS "/ClientLogin"
 
 #define LOGS_SERVER "http://www.yuvraaj.net"
