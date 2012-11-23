@@ -1,195 +1,131 @@
-/*
-@version: 0.5
-@author: Sudheer K. <scifi1947 at gmail.com>
-@license: GNU General Public License
-
-Based on Telepathy-SNOM with copyright notice below.
-*/
-
-/*
- * Telepathy SNOM VoIP phone connection manager
- * Copyright (C) 2006 by basyskom GmbH
- *  @author Tobias Hunger <info@basyskom.de>
- *
- * This library is free software; you can redisQObject::tribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License version 2.1 as published by the Free Software Foundation.
- *
- * This library is disQObject::tributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc.,
- * 51 Franklin SQObject::treet, Fifth Floor, Boston, MA  02110-1301  USA
- */
-
+#include "QGVConnectionManager.h"
 #include <iostream>
-#include <fstream>
-
-#include <QtCore>
-#include <QtDBus>
-
-#include "names.h"
-#include "connectionmanager.h"
-#include "basetypes.h"
-#include "connectionmanagertypes.h"
-#include "connectiontypes.h"
-#include "connectioninterfacerequeststypes.h"
-#include "connectioninterfacecapabilitiestypes.h"
-
-
 using namespace std;
-ofstream logfile;
-QSettings *settings = NULL;
 
-int logLevel = 0;
+QtMsgHandler    pOldHandler = NULL;
+QFile fLogfile;       //! Logfile
+int   logLevel = 5;   //! Log level
+int   logCounter = 0; //! Number of log entries since the last log flush
+#define LOG_FLUSH_LEVEL 0 // 50
 
-QString
-getStoreDirectory ()
-{
-    QString strStoreDir = QDir::homePath ();
-    QDir dirHome(strStoreDir);
-    if (!strStoreDir.endsWith (QDir::separator ()))
-    {
-        strStoreDir += QDir::separator ();
-    }
-    strStoreDir += ".qgvdial";
-    if (!QFileInfo(strStoreDir).exists ()) {
-        dirHome.mkdir (".qgvdial");
-    }
-
-#if defined(Q_OS_SYMBIAN)
-    strStoreDir.replace (QChar('/'), "\\");
-#endif
-
-    return strStoreDir;
-}//getStoreDirectory
+QStringList arrLogFiles;
 
 void
-open_logfile ()
+qgv_LogFlush()
 {
-    if (!logfile.is_open ()) {
-        QString strFile = getStoreDirectory()
-                        + QDir::separator ()
-                        + "qgv-tp.log";
-        logfile.open(strFile.toAscii(), ios::app);
+    if (logCounter) {
+        logCounter = 0;
+        fLogfile.flush ();
+        cout.flush();
     }
 }
 
-void dbgHandler(QtMsgType type, const char *msg)
+void
+myMessageOutput(QtMsgType type, const char *msg)
 {
-    QDateTime dt = QDateTime::currentDateTime ();
-    int level = 0;
-
+    int level = -1;
     switch (type) {
-        case QtDebugMsg:
-            level = 3;
-            break;
-        case QtWarningMsg:
-            level = 2;
-            break;
-        case QtCriticalMsg:
-            level = 1;
-            break;
-        case QtFatalMsg:
-            level = 0;
-            break;
+    case QtDebugMsg:
+        level = 3;
+        break;
+    case QtWarningMsg:
+        level = 2;
+        break;
+    case QtCriticalMsg:
+        level = 1;
+        break;
+    case QtFatalMsg:
+        level = 0;
     }
 
+    QDateTime dt = QDateTime::currentDateTime ();
     QString strLog = QString("%1 : %2 : %3")
                      .arg(dt.toString ("yyyy-MM-dd hh:mm:ss.zzz"))
                      .arg(level)
                      .arg(msg);
 
+    // Send to standard output.
+    // I'm not using endl here because endl causes flushes
+    cout << strLog.toAscii().constData() << "\n";
+
+    strLog += '\n';
     if (level <= logLevel) {
-        open_logfile ();
-        logfile << strLog.toAscii().data() << endl;
-    }
-    cout << strLog.toAscii().data() << endl;
+        if (fLogfile.isOpen ()) {
+            // Append it to the file
+            fLogfile.write(strLog.toLatin1 ());
 
-    if (QtFatalMsg == type) {
-        abort ();
-    }
-}
-
-void
-parseSettings()
-{
-    if (NULL == settings) {
-        QString strFile = getStoreDirectory()
-                        + QDir::separator ()
-                        + "qgv-tp.ini";
-        settings = new QSettings(strFile, QSettings::IniFormat);
-        cout << "Created settings at file " << strFile.toAscii().constData() << endl;
-    }
-
-    if (!settings->contains("LogLevel")) {
-        settings->setValue("LogLevel", int(1));
-        cout << "Set default log level" << endl;
-    }
-    logLevel = settings->value("LogLevel").toInt();
-
-    settings->sync();
-}
-
-int
-main(int argc, char ** argv)
-{
-    QCoreApplication app(argc, argv);
-    QString msg;
-
-    parseSettings();
-
-    open_logfile ();
-    qInstallMsgHandler(dbgHandler);
-
-    // register types:
-    qDBusRegisterMetaType<org::freedesktop::Telepathy::ParameterDefinition>();
-    qDBusRegisterMetaType<org::freedesktop::Telepathy::ParameterDefinitionList>();
-    qDBusRegisterMetaType<org::freedesktop::Telepathy::ChannelInfo>();
-    qDBusRegisterMetaType<org::freedesktop::Telepathy::ChannelInfoList>();
-    qDBusRegisterMetaType<org::freedesktop::Telepathy::ChannelDetails>();
-    qDBusRegisterMetaType<org::freedesktop::Telepathy::ChannelDetailsList>();
-    qDBusRegisterMetaType<org::freedesktop::Telepathy::ContactCapabilities>();
-    qDBusRegisterMetaType<org::freedesktop::Telepathy::ContactCapabilitiesList>();
-    qDBusRegisterMetaType<org::freedesktop::Telepathy::CapabilityPair>();
-    qDBusRegisterMetaType<org::freedesktop::Telepathy::CapabilityPairList>();
-    qDBusRegisterMetaType<org::freedesktop::Telepathy::CapabilityChange>();
-    qDBusRegisterMetaType<org::freedesktop::Telepathy::CapabilityChangeList>();
-    qDBusRegisterMetaType<org::freedesktop::Telepathy::RequestableChannelClass>();
-    qDBusRegisterMetaType<org::freedesktop::Telepathy::RequestableChannelClassList>();
-
-    QDBusConnection connection = QDBusConnection::sessionBus();
-
-    if (!connection.interface()->isServiceRegistered(cm_service_name)) {
-        // register CM on D-BUS:
-        if (connection.registerService(cm_service_name)) {
-            msg = QString ("Service %1 registered with session bus.")
-                    .arg(cm_service_name);
-            qDebug() << msg;
-        } else {
-            msg = QString ("Unable to register service %1 with session bus.")
-                    .arg(cm_service_name);
-            qDebug() << msg;
+            ++logCounter;
+            if (logCounter > LOG_FLUSH_LEVEL) {
+                qgv_LogFlush ();
+            }
         }
     }
 
-    ConnectionManager connection_mgr(&app);
-    if (!connection.registerObject(cm_object_path,&connection_mgr)) {
-        msg = QString ("Unable to register VICaR connection manager at path %1 with session bus.")
-                .arg(cm_object_path);
-        qDebug() << msg;
+    if (QtFatalMsg == type) {
+        abort();
+    }
+}//myMessageOutput
+
+static void
+initLogging ()
+{
+    QString strLogfile;
+    /*
+    OsDependent &osd = Singletons::getRef().getOSD ();
+    strLogfile = osd.getAppDirectory ();
+    */
+
+    strLogfile = QDir::homePath() + "/.qgvdial/qgv-tp.log";
+
+    for (int i = 4; i >= 0; i--) {
+        arrLogFiles.append (QString("%1.%2").arg(strLogfile).arg(i));
+    }
+    arrLogFiles.append (strLogfile);
+
+    QFile::remove (arrLogFiles[0]);
+    for (int i = 1; i < arrLogFiles.count (); i++) {
+        if (QFile::exists (arrLogFiles[i])) {
+            QFile::rename (arrLogFiles[i], arrLogFiles[i-1]);
+        }
     }
 
-    qDebug("Entering main loop.");
-    int rv = app.exec();
-    logfile.close();
-    if (settings != NULL) {
-        delete settings;
-        settings = NULL;
+    fLogfile.setFileName (strLogfile);
+    fLogfile.open (QIODevice::ReadWrite);
+
+    pOldHandler = qInstallMsgHandler(myMessageOutput);
+}//initLogging
+
+static void
+deinitLogging ()
+{
+    fLogfile.close ();
+}//deinitLogging
+
+int
+main(int argc, char *argv[])
+{
+    QCoreApplication a(argc, argv);
+
+    initLogging();
+
+    registerDBusTypes();
+
+    QGVConnectionManager *cm = new QGVConnectionManager(&a);
+    if (NULL == cm) {
+        Q_WARN("Failed to allocate connection manager");
+        return -1;
     }
+
+    if (!cm->registerObject ()) {
+        delete cm;
+        Q_WARN("Failed to register connection manager");
+        return -1;
+    }
+    Q_DEBUG("CM object and service registered. Start event loop");
+
+    int rv = a.exec();
+
+    deinitLogging();
+
     return rv;
-}//main
+}

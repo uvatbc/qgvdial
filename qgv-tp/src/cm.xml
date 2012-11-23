@@ -1,0 +1,24 @@
+<node>
+  <interface name="org.freedesktop.Telepathy.ConnectionManager">
+    <method name="RequestConnection">
+      <arg name="Protocol" type="s" direction="in"/>
+      <arg name="Parameters" type="a{sv}" direction="in"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="QVariantMap"/>
+      <arg name="Bus_Name" type="s" direction="out"/>
+      <arg name="Object_Path" type="o" direction="out"/>
+    </method>
+    <method name="ListProtocols">
+      <arg name="Protocols" type="as" direction="out"/>
+    </method>
+    <method name="GetParameters">
+      <arg name="Protocol" type="s" direction="in"/>
+      <arg name="Parameters" type="a(susv)" direction="out"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="Qt_Type_a_susv"/>
+    </method>
+    <signal name="NewConnection">
+      <arg type="s"/>
+      <arg type="o"/>
+      <arg type="s"/>
+    </signal>
+  </interface>
+</node>

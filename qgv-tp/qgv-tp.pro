@@ -7,33 +7,33 @@ CONFIG   -= app_bundle
 
 TEMPLATE = app
 VPATH += src
-#MOC_DIR = mocs
-#OBJECTS_DIR = objs
+INCLUDEPATH += src
 
-SOURCES  += src/main.cpp \
-            src/connectiontypes.cpp \
-            src/connectionmanagertypes.cpp \
-            src/connectionmanageradaptor.cpp \
-            src/connectionmanager.cpp \
-            src/connectionadaptor.cpp \
-            src/connection.cpp \
-            src/connectioninterfacerequeststypes.cpp \
-            src/connectioninterfacerequestsadaptor.cpp \
-            src/connectioninterfacecapabilitiestypes.cpp \
-            src/connectioninterfacecapabilitiesadaptor.cpp
+MOC_DIR = moc
+OBJECTS_DIR = obj
 
-HEADERS  += src/names.h \
-            src/connectiontypes.h \
-            src/connectionmanagertypes.h \
-            src/connectionmanageradaptor.h \
-            src/connectionmanager.h \
-            src/connectionadaptor.h \
-            src/connection.h \
-            src/basetypes.h \
-            src/connectioninterfacerequeststypes.h \
-            src/connectioninterfacerequestsadaptor.h \
-            src/connectioninterfacecapabilitiestypes.h \
-            src/connectioninterfacecapabilitiesadaptor.h
+# Input
+HEADERS += src/global.h                     \
+           src/shared_data_types.h          \
+           src/gen/cm_adapter.h             \
+           src/gen/connection_adapter.h     \
+           src/gen/protocol_adapter.h       \
+           src/QGVConnectionManager.h       \
+           src/QGVConnection.h
+
+SOURCES += src/shared_data_types.cpp        \
+           src/gen/cm_adapter.cpp           \
+           src/gen/connection_adapter.cpp   \
+           src/gen/protocol_adapter.cpp     \
+           src/main.cpp                     \
+           src/QGVConnectionManager.cpp     \
+           src/QGVConnection.cpp
+
+OTHER_FILES += src/protocol.xml             \
+               src/connection.xml           \
+               src/cm.xml                   \
+               src/connection-ifaces.xml    \
+               src/channel.xml
 
 ###############################################################
 # Installation related line go here

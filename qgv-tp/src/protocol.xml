@@ -1,0 +1,24 @@
+<node>
+  <interface name="org.freedesktop.Telepathy.Protocol.Interface.Addressing">
+    <method name="NormalizeContactURI">
+      <arg name="URI" type="s" direction="in"/>
+      <arg name="Normalized_URI" type="s" direction="out"/>
+    </method>
+    <method name="NormalizeVCardAddress">
+      <arg name="VCard_Field" type="s" direction="in"/>
+      <arg name="VCard_Address" type="s" direction="in"/>
+      <arg name="Normalized_VCard_Address" type="s" direction="out"/>
+    </method>
+  </interface>
+  <interface name="org.freedesktop.Telepathy.Protocol">
+    <method name="NormalizeContact">
+      <arg name="Contact_ID" type="s" direction="in"/>
+      <arg name="Normalized_Contact_ID" type="s" direction="out"/>
+    </method>
+    <method name="IdentifyAccount">
+      <arg name="Parameters" type="a{sv}" direction="in"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QVariantMap"/>
+      <arg name="Account_ID" type="s" direction="out"/>
+    </method>
+  </interface>
+</node>
