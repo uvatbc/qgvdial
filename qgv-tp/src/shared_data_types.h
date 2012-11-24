@@ -203,9 +203,40 @@ Q_DECLARE_METATYPE(Struct_dict_sv_as)
 typedef QList<Struct_dict_sv_as> Qt_Type_a_dict_sv_as;
 Q_DECLARE_METATYPE(Qt_Type_a_dict_sv_as)
 
+////////////////////////////////////////////////////////////////////////////////
+// aaa{sv}
+typedef QList<QVariantMap> Qt_Type_a_dict_sv;
+Q_DECLARE_METATYPE(Qt_Type_a_dict_sv)
+
+typedef QList<Qt_Type_a_dict_sv> Qt_Type_a_a_dict_sv;
+Q_DECLARE_METATYPE(Qt_Type_a_a_dict_sv)
+
+////////////////////////////////////////////////////////////////////////////////
+// a{uv}
+typedef QMap<uint, QVariant> Qt_Type_dict_uv;
+Q_DECLARE_METATYPE(Qt_Type_dict_uv)
+
+////////////////////////////////////////////////////////////////////////////////
+// a(uuuuus)
+struct Struct_uuuuus {
+    uint    u1;
+    uint    u2;
+    uint    u3;
+    uint    u4;
+    uint    u5;
+    QString s;
+};
+Q_DECLARE_METATYPE(Struct_uuuuus)
+
+typedef QList<Struct_uuuuus> Qt_Type_a_uuuuus;
+Q_DECLARE_METATYPE(Qt_Type_a_uuuuus)
+
+////////////////////////////////////////////////////////////////////////////////
+
 #include "QGVConnection.h"
 #include "QGVConnectionManager.h"
-    
+#include "QGVChannel.h"
+
 void registerDBusTypes();
 const QDBusArgument &
 operator>>(const QDBusArgument &argument, Struct_susv &param);

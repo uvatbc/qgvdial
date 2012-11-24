@@ -1,0 +1,39 @@
+<node>
+  <interface name="org.freedesktop.Telepathy.Channel.Interface.Messages">
+    <method name="SendMessage">
+      <arg name="Message" type="aa{sv}" direction="in"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_a_dict_sv"/>
+      <arg name="Flags" type="u" direction="in"/>
+    </method>
+    <method name="GetPendingMessageContent">
+      <arg name="Message_ID" type="u" direction="in" />
+      <arg name="Parts" type="au" direction="in"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="Qt_Type_au"/>
+      <arg name="Content" type="a{uv}" direction="out"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="Qt_Type_dict_uv"/>
+    </method>
+    <signal name="MessageSent">
+      <arg name="Content" type="aa{sv}" direction="in"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_a_dict_sv"/>
+      <arg name="Flags" type="u" direction="in"/>
+      <arg name="Message_Token" type="s" direction="in" />
+    </signal>
+    <signal name="PendingMessagesRemoved">
+      <arg name="Message_IDs" type="au" direction="in"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_au"/>
+    </signal>
+    <signal name="MessageReceived">
+      <arg name="Message" type="aa{sv}" direction="in"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_a_dict_sv"/>
+    </signal>
+    <property name="SupportedContentTypes" type="as" access="read" />
+    <property name="MessageTypes" type="au" access="read">
+      <annotation name="com.trolltech.QtDBus.QtTypeName" value="Qt_Type_au"/>
+    </property>
+    <property name="MessagePartSupportFlags" type="u" access="read" />
+    <property name="PendingMessages" type="aaa{sv}" access="read">
+      <annotation name="com.trolltech.QtDBus.QtTypeName" value="Qt_Type_a_a_dict_sv"/>
+    </property>
+    <property name="DeliveryReportingSupport" type="u" access="read" />
+  </interface>
+</node>

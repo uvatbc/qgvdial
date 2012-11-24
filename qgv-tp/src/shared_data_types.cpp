@@ -54,6 +54,10 @@ registerDBusTypes()
     qDBusRegisterMetaType<Qt_Type_dict_u_uss>();
     qDBusRegisterMetaType<Struct_dict_sv_as>();
     qDBusRegisterMetaType<Qt_Type_a_dict_sv_as>();
+    qDBusRegisterMetaType<Qt_Type_a_dict_sv>();
+    qDBusRegisterMetaType<Qt_Type_a_a_dict_sv>();
+    qDBusRegisterMetaType<Qt_Type_dict_uv>();
+    qDBusRegisterMetaType<Qt_Type_a_uuuuus>();
 */
 }//registerDBusTypes
 
