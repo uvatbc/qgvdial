@@ -25,7 +25,7 @@ Contact: yuvraaj@gmail.com
 #ifdef __cplusplus
 
 #include <QtCore>
-#include "shared_data_types.h"
+#include <QtDBus>
 
 #define LOGS_SERVER "http://www.yuvraaj.net"
 
@@ -116,11 +116,23 @@ Contact: yuvraaj@gmail.com
 // "org.freedesktop.Telepathy.Channel.Type.StreamedMedia.InitialAudio"
 #define ofdT_StreamedMedia_InitialAudio ofdT_ChannelType_StreamedMedia  ".InitialAudio"
 
+// "org.freedesktop.Telepathy.Channel.Interface.Messages"
+#define ofdT_Chan_I_Messages            ofdT_Channel ".Interface.Messages"
 
+////////////////////////////////////////////////////////////////////////////////
 #define QGV_CM_OP   ofDT_CM_OP "/" QGV_CMName
 #define QGV_CM_SP   ofdT_CM_SP "." QGV_CMName
 #define QGV_CONN_OP ofdT_CONN_OP "/" QGV_CMName "/" QGV_ProtocolName "/"
 #define QGV_CONN_SP ofdT_CONN_SP "." QGV_CMName "." QGV_ProtocolName
+
+////////////////////////////////////////////////////////////////////////////////
+enum ofdT_Handle_Type {
+    None        = 0,
+    Contact     = 1,
+    Room        = 2,
+    List        = 3,
+    Group       = 4
+};
 
 #endif //__cplusplus
 #endif //__GLOBAL_H__

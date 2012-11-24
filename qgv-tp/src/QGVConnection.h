@@ -23,6 +23,7 @@ Contact: yuvraaj@gmail.com
 #define _QGV_CONNECTION_H_
 
 #include "global.h"
+#include "shared_data_types.h"
 
 class QGVConnection : public QObject, protected QDBusContext
 {

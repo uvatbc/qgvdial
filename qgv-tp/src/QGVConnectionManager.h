@@ -23,6 +23,7 @@ Contact: yuvraaj@gmail.com
 #define _QGVCONNECTIONMANAGER_H_
 
 #include "global.h"
+#include "shared_data_types.h"
 
 class QGVConnection;
 typedef QMap<QString, QGVConnection *> QGVConnectionMap;

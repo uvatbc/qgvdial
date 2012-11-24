@@ -20,6 +20,7 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "QGVChannel.h"
+#include "gen/channel_adapter.h"
 
 QGVChannel::QGVChannel(QObject *parent /*= NULL*/)
 : QObject(parent)
@@ -33,35 +34,30 @@ QGVChannel::~QGVChannel()
 void
 QGVChannel::Close()
 {
+    Q_DEBUG("Channel close requested");
 }//QGVChannel::Close
 
 QString
 QGVChannel::GetChannelType()
 {
-    QString rv;
-    return rv;
+    Q_DEBUG(QString("Channel type = %1").arg(m_channelType));
+    return m_channelType;
 }//QGVChannel::GetChannelType
 
 uint
 QGVChannel::GetHandle(uint &Target_Handle)
 {
-    uint rv(0);
+    Target_Handle = 0;
+    ofdT_Handle_Type rv = None;
     return rv;
 }//QGVChannel::GetHandle
 
 QStringList
 QGVChannel::GetInterfaces()
 {
-    QStringList rv;
-    return rv;
+    Q_DEBUG(QString("Returning interfaces [%1]").arg(m_interfaces.join(", ")));
+    return m_interfaces;
 }//QGVChannel::GetInterfaces
-
-QString
-QGVChannel::channelType() const
-{
-    QString rv;
-    return rv;
-}//QGVChannel::channelType
 
 uint
 QGVChannel::initiatorHandle() const
@@ -77,32 +73,27 @@ QGVChannel::initiatorID() const
     return rv;
 }//QGVChannel::initiatorID
 
-QStringList
-QGVChannel::interfaces() const
-{
-    QStringList rv;
-    return rv;
-}//QGVChannel::interfaces
-
 bool
 QGVChannel::requested() const
 {
-    bool rv(false);
-    return rv;
+    // Until I support notification of an incoming call or text, requested is
+    // ALWAYS true
+    return (true);
 }//QGVChannel::requested
 
 uint
-QGVChannel::targetHandle() const
+QGVChannel::targetHandle()
 {
-    uint rv(0);
-    return rv;
+    uint Target_Handle(0);
+    GetHandle (Target_Handle);
+    return Target_Handle;
 }//QGVChannel::targetHandle
 
 uint
-QGVChannel::targetHandleType() const
+QGVChannel::targetHandleType()
 {
-    uint rv(0);
-    return rv;
+    uint Target_Handle(0);
+    return GetHandle (Target_Handle);
 }//QGVChannel::targetHandleType
 
 QString

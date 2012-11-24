@@ -23,6 +23,7 @@ Contact: yuvraaj@gmail.com
 #define _QGV_CHANNEL_H_
 
 #include "global.h"
+#include "shared_data_types.h"
 
 class QGVChannel : public QObject, protected QDBusContext
 {
@@ -35,26 +36,23 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 // Channel Interface:
 public: // PROPERTIES
-    Q_PROPERTY(QString ChannelType READ channelType)
-    QString channelType() const;
+    Q_PROPERTY(QString ChannelType READ GetChannelType)
 
     Q_PROPERTY(uint InitiatorHandle READ initiatorHandle)
     uint initiatorHandle() const;
-
     Q_PROPERTY(QString InitiatorID READ initiatorID)
     QString initiatorID() const;
 
-    Q_PROPERTY(QStringList Interfaces READ interfaces)
-    QStringList interfaces() const;
+    Q_PROPERTY(QStringList Interfaces READ GetInterfaces)
 
     Q_PROPERTY(bool Requested READ requested)
     bool requested() const;
 
     Q_PROPERTY(uint TargetHandle READ targetHandle)
-    uint targetHandle() const;
+    uint targetHandle();
 
     Q_PROPERTY(uint TargetHandleType READ targetHandleType)
-    uint targetHandleType() const;
+    uint targetHandleType();
 
     Q_PROPERTY(QString TargetID READ targetID)
     QString targetID() const;
@@ -68,6 +66,9 @@ Q_SIGNALS: // SIGNALS
     void Closed();
 ////////////////////////////////////////////////////////////////////////////////
 
+protected:
+    QString m_channelType;
+    QStringList m_interfaces;
 };
 
 #endif//_QGV_CHANNEL_H_
