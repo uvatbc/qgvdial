@@ -370,7 +370,7 @@ QGVConnection::processChannel(const QVariantMap &request,
         sendErrorReply (ofdT_Err_NetworkError, "Channel created successfully");
         success = true;
     } else if (strType == ofdT_ChannelType_Text) {
-        Q_DEBUG(QString("Text to %1. Request fields:").arg(strNum));
+        Q_DEBUG(QString("Text to %1.").arg(strNum));
 
         QString objName = m_dbusObjectPath
                            + QString("/%1").arg(++m_channelNumber);
@@ -378,9 +378,11 @@ QGVConnection::processChannel(const QVariantMap &request,
         bool rv = textChan->registerObject ();
         if (rv) {
             objPath.setPath (objName);
+            Q_DEBUG("Text channel created.");
             success = true;
         } else {
             delete textChan;
+            Q_WARN("Failed to create text channel");
             success = false;
         }
 

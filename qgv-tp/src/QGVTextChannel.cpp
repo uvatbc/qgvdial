@@ -64,6 +64,9 @@ QGVTextChannel::registerObject()
         if (NULL != ma) {
             delete ma;
         }
+        Q_WARN("Failed to register Text channel");
+    } else {
+        Q_DEBUG("Text channel object registered");
     }
 
     return (rv);

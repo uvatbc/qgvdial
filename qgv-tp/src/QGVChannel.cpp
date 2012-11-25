@@ -52,6 +52,8 @@ QGVChannel::registerObject()
         return false;
     }
 
+    Q_DEBUG(QString("Registered channel object %1").arg(m_dbusObjectPath));
+
     return true;
 }//QGVChannel::registerObject
 
