@@ -28,6 +28,7 @@ QGVChannel::QGVChannel(const QString &objName, const QString &dest,
 , m_dbusObjectPath(objName)
 , m_destination(dest)
 {
+    m_interfaces << ofdT_Channel;
 }//QGVChannel::QGVChannel
 
 QGVChannel::~QGVChannel()
