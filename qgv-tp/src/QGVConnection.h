@@ -52,6 +52,11 @@ public:
         // There are more, but I don't care about them right now.
     };
 
+private slots:
+    void onNewChannel(const QDBusObjectPath &Object_Path,
+                      const QString &Channel_Type, uint Handle_Type,
+                      uint Handle, bool Suppress_Handler);
+
 public:
     // DBus Interface properties for Connection
     Q_PROPERTY(bool HasImmortalHandles  READ hasImmortalHandles)
@@ -67,7 +72,6 @@ public:
 
     Q_PROPERTY(Qt_Type_a_dict_sv_as RequestableChannelClasses READ requestableChannelClasses)
     Qt_Type_a_dict_sv_as requestableChannelClasses() const;
-
 
 public Q_SLOTS: // METHODS
 ////////////////////////////////////////////////////////////////////////////////
@@ -96,8 +100,9 @@ Q_SIGNALS: // SIGNALS
 ////////////////////////////////////////////////////////////////////////////////
 // Connection interface signals
     void ConnectionError(const QString &in0, const QVariantMap &in1);
-    void NewChannel(const QDBusObjectPath &in0, const QString &in1, uint in2,
-                    uint in3, bool in4);
+    void NewChannel(const QDBusObjectPath &Object_Path,
+                    const QString &Channel_Type, uint Handle_Type, uint Handle,
+                    bool Suppress_Handler);
     void SelfHandleChanged(uint in0);
     void StatusChanged(uint status, uint reason);
 

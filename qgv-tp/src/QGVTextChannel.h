@@ -70,6 +70,15 @@ public:
     virtual ~QGVTextChannel();
     virtual bool registerObject();
 
+private slots:
+    void newChannelTimeout();
+
+Q_SIGNALS:
+    void pingNewChannel(const QDBusObjectPath &Object_Path,
+                        const QString &Channel_Type, uint Handle_Type,
+                        uint Handle, bool Suppress_Handler);
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // Channel.Type.Text Interface:
 public: // PROPERTIES
@@ -80,9 +89,9 @@ public Q_SLOTS: // METHODS
     void Send(uint Type, const QString &Text);
 Q_SIGNALS: // SIGNALS
     void LostMessage();
-    void Received();
-    void SendError();
-    void Sent();
+    void Received(uint ID, uint Timestamp, uint Sender, uint Type, uint Flags, const QString &Text);
+    void SendError(uint Error, uint Timestamp, uint Type, const QString &Text);
+    void Sent(uint Timestamp, uint Type, const QString &Text);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Channel.Interface.Messages Interface
@@ -106,9 +115,9 @@ public Q_SLOTS: // METHODS
     Qt_Type_dict_uv GetPendingMessageContent(uint Message_ID, const Qt_Type_au &Parts);
     void SendMessage(const Qt_Type_a_dict_sv &Message, uint Flags);
 Q_SIGNALS: // SIGNALS
-    void MessageReceived();
-    void MessageSent();
-    void PendingMessagesRemoved();
+    void MessageReceived(const Qt_Type_a_dict_sv &Message);
+    void MessageSent(const Qt_Type_a_dict_sv &Content, uint Flags, const QString &Message_Token);
+    void PendingMessagesRemoved(const Qt_Type_au &Message_IDs);
 ////////////////////////////////////////////////////////////////////////////////
 
 };

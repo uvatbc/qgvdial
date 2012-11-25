@@ -99,6 +99,8 @@ Contact: yuvraaj@gmail.com
 #define ofdT_Channel ofdT_SP ".Channel"
 // "org.freedesktop.Telepathy.Channel.TargetID"
 #define ofdT_Channel_TargetID           ofdT_Channel ".TargetID"
+// org.freedesktop.Telepathy.Channel.Requested
+#define ofdT_Channel_Requested          ofdT_Channel ".Requested"
 
 // "org.freedesktop.Telepathy.Channel.ChannelType"
 #define ofdT_Channel_ChannelType        ofdT_Channel ".ChannelType"

@@ -89,11 +89,11 @@
       <arg type="u"/>
     </signal>
     <signal name="NewChannel">
-      <arg type="o"/>
-      <arg type="s"/>
-      <arg type="u"/>
-      <arg type="u"/>
-      <arg type="b"/>
+      <arg name="Object_Path" type="o"/>
+      <arg name="Channel_Type" type="s"/>
+      <arg name="Handle_Type" type="u"/>
+      <arg name="Handle" type="u"/>
+      <arg name="Suppress_Handler" type="b"/>
     </signal>
     <signal name="ConnectionError">
       <arg type="s"/>

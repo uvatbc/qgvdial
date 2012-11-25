@@ -67,10 +67,18 @@ QGVTextChannel::registerObject()
         Q_WARN("Failed to register Text channel");
     } else {
         Q_DEBUG("Text channel object registered");
+        QTimer::singleShot (1, this, SLOT(newChannelTimeout()));
     }
 
     return (rv);
 }//QGVTextChannel::registerObject
+
+void
+QGVTextChannel::newChannelTimeout()
+{
+    QDBusObjectPath oP(m_dbusObjectPath);
+    emit pingNewChannel (oP, m_channelType, 0, 0, true);
+}//QGVTextChannel::newChannelTimeout
 
 void
 QGVTextChannel::AcknowledgePendingMessages(const Qt_Type_au & /*IDs*/)

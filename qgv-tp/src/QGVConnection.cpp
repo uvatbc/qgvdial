@@ -378,6 +378,12 @@ QGVConnection::processChannel(const QVariantMap &request,
         bool rv = textChan->registerObject ();
         if (rv) {
             objPath.setPath (objName);
+
+            connect(textChan,
+                    SIGNAL(pingNewChannel(QDBusObjectPath,QString,uint,uint,bool)),
+                    this,
+                    SLOT(onNewChannel(QDBusObjectPath,QString,uint,uint,bool)));
+
             Q_DEBUG("Text channel created.");
             success = true;
         } else {
@@ -413,6 +419,30 @@ QGVConnection::processChannel(const QVariantMap &request,
 
     return success;
 }//QGVConnection::processChannel
+
+void
+QGVConnection::onNewChannel(const QDBusObjectPath &Object_Path,
+                            const QString &Channel_Type, uint Handle_Type,
+                            uint Handle, bool Suppress_Handler)
+{
+    Qt_Type_a_o_dict_sv chanInfoList;
+    Struct_o_dict_sv chanInfo;
+
+    Q_DEBUG("Time for a new channel");
+
+    chanInfo.o = Object_Path.path ();
+    chanInfo.vmap[ofdT_Channel_ChannelType] = Channel_Type;
+    chanInfo.vmap[ofdT_Channel_TargetHandleType] = Handle_Type;
+    chanInfo.vmap[ofdT_Channel_TargetHandle] = Handle;
+    chanInfo.vmap[ofdT_Channel_TargetID] = "";
+    chanInfo.vmap[ofdT_Channel_Requested] = Suppress_Handler;
+
+    chanInfoList << chanInfo;
+    emit NewChannels (chanInfoList);
+    emit NewChannel (Object_Path, Channel_Type, Handle_Type, Handle,
+                     Suppress_Handler);
+}//QGVConnection::onNewChannel
+
 
 QDBusObjectPath
 QGVConnection::CreateChannel(const QVariantMap &Request,    // IN
