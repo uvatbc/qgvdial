@@ -120,7 +120,8 @@ public:
     QString getDBusBusName();
 
 private:
-    bool processChannel(const QVariantMap &request);
+    bool processChannel(const QVariantMap &request,
+                        QDBusObjectPath &objPath);
 
 private:
     uint    m_selfHandle;
@@ -128,6 +129,7 @@ private:
     QString m_dbusObjectPath;
     QString m_dbusBusName;
     bool    m_hasImmortalHandle;
+    uint    m_channelNumber;
 
     ConnectionStatus m_connStatus;
 };

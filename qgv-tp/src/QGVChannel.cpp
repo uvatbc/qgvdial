@@ -22,14 +22,38 @@ Contact: yuvraaj@gmail.com
 #include "QGVChannel.h"
 #include "gen/channel_adapter.h"
 
-QGVChannel::QGVChannel(QObject *parent /*= NULL*/)
+QGVChannel::QGVChannel(const QString &objName, const QString &dest,
+                       QObject *parent /*= NULL*/)
 : QObject(parent)
+, m_dbusObjectPath(objName)
+, m_destination(dest)
 {
 }//QGVChannel::QGVChannel
 
 QGVChannel::~QGVChannel()
 {
 }//QGVChannel::~QGVChannel
+
+bool
+QGVChannel::registerObject()
+{
+    ChannelAdaptor *ca = new ChannelAdaptor(this);
+    if (NULL == ca) {
+        Q_WARN("Failed to create channel adapter object");
+        return false;
+    }
+
+    QDBusConnection sessionBus = QDBusConnection::sessionBus();
+    bool rv = sessionBus.registerObject(m_dbusObjectPath, this);
+    if (!rv) {
+        Q_WARN(QString("Couldn't register Channel object path %1")
+                .arg(m_dbusObjectPath));
+        delete ca;
+        return false;
+    }
+
+    return true;
+}//QGVChannel::registerObject
 
 void
 QGVChannel::Close()
@@ -48,8 +72,7 @@ uint
 QGVChannel::GetHandle(uint &Target_Handle)
 {
     Target_Handle = 0;
-    ofdT_Handle_Type rv = None;
-    return rv;
+    return ofdT_HT_None;
 }//QGVChannel::GetHandle
 
 QStringList

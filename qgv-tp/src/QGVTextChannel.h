@@ -25,13 +25,50 @@ Contact: yuvraaj@gmail.com
 #include "global.h"
 #include "shared_data_types.h"
 
+// Channel Delivery Reporting Support Flags = CDRS Flags
+#define CDRS_None                   0
+#define CDRS_Receive_Failures       1
+#define CDRS_Receive_Successes      2
+#define CDRS_Receive_Read           4
+#define CDRS_Receive_Deleted        8
+
+// Channel Message Part Support Flags = MPS Flags
+#define MPS_No_Attachments          0
+#define MPS_One_Attachment          1
+#define MPS_Multiple_Attachments    2
+
+// Channel Message Sending Flags
+#define MSF_None                    0
+#define MSF_Report_Delivery         1
+#define MSF_Report_Read             2
+#define MSF_Report_Deleted          4
+
+// Channel Text Message Type
+enum Channel_Text_Message_Type {
+    CTMT_Normal          = 0,
+    CTMT_Action          = 1,
+    CTMT_Notice          = 2,
+    CTMT_Auto_Reply      = 3,
+    CTMT_Delivery_Report = 4
+};
+
 class QGVTextChannel : public QGVChannel
 {
     Q_OBJECT
 
+    enum ChannelTextType {
+        CTT_Normal          = 0,
+        CTT_Action          = 1,
+        CTT_Notice          = 2,
+        CTT_Auto_Reply      = 3,
+        CTT_Delivery_Report = 4
+    };
+
 public:
-    QGVTextChannel(QObject *parent = NULL);
+    QGVTextChannel(const QString &objName, const QString &dest,
+                   QObject *parent = NULL);
     virtual ~QGVTextChannel();
+    virtual bool registerObject();
 
 ////////////////////////////////////////////////////////////////////////////////
 // Channel.Type.Text Interface:

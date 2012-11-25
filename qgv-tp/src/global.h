@@ -127,11 +127,11 @@ Contact: yuvraaj@gmail.com
 
 ////////////////////////////////////////////////////////////////////////////////
 enum ofdT_Handle_Type {
-    None        = 0,
-    Contact     = 1,
-    Room        = 2,
-    List        = 3,
-    Group       = 4
+    ofdT_HT_None    = 0,
+    ofdT_HT_Contact = 1,
+    ofdT_HT_Room    = 2,
+    ofdT_HT_List    = 3,
+    ofdT_HT_Group   = 4
 };
 
 #endif //__cplusplus

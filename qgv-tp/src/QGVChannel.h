@@ -30,8 +30,10 @@ class QGVChannel : public QObject, protected QDBusContext
     Q_OBJECT
 
 public:
-    QGVChannel(QObject *parent = NULL);
+    QGVChannel(const QString &objName, const QString &dest,
+               QObject *parent = NULL);
     virtual ~QGVChannel();
+    virtual bool registerObject();
 
 ////////////////////////////////////////////////////////////////////////////////
 // Channel Interface:
@@ -67,7 +69,9 @@ Q_SIGNALS: // SIGNALS
 ////////////////////////////////////////////////////////////////////////////////
 
 protected:
-    QString m_channelType;
+    QString     m_dbusObjectPath;
+    QString     m_destination;
+    QString     m_channelType;
     QStringList m_interfaces;
 };
 
