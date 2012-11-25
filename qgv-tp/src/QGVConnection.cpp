@@ -430,7 +430,7 @@ QGVConnection::onNewChannel(const QDBusObjectPath &Object_Path,
 
     Q_DEBUG("Time for a new channel");
 
-    chanInfo.o = Object_Path.path ();
+    chanInfo.o = Object_Path;
     chanInfo.vmap[ofdT_Channel_ChannelType] = Channel_Type;
     chanInfo.vmap[ofdT_Channel_TargetHandleType] = Handle_Type;
     chanInfo.vmap[ofdT_Channel_TargetHandle] = Handle;
@@ -442,7 +442,6 @@ QGVConnection::onNewChannel(const QDBusObjectPath &Object_Path,
     emit NewChannel (Object_Path, Channel_Type, Handle_Type, Handle,
                      Suppress_Handler);
 }//QGVConnection::onNewChannel
-
 
 QDBusObjectPath
 QGVConnection::CreateChannel(const QVariantMap &Request,    // IN

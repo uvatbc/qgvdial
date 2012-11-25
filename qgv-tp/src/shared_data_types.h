@@ -31,9 +31,9 @@ Contact: yuvraaj@gmail.com
 ////////////////////////////////////////////////////////////////////////////////
 // a(susv)
 struct Struct_susv {
-    QString     s1;
-    uint        u;
-    QString     s2;
+    QString         s1;
+    uint            u;
+    QString         s2;
     QDBusVariant    v;
 };
 Q_DECLARE_METATYPE(Struct_susv)
@@ -48,7 +48,7 @@ Q_DECLARE_METATYPE(Qt_Type_au)
 
 ////////////////////////////////////////////////////////////////////////////////
 // a{us}
-typedef QMap<unsigned, QString> Qt_Type_dict_us;
+typedef QMap<uint, QString> Qt_Type_dict_us;
 Q_DECLARE_METATYPE(Qt_Type_dict_us)
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -76,10 +76,10 @@ Q_DECLARE_METATYPE(Qt_Type_a_us)
 ////////////////////////////////////////////////////////////////////////////////
 // a(usuu)
 struct Struct_usuu {
-    unsigned u1;
-    QString  s;
-    unsigned u2;
-    unsigned u3;
+    uint    u1;
+    QString s;
+    uint    u2;
+    uint    u3;
 };
 Q_DECLARE_METATYPE(Struct_usuu)
 
@@ -89,12 +89,12 @@ Q_DECLARE_METATYPE(Qt_Type_a_usuu)
 ////////////////////////////////////////////////////////////////////////////////
 // a(usuuuu)
 struct Struct_usuuuu {
-    unsigned u1;
-    QString  s;
-    unsigned u2;
-    unsigned u3;
-    unsigned u4;
-    unsigned u5;
+    uint    u1;
+    QString s;
+    uint    u2;
+    uint    u3;
+    uint    u4;
+    uint    u5;
 };
 Q_DECLARE_METATYPE(Struct_usuuuu)
 
@@ -103,28 +103,28 @@ Q_DECLARE_METATYPE(Qt_Type_a_usuuuu)
 
 ////////////////////////////////////////////////////////////////////////////////
 // a{ua{sv}}
-typedef QMap<unsigned, QVariantMap> Qt_Type_dict_u_dict_sv;
+typedef QMap<uint, QVariantMap> Qt_Type_dict_u_dict_sv;
 Q_DECLARE_METATYPE(Qt_Type_dict_u_dict_sv)
 
 ////////////////////////////////////////////////////////////////////////////////
 // a{u(uus)}
 struct Struct_uus {
-    unsigned u1;
-    unsigned u2;
+    uint    u1;
+    uint    u2;
     QString s;
 };
 Q_DECLARE_METATYPE(Struct_uus)
 
-typedef QMap<unsigned, Struct_uus> Qt_Type_dict_u_uus;
+typedef QMap<uint, Struct_uus> Qt_Type_dict_u_uus;
 Q_DECLARE_METATYPE(Qt_Type_dict_u_uus)
 
 ////////////////////////////////////////////////////////////////////////////////
 // a(osuu)
 struct Struct_osuu {
-    QString o;  // Object path
-    QString s;
-    unsigned u1;
-    unsigned u2;
+    QDBusObjectPath o;
+    QString         s;
+    uint            u1;
+    uint            u2;
 };
 Q_DECLARE_METATYPE(Struct_osuu)
 
@@ -139,13 +139,13 @@ Q_DECLARE_METATYPE(Qt_Type_dict_s_dict_sv)
 
 // 2. (u$1) = (ua{sa{sv}})
 struct Struct_u_dict_s_dict_sv {
-    unsigned u;
+    uint u;
     Qt_Type_dict_s_dict_sv dict_s_dict_sv;
 };
 Q_DECLARE_METATYPE(Struct_u_dict_s_dict_sv)
 
 // 3. a{u$2} = final step = a{u(ua{sa{sv}})}
-typedef QMap<unsigned, Struct_u_dict_s_dict_sv> Qt_Type_dict_u_u_dict_s_dict_sv;
+typedef QMap<uint, Struct_u_dict_s_dict_sv> Qt_Type_dict_u_u_dict_s_dict_sv;
 Q_DECLARE_METATYPE(Qt_Type_dict_u_u_dict_s_dict_sv)
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -171,8 +171,8 @@ Q_DECLARE_METATYPE(Qt_Type_dict_s_ubb_dict_ss)
 // a(oa{sv}): Lets do it in steps:
 // 1. (oa{sv})
 struct Struct_o_dict_sv {
-    QString o;
-    QVariantMap vmap;
+    QDBusObjectPath o;
+    QVariantMap     vmap;
 };
 Q_DECLARE_METATYPE(Struct_o_dict_sv)
 
@@ -183,13 +183,13 @@ Q_DECLARE_METATYPE(Qt_Type_a_o_dict_sv)
 ////////////////////////////////////////////////////////////////////////////////
 // a{u(uss)}
 struct Struct_uss {
-    unsigned u;
+    uint    u;
     QString s1;
     QString s2;
 };
 Q_DECLARE_METATYPE(Struct_uss)
 
-typedef QMap<unsigned, Struct_uss> Qt_Type_dict_u_uss;
+typedef QMap<uint, Struct_uss> Qt_Type_dict_u_uss;
 Q_DECLARE_METATYPE(Qt_Type_dict_u_uss)
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -213,7 +213,7 @@ Q_DECLARE_METATYPE(Qt_Type_a_a_dict_sv)
 
 ////////////////////////////////////////////////////////////////////////////////
 // a{uv}
-typedef QMap<uint, QVariant> Qt_Type_dict_uv;
+typedef QMap<uint, QDBusVariant> Qt_Type_dict_uv;
 Q_DECLARE_METATYPE(Qt_Type_dict_uv)
 
 ////////////////////////////////////////////////////////////////////////////////
