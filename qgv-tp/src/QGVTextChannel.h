@@ -102,8 +102,7 @@ public: // PROPERTIES
     Q_PROPERTY(uint MessagePartSupportFlags READ messagePartSupportFlags)
     uint messagePartSupportFlags() const;
 
-    Q_PROPERTY(Qt_Type_au MessageTypes READ messageTypes)
-    Qt_Type_au messageTypes() const;
+    Q_PROPERTY(Qt_Type_au MessageTypes READ GetMessageTypes)
 
     Q_PROPERTY(Qt_Type_a_a_dict_sv PendingMessages READ pendingMessages)
     Qt_Type_a_a_dict_sv pendingMessages() const;

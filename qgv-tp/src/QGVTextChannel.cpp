@@ -66,29 +66,58 @@ QGVTextChannel::registerObject()
         }
         Q_WARN("Failed to register Text channel");
     } else {
-        Q_DEBUG("Text channel object registered");
+        Q_DEBUG("Text channel object registered. Deferring new channel signal");
         QTimer::singleShot (1, this, SLOT(newChannelTimeout()));
     }
 
     return (rv);
 }//QGVTextChannel::registerObject
 
+/*
+ * This single shot QTimer slot is to ensure that the new channel signal is
+ * emitted only after the handler for EnsureChannel or CreateChannel has
+ * returned. This is required according to the spec.
+ */
 void
 QGVTextChannel::newChannelTimeout()
 {
+    Q_DEBUG("Time to tell the world about this new channel");
     QDBusObjectPath oP(m_dbusObjectPath);
     emit pingNewChannel (oP, m_channelType, 0, 0, true);
+
+    const QMetaObject *mo = this->metaObject ();
+    if (NULL == mo) {
+        Q_WARN("NULL meta object");
+        return;
+    }
+
+    Q_DEBUG("Dumping property info:");
+    for (int i = 0; i < mo->propertyCount (); i++) {
+        QMetaProperty mp = mo->property (i);
+        if (mp.isReadable ()) {
+            Q_DEBUG(QString("Type: %1. Name: %2. Value: %3")
+                    .arg(mp.typeName()).arg(mp.name())
+                    .arg(mp.read(this).toString()));
+        } else {
+            Q_DEBUG(QString("Unreadable property. Type: %1. Name: %2.")
+                    .arg(mp.typeName()).arg(mp.name()));
+        }
+    }
 }//QGVTextChannel::newChannelTimeout
 
 void
 QGVTextChannel::AcknowledgePendingMessages(const Qt_Type_au & /*IDs*/)
 {
+    Q_DEBUG("Here");
 }//QGVTextChannel::AcknowledgePendingMessages
 
 Qt_Type_au
 QGVTextChannel::GetMessageTypes()
 {
+    Q_DEBUG("Returning Message Type = [Normal]");
+
     Qt_Type_au rv;
+    rv << CTMT_Normal;
     return rv;
 }//QGVTextChannel::GetMessageTypes
 
@@ -129,26 +158,21 @@ QGVTextChannel::Send(uint Type, const QString &Text)
 uint
 QGVTextChannel::deliveryReportingSupport() const
 {
+    Q_DEBUG("No delivery reporting support");
     return CDRS_None;
 }//QGVTextChannel::deliveryReportingSupport
 
 uint
 QGVTextChannel::messagePartSupportFlags() const
 {
+    Q_DEBUG("No attachments permitted");
     return MPS_No_Attachments;
 }//QGVTextChannel::messagePartSupportFlags
-
-Qt_Type_au
-QGVTextChannel::messageTypes() const
-{
-    Qt_Type_au rv;
-    rv << CTMT_Normal;
-    return rv;
-}//QGVTextChannel::messageTypes
 
 Qt_Type_a_a_dict_sv
 QGVTextChannel::pendingMessages() const
 {
+    Q_DEBUG("No pending messages");
     Qt_Type_a_a_dict_sv rv;
     return rv;
 }//QGVTextChannel::pendingMessages
@@ -156,6 +180,7 @@ QGVTextChannel::pendingMessages() const
 QStringList
 QGVTextChannel::supportedContentTypes() const
 {
+    Q_DEBUG("Supported content: text/plain");
     QStringList rv;
     rv << "text/plain";
     return rv;
@@ -165,6 +190,7 @@ Qt_Type_dict_uv
 QGVTextChannel::GetPendingMessageContent(uint /*Message_ID*/,
                                          const Qt_Type_au & /*Parts*/)
 {
+    Q_DEBUG("No pending message content");
     Qt_Type_dict_uv rv;
     return rv;
 }//QGVTextChannel::GetPendingMessageContent
