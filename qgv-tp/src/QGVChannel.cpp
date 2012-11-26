@@ -62,6 +62,7 @@ void
 QGVChannel::Close()
 {
     Q_DEBUG("Channel close requested");
+    this->deleteLater();
 }//QGVChannel::Close
 
 QString

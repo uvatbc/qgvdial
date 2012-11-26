@@ -22,6 +22,29 @@ Contact: yuvraaj@gmail.com
 #include "QGVTextChannel.h"
 #include "gen/textchannel_adapter.h"
 
+static void
+dumpObjectProperties(QObject *obj)
+{
+    const QMetaObject *mo = obj->metaObject ();
+    if (NULL == mo) {
+        Q_WARN("NULL meta object");
+        return;
+    }
+
+    Q_DEBUG("Dumping property info:");
+    for (int i = 0; i < mo->propertyCount (); i++) {
+        QMetaProperty mp = mo->property (i);
+        if (mp.isReadable ()) {
+            Q_DEBUG(QString("Type: %1. Name: %2. Value: %3")
+                    .arg(mp.typeName()).arg(mp.name())
+                    .arg(mp.read(obj).toString()));
+        } else {
+            Q_DEBUG(QString("Unreadable property. Type: %1. Name: %2.")
+                    .arg(mp.typeName()).arg(mp.name()));
+        }
+    }
+}//dumpObjectProperties
+
 QGVTextChannel::QGVTextChannel(const QString &objName, const QString &dest,
                                QObject *parent /*= NULL*/)
 : QGVChannel(objName, dest, parent)
@@ -84,25 +107,6 @@ QGVTextChannel::newChannelTimeout()
     Q_DEBUG("Time to tell the world about this new channel");
     QDBusObjectPath oP(m_dbusObjectPath);
     emit pingNewChannel (oP, m_channelType, 0, 0, true);
-
-    const QMetaObject *mo = this->metaObject ();
-    if (NULL == mo) {
-        Q_WARN("NULL meta object");
-        return;
-    }
-
-    Q_DEBUG("Dumping property info:");
-    for (int i = 0; i < mo->propertyCount (); i++) {
-        QMetaProperty mp = mo->property (i);
-        if (mp.isReadable ()) {
-            Q_DEBUG(QString("Type: %1. Name: %2. Value: %3")
-                    .arg(mp.typeName()).arg(mp.name())
-                    .arg(mp.read(this).toString()));
-        } else {
-            Q_DEBUG(QString("Unreadable property. Type: %1. Name: %2.")
-                    .arg(mp.typeName()).arg(mp.name()));
-        }
-    }
 }//QGVTextChannel::newChannelTimeout
 
 void
