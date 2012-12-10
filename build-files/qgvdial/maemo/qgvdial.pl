@@ -43,7 +43,7 @@ print "$cmd\n";
 system($cmd);
 
 # Copy the correct pro file
-system("cp $basedir/build-files/qgvdial/pro.qgvdial $basedir/qgvdial.pro");
+system("cp $basedir/build-files/qgvdial/maemo/pro.qgvdial $basedir/qgvdial.pro");
 
 # Do everything upto the preparation of the debian directory. Code is still not compiled.
 $cmd = "cd $basedir && echo y | dh_make --createorig --single -e yuvraaj\@gmail.com -c lgpl";

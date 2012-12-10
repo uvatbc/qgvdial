@@ -44,7 +44,7 @@ print "$cmd\n";
 system($cmd);
 
 # Copy the correct pro file
-system("cp $basedir/build-files/qgvdial/pro.qgvdial $basedir/qgvdial.pro");
+system("cp $basedir/build-files/qgvdial/harmattan/pro.qgvdial $basedir/qgvdial.pro");
 
 # For the moment, forcibly include mqlib
 $cmd = "cd $basedir/src && touch mqlib-build";
