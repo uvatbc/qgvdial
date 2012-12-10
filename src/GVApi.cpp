@@ -399,6 +399,14 @@ GVApi::login(AsyncTaskToken *token)
     }
 
     if (loggedIn) {
+
+        if (rnr_se.isEmpty ()) {
+            Q_WARN("User was already logged in, but there is no rnr_se!");
+        } else if (emitLog) {
+            Q_DEBUG("User was already logged in...");
+        }
+
+        token->outParams["rnr_se"] = rnr_se;
         token->status = ATTS_SUCCESS;
         token->emitCompleted ();
         return true;
@@ -992,6 +1000,7 @@ GVApi::onGotRnr(bool success, const QByteArray &response, QNetworkReply *reply,
 
         rnr_se = rx.cap (1);
 
+        token->outParams["rnr_se"] = rnr_se;
         token->status = ATTS_SUCCESS;
         token->emitCompleted ();
         token = NULL;

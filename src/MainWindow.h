@@ -286,9 +286,9 @@ private:
     //! Request quit in the app
     void requestQuit();
 
-    void showMsgBox (const QString &strMessage, bool inputBox);
-    void showMsgBox (const QString &strMessage);
-    void showInputBox (const QString &strMessage);
+    void showMsgBox (const QString &strMessage, bool inputBox = false);
+    inline void showInputBox(const QString &msg) { showMsgBox(msg, true); }
+
     void onSigMsgBoxDone(bool ok = true);
 
 private:

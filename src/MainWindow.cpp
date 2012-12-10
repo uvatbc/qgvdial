@@ -1169,7 +1169,7 @@ MainWindow::refreshPinSettings()
 }//MainWindow::refreshPinSettings
 
 void
-MainWindow::showMsgBox (const QString &strMessage, bool inputBox)
+MainWindow::showMsgBox (const QString &strMessage, bool inputBox /*= false*/)
 {
     QObject *obj = getQMLObject ("MsgBox");
     if (NULL == obj) {
@@ -1181,18 +1181,6 @@ MainWindow::showMsgBox (const QString &strMessage, bool inputBox)
     obj->setProperty ("inputBox", inputBox);
     obj->setProperty ("opacity", QVariant(1.0));
 }//MainWindow::showMsgBox
-
-void
-MainWindow::showMsgBox (const QString &strMessage)
-{
-    showMsgBox (strMessage, false);
-}//MainWindow::showMsgBox
-
-void
-MainWindow::showInputBox (const QString &strMessage)
-{
-    showMsgBox (strMessage, true);
-}//MainWindow::showInputBox
 
 void
 MainWindow::onSigMsgBoxDone (bool ok /* = true*/)

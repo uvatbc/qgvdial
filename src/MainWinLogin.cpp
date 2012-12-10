@@ -166,40 +166,7 @@ MainWindow::loginCompleted (AsyncTaskToken *token)
         return;
     }
 
-    if (token->status != ATTS_SUCCESS) {
-        logoutCompleted (NULL);
-
-        OsDependent &osd = Singletons::getRef().getOSD ();
-        osd.setLongWork (this, false);
-
-        QString strErr = token->errorString;
-
-        if (token->status == ATTS_NW_ERROR) {
-            loginStatus = LS_NwError;
-            if (strErr.isEmpty ()) {
-                strErr = "Network error";
-            }
-        } else {
-            dbMain.clearUser ();
-            dbMain.clearPass ();
-            dbMain.clearContactsPass ();
-            dbMain.setTFAFlag (false);
-            QTimer::singleShot (500, this, SLOT(onRecreateCookieJar()));
-        }
-
-        if (token->status == ATTS_LOGIN_FAIL_SHOWURL) {
-            QUrl url = token->outParams["nextUrl"].toUrl ();
-            QDesktopServices::openUrl (url);
-        }
-
-        if (strErr.isEmpty ()) {
-            strErr = "User login failed";
-            setStatus ("User login failed", 30*1000);
-        }
-        this->showMsgBox (strErr);
-
-        Q_WARN(QString("User login failed. Error string: %1").arg(strErr));
-    } else {
+    if (token->status == ATTS_SUCCESS) {
         setStatus ("User logged in");
         Q_DEBUG ("User logged in");
 
@@ -232,6 +199,12 @@ MainWindow::loginCompleted (AsyncTaskToken *token)
         if (bInitContacts) {
             // Prepare the contacts
             initContacts (contactsPass);
+        }
+
+        if (token->outParams["rnr_se"].toString().isEmpty()) {
+            Q_WARN("GV may not work correctly: rnr_se is empty!");
+            showMsgBox ("GV account configuration may not be complete. "
+                        "Everything may not work as expected.");
         }
 
         // Prepare the inbox widget for usage
@@ -268,6 +241,39 @@ MainWindow::loginCompleted (AsyncTaskToken *token)
 
         // Fill up the pin settings
         refreshPinSettings ();
+    } else {
+        logoutCompleted (NULL);
+
+        OsDependent &osd = Singletons::getRef().getOSD ();
+        osd.setLongWork (this, false);
+
+        QString strErr = token->errorString;
+
+        if (token->status == ATTS_NW_ERROR) {
+            loginStatus = LS_NwError;
+            if (strErr.isEmpty ()) {
+                strErr = "Network error";
+            }
+        } else {
+            dbMain.clearUser ();
+            dbMain.clearPass ();
+            dbMain.clearContactsPass ();
+            dbMain.setTFAFlag (false);
+            QTimer::singleShot (500, this, SLOT(onRecreateCookieJar()));
+        }
+
+        if (token->status == ATTS_LOGIN_FAIL_SHOWURL) {
+            QUrl url = token->outParams["nextUrl"].toUrl ();
+            QDesktopServices::openUrl (url);
+        }
+
+        if (strErr.isEmpty ()) {
+            strErr = "User login failed";
+            setStatus ("User login failed", 30*1000);
+        }
+        this->showMsgBox (strErr);
+
+        Q_WARN(QString("User login failed. Error string: %1").arg(strErr));
     }
 
     if (token) {
