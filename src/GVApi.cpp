@@ -2141,19 +2141,16 @@ GVApi::onVmail(bool success, const QByteArray &response, QNetworkReply *,
         file.close();
 
         token->status = ATTS_SUCCESS;
-        token->emitCompleted ();
-        token = NULL;
 
         success = true;
     } while (0); // End cleanup block (not a loop)
 
-    if (!success) {
-        if (token) {
-            if (token->status == ATTS_SUCCESS) {
-                token->status = ATTS_FAILURE;
-            }
-            token->emitCompleted ();
+    if (NULL != token) {
+        if (!success) {
+            token->status = ATTS_FAILURE;
         }
+        token->emitCompleted ();
+        token = NULL;
     }
 }//GVApi::onVmail
 

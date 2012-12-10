@@ -37,8 +37,20 @@ MainWindow::playVmail (const QString &strFile)
         bBeginPlayAfterLoad = true;
         vmailPlayer->setCurrentSource (Phonon::MediaSource(url));
 //        vmailPlayer->setVolume (50);
+        QTimer::singleShot(1000, this, SLOT(ensureVmailPlaying()));
     } while (0); // End cleanup block (not a loop)
 }//MainWindow::playVmail
+
+void
+MainWindow::ensureVmailPlaying()
+{
+    if (bBeginPlayAfterLoad) {
+        bBeginPlayAfterLoad = false;
+        if (vmailPlayer) {
+            QTimer::singleShot(500, vmailPlayer, SLOT(play()));
+        }
+    }
+}//MainWindow::ensureVmailPlaying
 
 void
 MainWindow::createVmailPlayer()
@@ -46,7 +58,7 @@ MainWindow::createVmailPlayer()
     if (vmailPlayer) {
         return;
     }
-    
+
     vmailPlayer = new Phonon::MediaObject(this);
     Phonon::AudioOutput *audioOutput =
         new Phonon::AudioOutput(Phonon::MusicCategory, vmailPlayer);
@@ -175,13 +187,7 @@ MainWindow::onVmailPlayerStateChanged(Phonon::State newState,
         value = 0;
         break;
     case Phonon::StoppedState:
-        if (bBeginPlayAfterLoad) {
-            bBeginPlayAfterLoad = false;
-            if (vmailPlayer) {
-                Q_DEBUG("Autoplaying at the end of load");
-                QTimer::singleShot(500, vmailPlayer, SLOT(play()));
-            }
-        }
+        ensureVmailPlaying ();
         value = 0;
         break;
     case Phonon::PlayingState:

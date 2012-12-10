@@ -146,6 +146,7 @@ private slots:
                                    Phonon::State oldState);
     //! Invoked when the QML sends us a vmail play/pause/stop signal
     void onSigVmailPlayback (int newstate);
+    void ensureVmailPlaying();
 
     //! Invoked by QML when the user selects a new phone method
     void onRegPhoneSelectionChange (int index);
