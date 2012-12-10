@@ -46,21 +46,27 @@ OTHER_FILES += src/protocol.xml             \
                src/textchannel.xml
 
 ###############################################################
-# Installation related line go here
+# Installation related info goes here
 ###############################################################
+
+exists(isHarmattan) {
+    DEBDIR = qgvdial
+} else {
+    DEBDIR = qgvtp
+}
 
 # Installation for maemo
 maemo5 {
     exists(../../buildit.sh) {
-        PREFIX = ../debian/qgvtp/usr
+        PREFIX = ../debian/$$DEBDIR/usr
         message(Built using my scripts... probably inside scratchbox)
     }
     exists(../../buildit.pl) {
-        PREFIX = ../debian/qgvtp/usr
+        PREFIX = ../debian/$$DEBDIR/usr
         message(Built using my scripts)
     }
     !exists(../../buildit.pl):!exists(../../buildit.sh) {
-        PREFIX = ../maemo/debian/qgvtp/usr
+        PREFIX = ../maemo/debian/$DEBDIR/usr
         message(Build using qtcreator)
     }
 
