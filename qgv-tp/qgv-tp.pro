@@ -45,42 +45,57 @@ OTHER_FILES += src/protocol.xml             \
                src/channel.xml              \
                src/textchannel.xml
 
+# For the beta version of the SDK, this part will identify Meego/Harmattan
+exists($$QMAKE_INCDIR_QT"/../qmsystem2/qmkeys.h"):!contains(MEEGO_EDITION,harmattan): {
+  MEEGO_VERSION_MAJOR     = 1
+  MEEGO_VERSION_MINOR     = 2
+  MEEGO_VERSION_PATCH     = 0
+  MEEGO_EDITION           = harmattan
+}
+
+contains(MEEGO_EDITION,harmattan) {
+  message(Meego!)
+  DEFINES += MEEGO_HARMATTAN
+}
+
 ###############################################################
 # Installation related info goes here
 ###############################################################
 
-exists(isHarmattan) {
+exists(../isHarmattan) {
     DEBDIR = qgvdial
+    message(Using qgvdial as the debian directory)
 } else {
     DEBDIR = qgvtp
+    message(Using qgvtp as the debian directory)
 }
 
-# Installation for maemo
 maemo5 {
-    exists(../../buildit.sh) {
+    message(maemo5 install)
+    exists(../../buildit.sh) || exists(../../buildit.pl) || exists(.svn) {
         PREFIX = ../debian/$$DEBDIR/usr
         message(Built using my scripts... probably inside scratchbox)
-    }
-    exists(../../buildit.pl) {
-        PREFIX = ../debian/$$DEBDIR/usr
-        message(Built using my scripts)
-    }
-    !exists(../../buildit.pl):!exists(../../buildit.sh) {
-        PREFIX = ../maemo/debian/$DEBDIR/usr
+    } else {
+        PREFIX = ../maemo/debian/$$DEBDIR/usr
         message(Build using qtcreator)
     }
 
-    message(maemo5 install)
-    OPTPREFIX  = $$PREFIX/../opt/qgvdial
-    BINDIR     = $$OPTPREFIX/bin
+    OPTPREFIX  = $$PREFIX/../opt
     DATADIR    = $$PREFIX/share
-    OPTDATADIR = $$OPTPREFIX/share
+}
 
-    DEFINES += DATADIR=\"$$DATADIR\" PKGDATADIR=\"$$PKGDATADIR\"
+contains(DEFINES,MEEGO_HARMATTAN) {
+    message(Harmattan install)
 
+    OPTPREFIX  = /opt
+    DATADIR    = /usr/share
+}
+
+# Installation for maemo
+maemo5|contains(DEFINES,MEEGO_HARMATTAN) {
     INSTALLS += target service manager qprofile
 
-    target.path =$$BINDIR
+    target.path = $$OPTPREFIX/qgvdial/bin
 
     service.path = $$DATADIR/dbus-1/services
     service.files += ../data/org.freedesktop.Telepathy.ConnectionManager.qgvtp.service
@@ -93,16 +108,13 @@ maemo5 {
 }
 
 # Installation for Linux
-unix:!symbian:!maemo5 {
-    BINDIR  = $$PREFIX/bin
+unix:!symbian:!maemo5:!contains(DEFINES,MEEGO_HARMATTAN) {
     DATADIR = $$PREFIX/share
-    message($$BINDIR)
-
-    DEFINES += DATADIR=\"$$DATADIR\" PKGDATADIR=\"$$PKGDATADIR\"
+    message($$PREFIX/bin)
 
     INSTALLS += target service manager
 
-    target.path =$$BINDIR
+    target.path = $$PREFIX/bin
 
     service.path = $$DATADIR/dbus-1/services
     service.files += ../data/org.freedesktop.Telepathy.ConnectionManager.qgvtp.service
