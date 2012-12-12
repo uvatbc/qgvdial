@@ -13,4 +13,9 @@
         <credential name="CAP::fowner" />
         <credential name="CAP::chown" />
     </request>
+    <provide>
+        <credential name="access" />
+        <dbus name="org.freedesktop.Telepathy.ConnectionManager.qgvtp" bus="session">
+        </dbus>
+    </provide>
 </aegis>

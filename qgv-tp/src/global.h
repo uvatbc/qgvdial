@@ -122,9 +122,13 @@ Contact: yuvraaj@gmail.com
 #define ofdT_Chan_I_Messages            ofdT_Channel ".Interface.Messages"
 
 ////////////////////////////////////////////////////////////////////////////////
+// org/freedesktop/Telepathy/ConnectionManager/qgvtp
 #define QGV_CM_OP   ofDT_CM_OP "/" QGV_CMName
+// org.freedesktop.Telepathy.ConnectionManager.qgvtp
 #define QGV_CM_SP   ofdT_CM_SP "." QGV_CMName
+// org/freedesktop/Telepathy/Connection/qgvtp/qgv/
 #define QGV_CONN_OP ofdT_CONN_OP "/" QGV_CMName "/" QGV_ProtocolName "/"
+// org.freedesktop.Telepathy.Connection.qgvtp.qgv
 #define QGV_CONN_SP ofdT_CONN_SP "." QGV_CMName "." QGV_ProtocolName
 
 ////////////////////////////////////////////////////////////////////////////////
