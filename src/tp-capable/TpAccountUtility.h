@@ -23,7 +23,7 @@ Contact: yuvraaj@gmail.com
 #define __TP_ACCOUNT_UTILITY_H__
 
 #include "PhoneIntegrationIface.h"
-#include <TelepathyQt/AccountManager>
+#include "TpHeaders.h"
 
 class TpPhoneIntegration : public IPhoneIntegration
 {

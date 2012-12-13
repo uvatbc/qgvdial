@@ -20,7 +20,6 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "TpAccountUtility.h"
-#include <TelepathyQt/PendingAccount>
 
 #define ofdTA "org.freedesktop.Telepathy.Account"
 #define cnAIC "com.nokia.Account.Interface.Compat"
