@@ -32,6 +32,10 @@ public:
     IPhoneIntegration(QObject *parent = NULL)
         : QObject (parent)
         , m_integrationEnabled(false) {}
+    virtual bool isEnabled() { return m_integrationEnabled; }
+
+Q_SIGNALS:
+    void enableChanged(bool enabled);
 
 public Q_SLOTS:
     virtual void integrateChanged(bool enable = false) {

@@ -31,6 +31,7 @@ class TpPhoneIntegration : public IPhoneIntegration
 
 public:
     TpPhoneIntegration(QObject *parent = NULL);
+    bool isEnabled();
 
 public Q_SLOTS:
     void integrateChanged(bool enable = false);
@@ -39,6 +40,10 @@ private Q_SLOTS:
     void onAcMgrReady(Tp::PendingOperation *operation);
     void onAccountCreated(Tp::PendingOperation *operation);
     void onAccountRemoved(Tp::PendingOperation *operation);
+    void onAccountOnline(Tp::PendingOperation *operation);
+
+private:
+    void updateEnabled();
 
 private:
     AccountManagerPtr acMgr;

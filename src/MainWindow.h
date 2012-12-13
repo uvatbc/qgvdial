@@ -234,7 +234,7 @@ private slots:
     void onSigDeleteInboxEntry(const QString &id);
     void onUserAllowedDelete(bool ok);
 
-    // Signal for periodic refresh settings changes
+    //! Signal for periodic refresh settings changes
     void
     onSigRefreshChanges(bool bRefreshEnable, const QString &contactsPeriod,
                         const QString &inboxPeriod, bool bMqEnable,
@@ -244,6 +244,9 @@ private slots:
 
     void onPeriodicContactsRefresh();
     void onPeriodicInboxRefresh();
+
+    //! When the phone integration changes, this slot is fired
+    void onPhoneIntegrationChanged(bool enable);
 
 private:
     void initLogging ();

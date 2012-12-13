@@ -38,11 +38,12 @@ TpPhoneIntegration::TpPhoneIntegration(QObject *parent /*= NULL*/)
 void
 TpPhoneIntegration::onAcMgrReady(Tp::PendingOperation * /*operation*/)
 {
-    if (acMgr->isReady ()) {
+    if (acMgr->isReady()) {
         Q_DEBUG("Account manager is ready");
     } else {
         Q_WARN("Account manager is not getting ready");
     }
+    updateEnabled();
 }//TpPhoneIntegration::onAcMgrReady
 
 void
@@ -106,20 +107,63 @@ TpPhoneIntegration::integrateChanged(bool enable /* = false*/)
 }//TpPhoneIntegration::integrateChanged
 
 void
-TpPhoneIntegration::onAccountCreated(Tp::PendingOperation *operation)
+TpPhoneIntegration::onAccountCreated(Tp::PendingOperation *op)
 {
-    Tp::PendingAccount *pa = (Tp::PendingAccount *) operation;
+    Tp::PendingAccount *pa = (Tp::PendingAccount *) op;
     AccountPtr ac = pa->account();
 
-    bool isOnline = ac->isOnline ();
     QString acPath = ac->objectPath ();
+    Q_DEBUG(QString("Account with path %1 is created").arg(acPath));
 
-    Q_DEBUG(QString("Account with path %1 is %2online")
-            .arg(acPath).arg(isOnline ? "" : "not "));
+    Tp::Presence::Presence presence(ConnectionPresenceTypeAvailable, "online",
+                                    "Available");
+    op = ac->setRequestedPresence(presence);
+    connect(op, SIGNAL(finished(Tp::PendingOperation*)),
+            this, SLOT(onAccountOnline(Tp::PendingOperation*)));
 }//TpPhoneIntegration::onAccountCreated
+
+void
+TpPhoneIntegration::onAccountOnline(Tp::PendingOperation *op)
+{
+    if (op->isError()) {
+        Q_WARN("Account could not be made online");
+    } else {
+        Q_DEBUG("Account is now online");
+    }
+}//TpPhoneIntegration::onAccountOnline
 
 void
 TpPhoneIntegration::onAccountRemoved(Tp::PendingOperation * /*operation*/)
 {
     Q_DEBUG("Account removed");
+    updateEnabled();
 }//TpPhoneIntegration::onAccountRemoved
+
+void
+TpPhoneIntegration::updateEnabled()
+{
+    bool oldValue = m_integrationEnabled;
+
+    m_integrationEnabled = false;
+    if (acMgr->isReady()) {
+        QList<AccountPtr> allAc = acMgr->allAccounts ();
+        foreach (AccountPtr ac, allAc) {
+            QString acPath = ac->objectPath ();
+            if (acPath.contains ("qgvtp/qgv/qgvtp")) {
+                m_integrationEnabled = true;
+                break;
+            }
+        }
+    }
+
+    if (oldValue != m_integrationEnabled) {
+        emit enableChanged(m_integrationEnabled);
+    }
+}//TpPhoneIntegration::updateEnabled
+
+bool
+TpPhoneIntegration::isEnabled()
+{
+    updateEnabled();
+    return m_integrationEnabled;
+}//TpPhoneIntegration::isEnabled

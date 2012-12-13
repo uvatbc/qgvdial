@@ -22,14 +22,22 @@ Contact: yuvraaj@gmail.com
 import QtQuick 1.1
 import com.nokia.meego 1.0
 
-CheckBox {
+Item {
     id: container
     objectName: "PhoneIntegrationView"
+    height: btn.height
+
     signal sigIntegrateChanged(bool enable)
+    property bool enableIntegrate: false
 
-    text: "Integrate into Call UI"
+    QGVButton {
+        id: btn
+        anchors.horizontalCenter: parent.horizontalCenter
+        text: container.enableIntegrate ? "Disable Call Integration" : "Enable Call Integration"
 
-    onClicked: {
-        container.sigIntegrateChanged(checked)
+        onClicked: {
+            enableIntegrate = !enableIntegrate;
+            container.sigIntegrateChanged(container.enableIntegrate);
+        }
     }
-}//CheckBox
+}//Item

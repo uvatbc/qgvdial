@@ -622,6 +622,11 @@ MainWindow::initQML ()
     if (!rv) { exit(1); }
 
     IPhoneIntegration &phoneIntegration = Singletons::getRef().getPhoneIntegration();
+    rv = connect(&phoneIntegration, SIGNAL(enableChanged(bool)),
+                 this, SLOT(onPhoneIntegrationChanged(bool)));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+
     obj = getQMLObject ("PhoneIntegrationView");
     if (NULL != obj) {
         // Only if the phone integration exists will we get this page
@@ -1601,3 +1606,15 @@ MainWindow::onPeriodicInboxRefresh()
 
     inboxTimer.start (inboxPeriod);
 }//MainWindow::onPeriodicInboxRefresh
+
+void
+MainWindow::onPhoneIntegrationChanged(bool enable)
+{
+    QObject *obj = getQMLObject ("PhoneIntegrationView");
+    if (NULL == obj) {
+        return;
+    }
+
+    obj->setProperty("enableIntegrate", enable);
+}//MainWindow::onPhoneIntegrationChanged
+
