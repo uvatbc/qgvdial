@@ -34,10 +34,9 @@ Contact: yuvraaj@gmail.com
 #endif
 #include <TelepathyQt/PendingChannelRequest>
 #include <TelepathyQt/PendingAccount>
-#include <TelepathyQt/Connection>
-#include <TelepathyQt/AccountManager>
-#include <TelepathyQt/SharedPtr>
 #include <TelepathyQt/PendingReady>
+#include <TelepathyQt/Connection>
+#include <TelepathyQt/SharedPtr>
 #include <TelepathyQt/Channel>
 #include <TelepathyQt/StreamedMediaChannel>
 #include <TelepathyQt/ClientRegistrar>
@@ -58,10 +57,9 @@ Contact: yuvraaj@gmail.com
 #endif
 #include <TelepathyQt4/PendingChannelRequest>
 #include <TelepathyQt4/PendingAccount>
-#include <TelepathyQt4/Connection>
-#include <TelepathyQt4/AccountManager>
-#include <TelepathyQt4/SharedPtr>
 #include <TelepathyQt4/PendingReady>
+#include <TelepathyQt4/Connection>
+#include <TelepathyQt4/SharedPtr>
 #include <TelepathyQt4/Channel>
 #include <TelepathyQt4/StreamedMediaChannel>
 #include <TelepathyQt4/ClientRegistrar>

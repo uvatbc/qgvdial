@@ -20,6 +20,7 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "TpAccountUtility.h"
+#include "TpHeaders.h"
 
 #define ofdTA "org.freedesktop.Telepathy.Account"
 #define cnAIC "com.nokia.Account.Interface.Compat"
