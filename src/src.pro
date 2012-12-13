@@ -115,8 +115,6 @@ SOURCES  += ../src/main.cpp                 \
             ../src/Singletons.cpp           \
             ../src/CacheDatabase.cpp        \
             ../src/OsDependent.cpp          \
-            ../src/SkypeClientFactory.cpp   \
-            ../src/SkypeClient.cpp          \
             ../src/ObserverFactory.cpp      \
             ../src/CalloutInitiator.cpp     \
             ../src/CallInitiatorFactory.cpp \
@@ -139,10 +137,11 @@ SOURCES  += ../src/main.cpp                 \
             ../src/GVApi.cpp                \
             ../src/MyXmlErrorHandler.cpp    \
             ../src/FuzzyTimer.cpp           \
-            ../src/NwInfo.cpp
+            ../src/NwInfo.cpp               \
+            ../src/desktop/SkypeClientFactory.cpp \
+            ../src/desktop/SkypeClient.cpp
 
 HEADERS  += ../src/global.h                 \
-            ../src/TpHeaders.h              \
             ../src/IObserver.h              \
             ../src/MainApp.h                \
             ../src/MainWindow.h             \
@@ -150,8 +149,6 @@ HEADERS  += ../src/global.h                 \
             ../src/CacheDatabase.h          \
             ../src/CacheDatabase_int.h      \
             ../src/OsDependent.h            \
-            ../src/SkypeClientFactory.h     \
-            ../src/SkypeClient.h            \
             ../src/ObserverFactory.h        \
             ../src/CalloutInitiator.h       \
             ../src/CallInitiatorFactory.h   \
@@ -174,7 +171,10 @@ HEADERS  += ../src/global.h                 \
             ../src/GVApi.h                  \
             ../src/MyXmlErrorHandler.h      \
             ../src/FuzzyTimer.h             \
-            ../src/NwInfo.h
+            ../src/NwInfo.h                 \
+            ../src/tp-capable/TpHeaders.h   \
+            ../src/desktop/SkypeClientFactory.h \
+            ../src/desktop/SkypeClient.h
 
 contains(DEFINES,MEEGO_HARMATTAN) | contains(DEFINES,IS_S3_BELLE) {
     DEFINES += ENABLE_FUZZY_TIMER
@@ -255,25 +255,25 @@ OTHER_FILES  += ../src/winrsrc.rc           \
 
 # In Linux and maemo, add the telepathy related sources and headers.
 unix:!symbian {
-    HEADERS  += ../src/TpObserver.h            \
-                ../src/TpCalloutInitiator.h    \
-                ../src/gen/api_adapter.h       \
-                ../src/DBusApi.h
-    SOURCES  += ../src/TpObserver.cpp          \
-                ../src/TpCalloutInitiator.cpp  \
-                ../src/gen/api_adapter.cpp     \
-                ../src/DBusApi.cpp
+    HEADERS  += ../src/tp-capable/TpObserver.h          \
+                ../src/tp-capable/TpCalloutInitiator.h  \
+                ../src/gen/api_adapter.h                \
+                ../src/tp-capable/DBusApi.h
+    SOURCES  += ../src/tp-capable/TpObserver.cpp        \
+                ../src/tp-capable/TpCalloutInitiator.cpp \
+                ../src/gen/api_adapter.cpp              \
+                ../src/tp-capable/DBusApi.cpp
 }
 
 # In desktop Linux, add the Skype client
 unix:!symbian:!maemo5 {
-    HEADERS  += ../src/SkypeLinuxClient.h               \
-                ../src/SkypeObserver.h                  \
-                ../src/DesktopSkypeCallInitiator.h
+    HEADERS  += ../src/desktop/SkypeLinuxClient.h               \
+                ../src/desktop/SkypeObserver.h                  \
+                ../src/desktop/DesktopSkypeCallInitiator.h
 
-    SOURCES  += ../src/SkypeLinuxClient.cpp             \
-                ../src/SkypeObserver.cpp                \
-                ../src/DesktopSkypeCallInitiator.cpp
+    SOURCES  += ../src/desktop/SkypeLinuxClient.cpp             \
+                ../src/desktop/SkypeObserver.cpp                \
+                ../src/desktop/DesktopSkypeCallInitiator.cpp
 }
 
 win32 {
@@ -281,12 +281,12 @@ win32 {
     RC_FILE = ../src/winrsrc.rc
 
 # In desktop Windows, add the Skype client.
-    HEADERS += ../src/SkypeWinClient.h             \
-               ../src/SkypeObserver.h              \
-               ../src/DesktopSkypeCallInitiator.h
-    SOURCES += ../src/SkypeWinClient.cpp           \
-               ../src/SkypeObserver.cpp            \
-               ../src/DesktopSkypeCallInitiator.cpp
+    HEADERS += ../src/desktop/SkypeWinClient.h             \
+               ../src/desktop/SkypeObserver.h              \
+               ../src/desktop/DesktopSkypeCallInitiator.h
+    SOURCES += ../src/desktop/SkypeWinClient.cpp           \
+               ../src/desktop/SkypeObserver.cpp            \
+               ../src/desktop/DesktopSkypeCallInitiator.cpp
 }
 
 ############################## Mosquitto ##############################
