@@ -242,10 +242,12 @@ OTHER_FILES  += ../src/winrsrc.rc           \
                 ../qml/generic/QGVLabel.qml     \
                 ../qml/generic/QGVTextEdit.qml  \
                 ../qml/generic/QGVTextInput.qml \
+                ../qml/generic/PhoneIntegrationView.qml \
                 ../qml/meego/QGVButton.qml      \
                 ../qml/meego/QGVLabel.qml       \
                 ../qml/meego/QGVTextEdit.qml    \
                 ../qml/meego/QGVTextInput.qml   \
+                ../qml/meego/PhoneIntegrationView.qml \
                 ../qml/s3/QGVButton.qml         \
                 ../qml/s3/QGVTextEdit.qml       \
                 ../qml/s3/QGVTextInput.qml      \

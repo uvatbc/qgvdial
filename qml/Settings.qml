@@ -48,7 +48,7 @@ Flickable {
     contentHeight: expandLoginDetails.height + expandProxySettings.height +
                    expandDialSettings.height + expandRefreshSettings.height +
                    expandPinSettings.height + expandLogView.height +
-                   expandAbout.height
+                   expandPhoneIntegration.height + expandAbout.height
     contentWidth: width
     clip: true
 
@@ -246,9 +246,32 @@ Flickable {
     }//ExpandView (log view)
 
     ExpandView {
-        id: expandAbout
+        id: expandPhoneIntegration
         anchors {
             top: expandLogView.bottom
+            left: parent.left
+        }
+
+        width: parent.width
+        contentHeight: phoneIntegrationView.height;
+
+        onClicked: if (isExpanded) yAdjustTimer.setY = y;
+
+        mainTitle: "Phone integration"
+
+        PhoneIntegrationView {
+            id: phoneIntegrationView
+
+            width: parent.width
+            opacity: parent.containedOpacity
+            y: parent.startY
+        }
+    }//ExpandView (phone integration)
+
+    ExpandView {
+        id: expandAbout
+        anchors {
+            top: expandPhoneIntegration.bottom
             left: parent.left
         }
 
