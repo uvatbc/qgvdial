@@ -30,6 +30,7 @@ class SkypeClientFactory;
 class ObserverFactory;
 class CallInitiatorFactory;
 class NwInfo;
+class IPhoneIntegration;
 
 // For some reason the symbian MOC doesn't like it if I don't include QObject
 // even though it is present in QtCore which is included in global.h
@@ -46,6 +47,7 @@ public:
     SkypeClientFactory  & getSkypeFactory ();
     CallInitiatorFactory& getCIFactory ();
     NwInfo              & getNwInfo ();
+    IPhoneIntegration   & getPhoneIntegration ();
 
     void deinit();
 
@@ -61,5 +63,6 @@ private:
 #include "SkypeClientFactory.h"
 #include "CallInitiatorFactory.h"
 #include "NwInfo.h"
+#include "PhoneIntegrationIface.h"
 
 #endif //__SINGLETONS_H__

@@ -618,6 +618,21 @@ OsDependent::onBtnClickFroHapticFeedback()
 #endif
 }//OsDependent::onBtnClickFroHapticFeedback
 
+IPhoneIntegration *
+OsDependent::createPhoneIntegreationObj(QObject *parent)
+{
+    IPhoneIntegration *rv = NULL;
+#if TELEPATHY_CAPABLE
+    rv = new TpPhoneIntegration(parent);
+#endif
+
+    if (NULL == rv) {
+        // Default object does absolutely nothing
+        rv = new IPhoneIntegration(parent);
+    }
+    return rv;
+}//OsDependent::createPhoneIntegreationObj
+
 #ifdef QT_NO_SYSTEMTRAYICON
 QSystemTrayIcon::QSystemTrayIcon(QWidget *parent /*= 0*/)
 : QWidget (parent)

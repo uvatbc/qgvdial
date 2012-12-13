@@ -23,6 +23,7 @@ Contact: yuvraaj@gmail.com
 
 static CacheDatabase *dbMain = NULL;
 static NwInfo *nwInfo = NULL;
+static IPhoneIntegration *phoneIntegration = NULL;
 
 Singletons::Singletons (QObject *parent/* = 0*/)
 : QObject (parent)
@@ -86,6 +87,17 @@ Singletons::getNwInfo ()
     }
     return (*nwInfo);
 }//Singletons::getNwInfo
+
+IPhoneIntegration &
+Singletons::getPhoneIntegration ()
+{
+    if (NULL == phoneIntegration) {
+        OsDependent &osd = Singletons::getRef().getOSD();
+        phoneIntegration = osd.createPhoneIntegreationObj (this);
+    }
+
+    return (*phoneIntegration);
+}//Singletons::getPhoneIntegration
 
 void
 Singletons::deinit()

@@ -23,6 +23,7 @@ Contact: yuvraaj@gmail.com
 #define __TP_ACCOUNT_UTILITY_H__
 
 #include "PhoneIntegrationIface.h"
+#include <TelepathyQt/AccountManager>
 
 class TpPhoneIntegration : public IPhoneIntegration
 {
@@ -33,6 +34,14 @@ public:
 
 public Q_SLOTS:
     void integrateChanged(bool enable = false);
+
+private Q_SLOTS:
+    void onAcMgrReady(Tp::PendingOperation *operation);
+    void onAccountCreated(Tp::PendingOperation *operation);
+    void onAccountRemoved(Tp::PendingOperation *operation);
+
+private:
+    AccountManagerPtr acMgr;
 };
 
 #endif //__TP_ACCOUNT_UTILITY_H__

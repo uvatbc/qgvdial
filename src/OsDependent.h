@@ -94,6 +94,8 @@ public:
 
     void onBtnClickFroHapticFeedback();
 
+    IPhoneIntegration *createPhoneIntegreationObj(QObject *parent);
+
 signals:
     void orientationChanged (OsIndependentOrientation o);
 

@@ -69,8 +69,8 @@ CallInitiatorFactory::init ()
 
 #if TELEPATHY_CAPABLE
     rv = connect (
-         actMgr->becomeReady (), SIGNAL (finished(Tp::PendingOperation*)),
-         this, SLOT (onAccountManagerReady (Tp::PendingOperation *)));
+         actMgr->becomeReady (), SIGNAL(finished(Tp::PendingOperation*)),
+         this, SLOT(onAccountManagerReady(Tp::PendingOperation *)));
     Q_ASSERT(rv);
 #endif
 

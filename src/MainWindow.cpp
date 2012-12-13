@@ -499,8 +499,8 @@ MainWindow::initQML ()
     this->setPassword ("hunter2 :p");
 
     // The root object changes when we reload the source. Pick it up again.
-    QObject *gObj = this->getQMLObject ("MainPage");
-    if (NULL == gObj) {
+    QObject *obj = this->getQMLObject ("MainPage");
+    if (NULL == obj) {
         Q_WARN("Could not get to MainPage");
         requestQuit ();
         return;
@@ -508,105 +508,105 @@ MainWindow::initQML ()
 
     bool rv;
     // Connect all signals to slots in this class.
-    rv = connect (gObj, SIGNAL(sigCall(QString)),
+    rv = connect (obj, SIGNAL(sigCall(QString)),
                   this, SLOT  (dialNow(QString)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
     rv = connect (
-        gObj, SIGNAL (sigText(const QString&,const QString&)),
+        obj, SIGNAL (sigText(const QString&,const QString&)),
         this, SLOT   (onSigText(const QString&,const QString&)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
-    rv = connect (gObj, SIGNAL(sigSelChanged(int)),
+    rv = connect (obj, SIGNAL(sigSelChanged(int)),
                   this, SLOT(onRegPhoneSelectionChange(int)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
-    rv = connect (gObj, SIGNAL(sigHide ()),
+    rv = connect (obj, SIGNAL(sigHide ()),
                   this, SLOT(onSigHide ()));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
-    rv = connect (gObj, SIGNAL(sigQuit ()),
+    rv = connect (obj, SIGNAL(sigQuit ()),
                   this, SLOT(on_actionE_xit_triggered ()));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
     rv = connect (
-        gObj     , SIGNAL(sigSearchContacts(const QString &)),
+        obj     , SIGNAL(sigSearchContacts(const QString &)),
         oContacts, SLOT(onSearchQueryChanged(const QString &)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
 
-    rv = connect (gObj, SIGNAL(sigRefreshContacts()),
+    rv = connect (obj, SIGNAL(sigRefreshContacts()),
                   oContacts, SLOT(refreshContacts()));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
-    rv = connect (gObj, SIGNAL(sigRefreshAllContacts()),
+    rv = connect (obj, SIGNAL(sigRefreshAllContacts()),
                   oContacts, SLOT(refreshAllContacts()));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
 
-    rv = connect (gObj, SIGNAL(sigHaptic()),
+    rv = connect (obj, SIGNAL(sigHaptic()),
                   this, SLOT(onBtnClickFroHapticFeedback()));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
 
-    gObj = getQMLObject ("RegisteredPhonesView");
-    if (NULL == gObj) {
+    obj = getQMLObject ("RegisteredPhonesView");
+    if (NULL == obj) {
         Q_WARN("Could not get to RegisteredPhonesView");
         requestQuit ();
         return;
     }
-    rv = connect (gObj, SIGNAL (sigSelChanged (int)),
+    rv = connect (obj, SIGNAL (sigSelChanged (int)),
                   this, SLOT   (onRegPhoneSelectionChange (int)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
 
-    gObj = getQMLObject ("MsgBox");
-    if (NULL == gObj) {
+    obj = getQMLObject ("MsgBox");
+    if (NULL == obj) {
         Q_WARN("Could not get to MsgBox");
         requestQuit ();
         return;
     }
-    rv = connect (gObj, SIGNAL(sigOk()), this, SLOT(onSigMsgBoxOk()));
+    rv = connect (obj, SIGNAL(sigOk()), this, SLOT(onSigMsgBoxOk()));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
-    rv = connect (gObj, SIGNAL(sigCancel()), this, SLOT(onSigMsgBoxCancel()));
+    rv = connect (obj, SIGNAL(sigCancel()), this, SLOT(onSigMsgBoxCancel()));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
 
-    gObj = getQMLObject ("InboxPage");
-    if (NULL == gObj) {
+    obj = getQMLObject ("InboxPage");
+    if (NULL == obj) {
         Q_WARN("Could not get to InboxPage");
         requestQuit ();
         return;
     }
-    rv = connect (gObj  , SIGNAL(sigInboxSelect(QString)),
+    rv = connect (obj  , SIGNAL(sigInboxSelect(QString)),
                   oInbox, SLOT(onInboxSelected(const QString&)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
-    rv = connect (gObj, SIGNAL(sigVoicemail(QString)),
+    rv = connect (obj, SIGNAL(sigVoicemail(QString)),
                   this, SLOT(retrieveVoicemail(const QString&)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
-    rv = connect (gObj, SIGNAL(sigVmailPlayback(int)),
+    rv = connect (obj, SIGNAL(sigVmailPlayback(int)),
                   this, SLOT(onSigVmailPlayback(int)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
-    rv = connect (gObj  , SIGNAL(sigMarkAsRead(QString)),
+    rv = connect (obj  , SIGNAL(sigMarkAsRead(QString)),
                   oInbox, SLOT(onSigMarkAsRead(const QString &)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
-    rv = connect (gObj, SIGNAL(sigRefreshInbox()),
+    rv = connect (obj, SIGNAL(sigRefreshInbox()),
                   oInbox, SLOT(refresh()));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
-    rv = connect (gObj, SIGNAL(sigRefreshAllInbox()),
+    rv = connect (obj, SIGNAL(sigRefreshAllInbox()),
                   oInbox, SLOT(refreshFullInbox()));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
-    rv = connect(gObj, SIGNAL(sigCloseVmail()), this, SLOT(onSigCloseVmail()));
+    rv = connect(obj, SIGNAL(sigCloseVmail()), this, SLOT(onSigCloseVmail()));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
-    rv = connect(gObj, SIGNAL(sigDeleteInboxEntry(const QString &)),
+    rv = connect(obj, SIGNAL(sigDeleteInboxEntry(const QString &)),
                  this, SLOT(onSigDeleteInboxEntry(const QString &)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
@@ -621,6 +621,16 @@ MainWindow::initQML ()
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
 
+    IPhoneIntegration &phoneIntegration = Singletons::getRef().getPhoneIntegration();
+    obj = getQMLObject ("PhoneIntegrationView");
+    if (NULL != obj) {
+        // Only if the phone integration exists will we get this page
+        rv = connect(obj, SIGNAL(sigIntegrateChanged(bool)),
+                     &phoneIntegration, SLOT(integrateChanged(bool)));
+        Q_ASSERT(rv);
+        if (!rv) { exit(1); }
+    }
+
 #if DESKTOP_OS
     Qt::WindowFlags flags = this->windowFlags ();
     flags |= Qt::CustomizeWindowHint;
@@ -628,8 +638,8 @@ MainWindow::initQML ()
     this->setWindowFlags (flags);
     this->setFixedSize(this->size());
 
-    gObj = getQMLObject ("CloseButton");
-    gObj->setProperty ("visible", (bool)false);
+    obj = getQMLObject ("CloseButton");
+    obj->setProperty ("visible", (bool)false);
 #endif
 
 }//MainWindow::initQML
