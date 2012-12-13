@@ -7,14 +7,10 @@
         <for path="/opt/qgvdial/bin/qgvdial" />
         <for path="/opt/qgvdial/bin/qgv-tp" />
     </request>
+
     <request context="INSTALL">
         <credential name="CAP::kill" />
         <credential name="CAP::fowner" />
         <credential name="CAP::chown" />
     </request>
-    <provide>
-        <credential name="access" />
-        <dbus name="org.freedesktop.Telepathy.ConnectionManager.qgvtp" bus="session">
-        </dbus>
-    </provide>
 </aegis>

@@ -41,6 +41,7 @@ QGVConnection::~QGVConnection()
 void
 QGVConnection::AddClientInterest(const QStringList & /*Tokens*/)
 {
+    Q_DEBUG("Not implemented");
 }//QGVConnection::AddClientInterest
 
 void
@@ -79,6 +80,7 @@ QGVConnection::GetInterfaces()
 QString
 QGVConnection::GetProtocol()
 {
+    Q_DEBUG("Requested protocol");
     return QGV_ProtocolName;
 }//QGVConnection::GetProtocol
 
@@ -109,9 +111,11 @@ QGVConnection::HoldHandles(uint /*Handle_Type*/, const Qt_Type_au & /*Handles*/)
         sendErrorReply (ofdT_Err_Disconnected,
                         "Connection object not connected");
         Q_WARN("Not connected");
+        return;
     }
 
     // There's nothing really to "hold"
+    Q_DEBUG("Not implemented");
 }//QGVConnection::HoldHandles
 
 QStringList
@@ -170,6 +174,7 @@ QGVConnection::ReleaseHandles(uint /*Handle_Type*/, const Qt_Type_au & /*Handles
 void
 QGVConnection::RemoveClientInterest(const QStringList & /*Tokens*/)
 {
+    Q_DEBUG("Not implemented");
 }//QGVConnection::RemoveClientInterest
 
 QDBusObjectPath
