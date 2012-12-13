@@ -19,9 +19,18 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-import Qt 4.7
+import QtQuick 1.1
+import com.nokia.meego 1.0
 
-QGVLabel {
-    text: "Not supported"
-}
+CheckBox {
+    id: container
+    objectName: "PhoneIntegrationView"
+    signal sigIntegrateChanged(bool enable)
+
+    text: "Integrate into Call UI"
+
+    onClicked: {
+        container.sigIntegrateChanged(checked)
+    }
+}//CheckBox
 

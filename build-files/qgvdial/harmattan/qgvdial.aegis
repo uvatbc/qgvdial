@@ -6,7 +6,6 @@
         <credential name="GID::users" />
         <for path="/opt/qgvdial/bin/qgvdial" />
         <for path="/opt/qgvdial/bin/qgv-tp" />
-        <for path="/opt/qgvdial/bin/qgv-util" />
     </request>
     <request context="INSTALL">
         <credential name="CAP::kill" />

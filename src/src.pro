@@ -284,6 +284,7 @@ win32 {
     HEADERS += ../src/desktop/SkypeWinClient.h             \
                ../src/desktop/SkypeObserver.h              \
                ../src/desktop/DesktopSkypeCallInitiator.h
+
     SOURCES += ../src/desktop/SkypeWinClient.cpp           \
                ../src/desktop/SkypeObserver.cpp            \
                ../src/desktop/DesktopSkypeCallInitiator.cpp
