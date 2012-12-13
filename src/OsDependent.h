@@ -46,6 +46,7 @@ QTM_USE_NAMESPACE
 
 #if TELEPATHY_CAPABLE
 #include "DBusApi.h"
+#include "TpAccountUtility.h"
 #endif
 
 // For some reason the symbian MOC doesn't like it if I don't include QObject

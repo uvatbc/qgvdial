@@ -19,17 +19,16 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-import QtQuick 1.1
-import com.nokia.meego 1.0
+#include "TpAccountUtility.h"
 
-CheckBox {
-    id: container
-    objectName: "PhoneIntegrationView"
-    signal sigIntegrateChanged(bool enable)
+TpPhoneIntegration::TpPhoneIntegration(QObject *parent /*= NULL*/)
+: IPhoneIntegration(parent)
+{
 
-    text: "Integrate into Call UI"
+}//TpPhoneIntegration::TpPhoneIntegration
 
-    onClicked: {
-        container.sigIntegrateChanged(checked)
-    }
-}//CheckBox
+void
+TpPhoneIntegration::integrateChanged(bool enable /* = false*/)
+{
+
+}//TpPhoneIntegration::integrateChanged

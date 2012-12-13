@@ -19,17 +19,29 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-import QtQuick 1.1
-import com.nokia.meego 1.0
+#ifndef __PHONEINTEGRATIONIFACE_H__
+#define __PHONEINTEGRATIONIFACE_H__
 
-CheckBox {
-    id: container
-    objectName: "PhoneIntegrationView"
-    signal sigIntegrateChanged(bool enable)
+#include "global.h"
 
-    text: "Integrate into Call UI"
+class IPhoneIntegration : public QObject
+{
+    Q_OBJECT
 
-    onClicked: {
-        container.sigIntegrateChanged(checked)
+public:
+    IPhoneIntegration(QObject *parent = NULL)
+        : QObject (parent)
+        , m_integrationEnabled(false) {}
+
+public Q_SLOTS:
+    virtual void integrateChanged(bool enable = false) {
+        Q_DEBUG(QString("User requested that phone integration be %1")
+                .arg (enable ? "enabled" : "disabled"));
+        m_integrationEnabled = enable;
     }
-}//CheckBox
+
+protected:
+    bool m_integrationEnabled;
+};
+
+#endif //__PHONEINTEGRATIONIFACE_H__

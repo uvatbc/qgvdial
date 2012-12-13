@@ -83,21 +83,22 @@ contains(DEFINES,MEEGO_HARMATTAN) {
 unix:!symbian: {
     QT *= dbus
 
-maemo5 {
-    message(Maemo or Meego TP)
-    INCLUDEPATH += $$QMAKESPEC/usr/include/telepathy-1.0/
-    DEFINES += TP10
-} else {
-    exists($$QMAKESPEC/usr/include/telepathy-qt4/TelepathyQt/Constants) {
-        message(Brand new TP)
-        INCLUDEPATH += $$QMAKESPEC/usr/include/telepathy-qt4/
-    } else {
-        message(Old TP)
+    maemo5 {
+        message(Maemo or Meego TP)
         INCLUDEPATH += $$QMAKESPEC/usr/include/telepathy-1.0/
         DEFINES += TP10
+    } else {
+        exists($$QMAKESPEC/usr/include/telepathy-qt4/TelepathyQt/Constants) {
+            message(Brand new TP)
+            INCLUDEPATH += $$QMAKESPEC/usr/include/telepathy-qt4/
+        } else {
+            message(Old TP)
+            INCLUDEPATH += $$QMAKESPEC/usr/include/telepathy-1.0/
+            DEFINES += TP10
+        }
     }
-}
     LIBS += -ltelepathy-qt4 -lssl -lcrypto
+    INCLUDEPATH += tp-capable
 }
 
 # In Windows, add openssl
@@ -138,7 +139,7 @@ SOURCES  += ../src/main.cpp                 \
             ../src/MyXmlErrorHandler.cpp    \
             ../src/FuzzyTimer.cpp           \
             ../src/NwInfo.cpp               \
-            ../src/desktop/SkypeClientFactory.cpp \
+            ../src/SkypeClientFactory.cpp   \
             ../src/desktop/SkypeClient.cpp
 
 HEADERS  += ../src/global.h                 \
@@ -172,8 +173,9 @@ HEADERS  += ../src/global.h                 \
             ../src/MyXmlErrorHandler.h      \
             ../src/FuzzyTimer.h             \
             ../src/NwInfo.h                 \
+            ../src/PhoneIntegrationIface.h  \
             ../src/tp-capable/TpHeaders.h   \
-            ../src/desktop/SkypeClientFactory.h \
+            ../src/SkypeClientFactory.h     \
             ../src/desktop/SkypeClient.h
 
 contains(DEFINES,MEEGO_HARMATTAN) | contains(DEFINES,IS_S3_BELLE) {
@@ -253,16 +255,18 @@ OTHER_FILES  += ../src/winrsrc.rc           \
                 ../qml/s3/QGVTextInput.qml      \
                 readme.txt
 
-# In Linux and maemo, add the telepathy related sources and headers.
+# In Linux, maemo and harmattan, add the telepathy related sources and headers.
 unix:!symbian {
     HEADERS  += ../src/tp-capable/TpObserver.h          \
                 ../src/tp-capable/TpCalloutInitiator.h  \
                 ../src/gen/api_adapter.h                \
-                ../src/tp-capable/DBusApi.h
+                ../src/tp-capable/DBusApi.h             \
+                ../src/tp-capable/TpAccountUtility.h
     SOURCES  += ../src/tp-capable/TpObserver.cpp        \
                 ../src/tp-capable/TpCalloutInitiator.cpp \
                 ../src/gen/api_adapter.cpp              \
-                ../src/tp-capable/DBusApi.cpp
+                ../src/tp-capable/DBusApi.cpp           \
+                ../src/tp-capable/TpAccountUtility.cpp
 }
 
 # In desktop Linux, add the Skype client
@@ -274,6 +278,8 @@ unix:!symbian:!maemo5 {
     SOURCES  += ../src/desktop/SkypeLinuxClient.cpp             \
                 ../src/desktop/SkypeObserver.cpp                \
                 ../src/desktop/DesktopSkypeCallInitiator.cpp
+
+    INCLUDEPATH *= desktop
 }
 
 win32 {
@@ -288,6 +294,8 @@ win32 {
     SOURCES += ../src/desktop/SkypeWinClient.cpp           \
                ../src/desktop/SkypeObserver.cpp            \
                ../src/desktop/DesktopSkypeCallInitiator.cpp
+
+    INCLUDEPATH *= desktop
 }
 
 ############################## Mosquitto ##############################
