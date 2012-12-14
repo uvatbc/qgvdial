@@ -452,6 +452,8 @@ QDBusObjectPath
 QGVConnection::CreateChannel(const QVariantMap &Request,    // IN
                              QVariantMap & /*Properties*/)  // OUT
 {
+    Q_DEBUG("Here");
+
     QDBusObjectPath objPath;
     bool success = processChannel (Request, objPath);
     return objPath;
@@ -462,6 +464,8 @@ QGVConnection::EnsureChannel(const QVariantMap &Request,    // IN
                              QDBusObjectPath & Channel, // OUT
                              QVariantMap & /*Properties*/)  // OUT
 {
+    Q_DEBUG("Here");
+
     QDBusObjectPath objPath;
     bool success = processChannel (Request, objPath);
     if (success) {
@@ -476,12 +480,15 @@ QGVConnection::channels() const
 {
     Qt_Type_a_o_dict_sv rv;
     // Always return an empty channels list
+    Q_DEBUG("Returning empty channels list");
     return rv;
 }//QGVConnection::channels
 
 Qt_Type_a_dict_sv_as
 QGVConnection::requestableChannelClasses() const
 {
+    Q_DEBUG("Here");
+
     uint hType(1);  // Handle type : Contact
     Struct_dict_sv_as r1, r2;
 
@@ -497,5 +504,6 @@ QGVConnection::requestableChannelClasses() const
     Qt_Type_a_dict_sv_as rv;
     rv.append (r1);
     rv.append (r2);
+
     return rv;
 }//QGVConnection::requestableChannelClasses

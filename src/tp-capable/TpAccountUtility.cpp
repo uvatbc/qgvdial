@@ -115,9 +115,8 @@ TpPhoneIntegration::onAccountCreated(Tp::PendingOperation *op)
     QString acPath = ac->objectPath ();
     Q_DEBUG(QString("Account with path %1 is created").arg(acPath));
 
-    Tp::Presence::Presence presence(ConnectionPresenceTypeAvailable, "online",
-                                    "Available");
-    op = ac->setRequestedPresence(presence);
+    Tp::Presence p(ConnectionPresenceTypeAvailable, "online", "Available");
+    op = ac->setRequestedPresence(p);
     connect(op, SIGNAL(finished(Tp::PendingOperation*)),
             this, SLOT(onAccountOnline(Tp::PendingOperation*)));
 }//TpPhoneIntegration::onAccountCreated
