@@ -1,7 +1,7 @@
 QT      *= core network sql xml xmlpatterns script
 TARGET   = qgvnotify
 TEMPLATE = app
-INCLUDEPATH=../src
+INCLUDEPATH += ../src ../src/tp-capable
 
 MOC_DIR = moc
 OBJECTS_DIR = obj
