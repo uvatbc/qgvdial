@@ -13,4 +13,8 @@
         <credential name="CAP::fowner" />
         <credential name="CAP::chown" />
     </request>
+
+    <request context="REMOVE">
+        <credential name="CAP::kill" />
+    </request>
 </aegis>

@@ -67,6 +67,7 @@ symbian | contains(DEFINES,MEEGO_HARMATTAN) {
 win32 {
 CONFIG *= embed_manifest_exe
 }
+INCLUDEPATH += .
 
 maemo5 {
     message(Maemo5 your world)
@@ -174,7 +175,7 @@ HEADERS  += ../src/global.h                 \
             ../src/FuzzyTimer.h             \
             ../src/NwInfo.h                 \
             ../src/PhoneIntegrationIface.h  \
-            ../src/tp-capable/TpHeaders.h   \
+            ../src/TpHeaders.h              \
             ../src/SkypeClientFactory.h     \
             ../src/SkypeClient.h
 

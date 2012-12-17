@@ -31,8 +31,6 @@ Contact: yuvraaj@gmail.com
 #include <QtXml>
 #include <QtScript>
 
-#include "NwReqTracker.h"
-
 #define APPLICATION_NAME "qgvdial"
 
 #define UA_N900    "Mozilla/5.0 (X11; U; Linux armv7l; en-GB; rv:1.9.2a1pre) Gecko/20090928 Firefox/3.5 Maemo Browser 1.4.1.21 RX-51 N900"
@@ -350,6 +348,8 @@ void qgv_LogFlush();
 #define Q_WARN(_s) qWarning() << QString("%1(%2): %3").arg(__FULLFUNC__).arg(__LINE__).arg(_s)
 #define Q_CRIT(_s) qCritical() << QString("%1(%2): %3").arg(__FULLFUNC__).arg(__LINE__).arg(_s)
 
+#include "NwReqTracker.h"
+#include "PhoneIntegrationIface.h"
 #include "TpHeaders.h"
 #include "AsyncTaskToken.h"
 
