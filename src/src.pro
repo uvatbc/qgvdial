@@ -140,7 +140,7 @@ SOURCES  += ../src/main.cpp                 \
             ../src/FuzzyTimer.cpp           \
             ../src/NwInfo.cpp               \
             ../src/SkypeClientFactory.cpp   \
-            ../src/desktop/SkypeClient.cpp
+            ../src/SkypeClient.cpp
 
 HEADERS  += ../src/global.h                 \
             ../src/IObserver.h              \
@@ -176,7 +176,7 @@ HEADERS  += ../src/global.h                 \
             ../src/PhoneIntegrationIface.h  \
             ../src/tp-capable/TpHeaders.h   \
             ../src/SkypeClientFactory.h     \
-            ../src/desktop/SkypeClient.h
+            ../src/SkypeClient.h
 
 contains(DEFINES,MEEGO_HARMATTAN) | contains(DEFINES,IS_S3_BELLE) {
     DEFINES += ENABLE_FUZZY_TIMER
