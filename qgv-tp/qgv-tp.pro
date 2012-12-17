@@ -98,13 +98,13 @@ maemo5|contains(DEFINES,MEEGO_HARMATTAN) {
     target.path = $$OPTPREFIX/qgvdial/bin
 
     service.path = $$DATADIR/dbus-1/services
-    service.files += ../data/org.freedesktop.Telepathy.ConnectionManager.qgvtp.service
+    service.files += data/org.freedesktop.Telepathy.ConnectionManager.qgvtp.service
 
     manager.path = $$DATADIR/telepathy/managers
-    manager.files += ../data/qgvtp.manager
+    manager.files += data/qgvtp.manager
 
     qprofile.path = $$DATADIR/osso-rtcom
-    qprofile.files += ../data/qgvtp.profile
+    qprofile.files += data/qgvtp.profile
 }
 
 # Installation for Linux
@@ -117,9 +117,9 @@ unix:!symbian:!maemo5:!contains(DEFINES,MEEGO_HARMATTAN) {
     target.path = $$PREFIX/bin
 
     service.path = $$DATADIR/dbus-1/services
-    service.files += ../data/org.freedesktop.Telepathy.ConnectionManager.qgvtp.service
+    service.files += data/org.freedesktop.Telepathy.ConnectionManager.qgvtp.service
 
     manager.path = $$DATADIR/telepathy/managers
-    manager.files += ../data/qgvtp.manager
+    manager.files += data/qgvtp.manager
 }
 
