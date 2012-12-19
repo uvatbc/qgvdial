@@ -204,8 +204,11 @@ contains(DEFINES,MEEGO_HARMATTAN) {
 contains(DEFINES,IS_S3) | contains(DEFINES,IS_S3_BELLE) {
     RESOURCES += ../src/qgvdial-s3.qrc
 } else {
+maemo5 {
+    RESOURCES += ../src/qgvdial-maemo.qrc
+} else {
     RESOURCES += ../src/qgvdial-generic.qrc
-} }
+} } }
 
 
 # This is so that QtCreator can show these files in the files list.
