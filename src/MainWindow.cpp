@@ -631,7 +631,7 @@ MainWindow::initQML ()
     if (NULL != obj) {
         // Only if the phone integration exists will we get this page
         rv = connect(obj, SIGNAL(sigIntegrateChanged(bool)),
-                     &phoneIntegration, SLOT(integrateChanged(bool)));
+                     &phoneIntegration, SLOT(phoneIntegrationChanged(bool)));
         Q_ASSERT(rv);
         if (!rv) { exit(1); }
     }

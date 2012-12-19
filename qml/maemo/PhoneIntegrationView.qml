@@ -32,6 +32,8 @@ Item {
     QGVButton {
         id: btn
         anchors.horizontalCenter: parent.horizontalCenter
+        width: 150 * g_wMul
+
         text: container.enableIntegrate ? "Disable Call Integration" : "Enable Call Integration"
 
         onClicked: {

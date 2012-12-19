@@ -38,7 +38,7 @@ Q_SIGNALS:
     void enableChanged(bool enabled);
 
 public Q_SLOTS:
-    virtual void integrateChanged(bool enable = false) {
+    virtual void phoneIntegrationChanged(bool enable = false) {
         Q_DEBUG(QString("User requested that phone integration be %1")
                 .arg (enable ? "enabled" : "disabled"));
         m_integrationEnabled = enable;

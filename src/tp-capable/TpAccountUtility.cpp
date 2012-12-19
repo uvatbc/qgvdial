@@ -47,64 +47,61 @@ TpPhoneIntegration::onAcMgrReady(Tp::PendingOperation * /*operation*/)
 }//TpPhoneIntegration::onAcMgrReady
 
 void
-TpPhoneIntegration::integrateChanged(bool enable /* = false*/)
+TpPhoneIntegration::phoneIntegrationChanged(bool enable /* = false*/)
 {
-    IPhoneIntegration::integrateChanged (enable);
-    bool rv;
+    IPhoneIntegration::phoneIntegrationChanged (enable);
 
     if (enable) {
-        QVariantMap connectionParametersMap;
-        connectionParametersMap.insert("account","qgvtp");
-
-        QList<QVariant> presenceDetails;
-        uint presenceType(2); //Available = 2
-        presenceDetails << presenceType;
-        presenceDetails << "online";
-        presenceDetails << "Available";
-
-        QVariantMap accountPropertiesMap;
-        // Looks like this is not required... (?)
-        //"org.freedesktop.Telepathy.Account.AutomaticPresence" = simple presence
-        //accountPropertiesMap.insert(ofdTA ".AutomaticPresence",
-        //                            QVariant::fromValue(presence));
-        //"org.freedesktop.Telepathy.Account.RequestedPresence" = simple presence
-        //accountPropertiesMap.insert(ofdTA ".RequestedPresence",
-        //                            QVariant::fromValue(presence));
-
-        // "org.freedesktop.Telepathy.Account.Enabled" = true
-        accountPropertiesMap.insert(ofdTA ".Enabled", true);
-        // "org.freedesktop.Telepathy.Account.ConnectAutomatically" = true
-        accountPropertiesMap.insert(ofdTA ".ConnectAutomatically", true);
-        // "com.nokia.Account.Interface.Compat.Profile" = "qgvtp"
-        accountPropertiesMap.insert(cnAIC ".Profile", "qgvtp");
-
-        QStringList valuesList;
-        valuesList.append("TEL");
-        // "com.nokia.Account.Interface.Compat.SecondaryVCardFields" = a("TEL")
-        accountPropertiesMap.insert(cnAIC ".SecondaryVCardFields", valuesList);
-
-        Tp::PendingAccount *pa =
-        acMgr->createAccount ("qgvtp", "qgv", "qgvtp", connectionParametersMap,
-                              accountPropertiesMap);
-        rv = connect(pa, SIGNAL(finished(Tp::PendingOperation*)),
-                     this, SLOT(onAccountCreated(Tp::PendingOperation*)));
-        Q_ASSERT(rv);
-        if (!rv) {
-            Q_WARN("Failed to connect account creation signal");
-        }
+        enablePhoneIntegration ();
     } else {
-        QList<AccountPtr> allAc = acMgr->allAccounts ();
-        foreach (AccountPtr ac, allAc) {
-            QString acPath = ac->objectPath ();
-            if (acPath.contains ("qgvtp/qgv/qgvtp")) {
-                Q_DEBUG(QString("Removing account %1").arg (acPath));
-                Tp::PendingOperation *op = ac->remove ();
-                connect(op, SIGNAL(finished(Tp::PendingOperation*)),
-                        this, SLOT(onAccountRemoved(Tp::PendingOperation*)));
-            }
-        }
+        disablePhoneIntegration ();
     }
 }//TpPhoneIntegration::integrateChanged
+
+void
+TpPhoneIntegration::enablePhoneIntegration()
+{
+    bool rv;
+    QVariantMap connectionParametersMap;
+    connectionParametersMap.insert("account","qgvtp");
+
+    QList<QVariant> presenceDetails;
+    uint presenceType(2); //Available = 2
+    presenceDetails << presenceType;
+    presenceDetails << "online";
+    presenceDetails << "Available";
+
+    QVariantMap accountPropertiesMap;
+    // Looks like this is not required... (?)
+    //"org.freedesktop.Telepathy.Account.AutomaticPresence" = simple presence
+    //accountPropertiesMap.insert(ofdTA ".AutomaticPresence",
+    //                            QVariant::fromValue(presence));
+    //"org.freedesktop.Telepathy.Account.RequestedPresence" = simple presence
+    //accountPropertiesMap.insert(ofdTA ".RequestedPresence",
+    //                            QVariant::fromValue(presence));
+
+    // "org.freedesktop.Telepathy.Account.Enabled" = true
+    accountPropertiesMap.insert(ofdTA ".Enabled", true);
+    // "org.freedesktop.Telepathy.Account.ConnectAutomatically" = true
+    accountPropertiesMap.insert(ofdTA ".ConnectAutomatically", true);
+    // "com.nokia.Account.Interface.Compat.Profile" = "qgvtp"
+    accountPropertiesMap.insert(cnAIC ".Profile", "qgvtp");
+
+    QStringList valuesList;
+    valuesList.append("TEL");
+    // "com.nokia.Account.Interface.Compat.SecondaryVCardFields" = a("TEL")
+    accountPropertiesMap.insert(cnAIC ".SecondaryVCardFields", valuesList);
+
+    Tp::PendingAccount *pa =
+    acMgr->createAccount ("qgvtp", "qgv", "qgvtp", connectionParametersMap,
+                          accountPropertiesMap);
+    rv = connect(pa, SIGNAL(finished(Tp::PendingOperation*)),
+                 this, SLOT(onAccountCreated(Tp::PendingOperation*)));
+    Q_ASSERT(rv);
+    if (!rv) {
+        Q_WARN("Failed to connect account creation signal");
+    }
+}//TpPhoneIntegration::enablePhoneIntegration
 
 void
 TpPhoneIntegration::onAccountCreated(Tp::PendingOperation *op)
@@ -120,6 +117,21 @@ TpPhoneIntegration::onAccountCreated(Tp::PendingOperation *op)
     connect(op, SIGNAL(finished(Tp::PendingOperation*)),
             this, SLOT(onAccountOnline(Tp::PendingOperation*)));
 }//TpPhoneIntegration::onAccountCreated
+
+void
+TpPhoneIntegration::disablePhoneIntegration()
+{
+    QList<AccountPtr> allAc = acMgr->allAccounts ();
+    foreach (AccountPtr ac, allAc) {
+        QString acPath = ac->objectPath ();
+        if (acPath.contains ("qgvtp/qgv/qgvtp")) {
+            Q_DEBUG(QString("Removing account %1").arg (acPath));
+            Tp::PendingOperation *op = ac->remove ();
+            connect(op, SIGNAL(finished(Tp::PendingOperation*)),
+                    this, SLOT(onAccountRemoved(Tp::PendingOperation*)));
+        }
+    }
+}//TpPhoneIntegration::disablePhoneIntegration
 
 void
 TpPhoneIntegration::onAccountOnline(Tp::PendingOperation *op)

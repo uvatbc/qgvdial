@@ -34,7 +34,7 @@ public:
     bool isEnabled();
 
 public Q_SLOTS:
-    void integrateChanged(bool enable = false);
+    void phoneIntegrationChanged(bool enable = false);
 
 private Q_SLOTS:
     void onAcMgrReady(Tp::PendingOperation *operation);
@@ -43,6 +43,9 @@ private Q_SLOTS:
     void onAccountOnline(Tp::PendingOperation *operation);
 
 private:
+    void enablePhoneIntegration();
+    void disablePhoneIntegration();
+
     void updateEnabled();
 
 private:
