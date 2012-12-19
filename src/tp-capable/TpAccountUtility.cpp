@@ -49,9 +49,16 @@ TpPhoneIntegration::onAcMgrReady(Tp::PendingOperation * /*operation*/)
 void
 TpPhoneIntegration::phoneIntegrationChanged(bool enable /* = false*/)
 {
+    if (!acMgr->isReady ()) {
+        Q_WARN("Account manager is not ready!");
+    }
+
     IPhoneIntegration::phoneIntegrationChanged (enable);
 
     if (enable) {
+        QStringList props = acMgr->supportedAccountProperties ();
+        Q_DEBUG(QString("Supported properties = %1").arg (props.join ("")));
+
         enablePhoneIntegration ();
     } else {
         disablePhoneIntegration ();
