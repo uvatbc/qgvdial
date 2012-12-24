@@ -237,10 +237,61 @@ Q_DECLARE_METATYPE(Qt_Type_a_uuuuus)
 #include "QGVConnectionManager.h"
 #include "QGVChannel.h"
 
+////////////////////////////////////////////////////////////////////////////////
+// DBus types
 void registerDBusTypes();
 const QDBusArgument &
 operator>>(const QDBusArgument &argument, Struct_susv &param);
 QDBusArgument &
 operator<<(QDBusArgument &argument, const Struct_susv &param);
+const QDBusArgument &
+operator>>(const QDBusArgument &argument, Struct_su &param);
+QDBusArgument &
+operator<<(QDBusArgument &argument, const Struct_su &param);
+const QDBusArgument &
+operator>>(const QDBusArgument &argument, Struct_us &param);
+QDBusArgument &
+operator<<(QDBusArgument &argument, const Struct_us &param);
+const QDBusArgument &
+operator>>(const QDBusArgument &argument, Struct_usuu &param);
+QDBusArgument &
+operator<<(QDBusArgument &argument, const Struct_usuu &param);
+const QDBusArgument &
+operator>>(const QDBusArgument &argument, Struct_usuuuu &param);
+QDBusArgument &
+operator<<(QDBusArgument &argument, const Struct_usuuuu &param);
+const QDBusArgument &
+operator>>(const QDBusArgument &argument, Struct_uus &param);
+QDBusArgument &
+operator<<(QDBusArgument &argument, const Struct_uus &param);
+const QDBusArgument &
+operator>>(const QDBusArgument &argument, Struct_osuu &param);
+QDBusArgument &
+operator<<(QDBusArgument &argument, const Struct_osuu &param);
+const QDBusArgument &
+operator>>(const QDBusArgument &argument, Struct_u_dict_s_dict_sv &param);
+QDBusArgument &
+operator<<(QDBusArgument &argument, const Struct_u_dict_s_dict_sv &param);
+const QDBusArgument &
+operator>>(const QDBusArgument &argument, Struct_ubb_dict_ss &param);
+QDBusArgument &
+operator<<(QDBusArgument &argument, const Struct_ubb_dict_ss &param);
+const QDBusArgument &
+operator>>(const QDBusArgument &argument, Struct_o_dict_sv &param);
+QDBusArgument &
+operator<<(QDBusArgument &argument, const Struct_o_dict_sv &param);
+const QDBusArgument &
+operator>>(const QDBusArgument &argument, Struct_uss &param);
+QDBusArgument &
+operator<<(QDBusArgument &argument, const Struct_uss &param);
+const QDBusArgument &
+operator>>(const QDBusArgument &argument, Struct_dict_sv_as &param);
+QDBusArgument &
+operator<<(QDBusArgument &argument, const Struct_dict_sv_as &param);
+const QDBusArgument &
+operator>>(const QDBusArgument &argument, Struct_uuuuus &param);
+QDBusArgument &
+operator<<(QDBusArgument &argument, const Struct_uuuuus &param);
+////////////////////////////////////////////////////////////////////////////////
 
 #endif//__SHARED_DATA_TYPES__
