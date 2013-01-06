@@ -271,19 +271,21 @@ QGVConnection::registerObject()
     do { // Begin cleanup block (not a loop)
         rv = sessionBus.registerObject(m_dbusObjectPath, this);
         if (!rv) {
-            Q_WARN("Couldn't register Connection object to user ") << m_user;
+            Q_WARN(QString("Couldn't register Connection object for user %1")
+                    .arg(m_user));
             break;
         }
         connObjReg = true;
 
         rv = sessionBus.registerService (m_dbusBusName);
         if (!rv) {
-            Q_WARN("Couldn't register Connection bus for user ") << m_user;
+            Q_WARN(QString("Couldn't register Connection bus for user %1")
+                    .arg(m_user));
             break;
         }
         connSrvReg = true;
 
-        Q_DEBUG("Connection registered for user ") << m_user;
+        Q_DEBUG(QString("Connection registered for user %1").arg(m_user));
     } while (0); // End cleanup block (not a loop)
 
     if (!rv) {
