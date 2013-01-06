@@ -28,7 +28,7 @@ QGVConnection::QGVConnection(const QString &u, const QString &p,
 : QObject(parent)
 , m_user(u)
 , m_pass(p)
-, m_hasImmortalHandle(false)
+, m_hasImmortalHandle(true)
 , m_channelNumber(0)
 , m_connStatus(QGVConnection::Disconnected)
 {
@@ -39,6 +39,74 @@ QGVConnection::~QGVConnection()
 {
     Q_DEBUG("Here");
 }//QGVConnection::~QGVConnection
+
+bool
+QGVConnection::registerObject()
+{
+    ConnectionAdaptor *ca = new ConnectionAdaptor(this);
+    if (NULL == ca) {
+        Q_WARN("Failed to create connection adapter object");
+        return false;
+    }
+    RequestsAdaptor *ra = new RequestsAdaptor(this);
+    if (NULL == ra) {
+        Q_WARN("Failed to create connection adapter object");
+        delete ca;
+        return false;
+    }
+
+    bool connObjReg = false, connSrvReg = false;
+
+    QString noAmpUser = m_user;
+    noAmpUser.replace('@', '_');
+    noAmpUser.replace('.', '_');
+
+    m_dbusObjectPath = QGV_CONN_OP + noAmpUser;
+    m_dbusBusName = QGV_CONN_SP "." + noAmpUser;
+
+    QDBusConnection sessionBus = QDBusConnection::sessionBus();
+    bool rv = false;
+    do { // Begin cleanup block (not a loop)
+        rv = sessionBus.registerObject(m_dbusObjectPath, this);
+        if (!rv) {
+            Q_WARN(QString("Couldn't register Connection object for user %1")
+                    .arg(m_user));
+            break;
+        }
+        connObjReg = true;
+
+        rv = sessionBus.registerService (m_dbusBusName);
+        if (!rv) {
+            Q_WARN(QString("Couldn't register Connection bus for user %1")
+                    .arg(m_user));
+            break;
+        }
+        connSrvReg = true;
+
+        Q_DEBUG(QString("Connection registered for user %1").arg(m_user));
+    } while (0); // End cleanup block (not a loop)
+
+    if (!rv) {
+        if (connObjReg) {
+            sessionBus.unregisterObject(m_dbusObjectPath);
+        }
+        if (connSrvReg) {
+            sessionBus.unregisterService (m_dbusBusName);
+        }
+        m_dbusObjectPath.clear ();
+        m_dbusBusName.clear ();
+    }
+
+    return rv;
+}//QGVConnection::registerObject
+
+void
+QGVConnection::unregisterObject()
+{
+    QDBusConnection sessionBus = QDBusConnection::sessionBus();
+    sessionBus.unregisterObject (m_dbusObjectPath);
+    sessionBus.unregisterService (m_dbusBusName);
+}//QGVConnection::unregisterObject
 
 void
 QGVConnection::AddClientInterest(const QStringList & /*Tokens*/)
@@ -246,74 +314,6 @@ QGVConnection::getDBusBusName()
 {
     return m_dbusBusName;
 }//QGVConnection::getDBusBusName
-
-bool
-QGVConnection::registerObject()
-{
-    ConnectionAdaptor *ca = new ConnectionAdaptor(this);
-    if (NULL == ca) {
-        Q_WARN("Failed to create connection adapter object");
-        return false;
-    }
-    RequestsAdaptor *ra = new RequestsAdaptor(this);
-    if (NULL == ra) {
-        Q_WARN("Failed to create connection adapter object");
-        delete ca;
-        return false;
-    }
-
-    bool connObjReg = false, connSrvReg = false;
-
-    QString noAmpUser = m_user;
-    noAmpUser.replace('@', '_');
-    noAmpUser.replace('.', '_');
-
-    m_dbusObjectPath = QGV_CONN_OP + noAmpUser;
-    m_dbusBusName = QGV_CONN_SP "." + noAmpUser;
-
-    QDBusConnection sessionBus = QDBusConnection::sessionBus();
-    bool rv = false;
-    do { // Begin cleanup block (not a loop)
-        rv = sessionBus.registerObject(m_dbusObjectPath, this);
-        if (!rv) {
-            Q_WARN(QString("Couldn't register Connection object for user %1")
-                    .arg(m_user));
-            break;
-        }
-        connObjReg = true;
-
-        rv = sessionBus.registerService (m_dbusBusName);
-        if (!rv) {
-            Q_WARN(QString("Couldn't register Connection bus for user %1")
-                    .arg(m_user));
-            break;
-        }
-        connSrvReg = true;
-
-        Q_DEBUG(QString("Connection registered for user %1").arg(m_user));
-    } while (0); // End cleanup block (not a loop)
-
-    if (!rv) {
-        if (connObjReg) {
-            sessionBus.unregisterObject(m_dbusObjectPath);
-        }
-        if (connSrvReg) {
-            sessionBus.unregisterService (m_dbusBusName);
-        }
-        m_dbusObjectPath.clear ();
-        m_dbusBusName.clear ();
-    }
-
-    return rv;
-}//QGVConnection::registerObject
-
-void
-QGVConnection::unregisterObject()
-{
-    QDBusConnection sessionBus = QDBusConnection::sessionBus();
-    sessionBus.unregisterObject (m_dbusObjectPath);
-    sessionBus.unregisterService (m_dbusBusName);
-}//QGVConnection::unregisterObject
 
 bool
 QGVConnection::hasImmortalHandles() const
