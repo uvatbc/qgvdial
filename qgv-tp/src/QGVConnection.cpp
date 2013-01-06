@@ -260,11 +260,12 @@ QGVConnection::registerObject()
 
     bool connObjReg = false, connSrvReg = false;
 
-    m_dbusObjectPath = QGV_CONN_OP + m_user;
-    m_dbusObjectPath.replace('@', '_');
+    QString noAmpUser = m_user;
+    noAmpUser.replace('@', '_');
+    noAmpUser.replace('.', '_');
 
-    m_dbusBusName = QGV_CONN_SP "." + m_user;
-    m_dbusBusName.replace('@', '_');
+    m_dbusObjectPath = QGV_CONN_OP + noAmpUser;
+    m_dbusBusName = QGV_CONN_SP "." + noAmpUser;
 
     QDBusConnection sessionBus = QDBusConnection::sessionBus();
     bool rv = false;
