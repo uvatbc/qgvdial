@@ -32,10 +32,12 @@ QGVConnection::QGVConnection(const QString &u, const QString &p,
 , m_channelNumber(0)
 , m_connStatus(QGVConnection::Disconnected)
 {
+    Q_DEBUG("Here");
 }//QGVConnection::QGVConnection
 
 QGVConnection::~QGVConnection()
 {
+    Q_DEBUG("Here");
 }//QGVConnection::~QGVConnection
 
 void
@@ -125,9 +127,9 @@ QGVConnection::InspectHandles(uint /*Handle_Type*/, const Qt_Type_au & /*Handles
 
     do {
         if (m_connStatus != QGVConnection::Connected) {
+            Q_WARN("Not connected");
             sendErrorReply (ofdT_Err_Disconnected,
                             "Connection object not connected");
-            Q_WARN("Not connected");
             break;
         }
 
@@ -144,9 +146,9 @@ QGVConnection::ListChannels()
 
     do {
         if (m_connStatus != QGVConnection::Connected) {
+            Q_WARN("Not connected");
             sendErrorReply (ofdT_Err_Disconnected,
                             "Connection object not connected");
-            Q_WARN("Not connected");
             break;
         }
 
@@ -161,9 +163,9 @@ QGVConnection::ReleaseHandles(uint /*Handle_Type*/, const Qt_Type_au & /*Handles
 {
     do {
         if (m_connStatus != QGVConnection::Connected) {
+            Q_WARN("Not connected");
             sendErrorReply (ofdT_Err_Disconnected,
                             "Connection object not connected");
-            Q_WARN("Not connected");
             break;
         }
 
@@ -185,9 +187,9 @@ QGVConnection::RequestChannel(const QString & /*Type*/, uint /*Handle_Type*/,
 
     do {
         if (m_connStatus != QGVConnection::Connected) {
+            Q_WARN("Not connected");
             sendErrorReply (ofdT_Err_Disconnected,
                             "Connection object not connected");
-            Q_WARN("Not connected");
             break;
         }
 
@@ -206,9 +208,9 @@ QGVConnection::RequestHandles(uint /*Handle_Type*/,
 
     do {
         if (m_connStatus != QGVConnection::Connected) {
+            Q_WARN("Not connected");
             sendErrorReply (ofdT_Err_Disconnected,
                             "Connection object not connected");
-            Q_WARN("Not connected");
             break;
         }
 
@@ -222,12 +224,14 @@ QGVConnection::RequestHandles(uint /*Handle_Type*/,
 void
 QGVConnection::setSelfHandle(uint h)
 {
+    Q_DEBUG("Here");
     m_selfHandle = h;
 }//QGVConnection::SetSelfHandle
 
 int
 QGVConnection::getSelfHandle()
 {
+    Q_DEBUG("Here");
     return m_selfHandle;
 }//QGVConnection::getSelfHandle
 
@@ -314,6 +318,7 @@ QGVConnection::unregisterObject()
 bool
 QGVConnection::hasImmortalHandles() const
 {
+    Q_DEBUG("Here");
     return m_hasImmortalHandle;
 }//QGVConnection::hasImmortalHandles
 

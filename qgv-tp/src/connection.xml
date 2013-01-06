@@ -30,10 +30,8 @@
     </property>
   </interface>
   <interface name="org.freedesktop.Telepathy.Connection">
-    <method name="Connect">
-    </method>
-    <method name="Disconnect">
-    </method>
+    <method name="Connect" />
+    <method name="Disconnect" />
     <method name="GetInterfaces">
       <arg name="Interfaces" type="as" direction="out"/>
     </method>

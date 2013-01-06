@@ -29,13 +29,6 @@ class QGVConnection : public QObject, protected QDBusContext
 {
     Q_OBJECT
 
-    Q_PROPERTY(QString m_dbusObjectPath READ getDBusObjectPath)
-    Q_PROPERTY(QString m_dbusBusName    READ getDBusBusName)
-
-    Q_PROPERTY(int m_selfHandle
-               READ getSelfHandle
-               WRITE setSelfHandle)
-
 public:
     enum ConnectionStatus {
         Connected       = 0,
