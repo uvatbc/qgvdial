@@ -56,6 +56,7 @@ Contact: yuvraaj@gmail.com
 // org.freedesktop.Telepathy.Connection
 #define ofdT_CONN_SP        ofdT_SP ".Connection"
 
+// org.freedesktop.Telepathy.Connection.Interface
 #define ofdT_Conn_Iface                 ofdT_CONN_SP ".Interface"
 // org.freedesktop.Telepathy.Connection.Interface.ContactBlocking
 #define ofdT_Conn_Iface_ContactBlocking ofdT_Conn_Iface ".ContactBlocking"

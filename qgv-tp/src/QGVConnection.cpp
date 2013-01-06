@@ -73,7 +73,7 @@ QGVConnection::GetInterfaces()
 {
     QStringList rv;
     rv << ofdT_Conn_Iface_Requests;
-    Q_DEBUG("Returning interfaces");
+    Q_DEBUG(QString("Returning interfaces: [%1]").arg(rv.join (", ")));
     return rv;
 }//QGVConnection::GetInterfaces
 
@@ -263,7 +263,7 @@ QGVConnection::registerObject()
     m_dbusObjectPath = QGV_CONN_OP + m_user;
     m_dbusObjectPath.replace('@', '_');
 
-    m_dbusBusName = QGV_CONN_SP + m_user;
+    m_dbusBusName = QGV_CONN_SP "." + m_user;
     m_dbusBusName.replace('@', '_');
 
     QDBusConnection sessionBus = QDBusConnection::sessionBus();
