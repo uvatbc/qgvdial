@@ -27,43 +27,45 @@ Contact: yuvraaj@gmail.com
 
 TpPhoneIntegration::TpPhoneIntegration(QObject *parent /*= NULL*/)
 : IPhoneIntegration(parent)
+, m_acMgrInitInProgress(false)
+, m_EnableAfteracMgrInit(false)
 {
+}//TpPhoneIntegration::TpPhoneIntegration
+
+void
+TpPhoneIntegration::phoneIntegrationChanged(bool enable /* = false*/)
+{
+    if (!acMgr.isNull ()) {
+        Q_WARN("Account manager is valid!!");
+        return;
+    }
+
+    m_EnableAfteracMgrInit = enable;
     acMgr = AccountManager::create();
 
     Tp::PendingOperation *op = acMgr->becomeReady ();
     connect(op, SIGNAL(finished(Tp::PendingOperation*)),
             this, SLOT(onAcMgrReady(Tp::PendingOperation*)));
-}//TpPhoneIntegration::TpPhoneIntegration
+}//TpPhoneIntegration::integrateChanged
 
 void
 TpPhoneIntegration::onAcMgrReady(Tp::PendingOperation * /*operation*/)
 {
     if (acMgr->isReady()) {
         Q_DEBUG("Account manager is ready");
+
+        if (m_EnableAfteracMgrInit) {
+            QStringList props = acMgr->supportedAccountProperties ();
+            Q_DEBUG(QString("Supported properties = [%1]").arg(props.join(", ")));
+
+            enablePhoneIntegration ();
+        } else {
+            disablePhoneIntegration ();
+        }
     } else {
         Q_WARN("Account manager is not getting ready");
     }
-    updateEnabled();
 }//TpPhoneIntegration::onAcMgrReady
-
-void
-TpPhoneIntegration::phoneIntegrationChanged(bool enable /* = false*/)
-{
-    if (!acMgr->isReady ()) {
-        Q_WARN("Account manager is not ready!");
-    }
-
-    IPhoneIntegration::phoneIntegrationChanged (enable);
-
-    if (enable) {
-        QStringList props = acMgr->supportedAccountProperties ();
-        Q_DEBUG(QString("Supported properties = %1").arg (props.join ("")));
-
-        enablePhoneIntegration ();
-    } else {
-        disablePhoneIntegration ();
-    }
-}//TpPhoneIntegration::integrateChanged
 
 void
 TpPhoneIntegration::enablePhoneIntegration()
@@ -91,13 +93,17 @@ TpPhoneIntegration::enablePhoneIntegration()
     accountPropertiesMap.insert(ofdTA ".Enabled", true);
     // "org.freedesktop.Telepathy.Account.ConnectAutomatically" = true
     accountPropertiesMap.insert(ofdTA ".ConnectAutomatically", true);
+#if defined(MEEGO_HARMATTAN)
     // "com.nokia.Account.Interface.Compat.Profile" = "qgvtp"
     accountPropertiesMap.insert(cnAIC ".Profile", "qgvtp");
+#endif
 
     QStringList valuesList;
     valuesList.append("TEL");
+#if defined(MEEGO_HARMATTAN)
     // "com.nokia.Account.Interface.Compat.SecondaryVCardFields" = a("TEL")
     accountPropertiesMap.insert(cnAIC ".SecondaryVCardFields", valuesList);
+#endif
 
     Tp::PendingAccount *pa =
     acMgr->createAccount ("qgvtp", "qgv", "qgvtp", connectionParametersMap,
@@ -144,6 +150,9 @@ TpPhoneIntegration::disablePhoneIntegration()
                     this, SLOT(onAccountRemoved(Tp::PendingOperation*)));
         }
     }
+
+    acMgr.reset ();
+    IPhoneIntegration::phoneIntegrationChanged (false);
 }//TpPhoneIntegration::disablePhoneIntegration
 
 void
@@ -151,43 +160,29 @@ TpPhoneIntegration::onAccountOnline(Tp::PendingOperation *op)
 {
     if (op->isError()) {
         Q_WARN("Account could not be made online");
+        disablePhoneIntegration();
     } else {
         Q_DEBUG("Account is now online");
+        IPhoneIntegration::phoneIntegrationChanged (true);
     }
+
+    acMgr.reset ();
 }//TpPhoneIntegration::onAccountOnline
 
 void
 TpPhoneIntegration::onAccountRemoved(Tp::PendingOperation * /*operation*/)
 {
     Q_DEBUG("Account removed");
-    updateEnabled();
-}//TpPhoneIntegration::onAccountRemoved
 
-void
-TpPhoneIntegration::updateEnabled()
-{
-    bool oldValue = m_integrationEnabled;
-
+    bool oldVal = m_integrationEnabled;
     m_integrationEnabled = false;
-    if (acMgr->isReady()) {
-        QList<AccountPtr> allAc = acMgr->allAccounts ();
-        foreach (AccountPtr ac, allAc) {
-            QString acPath = ac->objectPath ();
-            if (acPath.contains ("qgvtp/qgv/qgvtp")) {
-                m_integrationEnabled = true;
-                break;
-            }
-        }
-    }
-
-    if (oldValue != m_integrationEnabled) {
+    if (oldVal != m_integrationEnabled) {
         emit enableChanged(m_integrationEnabled);
     }
-}//TpPhoneIntegration::updateEnabled
+}//TpPhoneIntegration::onAccountRemoved
 
 bool
 TpPhoneIntegration::isEnabled()
 {
-    updateEnabled();
     return m_integrationEnabled;
 }//TpPhoneIntegration::isEnabled

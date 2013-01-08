@@ -31,6 +31,7 @@ class TpPhoneIntegration : public IPhoneIntegration
 
 public:
     TpPhoneIntegration(QObject *parent = NULL);
+
     bool isEnabled();
 
 public Q_SLOTS:
@@ -46,9 +47,9 @@ private:
     void enablePhoneIntegration();
     void disablePhoneIntegration();
 
-    void updateEnabled();
-
 private:
+    bool m_acMgrInitInProgress;
+    bool m_EnableAfteracMgrInit;
     AccountManagerPtr acMgr;
 };
 

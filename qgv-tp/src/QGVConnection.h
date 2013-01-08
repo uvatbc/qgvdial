@@ -105,7 +105,8 @@ Q_SIGNALS: // SIGNALS
     void NewChannels(const Qt_Type_a_o_dict_sv &in0);
 
 public:
-    QGVConnection(const QString &u, const QString &p, QObject *parent = NULL);
+    QGVConnection(const QString &u, const QString &p, uint selfH,
+                  QObject *parent = NULL);
     ~QGVConnection();
 
     void setSelfHandle(uint h);

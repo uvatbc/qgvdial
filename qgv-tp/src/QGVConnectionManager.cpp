@@ -31,7 +31,7 @@ Contact: yuvraaj@gmail.com
 
 QGVConnectionManager::QGVConnectionManager(QObject *parent)
 : QObject(parent)
-, m_connectionHandleCounter(0)
+, m_connectionHandleCount(0)
 {
 }//QGVConnectionManager::QGVConnectionManager
 
@@ -184,7 +184,8 @@ QGVConnectionManager::RequestConnection(const QString &Protocol,
         }
 
         // Create the connection objects and associate them together
-        conn = new QGVConnection(username, password, this);
+        conn = new QGVConnection(username, password, ++m_connectionHandleCount,
+                                 this);
         if (NULL == conn) {
             errMsg = QString("Failed to allocate connection for username: %1")
                         .arg(username);
@@ -206,7 +207,6 @@ QGVConnectionManager::RequestConnection(const QString &Protocol,
         }
         Q_DEBUG("New connection object registered");
 
-        conn->setSelfHandle(++m_connectionHandleCounter);
         m_connectionMap[username] = conn;
 
         // Must emit NewConnection on success

@@ -49,7 +49,7 @@ Q_SIGNALS: // SIGNALS
 
 private:
     QGVConnectionMap m_connectionMap;
-    uint m_connectionHandleCounter;
+    uint m_connectionHandleCount;
 };
 
 #endif//_QGVCONNECTIONMANAGER_H_

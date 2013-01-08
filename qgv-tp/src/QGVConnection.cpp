@@ -23,14 +23,15 @@ Contact: yuvraaj@gmail.com
 #include "gen/connection_adapter.h"
 #include "QGVTextChannel.h"
 
-QGVConnection::QGVConnection(const QString &u, const QString &p,
+QGVConnection::QGVConnection(const QString &u, const QString &p, uint selfH,
                              QObject *parent /*= NULL*/)
 : QObject(parent)
+, m_selfHandle(selfH)
 , m_user(u)
 , m_pass(p)
 , m_hasImmortalHandle(true)
 , m_channelNumber(0)
-, m_connStatus(QGVConnection::Disconnected)
+, m_connStatus(QGVConnection::Connected)
 {
     Q_DEBUG("Here");
 }//QGVConnection::QGVConnection
@@ -157,13 +158,7 @@ QGVConnection::GetProtocol()
 uint
 QGVConnection::GetSelfHandle()
 {
-    if (m_connStatus != QGVConnection::Connected) {
-        sendErrorReply (ofdT_Err_Disconnected,
-                        "Connection object not connected");
-        Q_WARN("Not connected");
-    } else {
-        Q_DEBUG(QString("Returning self handle %1").arg(m_selfHandle));
-    }
+    Q_DEBUG(QString("Returning self handle %1").arg(m_selfHandle));
     return m_selfHandle;
 }//QGVConnection::GetSelfHandle
 
