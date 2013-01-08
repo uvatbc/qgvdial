@@ -29,7 +29,7 @@ symbian {
 DEFINES += NO_CONTACTS_CAPTCHA
 
 # For verbose debugging
-#DEFINES += DBG_TP_VERBOSE
+DEFINES += DBG_TP_VERBOSE
 #DEFINES += DBG_VERBOSE
 
 QT      *= core gui sql xml xmlpatterns script declarative phonon
@@ -201,14 +201,18 @@ RESOURCES += ../src/qgvdial.qrc
 contains(DEFINES,MEEGO_HARMATTAN) {
     RESOURCES += ../src/qgvdial-meego.qrc
 } else {
-contains(DEFINES,IS_S3) | contains(DEFINES,IS_S3_BELLE) {
+contains(DEFINES, IS_S3) | contains(DEFINES, IS_S3_BELLE) {
     RESOURCES += ../src/qgvdial-s3.qrc
 } else {
 maemo5 {
     RESOURCES += ../src/qgvdial-maemo.qrc
 } else {
+unix : !symbian {
+# Unix && !Symbian && !maemo5 && !harmattan = Linux desktop
+    RESOURCES += ../src/qgvdial-desktop-linux.qrc
+} else {
     RESOURCES += ../src/qgvdial-generic.qrc
-} } }
+} } } }
 
 
 # This is so that QtCreator can show these files in the files list.

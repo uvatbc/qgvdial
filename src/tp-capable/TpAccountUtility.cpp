@@ -114,6 +114,12 @@ void
 TpPhoneIntegration::onAccountCreated(Tp::PendingOperation *op)
 {
     Tp::PendingAccount *pa = (Tp::PendingAccount *) op;
+
+    if (pa->isError ()) {
+        Q_WARN("Failed to create account");
+        return;
+    }
+
     AccountPtr ac = pa->account();
 
     QString acPath = ac->objectPath ();
