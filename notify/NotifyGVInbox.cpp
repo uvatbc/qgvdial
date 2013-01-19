@@ -66,34 +66,33 @@ GVInbox::onCheckInboxDone (AsyncTaskToken *token)
 
         QDateTime latestOnServer = token->outParams["serverLatest"].toDateTime();
 
-        delete token;
-        token = NULL;
-
         if (!m_dtPrevLatest.isValid ()) {
             m_dtPrevLatest = latestOnServer.addDays (-1);
         }
-
         if (latestOnServer > m_dtPrevLatest) {
             bInboxChanged = true;
+            m_dtPrevLatest = latestOnServer;
         }
-        m_dtPrevLatest = latestOnServer;
 
         quint32 count;
         count = token->outParams["allCount"].toInt();
         if (count != m_allCount) {
             bInboxChanged = true;
+            m_allCount = count;
         }
-        m_allCount = count;
 
         count = token->outParams["trashCount"].toInt();
         if (count != m_trashCount) {
             bInboxChanged = true;
+            m_trashCount = count;
         }
-        m_trashCount = count;
 
         if (bInboxChanged) {
             emit inboxChanged ();
         }
+
+        delete token;
+        token = NULL;
     } while (0); // End cleanup block (not a loop)
 
     QMutexLocker locker(&m_mutex);
