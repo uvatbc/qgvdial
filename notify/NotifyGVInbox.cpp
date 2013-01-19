@@ -4,9 +4,11 @@
 GVInbox::GVInbox (GVApi &gref, QObject *parent)
 : QObject (parent)
 , gvApi(gref)
-, mutex (QMutex::Recursive)
-, bLoggedIn (false)
-, bRefreshInProgress (false)
+, m_mutex (QMutex::Recursive)
+, m_bLoggedIn (false)
+, m_bRefreshInProgress (false)
+, m_allCount(0)
+, m_trashCount(0)
 {
 }//GVInbox::GVInbox
 
@@ -17,11 +19,11 @@ GVInbox::~GVInbox(void)
 void
 GVInbox::refresh ()
 {
-    QMutexLocker locker(&mutex);
-    if (!bLoggedIn) {
+    QMutexLocker locker(&m_mutex);
+    if (!m_bLoggedIn) {
         return;
     }
-    if (bRefreshInProgress) {
+    if (m_bRefreshInProgress) {
         Q_WARN("Refresh in progress. Ignore this one.");
         return;
     }
@@ -39,7 +41,7 @@ GVInbox::refresh ()
         return;
     }
 
-    bRefreshInProgress = true;
+    m_bRefreshInProgress = true;
 
     if (!gvApi.checkRecentInbox (token)) {
         onCheckInboxDone (NULL);
@@ -50,6 +52,7 @@ GVInbox::refresh ()
 void
 GVInbox::onCheckInboxDone (AsyncTaskToken *token)
 {
+    bool bInboxChanged = false;
     do { // Begin cleanup block (not a loop)
         if (!token) {
             Q_WARN("No token provided. Failure!!");
@@ -66,31 +69,47 @@ GVInbox::onCheckInboxDone (AsyncTaskToken *token)
         delete token;
         token = NULL;
 
-        if (!dtPrevLatest.isValid ()) {
-            dtPrevLatest = latestOnServer.addDays (-1);
+        if (!m_dtPrevLatest.isValid ()) {
+            m_dtPrevLatest = latestOnServer.addDays (-1);
         }
 
-        if (latestOnServer > dtPrevLatest) {
+        if (latestOnServer > m_dtPrevLatest) {
+            bInboxChanged = true;
+        }
+        m_dtPrevLatest = latestOnServer;
+
+        quint32 count;
+        count = token->outParams["allCount"].toInt();
+        if (count != m_allCount) {
+            bInboxChanged = true;
+        }
+        m_allCount = count;
+
+        count = token->outParams["trashCount"].toInt();
+        if (count != m_trashCount) {
+            bInboxChanged = true;
+        }
+        m_trashCount = count;
+
+        if (bInboxChanged) {
             emit inboxChanged ();
         }
-
-        dtPrevLatest = latestOnServer;
     } while (0); // End cleanup block (not a loop)
 
-    QMutexLocker locker(&mutex);
-    bRefreshInProgress = false;
+    QMutexLocker locker(&m_mutex);
+    m_bRefreshInProgress = false;
 }//GVInbox::onCheckInboxDone
 
 void
 GVInbox::loginSuccess ()
 {
-    QMutexLocker locker(&mutex);
-    bLoggedIn = true;
+    QMutexLocker locker(&m_mutex);
+    m_bLoggedIn = true;
 }//GVInbox::loginSuccess
 
 void
 GVInbox::loggedOut ()
 {
-    QMutexLocker locker(&mutex);
-    bLoggedIn = false;
+    QMutexLocker locker(&m_mutex);
+    m_bLoggedIn = false;
 }//GVInbox::loggedOut

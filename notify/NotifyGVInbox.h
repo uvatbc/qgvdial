@@ -31,16 +31,22 @@ private:
     GVApi          &gvApi;
 
     //! Mutex for the following variables
-    QMutex          mutex;
+    QMutex          m_mutex;
 
     //! Are we logged in?
-    bool            bLoggedIn;
+    bool            m_bLoggedIn;
 
     //! Is there a refresh in progress?
-    bool            bRefreshInProgress;
+    bool            m_bRefreshInProgress;
 
     //! Date time of latest update
-    QDateTime       dtPrevLatest;
+    QDateTime       m_dtPrevLatest;
+
+    //! Count of the items in inbox/all
+    quint32         m_allCount;
+
+    //! Count of the items in inbox/trash
+    quint32         m_trashCount;
 };
 
 #endif // NOTIFYGVINBOX_H

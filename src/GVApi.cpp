@@ -2445,8 +2445,36 @@ GVApi::onCheckRecentInbox(bool success, const QByteArray &response,
             serverLatest = QDateTime::fromMSecsSinceEpoch (0);
         }
 
+        quint32 totalSize;
+        totalSize = scriptEngine.evaluate("obj[\"totalSize\"]").toInt32 ();
+        if (scriptEngine.hasUncaughtException ()) {
+            Q_WARN("Uncaught exception executing script :")
+                << scriptEngine.uncaughtException().toString()
+                << "JSON =" << xmlHandler.strJson;
+            break;
+        }
+
+#if 0
+        QString fName;
+        if (!token->outParams.contains ("serverLatest")) {
+            fName = "updateAll.html";
+        } else {
+            fName = "updateTrash.html";
+        }
+
+        QFile fTemp(fName);
+        fTemp.open (QFile::ReadWrite);
+        fTemp.write (response);
+        fTemp.close ();
+#endif
+
+        // Now that I've got the latest from inbox/all, look for it in trash.
+        // The completion callback for trash is this (same) function.
+        // To make sure that I don't fall into an infinite loop, look for trash
+        // only if the outParams doesn't have the "serverLatest" field.
         if (!token->outParams.contains ("serverLatest")) {
             token->outParams["serverLatest"] = serverLatest;
+            token->outParams["allCount"] = totalSize;
 
             success = doGet(GV_HTTPS "/b/0/inbox/recent/trash", token, this,
                             SLOT(onCheckRecentInbox(bool,const QByteArray&,QNetworkReply*,void*)));
@@ -2461,6 +2489,9 @@ GVApi::onCheckRecentInbox(bool success, const QByteArray &response,
             success = true;
             break;
         }
+
+        // Reaching here means that this is the trash results path
+        token->outParams["trashCount"] = totalSize;
 
         QDateTime allEntryTime = token->outParams["serverLatest"].toDateTime();
         if (serverLatest > allEntryTime) {
