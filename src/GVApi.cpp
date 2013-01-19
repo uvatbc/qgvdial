@@ -2487,7 +2487,9 @@ GVApi::onCheckRecentInbox(bool success, const QByteArray &response,
 void
 GVApi::resetNwMgr()
 {
-    Q_DEBUG("Changing network manager");
+    if (emitLog) {
+        Q_DEBUG("Changing network manager");
+    }
 
     if (NULL != nwMgr) {
         nwMgr->deleteLater ();
