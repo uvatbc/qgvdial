@@ -31,21 +31,21 @@ MainWindow::setStatus(const QString &strText, int /*timeout = 3000*/)
 void
 MainWindow::init()
 {
-    connect(&gvApi, SIGNAL(twoStepAuthentication(AsyncTaskToken *)),
-             this , SLOT(onTwoStepAuthentication(AsyncTaskToken *)));
+    connect(&gvApi, SIGNAL(twoStepAuthentication(AsyncTaskToken*)),
+             this , SLOT(onTwoStepAuthentication(AsyncTaskToken*)));
 
     // Status from contacts object
-    QObject::connect (&oContacts, SIGNAL (status   (const QString &, int)),
-                       this     , SLOT   (setStatus(const QString &, int)));
+    QObject::connect (&oContacts, SIGNAL(status(const QString&,int)),
+                       this     , SLOT(setStatus(const QString&,int)));
     // oContacts.allContacts -> this.getContactsDone
-    QObject::connect (&oContacts, SIGNAL (allContacts (bool, bool)),
-                      this      , SLOT   (getContactsDone (bool, bool)));
+    QObject::connect (&oContacts, SIGNAL(allContacts(bool,bool)),
+                      this      , SLOT(getContactsDone(bool,bool)));
     // Status from inbox object
-    QObject::connect (&oInbox, SIGNAL (status   (const QString &, int)),
-                       this  , SLOT   (setStatus(const QString &, int)));
+    QObject::connect (&oInbox, SIGNAL(status(const QString&,int)),
+                       this  , SLOT(setStatus(const QString&,int)));
     // Inbox has updated
-    QObject::connect (&oInbox, SIGNAL (inboxChanged ()),
-                       this  , SLOT   (inboxChanged ()));
+    QObject::connect (&oInbox, SIGNAL(inboxChanged()),
+                       this  , SLOT(inboxChanged()));
     // Timer tick
     QObject::connect (&mainTimer, SIGNAL(timeout()), this, SLOT(doWork()));
 
@@ -69,8 +69,8 @@ MainWindow::init()
         getOut ();
         return;
     }
-    connect(client, SIGNAL(CommandForClient(const QString &)),
-            this  , SLOT(onCommandForClient(const QString &)));
+    connect(client, SIGNAL(CommandForClient(const QString&)),
+            this  , SLOT(onCommandForClient(const QString&)));
 
     onCommandForClient("getUser");
 
