@@ -439,8 +439,13 @@ MainWindow::init ()
 
     // When there is a real change in the NW configuration, reset the nw access
     // manager on the GvAPI class object
-    rv = connect(&Singletons::getRef().getNwInfo(), SIGNAL(realChange()),
+    NwInfo &nwInfo = Singletons::getRef().getNwInfo();
+    rv = connect(&nwInfo, SIGNAL(realChange()),
                  &gvApi, SLOT(resetNwMgr()));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+    rv = connect(&nwInfo, SIGNAL(realChange()),
+                 this, SLOT(refreshPeriodSettings()));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
 
