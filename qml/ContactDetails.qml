@@ -20,6 +20,9 @@ Contact: yuvraaj@gmail.com
 */
 
 import Qt 4.7
+import "meego"
+import "generic"
+import "s3"
 
 Rectangle { // Contact details
     id: container

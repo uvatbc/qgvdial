@@ -55,5 +55,9 @@
         <file alias="SmsView.qml">../qml/SmsView.qml</file>
         <file alias="Tab.qml">../qml/Tab.qml</file>
         <file alias="TabbedUI.qml">../qml/TabbedUI.qml</file>
+        <file alias="meego/MeegoDummy.txt">../qml/meego/MeegoDummy.txt</file>
+        <file alias="maemo/MaemoDummy.txt">../qml/maemo/MaemoDummy.txt</file>
+        <file alias="s3/S3Dummy.txt">../qml/s3/S3Dummy.txt</file>
+        <file alias="generic/GenericDummy.txt">../qml/generic/GenericDummy.txt</file>
     </qresource>
 </RCC>
