@@ -21,6 +21,7 @@ Contact: yuvraaj@gmail.com
 
 #include "TpAccountUtility.h"
 #include "TpHeaders.h"
+#include "Singletons.h"
 
 #define ofdTA "org.freedesktop.Telepathy.Account"
 #define cnAIC "com.nokia.Account.Interface.Compat"
@@ -70,9 +71,20 @@ TpPhoneIntegration::onAcMgrReady(Tp::PendingOperation * /*operation*/)
 void
 TpPhoneIntegration::enablePhoneIntegration()
 {
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain();
+    QString user, pass;
     bool rv;
+
+    rv = dbMain.getUserPass (user, pass);
+    if (!rv) {
+        Q_WARN("Failed to get user pass");
+        return;
+    }
+    user.replace('@', '_');
+    user.replace('.', '_');
+
     QVariantMap connectionParametersMap;
-    connectionParametersMap.insert("account","qgvtp");
+    connectionParametersMap.insert("account", user);
 
     QList<QVariant> presenceDetails;
     uint presenceType(2); //Available = 2
@@ -106,7 +118,7 @@ TpPhoneIntegration::enablePhoneIntegration()
 #endif
 
     Tp::PendingAccount *pa =
-    acMgr->createAccount ("qgvtp", "qgv", "qgvtp", connectionParametersMap,
+    acMgr->createAccount ("qgvtp", "qgv", user, connectionParametersMap,
                           accountPropertiesMap);
     rv = connect(pa, SIGNAL(finished(Tp::PendingOperation*)),
                  this, SLOT(onAccountCreated(Tp::PendingOperation*)));

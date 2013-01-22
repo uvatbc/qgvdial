@@ -172,15 +172,16 @@ QGVConnectionManager::RequestConnection(const QString &Protocol,
         */
 
         if (m_connectionMap.contains (username)) {
+#if 0
             errMsg = QString("Connection already exists for username: %1")
                         .arg(username);
             errName = ofdT_Err_NotAvailable;
             Q_WARN(errMsg);
             break;
-
-            // DO NOT RETURN THE EXISTING CONNECTION!!!!
-            //conn = m_connectionMap[username];
-            //break;
+#else
+            conn = m_connectionMap[username];
+            break;
+#endif
         }
 
         // Create the connection objects and associate them together
