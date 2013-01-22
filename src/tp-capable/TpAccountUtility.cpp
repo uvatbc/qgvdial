@@ -155,7 +155,7 @@ TpPhoneIntegration::disablePhoneIntegration()
     QList<AccountPtr> allAc = acMgr->allAccounts ();
     foreach (AccountPtr ac, allAc) {
         QString acPath = ac->objectPath ();
-        if (acPath.contains ("qgvtp/qgv/qgvtp")) {
+        if (acPath.contains ("qgvtp/qgv/")) {
             Q_DEBUG(QString("Removing account %1").arg (acPath));
             Tp::PendingOperation *op = ac->remove ();
             connect(op, SIGNAL(finished(Tp::PendingOperation*)),
