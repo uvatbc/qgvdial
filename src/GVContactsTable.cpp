@@ -240,6 +240,8 @@ GVContactsTable::mqUpdateContacts(const QDateTime &dtUpdate)
     dbMain.getLatestContact (dtLatest);
     if (dtLatest <= dtUpdate) {
         refreshContacts (dtLatest);
+    } else {
+        Q_DEBUG("Latest contact in cache is older than the date from Mq");
     }
 }//GVContactsTable::mqUpdateContacts
 
