@@ -98,16 +98,14 @@ void
 MqClientThread::on_connect (int rc)
 {
     if (0 != rc) {
-        Q_WARN("Mosquitto: Failed in on_connect. Error =")
-                << QString("%1").arg(rc);
+        Q_WARN(QString("Mosquitto: Failed in on_connect. Error = %1").arg(rc));
         return;
     }
     Q_DEBUG(QString("Mosquitto: Connected to %1").arg(strHost));
 
-    rc = this->subscribe (NULL, strTopic.toLatin1().constData (), 1);
+    rc = this->subscribe (NULL, strTopic.toLatin1().constData (), 0);
     if (0 != rc) {
-        Q_WARN("Mosquitto: Failed in subscribe. Error =")
-                << QString("%1").arg(rc);
+        Q_WARN(QString("Mosquitto: Failed to subscribe. Error = %1").arg(rc));
         emit status ("Failed to subscribe to Mosquitto server");
         return;
     }
@@ -192,17 +190,20 @@ MqClientThread::run ()
 {
 #define MQTHREAD_MAX_RETRIES 5
     int rv, retries = 0;
+    bool firstTime = true;
     Q_DEBUG("Mq thread: Enter thread");
 
     do {
         if (strHost.length () == 0) {
-            Q_WARN ("Mq thread: Invalid Host");
+            Q_WARN("Mq thread: Invalid Host");
             break;
         }
 
         Q_DEBUG(QString("Mq thread: Attempting to connect to host %1")
                     .arg(strHost));
-        rv = this->mq_connect (strHost.toLatin1().constData(), port, 60, false);
+        rv =
+        this->mq_connect (strHost.toLatin1().constData(), port, 60, firstTime);
+        firstTime = false;
         if (0 != rv) {
             Q_WARN(QString("Mq thread: Failed to connect. Error = %1").arg(rv));
             emit status("Failed to connect to Mosquitto server");
@@ -218,23 +219,28 @@ MqClientThread::run ()
                 // In the normal case, continue the loop
             } else if ((MOSQ_ERR_INVAL == rv) ||
                        (MOSQ_ERR_NOMEM == rv)) {
-                Q_WARN ("Mq thread: Unrecoverable error in loop:")
-                        << QString("%1").arg(rv);
+                Q_WARN(QString("Mq thread: Unrecoverable error in loop: %1")
+                            .arg(rv));
                 retries++;
                 break;
             } else if ((MOSQ_ERR_NO_CONN == rv) ||
                        (MOSQ_ERR_PROTOCOL == rv)) {
-                Q_WARN ("Mq thread: error=") << QString("%1").arg(rv)
-                        << "Recoverable hopefully";
+                Q_WARN(QString("Mq thread: error = %1. Recoverable hopefully")
+                            .arg(rv));
                 this->sleep (1);
                 retries++;
                 break;
             } else if (MOSQ_ERR_CONN_LOST == rv) {
-                Q_WARN ("Lost connection to mosquitto server");
-                rv = this->mq_connect (strHost.toLatin1().constData(), port, 60, true);
+                Q_WARN("Lost connection to mosquitto server");
+                rv = this->mq_connect (strHost.toLatin1().constData(), port, 60,
+                                       true);
+                if (MOSQ_ERR_SUCCESS != rv) {
+                    Q_WARN(QString("Mq thread: Failed to connect: %1").arg(rv));
+                    retries++;
+                    break;
+                }
             } else {
-                Q_WARN ("Mq thread: Other error in loop:")
-                        << QString("%1").arg(rv);
+                Q_WARN(QString("Mq thread: Other error in loop: %1").arg(rv));
                 retries++;
                 break;
             }
@@ -282,7 +288,7 @@ MqClientThread::setUserPass (const QString &user, const QString &pass)
     int rv = mosquitto_username_pw_set(mosq, strUser.toLatin1().constData (),
                                              strPass.toLatin1().constData ());
     if (0 != rv) {
-        Q_WARN (QString("Mosquitto: Failed to set user and pass. Error =")
+        Q_WARN(QString("Mosquitto: Failed to set user and pass. Error =")
                         .arg(rv));
     }
 }//MqClientThread::setUserPass

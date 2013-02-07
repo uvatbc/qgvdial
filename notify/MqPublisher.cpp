@@ -80,10 +80,11 @@ MqPublisher::on_mqConnected (int result)
 
     uint16_t mid_sent;
     mosquitto_publish(mosq, &mid_sent,
-                      m_strTopic.toLatin1 ().data (),
-                      m_byPayload.length (),
-                      (const uint8_t *)m_byPayload.constData (),
-                      2, true);
+                      m_strTopic.toLatin1().data(),
+                      m_byPayload.length(),
+                      (const uint8_t *)m_byPayload.constData(),
+                      0,    // QOS: guaranteed delivery. 4 way handshake
+                      true);
 }//MqPublisher::on_mqConnected
 
 void
