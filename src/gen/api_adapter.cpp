@@ -123,3 +123,31 @@ QStringList TextServerAdaptor::getTextsByDate(const QString &strStart, const QSt
     return arrTexts;
 }
 
+/*
+ * Implementation of adaptor class UIServerAdaptor
+ */
+
+UIServerAdaptor::UIServerAdaptor(QObject *parent)
+    : QDBusAbstractAdaptor(parent)
+{
+    // constructor
+    setAutoRelaySignals(true);
+}
+
+UIServerAdaptor::~UIServerAdaptor()
+{
+    // destructor
+}
+
+void UIServerAdaptor::OpenContacts()
+{
+    // handle method call org.QGVDial.UIServer.OpenContacts
+    QMetaObject::invokeMethod(parent(), "OpenContacts");
+}
+
+void UIServerAdaptor::OpenInbox()
+{
+    // handle method call org.QGVDial.UIServer.OpenInbox
+    QMetaObject::invokeMethod(parent(), "OpenInbox");
+}
+

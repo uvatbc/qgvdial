@@ -91,5 +91,26 @@ Q_SIGNALS: // SIGNALS
     void CallbacksChanged();
 };
 
+class QGVDBusUiApi : public QObject
+{
+    Q_OBJECT
+
+public:
+    QGVDBusUiApi(QObject *parent = NULL);
+    ~QGVDBusUiApi();
+    bool registerObject();
+
+signals:
+    void sigOpenInbox();
+    void sigOpenContacts();
+
+/////////////////////////////// DBus connections ///////////////////////////////
+public: // PROPERTIES
+public Q_SLOTS: // METHODS
+    void OpenContacts();
+    void OpenInbox();
+Q_SIGNALS: // SIGNALS
+};
+
 #endif//DBUSAPI_H
 

@@ -35,5 +35,9 @@
     </method>
     <signal name="CallbacksChanged" />
   </interface>
+  <interface name="org.QGVDial.UIServer">
+    <method name="OpenInbox" />
+    <method name="OpenContacts" />
+  </interface>
 </node>
 

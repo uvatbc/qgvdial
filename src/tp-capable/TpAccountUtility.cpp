@@ -57,7 +57,7 @@ TpPhoneIntegration::onAcMgrReady(Tp::PendingOperation * /*operation*/)
 
         if (m_EnableAfteracMgrInit) {
             QStringList props = acMgr->supportedAccountProperties ();
-            Q_DEBUG(QString("Supported properties = [%1]").arg(props.join(", ")));
+            Q_DEBUG(QString("Supported properties = [%1]").arg(props.join(",\n")));
 
             enablePhoneIntegration ();
         } else {
@@ -86,20 +86,23 @@ TpPhoneIntegration::enablePhoneIntegration()
     QVariantMap connectionParametersMap;
     connectionParametersMap.insert("account", user);
 
+    QVariantMap accountPropertiesMap;
+
+/*
     QList<QVariant> presenceDetails;
     uint presenceType(2); //Available = 2
     presenceDetails << presenceType;
     presenceDetails << "online";
     presenceDetails << "Available";
 
-    QVariantMap accountPropertiesMap;
     // Looks like this is not required... (?)
     //"org.freedesktop.Telepathy.Account.AutomaticPresence" = simple presence
-    //accountPropertiesMap.insert(ofdTA ".AutomaticPresence",
-    //                            QVariant::fromValue(presence));
+    accountPropertiesMap.insert(ofdTA ".AutomaticPresence",
+                                QVariant::fromValue(presence));
     //"org.freedesktop.Telepathy.Account.RequestedPresence" = simple presence
-    //accountPropertiesMap.insert(ofdTA ".RequestedPresence",
-    //                            QVariant::fromValue(presence));
+    accountPropertiesMap.insert(ofdTA ".RequestedPresence",
+                                QVariant::fromValue(presence));
+*/
 
     // "org.freedesktop.Telepathy.Account.Enabled" = true
     accountPropertiesMap.insert(ofdTA ".Enabled", true);

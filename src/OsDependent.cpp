@@ -28,6 +28,7 @@ OsDependent::OsDependent(QObject *parent)
 , dbusCallApi(NULL)
 , dbusTextApi(NULL)
 , dbusSettingsApi(NULL)
+, dbusUiApi(NULL)
 #endif
 {
 #if SYSTEMDISPLAYINFO
@@ -216,6 +217,31 @@ OsDependent::initApiServer()
                          SLOT(onPhoneChanges(const QStringList&,int)));
             if (!rv) {
                 Q_WARN("Failed to connect second text signal");
+                break;
+            }
+            rv = false;
+        }
+
+        if (NULL == dbusUiApi) {
+            dbusUiApi = new QGVDBusUiApi(this);
+            if (NULL == dbusUiApi) {
+                Q_WARN("Couldn't allocate UI api");
+                break;
+            }
+            if (!dbusUiApi->registerObject ()) {
+                Q_WARN("Failed to register UI api");
+                break;
+            }
+            rv = connect(dbusUiApi, SIGNAL(sigOpenInbox()),
+                         this, SIGNAL(sigOpenInbox()));
+            if (!rv) {
+                Q_WARN("Failed to connect open inbox signal");
+                break;
+            }
+            rv = connect(dbusUiApi, SIGNAL(sigOpenContacts()),
+                         this, SIGNAL(sigOpenContacts()));
+            if (!rv) {
+                Q_WARN("Failed to connect open contacts signal");
                 break;
             }
             rv = false;

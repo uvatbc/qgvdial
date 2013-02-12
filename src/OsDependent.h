@@ -109,6 +109,10 @@ signals:
 
     // Signals from mainwindow -> dial, text and settings servers
     void phoneChanges(const QStringList &phones, int index);
+
+    // Signals from the UI server
+    void sigOpenInbox();
+    void sigOpenContacts();
 ////////////////////////////////////////////////////////////////////////////////
 
 private:
@@ -136,6 +140,7 @@ private:
     QGVDBusCallApi     *dbusCallApi;
     QGVDBusTextApi     *dbusTextApi;
     QGVDBusSettingsApi *dbusSettingsApi;
+    QGVDBusUiApi       *dbusUiApi;
 #endif
 
     friend class Singletons;

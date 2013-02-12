@@ -200,3 +200,41 @@ QGVDBusSettingsApi::onPhoneChanges(const QStringList &phones, int index)
     m_phoneIndex = index;
     emit CallbacksChanged();
 }//QGVDBusSettingsApi::onPhoneChanges
+
+QGVDBusUiApi::QGVDBusUiApi(QObject *parent /*= NULL*/)
+: QObject(parent)
+{
+}//QGVDBusUiApi::QGVDBusUiApi
+
+QGVDBusUiApi::~QGVDBusUiApi()
+{
+}//QGVDBusUiApi::~QGVDBusUiApi
+
+bool
+QGVDBusUiApi::registerObject()
+{
+    UIServerAdaptor *obj = new UIServerAdaptor(this);
+    if (NULL == obj) {
+        return false;
+    }
+
+    QDBusConnection sessionBus = QDBusConnection::sessionBus();
+    if (!sessionBus.registerObject ("/org/QGVDial/UIServer", this)) {
+        delete obj;
+        return false;
+    }
+
+    return true;
+}//QGVDBusUiApi::registerObject
+
+void
+QGVDBusUiApi::OpenContacts()
+{
+    emit sigOpenContacts();
+}//QGVDBusUiApi::OpenContacts
+
+void
+QGVDBusUiApi::OpenInbox()
+{
+    emit sigOpenInbox();
+}//QGVDBusUiApi::OpenInbox

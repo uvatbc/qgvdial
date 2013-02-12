@@ -9,8 +9,8 @@
  * before re-generating it.
  */
 
-#ifndef API_ADAPTER_H_1352017339
-#define API_ADAPTER_H_1352017339
+#ifndef API_ADAPTER_H_1360656598
+#define API_ADAPTER_H_1360656598
 
 #include <QtCore/QObject>
 #include <QtDBus/QtDBus>
@@ -117,6 +117,30 @@ public Q_SLOTS: // METHODS
     void TextWithoutData(const QStringList &arrNumbers);
     QStringList getTextsByContact(const QString &strContact);
     QStringList getTextsByDate(const QString &strStart, const QString &strEnd);
+Q_SIGNALS: // SIGNALS
+};
+
+/*
+ * Adaptor class for interface org.QGVDial.UIServer
+ */
+class UIServerAdaptor: public QDBusAbstractAdaptor
+{
+    Q_OBJECT
+    Q_CLASSINFO("D-Bus Interface", "org.QGVDial.UIServer")
+    Q_CLASSINFO("D-Bus Introspection", ""
+"  <interface name=\"org.QGVDial.UIServer\">\n"
+"    <method name=\"OpenInbox\"/>\n"
+"    <method name=\"OpenContacts\"/>\n"
+"  </interface>\n"
+        "")
+public:
+    UIServerAdaptor(QObject *parent);
+    virtual ~UIServerAdaptor();
+
+public: // PROPERTIES
+public Q_SLOTS: // METHODS
+    void OpenContacts();
+    void OpenInbox();
 Q_SIGNALS: // SIGNALS
 };
 
