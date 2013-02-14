@@ -134,8 +134,8 @@ MqClientThread::on_message (const struct mosquitto_message *message)
     if (arrPayload.length () > 1) {
         quint64 inTime_t = arrPayload[1].toInt();
         if (0 != inTime_t) {
+            // fromTime_t always treats the date/time as if it were UTC.
             dtUpdate = QDateTime::fromTime_t(inTime_t);
-            dtUpdate.setTimeSpec(Qt::UTC);
         }
     }
     dtUpdate = dtUpdate.toLocalTime();

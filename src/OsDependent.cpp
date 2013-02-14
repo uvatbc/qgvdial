@@ -293,6 +293,10 @@ OsDependent::initApiServer()
             delete dbusSettingsApi;
             dbusSettingsApi = NULL;
         }
+        if (NULL != dbusUiApi) {
+            delete dbusUiApi;
+            dbusUiApi = NULL;
+        }
     }
 #endif
 }//OsDependent::initApiServer
