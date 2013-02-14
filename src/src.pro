@@ -409,7 +409,8 @@ maemo5|contains(DEFINES,MEEGO_HARMATTAN) {
 
     dbusservice.path = $$DATADIR/dbus-1/services
     dbusservice.files = ../build-files/qgvdial/maemo/qgvdial.Call.service \
-                        ../build-files/qgvdial/maemo/qgvdial.Text.service
+                        ../build-files/qgvdial/maemo/qgvdial.Text.service \
+                        ../build-files/qgvdial/maemo/qgvdial.UI.service
 }
 
 # Harmattan specific install section
@@ -430,7 +431,8 @@ contains(DEFINES,MEEGO_HARMATTAN) {
     icon_scalable.files = qgvdial.png
 
     dbusservice.files = ../build-files/qgvdial/harmattan/qgvdial.Call.service \
-                        ../build-files/qgvdial/harmattan/qgvdial.Text.service
+                        ../build-files/qgvdial/harmattan/qgvdial.Text.service \
+                        ../build-files/qgvdial/harmattan/qgvdial.UI.service
 }
 
 # Installation for Linux
