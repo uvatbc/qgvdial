@@ -328,14 +328,14 @@ exists(../src/mqlib-build) {
 #######################################################################
 
 symbian {
-    HEADERS  += ../src/SymbianCallInitiator.h          \
-                ../src/SymbianCallInitiatorPrivate.h   \
-                ../src/SymbianCallObserverPrivate.h    \
-                ../src/SymbianDTMFPrivate.h
-    SOURCES  += ../src/SymbianCallInitiator.cpp        \
-                ../src/SymbianCallInitiatorPrivate.cpp \
-                ../src/SymbianCallObserverPrivate.cpp  \
-                ../src/SymbianDTMFPrivate.cpp
+    HEADERS  += ../src/symbian/SymbianCallInitiator.h          \
+                ../src/symbian/SymbianCallInitiatorPrivate.h   \
+                ../src/symbian/SymbianCallObserverPrivate.h    \
+                ../src/symbian/SymbianDTMFPrivate.h
+    SOURCES  += ../src/symbian/SymbianCallInitiator.cpp        \
+                ../src/symbian/SymbianCallInitiatorPrivate.cpp \
+                ../src/symbian/SymbianCallObserverPrivate.cpp  \
+                ../src/symbian/SymbianDTMFPrivate.cpp
 
 # The Symbian telephony stack library and the equivalent of openssl
     LIBS += -letel3rdparty -llibcrypto
