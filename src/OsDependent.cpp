@@ -21,6 +21,10 @@ Contact: yuvraaj@gmail.com
 
 #include "OsDependent.h"
 
+#if defined(MEEGO_HARMATTAN)
+#include <MRemoteAction>
+#endif
+
 OsDependent::OsDependent(QObject *parent)
 : QObject(parent)
 , bDBusObjectRegistered(false)
@@ -70,6 +74,20 @@ OsDependent::init ()
         // Initialize the haptic feedback
         btnClickBuzz->setIntensity (1.0);
         btnClickBuzz->setDuration (50);
+    }
+#endif
+
+#if defined(MEEGO_HARMATTAN)
+    {
+    MRemoteAction action("org.QGVDial.APIServer",
+                         "org/QGVDial/UIServer",
+                         "org.QGVDial.UIServer",
+                         "Refresh");
+    QDBusInterface interface("com.nokia.home.EventFeed",
+                             "/eventfeed",
+                             "com.nokia.home.EventFeed",
+                             QDBusConnection::sessionBus());
+    interface.call(QDBus::NoBlock, "addRefreshAction", action.toString());
     }
 #endif
 

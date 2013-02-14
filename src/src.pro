@@ -49,6 +49,11 @@ PRECOMPILED_HEADER = ../src/global.h
 CONFIG   += mobility
 MOBILITY += systeminfo
 
+# Meego requires Meegotouch
+contains(DEFINES,MEEGO_HARMATTAN) {
+    CONFIG += meegotouch
+}
+
 # Qt-Components required for Harmattan, S3 and Belle.
 symbian | contains(DEFINES,MEEGO_HARMATTAN) {
     CONFIG += qt-components

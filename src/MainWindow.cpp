@@ -296,8 +296,8 @@ MainWindow::init ()
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
     rv =
-    connect(&gvApi, SIGNAL (registeredPhone    (const GVRegisteredNumber &)),
-             this , SLOT   (gotRegisteredPhone (const GVRegisteredNumber &)));
+    connect(&gvApi, SIGNAL(registeredPhone(const GVRegisteredNumber&)),
+             this , SLOT(gotRegisteredPhone(const GVRegisteredNumber&)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
 
