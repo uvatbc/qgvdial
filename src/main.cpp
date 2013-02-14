@@ -36,6 +36,14 @@ int   logCounter = 0; //! Number of log entries since the last log flush
 
 QStringList arrLogFiles;
 
+const char *ignoreMsgs[] = {
+    "MPanRecognizerTouch",
+    "QGLWindowSurface",
+    "brokenTexSubImage",
+    "FullClearOnEveryFrame",
+    "hijackWindow"
+};
+
 void
 qgv_LogFlush()
 {
@@ -71,8 +79,10 @@ myMessageOutput(QtMsgType type, const char *msg)
                      .arg(msg);
 
     // Ignore some log messages.
-    if (strLog.contains("MPanRecognizerTouch")) {
-        return;
+    for (quint16 i = 0; i < COUNT_OF(ignoreMsgs); i++) {
+        if (strLog.contains(ignoreMsgs[i])) {
+            return;
+        }
     }
 
     // Send to standard output.

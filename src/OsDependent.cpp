@@ -80,7 +80,7 @@ OsDependent::init ()
 #if defined(MEEGO_HARMATTAN)
     {
     MRemoteAction action("org.QGVDial.APIServer",
-                         "org/QGVDial/UIServer",
+                         "/org/QGVDial/UIServer",
                          "org.QGVDial.UIServer",
                          "Refresh");
     QDBusInterface interface("com.nokia.home.EventFeed",

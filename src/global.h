@@ -56,6 +56,8 @@ Contact: yuvraaj@gmail.com
 #define POST_FORM "application/x-www-form-urlencoded"
 #define POST_TEXT "text/plain"
 
+#define COUNT_OF(x) ((sizeof(x)/sizeof(0[x])) / ((size_t)(!(sizeof(x) % sizeof(0[x])))))
+
 typedef QList<QVariantMap> VarMapList;
 
 struct GVRegisteredNumber
