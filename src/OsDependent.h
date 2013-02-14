@@ -113,6 +113,8 @@ signals:
     // Signals from the UI server
     void sigOpenInbox();
     void sigOpenContacts();
+    void sigRefresh();
+    void sigQuit();
 ////////////////////////////////////////////////////////////////////////////////
 
 private:

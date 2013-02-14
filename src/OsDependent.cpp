@@ -244,6 +244,18 @@ OsDependent::initApiServer()
                 Q_WARN("Failed to connect open contacts signal");
                 break;
             }
+            rv = connect(dbusUiApi, SIGNAL(sigRefresh()),
+                         this, SIGNAL(sigRefresh()));
+            if (!rv) {
+                Q_WARN("Failed to connect refresh signal");
+                break;
+            }
+            rv = connect(dbusUiApi, SIGNAL(sigQuit()),
+                         this, SIGNAL(sigQuit()));
+            if (!rv) {
+                Q_WARN("Failed to connect quit signal");
+                break;
+            }
             rv = false;
         }
 

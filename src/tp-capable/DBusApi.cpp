@@ -238,3 +238,15 @@ QGVDBusUiApi::OpenInbox()
 {
     emit sigOpenInbox();
 }//QGVDBusUiApi::OpenInbox
+
+void
+QGVDBusUiApi::Quit()
+{
+    emit sigQuit();
+}//QGVDBusUiApi::Quit
+
+void
+QGVDBusUiApi::Refresh()
+{
+    emit sigRefresh();
+}//QGVDBusUiApi::Refresh

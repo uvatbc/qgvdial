@@ -267,6 +267,22 @@ MainWindow::init ()
                   &osd, SIGNAL(phoneChanges(const QStringList &,int)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
+    rv = connect (&osd, SIGNAL(sigOpenInbox()),
+                  this, SLOT(onSigOpenInbox()));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+    rv = connect (&osd, SIGNAL(sigOpenContacts()),
+                  this, SLOT(onSigOpenContacts()));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+    rv = connect (&osd, SIGNAL(sigRefresh()),
+                  this, SLOT(onRefresh()));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+    rv = connect (&osd, SIGNAL(sigQuit()),
+                  this, SLOT(on_actionE_xit_triggered()));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
 
     // Set up cookies
     QList<QNetworkCookie> cookies;
@@ -1623,3 +1639,28 @@ MainWindow::onPhoneIntegrationChanged(bool enable)
     obj->setProperty("enableIntegrate", enable);
 }//MainWindow::onPhoneIntegrationChanged
 
+void
+MainWindow::onSigOpenInbox()
+{
+    QObject *obj = getQMLObject ("TabbedUI");
+    if (NULL == obj) {
+        Q_WARN("Failed to get a handle to the TabbedUI");
+        return;
+    }
+
+    int index = 2;
+    QMetaObject::invokeMethod (obj, "tabClicked", Q_ARG(QVariant, index));
+}//MainWindow::onSigOpenInbox
+
+void
+MainWindow::onSigOpenContacts()
+{
+    QObject *obj = getQMLObject ("TabbedUI");
+    if (NULL == obj) {
+        Q_WARN("Failed to get a handle to the TabbedUI");
+        return;
+    }
+
+    int index = 1;
+    QMetaObject::invokeMethod (obj, "tabClicked", Q_ARG(QVariant, index));
+}//MainWindow::onSigOpenContacts

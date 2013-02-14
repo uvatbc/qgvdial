@@ -69,6 +69,8 @@ CONFIG *= embed_manifest_exe
 }
 INCLUDEPATH += .
 
+OTHER_FILES += gen/api_server.xml
+
 maemo5 {
     message(Maemo5 your world)
     QT *= maemo5

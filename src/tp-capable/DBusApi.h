@@ -103,12 +103,16 @@ public:
 signals:
     void sigOpenInbox();
     void sigOpenContacts();
+    void sigQuit();
+    void sigRefresh();
 
 /////////////////////////////// DBus connections ///////////////////////////////
 public: // PROPERTIES
 public Q_SLOTS: // METHODS
     void OpenContacts();
     void OpenInbox();
+    void Quit();
+    void Refresh();
 Q_SIGNALS: // SIGNALS
 };
 

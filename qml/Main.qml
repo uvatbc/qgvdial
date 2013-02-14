@@ -169,6 +169,7 @@ Rectangle {
 
             TabbedUI {
                 id: tabbedUI
+                objectName: "TabbedUI"
 
                 tabsHeight: (main.height + main.width) / 20
                 tabIndex: 3

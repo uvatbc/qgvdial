@@ -38,6 +38,8 @@
   <interface name="org.QGVDial.UIServer">
     <method name="OpenInbox" />
     <method name="OpenContacts" />
+    <method name="Refresh" />
+    <method name="Quit" />
   </interface>
 </node>
 

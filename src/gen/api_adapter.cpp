@@ -151,3 +151,15 @@ void UIServerAdaptor::OpenInbox()
     QMetaObject::invokeMethod(parent(), "OpenInbox");
 }
 
+void UIServerAdaptor::Quit()
+{
+    // handle method call org.QGVDial.UIServer.Quit
+    QMetaObject::invokeMethod(parent(), "Quit");
+}
+
+void UIServerAdaptor::Refresh()
+{
+    // handle method call org.QGVDial.UIServer.Refresh
+    QMetaObject::invokeMethod(parent(), "Refresh");
+}
+

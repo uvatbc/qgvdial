@@ -9,8 +9,8 @@
  * before re-generating it.
  */
 
-#ifndef API_ADAPTER_H_1360656598
-#define API_ADAPTER_H_1360656598
+#ifndef API_ADAPTER_H_1360816713
+#define API_ADAPTER_H_1360816713
 
 #include <QtCore/QObject>
 #include <QtDBus/QtDBus>
@@ -131,6 +131,8 @@ class UIServerAdaptor: public QDBusAbstractAdaptor
 "  <interface name=\"org.QGVDial.UIServer\">\n"
 "    <method name=\"OpenInbox\"/>\n"
 "    <method name=\"OpenContacts\"/>\n"
+"    <method name=\"Refresh\"/>\n"
+"    <method name=\"Quit\"/>\n"
 "  </interface>\n"
         "")
 public:
@@ -141,6 +143,8 @@ public: // PROPERTIES
 public Q_SLOTS: // METHODS
     void OpenContacts();
     void OpenInbox();
+    void Quit();
+    void Refresh();
 Q_SIGNALS: // SIGNALS
 };
 
