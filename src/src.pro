@@ -69,9 +69,6 @@ symbian | contains(DEFINES,MEEGO_HARMATTAN) {
     include(qtsingleapplication/qtsingleapplication.pri)
 }
 
-win32 {
-CONFIG *= embed_manifest_exe
-}
 INCLUDEPATH += .
 
 OTHER_FILES += gen/api_server.xml
@@ -87,31 +84,10 @@ contains(DEFINES,MEEGO_HARMATTAN) {
     OTHER_FILES += ../build-files/qgvdial/harmattan/qgvdial.desktop
 }
 
-# In Linux and maemo, add telepathy and openssl
+# In Linux, maemo and harmattan, add the telepathy related sources and headers,
+# telepathy libraries and openssl library.
 unix:!symbian: {
-    QT *= dbus
-
-    maemo5 {
-        message(Maemo or Meego TP)
-        INCLUDEPATH += $$QMAKESPEC/usr/include/telepathy-1.0/
-        DEFINES += TP10
-    } else {
-        exists($$QMAKESPEC/usr/include/telepathy-qt4/TelepathyQt/Constants) {
-            message(Brand new TP)
-            INCLUDEPATH += $$QMAKESPEC/usr/include/telepathy-qt4/
-        } else {
-            message(Old TP)
-            INCLUDEPATH += $$QMAKESPEC/usr/include/telepathy-1.0/
-            DEFINES += TP10
-        }
-    }
-    LIBS += -ltelepathy-qt4 -lssl -lcrypto
-    INCLUDEPATH += tp-capable
-}
-
-# In Windows, add openssl
-win32 {
-    LIBS *= -llibeay32
+   include(../src/tp-capable/tp-capable.pri)
 }
 
 SOURCES  += ../src/main.cpp                 \
@@ -270,48 +246,13 @@ OTHER_FILES  += ../src/winrsrc.rc           \
                 ../qml/s3/QGVTextInput.qml      \
                 readme.txt
 
-# In Linux, maemo and harmattan, add the telepathy related sources and headers.
-unix:!symbian {
-    HEADERS  += ../src/tp-capable/TpObserver.h          \
-                ../src/tp-capable/TpCalloutInitiator.h  \
-                ../src/gen/api_adapter.h                \
-                ../src/tp-capable/DBusApi.h             \
-                ../src/tp-capable/TpAccountUtility.h
-    SOURCES  += ../src/tp-capable/TpObserver.cpp        \
-                ../src/tp-capable/TpCalloutInitiator.cpp \
-                ../src/gen/api_adapter.cpp              \
-                ../src/tp-capable/DBusApi.cpp           \
-                ../src/tp-capable/TpAccountUtility.cpp
-}
-
 # In desktop Linux, add the Skype client
 unix:!symbian:!maemo5 {
-    HEADERS  += ../src/desktop/SkypeLinuxClient.h               \
-                ../src/desktop/SkypeObserver.h                  \
-                ../src/desktop/DesktopSkypeCallInitiator.h
-
-    SOURCES  += ../src/desktop/SkypeLinuxClient.cpp             \
-                ../src/desktop/SkypeObserver.cpp                \
-                ../src/desktop/DesktopSkypeCallInitiator.cpp
-
-    INCLUDEPATH *= desktop
-}
-
+   include(../src/desktop/desktop.pri)
+} else {
 win32 {
-# Resource file is for windows only - for the icon
-    RC_FILE = ../src/winrsrc.rc
-
-# In desktop Windows, add the Skype client.
-    HEADERS += ../src/desktop/SkypeWinClient.h             \
-               ../src/desktop/SkypeObserver.h              \
-               ../src/desktop/DesktopSkypeCallInitiator.h
-
-    SOURCES += ../src/desktop/SkypeWinClient.cpp           \
-               ../src/desktop/SkypeObserver.cpp            \
-               ../src/desktop/DesktopSkypeCallInitiator.cpp
-
-    INCLUDEPATH *= desktop
-}
+   include(../src/desktop/desktop.pri)
+} }
 
 ############################## Mosquitto ##############################
 # Add mosquitto support sources to EVERYONE.
@@ -328,42 +269,7 @@ exists(../src/mqlib-build) {
 #######################################################################
 
 symbian {
-    HEADERS  += ../src/symbian/SymbianCallInitiator.h          \
-                ../src/symbian/SymbianCallInitiatorPrivate.h   \
-                ../src/symbian/SymbianCallObserverPrivate.h    \
-                ../src/symbian/SymbianDTMFPrivate.h
-    SOURCES  += ../src/symbian/SymbianCallInitiator.cpp        \
-                ../src/symbian/SymbianCallInitiatorPrivate.cpp \
-                ../src/symbian/SymbianCallObserverPrivate.cpp  \
-                ../src/symbian/SymbianDTMFPrivate.cpp
-
-# The Symbian telephony stack library and the equivalent of openssl
-    LIBS += -letel3rdparty -llibcrypto
-
-    TARGET.UID3 = 0x2003B499
-    TARGET.CAPABILITY += NetworkServices ReadUserData ReadDeviceData WriteDeviceData SwEvent
-    TARGET.EPOCSTACKSIZE = 0x14000          # 80 KB stack size
-    TARGET.EPOCHEAPSIZE = 0x020000 0x2000000 # 128 KB - 20 MB
-
-# the icon for our sis file
-    ICON=../icons/qgv.svg
-# This hack is required until the next version of QT SDK
-    QT_CONFIG -= opengl
-
-    vendorinfo = "%{\"Yuvraaj Kelkar\"}" \
-                 ":\"Yuvraaj Kelkar\""
-
-    my_deployment.pkg_prerules = vendorinfo
-
-    contains(CONFIG,qt-components) {
-# This makes the smart installer get qt-components.... I think
-    DEPLOYMENT.installer_header = 0x2002CCCF
-    my_deployment.pkg_prerules += \
-        "; Dependency to Symbian Qt Quick components" \
-        "(0x200346DE), 1, 0, 0, {\"Qt Quick components for Symbian\"}"
-    }
-
-    DEPLOYMENT += my_deployment
+    include(symbian/symbian.pri)
 }
 
 ###############################################################
@@ -439,21 +345,3 @@ contains(DEFINES,MEEGO_HARMATTAN) {
                         ../build-files/qgvdial/harmattan/qgvdial.Text.service \
                         ../build-files/qgvdial/harmattan/qgvdial.UI.service
 }
-
-# Installation for Linux
-unix:!symbian:!maemo5:!contains(DEFINES,MEEGO_HARMATTAN) {
-    DATADIR = /usr/share
-    message(Regular Linux install)
-
-    INSTALLS += target icon dbusservice
-
-    target.path =/usr/bin/qgvdial
-
-    icon.path = $$DATADIR/qgvdial/icons
-    icon.files += qgvdial.png
-
-    dbusservice.path = $$DATADIR/dbus-1/services
-    dbusservice.files = ../build-files/qgvdial/ubuntu/qgvdial.Call.service \
-                        ../build-files/qgvdial/ubuntu/qgvdial.Text.service
-}
-

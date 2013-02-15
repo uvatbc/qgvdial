@@ -35,7 +35,8 @@ TextField {
     inputMethodHints: Qt.ImhNoAutoUppercase + Qt.ImhNoPredictiveText
 
     function closeSoftwareInputPanel() {
-        container.platformCloseSoftwareInputPanel();
+        // Don't allow this on Meego
+        // container.platformCloseSoftwareInputPanel();
     }
 
     function doAccepted() {

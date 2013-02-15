@@ -1,3 +1,4 @@
 #!/bin/sh
-# /opt/qgvdial/bin/qgvdial quit &
-# killall qgvdial
+killall qgvdial
+exit 0
+
