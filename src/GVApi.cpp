@@ -46,14 +46,16 @@ GVApi::getSystemProxies (QNetworkProxy &http, QNetworkProxy &https)
     do { // Begin cleanup block (not a loop)
         QList<QNetworkProxy> netProxies =
         QNetworkProxyFactory::systemProxyForQuery (
-        QNetworkProxyQuery(QUrl("http://www.google.com")));
-        http = netProxies[0];
-        if (QNetworkProxy::NoProxy != http.type ()) {
-            if (emitLog) {
-                Q_DEBUG("Got proxy: host = ") << http.hostName ()
-                               << ", port = " << http.port ();
+            QNetworkProxyQuery(QUrl("http://www.google.com")));
+        if (netProxies.count() != 0) {
+            http = netProxies[0];
+            if (QNetworkProxy::NoProxy != http.type ()) {
+                if (emitLog) {
+                    Q_DEBUG(QString("Got proxy: host = %1, port = %2")
+                            .arg(http.hostName ()).arg (http.port ()));
+                }
+                break;
             }
-            break;
         }
 
         // Otherwise Confirm it
@@ -86,14 +88,16 @@ GVApi::getSystemProxies (QNetworkProxy &http, QNetworkProxy &https)
     do { // Begin cleanup block (not a loop)
         QList<QNetworkProxy> netProxies =
         QNetworkProxyFactory::systemProxyForQuery (
-        QNetworkProxyQuery(QUrl("https://www.google.com")));
-        https = netProxies[0];
-        if (QNetworkProxy::NoProxy != https.type ()) {
-            if (emitLog) {
-                Q_DEBUG("Got proxy: host =") << https.hostName () << ", port = "
-                                             << https.port ();
+            QNetworkProxyQuery(QUrl("https://www.google.com")));
+        if (netProxies.count () != 0) {
+            https = netProxies[0];
+            if (QNetworkProxy::NoProxy != https.type ()) {
+                if (emitLog) {
+                    Q_DEBUG(QString("Got proxy: host = %1, port = %2")
+                            .arg(https.hostName ()).arg (https.port ()));
+                }
+                break;
             }
-            break;
         }
 
         // Otherwise Confirm it
@@ -114,7 +118,7 @@ GVApi::getSystemProxies (QNetworkProxy &http, QNetworkProxy &https)
             int port = strPort.toInt ();
 
             if (emitLog) {
-                Q_DEBUG("Found http proxy: ") << strHost << ":" << port;
+                Q_DEBUG("Found https proxy: ") << strHost << ":" << port;
             }
             https.setHostName (strHost);
             https.setPort (port);
