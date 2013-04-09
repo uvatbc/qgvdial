@@ -1804,7 +1804,7 @@ GVApi::callOut(AsyncTaskToken *token)
     url.addQueryItem("m" , "call");
     url.addQueryItem("n" , dest);
     url.addQueryItem("f" , "");
-    url.addQueryItem("v" , "7");
+    url.addQueryItem("v" , "11");
 
     Q_DEBUG(QString("Call back: dest=%1, using=").arg(dest));
 
@@ -2020,7 +2020,7 @@ GVApi::sendSms(AsyncTaskToken *token)
     url.addQueryItem("m" , "sms");
     url.addQueryItem("n" , token->inParams["destination"].toString());
     url.addQueryItem("f" , "");
-    url.addQueryItem("v" , "7");
+    url.addQueryItem("v" , "11");
     url.addQueryItem("txt",token->inParams["text"].toString());
 
     return doSendSms (url, token);
