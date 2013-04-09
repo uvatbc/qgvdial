@@ -403,7 +403,6 @@ GVApi::login(AsyncTaskToken *token)
     }
 
     if (loggedIn) {
-
         if (rnr_se.isEmpty ()) {
             Q_WARN("User was already logged in, but there is no rnr_se!");
         } else if (emitLog) {
@@ -416,19 +415,22 @@ GVApi::login(AsyncTaskToken *token)
         return true;
     }
 
-    QUrl url(GV_ACCOUNT_SERVICELOGIN);
+    //QUrl url(GV_ACCOUNT_SERVICELOGIN);
+    QUrl url(GV_HTTPS);
     return doLogin1 (url, token);
 }//GVApi::login
 
 bool
 GVApi::doLogin1(QUrl url, AsyncTaskToken *token)
 {
+/*
     url.addQueryItem("nui"     , "5");
     url.addQueryItem("service" , "grandcentral");
     url.addQueryItem("ltmpl"   , "mobile");
     url.addQueryItem("btmpl"   , "mobile");
     url.addQueryItem("passive" , "true");
-    url.addQueryItem("continue", "https://www.google.com/voice/m");
+    url.addQueryItem("continue", GV_HTTPS_M "?initialauth");
+*/
 
     bool rv =
     doGet(url, token, this,
@@ -473,6 +475,7 @@ GVApi::onLogin1(bool success, const QByteArray &response, QNetworkReply *,
 
         Q_DEBUG("Starting service login");
         QUrl url(GV_ACCOUNT_SERVICELOGIN);
+        url.addQueryItem("continue", GV_HTTPS_M "?initialauth");
         success = postLogin (url, token);
     } while (0); // End cleanup block (not a loop)
 
@@ -784,6 +787,15 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
         // If "gvx" was found, then we're logged in.
         if (!loggedIn) {
             success = false;
+
+            QString msg = "Cookie names: ";
+            QStringList cookieNames;
+            foreach (QNetworkCookie cookie, jar->getAllCookies ()) {
+                cookieNames += cookie.name();
+            }
+            msg += cookieNames.join (", ");
+            Q_DEBUG(msg);
+
             break;
         }
 
