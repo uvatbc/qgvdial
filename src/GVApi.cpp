@@ -626,9 +626,6 @@ GVApi::postLogin(QUrl url, AsyncTaskToken *token)
         }
     }
 
-    Q_DEBUG(url.toString());
-    Q_DEBUG(QString(content.encodedQuery()));
-
     found =
     doPostForm(url, content.encodedQuery(), token, this,
                SLOT(onLogin2(bool,const QByteArray&,QNetworkReply*,void*)));
@@ -796,8 +793,6 @@ GVApi::resumeTFALogin(AsyncTaskToken *token)
         }
 
         QUrl twoFactorUrl = QUrl::fromPercentEncoding(formAction.toLatin1 ());
-
-        Q_DEBUG(twoFactorUrl.toString ());
 
         QUrl content = twoFactorUrl;
         content.addQueryItem("smsUserPin"      , smsUserPin);
