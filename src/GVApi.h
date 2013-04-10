@@ -151,7 +151,6 @@ private:
                     QObject *receiver, const char *method);
 
     // Login and two factor
-    bool doLogin1(QUrl url, AsyncTaskToken *token);
     bool postLogin(QUrl url, AsyncTaskToken *token);
     bool parseHiddenLoginFields(const QString &strResponse, QVariantMap &ret);
     bool getRnr(AsyncTaskToken *token);

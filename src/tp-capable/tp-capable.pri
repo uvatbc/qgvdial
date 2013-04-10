@@ -28,4 +28,3 @@ SOURCES  += $$PWD/TpObserver.cpp        \
             $$PWD/../gen/api_adapter.cpp \
             $$PWD/DBusApi.cpp           \
             $$PWD/TpAccountUtility.cpp
-

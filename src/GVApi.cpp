@@ -415,22 +415,7 @@ GVApi::login(AsyncTaskToken *token)
         return true;
     }
 
-    //QUrl url(GV_ACCOUNT_SERVICELOGIN);
-    QUrl url(GV_HTTPS);
-    return doLogin1 (url, token);
-}//GVApi::login
-
-bool
-GVApi::doLogin1(QUrl url, AsyncTaskToken *token)
-{
-/*
-    url.addQueryItem("nui"     , "5");
-    url.addQueryItem("service" , "grandcentral");
-    url.addQueryItem("ltmpl"   , "mobile");
-    url.addQueryItem("btmpl"   , "mobile");
-    url.addQueryItem("passive" , "true");
-    url.addQueryItem("continue", GV_HTTPS_M "?initialauth");
-*/
+    QUrl url(GV_HTTP);
 
     bool rv =
     doGet(url, token, this,
@@ -438,7 +423,7 @@ GVApi::doLogin1(QUrl url, AsyncTaskToken *token)
     Q_ASSERT(rv);
 
     return rv;
-}//GVApi::doLogin1
+}//GVApi::login
 
 void
 GVApi::onLogin1(bool success, const QByteArray &response, QNetworkReply *,
@@ -467,15 +452,38 @@ GVApi::onLogin1(bool success, const QByteArray &response, QNetworkReply *,
             break;
         }
 
+        hiddenLoginFields.clear ();
         if (!parseHiddenLoginFields (strResponse, hiddenLoginFields)) {
             Q_WARN("Failed to parse hidden fields");
             success = false;
             break;
         }
 
+        QString nextAction;
+        QRegExp rxForm("<form.*>(.*)</form>");
+        rxForm.setMinimal(true);
+        int pos = strResponse.indexOf (rxForm);
+        while (-1 != pos) {
+            QString cap = rxForm.cap (0);
+            quint32 len = cap.length ();
+            QRegExp rxAction("action=\"(.*)\"");
+            rxAction.setMinimal (true);
+            if (cap.contains ("gaia_loginform") && cap.contains (rxAction)) {
+                nextAction = rxAction.cap (1);
+                break;
+            }
+
+            pos = strResponse.indexOf (rxForm, pos + len);
+        }
+
+        if (nextAction.isEmpty ()) {
+            Q_WARN("Failed to get login form");
+            success = false;
+            break;
+        }
+
         Q_DEBUG("Starting service login");
-        QUrl url(GV_ACCOUNT_SERVICELOGIN);
-        url.addQueryItem("continue", GV_HTTPS_M "?initialauth");
+        QUrl url(nextAction);
         success = postLogin (url, token);
     } while (0); // End cleanup block (not a loop)
 
@@ -557,6 +565,7 @@ gonext:
 bool
 GVApi::postLogin(QUrl url, AsyncTaskToken *token)
 {
+    QUrl content;
     QNetworkCookie galx;
     bool found = false;
 
@@ -577,30 +586,51 @@ GVApi::postLogin(QUrl url, AsyncTaskToken *token)
 
     QStringList keys;
     QVariantMap allLoginFields;
-    allLoginFields["passive"]     = "true";
-    allLoginFields["timeStmp"]    = "";
-    allLoginFields["secTok"]      = "";
-    allLoginFields["GALX"]        = galx.value ();
-    allLoginFields["Email"]       = token->inParams["user"];
-    allLoginFields["Passwd"]      = token->inParams["pass"];
-    allLoginFields["PersistentCookie"] = "yes";
-    allLoginFields["rmShown"]     = "1";
-    allLoginFields["signIn"]      = "Sign+in";
-
     keys = hiddenLoginFields.keys();
     foreach (QString key, keys) {
         allLoginFields[key] = hiddenLoginFields[key];
     }
 
+    if (!allLoginFields.contains ("Email")) {
+        allLoginFields["Email"] = token->inParams["user"];
+    }
+    if (!allLoginFields.contains ("Passwd")) {
+        allLoginFields["Passwd"] = token->inParams["pass"];
+    }
+    if (!allLoginFields.contains ("PersistentCookie")) {
+        allLoginFields["PersistentCookie"] = "yes";
+    }
+    if (!allLoginFields.contains ("passive")) {
+        allLoginFields["passive"] = "true";
+    }
+    if (!allLoginFields.contains ("timeStmp")) {
+        allLoginFields["timeStmp"] = "";
+    }
+    if (!allLoginFields.contains ("secTok")) {
+        allLoginFields["secTok"] = "";
+    }
+    if (!allLoginFields.contains ("GALX")) {
+        allLoginFields["GALX"] = galx.value ();
+    }
+    if (!allLoginFields.contains ("rmShown")) {
+        allLoginFields["rmShown"] = "1";
+    }
+    if (!allLoginFields.contains ("signIn")) {
+        allLoginFields["signIn"] = "Sign+in";
+    }
+
     keys = allLoginFields.keys();
     foreach (QString key, keys) {
         if (key != "dsh") {
-            url.addQueryItem(key, allLoginFields[key].toString());
+            content.addQueryItem(key, allLoginFields[key].toString());
         }
     }
 
+    Q_DEBUG(url.toString());
+    Q_DEBUG(QString(content.encodedQuery()));
+
     found =
-    doPostForm(url, url.encodedQuery(), token, this,
+    doPostForm(url, content.encodedQuery(), token, this,
                SLOT(onLogin2(bool,const QByteArray&,QNetworkReply*,void*)));
     Q_ASSERT(found);
 
@@ -615,7 +645,6 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
     QString strResponse = response;
     bool accountConfigured = true;
     bool accountReviewRequested = false;
-    bool foreignUrl = false;
 
 #if 0
     QFile fTemp("login2.html");
@@ -631,175 +660,77 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
             break;
         }
 
-        // There will be 2-3 moved temporarily redirects.
-        QUrl urlMoved = NwReqTracker::hasMoved(reply);
-        if (!urlMoved.isEmpty ()) {
-            QString dest = urlMoved.toString ();
-            if (dest.contains ("voice/help/setupMobile")) {
-                accountConfigured = false;
-                success = false;
-                break;
-            }
+        QUrl replyUrl = reply->url ();
+        QString strReplyUrl = replyUrl.toString();
 
-            if (dest.contains ("AccountRecoveryOptions")) {
-                token->outParams["nextUrl"] = urlMoved;
-                accountReviewRequested = true;
-                success = false;
-                break;
-            }
-#if 0
-            if (emitLog) {
-                Q_DEBUG("Moved to") << dest;
-            }
-#endif
-
-            int foreign = 0;
-            if ((token->outParams.contains ("foreign")) &&
-                ((dest == GV_HTTPS_M) ||
-                  (foreign = token->outParams["foreign"].toInt()) > 0))
-            {
-                foreign++;
-                token->outParams["foreign"] = foreign;
-                success = doGet(urlMoved, token, this,
-                   SLOT(onLogin2(bool,const QByteArray&,QNetworkReply*,void*)));
-            } else {
-                success = postLogin (urlMoved, token);
-            }
-            break;
-        }
-
-        do { // Begin cleanup block (not a loop)
-            QUrl replyUrl = reply->url ();
-            QString strReplyUrl = replyUrl.toString();
-            if (!strReplyUrl.contains (GOOGLE_ACCOUNTS)) {
-                break;
-            }
-
-            QRegExp rxBody("<body.*>(.*)</body>");
-            rxBody.setMinimal(true);
-            if (!strResponse.contains (rxBody)) {
-                break;
-            }
-
-            QString cap = rxBody.cap (1);
-
-            QDomDocument doc("foreign");
-            doc.setContent (cap);
-
-            QDomElement docElem = doc.documentElement();
-            if (docElem.isNull ()) {
-                break;
-            }
-
-            QString docElemText = docElem.text ();
-#if 0
-            Q_DEBUG(docElemText);
-            Q_DEBUG(docElem.tagName ());
-#endif
-
-            if (docElemText.contains ("The username or password you entered "
-                                      "is incorrect."))
-            {
-                Q_WARN("Found Google's login failure string.");
-                break;
-            }
-
-            bool needsTwoFactor = false;
-            QDomElement twoFactorForm;
-
-            QRegExp rxForm("<form.*>(.*)</form>");
-            rxForm.setMinimal(true);
-            int pos = cap.indexOf (rxForm);
-            while (-1 != pos) {
-                QDomDocument doc1("foreign");
-                QString cap1 = rxForm.cap (0);
-                doc1.setContent (cap1);
-                twoFactorForm = doc1.documentElement();
-                if (twoFactorForm.isNull ()) {
-                    break;
-                }
-                QString formId = twoFactorForm.attribute ("id");
-                if (formId == "verify-form") {
-                    needsTwoFactor = true;
-                    break;
-                }
-
-                pos = cap.indexOf (rxForm, pos + cap1.length ());
-            }
-
-            if (needsTwoFactor) {
-                if (emitLog) {
-                    Q_DEBUG("Two factor AUTH required!");
-                }
-
-                token->inParams["tfaAction"] = twoFactorForm.attribute("action");
-
-                emit twoStepAuthentication(token);
-                foreignUrl = true;
-                break;
-            }
-
-            QDomNodeList aList = docElem.elementsByTagName ("a");
-            if (aList.isEmpty ()) {
-                break;
-            }
-
-            QString newLoc;
-            for (uint i = 0; i < aList.length (); i++) {
-                QDomElement a = aList.at(i).toElement ();
-                if (a.isNull ()) {
-                    continue;
-                }
-
-                newLoc = a.attribute ("href");
-                if (newLoc.isEmpty ()) {
-                    continue;
-                }
-
-                break;
-            }
-
-            if (newLoc.isEmpty ()) {
-                break;
-            }
-
-            Q_DEBUG("Foreign account! Destination: ") << newLoc;
-            foreignUrl = true;
-
-            urlMoved = QUrl(newLoc);
-            success = doGet(urlMoved, token, this,
-                   SLOT(onLogin2(bool,const QByteArray&,QNetworkReply*,void*)));
-            token->outParams["foreign"] = 0;
-        } while (0); // End cleanup block (not a loop)
-
-        if (foreignUrl) {
-            break;
-        }
-
-        // After this we should have completed login. Check for cookie "gvx"
-        foreach (QNetworkCookie cookie, jar->getAllCookies ()) {
-            if (cookie.name() == "gvx") {
-                loggedIn = true;
-                break;
-            }
-        }
-
-        // If "gvx" was found, then we're logged in.
-        if (!loggedIn) {
-            success = false;
-
-            QString msg = "Cookie names: ";
-            QStringList cookieNames;
+        // Check to see if 2 factor auth is expected or rquired.
+        if (!strReplyUrl.contains ("SmsAuth")) {
             foreach (QNetworkCookie cookie, jar->getAllCookies ()) {
-                cookieNames += cookie.name();
+                if (cookie.name() == "gvx") {
+                    loggedIn = true;
+                    break;
+                }
             }
-            msg += cookieNames.join (", ");
-            Q_DEBUG(msg);
 
+            // If "gvx" was found, then we're logged in.
+            if (!loggedIn) {
+                success = false;
+
+                // Dump out cookie names
+                QString msg = "Cookie names: ";
+                QStringList cookieNames;
+                foreach (QNetworkCookie cookie, jar->getAllCookies ()) {
+                    cookieNames += cookie.name();
+                }
+                msg += cookieNames.join (", ");
+                Q_DEBUG(msg);
+
+                break;
+            }
+
+            success = getRnr (token);
             break;
         }
 
-        success = getRnr (token);
+        // 2 factor auth is required.
+        hiddenLoginFields.clear ();
+        if (!parseHiddenLoginFields (strResponse, hiddenLoginFields)) {
+            Q_WARN("Failed to parse hidden fields");
+            success = false;
+            break;
+        }
+
+        QString nextAction;
+        QRegExp rxForm("<form.*>(.*)</form>");
+        rxForm.setMinimal(true);
+        int pos = strResponse.indexOf (rxForm);
+        while (-1 != pos) {
+            QString cap = rxForm.cap (0);
+            quint32 len = cap.length ();
+            QRegExp rxAction("action=[\"|'](.*)[\"|']");
+            rxAction.setMinimal (true);
+            if (cap.contains ("verify-form")) {
+                if (cap.contains (rxAction)) {
+                    nextAction = rxAction.cap (1);
+                    break;
+                }
+            }
+
+            pos = strResponse.indexOf (rxForm, pos + len);
+        }
+
+        if (nextAction.isEmpty ()) {
+            Q_WARN("Failed to get two factor auth form");
+            success = false;
+            break;
+        }
+
+        if (emitLog) {
+            Q_DEBUG("Two factor AUTH required!");
+        }
+        token->inParams["tfaAction"] = nextAction;
+        emit twoStepAuthentication(token);
+        success = true;
     } while (0); // End cleanup block (not a loop)
 
     if (!success) {
@@ -866,6 +797,8 @@ GVApi::resumeTFALogin(AsyncTaskToken *token)
 
         QUrl twoFactorUrl = QUrl::fromPercentEncoding(formAction.toLatin1 ());
 
+        Q_DEBUG(twoFactorUrl.toString ());
+
         QUrl content = twoFactorUrl;
         content.addQueryItem("smsUserPin"      , smsUserPin);
         content.addQueryItem("smsVerifyPin"    , "Verify");
@@ -905,24 +838,28 @@ GVApi::onTFAAutoPost(bool success, const QByteArray &response,
         }
 
         success = false;
-        QRegExp rx("<form\\s*action\\s*=\\s*\"(.*)\"\\s*method\\s*=\\s*\"POST\"");
-        if ((rx.indexIn (strResponse) == -1) || (rx.numCaptures () != 1)) {
+        QRegExp rx1("<form(.*)>");
+        rx1.setMinimal (true);
+        if ((rx1.indexIn (strResponse) == -1) || (rx1.numCaptures () != 1)) {
             Q_WARN("Failed to login.");
             break;
         }
 
-        QUrl nextUrl(rx.cap(1));
-
-        QVariantMap ret;
-        if (!parseHiddenLoginFields (strResponse, ret)) {
+        QString cap = rx1.cap(1);
+        QRegExp rx2("action\\s*=\\s*\"(.*)\"");
+        rx2.setMinimal (true);
+        if ((rx2.indexIn (cap) == -1) || (rx2.numCaptures () != 1)) {
             Q_WARN("Failed to login.");
             break;
         }
+        cap = rx2.cap (1);
 
-        QStringList keys;
-        keys = ret.keys();
-        foreach (QString key, keys) {
-            hiddenLoginFields[key] = ret[key];
+        QUrl nextUrl = QUrl::fromPercentEncoding (cap.toLatin1 ());
+
+        hiddenLoginFields.clear ();
+        if (!parseHiddenLoginFields (strResponse, hiddenLoginFields)) {
+            Q_WARN("Failed to login.");
+            break;
         }
 
         success = postLogin (nextUrl, token);

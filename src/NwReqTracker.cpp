@@ -162,6 +162,10 @@ NwReqTracker::onReplyFinished()
             break;
         }
 
+        if (emitLog) {
+            Q_DEBUG(urlMoved.toString());
+        }
+
         QNetworkRequest req(urlMoved);
         req.setRawHeader("User-Agent", uaString);
 
@@ -328,7 +332,7 @@ NwReqTracker::hasMoved(QNetworkReply *reply)
         }
 
         url = QUrl(result.remove (0, pos));
-        Q_DEBUG("url:") << url.toString ();
+        Q_DEBUG(url.toString ());
     } while (0); // End cleanup block (not a loop)
     return url;
 }//NwReqTracker::hasMoved

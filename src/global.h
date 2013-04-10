@@ -39,6 +39,7 @@ Contact: yuvraaj@gmail.com
 #define UA_IPOD    "Mozilla/5.0 (iPod; U; CPU iPhone OS 4_3_3 like Mac OS X; ja-jp) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8J2 Safari/6533.18.5"
 #define UA_DESKTOP "Mozilla/5.0 (X11; Linux x86_64; rv:5.0) Gecko/20100101 Firefox/5.0"
 
+#define GV_HTTP         "http://www.google.com/voice"
 #define GV_HTTPS        "https://www.google.com/voice"
 #define GV_HTTPS_M      "https://www.google.com/voice/m"
 
