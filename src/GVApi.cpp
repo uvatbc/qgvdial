@@ -1157,24 +1157,36 @@ GVApi::onGetPhones(bool success, const QByteArray &response, QNetworkReply *,
                 }
 
                 if (strPName == "id") {
-                    regNumber.strId = strVal;
+                    regNumber.id = strVal;
                 } else if (strPName == "name") {
-                    regNumber.strName = strVal;
+                    regNumber.name = strVal;
                 } else if (strPName == "phoneNumber") {
-                    regNumber.strNumber = strVal;
+                    regNumber.number = strVal;
                 } else if (strPName == "type") {
                     regNumber.chType = strVal[0].toAscii ();
-                } else if ((strPName == "verified") ||
-                           (strPName == "policyBitmask") ||
+                } else if (strPName == "verified") {
+                    regNumber.verified = (strVal == "true");
+                } else if (strPName == "smsEnabled") {
+                    regNumber.smsEnabled = (strVal == "true");
+                } else if (strPName == "telephonyVerified") {
+                    regNumber.telephonyVerified = (strVal == "true");
+                } else if (strPName == "active") {
+                    regNumber.active = (strVal == "true");
+                } else if (strPName == "inVerification") {
+                    regNumber.inVerification = (strVal == "true");
+                } else if (strPName == "reverifyNeeded") {
+                    regNumber.reverifyNeeded = (strVal == "true");
+                } else if (strPName == "forwardingCountry") {
+                    regNumber.forwardingCountry = strVal;
+                } else if (strPName == "displayUnverifyScheduledDateTime") {
+                    regNumber.displayUnverifyScheduledDateTime = strVal;
+                } else if ((strPName == "policyBitmask") ||
                            (strPName == "dEPRECATEDDisabled") ||
-                           (strPName == "telephonyVerified") ||
-                           (strPName == "smsEnabled") ||
                            (strPName == "incomingAccessNumber") ||
                            (strPName == "voicemailForwardingVerified") ||
                            (strPName == "behaviorOnRedirect") ||
                            (strPName == "carrier") ||
                            (strPName == "customOverrideState") ||
-                           (strPName == "inVerification") ||
                            (strPName == "recentlyProvisionedOrDeprovisioned") ||
                            (strPName == "formattedNumber") ||
                            (strPName == "wd") ||
@@ -1185,7 +1197,6 @@ GVApi::onGetPhones(bool success, const QByteArray &response, QNetworkReply *,
                            (strPName == "weekendAllDay") ||
                            (strPName == "weekendTimes") ||
                            (strPName == "redirectToVoicemail") ||
-                           (strPName == "active") ||
                            (strPName == "enabledForOthers")) {
                 } else {
                     if (emitLog) {
@@ -1196,8 +1207,8 @@ GVApi::onGetPhones(bool success, const QByteArray &response, QNetworkReply *,
             }
 
             if (emitLog) {
-                Q_DEBUG("Name =") << regNumber.strName
-                    << "number =" << regNumber.strNumber
+                Q_DEBUG("Name =") << regNumber.name
+                    << "number =" << regNumber.number
                     << "type ="   << regNumber.chType;
             }
             emit registeredPhone (regNumber);

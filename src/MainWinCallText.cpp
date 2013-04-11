@@ -165,7 +165,7 @@ MainWindow::dialNow (const QString &strTarget)
             token->inParams["source"] = ci->selfNumber ();
             success = gvApi.callOut (token);
         } else {
-            token->inParams["source"] = gvRegNumber.strNumber;
+            token->inParams["source"] = gvRegNumber.number;
             token->inParams["sourceType"] = QString(gvRegNumber.chType);
             success = gvApi.callBack (token);
         }
@@ -425,8 +425,8 @@ MainWindow::getDialSettings (bool                 &bDialout   ,
         }
 
         gvRegNumber.chType = data.chType;
-        gvRegNumber.strName = data.strName;
-        gvRegNumber.strNumber = data.strDesc;
+        gvRegNumber.name = data.strName;
+        gvRegNumber.number = data.strDesc;
         bDialout = (data.type == RNT_Callout);
         if (bDialout) {
             initiator = (CalloutInitiator *) data.pCtx;

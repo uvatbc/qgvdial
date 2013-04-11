@@ -24,63 +24,56 @@ import Qt 4.7
 Item {
     id: container
 
-    height: mainColumn.height + 2
-
     // Font size
     property real internalPointSize: (8 * g_fontMul)
 
-    Column {
-        id: mainColumn
+    height: registeredPhonesView.height + 2
 
+    RadioButton {
+        id: delegateRadioButton
+        width: parent.width
+        pointSize: container.internalPointSize
+        text: "mText"
+        visible: false
+        opacity: 0
+    }
+
+    ListView {
+        id: registeredPhonesView
+        objectName: "RegisteredPhonesView"
+
+        signal sigSelChanged (int index)
+        function setSelected(index) {
+            var i;
+            for (i = 0; i < regPhoneModel.count; i++) {
+                regPhoneModel.setProperty (i, "isChecked", (i === index));
+            }
+        }
 
         anchors {
             top: parent.top
             left: parent.left
         }
         width: parent.width
-        height: childrenRect.height
+        height: ((delegateRadioButton.height + spacing) * regPhoneModel.count) + 5
+        interactive: false
 
-        ListView {
-            id: registeredPhonesView
-            objectName: "RegisteredPhonesView"
+        model: ListModel {
+            id: regPhoneModel
+            objectName: "RegisteredPhonesModel"
+        }//ListModel (of the registered phones)
 
-            signal sigSelChanged (int index)
-            function setSelected(index) {
-                var i;
-                for (i = 0; i < regPhoneModel.count; i++) {
-                    regPhoneModel.setProperty (i, "isChecked", (i === index));
-                }
+        delegate: RadioButton {
+            width: registeredPhonesView.width
+            text: entryText
+            check: isChecked
+            autoChange: false
+            pointSize: container.internalPointSize
+            onClicked: {
+                registeredPhonesView.sigSelChanged(index);
             }
-
-            width: parent.width
-            height: ((delegateRadioButton.height + spacing) * regPhoneModel.count) + 5
-            interactive: false
-
-            model: ListModel {
-                id: regPhoneModel
-                objectName: "RegisteredPhonesModel"
-            }//ListModel (of the registered phones)
-
-            delegate: RadioButton {
-                width: registeredPhonesView.width
-                text: entryText
-                check: isChecked
-                autoChange: false
-                pointSize: container.internalPointSize
-                onClicked: {
-                    registeredPhonesView.sigSelChanged(index);
-                }
-            }
-        }//ListView (of the registered phones)
-    }// Main
+        }
+    }//ListView (of the registered phones)
 
     // Only for the sake of height calculations
-    RadioButton {
-        id: delegateRadioButton
-        width: parent.width
-        text: "entryText"
-        visible: false
-        opacity: 0
-        pointSize: container.internalPointSize
-    }
 }//Item(container)

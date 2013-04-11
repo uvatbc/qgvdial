@@ -41,6 +41,8 @@ BorderImage {
 
     // Button emits clicks, but we also mention what is the text to display
     signal clicked
+    // The generic version does have a press and hold, even though the platform specific ones don't
+    signal pressHold
 
     onWidthChanged: updateTextWidth();
     function updateTextWidth() {

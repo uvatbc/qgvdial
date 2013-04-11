@@ -395,8 +395,8 @@ CacheDatabase::getRegisteredNumbers (GVRegisteredNumberArray &listNumbers)
     while (query.next ())
     {
         GVRegisteredNumber num;
-        num.strName        = query.value(0).toString();
-        num.strNumber = query.value(1).toString();
+        num.name        = query.value(0).toString();
+        num.number = query.value(1).toString();
         num.chType         = query.value(2).toString()[0].toAscii ();
         listNumbers += num;
     }
@@ -420,14 +420,14 @@ CacheDatabase::putRegisteredNumbers (const GVRegisteredNumberArray &listNumbers)
 
         foreach (GVRegisteredNumber num, listNumbers) {
             // Must scrub single quotes
-            num.strName.replace ("'", "''");
-            num.strNumber.replace ("'", "''");
+            num.name.replace ("'", "''");
+            num.number.replace ("'", "''");
 
             strQ = QString ("INSERT INTO " GV_REG_NUMS_TABLE
                             " (" GV_RN_NAME ", " GV_RN_NUM ", " GV_RN_TYPE ") "
                             "VALUES ('%1', '%2', %3)")
-                    .arg (num.strName)
-                    .arg (num.strNumber)
+                    .arg (num.name)
+                    .arg (num.number)
                     .arg (num.chType);
             query.exec (strQ);
         }

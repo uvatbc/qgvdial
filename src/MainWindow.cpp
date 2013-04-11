@@ -1272,14 +1272,14 @@ MainWindow::onCallInitiatorsChange (bool bSave)
     modelRegNumber->clear ();
 
     for (int i = 0; i < arrNumbers.size (); i++) {
-        strCiName = "Dial back: " + arrNumbers[i].strName;
+        strCiName = "Dial back: " + arrNumbers[i].name;
         modelRegNumber->insertRow (strCiName,
-                                   arrNumbers[i].strNumber,
+                                   arrNumbers[i].number,
                                    arrNumbers[i].chType);
 
         oneEntry.clear ();
         oneEntry["entryText"] = strCiName;
-        oneEntry["entryNumber"] = arrNumbers[i].strNumber;
+        oneEntry["entryNumber"] = arrNumbers[i].number;
         oneEntry["entryType"] = arrNumbers[i].chType;
         oneEntry["isChecked"] = isChecked;
 

@@ -62,17 +62,31 @@ typedef QList<QVariantMap> VarMapList;
 
 struct GVRegisteredNumber
 {
-    QString     strId;
-    QString     strName;
-    QString     strNumber;
+    QString     id;
+    QString     name;
+    QString     number;
     char        chType;
+
+    quint64     active              : 1;
+    quint64     verified            : 1;
+    quint64     inVerification      : 1;
+    quint64     reverifyNeeded      : 1;
+    quint64     smsEnabled          : 1;
+    quint64     telephonyVerified   : 1;
+
+    QString     forwardingCountry;
+    QString     displayUnverifyScheduledDateTime;
 
     GVRegisteredNumber () {init();}
     void init() {
         chType = 0;
-        strId.clear ();
-        strName.clear ();
-        strNumber.clear ();
+        id.clear ();
+        name.clear ();
+        number.clear ();
+        active = verified = inVerification = reverifyNeeded = smsEnabled
+               = telephonyVerified = 0;
+        forwardingCountry.clear ();
+        displayUnverifyScheduledDateTime.clear ();
     }
 };
 typedef QVector<GVRegisteredNumber> GVRegisteredNumberArray;
