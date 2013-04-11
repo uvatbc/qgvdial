@@ -1731,11 +1731,12 @@ GVApi::callOut(AsyncTaskToken *token)
         return true;
     }
 
+    QString fwdingNum = token->inParams["source"].toString();
     QString dest = token->inParams["destination"].toString();
     QUrl url(GV_HTTPS_M "/x");
     url.addQueryItem("m" , "call");
     url.addQueryItem("n" , dest);
-    url.addQueryItem("f" , "");
+    url.addQueryItem("f" , fwdingNum);
     url.addQueryItem("v" , "11");
 
     Q_DEBUG(QString("Call back: dest=%1, using=").arg(dest));

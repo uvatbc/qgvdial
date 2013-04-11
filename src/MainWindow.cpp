@@ -1172,6 +1172,12 @@ MainWindow::onSigPinSettingChanges(bool bEnable, const QString &pin)
 
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     dbMain.setGvPin (bEnable, strPin);
+
+    if (bEnable) {
+        strGvPin = strPin;
+    } else {
+        strGvPin = "0000";
+    }
 }//MainWindow::onSigPinSettingChanges
 
 void
