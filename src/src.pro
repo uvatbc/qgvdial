@@ -173,48 +173,48 @@ unix : !symbian {
 
 
 # This is so that QtCreator can show these files in the files list.
-OTHER_FILES  += ../src/winrsrc.rc           \
-                ../qml/About.qml            \
-                ../qml/ActionButtons.qml    \
-                ../qml/ContactDetails.qml   \
-                ../qml/ContactsList.qml     \
-                ../qml/DialSettings.qml     \
-                ../qml/DigitButton.qml      \
-                ../qml/ExpandView.qml       \
-                ../qml/Fader.qml            \
-                ../qml/helper.js            \
-                ../qml/HMain.qml            \
-                ../qml/InboxList.qml        \
-                ../qml/Keypad.qml           \
+OTHER_FILES  += ../src/winrsrc.rc               \
+                ../qml/About.qml                \
+                ../qml/ActionButtons.qml        \
+                ../qml/ContactDetails.qml       \
+                ../qml/ContactsList.qml         \
+                ../qml/DialSettings.qml         \
+                ../qml/DigitButton.qml          \
+                ../qml/ExpandView.qml           \
+                ../qml/Fader.qml                \
+                ../qml/helper.js                \
+                ../qml/HMain.qml                \
+                ../qml/InboxList.qml            \
+                ../qml/Keypad.qml               \
                 ../qml/ListRefreshComponent.qml \
-                ../qml/LoginDetails.qml     \
-                ../qml/LoginPage.qml        \
-                ../qml/LogView.qml          \
-                ../qml/Main.qml             \
-                ../qml/MainView.qml         \
-                ../qml/MsgBox.qml           \
-                ../qml/MyButton.qml         \
-                ../qml/PinSetting.qml       \
-                ../qml/Proxy.qml            \
-                ../qml/RadioButton.qml      \
-                ../qml/RefreshSettings.qml  \
-                ../qml/S3Main.qml           \
-                ../qml/SaveCancel.qml       \
-                ../qml/Scrollbar.qml        \
-                ../qml/Settings.qml         \
-                ../qml/SmsView.qml          \
-                ../qml/Tab.qml              \
-                ../qml/TabbedUI.qml         \
-                ../qml/generic/QGVButton.qml    \
-                ../qml/generic/QGVLabel.qml     \
-                ../qml/generic/QGVTextEdit.qml  \
-                ../qml/generic/QGVTextInput.qml \
+                ../qml/LoginDetails.qml         \
+                ../qml/LoginPage.qml            \
+                ../qml/LogView.qml              \
+                ../qml/Main.qml                 \
+                ../qml/MainView.qml             \
+                ../qml/MsgBox.qml               \
+                ../qml/MyButton.qml             \
+                ../qml/PinSetting.qml           \
+                ../qml/Proxy.qml                \
+                ../qml/RefreshSettings.qml      \
+                ../qml/S3Main.qml               \
+                ../qml/SaveCancel.qml           \
+                ../qml/Scrollbar.qml            \
+                ../qml/Settings.qml             \
+                ../qml/SmsView.qml              \
+                ../qml/Tab.qml                  \
+                ../qml/TabbedUI.qml             \
+                ../qml/generic/QGVButton.qml            \
+                ../qml/generic/QGVLabel.qml             \
+                ../qml/generic/QGVRadioButton.qml       \
+                ../qml/generic/QGVTextEdit.qml          \
+                ../qml/generic/QGVTextInput.qml         \
                 ../qml/generic/PhoneIntegrationView.qml \
-                ../qml/meego/QGVButton.qml      \
-                ../qml/meego/QGVLabel.qml       \
-                ../qml/meego/QGVTextEdit.qml    \
-                ../qml/meego/QGVTextInput.qml   \
-                ../qml/meego/PhoneIntegrationView.qml \
+                ../qml/meego/QGVButton.qml              \
+                ../qml/meego/QGVLabel.qml               \
+                ../qml/meego/QGVTextEdit.qml            \
+                ../qml/meego/QGVTextInput.qml           \
+                ../qml/meego/PhoneIntegrationView.qml   \
                 ../qml/s3/QGVButton.qml         \
                 ../qml/s3/QGVTextEdit.qml       \
                 ../qml/s3/QGVTextInput.qml      \

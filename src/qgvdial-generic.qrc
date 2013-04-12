@@ -2,6 +2,7 @@
     <qresource prefix="/">
         <file alias="QGVButton.qml">../qml/generic/QGVButton.qml</file>
         <file alias="QGVLabel.qml">../qml/generic/QGVLabel.qml</file>
+        <file alias="QGVRadioButton.qml">../qml/generic/QGVRadioButton.qml</file>
         <file alias="QGVTextEdit.qml">../qml/generic/QGVTextEdit.qml</file>
         <file alias="QGVTextInput.qml">../qml/generic/QGVTextInput.qml</file>
         <file alias="PhoneIntegrationView.qml">../qml/generic/PhoneIntegrationView.qml</file>
