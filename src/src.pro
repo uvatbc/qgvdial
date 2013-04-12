@@ -212,10 +212,12 @@ OTHER_FILES  += ../src/winrsrc.rc               \
                 ../qml/generic/PhoneIntegrationView.qml \
                 ../qml/meego/QGVButton.qml              \
                 ../qml/meego/QGVLabel.qml               \
+                ../qml/meego/QGVRadioButton.qml         \
                 ../qml/meego/QGVTextEdit.qml            \
                 ../qml/meego/QGVTextInput.qml           \
                 ../qml/meego/PhoneIntegrationView.qml   \
                 ../qml/s3/QGVButton.qml         \
+                ../qml/s3/QGVRadioButton.qml    \
                 ../qml/s3/QGVTextEdit.qml       \
                 ../qml/s3/QGVTextInput.qml      \
                 readme.txt
