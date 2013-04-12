@@ -1,6 +1,6 @@
 /*
 qgvdial is a cross platform Google Voice Dialer
-Copyright (C) 2009-2012  Yuvraaj Kelkar
+Copyright (C) 2009-2013  Yuvraaj Kelkar
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -35,7 +35,7 @@ Item {
 
     function setMqValues(bEnable, host, port, topic) {
         console.debug ("QML: Setting Mq settings")
-        mqSupport.check = bEnable;
+        mqSupport.checked = bEnable;
         textMqServer.text = host;
         textMqPort.text = port;
         textMqTopic.text = topic;
@@ -43,7 +43,7 @@ Item {
 
     function setRefreshValues(bEnable, contactsPeriod, inboxPeriod) {
         console.debug ("QML: Setting Refresh settings")
-        periodicRefresh.check = bEnable;
+        periodicRefresh.checked = bEnable;
         textContactsRefreshPeriod.text = contactsPeriod;
         textInboxRefreshPeriod.text = inboxPeriod;
     }
@@ -63,21 +63,21 @@ Item {
         property real subTextPointSize: (8 * g_fontMul)
         property real fontPointMultiplier: 8.0 / 10.0
 
-        RadioButton {
+        QGVRadioButton {
             id: periodicRefresh
             width: parent.width
 
             text: "Enable periodic refresh"
 
             pointSize: (8 * g_fontMul)
-        }//RadioButton (enable periodicRefresh)
+        }//QGVRadioButton (enable periodicRefresh)
 
         Row {
             width: parent.width
             height: lblContactsRefreshPeriod.height
             spacing: 2
 
-            opacity: (periodicRefresh.check ? 1 : 0)
+            opacity: (periodicRefresh.checked ? 1 : 0)
 
             QGVLabel {
                 id: lblContactsRefreshPeriod
@@ -110,7 +110,7 @@ Item {
             height: lblInboxRefreshPeriod.height
             spacing: 2
 
-            opacity: (periodicRefresh.check ? 1 : 0)
+            opacity: (periodicRefresh.checked ? 1 : 0)
 
             QGVLabel {
                 id: lblInboxRefreshPeriod
@@ -132,19 +132,19 @@ Item {
             }//QGVTextInput (inbox refresh period)
         }// Row (Inbox refresh period)
 
-        RadioButton {
+        QGVRadioButton {
             id: mqSupport
             width: parent.width
 
             text: "Enable mosquitto"
             pointSize: mainColumn.subTextPointSize
-        }// RadioButton (enable mqSupport)
+        }// QGVRadioButton (enable mqSupport)
 
         Row {
             width: parent.width
             height: lblHost.height
             spacing: 2
-            opacity: (mqSupport.check ? 1 : 0)
+            opacity: (mqSupport.checked ? 1 : 0)
 
             QGVLabel {
                 id: lblHost
@@ -170,7 +170,7 @@ Item {
             height: lblPort.height
             spacing: 2
 
-            opacity: (mqSupport.check ? 1 : 0)
+            opacity: (mqSupport.checked ? 1 : 0)
 
             QGVLabel {
                 id: lblPort
@@ -196,7 +196,7 @@ Item {
             width: parent.width
             height: lblTopic.height
             spacing: 2
-            opacity: (mqSupport.check ? 1 : 0)
+            opacity: (mqSupport.checked ? 1 : 0)
 
             QGVLabel {
                 id: lblTopic
@@ -225,10 +225,10 @@ Item {
             width: parent.width - 1
 
             onSigSave: {
-                container.sigRefreshChanges (periodicRefresh.check,
+                container.sigRefreshChanges (periodicRefresh.checked,
                                              textContactsRefreshPeriod.text,
                                              textInboxRefreshPeriod.text,
-                                             mqSupport.check,
+                                             mqSupport.checked,
                                              textMqServer.text,
                                              textMqPort.text,
                                              textMqTopic.text);

@@ -1,6 +1,6 @@
 /*
 qgvdial is a cross platform Google Voice Dialer
-Copyright (C) 2009-2012  Yuvraaj Kelkar
+Copyright (C) 2009-2013  Yuvraaj Kelkar
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -29,7 +29,7 @@ Item {
 
     height: registeredPhonesView.height + 2
 
-    RadioButton {
+    QGVRadioButton {
         id: delegateRadioButton
         width: parent.width
         pointSize: container.internalPointSize
@@ -63,10 +63,10 @@ Item {
             objectName: "RegisteredPhonesModel"
         }//ListModel (of the registered phones)
 
-        delegate: RadioButton {
+        delegate: QGVRadioButton {
             width: registeredPhonesView.width
             text: entryText
-            check: isChecked
+            checked: isChecked
             autoChange: false
             pointSize: container.internalPointSize
             onClicked: {

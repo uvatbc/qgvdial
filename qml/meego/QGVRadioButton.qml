@@ -22,12 +22,7 @@ Contact: yuvraaj@gmail.com
 import QtQuick 1.1
 import com.nokia.meego 1.0
 
-// QGVLabel is just a one-to-one map to the Meego qt-components Label item
-
-Label {
-    id: container
-
-    property real fontPointMultiplier: 1.0
-    font.pixelSize: (platformStyle.fontPixelSize * fontPointMultiplier * 1.3)
-    color: "white"
-}//Label
+RadioButton {
+    property bool autoChange: true      // Ignored
+    property real pointSize: 1          // Ignored
+}//Rectangle (container)

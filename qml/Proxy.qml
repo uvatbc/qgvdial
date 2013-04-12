@@ -1,6 +1,6 @@
 /*
 qgvdial is a cross platform Google Voice Dialer
-Copyright (C) 2009-2012  Yuvraaj Kelkar
+Copyright (C) 2009-2013  Yuvraaj Kelkar
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -33,11 +33,11 @@ Item {
     function setValues(bEnable, bUseSystemProxy, host, port,
                        bRequiresAuth, user, pass) {
         console.debug ("QML: Setting proxy settings")
-        proxySupport.check = bEnable;
-        proxySystem.check = bUseSystemProxy;
+        proxySupport.checked = bEnable;
+        proxySystem.checked = bUseSystemProxy;
         textUserProxyHost.text = host;
         textUserProxyPort.text = port;
-        proxyUserPassRequired.check = bRequiresAuth;
+        proxyUserPassRequired.checked = bRequiresAuth;
         textUserProxyUser.text = user;
         textUserProxyPass.text = pass;
     }
@@ -49,9 +49,9 @@ Item {
                            bool bRequiresAuth,
                            string user, string pass)
 
-    property bool bEnableProxy: proxySupport.check
-    property bool bSystemProxy: proxySystem.check
-    property bool bProxyUserPass: proxyUserPassRequired.check
+    property bool bEnableProxy: proxySupport.checked
+    property bool bSystemProxy: proxySystem.checked
+    property bool bProxyUserPass: proxyUserPassRequired.checked
     property real internalPointSize: (8 * g_fontMul)
 
     onSigDone: {
@@ -71,22 +71,22 @@ Item {
         spacing: 2
         width: parent.width
 
-        RadioButton {
+        QGVRadioButton {
             id: proxySupport
             width: parent.width
 
             text: "Enable proxy support"
             pointSize: container.internalPointSize
-        }// RadioButton (proxySupport)
+        }// QGVRadioButton (proxySupport)
 
-        RadioButton {
+        QGVRadioButton {
             id: proxySystem
             width: parent.width
             opacity: (bEnableProxy? 1 : 0)
 
             text: "Use system proxy settings"
             pointSize: container.internalPointSize
-        }// RadioButton (proxySystem)
+        }// QGVRadioButton (proxySystem)
 
         Row {
             id: rowUserProxyHost
@@ -141,14 +141,14 @@ Item {
             }//QGVTextInput (proxy port)
         }// Row (user proxy port)
 
-        RadioButton {
+        QGVRadioButton {
             id: proxyUserPassRequired
             width: parent.width
             opacity: (bEnableProxy && !bSystemProxy ? 1 : 0)
 
             text: "Requires user and pass"
             pointSize: container.internalPointSize
-        }// RadioButton (proxyUserPassRequired)
+        }// QGVRadioButton (proxyUserPassRequired)
 
         Row {
             id: rowProxyUsername

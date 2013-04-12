@@ -1,6 +1,6 @@
 /*
 qgvdial is a cross platform Google Voice Dialer
-Copyright (C) 2009-2012  Yuvraaj Kelkar
+Copyright (C) 2009-2013  Yuvraaj Kelkar
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -29,7 +29,7 @@ Rectangle {
     color: "black"
 
     property string text: "Yes or no question?"
-    property bool check: false
+    property bool checked: false
     property bool autoChange: true
     property real pointSize: (10 * g_fontMul)
 
@@ -56,9 +56,9 @@ Rectangle {
                 anchors.centerIn: parent
                 height: parent.height * 0.8
                 width: height
-                smooth: visible
+                smooth: true
 
-                visible: container.check == true
+                visible: (container.checked == true)
             }
         }//Rectangle with tick mark Image
 
@@ -77,10 +77,10 @@ Rectangle {
 
         onClicked: {
             if (autoChange) {
-                if (container.check == true) {
-                    container.check = false;
+                if (container.checked === true) {
+                    container.checked = false;
                 } else {
-                    container.check = true;
+                    container.checked = true;
                 }
             }
             container.clicked();

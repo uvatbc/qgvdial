@@ -1,6 +1,6 @@
 /*
 qgvdial is a cross platform Google Voice Dialer
-Copyright (C) 2009-2012  Yuvraaj Kelkar
+Copyright (C) 2009-2013  Yuvraaj Kelkar
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -32,14 +32,14 @@ Item {
 
     function setValues(bEnable, pin) {
         console.debug ("QML: Setting Pin settings")
-        pinSupport.check = bEnable;
+        pinSupport.checked = bEnable;
         textPin.text = pin;
     }
 
     signal sigDone(bool bSave)
     signal sigPinSettingChanges(bool bEnable, string pin)
 
-    property bool bEnable: pinSupport.check
+    property bool bEnable: pinSupport.checked
 
     onSigDone: {
         textPin.closeSoftwareInputPanel();
@@ -54,13 +54,13 @@ Item {
         spacing: 2
         width: parent.width
 
-        RadioButton {
+        QGVRadioButton {
             id: pinSupport
             width: parent.width
 
             text: "Use PIN for GV dial"
             pointSize: (8 * g_fontMul)
-        }//RadioButton (pinSupport)
+        }//QGVRadioButton (pinSupport)
 
         Row {
             width: parent.width
