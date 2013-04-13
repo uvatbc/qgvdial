@@ -23,6 +23,5 @@ import QtQuick 1.1
 import com.nokia.meego 1.0
 
 RadioButton {
-    property bool autoChange: true      // Ignored
     property real pointSize: 1          // Ignored
 }//Rectangle (container)

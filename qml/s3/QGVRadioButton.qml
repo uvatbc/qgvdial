@@ -30,7 +30,6 @@ Rectangle {
 
     property string text: "Yes or no question?"
     property bool checked: false
-    property bool autoChange: true
     property real pointSize: (10 * g_fontMul)
 
     signal clicked
@@ -75,16 +74,7 @@ Rectangle {
     MouseArea {
         anchors.fill: parent
 
-        onClicked: {
-            if (autoChange) {
-                if (container.checked === true) {
-                    container.checked = false;
-                } else {
-                    container.checked = true;
-                }
-            }
-            container.clicked();
-        }
+        onClicked: container.clicked();
     }//MouseArea
 
     states: [
