@@ -46,6 +46,7 @@ Item {
         signal sigSelChanged (int index)
         function setSelected(index) {
             container.currentSelection = index;
+            console.debug("New index = " + container.currentSelection);
         }
 
         anchors {
@@ -67,6 +68,7 @@ Item {
             checked: (index == container.currentSelection)
             pointSize: container.internalPointSize
             onClicked: {
+                console.debug("Selected index " + index);
                 registeredPhonesView.sigSelChanged(index);
             }
         }

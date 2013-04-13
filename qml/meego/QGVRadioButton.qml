@@ -22,6 +22,6 @@ Contact: yuvraaj@gmail.com
 import QtQuick 1.1
 import com.nokia.meego 1.0
 
-RadioButton {
+CheckBox {
     property real pointSize: 1          // Ignored
 }//Rectangle (container)
