@@ -26,7 +26,6 @@ Item {
 
     // Font size
     property real internalPointSize: (8 * g_fontMul)
-    property int currentSelection: 0
 
     height: registeredPhonesView.height + 2
 
@@ -45,8 +44,16 @@ Item {
 
         signal sigSelChanged (int index)
         function setSelected(index) {
-            container.currentSelection = index;
-            console.debug("New index = " + container.currentSelection);
+            var i, val;
+            for (i = 0; i < regPhoneModel.count; i++) {
+                if (i === index) {
+                    val = true;
+                } else {
+                    val = false;
+                }
+
+                regPhoneModel.setProperty(i, "isChecked", val);
+            }
         }
 
         anchors {
@@ -65,12 +72,10 @@ Item {
         delegate: QGVRadioButton {
             width: registeredPhonesView.width
             text: entryText
-            checked: (index == container.currentSelection)
+            //checked: (index == container.currentSelection)
+            checked: isChecked
             pointSize: container.internalPointSize
-            onClicked: {
-                console.debug("Selected index " + index);
-                registeredPhonesView.sigSelChanged(index);
-            }
+            onClicked: registeredPhonesView.sigSelChanged(index);
         }
     }//ListView (of the registered phones)
 
