@@ -42,18 +42,14 @@ Item {
         id: registeredPhonesView
         objectName: "RegisteredPhonesView"
 
-        signal sigSelChanged (int index)
-        function setSelected(index) {
-            var i, val;
+        signal sigSelChanged (int ind)
+        function setSelected(ind) {
+            var i;
             for (i = 0; i < regPhoneModel.count; i++) {
-                if (i === index) {
-                    val = true;
-                } else {
-                    val = false;
-                }
-
-                regPhoneModel.setProperty(i, "isChecked", val);
+                regPhoneModel.setProperty(i, "isChecked", false);
             }
+
+            regPhoneModel.setProperty(ind, "isChecked", true);
         }
 
         anchors {

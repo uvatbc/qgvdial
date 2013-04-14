@@ -24,4 +24,6 @@ import com.nokia.meego 1.0
 
 CheckBox {
     property real pointSize: 1          // Ignored
+
+    CheckBoxStyle { inverted: true }
 }//Rectangle (container)
