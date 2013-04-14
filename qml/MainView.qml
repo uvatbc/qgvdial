@@ -28,7 +28,6 @@ Rectangle {
 
     signal sigCall(string number)
     signal sigText(string number)
-    signal sigSelChanged (int index)
     signal sigHaptic
 
     property bool landscape: main.width > main.height

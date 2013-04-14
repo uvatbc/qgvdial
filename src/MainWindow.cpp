@@ -538,10 +538,6 @@ MainWindow::initQML ()
         this, SLOT   (onSigText(const QString&,const QString&)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
-    rv = connect (obj, SIGNAL(sigSelChanged(int)),
-                  this, SLOT(onRegPhoneSelectionChange(int)));
-    Q_ASSERT(rv);
-    if (!rv) { exit(1); }
     rv = connect (obj, SIGNAL(sigHide ()),
                   this, SLOT(onSigHide ()));
     Q_ASSERT(rv);
@@ -576,8 +572,12 @@ MainWindow::initQML ()
         requestQuit ();
         return;
     }
-    rv = connect (obj, SIGNAL (sigSelChanged (int)),
-                  this, SLOT   (onRegPhoneSelectionChange (int)));
+    rv = connect (obj, SIGNAL(sigSelChanged(int)),
+                  this, SLOT(onRegPhoneSelectionChange(int)));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+    rv = connect (obj, SIGNAL(sigSelOptions(int)),
+                  this, SLOT(onRegPhoneSelectionOptions(int)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
 
@@ -987,6 +987,12 @@ MainWindow::onRegPhoneSelectionChange (int index)
 }//MainWindow::onRegPhoneSelectionChange
 
 void
+MainWindow::onRegPhoneSelectionOptions (int index)
+{
+    Q_DEBUG(QString("Options for %1").arg (index));
+}//MainWindow::onRegPhoneSelectionOptions
+
+void
 MainWindow::onRefresh ()
 {
     Q_DEBUG ("Refresh all requested.");
@@ -1263,7 +1269,7 @@ MainWindow::onCallInitiatorsChange (bool bSave)
 
     QVariantMap oneEntry;
     QScriptEngine scriptEngine;
-    bool isChecked = false;
+    bool isChecked = false, showEntryOptions;
 
     QString strCiName;
 
@@ -1271,6 +1277,7 @@ MainWindow::onCallInitiatorsChange (bool bSave)
     QMetaObject::invokeMethod (model, "clear");
     modelRegNumber->clear ();
 
+    showEntryOptions = false;
     for (int i = 0; i < arrNumbers.size (); i++) {
         strCiName = "Dial back: " + arrNumbers[i].name;
         modelRegNumber->insertRow (strCiName,
@@ -1282,12 +1289,14 @@ MainWindow::onCallInitiatorsChange (bool bSave)
         oneEntry["entryNumber"] = arrNumbers[i].number;
         oneEntry["entryType"] = arrNumbers[i].chType;
         oneEntry["isChecked"] = isChecked;
+        oneEntry["showEntryOptions"] = showEntryOptions;
 
         QMetaObject::invokeMethod (model, "append",
             Q_ARG(QScriptValue, scriptEngine.toScriptValue(oneEntry)));
     }
 
     // Store the callouts in the same widget as the callbacks
+    showEntryOptions = true;
     CallInitiatorFactory& cif = Singletons::getRef().getCIFactory ();
     foreach (CalloutInitiator *ci, cif.getInitiators ()) {
         if (ci->isValid ()) {
@@ -1299,6 +1308,7 @@ MainWindow::onCallInitiatorsChange (bool bSave)
             oneEntry["entryNumber"] = ci->selfNumber ();
             oneEntry["entryType"] = 'O';
             oneEntry["isChecked"] = isChecked;
+            oneEntry["showEntryOptions"] = showEntryOptions;
 
             QMetaObject::invokeMethod (model, "append",
                 Q_ARG(QScriptValue, scriptEngine.toScriptValue(oneEntry)));

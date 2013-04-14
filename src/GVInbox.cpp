@@ -234,7 +234,7 @@ GVInbox::oneInboxEntry (const GVInboxEntry &hevent)
 
         modelInbox->insertEntry (hevent);
     } else {
-        Q_DEBUG(QString("Delete entry with ID %1").arg (hevent.id));
+        //Q_DEBUG(QString("Delete entry with ID %1").arg (hevent.id));
         passedWaterLevel = true;
 
         modelInbox->deleteEntry (hevent);

@@ -42,7 +42,9 @@ Item {
         id: registeredPhonesView
         objectName: "RegisteredPhonesView"
 
-        signal sigSelChanged (int ind)
+        signal sigSelChanged(int ind)
+        signal sigSelOptions(int ind)
+
         function setSelected(ind) {
             var i;
             for (i = 0; i < regPhoneModel.count; i++) {
@@ -72,6 +74,20 @@ Item {
             checked: isChecked
             pointSize: container.internalPointSize
             onClicked: registeredPhonesView.sigSelChanged(index);
+
+            QGVButton {
+                anchors {
+                    right: parent.right
+                    verticalCenter: parent.verticalCenter
+                }
+
+                text: "..."
+                width: 25
+
+                visible: showEntryOptions
+
+                onClicked: registeredPhonesView.sigSelOptions(index);
+            }
         }
     }//ListView (of the registered phones)
 

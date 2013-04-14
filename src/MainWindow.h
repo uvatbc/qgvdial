@@ -150,6 +150,8 @@ private slots:
 
     //! Invoked by QML when the user selects a new phone method
     void onRegPhoneSelectionChange (int index);
+    //! Invoked by QML when the user wanted to set options on the phone
+    void onRegPhoneSelectionOptions (int index);
 
     //! Invoked when the user wishes to open the inbox page
     void onSigOpenInbox();

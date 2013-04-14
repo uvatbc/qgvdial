@@ -36,8 +36,6 @@ Rectangle {
     // Signals from dialpad, contacts and inbox
     signal sigCall(string number)
     signal sigText(string numbers, string smsText)
-    // Signal from dialpad indicating change of callback / callout
-    signal sigSelChanged(int index)
     // Signals from the Settings page
     signal sigHide
     signal sigQuit
@@ -112,7 +110,6 @@ Rectangle {
                         anchors.fill: parent
 
                         onSigCall: main.sigCall (number)
-                        onSigSelChanged: main.sigSelChanged(index)
                         onSigText: {
                             mainFlipView.flipped = true;
                             smsView.addSmsDestination(number, number);
