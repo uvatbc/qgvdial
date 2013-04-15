@@ -28,6 +28,7 @@
         <file alias="ActionButtons.qml">../qml/ActionButtons.qml</file>
         <file alias="ContactDetails.qml">../qml/ContactDetails.qml</file>
         <file alias="ContactsList.qml">../qml/ContactsList.qml</file>
+        <file alias="DialoutSelection.qml">../qml/DialoutSelection.qml</file>
         <file alias="DialSettings.qml">../qml/DialSettings.qml</file>
         <file alias="DigitButton.qml">../qml/DigitButton.qml</file>
         <file alias="ExpandView.qml">../qml/ExpandView.qml</file>

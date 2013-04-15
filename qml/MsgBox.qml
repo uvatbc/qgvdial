@@ -41,7 +41,6 @@ Item {
     Fader {
         anchors.fill: parent
         state: "faded"
-
         fadingOpacity: 0.8
     }//Fader (to fade out the back ground)
 

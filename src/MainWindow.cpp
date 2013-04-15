@@ -31,6 +31,8 @@ MainWindow::MainWindow (QWidget *parent)
 , gvApi (true, this)
 , icoQgv (":/qgv.png")
 , pSystray (NULL)
+, m_dialoutSelectionDialog(NULL)
+, m_registeredPhonesModel(NULL)
 , oContacts (NULL)
 , oInbox (NULL)
 , bBeginPlayAfterLoad (false)
@@ -657,6 +659,22 @@ MainWindow::initQML ()
         if (!rv) { exit(1); }
     }
 
+    obj = getQMLObject ("DialoutSelectionDialog");
+    if (NULL == obj) {
+        Q_WARN("Could not get to DialoutSelectionDialog");
+        requestQuit ();
+        return;
+    }
+    m_dialoutSelectionDialog = obj;
+
+    obj = getQMLObject ("RegisteredPhonesModel");
+    if (NULL == obj) {
+        Q_WARN("Could not get to RegisteredPhonesModel");
+        requestQuit ();
+        return;
+    }
+    m_registeredPhonesModel = obj;
+
 #if DESKTOP_OS
     Qt::WindowFlags flags = this->windowFlags ();
     flags |= Qt::CustomizeWindowHint;
@@ -1259,9 +1277,6 @@ MainWindow::onSigMsgBoxCancel()
 void
 MainWindow::onCallInitiatorsChange (bool bSave)
 {
-    QObject *model = getQMLObject ("RegisteredPhonesModel");
-    Q_ASSERT(model);
-
     // Set the correct callback
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     QString strCallback;
@@ -1274,7 +1289,8 @@ MainWindow::onCallInitiatorsChange (bool bSave)
     QString strCiName;
 
     // Clear out all entries in the model...
-    QMetaObject::invokeMethod (model, "clear");
+    QMetaObject::invokeMethod (m_registeredPhonesModel, "clear");
+    QMetaObject::invokeMethod (m_dialoutSelectionDialog, "clearModel");
     modelRegNumber->clear ();
 
     showEntryOptions = false;
@@ -1291,8 +1307,13 @@ MainWindow::onCallInitiatorsChange (bool bSave)
         oneEntry["isChecked"] = isChecked;
         oneEntry["showEntryOptions"] = showEntryOptions;
 
-        QMetaObject::invokeMethod (model, "append",
+        QMetaObject::invokeMethod (m_registeredPhonesModel, "append",
             Q_ARG(QScriptValue, scriptEngine.toScriptValue(oneEntry)));
+
+        if (arrNumbers[i].chType != '9') {
+            QMetaObject::invokeMethod (m_dialoutSelectionDialog, "addEntry",
+                                       Q_ARG(QVariant, arrNumbers[i].number));
+        }
     }
 
     // Store the callouts in the same widget as the callbacks
@@ -1310,7 +1331,7 @@ MainWindow::onCallInitiatorsChange (bool bSave)
             oneEntry["isChecked"] = isChecked;
             oneEntry["showEntryOptions"] = showEntryOptions;
 
-            QMetaObject::invokeMethod (model, "append",
+            QMetaObject::invokeMethod (m_registeredPhonesModel, "append",
                 Q_ARG(QScriptValue, scriptEngine.toScriptValue(oneEntry)));
         }
     }

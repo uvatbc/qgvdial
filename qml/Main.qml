@@ -233,6 +233,12 @@ Rectangle {
         anchors.fill: parent
     }//MsgBox
 
+    DialoutSelection {
+       objectName: "DialoutSelectionDialog"
+       anchors.fill: parent
+       opacity: 0
+    }//DialoutSelection
+
     Rectangle {
         id: barStatus
         width: parent.width

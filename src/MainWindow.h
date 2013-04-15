@@ -307,6 +307,10 @@ private:
     // Tray, icons, widgets
     QIcon           icoQgv;
     QSystemTrayIcon *pSystray;
+
+    QObject         *m_dialoutSelectionDialog;
+    QObject         *m_registeredPhonesModel;
+
     //! GV Contacts object
     GVContactsTable *oContacts;
     //! GV Inbox object

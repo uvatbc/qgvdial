@@ -178,6 +178,7 @@ OTHER_FILES  += ../src/winrsrc.rc               \
                 ../qml/ActionButtons.qml        \
                 ../qml/ContactDetails.qml       \
                 ../qml/ContactsList.qml         \
+                ../qml/DialoutSelection.qml     \
                 ../qml/DialSettings.qml         \
                 ../qml/DigitButton.qml          \
                 ../qml/ExpandView.qml           \
