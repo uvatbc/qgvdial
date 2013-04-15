@@ -40,9 +40,13 @@ signals:
     void callInitiated (bool bSuccess, void *ctx);
 
 public:
+    virtual QString id () = 0;
     virtual QString name () = 0;
     virtual QString selfNumber () = 0;
     virtual bool isValid () = 0;
+
+    virtual void setAssociatedNumber(QString num) { m_associatedNumber = num; }
+    virtual QString getAssociatedNumber() { return m_associatedNumber; }
 
 public slots:
     virtual void initiateCall (const QString &strDestination, void *ctx = NULL) = 0;
@@ -52,6 +56,9 @@ public slots:
 
 protected:
     void *m_Context;
+
+    //! The phne number associated with a dialout initiator
+    QString m_associatedNumber;
 };
 typedef QList<CalloutInitiator *> CalloutInitiatorList;
 

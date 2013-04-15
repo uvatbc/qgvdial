@@ -37,6 +37,7 @@ public:
     explicit SymbianCallInitiator(QObject *parent = 0);
     ~SymbianCallInitiator();
 
+    QString id ();
     QString name ();
     QString selfNumber ();
     bool isValid ();

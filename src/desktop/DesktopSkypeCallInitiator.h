@@ -34,6 +34,7 @@ private:
     explicit DesktopSkypeCallInitiator(QObject *parent = 0);
 
 public:
+    QString id ();
     QString name ();
     QString selfNumber ();
     bool isValid ();

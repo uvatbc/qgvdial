@@ -162,7 +162,7 @@ MainWindow::dialNow (const QString &strTarget)
         if (bDialout) {
             ctx->ci = ci;
 
-            token->inParams["source"] = ci->selfNumber ();
+            token->inParams["source"] = ci->getAssociatedNumber ();
             success = gvApi.callOut (token);
         } else {
             token->inParams["source"] = gvRegNumber.number;

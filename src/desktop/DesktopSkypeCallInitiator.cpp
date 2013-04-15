@@ -120,6 +120,12 @@ DesktopSkypeCallInitiator::onCallInitiated (bool bSuccess, const QVariantList &)
 }//DesktopSkypeCallInitiator::onCallInitiated
 
 QString
+DesktopSkypeCallInitiator::id ()
+{
+    return ("DesktopSkypeUniqueId");
+}//DesktopSkypeCallInitiator::id
+
+QString
 DesktopSkypeCallInitiator::name ()
 {
     return ("skype");

@@ -35,6 +35,7 @@ private:
     TpCalloutInitiator (Tp::AccountPtr act, QObject *parent = 0);
 
 public:
+    QString id ();
     QString name ();
     QString selfNumber ();
     bool isValid ();
@@ -68,6 +69,7 @@ private:
 
 private:
     Tp::AccountPtr      account;
+    QString             m_uniqueId;
     QString             strActCmName;
     QString             strSelfNumber;
 

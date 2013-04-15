@@ -31,6 +31,7 @@ Contact: yuvraaj@gmail.com
 TpCalloutInitiator::TpCalloutInitiator (Tp::AccountPtr act, QObject *parent)
 : CalloutInitiator(parent)
 , account (act)
+, m_uniqueId("undefined")
 , strActCmName("undefined")
 , strSelfNumber("undefined")
 , systemBus(QDBusConnection::systemBus())
@@ -71,7 +72,6 @@ TpCalloutInitiator::TpCalloutInitiator (Tp::AccountPtr act, QObject *parent)
 
     Tp::ConnectionPtr connection = account->connection();
     onConnectionChanged (connection);
-
 }//TpCalloutInitiator::TpCalloutInitiator
 
 void
@@ -129,6 +129,9 @@ TpCalloutInitiator::onConnectionReady (Tp::PendingOperation *op)
             break;
         }
         Q_DEBUG ("Self Contact is null");
+
+        m_uniqueId = account->uniqueIdentifier ();
+        Q_DEBUG (QString("Unique ID = %1").arg (m_uniqueId));
 
         strActCmName = account->cmName ();
         if (strActCmName == "spirit") {
@@ -270,6 +273,12 @@ TpCalloutInitiator::onDtmfChannelInvalidated(Tp::DBusProxy * /*proxy*/,
 {
     channel.reset ();
 }//TpCalloutInitiator::onDtmfChannelInvalidated
+
+QString
+TpCalloutInitiator::id ()
+{
+    return (m_uniqueId);
+}//TpCalloutInitiator::id
 
 QString
 TpCalloutInitiator::name ()

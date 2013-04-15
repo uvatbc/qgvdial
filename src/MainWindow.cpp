@@ -666,6 +666,10 @@ MainWindow::initQML ()
         return;
     }
     m_dialoutSelectionDialog = obj;
+    rv = connect(obj, SIGNAL(sigSelected(int,QString)),
+                 this, SLOT(onDialoutOptionSelected(int,QString)));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
 
     obj = getQMLObject ("RegisteredPhonesModel");
     if (NULL == obj) {
@@ -1008,7 +1012,22 @@ void
 MainWindow::onRegPhoneSelectionOptions (int index)
 {
     Q_DEBUG(QString("Options for %1").arg (index));
+    //TODO: Get the current phone number (if set) for the dial out method
+    m_dialoutSelectionDialog->setProperty ("opacity", 1);
 }//MainWindow::onRegPhoneSelectionOptions
+
+void
+MainWindow::onDialoutOptionSelected(int index, QString phoneNumber)
+{
+    Q_DEBUG(QString("User selected number %1 for option %2")
+            .arg(phoneNumber).arg (index));
+    m_dialoutSelectionDialog->setProperty ("opacity", 0);
+
+    CallInitiatorFactory& cif = Singletons::getRef().getCIFactory ();
+    if (index < cif.getInitiators().count ()) {
+        cif.getInitiators()[index]->setAssociatedNumber(phoneNumber);
+    }
+}//MainWindow::onDialoutOptionSelected
 
 void
 MainWindow::onRefresh ()

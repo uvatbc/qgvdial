@@ -55,6 +55,12 @@ SymbianCallInitiator::~SymbianCallInitiator()
 }//SymbianCallInitiator::~SymbianCallInitiator
 
 QString
+SymbianCallInitiator::id ()
+{
+    return ("SymbianCallUniqueId");
+}//SymbianCallInitiator::id
+
+QString
 SymbianCallInitiator::name ()
 {
     return "Phone";
