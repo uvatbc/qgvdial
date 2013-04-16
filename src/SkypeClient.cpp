@@ -946,8 +946,7 @@ SkypeClient::sendDTMF (QString strTones, bool bFirstTime)
             QString cmd = QString ("SET CALL %1 DTMF %2")
                             .arg (callId).arg (chTone);
             rv = invoke (cmd);
-            if (!rv)
-            {
+            if (!rv) {
                 qWarning ("SkypeClient: Failed to send DTMF tone");
                 rv = false;
                 break;

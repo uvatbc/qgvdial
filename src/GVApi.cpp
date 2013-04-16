@@ -1207,9 +1207,9 @@ GVApi::onGetPhones(bool success, const QByteArray &response, QNetworkReply *,
             }
 
             if (emitLog) {
-                Q_DEBUG("Name =") << regNumber.name
-                    << "number =" << regNumber.number
-                    << "type ="   << regNumber.chType;
+                Q_DEBUG(QString("Name = %1, number = %2, type = %3")
+                        .arg (regNumber.name, regNumber.number)
+                        .arg (QString(regNumber.chType)));
             }
             emit registeredPhone (regNumber);
         }
