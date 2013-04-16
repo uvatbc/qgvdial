@@ -151,9 +151,9 @@ private slots:
     //! Invoked by QML when the user selects a new phone method
     void onRegPhoneSelectionChange (int index);
     //! Invoked by QML when the user wanted to set options on the phone
-    void onRegPhoneSelectionOptions (int index);
+    void onRegPhoneSelectionOptions (QString id);
     //! Invoked when the user clicks on a phone number from the selection dlg
-    void onDialoutOptionSelected (int index, QString phoneNumber);
+    void onDialoutOptionSelected (QString phoneNumber);
 
     //! Invoked when the user wishes to open the inbox page
     void onSigOpenInbox();
@@ -403,6 +403,11 @@ private:
     FuzzyTimer      contactsTimer;
     //! Inbox refresh fuzzy timer
     FuzzyTimer      inboxTimer;
+
+    //! When the user wants to choose a number for a dialout option, the id
+    //! of the CI needs to be saved here because the dialog box for the number
+    //! is asynchronous
+    QString         m_dialoutSelectionId;
 };
 
 #endif // MAINWINDOW_H

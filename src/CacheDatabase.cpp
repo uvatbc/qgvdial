@@ -1674,6 +1674,8 @@ CacheDatabase::setCIAssociation(const QString &ciID, const QString &number)
                         "(" GV_CI_ID "," GV_CI_NUMBER ") VALUES "
                         "('%1','%2')")
                         .arg(scrubCiId, scrubNum));
+
+    Q_DEBUG(QString("[%1] = %2").arg(ciID, number));
 }//CacheDatabase::setCIAssociation
 
 bool
@@ -1691,6 +1693,7 @@ CacheDatabase::getCIAssociation(const QString &ciID, QString &number)
     if (query.next ()) {
         number = query.value(0).toString();
         rv = true;
+        Q_DEBUG(QString("[%1] = %2").arg(ciID, number));
     }
 
     return (rv);

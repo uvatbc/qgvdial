@@ -572,8 +572,8 @@ MainWindow::initQML ()
                   this, SLOT(onRegPhoneSelectionChange(int)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
-    rv = connect (obj, SIGNAL(sigSelOptions(int)),
-                  this, SLOT(onRegPhoneSelectionOptions(int)));
+    rv = connect (obj, SIGNAL(sigSelOptions(QString)),
+                  this, SLOT(onRegPhoneSelectionOptions(QString)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
 
@@ -660,8 +660,8 @@ MainWindow::initQML ()
         return;
     }
     m_dialoutSelectionDialog = obj;
-    rv = connect(obj, SIGNAL(sigSelected(int,QString)),
-                 this, SLOT(onDialoutOptionSelected(int,QString)));
+    rv = connect(obj, SIGNAL(sigSelected(QString)),
+                 this, SLOT(onDialoutOptionSelected(QString)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
 
@@ -1003,27 +1003,38 @@ MainWindow::onRegPhoneSelectionChange (int index)
 }//MainWindow::onRegPhoneSelectionChange
 
 void
-MainWindow::onRegPhoneSelectionOptions (int index)
+MainWindow::onRegPhoneSelectionOptions (QString id)
 {
-    Q_DEBUG(QString("Options for %1").arg (index));
-    //TODO: Get the current phone number (if set) for the dial out method
+    Q_DEBUG(QString("Options for %1").arg (id));
+    // Get the current phone number (if set) for the dial out method.
+    // Open the dialog box, and save the id so that it can be used in
+    // MainWindow::onDialoutOptionSelected
     m_dialoutSelectionDialog->setProperty ("opacity", 1);
+    m_dialoutSelectionId = id;
 }//MainWindow::onRegPhoneSelectionOptions
 
 void
-MainWindow::onDialoutOptionSelected(int index, QString phoneNumber)
+MainWindow::onDialoutOptionSelected(QString phoneNumber)
 {
     Q_DEBUG(QString("User selected number %1 for option %2")
-            .arg(phoneNumber).arg (index));
+            .arg(phoneNumber).arg (m_dialoutSelectionId));
     m_dialoutSelectionDialog->setProperty ("opacity", 0);
 
+    bool found = false;
     CallInitiatorFactory& cif = Singletons::getRef().getCIFactory ();
-    if (index < cif.getInitiators().count ()) {
-        CalloutInitiator *ci = cif.getInitiators()[index];
-        ci->setAssociatedNumber(phoneNumber);
+    foreach (CalloutInitiator *ci, cif.getInitiators()) {
+        if (ci->id () == m_dialoutSelectionId) {
+            ci->setAssociatedNumber(phoneNumber);
 
-        CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-        dbMain.setCIAssociation (ci->id(), phoneNumber);
+            CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+            dbMain.setCIAssociation (ci->id(), phoneNumber);
+            Q_DEBUG(QString("CI %1 = %2 saved").arg(ci->id(), phoneNumber));
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        Q_WARN(QString("CI %1 not found!!").arg(m_dialoutSelectionId));
     }
 }//MainWindow::onDialoutOptionSelected
 
@@ -1301,7 +1312,7 @@ MainWindow::onCallInitiatorsChange (bool bSave)
 
     QVariantMap oneEntry;
     QScriptEngine scriptEngine;
-    bool isChecked = false, showEntryOptions;
+    bool isChecked = false;
 
     QString strCiName, strCiNum;
 
@@ -1310,7 +1321,6 @@ MainWindow::onCallInitiatorsChange (bool bSave)
     QMetaObject::invokeMethod (m_dialoutSelectionDialog, "clearModel");
     modelRegNumber->clear ();
 
-    showEntryOptions = false;
     for (int i = 0; i < arrNumbers.size (); i++) {
         strCiName = "Dial back: " + arrNumbers[i].name;
         modelRegNumber->insertRow (strCiName,
@@ -1322,7 +1332,7 @@ MainWindow::onCallInitiatorsChange (bool bSave)
         oneEntry["entryNumber"] = arrNumbers[i].number;
         oneEntry["entryType"] = arrNumbers[i].chType;
         oneEntry["isChecked"] = isChecked;
-        oneEntry["showEntryOptions"] = showEntryOptions;
+        oneEntry["entryID"] = "undefined";
 
         QMetaObject::invokeMethod (m_registeredPhonesModel, "append",
             Q_ARG(QScriptValue, scriptEngine.toScriptValue(oneEntry)));
@@ -1334,7 +1344,6 @@ MainWindow::onCallInitiatorsChange (bool bSave)
     }
 
     // Store the callouts in the same widget as the callbacks
-    showEntryOptions = true;
     CallInitiatorFactory& cif = Singletons::getRef().getCIFactory ();
     foreach (CalloutInitiator *ci, cif.getInitiators ()) {
         if (ci->isValid ()) {
@@ -1346,13 +1355,17 @@ MainWindow::onCallInitiatorsChange (bool bSave)
             oneEntry["entryNumber"] = ci->selfNumber ();
             oneEntry["entryType"] = 'O';
             oneEntry["isChecked"] = isChecked;
-            oneEntry["showEntryOptions"] = showEntryOptions;
+            oneEntry["entryID"] = ci->id ();
 
             QMetaObject::invokeMethod (m_registeredPhonesModel, "append",
                 Q_ARG(QScriptValue, scriptEngine.toScriptValue(oneEntry)));
 
             if (dbMain.getCIAssociation (ci->id (), strCiNum)) {
                 ci->setAssociatedNumber (strCiNum);
+                Q_DEBUG(QString("CI %1 found number %2")
+                        .arg(ci->id(), strCiNum));
+            } else {
+                Q_DEBUG(QString("CI %1 found no number").arg(ci->id()));
             }
         }
     }

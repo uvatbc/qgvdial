@@ -161,8 +161,17 @@ MainWindow::dialNow (const QString &strTarget)
         gvApiProgressString = "Call progress";
         if (bDialout) {
             ctx->ci = ci;
+            QString assocNum = ci->getAssociatedNumber ();
+            
+            if (assocNum.isEmpty()) {
+                setStatus ("Dial out needs source number.");
+                Q_WARN ("Dial out needs source number.");
+                break;
+            }
 
-            token->inParams["source"] = ci->getAssociatedNumber ();
+            Q_DEBUG(assocNum);
+
+            token->inParams["source"] = assocNum;
             success = gvApi.callOut (token);
         } else {
             token->inParams["source"] = gvRegNumber.number;

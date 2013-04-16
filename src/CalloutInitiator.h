@@ -45,8 +45,8 @@ public:
     virtual QString selfNumber () = 0;
     virtual bool isValid () = 0;
 
-    virtual void setAssociatedNumber(QString num) { m_associatedNumber = num; }
-    virtual QString getAssociatedNumber() { return m_associatedNumber; }
+    virtual inline void setAssociatedNumber(QString num) { m_associatedNumber = num; }
+    virtual inline QString getAssociatedNumber() { return m_associatedNumber; }
 
 public slots:
     virtual void initiateCall (const QString &strDestination, void *ctx = NULL) = 0;

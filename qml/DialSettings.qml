@@ -46,7 +46,7 @@ Item {
         objectName: "RegisteredPhonesView"
 
         signal sigSelChanged(int ind)
-        signal sigSelOptions(int ind)
+        signal sigSelOptions(string id)
 
         function setSelected(ind) {
             var i;
@@ -88,9 +88,9 @@ Item {
                 text: "..."
                 width: 25
 
-                visible: showEntryOptions
+                visible: (entryID !== "undefined")
 
-                onClicked: registeredPhonesView.sigSelOptions(index);
+                onClicked: registeredPhonesView.sigSelOptions(entryID);
             }
         }
     }//ListView (of the registered phones)

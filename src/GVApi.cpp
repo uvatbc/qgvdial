@@ -1728,9 +1728,8 @@ GVApi::callOut(AsyncTaskToken *token)
         return (true);
     }
 
-    // Ensure that the params  are valid
-    if (!token->inParams.contains ("destination"))
-    {
+    // Ensure that the params are valid
+    if (!token->inParams.contains ("destination")) {
         token->status = ATTS_INVALID_PARAMS;
         token->emitCompleted ();
         return true;
@@ -1750,7 +1749,9 @@ GVApi::callOut(AsyncTaskToken *token)
     url.addQueryItem("f" , fwdingNum);
     url.addQueryItem("v" , "11");
 
-    Q_DEBUG(QString("Call back: dest=%1, using=").arg(dest));
+    if (emitLog) {
+        Q_DEBUG(QString("Call out: dest=%1, using=%2").arg(dest, fwdingNum));
+    }
 
     QByteArray content;
     QList<QNetworkCookie> allCookies = jar->getAllCookies ();

@@ -24,7 +24,7 @@ import Qt 4.7
 Item {
     id: container
 
-    signal sigSelected(int ind, string num)
+    signal sigSelected(string num)
 
     function clearModel() {
         phoneModel.clear();
@@ -38,7 +38,7 @@ Item {
             phoneModel.setProperty(i, "isSelected", false);
         }
         if ((ind === -1) || (ind >= phoneModel.count)) {
-            console.debug("Index out of bounds for dialout Sleection dialog");
+            console.debug("Index out of bounds for dialout selection dialog");
             return;
         }
         phoneModel.setProperty(ind, "isSelected", true);
@@ -85,10 +85,7 @@ Item {
 
             MouseArea {
                 anchors.fill: parent
-                onClicked: {
-                    console.debug("phone number selected: " + number);
-                    container.sigSelected(index, number);
-                }
+                onClicked: container.sigSelected(number);
             }
         }
     }
