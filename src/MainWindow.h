@@ -153,7 +153,7 @@ private slots:
     //! Invoked by QML when the user wanted to set options on the phone
     void onRegPhoneSelectionOptions (int index);
     //! Invoked when the user clicks on a phone number from the selection dlg
-    void onDialoutOptionSelected(int index, QString phoneNumber);
+    void onDialoutOptionSelected (int index, QString phoneNumber);
 
     //! Invoked when the user wishes to open the inbox page
     void onSigOpenInbox();

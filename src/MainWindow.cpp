@@ -427,13 +427,7 @@ MainWindow::init ()
     clearSmsDestinations ();
 
     // Save the temp store location for contact photos
-    QString strTempStore = osd.getAppDirectory();
-    QDir dirApp(strTempStore);
-    strTempStore += QDir::separator() + tr("temp");
-    if (!QFileInfo(strTempStore).exists ()) {
-        dirApp.mkdir ("temp");
-    }
-    oContacts->setTempStore(strTempStore);
+    oContacts->setTempStore(dbMain.getTempDirectory ());
 
 #if MOSQUITTO_CAPABLE
     // Connect the signals from the Mosquitto thread
@@ -1025,7 +1019,11 @@ MainWindow::onDialoutOptionSelected(int index, QString phoneNumber)
 
     CallInitiatorFactory& cif = Singletons::getRef().getCIFactory ();
     if (index < cif.getInitiators().count ()) {
-        cif.getInitiators()[index]->setAssociatedNumber(phoneNumber);
+        CalloutInitiator *ci = cif.getInitiators()[index];
+        ci->setAssociatedNumber(phoneNumber);
+
+        CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+        dbMain.setCIAssociation (ci->id(), phoneNumber);
     }
 }//MainWindow::onDialoutOptionSelected
 
@@ -1305,7 +1303,7 @@ MainWindow::onCallInitiatorsChange (bool bSave)
     QScriptEngine scriptEngine;
     bool isChecked = false, showEntryOptions;
 
-    QString strCiName;
+    QString strCiName, strCiNum;
 
     // Clear out all entries in the model...
     QMetaObject::invokeMethod (m_registeredPhonesModel, "clear");
@@ -1352,6 +1350,10 @@ MainWindow::onCallInitiatorsChange (bool bSave)
 
             QMetaObject::invokeMethod (m_registeredPhonesModel, "append",
                 Q_ARG(QScriptValue, scriptEngine.toScriptValue(oneEntry)));
+
+            if (dbMain.getCIAssociation (ci->id (), strCiNum)) {
+                ci->setAssociatedNumber (strCiNum);
+            }
         }
     }
 

@@ -20,6 +20,9 @@ Contact: yuvraaj@gmail.com
 */
 
 import Qt 4.7
+import "meego"
+import "generic"
+import "s3"
 
 Item {
     id: container
@@ -71,6 +74,7 @@ Item {
             width: registeredPhonesView.width
             text: entryText
             //checked: (index == container.currentSelection)
+            autoChange: false
             checked: isChecked
             pointSize: container.internalPointSize
             onClicked: registeredPhonesView.sigSelChanged(index);

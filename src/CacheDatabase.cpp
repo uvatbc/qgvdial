@@ -98,7 +98,11 @@ CacheDatabase::init ()
         settings->setValue (GV_S_VAR_VER, GV_SETTINGS_VER);
     }
     if (bBlowAway) {
-        blowAwayCache ();
+        if (!blowAwayCache ()) {
+            Q_WARN("Failed to blow away cache");
+            qApp->quit ();
+            return;
+        }
 
         // Insert the DB version number
         settings->setValue(GV_S_VAR_DB_VER, GV_S_VALUE_DB_VER);
@@ -107,22 +111,22 @@ CacheDatabase::init ()
     ensureCache ();
 }//CacheDatabase::init
 
-void
+bool
 CacheDatabase::blowAwayCache()
 {
-    QSqlQuery query(dbMain);
-    query.setForwardOnly (true);
-
-    purge_temp_files ((quint64)-1);
-
-    // Drop all tables!
-    QStringList arrTables = dbMain.tables ();
-    foreach (QString strTable, arrTables) {
-        strTable.replace ("'", "''");
-        QString strQ = QString("DROP TABLE '%1'").arg(strTable);
-        query.exec (strQ);
+    QString name = dbMain.databaseName ();
+    dbMain.close ();
+    QFile::remove(name);
+    if (!dbMain.open ()) {
+        Q_WARN(QString("Failed to open database %1. Error text = %2")
+                .arg(name, dbMain.lastError().text()));
+        qApp->quit ();
+        return (false);
     }
-    query.exec ("VACUUM");
+
+    deleteTempDirectory ();
+
+    return (true);
 }//CacheDatabase::blowAwayCache
 
 void
@@ -133,8 +137,7 @@ CacheDatabase::ensureCache ()
 
     QStringList arrTables = dbMain.tables ();
     // Ensure that the contacts table is present. If not, create it.
-    if (!arrTables.contains (GV_CONTACTS_TABLE))
-    {
+    if (!arrTables.contains (GV_CONTACTS_TABLE)) {
         query.exec ("CREATE TABLE " GV_CONTACTS_TABLE " "
                     "(" GV_C_NAME    " varchar, "
                         GV_C_ID      " varchar, "
@@ -144,8 +147,7 @@ CacheDatabase::ensureCache ()
     }
 
     // Ensure that the cached links table is present. If not, create it.
-    if (!arrTables.contains (GV_LINKS_TABLE))
-    {
+    if (!arrTables.contains (GV_LINKS_TABLE)) {
         query.exec ("CREATE TABLE " GV_LINKS_TABLE " "
                     "(" GV_L_LINK   " varchar, "
                         GV_L_TYPE   " varchar, "
@@ -153,17 +155,27 @@ CacheDatabase::ensureCache ()
     }
 
     // Ensure that the registered numbers table is present. If not, create it.
-    if (!arrTables.contains (GV_REG_NUMS_TABLE))
-    {
+    if (!arrTables.contains (GV_REG_NUMS_TABLE)) {
         query.exec ("CREATE TABLE " GV_REG_NUMS_TABLE " "
-                    "(" GV_RN_NAME  " varchar, "
-                        GV_RN_NUM   " varchar, "
-                        GV_RN_TYPE  " tinyint)");
+                    "(" GV_RN_NAME           " varchar, "
+                        GV_RN_NUM            " varchar, "
+                        GV_RN_TYPE           " tinyint, "
+                        GV_RN_FLAGS          " integer, "
+                        GV_RN_FWDCOUNTRY     " varchar, "
+                        GV_RN_DISPUNVERIFYDT " varchar"
+                    ")");
+    }
+
+    // Ensure that the call initiators table is present. If not, create it.
+    if (!arrTables.contains (GV_CI_TABLE)) {
+        query.exec ("CREATE TABLE " GV_CI_TABLE " "
+                    "(" GV_CI_ID     " varchar, "
+                        GV_CI_NUMBER " varchar"
+                    ")");
     }
 
     // Ensure that the inbox table is present. If not, create it.
-    if (!arrTables.contains (GV_INBOX_TABLE))
-    {
+    if (!arrTables.contains (GV_INBOX_TABLE)) {
         query.exec ("CREATE TABLE " GV_INBOX_TABLE " "
                     "(" GV_IN_ID        " varchar, "
                         GV_IN_TYPE      " tinyint, "
@@ -387,17 +399,30 @@ CacheDatabase::putCallback (const QString &strCallback)
 bool
 CacheDatabase::getRegisteredNumbers (GVRegisteredNumberArray &listNumbers)
 {
+    quint64 flags;
+    GVRegisteredNumber num;
     QSqlQuery query(dbMain);
     query.setForwardOnly (true);
 
-    query.exec ("SELECT " GV_RN_NAME ", " GV_RN_NUM ", " GV_RN_TYPE " "
+    query.exec ("SELECT " GV_RN_NAME "," GV_RN_NUM "," GV_RN_TYPE ","
+                GV_RN_FLAGS "," GV_RN_FWDCOUNTRY "," GV_RN_DISPUNVERIFYDT " "
                 "FROM " GV_REG_NUMS_TABLE);
-    while (query.next ())
-    {
-        GVRegisteredNumber num;
-        num.name        = query.value(0).toString();
-        num.number = query.value(1).toString();
-        num.chType         = query.value(2).toString()[0].toAscii ();
+    while (query.next ()) {
+        num.init ();
+        num.name                = query.value(0).toString();
+        num.number              = query.value(1).toString();
+        num.chType              = query.value(2).toString()[0].toAscii ();
+        flags                   = query.value(3).toInt();
+        num.forwardingCountry   = query.value(4).toString();
+        num.displayUnverifyScheduledDateTime = query.value(5).toString();
+
+        num.active            = flags & GV_RN_F_ACTIVE;
+        num.verified          = flags & GV_RN_F_VERIFIED;
+        num.inVerification    = flags & GV_RN_F_INVERIFICATION;
+        num.reverifyNeeded    = flags & GV_RN_F_REVERIFYNEEDED;
+        num.smsEnabled        = flags & GV_RN_F_SMSENABLED;
+        num.telephonyVerified = flags & GV_RN_F_TELEPHONYVERIFIED;
+
         listNumbers += num;
     }
 
@@ -407,6 +432,7 @@ CacheDatabase::getRegisteredNumbers (GVRegisteredNumberArray &listNumbers)
 bool
 CacheDatabase::putRegisteredNumbers (const GVRegisteredNumberArray &listNumbers)
 {
+    quint64 flags;
     QSqlQuery query(dbMain);
     query.setForwardOnly (true);
 
@@ -422,14 +448,33 @@ CacheDatabase::putRegisteredNumbers (const GVRegisteredNumberArray &listNumbers)
             // Must scrub single quotes
             num.name.replace ("'", "''");
             num.number.replace ("'", "''");
+            num.forwardingCountry.replace ("'", "''");
+            num.displayUnverifyScheduledDateTime.replace ("'", "''");
+
+            flags = (num.active             * GV_RN_F_ACTIVE)
+                  | (num.verified           * GV_RN_F_VERIFIED)
+                  | (num.inVerification     * GV_RN_F_INVERIFICATION)
+                  | (num.reverifyNeeded     * GV_RN_F_REVERIFYNEEDED)
+                  | (num.smsEnabled         * GV_RN_F_SMSENABLED)
+                  | (num.telephonyVerified  * GV_RN_F_TELEPHONYVERIFIED);
 
             strQ = QString ("INSERT INTO " GV_REG_NUMS_TABLE
-                            " (" GV_RN_NAME ", " GV_RN_NUM ", " GV_RN_TYPE ") "
-                            "VALUES ('%1', '%2', %3)")
+                            " (" GV_RN_NAME "," GV_RN_NUM "," GV_RN_TYPE ","
+                                 GV_RN_FLAGS "," GV_RN_FWDCOUNTRY ","
+                                 GV_RN_DISPUNVERIFYDT
+                             ") "
+                            "VALUES ('%1', '%2', %3, %4, '%5', '%6')")
                     .arg (num.name)
                     .arg (num.number)
-                    .arg (num.chType);
-            query.exec (strQ);
+                    .arg (num.chType)
+                    .arg (flags)
+                    .arg (num.forwardingCountry)
+                    .arg (num.displayUnverifyScheduledDateTime);
+            if (!query.exec (strQ)) {
+                Q_WARN(QString("Failed to insert registered number: %1")
+                       .arg (num.name));
+                // Don't care. Move on to the next one.
+            }
         }
     } while (0); // End cleanup block (not a loop)
 
@@ -1315,7 +1360,7 @@ CacheDatabase::cleanup_temp_files()
 }//CacheDatabase::cleanup_temp_files
 
 void
-CacheDatabase::purge_temp_files(quint64 howmany)
+CacheDatabase::purgeTempFiles(quint64 howmany)
 {
     QMap <QString, QString> mapLinkPath;
     int count;
@@ -1360,7 +1405,34 @@ CacheDatabase::purge_temp_files(quint64 howmany)
     }
 
     setQuickAndDirty (false);
-}//CacheDatabase::purge_temp_files
+}//CacheDatabase::purgeTempFiles
+
+QString
+CacheDatabase::getTempDirectory()
+{
+    OsDependent &osd = Singletons::getRef().getOSD ();
+    QString strTempStore = osd.getAppDirectory();
+    QDir dirApp(strTempStore);
+    strTempStore += QDir::separator() + tr("temp");
+    if (!QFileInfo(strTempStore).exists ()) {
+        dirApp.mkdir ("temp");
+    }
+
+    return (strTempStore);
+}//CacheDatabase::getTempDirectory
+
+void
+CacheDatabase::deleteTempDirectory()
+{
+    QDir tempDir(getTempDirectory ());
+    QStringList allFiles = tempDir.entryList ();
+    foreach (QString name, allFiles) {
+        if (name == "." || name == "..") {
+            continue;
+        }
+        tempDir.remove (name);
+    }
+}//CacheDatabase::deleteTempDirectory
 
 bool
 CacheDatabase::putTempFile(const QString &strLink, const QString &strPath)
@@ -1586,3 +1658,40 @@ CacheDatabase::getRefreshSettings (bool &enable, quint32 &contactsPeriod,
 
     return true;
 }//CacheDatabase::getRefreshSettings
+
+void
+CacheDatabase::setCIAssociation(const QString &ciID, const QString &number)
+{
+    QSqlQuery query(dbMain);
+    query.setForwardOnly (true);
+
+    QString scrubCiId = ciID;
+    QString scrubNum  = number;
+    scrubCiId.replace ("'", "''");
+    scrubNum.replace ("'", "''");
+
+    query.exec (QString("INSERT INTO " GV_CI_TABLE " "
+                        "(" GV_CI_ID "," GV_CI_NUMBER ") VALUES "
+                        "('%1','%2')")
+                        .arg(scrubCiId, scrubNum));
+}//CacheDatabase::setCIAssociation
+
+bool
+CacheDatabase::getCIAssociation(const QString &ciID, QString &number)
+{
+    bool rv = false;
+    QSqlQuery query(dbMain);
+    query.setForwardOnly (true);
+
+    QString scrubID = ciID;
+    scrubID.replace ("'", "''");
+
+    rv = query.exec (QString("SELECT " GV_CI_NUMBER " FROM " GV_CI_TABLE
+                            " WHERE " GV_CI_ID "='%1'").arg(scrubID));
+    if (query.next ()) {
+        number = query.value(0).toString();
+        rv = true;
+    }
+
+    return (rv);
+}//CacheDatabase::getCIAssociation

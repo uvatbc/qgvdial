@@ -49,7 +49,7 @@ public:
     void init ();
     void deinit ();
 
-    void blowAwayCache();
+    bool blowAwayCache();
     void ensureCache ();
 
     // Toggle quick and dirty!
@@ -160,12 +160,21 @@ public:
     bool getRefreshSettings (bool &enable, quint32 &contactsPeriod,
                              quint32 &inboxPeriod);
 
+    //! Full path of the temp directory for the image cache
+    QString getTempDirectory();
+
+    //! Association between a Call Initiator and the number for it
+    void setCIAssociation(const QString &ciID, const QString &number);
+    bool getCIAssociation(const QString &ciID, QString &number);
+
 private:
     bool putContactInfo (const ContactInfo &info);
     bool deleteContactInfo (const QString &strId);
 
     void cleanup_temp_files();
-    void purge_temp_files(quint64 howmany);
+    void purgeTempFiles(quint64 howmany);
+
+    void deleteTempDirectory();
 
 signals:
     void status(const QString &strText, int timeout = 2000);

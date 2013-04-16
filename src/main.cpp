@@ -117,6 +117,22 @@ initLogging ()
     OsDependent &osd = Singletons::getRef().getOSD ();
     QString strLogfile = osd.getAppDirectory ();
     strLogfile += QDir::separator ();
+    strLogfile += "qgvdial-startup.log";
+
+    fLogfile.setFileName (strLogfile);
+    fLogfile.open (QIODevice::ReadWrite);
+
+    pOldHandler = qInstallMsgHandler(myMessageOutput);
+}//initLogging
+
+static void
+initLogRotate()
+{
+    OsDependent &osd = Singletons::getRef().getOSD ();
+    QString strLogfile = osd.getAppDirectory ();
+    strLogfile += QDir::separator ();
+    QString oldLogFile = strLogfile;
+    oldLogFile += "qgvdial-startup.log";
     strLogfile += "qgvdial.log";
 
     for (int i = 4; i >= 0; i--) {
@@ -131,11 +147,10 @@ initLogging ()
         }
     }
 
+    fLogfile.close ();
     fLogfile.setFileName (strLogfile);
     fLogfile.open (QIODevice::ReadWrite);
-
-    pOldHandler = qInstallMsgHandler(myMessageOutput);
-}//initLogging
+}//initLogRotate
 
 static void
 deinitLogging ()
@@ -151,6 +166,10 @@ main (int argc, char *argv[])
     MainApp::setAttribute (Qt::AA_S60DontConstructApplicationPanes);
 #endif
 
+    // When the second instance comes in and tells the first instance to show
+    // I dont want the logs to rotate. So I've split up the initLogging function
+    // into two: once for the init before the MainApp and one to log-rotate and
+    // use the corrected name of the log file.
     initLogging ();
 
     MainApp app(argc, argv);
@@ -169,6 +188,9 @@ main (int argc, char *argv[])
     if (bQuit == true) {
         return (0);
     }
+
+    // here's the log rotate
+    initLogRotate ();
 
     OsDependent &osd = Singletons::getRef().getOSD ();
     osd.init ();

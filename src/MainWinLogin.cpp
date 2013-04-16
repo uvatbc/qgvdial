@@ -21,7 +21,6 @@ Contact: yuvraaj@gmail.com
 
 #include "MainWindow.h"
 
-
 /** Invoked to begin the login process.
  * We already have the username and password, so just start the login to the GV
  * website. The async completion routine is loginCompleted.
@@ -174,7 +173,10 @@ MainWindow::loginCompleted (AsyncTaskToken *token)
         dbMain.getUserPass (strOldUser, strOldPass);
         if (strOldUser != strUser) {
             // Cleanup cache
-            dbMain.blowAwayCache ();
+            if (!dbMain.blowAwayCache ()) {
+                requestQuit ();
+                return;
+            }
             dbMain.ensureCache ();
         }
 
