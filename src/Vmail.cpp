@@ -19,13 +19,36 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
+#include "Vmail.h"
 #include "MainWindow.h"
 
+#if PHONON_ENABLED
 #include <phonon/AudioOutput>
 #include <phonon/AudioOutputDevice>
+#endif
+
+qgvVmail::qgvVmail(MainWindow *parent)
+: QObject(parent)
+, bBeginPlayAfterLoad(false)
+, vmailPlayer (NULL)
+{
+}//qgvVmail::qgvVmail
 
 void
-MainWindow::playVmail (const QString &strFile)
+qgvVmail::onExit()
+{
+    for (QMap<QString,QString>::iterator i  = mapVmail.begin ();
+                                         i != mapVmail.end ();
+                                         i++)
+    {
+        Q_DEBUG(QString("Delete vmail cached at %1").arg (i.value ()));
+        QFile::remove (i.value ());
+    }
+    mapVmail.clear ();
+}//qgvVmail::onExit
+
+void
+qgvVmail::playVmail (const QString &strFile)
 {
     do { // Begin cleanup block (not a loop)
         // Convert it into a file:// url
@@ -35,30 +58,35 @@ MainWindow::playVmail (const QString &strFile)
 
         createVmailPlayer ();
         bBeginPlayAfterLoad = true;
+#if PHONON_ENABLED
         vmailPlayer->setCurrentSource (Phonon::MediaSource(url));
 //        vmailPlayer->setVolume (50);
+#endif
         QTimer::singleShot(1000, this, SLOT(ensureVmailPlaying()));
     } while (0); // End cleanup block (not a loop)
-}//MainWindow::playVmail
+}//qgvVmail::playVmail
 
 void
-MainWindow::ensureVmailPlaying()
+qgvVmail::ensureVmailPlaying()
 {
     if (bBeginPlayAfterLoad) {
         bBeginPlayAfterLoad = false;
-        if (vmailPlayer) {
+        if (NULL != vmailPlayer) {
+#if PHONON_ENABLED
             QTimer::singleShot(500, vmailPlayer, SLOT(play()));
+#endif
         }
     }
-}//MainWindow::ensureVmailPlaying
+}//qgvVmail::ensureVmailPlaying
 
 void
-MainWindow::createVmailPlayer()
+qgvVmail::createVmailPlayer()
 {
-    if (vmailPlayer) {
+    if (NULL != vmailPlayer) {
         return;
     }
 
+#if PHONON_ENABLED
     vmailPlayer = new Phonon::MediaObject(this);
     Phonon::AudioOutput *audioOutput =
         new Phonon::AudioOutput(Phonon::MusicCategory, vmailPlayer);
@@ -73,27 +101,33 @@ MainWindow::createVmailPlayer()
                   this, SLOT(onVmailPlayerFinished()));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
-}//MainWindow::createVmailPlayer
+#endif
+}//qgvVmail::createVmailPlayer
 
 void
-MainWindow::onVmailPlayerFinished()
+qgvVmail::onVmailPlayerFinished()
 {
     // Required to make phonon on Maemo work as expected.
     Q_DEBUG("Force stop vmail on finished");
+
+#if PHONON_ENABLED
     vmailPlayer->stop ();
-}//MainWindow::onVmailPlayerFinished
+#endif
+}//qgvVmail::onVmailPlayerFinished
 
 void
-MainWindow::onSigCloseVmail()
+qgvVmail::onSigCloseVmail()
 {
     if (NULL != vmailPlayer) {
+#if PHONON_ENABLED
         vmailPlayer->stop();
         vmailPlayer->clearQueue();
+#endif
     }
-}//MainWindow::onSigCloseVmail
+}//qgvVmail::onSigCloseVmail
 
 void
-MainWindow::retrieveVoicemail (const QString &strVmailLink)
+qgvVmail::retrieveVoicemail (const QString &strVmailLink)
 {
     AsyncTaskToken *token = NULL;
     bool rv = false;
@@ -102,7 +136,7 @@ MainWindow::retrieveVoicemail (const QString &strVmailLink)
         if (mapVmail.contains (strVmailLink)) {
             QString strFile = mapVmail[strVmailLink];
             Q_DEBUG("Playing cached vmail") << strFile;
-            setStatus ("Playing cached vmail");
+            emit setStatus ("Playing cached vmail");
             playVmail (strFile);
             rv = true;
             break;
@@ -128,10 +162,12 @@ MainWindow::retrieveVoicemail (const QString &strVmailLink)
         rv = connect (token, SIGNAL(completed(AsyncTaskToken*)),
                       this , SLOT(onVmailDownloaded(AsyncTaskToken*)));
 
-        gvApiProgressString = "Voicemail progress";
+        MainWindow *mainWin = (MainWindow *) parent();
+        mainWin->gvApiProgressString = "Voicemail progress";
+
         token->inParams["vmail_link"] = strVmailLink;
         token->inParams["file_location"] = strTemp;
-        if (!gvApi.getVoicemail (token)) {
+        if (!mainWin->gvApi.getVoicemail (token)) {
             Q_WARN ("Failed to play Voice mail");
             break;
         }
@@ -142,12 +178,13 @@ MainWindow::retrieveVoicemail (const QString &strVmailLink)
             delete token;
         }
     }
-}//MainWindow::retrieveVoicemail
+}//qgvVmail::retrieveVoicemail
 
 void
-MainWindow::onVmailDownloaded (AsyncTaskToken *token)
+qgvVmail::onVmailDownloaded (AsyncTaskToken *token)
 {
-    gvApiProgressString.clear ();
+    MainWindow *mainWin = (MainWindow *) parent();
+    mainWin->gvApiProgressString.clear ();
 
     QString strFilename = token->inParams["file_location"].toString();
     if (ATTS_SUCCESS == token->status) {
@@ -155,10 +192,10 @@ MainWindow::onVmailDownloaded (AsyncTaskToken *token)
         if (!mapVmail.contains (strVmailLink)) {
             mapVmail[strVmailLink] = strFilename;
             Q_DEBUG("Voicemail downloaded to ") << strFilename;
-            setStatus ("Voicemail downloaded");
+            emit setStatus ("Voicemail downloaded");
         } else {
             Q_DEBUG("Voicemail already existed. Using cached vmail");
-            setStatus ("Voicemail already existed. Using cached vmail");
+            emit setStatus ("Voicemail already existed. Using cached vmail");
             if (strFilename != mapVmail[strVmailLink]) {
                 QFile::remove (strFilename);
             }
@@ -168,11 +205,12 @@ MainWindow::onVmailDownloaded (AsyncTaskToken *token)
     } else {
         QFile::remove (strFilename);
     }
-}//MainWindow::onVmailDownloaded
+}//qgvVmail::onVmailDownloaded
 
+#if PHONON_ENABLED
 void
-MainWindow::onVmailPlayerStateChanged(Phonon::State newState,
-                                      Phonon::State /*oldState*/)
+qgvVmail::onVmailPlayerStateChanged(Phonon::State newState,
+                                    Phonon::State /*oldState*/)
 {
     int value = -1;
     Q_DEBUG(QString("Vmail player state changed to %1").arg(newState));
@@ -201,23 +239,27 @@ MainWindow::onVmailPlayerStateChanged(Phonon::State newState,
         return;
     }
 
-    QDeclarativeContext *ctx = this->rootContext();
+    MainWindow *mainWin = (MainWindow *) parent();
+    QDeclarativeContext *ctx = mainWin->rootContext();
     ctx->setContextProperty ("g_vmailPlayerState", value);
-}//MainWindow::onVmailPlayerStateChanged
+}//qgvVmail::onVmailPlayerStateChanged
+#endif
 
 void
-MainWindow::onSigVmailPlayback (int newstate)
+qgvVmail::onSigVmailPlayback (int newstate)
 {
     if (NULL == vmailPlayer) {
         Q_DEBUG("Vmail object not available.");
 
-        QDeclarativeContext *ctx = this->rootContext();
+        MainWindow *mainWin = (MainWindow *) parent();
+        QDeclarativeContext *ctx = mainWin->rootContext();
         int value = 0;
         ctx->setContextProperty ("g_vmailPlayerState", value);
 
         return;
     }
 
+#if PHONON_ENABLED
     switch(newstate) {
     case 0:
         Q_DEBUG("QML asked us to stop vmail");
@@ -235,4 +277,5 @@ MainWindow::onSigVmailPlayback (int newstate)
         Q_DEBUG(QString("Unknown newstate = %1").arg(newstate));
         break;
     }
-}//MainWindow::onSigVmailPlayback
+#endif
+}//qgvVmail::onSigVmailPlayback

@@ -29,9 +29,9 @@ Contact: yuvraaj@gmail.com
 #include "DialContext.h"
 #include "GVApi.h"
 #include "FuzzyTimer.h"
+#include "Vmail.h"
 
 #include <QtDeclarative>
-#include <phonon/MediaObject>
 
 #if MOSQUITTO_CAPABLE
 #include "MqClientThread.h"
@@ -137,17 +137,6 @@ private slots:
     //! Invoked every time a new registered phone is retrieved
     void gotAllRegisteredPhones (AsyncTaskToken *token);
 
-    //! Invoked by the inbox page when a voice mail is to be downloaded
-    void retrieveVoicemail (const QString &strVmailLink);
-    //! Invoked by GVApi when the voice mail download has completed
-    void onVmailDownloaded (AsyncTaskToken *token);
-    //! Invoked when the vmail player changes state
-    void onVmailPlayerStateChanged(Phonon::State newState,
-                                   Phonon::State oldState);
-    //! Invoked when the QML sends us a vmail play/pause/stop signal
-    void onSigVmailPlayback (int newstate);
-    void ensureVmailPlaying();
-
     //! Invoked by QML when the user selects a new phone method
     void onRegPhoneSelectionChange (int index);
     //! Invoked by QML when the user wanted to set options on the phone
@@ -209,11 +198,6 @@ private slots:
     void onSetContactsModel(QAbstractItemModel *model,
                             QAbstractItemModel *searchModel);
 
-    //! Invoked when the vmail is being shut off
-    void onSigCloseVmail();
-    //! Invoked when the vmail player has finished playing
-    void onVmailPlayerFinished();
-
     //! Created to delete the cookie jar and re-create it
     void onRecreateCookieJar();
 
@@ -264,7 +248,6 @@ private:
     void initQML ();
     bool connectSettingsSignals();
 
-
     void initContacts (const QString &contactsPass);
     void deinitContacts ();
 
@@ -278,8 +261,6 @@ private:
                           GVRegisteredNumber   &gvRegNumber,
                           CalloutInitiator    *&initiator  );
 
-    void playVmail (const QString &strFile);
-
     void setUsername(const QString &strUsername);
     void setPassword(const QString &strPassword);
 
@@ -287,8 +268,6 @@ private:
     void fallbackDialout (DialContext *ctx);
 
     void clearSmsDestinations();
-
-    void createVmailPlayer();
 
     void initMq();
 
@@ -317,10 +296,8 @@ private:
     GVContactsTable *oContacts;
     //! GV Inbox object
     GVInbox         *oInbox;
-
-    bool bBeginPlayAfterLoad;
-    //! The Phonon vmail player
-    Phonon::MediaObject *vmailPlayer;
+    //! Vmail object
+    qgvVmail        *oVmail;
 
     //! The QNAM for the MainWindow. Almost never used except to send logs.
     QNetworkAccessManager *nwMgr;
@@ -371,9 +348,6 @@ private:
     //! The users registered numbers
     GVRegisteredNumberArray arrNumbers;
 
-    //! Map between the voice mail link and its temp file name
-    QMap<QString,QString> mapVmail;
-
     QMutex          logMutex;
     //! This holds a circular buffer of log messages that will be shown by QML
     QStringList     arrLogMsgs;
@@ -408,6 +382,8 @@ private:
     //! of the CI needs to be saved here because the dialog box for the number
     //! is asynchronous
     QString         m_dialoutSelectionId;
+
+    friend class qgvVmail;
 };
 
 #endif // MAINWINDOW_H

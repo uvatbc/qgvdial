@@ -35,8 +35,7 @@ MainWindow::MainWindow (QWidget *parent)
 , m_registeredPhonesModel(NULL)
 , oContacts (NULL)
 , oInbox (NULL)
-, bBeginPlayAfterLoad (false)
-, vmailPlayer (NULL)
+, oVmail (NULL)
 , nwMgr (NULL)
 , statusTimer (this)
 #ifdef Q_WS_MAEMO_5
@@ -65,6 +64,8 @@ MainWindow::MainWindow (QWidget *parent)
 , contactsTimer (this)
 , inboxTimer (this)
 {
+    bool rv;
+
     modelRegNumber = new RegNumberModel(this);
     if (modelRegNumber == NULL) {
         Q_WARN("Failed to allocate modelRegNumber");
@@ -77,12 +78,23 @@ MainWindow::MainWindow (QWidget *parent)
         exit(1);
         return;
     }
+
     oInbox = new GVInbox(gvApi, this);
     if (oInbox == NULL) {
         Q_WARN("Failed to allocate oInbox");
         exit(1);
         return;
     }
+
+    oVmail = new qgvVmail(this);
+    if (oVmail == NULL) {
+        Q_WARN("Failed to allocate oVmail");
+        exit(1);
+        return;
+    }
+    rv = connect(oVmail, SIGNAL(setStatus(QString,int)),
+                 this, SLOT(setStatus(QString,int)));
+    Q_ASSERT(rv);
 
     initLogging ();
 
@@ -93,7 +105,6 @@ MainWindow::MainWindow (QWidget *parent)
 
     initQML ();
 
-    bool rv;
     // A systray icon if the OS supports it
     if (QSystemTrayIcon::isSystemTrayAvailable ())
     {
@@ -141,9 +152,9 @@ MainWindow::~MainWindow ()
     mqThread.terminate ();
 #endif
 
-    if (NULL != vmailPlayer) {
-        delete vmailPlayer;
-        vmailPlayer = NULL;
+    if (NULL != oVmail) {
+        delete oVmail;
+        oVmail = NULL;
     }
 
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
@@ -601,11 +612,11 @@ MainWindow::initQML ()
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
     rv = connect (obj, SIGNAL(sigVoicemail(QString)),
-                  this, SLOT(retrieveVoicemail(const QString&)));
+                  oVmail, SLOT(retrieveVoicemail(const QString&)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
     rv = connect (obj, SIGNAL(sigVmailPlayback(int)),
-                  this, SLOT(onSigVmailPlayback(int)));
+                  oVmail, SLOT(onSigVmailPlayback(int)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
     rv = connect (obj  , SIGNAL(sigMarkAsRead(QString)),
@@ -620,7 +631,7 @@ MainWindow::initQML ()
                   oInbox, SLOT(refreshFullInbox()));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
-    rv = connect(obj, SIGNAL(sigCloseVmail()), this, SLOT(onSigCloseVmail()));
+    rv = connect(obj, SIGNAL(sigCloseVmail()), oVmail, SLOT(onSigCloseVmail()));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
     rv = connect(obj, SIGNAL(sigDeleteInboxEntry(const QString &)),
@@ -826,14 +837,9 @@ MainWindow::on_actionE_xit_triggered ()
 {
     this->close ();
 
-    for (QMap<QString,QString>::iterator i  = mapVmail.begin ();
-                                         i != mapVmail.end ();
-                                         i++)
-    {
-        Q_DEBUG(QString("Delete vmail cached at %1").arg (i.value ()));
-        QFile::remove (i.value ());
+    if (NULL != oVmail) {
+        oVmail->onExit ();
     }
-    mapVmail.clear ();
 
 #if MOSQUITTO_CAPABLE
     mqThread.setQuit ();

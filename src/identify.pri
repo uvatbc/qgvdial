@@ -26,3 +26,10 @@ symbian {
     }
 }
 
+blackberry {
+    message(Blackberry!!)
+}
+
+unix:!symbian:!maemo5:!blackberry {
+    DEFINES += IS_LINUX_DESKTOP
+}

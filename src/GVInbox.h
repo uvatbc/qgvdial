@@ -51,9 +51,6 @@ signals:
     void textANumber (const QString &strNumber,
                       const QString &strNameLink = QString ());
 
-    //! Emitted when we identify a voicemail link
-    void retrieveVoicemail (const QString &strVmailLink);
-
     //! Emitted when the Inbox AbstractModel is created
     void setInboxModel(QAbstractItemModel *model);
 

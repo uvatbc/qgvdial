@@ -57,7 +57,7 @@ typedef int ssize_t;
 #define ECONNRESET 104
 #endif
 
-#if !defined(WIN32) && !defined(__SYMBIAN32__)
+#if !defined(WIN32) && !defined(__SYMBIAN32__) && !defined(__QNX__)
 #define HAVE_PSELECT
 #endif
 

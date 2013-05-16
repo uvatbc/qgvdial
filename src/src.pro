@@ -6,9 +6,13 @@ DEFINES += NO_CONTACTS_CAPTCHA
 DEFINES += DBG_TP_VERBOSE
 #DEFINES += DBG_VERBOSE
 
-QT      *= core gui sql xml xmlpatterns script declarative phonon
+QT      *= core gui sql xml xmlpatterns script declarative
 TARGET   = qgvdial
 TEMPLATE = app
+
+!blackberry {
+QT *= phonon
+}
 
 !win32 {
 # Win32 stores all intermidiate files into the debug and release folders.
@@ -20,8 +24,10 @@ TEMPLATE = app
 CONFIG *= precompile_header
 PRECOMPILED_HEADER = ../src/global.h
 
-CONFIG   += mobility
-MOBILITY += systeminfo
+CONFIG   *= mobility
+!blackberry {
+    MOBILITY *= systeminfo
+}
 
 # Meego requires Meegotouch
 contains(DEFINES,MEEGO_HARMATTAN) {
@@ -39,7 +45,8 @@ symbian | contains(DEFINES,MEEGO_HARMATTAN) {
 }
 
 # Except for Symbian S3 and S3 Belle add single application
-!contains(DEFINES,IS_S3) | !contains(DEFINES,IS_S3_BELLE){
+!contains(DEFINES,IS_S3) : !contains(DEFINES,IS_S3_BELLE) : !blackberry {
+    message(Single application library added)
     include(qtsingleapplication/qtsingleapplication.pri)
 }
 
@@ -60,8 +67,12 @@ contains(DEFINES,MEEGO_HARMATTAN) {
 
 # In Linux, maemo and harmattan, add the telepathy related sources and headers,
 # telepathy libraries and openssl library.
-unix:!symbian: {
+unix:!symbian:!blackberry {
    include(../src/tp-capable/tp-capable.pri)
+}
+# For blackberry, add the openssl library:
+blackberry {
+    LIBS += -lcrypto
 }
 
 SOURCES  += ../src/main.cpp                 \
@@ -69,7 +80,6 @@ SOURCES  += ../src/main.cpp                 \
             ../src/MainWindow.cpp           \
             ../src/MainWinLogs.cpp          \
             ../src/MainWinCallText.cpp      \
-            ../src/MainWinVmail.cpp         \
             ../src/MainWinLogin.cpp         \
             ../src/Singletons.cpp           \
             ../src/CacheDatabase.cpp        \
@@ -98,7 +108,8 @@ SOURCES  += ../src/main.cpp                 \
             ../src/FuzzyTimer.cpp           \
             ../src/NwInfo.cpp               \
             ../src/SkypeClientFactory.cpp   \
-            ../src/SkypeClient.cpp
+            ../src/SkypeClient.cpp          \
+            ../src/Vmail.cpp
 
 HEADERS  += ../src/global.h                 \
             ../src/IObserver.h              \
@@ -134,7 +145,8 @@ HEADERS  += ../src/global.h                 \
             ../src/PhoneIntegrationIface.h  \
             ../src/TpHeaders.h              \
             ../src/SkypeClientFactory.h     \
-            ../src/SkypeClient.h
+            ../src/SkypeClient.h            \
+            ../src/Vmail.h
 
 contains(DEFINES,MEEGO_HARMATTAN) | contains(DEFINES,IS_S3_BELLE) {
     DEFINES += ENABLE_FUZZY_TIMER
@@ -164,7 +176,7 @@ contains(DEFINES, IS_S3) | contains(DEFINES, IS_S3_BELLE) {
 maemo5 {
     RESOURCES += ../src/qgvdial-maemo.qrc
 } else {
-unix : !symbian {
+unix : !symbian : !blackberry {
 # Unix && !Symbian && !maemo5 && !harmattan = Linux desktop
     RESOURCES += ../src/qgvdial-desktop-linux.qrc
 } else {
@@ -224,12 +236,12 @@ OTHER_FILES  += ../src/winrsrc.rc               \
                 readme.txt
 
 # In desktop Linux, add the Skype client
-unix:!symbian:!maemo5 {
+contains(DEFINES,IS_LINUX_DESKTOP) {
    include(../src/desktop/desktop.pri)
-} else {
+}
 win32 {
    include(../src/desktop/desktop.pri)
-} }
+}
 
 ############################## Mosquitto ##############################
 # Add mosquitto support sources to EVERYONE.

@@ -31,7 +31,7 @@ Contact: yuvraaj@gmail.com
 #include <openssl/aes.h>
 #include <openssl/evp.h>
 
-#if defined(Q_OS_SYMBIAN) || defined(Q_WS_MAEMO_5)
+#if defined(Q_OS_SYMBIAN) || defined(Q_WS_MAEMO_5) || defined(Q_OS_BLACKBERRY)
 #define SYSTEMDISPLAYINFO 0
 #else
 #include <QtSystemInfo/QSystemDisplayInfo>
