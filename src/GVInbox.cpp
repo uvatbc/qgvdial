@@ -23,10 +23,10 @@ Contact: yuvraaj@gmail.com
 #include "GVInbox.h"
 #include "Singletons.h"
 #include "InboxModel.h"
+#include "MainWindow.h"
 
-GVInbox::GVInbox (GVApi &gref, QObject *parent)
+GVInbox::GVInbox (MainWindow *parent)
 : QObject (parent)
-, gvApi(gref)
 , mutex (QMutex::Recursive)
 , bLoggedIn (false)
 , bRefreshInProgress (false)
@@ -35,8 +35,8 @@ GVInbox::GVInbox (GVApi &gref, QObject *parent)
 , bRecentCheckInProgress(false)
 {
     bool rv = connect (
-        &gvApi, SIGNAL (oneInboxEntry (const GVInboxEntry &)),
-         this , SLOT   (oneInboxEntry (const GVInboxEntry &)));
+                &parent->gvApi, SIGNAL(oneInboxEntry(const GVInboxEntry&)),
+                this, SLOT(oneInboxEntry(const GVInboxEntry&)));
     Q_ASSERT(rv); Q_UNUSED(rv);
 
     // Initially, all are to be selected
@@ -142,7 +142,8 @@ GVInbox::refresh (const QDateTime &dtUpdate)
     bRefreshInProgress = true;
     newEntries = 0;
 
-    if (!gvApi.getInbox (token)) {
+    MainWindow *mainWin = (MainWindow *) parent();
+    if (!mainWin->gvApi.getInbox (token)) {
         getInboxDone (NULL);
         delete token;
     }
@@ -179,7 +180,8 @@ GVInbox::checkRecent()
                       this, SLOT(onCheckRecentCompleted(AsyncTaskToken*)));
     Q_ASSERT(rv); Q_UNUSED(rv);
 
-    if (!gvApi.checkRecentInbox (token)) {
+    MainWindow *mainWin = (MainWindow *) parent ();
+    if (!mainWin->gvApi.checkRecentInbox (token)) {
         onCheckRecentCompleted (NULL);
         delete token;
     }
@@ -284,7 +286,8 @@ GVInbox::getInboxDone (AsyncTaskToken *token)
         page++;
 
         token->inParams["page"] = page;
-        if (!gvApi.getInbox (token)) {
+        MainWindow *mainWin = (MainWindow *) parent ();
+        if (!mainWin->gvApi.getInbox (token)) {
             Q_WARN("Failed to get inbox!");
             break;
         }
@@ -336,7 +339,8 @@ GVInbox::getTrash()
     bRefreshInProgress = true;
     newEntries = 0;
 
-    if (!gvApi.getInbox (token)) {
+    MainWindow *mainWin = (MainWindow *) parent ();
+    if (!mainWin->gvApi.getInbox (token)) {
         getInboxDone (NULL);
         delete token;
     }
@@ -378,7 +382,8 @@ GVInbox::onSigMarkAsRead(const QString &msgId)
                        this , SLOT(onInboxEntryMarked(AsyncTaskToken*)));
     Q_ASSERT(rv); Q_UNUSED(rv);
 
-    if (!gvApi.markInboxEntryAsRead (token)) {
+    MainWindow *mainWin = (MainWindow *) parent ();
+    if (!mainWin->gvApi.markInboxEntryAsRead (token)) {
         token->status = ATTS_FAILURE;
         onInboxEntryMarked(token);
     }
@@ -408,7 +413,8 @@ GVInbox::onSigDeleteInboxEntry(const QString &id)
                        this , SLOT(onInboxEntryDeleted(AsyncTaskToken*)));
     Q_ASSERT(rv); Q_UNUSED(rv);
 
-    if (!gvApi.deleteInboxEntry (token)) {
+    MainWindow *mainWin = (MainWindow *) parent ();
+    if (!mainWin->gvApi.deleteInboxEntry (token)) {
         token->status = ATTS_FAILURE;
         onInboxEntryDeleted(token);
     }

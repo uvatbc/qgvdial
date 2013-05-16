@@ -28,14 +28,16 @@ Contact: yuvraaj@gmail.com
 // even though it is present in QtCore which is included in global.h
 #include <QObject>
 
+// Forward declarations
 class ContactsModel;
+class MainWindow;
 
 class GVContactsTable : public QObject
 {
     Q_OBJECT
 
 public:
-    GVContactsTable (QObject *parent = 0);
+    GVContactsTable (MainWindow *parent = 0);
     ~GVContactsTable ();
 
     void setTempStore(const QString &strTemp);

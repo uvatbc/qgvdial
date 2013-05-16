@@ -383,6 +383,8 @@ private:
     //! is asynchronous
     QString         m_dialoutSelectionId;
 
+    friend class GVInbox;
+    friend class GVContactsTable;
     friend class qgvVmail;
 };
 

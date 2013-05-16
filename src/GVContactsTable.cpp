@@ -20,6 +20,7 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "global.h"
+#include "MainWindow.h"
 #include "GVContactsTable.h"
 
 #ifndef NO_CONTACTS_CAPTCHA
@@ -31,7 +32,7 @@ Contact: yuvraaj@gmail.com
 #include "ContactsModel.h"
 #include "ContactsParserObject.h"
 
-GVContactsTable::GVContactsTable (QObject *parent)
+GVContactsTable::GVContactsTable (MainWindow *parent)
 : QObject (parent)
 , modelContacts (NULL)
 , modelSearchContacts (NULL)

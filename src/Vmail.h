@@ -60,6 +60,8 @@ public slots:
 private slots:
     //! Invoked when the vmail player has finished playing
     void onVmailPlayerFinished();
+    void ensureVmailPlaying();
+
 #if PHONON_ENABLED
     //! Invoked when the vmail player changes state
     void onVmailPlayerStateChanged(Phonon::State newState,
@@ -69,7 +71,6 @@ private slots:
 private:
     void playVmail (const QString &strFile);
     void createVmailPlayer();
-    void ensureVmailPlaying();
 
 private:
     bool bBeginPlayAfterLoad;

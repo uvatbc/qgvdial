@@ -79,7 +79,7 @@ MainWindow::MainWindow (QWidget *parent)
         return;
     }
 
-    oInbox = new GVInbox(gvApi, this);
+    oInbox = new GVInbox(this);
     if (oInbox == NULL) {
         Q_WARN("Failed to allocate oInbox");
         exit(1);
@@ -356,8 +356,8 @@ MainWindow::init ()
     if (!rv) { exit(1); }
 
     // Status from contacts object
-    rv = connect (oContacts, SIGNAL (status   (const QString &, int)),
-                  this     , SLOT   (setStatus(const QString &, int)));
+    rv = connect (oContacts, SIGNAL(status(const QString&,int)),
+                  this     , SLOT(setStatus(const QString&,int)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
     // oContacts->allContacts -> this.getContactsDone
@@ -366,8 +366,8 @@ MainWindow::init ()
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
     // Status from inbox object
-    rv = connect (oInbox, SIGNAL (status   (const QString &, int)),
-                  this  , SLOT   (setStatus(const QString &, int)));
+    rv = connect (oInbox, SIGNAL(status(const QString&,int)),
+                  this  , SLOT(setStatus(const QString&,int)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
 

@@ -26,6 +26,8 @@ Contact: yuvraaj@gmail.com
 #include "GVApi.h"
 #include <QObject>
 
+// Forward declarations
+class MainWindow;
 class InboxModel;
 
 class GVInbox : public QObject
@@ -33,7 +35,7 @@ class GVInbox : public QObject
     Q_OBJECT
 
 public:
-    GVInbox (GVApi &gref, QObject *parent = 0);
+    GVInbox (MainWindow *parent = 0);
     ~GVInbox(void);
 
     void deinitModel ();
@@ -90,8 +92,6 @@ private:
     void getTrash();
 
 private:
-    GVApi          &gvApi;
-
     QDateTime       dateWaterLevel;
     bool            passedWaterLevel;
 
