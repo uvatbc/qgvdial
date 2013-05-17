@@ -300,7 +300,7 @@ void qgv_LogFlush();
 #define DIABLO_OS 0
 #endif
 
-#if defined(Q_WS_X11) && !defined(Q_WS_MAEMO_5) && !defined(MEEGO_HARMATTAN)
+#if defined(Q_WS_X11) && !defined(Q_WS_MAEMO_5) && !defined(MEEGO_HARMATTAN) && !defined(Q_OS_BLACKBERRY)
 #define LINUX_DESKTOP 1
 #else
 #define LINUX_DESKTOP 0
@@ -312,7 +312,7 @@ void qgv_LogFlush();
 #define DESKTOP_OS 0
 #endif
 
-#if defined(Q_OS_SYMBIAN) || defined(Q_WS_MAEMO_5) || DIABLO_OS || defined(MEEGO_HARMATTAN)
+#if defined(Q_OS_SYMBIAN) || defined(Q_WS_MAEMO_5) || DIABLO_OS || defined(MEEGO_HARMATTAN) || defined(Q_OS_BLACKBERRY)
 #define MOBILE_OS 1
 #else
 #define MOBILE_OS 0
@@ -324,7 +324,7 @@ void qgv_LogFlush();
 #define TELEPATHY_CAPABLE 0
 #endif
 
-#if DESKTOP_OS || (MOBILE_OS && !DIABLO_OS) || defined(Q_OS_BLACKBERRY)
+#if DESKTOP_OS || (MOBILE_OS && !DIABLO_OS)
 #define MOSQUITTO_CAPABLE 1
 #else
 #define MOSQUITTO_CAPABLE 0
@@ -360,7 +360,7 @@ void qgv_LogFlush();
 #define __FULLFUNC__ __FUNCTION__
 #endif
 
-#ifdef Q_OS_BLACKBERRY
+#if defined(Q_OS_BLACKBERRY)
 #define PHONON_ENABLED 0
 #else
 #define PHONON_ENABLED 1
