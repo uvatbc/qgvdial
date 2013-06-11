@@ -25,6 +25,9 @@ Contact: yuvraaj@gmail.com
 #if PHONON_ENABLED
 #include <phonon/AudioOutput>
 #include <phonon/AudioOutputDevice>
+#else
+#include <QtMultimediaKit/QMediaContent>
+#include <QtMultimediaKit/QMediaPlaylist>
 #endif
 
 qgvVmail::qgvVmail(MainWindow *parent)
@@ -61,6 +64,8 @@ qgvVmail::playVmail (const QString &strFile)
 #if PHONON_ENABLED
         vmailPlayer->setCurrentSource (Phonon::MediaSource(url));
 //        vmailPlayer->setVolume (50);
+#else
+        vmailPlayer->setMedia(url);
 #endif
         QTimer::singleShot(1000, this, SLOT(ensureVmailPlaying()));
     } while (0); // End cleanup block (not a loop)
@@ -72,9 +77,8 @@ qgvVmail::ensureVmailPlaying()
     if (bBeginPlayAfterLoad) {
         bBeginPlayAfterLoad = false;
         if (NULL != vmailPlayer) {
-#if PHONON_ENABLED
+            // Phonon as well as MultimediaKit have the same slot. Yay for Qt.
             QTimer::singleShot(500, vmailPlayer, SLOT(play()));
-#endif
         }
     }
 }//qgvVmail::ensureVmailPlaying
@@ -86,19 +90,29 @@ qgvVmail::createVmailPlayer()
         return;
     }
 
+    bool rv;
+
 #if PHONON_ENABLED
     vmailPlayer = new Phonon::MediaObject(this);
     Phonon::AudioOutput *audioOutput =
         new Phonon::AudioOutput(Phonon::MusicCategory, vmailPlayer);
     Phonon::createPath(vmailPlayer, audioOutput);
 
-    bool rv = connect (
+    rv = connect (
         vmailPlayer, SIGNAL(stateChanged (Phonon::State, Phonon::State)),
-        this, SLOT(onVmailPlayerStateChanged(Phonon::State, Phonon::State)));
+        this, SLOT(onPhononPlayerStateChanged(Phonon::State, Phonon::State)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
     rv = connect (vmailPlayer, SIGNAL(finished ()),
                   this, SLOT(onVmailPlayerFinished()));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+#else
+    vmailPlayer = new QMediaPlayer(this);
+
+    rv = connect (
+        vmailPlayer, SIGNAL(stateChanged(QMediaPlayer::State)),
+        this, SLOT(onMMKitPlayerStateChanged(QMediaPlayer::State)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
 #endif
@@ -110,18 +124,20 @@ qgvVmail::onVmailPlayerFinished()
     // Required to make phonon on Maemo work as expected.
     Q_DEBUG("Force stop vmail on finished");
 
-#if PHONON_ENABLED
-    vmailPlayer->stop ();
-#endif
+    vmailPlayer->stop ();   // Present in Phonon and MMKit
 }//qgvVmail::onVmailPlayerFinished
 
 void
 qgvVmail::onSigCloseVmail()
 {
     if (NULL != vmailPlayer) {
+        vmailPlayer->stop ();   // Present in Phonon and MMKit
 #if PHONON_ENABLED
-        vmailPlayer->stop();
         vmailPlayer->clearQueue();
+#else
+        if (NULL != vmailPlayer->playlist ()) {
+            vmailPlayer->playlist()->clear();
+        }
 #endif
     }
 }//qgvVmail::onSigCloseVmail
@@ -208,9 +224,10 @@ qgvVmail::onVmailDownloaded (AsyncTaskToken *token)
 }//qgvVmail::onVmailDownloaded
 
 #if PHONON_ENABLED
+
 void
-qgvVmail::onVmailPlayerStateChanged(Phonon::State newState,
-                                    Phonon::State /*oldState*/)
+qgvVmail::onPhononPlayerStateChanged(Phonon::State newState,
+                                     Phonon::State /*oldState*/)
 {
     int value = -1;
     Q_DEBUG(QString("Vmail player state changed to %1").arg(newState));
@@ -242,7 +259,37 @@ qgvVmail::onVmailPlayerStateChanged(Phonon::State newState,
     MainWindow *mainWin = (MainWindow *) parent();
     QDeclarativeContext *ctx = mainWin->rootContext();
     ctx->setContextProperty ("g_vmailPlayerState", value);
-}//qgvVmail::onVmailPlayerStateChanged
+}//qgvVmail::onPhononPlayerStateChanged
+
+#else
+
+void
+qgvVmail::onMMKitPlayerStateChanged(QMediaPlayer::State state)
+{
+    int value = -1;
+    Q_DEBUG(QString("Vmail player state changed to %1").arg(state));
+
+    switch (state) {
+    case QMediaPlayer::StoppedState:
+        ensureVmailPlaying ();
+        value = 0;
+        break;
+    case QMediaPlayer::PlayingState:
+        value = 1;
+        break;
+    case QMediaPlayer::PausedState:
+        value = 2;
+        break;
+    default:
+        Q_WARN("Unknown state!");
+        return;
+    }
+
+    MainWindow *mainWin = (MainWindow *) parent();
+    QDeclarativeContext *ctx = mainWin->rootContext();
+    ctx->setContextProperty ("g_vmailPlayerState", value);
+}//qgvVmail::onMMKitPlayerStateChanged
+
 #endif
 
 void
@@ -259,7 +306,6 @@ qgvVmail::onSigVmailPlayback (int newstate)
         return;
     }
 
-#if PHONON_ENABLED
     switch(newstate) {
     case 0:
         Q_DEBUG("QML asked us to stop vmail");
@@ -277,5 +323,4 @@ qgvVmail::onSigVmailPlayback (int newstate)
         Q_DEBUG(QString("Unknown newstate = %1").arg(newstate));
         break;
     }
-#endif
 }//qgvVmail::onSigVmailPlayback

@@ -10,10 +10,6 @@ QT      *= core gui sql xml xmlpatterns script declarative
 TARGET   = qgvdial
 TEMPLATE = app
 
-!blackberry {
-QT *= phonon
-}
-
 !win32 {
 # Win32 stores all intermidiate files into the debug and release folders.
 # There is no need to create a separate moc and obj folder for Win32.
@@ -27,6 +23,12 @@ PRECOMPILED_HEADER = ../src/global.h
 CONFIG   *= mobility
 !blackberry {
     MOBILITY *= systeminfo
+}
+
+!blackberry {
+QT *= phonon
+} else {
+MOBILITY *= multimedia
 }
 
 # Meego requires Meegotouch

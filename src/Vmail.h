@@ -27,6 +27,8 @@ Contact: yuvraaj@gmail.com
 
 #if PHONON_ENABLED
 #include <phonon/MediaObject>
+#else
+#include <QtMultimediaKit/QMediaPlayer>
 #endif
 
 // For some reason the symbian MOC doesn't like it if I don't include QObject
@@ -64,8 +66,10 @@ private slots:
 
 #if PHONON_ENABLED
     //! Invoked when the vmail player changes state
-    void onVmailPlayerStateChanged(Phonon::State newState,
-                                   Phonon::State oldState);
+    void onPhononPlayerStateChanged(Phonon::State newState,
+                                    Phonon::State oldState);
+#else
+    void onMMKitPlayerStateChanged(QMediaPlayer::State state);
 #endif
 
 private:
@@ -82,7 +86,7 @@ private:
     //! The Phonon vmail player
     Phonon::MediaObject *vmailPlayer;
 #else
-    QObject *vmailPlayer;
+    QMediaPlayer *vmailPlayer;
 #endif
 };
 
