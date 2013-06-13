@@ -109,13 +109,13 @@ QGVConnectionManager::GetParameters(const QString &Protocol)
     // I could have used "username", but "account" is the well known name for
     // this parameter
     susv.s1 = "account";
-    susv.u  = CM_Param_Flags_None;
+    susv.u  = CM_Param_Flags_Required;
     susv.s2 = "s";                  // DBus signature
     susv.v.setVariant(QString());   // default value
     rv.append(susv);
 
     susv.s1 = "password";
-    susv.u  = CM_Param_Flags_None;
+    susv.u  = CM_Param_Flags_Required;
     susv.s2 = "s";                  // DBus signature
     susv.v.setVariant(QString());   // default value
     rv.append(susv);
