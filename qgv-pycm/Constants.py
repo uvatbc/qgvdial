@@ -1,5 +1,5 @@
 #!/usr/bin/python
  
 PROTOCOL = 'qgv'
-PROGRAM = 'qgvtp-py'
+PROGRAM = 'qgvtp'
 

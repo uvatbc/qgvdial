@@ -30,17 +30,21 @@ class qgvConnection(Connection,
                                    parameters['account'])
         self._handles[HANDLE_TYPE_CONTACT, self._self_handle.get_id()] =\
                                    self._self_handle
+        print "qgvConnection init"
  
     # borrowed from butterfly, required by telepathy's channel init
     def handle(self, handle_type, handle_id):
+        print "qgvConnection handle"
         self.check_handle(handle_type, handle_id)
         return self._handles[handle_type, handle_id]
  
     def Connect(self):
+        print "qgvConnection Connect"
         self.StatusChanged(CONNECTION_STATUS_CONNECTED,
                            CONNECTION_STATUS_REASON_REQUESTED)
  
     def Disconnect(self):
+        print "qgvConnection Disconnect"
         self.StatusChanged(CONNECTION_STATUS_DISCONNECTED,
                            CONNECTION_STATUS_REASON_REQUESTED)
         # stop handling all channels

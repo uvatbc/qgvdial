@@ -12,10 +12,14 @@ class qgvConnectionManager(ConnectionManager):
         ConnectionManager.__init__(self, PROGRAM)
         # use telepathy magic to provide required methods
         self._protos[PROTOCOL] = qgvConnection
+        print "CM constructed"
  
     def GetParameters(self, proto):
         from telepathy import NotImplemented, CONN_MGR_PARAM_FLAG_REQUIRED
         if proto != PROTOCOL:
             raise NotImplemented('unknown protocol %s' % proto)
-        return [('account', CONN_MGR_PARAM_FLAG_REQUIRED, 's', '')]
+        # I don't really need an account.
+        #return [('account', CONN_MGR_PARAM_FLAG_REQUIRED, 's', '')]
+        print "Return empty parameters list"
+        return []
 
