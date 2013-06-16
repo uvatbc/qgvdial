@@ -4,5 +4,5 @@ BusName=org.freedesktop.Telepathy.ConnectionManager.qgvtp
 ObjectPath=/org/freedesktop/Telepathy/ConnectionManager/qgvtp
 
 [Protocol qgv]
-param-account=s
-param-password=s
+param-account=s required register
+param-password=s required register secret

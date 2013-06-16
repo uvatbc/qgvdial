@@ -131,14 +131,8 @@ main(int argc, char *argv[])
 
     registerDBusTypes();
 
-    QGVConnectionManager *cm = new QGVConnectionManager(&a);
-    if (NULL == cm) {
-        Q_WARN("Failed to allocate connection manager");
-        return -1;
-    }
-
-    if (!cm->registerObject ()) {
-        delete cm;
+    QGVConnectionManager cm(&a);
+    if (!cm.registerObject ()) {
         Q_WARN("Failed to register connection manager");
         return -1;
     }
@@ -149,4 +143,4 @@ main(int argc, char *argv[])
     deinitLogging();
 
     return rv;
-}
+}//main
