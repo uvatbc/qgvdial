@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <qnx>
     <id>net.yuvraaj.qgvdial</id>
-    <versionNumber>0.3</versionNumber>
+    <versionNumber>0.3.0</versionNumber>
     <name>qgvdial - Google Voice client</name>
     <description>Google Voice client for Blackberry 10 devices</description>
     <asset path="qgvdial" entry="true">qgvdial</asset>
@@ -13,8 +13,9 @@
     <permission>access_phone</permission>
     <action system="true">run_native</action>
     <icon>
-        <image>qgvdial-114.png</image>
+        <image>qgvdial114.png</image>
     </icon>
+    <asset path="qgvdial114.png">qgvdial114.png</asset>
     <platformVersion>3.0.0</platformVersion>
     <systemChrome>standard</systemChrome>
 </qnx>
