@@ -475,7 +475,16 @@ QString
 OsDependent::getLogDirectory ()
 {
 #ifdef Q_OS_BLACKBERRY
-    return QDir::currentPath() + "./logs";
+    QString strDir = QDir::homePath ();
+    QDir dirHome(strDir);
+    if (!strDir.endsWith (QDir::separator ())) {
+        strDir += QDir::separator ();
+    }
+    strDir += "logs";
+    if (!QFileInfo(strDir).exists ()) {
+        dirHome.mkdir ("logs");
+    }
+    return strDir;
 #else
     return getAppDirectory();
 #endif
@@ -485,7 +494,7 @@ QString
 OsDependent::getDbDirectory ()
 {
 #ifdef Q_OS_BLACKBERRY
-    return QDir::currentPath() + "./db";
+    return QDir::homePath();
 #else
     return getAppDirectory();
 #endif
@@ -495,7 +504,7 @@ QString
 OsDependent::getTmpDirectory ()
 {
 #ifdef Q_OS_BLACKBERRY
-    return QDir::currentPath() + "./tmp";
+    return QDir::tempPath();
 #else
     QString strTempStore = getAppDirectory ();
     QDir dirApp(strTempStore);

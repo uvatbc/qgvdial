@@ -336,3 +336,6 @@ contains(DEFINES,MEEGO_HARMATTAN) {
                         ../build-files/qgvdial/harmattan/qgvdial.Text.service \
                         ../build-files/qgvdial/harmattan/qgvdial.UI.service
 }
+
+# For blackberry:
+OTHER_FILES += ../build-files/qgvdial/bb10/bar-descriptor.xml
