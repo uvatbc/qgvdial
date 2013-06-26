@@ -50,10 +50,10 @@ public:
 
 #if !HAS_SINGLE_APP
     inline bool isRunning() { return false; }
-    inline bool sendMessage(const QString &message, int timeout = 5000) {
+    inline bool sendMessage(const QString & /*message*/, int /*timeout*/ = 5000) {
         return false;
     }
-    inline void setActivationWindow(QWidget *w, bool activateOnMessage = true){}
+    inline void setActivationWindow(QWidget *, bool /*activateOnMessage*/ = true){}
 #endif
 
 #ifdef Q_WS_WIN32

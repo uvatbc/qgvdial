@@ -59,7 +59,7 @@ CacheDatabase::init ()
 {
     OsDependent &osd = Singletons::getRef().getOSD ();
     QString strDbFile, strIniFile;
-    strDbFile = osd.getAppDirectory () + QDir::separator ();
+    strDbFile = osd.getDbDirectory () + QDir::separator ();
     strIniFile = strDbFile;
     strDbFile += QGVDIAL_DB_NAME;
     strIniFile += QGVDIAL_INI_NAME;
@@ -1411,14 +1411,14 @@ QString
 CacheDatabase::getTempDirectory()
 {
     OsDependent &osd = Singletons::getRef().getOSD ();
-    QString strTempStore = osd.getAppDirectory();
+    QString strTempStore = osd.getTmpDirectory ();
     QDir dirApp(strTempStore);
     strTempStore += QDir::separator() + tr("temp");
     if (!QFileInfo(strTempStore).exists ()) {
         dirApp.mkdir ("temp");
     }
 
-    return (strTempStore);
+    return (osd.getTmpDirectory());
 }//CacheDatabase::getTempDirectory
 
 void

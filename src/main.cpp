@@ -115,7 +115,7 @@ static void
 initLogging ()
 {
     OsDependent &osd = Singletons::getRef().getOSD ();
-    QString strLogfile = osd.getAppDirectory ();
+    QString strLogfile = osd.getLogDirectory ();
     strLogfile += QDir::separator ();
     strLogfile += "qgvdial-startup.log";
 
@@ -129,7 +129,7 @@ static void
 initLogRotate()
 {
     OsDependent &osd = Singletons::getRef().getOSD ();
-    QString strLogfile = osd.getAppDirectory ();
+    QString strLogfile = osd.getLogDirectory ();
     strLogfile += QDir::separator ();
     QString oldLogFile = strLogfile;
     oldLogFile += "qgvdial-startup.log";

@@ -82,7 +82,11 @@ public:
     void setLongWork (QWidget *window, bool bSet = false);
 
     QRect getStartingSize ();
-    QString getAppDirectory ();
+
+    QString getLogDirectory ();
+    QString getDbDirectory ();
+    QString getTmpDirectory ();
+
     QString getMainQML();
     void getMultipliers(double &hMul, double &wMul, double &fontMul);
 
@@ -116,6 +120,9 @@ signals:
     void sigRefresh();
     void sigQuit();
 ////////////////////////////////////////////////////////////////////////////////
+
+private:
+    QString getAppDirectory ();
 
 private:
     OsDependent(QObject *parent = 0);

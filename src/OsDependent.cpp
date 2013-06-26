@@ -472,6 +472,42 @@ OsDependent::getAppDirectory ()
 }//OsDependent::getAppDirectory
 
 QString
+OsDependent::getLogDirectory ()
+{
+#ifdef Q_OS_BLACKBERRY
+    return QDir::currentPath() + "./logs";
+#else
+    return getAppDirectory();
+#endif
+}//OsDependent::getLogDirectory
+
+QString
+OsDependent::getDbDirectory ()
+{
+#ifdef Q_OS_BLACKBERRY
+    return QDir::currentPath() + "./db";
+#else
+    return getAppDirectory();
+#endif
+}//OsDependent::getDbDirectory
+
+QString
+OsDependent::getTmpDirectory ()
+{
+#ifdef Q_OS_BLACKBERRY
+    return QDir::currentPath() + "./tmp";
+#else
+    QString strTempStore = getAppDirectory ();
+    QDir dirApp(strTempStore);
+    strTempStore += QDir::separator() + tr("temp");
+    if (!QFileInfo(strTempStore).exists ()) {
+        dirApp.mkdir ("temp");
+    }
+    return (strTempStore);
+#endif
+}//OsDependent::getTmpDirectory
+
+QString
 OsDependent::getMainQML ()
 {
 #if defined(MEEGO_HARMATTAN)
