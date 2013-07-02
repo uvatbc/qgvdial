@@ -12,6 +12,7 @@
     <permission>access_internet</permission>
     <permission>post_notification</permission>
     <permission>access_phone</permission>
+    <permission>access_shared</permission>
     <action system="true">run_native</action>
     <icon>
         <image>qgvdial114.png</image>

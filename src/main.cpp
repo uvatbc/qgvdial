@@ -185,9 +185,11 @@ main (int argc, char *argv[])
             bQuit = true;
         }
     }
-    if (bQuit == true) {
+    if (bQuit) {
         return (0);
     }
+    
+    TOUCHME("app created");
 
     // here's the log rotate
     initLogRotate ();

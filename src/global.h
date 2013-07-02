@@ -383,6 +383,16 @@ void qgv_LogFlush();
 //#undef PHONON_ENABLED
 //#define PHONON_ENABLED 0
 
+#define TOUCHME(__a) \
+do { \
+    QString d = QString("%1(%2): %3").arg(__FULLFUNC__).arg(__LINE__).arg(__a); \
+    QString base = QDir::currentPath(); \
+    QFile f(base + "/shared/documents/qgvdial.log"); \
+    f.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text | QIODevice::Unbuffered); \
+    f.write(d.toLatin1()); \
+    f.close(); \
+} while (0)
+
 
 #endif //__cplusplus
 #endif //__GLOBAL_H__
