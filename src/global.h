@@ -383,6 +383,7 @@ void qgv_LogFlush();
 //#undef PHONON_ENABLED
 //#define PHONON_ENABLED 0
 
+#if defined(Q_OS_BLACKBERRY)
 #define TOUCHME(__a) \
 do { \
     QString d = QString("%1(%2): %3").arg(__FULLFUNC__).arg(__LINE__).arg(__a); \
@@ -392,7 +393,9 @@ do { \
     f.write(d.toLatin1()); \
     f.close(); \
 } while (0)
-
+#else
+#define TOUCHME(__a)
+#endif
 
 #endif //__cplusplus
 #endif //__GLOBAL_H__

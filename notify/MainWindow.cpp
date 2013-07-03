@@ -210,6 +210,10 @@ MainWindow::checkParams ()
             qWarning ("Ini file does not contain the mq topic");
             cout << "Enter topic:";
             in >> m_strMqTopic;
+            if (m_strMqTopic.startsWith ('-')) {
+                qWarning ("Using gv_notify as topic instead");
+                m_strMqTopic = "gv_notify";
+            }
             settings.setValue ("mqtopic", m_strMqTopic);
         } else {
             m_strMqTopic = settings.value ("mqtopic").toString ();
@@ -473,11 +477,14 @@ MainWindow::onTwoStepAuthentication(AsyncTaskToken *token)
     cout << "Enter PIN:";
     in >> strPIN;
 
-    token->inParams["user_pin"] = strPIN;
-
-    tfaRequired = true;
-
-    gvApi.resumeTFALogin (token);
+    if (strPIN.startsWith ('-')) {
+        qWarning ("Requesting GV Api to call you:");
+        gvApi.resumeTFAAltLogin (token);
+    } else {
+        token->inParams["user_pin"] = strPIN;
+        tfaRequired = true;
+        gvApi.resumeTFALogin (token);
+    }
 }//MainWindow::onTwoStepAuthentication
 
 void

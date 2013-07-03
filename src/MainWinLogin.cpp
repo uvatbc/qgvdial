@@ -440,7 +440,6 @@ MainWindow::onPinMsgBoxDone(bool ok)
 
     obj = getQMLObject ("MsgBox");
     do {// Begin cleanup block (not a loop)
-
         if (NULL == obj) {
             gvApi.cancel (token);
             Q_ASSERT(obj);
@@ -452,8 +451,13 @@ MainWindow::onPinMsgBoxDone(bool ok)
             break;
         }
 
-        token->inParams["user_pin"] = obj->property("inputText").toString();
-        gvApi.resumeTFALogin (token);
+        QString pin = obj->property("inputText").toString();
+        if (pin.isEmpty ()) {
+            gvApi.resumeTFAAltLogin (token);
+        } else {
+            token->inParams["user_pin"] = pin;
+            gvApi.resumeTFALogin (token);
+        }
         token = NULL;
     } while (0); // End cleanup block (not a loop)
 

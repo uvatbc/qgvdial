@@ -55,6 +55,7 @@ public:
 // GV API:
     bool login(AsyncTaskToken *token);
     bool resumeTFALogin(AsyncTaskToken *token);
+    bool resumeTFAAltLogin(AsyncTaskToken *token);
     bool logout(AsyncTaskToken *token);
     bool getPhones(AsyncTaskToken *token);
     bool getInbox(AsyncTaskToken *token);
@@ -92,6 +93,8 @@ private slots:
                        QNetworkReply *reply, void *ctx);
     void onGotRnr(bool success, const QByteArray &response,
                   QNetworkReply *reply, void *ctx);
+    void onTFAAltLoginResp(bool success, const QByteArray &response,
+                           QNetworkReply *reply, void *ctx);
 
     void internalLogoutForReLogin(AsyncTaskToken *token);
 

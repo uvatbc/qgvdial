@@ -697,12 +697,12 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
             break;
         }
 
-        QString nextAction;
+        QString nextAction, cap;
         QRegExp rxForm("<form.*>(.*)</form>");
         rxForm.setMinimal(true);
         int pos = strResponse.indexOf (rxForm);
         while (-1 != pos) {
-            QString cap = rxForm.cap (0);
+            cap = rxForm.cap (0);
             quint32 len = cap.length ();
             QRegExp rxAction("action=[\"|'](.*)[\"|']");
             rxAction.setMinimal (true);
@@ -721,6 +721,30 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
             success = false;
             break;
         }
+
+        do {
+            pos = strResponse.indexOf ("alternative-delivery");
+            if (-1 == pos) {
+                Q_WARN("Failed to get alternate delivery");
+                break;
+            }
+            pos = strResponse.lastIndexOf ('<', pos);
+            if (-1 == pos) {
+                Q_WARN("Failed to get alternate delivery");
+                break;
+            }
+            cap = strResponse.mid(pos, strResponse.indexOf('>', pos) - pos);
+
+            QRegExp rxHref("href\\s*=\\s*\"(.*)\"");
+            rxHref.setMinimal (true);
+            pos = cap.indexOf (rxHref);
+            if (-1 == pos) {
+                Q_WARN("Failed to get alternate delivery href");
+                break;
+            }
+            cap = rxHref.cap (1);
+            token->inParams["tfaAlternate"] = cap;
+        } while(0);
 
         if (emitLog) {
             Q_DEBUG("Two factor AUTH required!");
@@ -818,6 +842,62 @@ GVApi::resumeTFALogin(AsyncTaskToken *token)
 
     return (true);
 }//GVApi::resumeTFALogin
+
+bool
+GVApi::resumeTFAAltLogin(AsyncTaskToken *token)
+{
+    bool rv = false;
+    QString strUrl;
+
+    do { // Begin cleanup block (not a loop)
+        strUrl = token->inParams["tfaAlternate"].toString ();
+        strUrl.replace ("&amp;", "&");
+        QUrl url = QUrl::fromPercentEncoding (strUrl.toLatin1 ());
+        rv = doGet (url, token, this,
+                    SLOT(onTFAAltLoginResp(bool,QByteArray,QNetworkReply*,void*)));
+    } while (0); // End cleanup block (not a loop)
+
+    if (!rv) {
+        token->status = ATTS_LOGIN_FAILURE;
+        token->emitCompleted ();
+    }
+
+    return (rv);
+}//GVApi::resumeTFAAltLogin
+
+void
+GVApi::onTFAAltLoginResp(bool success, const QByteArray &response,
+                         QNetworkReply *reply, void *ctx)
+{
+    AsyncTaskToken *token = (AsyncTaskToken *)ctx;
+    QString strResponse = response;
+    QString strReplyUrl = reply->url().toString();
+
+    do { // Begin cleanup block (not a loop)
+        if (!success) {
+            token->status = ATTS_NW_ERROR;
+            break;
+        }
+
+        emit twoStepAuthentication(token);
+
+        success = true;
+    } while (0); // End cleanup block (not a loop)
+
+    if (!success) {
+        QString msg = QString("Failed to get response to alternate login! "
+                              "URL = %1. Response = %2")
+                        .arg(strReplyUrl, strResponse);
+        Q_WARN(msg);
+
+        if (token) {
+            if (token->status == ATTS_SUCCESS) {
+                token->status = ATTS_LOGIN_FAILURE;
+            }
+            token->emitCompleted ();
+        }
+    }
+}//GVApi::onTFAAltLoginResp
 
 void
 GVApi::onTFAAutoPost(bool success, const QByteArray &response,
