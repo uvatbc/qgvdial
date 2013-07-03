@@ -10,7 +10,7 @@ extern QString strLogfile;
 
 MainWindow::MainWindow(QObject *parent /*= 0*/)
 : QObject(parent)
-, gvApi (true, this)
+, gvApi (false, this)
 , bIsLoggedIn (false)
 , oContacts (this)
 , oInbox (gvApi, this)
