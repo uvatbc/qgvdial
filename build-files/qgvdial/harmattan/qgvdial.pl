@@ -4,7 +4,7 @@ my $cmd;
 # Delete any existing version file
 system("rm -f ver.cfg");
 # Get the latest version file from the repository
-$cmd = "ssh uv\@userver_x86 \"cd harmattan/export/qgvdial ; svn export $repo/build-files/ver.cfg\"";
+$cmd = "ssh uv\@userver \"cd harmattan/export/qgvdial ; svn export $repo/build-files/ver.cfg\"";
 system($cmd);
 
 # Pull out the version from the file
@@ -14,7 +14,7 @@ close QVARFILE;
 chomp $qver;
 
 # Get the subversion checkin version
-my $svnver = `ssh uv\@userver_x86 "svn log $repo --limit=1 | grep \"^r\""`;
+my $svnver = `ssh uv\@userver "svn log $repo --limit=1 | grep \"^r\""`;
 # Parse out the version number from the output we pulled out
 $svnver =~ m/^r(\d+)*/;
 $svnver = $1;
@@ -29,7 +29,7 @@ $basedir = "$basedir/qgvdial-$qver";
 # Delete any previous checkout directories
 system("rm -rf qgvdial-* qgvtp-* qgvdial_* qgvtp_*");
 
-$cmd = "ssh uv\@userver_x86 \"cd ~/harmattan/export/qgvdial ; svn export $repo qgvdial-$qver\"";
+$cmd = "ssh uv\@userver \"cd ~/harmattan/export/qgvdial ; svn export $repo qgvdial-$qver\"";
 system($cmd);
 system("cp $basedir/icons/qgv.png $basedir/src/qgvdial.png");
 
