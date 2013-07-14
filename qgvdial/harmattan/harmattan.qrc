@@ -1,9 +1,13 @@
 <RCC>
     <qresource prefix="/">
+        <!-- Main tab icons -->
         <file alias="dialpad.svg">../../icons/dialpad.svg</file>
         <file alias="people.svg">../../icons/people.svg</file>
         <file alias="history.svg">../../icons/history.svg</file>
         <file alias="settings.svg">../../icons/settings.svg</file>
+
+        <file alias="close.png">../../icons/close.png</file>
+        <file alias="search.png">../../icons/search.png</file>
+        <file alias="play.svg">../../icons/play.svg</file>
     </qresource>
 </RCC>
-

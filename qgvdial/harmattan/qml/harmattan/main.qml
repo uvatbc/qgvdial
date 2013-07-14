@@ -20,7 +20,7 @@ Contact: yuvraaj@gmail.com
 */
 
 import QtQuick 1.1
-import com.nokia.meego 1.0
+import com.nokia.meego 1.1
 
 PageStackWindow {
     id: appWindow
@@ -30,96 +30,29 @@ PageStackWindow {
         theme.inverted = true;
     }
 
-    initialPage: mainPage
-
-    MainPage {
-        id: mainPage
-    }//MainPage
+    initialPage: Page {
+        tools: commonTools
+    }
 
     TabGroup {
         id: tabgroup
-        currentTab: tab1
+        currentTab: dialTab
+
         DialPage {
-            id: tab1
+            id: dialTab
             toolbarHeight: appWindow.platformToolBarHeight
         }
-        Page {
-            id: tab2
-            Label {
-                id: lblresult
-                anchors.centerIn: parent
-                platformStyle: LabelStyle {
-                    textColor: "black"
-                    fontFamily: "Arial"
-                    fontPixelSize: 30
-                }
-            }
-            TextArea{
-                id: text1
-                anchors {
-                    horizontalCenter: parent.horizontalCenter
-                    top: lblresult.bottom
-                    topMargin: 10
-                }
-            }
-            Label {
-                id: labelname
-                text: qsTr("Name:")
-                anchors {
-                    top: text1.top
-                    topMargin: 10
-                    right: text1.left
-                    rightMargin: 10
-                }
-            }
-            Button{
-                id: btn
-                anchors {
-                    horizontalCenter: parent.horizontalCenter
-                    top: text1.bottom
-                    topMargin: 10
-                }
-                text: qsTr("Click here!")
-                onClicked: lblresult.text = "Hello " + text1.text + " !"
-            }
+        ContactsPage {
+            id: contactsTab
+            toolbarHeight: appWindow.platformToolBarHeight
         }
-        Page {
-            id: tab3
-            Label {
-                id: label
-                anchors.centerIn: parent
-                text: qsTr("Hello world!")
-                visible: false
-            }
-            Button{
-                id: btnClick
-                anchors {
-                    horizontalCenter: parent.horizontalCenter
-                    top: label.bottom
-                    topMargin: 10
-                }
-                text: qsTr("Click here!")
-                onClicked: label.visible = true
-            }
+        InboxPage {
+            id: inboxTab
+            toolbarHeight: appWindow.platformToolBarHeight
         }
-        Page {
-            id: tab4
-            Label {
-                id: label4
-                anchors.centerIn: parent
-                text: qsTr("Hello world!")
-                visible: false
-            }
-            Button{
-                id: btnClick4
-                anchors {
-                    horizontalCenter: parent.horizontalCenter
-                    top: label.bottom
-                    topMargin: 10
-                }
-                text: qsTr("Click here!")
-                onClicked: label.visible = true
-            }
+        SettingsPage {
+            id: settingsTab
+            toolbarHeight: appWindow.platformToolBarHeight
         }
     }//TabGroup
 
@@ -135,19 +68,19 @@ PageStackWindow {
         ButtonRow {
             TabButton {
                 iconSource: "qrc:/dialpad.svg"
-                tab: tab1
+                tab: dialTab
             }
             TabButton {
                 iconSource: "qrc:/people.svg"
-                tab: tab2
+                tab: contactsTab
             }
             TabButton {
                 iconSource: "qrc:/history.svg"
-                tab: tab3
+                tab: inboxTab
             }
             TabButton {
                 iconSource: "qrc:/settings.svg"
-                tab: tab4
+                tab: settingsTab
             }
         }
         ToolIcon {
@@ -159,10 +92,10 @@ PageStackWindow {
 
     Menu {
         id: myMenu
-        visualParent: pageStack
+        visualParent: appWindow
         MenuLayout {
             MenuItem {
-                text: qsTr("Sample menu item")
+                text: qsTr("Refresh")
             }
         }
     }//Menu

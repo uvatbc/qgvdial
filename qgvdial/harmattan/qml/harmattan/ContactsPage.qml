@@ -23,5 +23,40 @@ import QtQuick 1.1
 import com.nokia.meego 1.1
 
 Page {
+    id: container
     tools: commonTools
+
+    property bool isSearchResults: false
+    property real toolbarHeight: 50
+
+    Row {
+        id: searchRow
+        anchors {
+            top: parent.top
+            topMargin: 40
+        }
+        width: parent.width
+        spacing: 5
+
+        TextField {
+            id: searchField
+            placeholderText: "Search"
+            width: parent.width - searchButton.width - parent.spacing - 5
+        }
+
+        Button {
+            id: searchButton
+            iconSource: container.isSearchResults ? "qrc:/close.png" : "qrc:/search.png"
+            width: 70
+            anchors.verticalCenter: parent.verticalCenter
+        }
+    }
+
+    ListView {
+        id: contactsList
+        anchors {
+            top: searchRow.bottom
+        }
+        width: parent.width
+    }
 }

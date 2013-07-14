@@ -20,14 +20,13 @@ Contact: yuvraaj@gmail.com
 */
 
 import QtQuick 1.1
-import com.nokia.meego 1.0
+import com.nokia.meego 1.1
 
 Page {
     id: container
     tools: commonTools
 
     signal sigHaptic
-
     property real toolbarHeight: 50
 
     TextField {
@@ -82,12 +81,12 @@ Page {
         Button {
             text: "Text"
             height: 100
-            font.pointSize: 14
+            font.pixelSize: 35
         }
         Button {
             text: "Call"
             height: 100
-            font.pointSize: 14
+            font.pixelSize: 35
         }
     }
 }
