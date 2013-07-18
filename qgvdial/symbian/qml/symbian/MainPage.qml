@@ -19,22 +19,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#ifndef IMAINWINDOW_H
-#define IMAINWINDOW_H
+import QtQuick 1.1
+import com.nokia.symbian 1.1
 
-#include <QObject>
-
-class IMainWindow : public QObject
-{
-    Q_OBJECT
-public:
-    explicit IMainWindow(QObject *parent = 0);
-    virtual void init() = 0;
-
-signals:
-
-public slots:
-
-};
-
-#endif // IMAINWINDOW_H
+Page {
+    id: mainPage
+    Text {
+        anchors.centerIn: parent
+        text: qsTr("Hello world!")
+        color: platformStyle.colorNormalLight
+        font.pixelSize: 20
+    }
+}

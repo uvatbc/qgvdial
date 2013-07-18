@@ -19,22 +19,17 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#ifndef IMAINWINDOW_H
-#define IMAINWINDOW_H
+#include "MainWindow.h"
 
-#include <QObject>
-
-class IMainWindow : public QObject
+MainWindow::MainWindow(QObject *parent)
+: IMainWindow(parent)
+, m_view(NULL)
 {
-    Q_OBJECT
-public:
-    explicit IMainWindow(QObject *parent = 0);
-    virtual void init() = 0;
+}//MainWindow::MainWindow
 
-signals:
-
-public slots:
-
-};
-
-#endif // IMAINWINDOW_H
+void
+MainWindow::init()
+{
+    m_view.setMainQmlFile(QLatin1String("qml/symbian/main.qml"));
+    m_view.showExpanded();
+}//MainWindow::init

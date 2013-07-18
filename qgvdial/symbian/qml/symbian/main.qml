@@ -19,22 +19,21 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#ifndef IMAINWINDOW_H
-#define IMAINWINDOW_H
+import QtQuick 1.1
+import com.nokia.symbian 1.1
 
-#include <QObject>
+PageStackWindow {
+    id: window
+    initialPage: MainPage {tools: toolBarLayout}
+    showStatusBar: true
+    showToolBar: true
 
-class IMainWindow : public QObject
-{
-    Q_OBJECT
-public:
-    explicit IMainWindow(QObject *parent = 0);
-    virtual void init() = 0;
-
-signals:
-
-public slots:
-
-};
-
-#endif // IMAINWINDOW_H
+    ToolBarLayout {
+        id: toolBarLayout
+        ToolButton {
+            flat: true
+            iconSource: "toolbar-back"
+            onClicked: window.pageStack.depth <= 1 ? Qt.quit() : window.pageStack.pop()
+        }
+    }
+}
