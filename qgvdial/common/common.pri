@@ -1,4 +1,6 @@
 INCLUDEPATH += $$PWD
 
-SOURCES  += $$PWD/IMainWindow.cpp
+SOURCES  += $$PWD/main.cpp \
+            $$PWD/IMainWindow.cpp
+
 HEADERS  += $$PWD/IMainWindow.h

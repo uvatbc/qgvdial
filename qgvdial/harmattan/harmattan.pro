@@ -17,10 +17,8 @@ CONFIG += qdeclarative-boostable
 # Add dependency to Symbian components
 # CONFIG += qt-components
 
-SOURCES  += main.cpp \
-            MainWindow.cpp
-
-HEADERS += MainWindow.h
+SOURCES  += MainWindow.cpp
+HEADERS  += MainWindow.h
 
 include(../common/common.pri)
 
