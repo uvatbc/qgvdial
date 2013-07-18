@@ -8,8 +8,8 @@ QML_IMPORT_PATH =
 
 # If your application uses the Qt Mobility libraries, uncomment the following
 # lines and add the respective components to the MOBILITY variable.
-# CONFIG += mobility
-# MOBILITY +=
+CONFIG += mobility
+MOBILITY +=
 
 # Speed up launching on MeeGo/Harmattan when using applauncherd daemon
 CONFIG += qdeclarative-boostable
@@ -22,8 +22,7 @@ SOURCES  += main.cpp \
 
 HEADERS += MainWindow.h
 
-SOURCES  += ../common/IMainWindow.cpp
-HEADERS  += ../common/IMainWindow.h
+include(../common/common.pri)
 
 RESOURCES += harmattan.qrc
 
