@@ -15,6 +15,7 @@ SOURCES  += MainWindow.cpp
 HEADERS  += MainWindow.h
 
 include(../common/common.pri)
+include(../../api/api.pri)
 
 RESOURCES += maemo.qrc
 
