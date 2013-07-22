@@ -34,9 +34,8 @@ Rectangle {
         Tab {
             icon: "qrc:/dialpad.svg"
 
-            Rectangle {
+            DialPage {
                 anchors.fill: parent
-                color: "red"
             }
         }//Tab (Dialpad)
         Tab {
