@@ -32,6 +32,7 @@ Rectangle {
     property string placeholderText
 
     signal textChanged(string text)
+    signal accepted
 
     width: parent.width
     height: textInput.height * 1.8
@@ -56,6 +57,7 @@ Rectangle {
         echoMode: container.echoMode
  
         onTextChanged: container.textChanged(text)
+        onAccepted: container.accepted();
     }//TextInput
 
     Text {

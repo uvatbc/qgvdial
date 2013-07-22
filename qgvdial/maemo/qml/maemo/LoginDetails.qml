@@ -19,8 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-import QtQuick 1.1
-import com.nokia.meego 1.1
+import Qt 4.7
 
 Item {
     id: container
@@ -49,14 +48,15 @@ Item {
         height: lblEmail.height
         spacing: 2
 
-        Label {
+        Text {
             id: lblEmail
             text: "Email:"
             anchors.verticalCenter: parent.verticalCenter
             height: paintedHeight + 2
+            color: "white"
         }//Label ("Email:")
 
-        TextField {
+        TextOneLine {
             id: textUsername
             height: lblEmail.height
             width: parent.width - lblEmail.width - (parent.spacing * 2)
@@ -66,16 +66,17 @@ Item {
 
             KeyNavigation.tab: textPassword
             onAccepted: btnLogin.doClick();
-            onTextChanged: container.sigUserChanged(strText);
+            onTextChanged: container.sigUserChanged(text);
         }//QGVTextInput
 
-        Label {
+        Text {
             id: lblUsername
             anchors.verticalCenter: parent.verticalCenter
             height: paintedHeight + 2
             opacity: (g_bIsLoggedIn == true ? 1 : 0)
             text: container.username
-        }//QGVLabel (username)
+            color: "white"
+        }//Label (username)
     }//Row (username)
 
     Row {
@@ -91,14 +92,15 @@ Item {
         height: lblPass.height
         spacing: 2
 
-        Label {
+        Text {
             id: lblPass
             text: "Password:"
             anchors.verticalCenter: parent.verticalCenter
             height: paintedHeight + 2
+            color: "white"
         }//Label ("Password:")
 
-        TextField {
+        TextOneLine {
             id: textPassword
             height: lblPass.height
             width: parent.width - lblPass.width - (parent.spacing * 2)
@@ -110,14 +112,15 @@ Item {
             KeyNavigation.tab: textUsername
             onTextChanged: container.sigPassChanged(text);
             onAccepted: btnLogin.doClick();
-        }//TextField
+        }//QGVTextInput
 
-        Label {
+        Text {
             id: lblPassword
             anchors.verticalCenter: parent.verticalCenter
             height: paintedHeight + 2
             opacity: (g_bIsLoggedIn == true ? 1 : 0)
             text: Array(container.password.length+1).join("*")
+            color: "white"
         }//Label (password)
     }//Row (password)
 

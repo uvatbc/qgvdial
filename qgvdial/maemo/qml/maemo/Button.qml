@@ -26,6 +26,7 @@ Rectangle {
 
     property alias text: textItem.text
     property alias font: textItem.font
+    property string iconSource
 
     signal clicked
 
@@ -39,9 +40,25 @@ Rectangle {
         GradientStop { id: bottomGrad; position: 1.0; color: "darkblue" }
     }
 
+    Image {
+        id: btnIcon
+        anchors {
+            verticalCenter: parent.verticalCenter
+            left: parent.left
+            leftMargin: 5
+        }
+        height: parent.height - 2
+        width: height
+
+        visible: (button.iconSource.length != 0)
+    }
+
     Text {
         id: textItem
-        x: parent.width/2 - width/2; y: parent.height/2 - height/2
+
+        x: parent.width/2 - width/2 - (btnIcon.visible ? btnIcon.width/2 : 0)
+        y: parent.height/2 - height/2
+
         font.pixelSize: 18
         color: "white"
         style: Text.Raised

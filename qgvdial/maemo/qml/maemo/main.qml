@@ -41,25 +41,22 @@ Rectangle {
         Tab {
             icon: "qrc:/people.svg"
 
-            Rectangle {
+            ContactsPage {
                 anchors.fill: parent
-                color: "green"
             }
         }//Tab (Contacts)
         Tab {
             icon: "qrc:/history.svg"
 
-            Rectangle {
+            InboxPage {
                 anchors.fill: parent
-                color: "blue"
             }
         }//Tab (Inbox)
         Tab {
             icon: "qrc:/settings.svg"
 
-            Rectangle {
+            SettingsPage {
                 anchors.fill: parent
-                color: "yellow"
             }
         }//Tab (Settings)
     }//VisualDataModel (contains the tabs)
