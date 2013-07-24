@@ -8,25 +8,25 @@ TabbedPane {
         DialPage {
             id: dialPage
         }
-    }
+    }//DialPage
     Tab {
         title: qsTr("Contacts")
         ContactsPage {
             id: contactsPage
         }
-    }
+    }//ContactsPage
     Tab {
         title: qsTr("Inbox")
         InboxPage {
             id: inboxPage
         }
-    }
+    }//InboxPage
     Tab {
         title: qsTr("Settings")
         SettingsPage {
             id: settingsPage
         }
-    }
+    }//SettingsPage tab
 
     onCreationCompleted: {
         // this slot is called when declarative scene is created

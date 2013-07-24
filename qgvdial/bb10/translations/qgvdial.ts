@@ -4,7 +4,7 @@
 <context>
     <name>DialPage</name>
     <message>
-        <location filename="../assets/DialPage.qml" line="6"/>
+        <location filename="../assets/DialPage.qml" line="11"/>
         <source>Dial page</source>
         <translation type="unfinished"></translation>
     </message>
