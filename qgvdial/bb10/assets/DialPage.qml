@@ -7,16 +7,19 @@ Page {
     signal text(string num)
 
     Container {
-        Label {
-            text: qsTr("Dial page")
-            horizontalAlignment: HorizontalAlignment.Center
-            textStyle {
-                base: SystemDefaults.TextStyles.TitleText
+        attachedObjects: [
+            TextStyleDefinition {
+                id: tsd
+                base: SystemDefaults.TextStyles.BodyText
+                //fontWeight: FontWeight.Bold
+                fontSize: FontSize.XXLarge
             }
-        }//Label
+        ] //attachedObjects
         
         Label {
             id: textNumber
+            textStyle { base: tsd.style }
+            preferredHeight: 200
         }
         
         Keypad {

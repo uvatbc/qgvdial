@@ -12,7 +12,8 @@ Container {
     
     Container {
         layout: StackLayout { orientation: LayoutOrientation.LeftToRight }
-        
+        layoutProperties: StackLayoutProperties { spaceQuota: 1.0 }
+
         KeyButton {
             mainText: "1"
             onClicked: container.keyPress(mainText);
@@ -31,6 +32,7 @@ Container {
 
     Container {
         layout: StackLayout { orientation: LayoutOrientation.LeftToRight }
+        layoutProperties: StackLayoutProperties { spaceQuota: 1.0 }
 
         KeyButton {
             mainText: "4"
@@ -51,6 +53,7 @@ Container {
 
     Container {
         layout: StackLayout { orientation: LayoutOrientation.LeftToRight }
+        layoutProperties: StackLayoutProperties { spaceQuota: 1.0 }
 
         KeyButton {
             mainText: "7"
@@ -71,6 +74,7 @@ Container {
 
     Container {
         layout: StackLayout { orientation: LayoutOrientation.LeftToRight }
+        layoutProperties: StackLayoutProperties { spaceQuota: 1.0 }
 
         KeyButton {
             mainText: "*"
@@ -89,9 +93,8 @@ Container {
     }//Row 4
 
     Container {
-        layout: StackLayout {
-            orientation: LayoutOrientation.LeftToRight
-        }
+        layout: StackLayout { orientation: LayoutOrientation.LeftToRight }
+        layoutProperties: StackLayoutProperties { spaceQuota: 1.0 }
 
         Button {
             text: "Call"

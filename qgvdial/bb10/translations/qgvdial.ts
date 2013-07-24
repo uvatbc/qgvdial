@@ -2,14 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.0">
 <context>
-    <name>DialPage</name>
-    <message>
-        <location filename="../assets/DialPage.qml" line="11"/>
-        <source>Dial page</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>main</name>
     <message>
         <location filename="../assets/main.qml" line="7"/>

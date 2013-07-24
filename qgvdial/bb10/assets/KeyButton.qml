@@ -10,15 +10,23 @@ Container {
     signal pressAndHold
     signal doubleClicked
     
-    preferredWidth: 200
-    preferredHeight: 200
+    preferredWidth: 225
+    preferredHeight: 210
+    
+    layout: DockLayout { }
 
     attachedObjects: [
         TextStyleDefinition {
-            id: tsd
+            id: tsdxsmall
             base: SystemDefaults.TextStyles.BodyText
             //fontWeight: FontWeight.Bold
-            fontSize: FontSize.Small
+            fontSize: FontSize.XSmall
+        },
+        TextStyleDefinition {
+            id: tsdxxlarge
+            base: SystemDefaults.TextStyles.BodyText
+            fontWeight: FontWeight.Bold
+            fontSize: FontSize.XXLarge
         }
     ]//attachedObjects
     
@@ -43,15 +51,14 @@ Container {
     Label {
         text: container.mainText 
         horizontalAlignment: HorizontalAlignment.Center
-        verticalAlignment: VerticalAlignment.Top
+        verticalAlignment: VerticalAlignment.Center
+        textStyle { base: tsdxxlarge.style }
     }
     
     Label {
         text: container.subText
         horizontalAlignment: HorizontalAlignment.Right
-        verticalAlignment: VerticalAlignment.Bottom
-        textStyle {
-            base: tsd.style
-        }
+        verticalAlignment: VerticalAlignment.Center
+        textStyle { base: tsdxsmall.style }
     }
 }
