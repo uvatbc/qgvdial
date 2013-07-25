@@ -2294,7 +2294,7 @@ GVApi::onMarkAsRead(bool success, const QByteArray &response, QNetworkReply *,
 }//GVApi::onMarkAsRead
 
 void
-GVApi::dbg_alwaysFailDialing(bool set /*= true*/)
+GVApi::dbg_alwaysFailDialing(bool set /* = true*/)
 {
     dbgAlwaysFailDialing = set;
 }//GVApi::dbg_alwaysFailDialing
