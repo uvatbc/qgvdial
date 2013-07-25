@@ -131,10 +131,10 @@ GVApi::getSystemProxies (QNetworkProxy &http, QNetworkProxy &https)
 }//GVApi::getSystemProxies
 
 void
-GVApi::simplify_number (QString &strNumber, bool bAddIntPrefix /*= true*/)
+GVApi::simplify_number (QString &strNumber, bool bAddIntPrefix /* = true*/)
 {
-    strNumber.remove(QChar (' ')).remove(QChar ('(')).remove(QChar (')'));
-    strNumber.remove(QChar ('-'));
+    strNumber.remove(QChar(' ')).remove(QChar('(')).remove(QChar(')'));
+    strNumber.remove(QChar('-'));
 
     do // Begin cleanup block (not a loop)
     {
