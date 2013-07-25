@@ -1,20 +1,41 @@
-#include "mainwindow.h"
+/*
+qgvdial is a cross platform Google Voice Dialer
+Copyright (C) 2009-2013  Yuvraaj Kelkar
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
+Contact: yuvraaj@gmail.com
+*/
+
+#include "MainWindow_p.h"
 #include "ui_mainwindow.h"
 
-#include <QtCore/QCoreApplication>
-
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), ui(new Ui::MainWindow)
+MainWindowPrivate::MainWindowPrivate(QWidget *parent)
+: QMainWindow(parent)
+, ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-}
+}//MainWindowPrivateLLMainWindowPrivate
 
-MainWindow::~MainWindow()
+MainWindowPrivate::~MainWindowPrivate()
 {
     delete ui;
-}
+}//MainWindowPrivate::~MainWindowPrivate
 
-void MainWindow::setOrientation(ScreenOrientation orientation)
+void
+MainWindowPrivate::setOrientation(ScreenOrientation orientation)
 {
 #if defined(Q_OS_SYMBIAN)
     // If the version of Qt on the device is < 4.7.2, that attribute won't work
@@ -55,9 +76,10 @@ void MainWindow::setOrientation(ScreenOrientation orientation)
 #endif // QT_VERSION < 0x040702
     };
     setAttribute(attribute, true);
-}
+}//MainWindowPrivate::setOrientation
 
-void MainWindow::showExpanded()
+void
+MainWindowPrivate::showExpanded()
 {
 #if defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR)
     showFullScreen();
@@ -66,4 +88,4 @@ void MainWindow::showExpanded()
 #else
     show();
 #endif
-}
+}//MainWindowPrivate::showExpanded

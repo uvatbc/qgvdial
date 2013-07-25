@@ -10,9 +10,15 @@ DEPLOYMENTFOLDERS = # file1 dir1
 # CONFIG += mobility
 # MOBILITY +=
 
-SOURCES += main.cpp mainwindow.cpp
-HEADERS += mainwindow.h
-FORMS += mainwindow.ui
+SOURCES  += MainWindow.cpp \
+            MainWindow_p.cpp
+HEADERS  += MainWindow.h \
+            MainWindow_p.h
+
+FORMS   += mainwindow.ui
+
+include(../common/common.pri)
+include(../../api/api.pri)
 
 # Please do not modify the following two lines. Required for deployment.
 include(deployment.pri)

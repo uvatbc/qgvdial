@@ -19,32 +19,38 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#include "MainWindow.h"
+#ifndef MAINWINDOW_P_H
+#define MAINWINDOW_P_H
 
-static void
-initLogging ()
-{
-}//initLogging ()
+#include <QtGui>
+#include "global.h"
 
-static void
-deinitLogging ()
-{
-}//initLogging ()
-
-Q_DECL_EXPORT int
-main(int argc, char *argv[])
-{
-    QCoreApplication *app = createApplication(argc, argv);
-
-    initLogging ();
-
-    MainWindow *win = new MainWindow(app);
-    win->init();
-
-    int rv = app->exec();
-    deinitLogging ();
-
-    delete win;
-    delete app;
-    return rv;
+namespace Ui {
+    class MainWindow;
 }
+
+class MainWindowPrivate : public QMainWindow
+{
+    Q_OBJECT
+
+public:
+    enum ScreenOrientation {
+        ScreenOrientationLockPortrait,
+        ScreenOrientationLockLandscape,
+        ScreenOrientationAuto
+    };
+
+    explicit MainWindowPrivate(QWidget *parent = NULL);
+    virtual ~MainWindowPrivate();
+
+    // Note that this will only have an effect on Symbian and Fremantle.
+    void setOrientation(ScreenOrientation orientation);
+
+    void showExpanded();
+
+private:
+    Ui::MainWindow *ui;
+};
+
+
+#endif // MAINWINDOW_P_H

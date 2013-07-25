@@ -1,22 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow" >
-  <property name="geometry" >
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>200</width>
+    <width>497</width>
     <height>320</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>MainWindow</string>
   </property>
-  <widget class="QMenuBar" name="menuBar" />
-  <widget class="QWidget" name="centralWidget" />
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="tabPosition">
+       <enum>QTabWidget::East</enum>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="dialTab">
+       <attribute name="title">
+        <string>Dialpad</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="contactsTab">
+       <attribute name="title">
+        <string>Contacts</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="inboxTab">
+       <attribute name="title">
+        <string>Inbox</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="settingsTab">
+       <attribute name="title">
+        <string>Settings</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QToolBox" name="toolBox">
+          <property name="currentIndex">
+           <number>0</number>
+          </property>
+          <widget class="QWidget" name="page">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>437</width>
+             <height>180</height>
+            </rect>
+           </property>
+           <attribute name="label">
+            <string>Page 1</string>
+           </attribute>
+          </widget>
+          <widget class="QWidget" name="page_2">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>96</width>
+             <height>26</height>
+            </rect>
+           </property>
+           <attribute name="label">
+            <string>Page 2</string>
+           </attribute>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>497</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
  </widget>
- <layoutDefault spacing="6" margin="11" />
- <pixmapfunction></pixmapfunction>
+ <layoutdefault spacing="6" margin="11"/>
  <resources/>
  <connections/>
 </ui>

@@ -20,31 +20,29 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "MainWindow.h"
+#include "MainWindow_p.h"
+#include "ui_mainwindow.h"
 
-static void
-initLogging ()
+QCoreApplication *
+createApplication(int argc, char *argv[])
 {
-}//initLogging ()
-
-static void
-deinitLogging ()
-{
-}//initLogging ()
-
-Q_DECL_EXPORT int
-main(int argc, char *argv[])
-{
-    QCoreApplication *app = createApplication(argc, argv);
-
-    initLogging ();
-
-    MainWindow *win = new MainWindow(app);
-    win->init();
-
-    int rv = app->exec();
-    deinitLogging ();
-
-    delete win;
-    delete app;
-    return rv;
+    return new QApplication(argc, argv);
 }
+
+MainWindow::MainWindow(QObject *parent)
+: IMainWindow(parent)
+, m_d(new MainWindowPrivate)
+{
+}//MainWindow::MainWindow
+
+MainWindow::~MainWindow()
+{
+    delete m_d;
+}//MainWindow::~MainWindow
+
+void
+MainWindow::init()
+{
+    m_d->setOrientation(MainWindowPrivate::ScreenOrientationAuto);
+    m_d->showExpanded();
+}//MainWindow::init

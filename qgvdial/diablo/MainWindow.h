@@ -19,32 +19,27 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#include "MainWindow.h"
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
 
-static void
-initLogging ()
+#include "global.h"
+#include "IMainWindow.h"
+
+class MainWindowPrivate;
+class MainWindow : public IMainWindow
 {
-}//initLogging ()
+    Q_OBJECT
 
-static void
-deinitLogging ()
-{
-}//initLogging ()
+public:
+    explicit MainWindow(QObject *parent);
+    virtual ~MainWindow();
 
-Q_DECL_EXPORT int
-main(int argc, char *argv[])
-{
-    QCoreApplication *app = createApplication(argc, argv);
+    void init();
+private:
+    MainWindowPrivate *m_d;
+};
 
-    initLogging ();
+QCoreApplication *
+createApplication(int argc, char *argv[]);
 
-    MainWindow *win = new MainWindow(app);
-    win->init();
-
-    int rv = app->exec();
-    deinitLogging ();
-
-    delete win;
-    delete app;
-    return rv;
-}
+#endif // MAINWINDOW_H
