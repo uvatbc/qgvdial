@@ -34,14 +34,18 @@ deinitLogging ()
 Q_DECL_EXPORT int
 main(int argc, char *argv[])
 {
-    QScopedPointer<QCoreApplication> app(createApplication(argc, argv));
+    QCoreApplication *app = createApplication(argc, argv);
+    QObject *_app = (QObject *) app;
 
     initLogging ();
 
-    MainWindow win(app);
-    win.init ();
+    MainWindow *win = new MainWindow(_app);
+    win->init();
 
     int rv = app->exec();
     deinitLogging ();
+
+    delete win;
+    delete app;
     return rv;
 }
