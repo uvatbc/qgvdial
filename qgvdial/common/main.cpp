@@ -35,11 +35,10 @@ Q_DECL_EXPORT int
 main(int argc, char *argv[])
 {
     QCoreApplication *app = createApplication(argc, argv);
-    QObject *_app = (QObject *) app;
 
     initLogging ();
 
-    MainWindow *win = new MainWindow(_app);
+    MainWindow *win = new MainWindow(app);
     win->init();
 
     int rv = app->exec();
@@ -49,3 +48,4 @@ main(int argc, char *argv[])
     delete app;
     return rv;
 }
+
