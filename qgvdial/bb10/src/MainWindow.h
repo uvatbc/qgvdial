@@ -23,8 +23,18 @@ Contact: yuvraaj@gmail.com
 #ifndef MainWindow_HPP_
 #define MainWindow_HPP_
 
-#include <QObject>
 #include "IMainWindow.h"
+
+#include <bb/cascades/Application>
+
+#include <QLocale>
+#include <QTranslator>
+
+// include JS Debugger / CS Profiler enabler
+// this feature is enabled by default in the debug build only
+#include <Qt/qdeclarativedebug.h>
+
+using namespace bb::cascades;
 
 namespace bb { namespace cascades { class Application; }}
 
@@ -36,9 +46,15 @@ namespace bb { namespace cascades { class Application; }}
 class MainWindow : public IMainWindow
 {
     Q_OBJECT
+
 public:
-    MainWindow(QObject *app);
+    MainWindow(QCoreApplication *app);
     virtual ~MainWindow() {}
+
+    void init();
 };
+
+QCoreApplication *
+createApplication(int argc, char **argv);
 
 #endif /* MainWindow_HPP_ */

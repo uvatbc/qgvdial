@@ -25,7 +25,6 @@ Contact: yuvraaj@gmail.com
 #ifdef __cplusplus
 
 #include <QtCore>
-//#include <QtGui>
 #include <QtNetwork>
 #include <QtSql>
 #include <QtXml>
