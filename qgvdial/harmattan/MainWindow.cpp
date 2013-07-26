@@ -30,6 +30,7 @@ MainWindow::MainWindow(QObject *parent)
 void
 MainWindow::init()
 {
+    IMainWindow::init ();
     m_view.setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
     m_view.setMainQmlFile(QLatin1String("qml/harmattan/main.qml"));
     m_view.showExpanded();

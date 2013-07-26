@@ -24,6 +24,7 @@ Contact: yuvraaj@gmail.com
 
 #include "global.h"
 
+class CacheDbPrivate;
 class CacheDb : public QObject
 {
     Q_OBJECT
@@ -33,9 +34,14 @@ public:
     virtual ~CacheDb();
 
     bool init(const QString &dbDir);
+    void deinit();
+
+private:
+    void ensureCache();
+    bool blowAwayCache();
 
 protected:
-    QSqlDatabase db;
+    CacheDbPrivate *dPtr;
 };
 
 #endif//CACHEDB_H

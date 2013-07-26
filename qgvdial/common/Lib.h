@@ -19,16 +19,27 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#include "IMainWindow.h"
-#include "Lib.h"
+#ifndef LIB_H
+#define LIB_H
 
-IMainWindow::IMainWindow(QObject *parent)
-: QObject(parent)
-{
-}//IMainWindow::IMainWindow
+#include "global.h"
+#include "IOsDependent.h"
 
-void
-IMainWindow::init()
+class Lib : public QObject
 {
-    db.init (Lib::ref().getDbDir());
-}//IMainWindow::init
+    Q_OBJECT
+private:
+    explicit Lib(QObject *parent = 0);
+
+public:
+    static Lib &ref();
+    static void deref();
+
+    inline QString getTempDir() { return m_osd->getTempDir(); }
+    inline QString getDbDir()   { return m_osd->getDbDir(); }
+
+protected:
+    IOsDependant *m_osd;
+};
+
+#endif // LIB_H

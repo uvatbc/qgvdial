@@ -79,9 +79,6 @@ CacheDatabase::init ()
         return;
     }
 
-    QSqlQuery query(dbMain);
-    query.setForwardOnly (true);
-
     bool bBlowAway = true;
     QString strVer = settings->value(GV_S_VAR_DB_VER).toString();
     if (strVer == GV_S_VALUE_DB_VER) {

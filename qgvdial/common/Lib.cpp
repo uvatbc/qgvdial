@@ -19,16 +19,31 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#include "IMainWindow.h"
 #include "Lib.h"
 
-IMainWindow::IMainWindow(QObject *parent)
-: QObject(parent)
+static Lib *singleton = NULL;
+
+Lib &
+Lib::ref()
 {
-}//IMainWindow::IMainWindow
+    if (NULL == singleton) {
+        singleton = new Lib;
+    }
+
+    return (*singleton);
+}//Lib::ref
 
 void
-IMainWindow::init()
+Lib::deref()
 {
-    db.init (Lib::ref().getDbDir());
-}//IMainWindow::init
+    if (NULL != singleton) {
+        delete singleton;
+        singleton = NULL;
+    }
+}//Lib::deref
+
+Lib::Lib(QObject *parent)
+: QObject(parent)
+, m_osd(createOSD (this))
+{
+}//Lib::Lib

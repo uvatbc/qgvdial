@@ -19,16 +19,27 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#include "IMainWindow.h"
-#include "Lib.h"
+#include "OsDependant.h"
 
-IMainWindow::IMainWindow(QObject *parent)
-: QObject(parent)
+IOsDependant *
+createOSD(QObject *parent /* = NULL*/)
 {
-}//IMainWindow::IMainWindow
+    return (new OsDependant(parent));
+}//createOSD
 
-void
-IMainWindow::init()
+OsDependant::OsDependant(QObject *parent /* = NULL*/)
+: IOsDependant(parent)
 {
-    db.init (Lib::ref().getDbDir());
-}//IMainWindow::init
+}//OsDependant::OsDependant
+
+QString
+OsDependant::getTempDir()
+{
+    return "tempdir";
+}//OsDependant::getTempDir
+
+QString
+OsDependant::getDbDir()
+{
+    return "tempdir";
+}//OsDependant::getDbDir

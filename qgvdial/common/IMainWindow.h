@@ -23,6 +23,7 @@ Contact: yuvraaj@gmail.com
 #define IMAINWINDOW_H
 
 #include <QObject>
+#include "CacheDb.h"
 
 class IMainWindow : public QObject
 {
@@ -35,6 +36,8 @@ signals:
 
 public slots:
 
+protected:
+    CacheDb db;
 };
 
 #endif // IMAINWINDOW_H

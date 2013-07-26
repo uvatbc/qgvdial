@@ -43,6 +43,7 @@ MainWindow::~MainWindow()
 void
 MainWindow::init()
 {
+    IMainWindow::init ();
     m_d->setOrientation(MainWindowPrivate::ScreenOrientationAuto);
     m_d->showExpanded();
 }//MainWindow::init

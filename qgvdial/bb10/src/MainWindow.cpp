@@ -61,4 +61,5 @@ MainWindow::MainWindow(QCoreApplication *_app)
 void
 MainWindow::init()
 {
+    IMainWindow::init ();
 }//MainWindow::init

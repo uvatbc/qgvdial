@@ -11,8 +11,10 @@ QML_IMPORT_PATH =
 CONFIG += mobility
 MOBILITY +=
 
-SOURCES  += MainWindow.cpp
-HEADERS  += MainWindow.h
+SOURCES  += MainWindow.cpp \
+            OsDependant.cpp
+HEADERS  += MainWindow.h \
+            OsDependant.h
 
 include(../common/common.pri)
 include(../../api/api.pri)
