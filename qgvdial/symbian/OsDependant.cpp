@@ -31,15 +31,3 @@ OsDependant::OsDependant(QObject *parent /* = NULL*/)
 : IOsDependant(parent)
 {
 }//OsDependant::OsDependant
-
-QString
-OsDependant::getTempDir()
-{
-    return "tempdir";
-}//OsDependant::getTempDir
-
-QString
-OsDependant::getDbDir()
-{
-    return "dbdir";
-}//OsDependant::getDbDir

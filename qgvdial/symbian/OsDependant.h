@@ -24,15 +24,19 @@ Contact: yuvraaj@gmail.com
 
 #include "global.h"
 #include "IOsDependent.h"
+#include "OSDCipher.h"
+#include "OSDDirs.h"
 
-class OsDependant : public IOsDependant
+class OsDependant : public IOsDependant, public OsdCipher, public OsdDirs
 {
 public:
     OsDependant(QObject *parent = NULL);
 
-    QString getTempDir();
-    QString getDbDir();
+    inline QString getTempDir() { return _getTempDir (); }
+    inline QString getDbDir() { return _getDbDir (); }
 
+    inline bool cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt) {
+        return _cipher (byIn, byOut, bEncrypt);
+    }
 };
-
 #endif // OSDEPENDANT_H

@@ -33,11 +33,12 @@ public:
     explicit IMainWindow(QObject *parent = 0);
     virtual void init() = 0;
 
-signals:
-
 protected slots:
     virtual void onInitDone();
     void loginCompleted(AsyncTaskToken *task);
+
+protected:
+    void beginLogin(const QString &user, const QString &pass);
 
 protected:
     CacheDb db;

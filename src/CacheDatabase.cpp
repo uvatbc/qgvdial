@@ -298,7 +298,6 @@ CacheDatabase::putUserPass (const QString &strUser, const QString &strPass)
 {
     QByteArray byD;
     OsDependent &osd = Singletons::getRef().getOSD ();
-    QString strQ;
 
     osd.cipher (strUser.toAscii (), byD, true);
     settings->setValue (GV_S_VAR_USER, QString (byD.toHex ()));

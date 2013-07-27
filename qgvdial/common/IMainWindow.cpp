@@ -40,31 +40,40 @@ void
 IMainWindow::onInitDone()
 {
     QString user, pass;
-    bool bOk = false;
 
     do {
         if (db.usernameIsCached () && db.getUserPass (user,pass)) {
             // Begin logon
-            loginTask = new AsyncTaskToken(this);
-            if (NULL == loginTask) {
-                Q_WARN("Failed to allocate token");
-                break;
-            }
-
-            bOk = connect(loginTask, SIGNAL(completed(AsyncTaskToken*)),
-                          this, SLOT(loginCompleted(AsyncTaskToken*)));
-            Q_ASSERT(bOk);
-
-            loginTask->inParams["user"] = user;
-            loginTask->inParams["pass"] = pass;
-
-            Q_DEBUG("Login using user ") << user;
+            beginLogin (user, pass);
         } else {
             //TODO: Ask the user for login credentials
             Q_DEBUG("TODO: Ask the user for login credentials");
         }
     } while (0);
 }//IMainWindow::onInitDone
+
+void
+IMainWindow::beginLogin(const QString &user, const QString &pass)
+{
+    bool bOk;
+    do {
+        // Begin logon
+        loginTask = new AsyncTaskToken(this);
+        if (NULL == loginTask) {
+            Q_WARN("Failed to allocate token");
+            break;
+        }
+
+        bOk = connect(loginTask, SIGNAL(completed(AsyncTaskToken*)),
+                      this, SLOT(loginCompleted(AsyncTaskToken*)));
+        Q_ASSERT(bOk);
+
+        loginTask->inParams["user"] = user;
+        loginTask->inParams["pass"] = pass;
+
+        Q_DEBUG("Login using user ") << user;
+    } while (0);
+}//IMainWindow::beginLogin
 
 void
 IMainWindow::loginCompleted(AsyncTaskToken *task)
@@ -74,7 +83,14 @@ IMainWindow::loginCompleted(AsyncTaskToken *task)
 
     if (ATTS_SUCCESS == task->status) {
         Q_DEBUG("Login successful");
+        db.putUserPass (task->inParams["user"].toString(),
+                        task->inParams["pass"].toString());
+
+        //TODO: Begin contacts login
+        //TODO: Fetch inbox, registered numbers and all that stuff
     } else {
         Q_WARN("Login failed");
     }
+
+    delete task;
 }//IMainWindow::loginCompleted

@@ -215,3 +215,19 @@ CacheDb::getUserPass (QString &strUser, QString &strPass)
 
     return (bGotUser);
 }//CacheDb::getUserPass
+
+bool
+CacheDb::putUserPass (const QString &strUser, const QString &strPass)
+{
+    QByteArray byD;
+    Lib &lib = Lib::ref();
+    CacheDbPrivate &p = CacheDbPrivate::ref();
+
+    lib.cipher (strUser.toAscii (), byD, true);
+    p.settings->setValue (GV_S_VAR_USER, QString (byD.toHex ()));
+
+    lib.cipher (strPass.toAscii (), byD, true);
+    p.settings->setValue (GV_S_VAR_PASS, QString (byD.toHex ()));
+
+    return (true);
+}//CacheDb::petUserPass
