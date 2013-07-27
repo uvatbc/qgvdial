@@ -36,12 +36,12 @@ public:
     bool init(const QString &dbDir);
     void deinit();
 
+    bool usernameIsCached();
+    bool getUserPass (QString &strUser, QString &strPass);
+
 private:
     void ensureCache();
     bool blowAwayCache();
-
-protected:
-    CacheDbPrivate *dPtr;
 };
 
 #endif//CACHEDB_H

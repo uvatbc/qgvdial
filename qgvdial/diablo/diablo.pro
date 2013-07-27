@@ -21,6 +21,8 @@ FORMS   += mainwindow.ui
 
 include(../common/common.pri)
 include(../../api/api.pri)
+include(../features/openssl/openssl.pri)
+include(../features/linux-dirs/linux-dirs.pri)
 
 # Please do not modify the following two lines. Required for deployment.
 include(deployment.pri)

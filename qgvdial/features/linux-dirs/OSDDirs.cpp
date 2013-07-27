@@ -19,25 +19,42 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#ifndef OSDEPENDANT_H
-#define OSDEPENDANT_H
-
-#include "global.h"
-#include "IOsDependent.h"
-#include "OSDCipher.h"
 #include "OSDDirs.h"
 
-class OsDependant : public IOsDependant, public OsdCipher, public OsdDirs
+QString
+OsdDirs::_getAppDirectory()
 {
-public:
-    OsDependant(QObject *parent = NULL);
-
-    inline QString getTempDir() { return _getTempDir (); }
-    inline QString getDbDir() { return _getDbDir (); }
-
-    inline bool cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt) {
-        return _cipher (byIn, byOut, bEncrypt);
+    QString strStoreDir = QDir::homePath ();
+    QDir dirHome(strStoreDir);
+    if (!strStoreDir.endsWith (QDir::separator ())) {
+        strStoreDir += QDir::separator ();
     }
-};
+    strStoreDir += ".qgvdial";
+    if (!QFileInfo(strStoreDir).exists ()) {
+        dirHome.mkdir (".qgvdial");
+    }
 
-#endif // OSDEPENDANT_H
+#if defined(Q_OS_SYMBIAN)
+    strStoreDir.replace (QChar('/'), "\\");
+#endif
+
+    return strStoreDir;
+}//OsdDirs::_getAppDirectory
+
+QString
+OsdDirs::_getTempDir()
+{
+    QString strTempStore = _getAppDirectory ();
+    QDir dirApp(strTempStore);
+    strTempStore += QDir::separator() + QString("temp");
+    if (!QFileInfo(strTempStore).exists ()) {
+        dirApp.mkdir ("temp");
+    }
+    return (strTempStore);
+}//OsdDirs::_getTempDir
+
+QString
+OsdDirs::_getDbDir()
+{
+    return _getAppDirectory();
+}//OsdDirs::_getDbDir

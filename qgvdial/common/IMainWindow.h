@@ -24,6 +24,7 @@ Contact: yuvraaj@gmail.com
 
 #include <QObject>
 #include "CacheDb.h"
+#include "GVApi.h"
 
 class IMainWindow : public QObject
 {
@@ -34,10 +35,15 @@ public:
 
 signals:
 
-public slots:
+protected slots:
+    virtual void onInitDone();
+    void loginCompleted(AsyncTaskToken *task);
 
 protected:
     CacheDb db;
+    GVApi   api;
+
+    AsyncTaskToken *loginTask;
 };
 
 #endif // IMAINWINDOW_H

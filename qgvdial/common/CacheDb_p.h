@@ -32,13 +32,14 @@ protected:
     CacheDbPrivate() {}
     virtual ~CacheDbPrivate() {}
 
-public:
     static void setDbDir(const QString &dbDir);
     static CacheDbPrivate &ref();
     static void deref();
 
     QSqlDatabase db;
     QSettings *settings;
+
+    friend class CacheDb;
 };
 
 //////////////////////////////// Settings table ////////////////////////////////

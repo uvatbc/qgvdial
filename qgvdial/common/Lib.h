@@ -38,6 +38,10 @@ public:
     inline QString getTempDir() { return m_osd->getTempDir(); }
     inline QString getDbDir()   { return m_osd->getDbDir(); }
 
+    inline bool cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt) {
+        return m_osd->cipher(byIn, byOut, bEncrypt);
+    }
+
 protected:
     IOsDependant *m_osd;
 };

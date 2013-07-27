@@ -24,6 +24,9 @@ Contact: yuvraaj@gmail.com
 
 IMainWindow::IMainWindow(QObject *parent)
 : QObject(parent)
+, db(this)
+, api(true, this)
+, loginTask(NULL)
 {
 }//IMainWindow::IMainWindow
 
@@ -32,3 +35,46 @@ IMainWindow::init()
 {
     db.init (Lib::ref().getDbDir());
 }//IMainWindow::init
+
+void
+IMainWindow::onInitDone()
+{
+    QString user, pass;
+    bool bOk = false;
+
+    do {
+        if (db.usernameIsCached () && db.getUserPass (user,pass)) {
+            // Begin logon
+            loginTask = new AsyncTaskToken(this);
+            if (NULL == loginTask) {
+                Q_WARN("Failed to allocate token");
+                break;
+            }
+
+            bOk = connect(loginTask, SIGNAL(completed(AsyncTaskToken*)),
+                          this, SLOT(loginCompleted(AsyncTaskToken*)));
+            Q_ASSERT(bOk);
+
+            loginTask->inParams["user"] = user;
+            loginTask->inParams["pass"] = pass;
+
+            Q_DEBUG("Login using user ") << user;
+        } else {
+            //TODO: Ask the user for login credentials
+            Q_DEBUG("TODO: Ask the user for login credentials");
+        }
+    } while (0);
+}//IMainWindow::onInitDone
+
+void
+IMainWindow::loginCompleted(AsyncTaskToken *task)
+{
+    Q_ASSERT(loginTask == task);
+    loginTask = NULL;
+
+    if (ATTS_SUCCESS == task->status) {
+        Q_DEBUG("Login successful");
+    } else {
+        Q_WARN("Login failed");
+    }
+}//IMainWindow::loginCompleted

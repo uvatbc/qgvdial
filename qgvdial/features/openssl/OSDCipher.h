@@ -19,25 +19,14 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#ifndef OSDEPENDANT_H
-#define OSDEPENDANT_H
+#ifndef OSDCIPHER_H
+#define OSDCIPHER_H
 
 #include "global.h"
-#include "IOsDependent.h"
-#include "OSDCipher.h"
-#include "OSDDirs.h"
 
-class OsDependant : public IOsDependant, public OsdCipher, public OsdDirs
-{
+class OsdCipher {
 public:
-    OsDependant(QObject *parent = NULL);
-
-    inline QString getTempDir() { return _getTempDir (); }
-    inline QString getDbDir() { return _getDbDir (); }
-
-    inline bool cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt) {
-        return _cipher (byIn, byOut, bEncrypt);
-    }
+    bool _cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt);
 };
 
-#endif // OSDEPENDANT_H
+#endif//OSDCIPHER_H

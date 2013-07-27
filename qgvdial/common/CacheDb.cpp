@@ -1,9 +1,30 @@
+/*
+qgvdial is a cross platform Google Voice Dialer
+Copyright (C) 2009-2013  Yuvraaj Kelkar
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
+Contact: yuvraaj@gmail.com
+*/
+
 #include "CacheDb.h"
 #include "CacheDb_p.h"
+#include "Lib.h"
 
 CacheDb::CacheDb(QObject *parent /* = NULL*/)
 : QObject (parent)
-, dPtr(NULL)
 {
 }//CacheDb::CacheDb
 
@@ -159,3 +180,38 @@ CacheDb::ensureCache ()
 
     query.exec ("VACUUM");
 }//CacheDb::ensureCache
+
+bool
+CacheDb::usernameIsCached()
+{
+    return CacheDbPrivate::ref().settings->contains (GV_S_VAR_USER);
+}//CacheDb::usernameIsCached
+
+bool
+CacheDb::getUserPass (QString &strUser, QString &strPass)
+{
+    QByteArray byD;
+    Lib &lib = Lib::ref();
+    QString strResult;
+    CacheDbPrivate &p = CacheDbPrivate::ref();
+    bool bGotUser = false;
+
+    if (p.settings->contains (GV_S_VAR_USER)) {
+        strResult = p.settings->value(GV_S_VAR_USER).toString();
+        lib.cipher (QByteArray::fromHex (strResult.toAscii ()), byD, false);
+        strUser = byD;
+        bGotUser = true;
+    }
+
+    if (p.settings->contains (GV_S_VAR_PASS)) {
+        strResult = p.settings->value(GV_S_VAR_PASS).toString();
+        if (!bGotUser) {
+            p.settings->remove (GV_S_VAR_PASS);
+        } else {
+            lib.cipher (QByteArray::fromHex (strResult.toAscii ()), byD, false);
+            strPass = byD;
+        }
+    }
+
+    return (bGotUser);
+}//CacheDb::getUserPass

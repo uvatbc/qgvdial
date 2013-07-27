@@ -46,4 +46,6 @@ MainWindow::init()
     IMainWindow::init ();
     m_d->setOrientation(MainWindowPrivate::ScreenOrientationAuto);
     m_d->showExpanded();
+
+    QTimer::singleShot (1, this, SLOT(onInitDone()));
 }//MainWindow::init
