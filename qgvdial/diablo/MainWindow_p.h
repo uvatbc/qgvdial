@@ -50,6 +50,8 @@ public:
 
 private:
     Ui::MainWindow *ui;
+
+    friend class MainWindow;
 };
 
 

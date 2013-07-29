@@ -36,7 +36,20 @@ PageStackWindow {
 
     TabGroup {
         id: tabgroup
+        objectName: "MainTabGroup"
         currentTab: dialTab
+
+        function setTab(index) {
+            if (0 === index) {
+                currentTab = dialTab;
+            } else if (1 === index) {
+                currentTab = contactsTab;
+            } else if (2 === index) {
+                currentTab = inboxTab;
+            } else if (3 === index) {
+                currentTab = settingsTab;
+            }
+        }
 
         DialPage {
             id: dialTab

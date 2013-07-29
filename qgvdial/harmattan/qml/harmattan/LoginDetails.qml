@@ -25,15 +25,8 @@ import com.nokia.meego 1.1
 Item {
     id: container
 
-    signal sigUserChanged(string user)
-    signal sigPassChanged(string pass)
-    signal sigLogin
-    signal sigLogout
-
     property alias username: textUsername.text
     property alias password: textPassword.text
-
-    property bool g_bIsLoggedIn:false
 
     height: (rowUser.height + rowPass.height + btnLogin.height + 6)
 
@@ -58,22 +51,22 @@ Item {
 
         TextField {
             id: textUsername
+            objectName: "TextUsername"
+
             height: lblEmail.height
             width: parent.width - lblEmail.width - (parent.spacing * 2)
-            opacity: (g_bIsLoggedIn === true ? 0 : 1)
 
             placeholderText: "example@gmail.com"
 
             KeyNavigation.tab: textPassword
             onAccepted: btnLogin.doClick();
-            onTextChanged: container.sigUserChanged(strText);
         }//QGVTextInput
 
         Label {
             id: lblUsername
             anchors.verticalCenter: parent.verticalCenter
             height: paintedHeight + 2
-            opacity: (g_bIsLoggedIn == true ? 1 : 0)
+            opacity: (1 - textUsername.opacity)
             text: container.username
         }//QGVLabel (username)
     }//Row (username)
@@ -100,15 +93,15 @@ Item {
 
         TextField {
             id: textPassword
+            objectName: "TextPassword"
+
             height: lblPass.height
             width: parent.width - lblPass.width - (parent.spacing * 2)
-            opacity: (g_bIsLoggedIn == true ? 0 : 1)
             echoMode: TextInput.Password
 
             placeholderText: "Password"
 
             KeyNavigation.tab: textUsername
-            onTextChanged: container.sigPassChanged(text);
             onAccepted: btnLogin.doClick();
         }//TextField
 
@@ -116,13 +109,14 @@ Item {
             id: lblPassword
             anchors.verticalCenter: parent.verticalCenter
             height: paintedHeight + 2
-            opacity: (g_bIsLoggedIn == true ? 1 : 0)
+            opacity: (1 - textPassword.opacity)
             text: Array(container.password.length+1).join("*")
         }//Label (password)
     }//Row (password)
 
     Button {
         id: btnLogin
+        objectName: "LoginButton"
 
         anchors {
             horizontalCenter: parent.horizontalCenter
@@ -130,19 +124,6 @@ Item {
             topMargin: 2
         }
 
-        text: (g_bIsLoggedIn === true ? "Logout" : "Login")
-
-        function doClick() {
-            if (g_bIsLoggedIn) {
-                container.sigLogout();
-            } else {
-                container.sigLogin();
-            }
-
-            textUsername.closeSoftwareInputPanel();
-            textPassword.closeSoftwareInputPanel();
-        }
-
-        onClicked: btnLogin.doClick();
+        text: "Login"
     }//Button (login/logout)
 }//Item (container)

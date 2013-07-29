@@ -35,8 +35,17 @@ public:
     virtual ~MainWindow();
 
     void init();
+
+public slots:
+    void onLoginClicked();
+
+protected:
+    void uiRequestLoginDetails();
+    void uiRequestTFALoginDetails(void *ctx);
+    void uiSetUserPass(const QString &user, const QString &pass, bool editable);
+
 private:
-    MainWindowPrivate *m_d;
+    MainWindowPrivate *d;
 };
 
 QCoreApplication *

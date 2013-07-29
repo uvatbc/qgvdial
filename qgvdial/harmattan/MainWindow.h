@@ -37,10 +37,25 @@ public:
 
 signals:
 
-public slots:
+protected slots:
+    void declStatusChanged(QDeclarativeView::Status status);
+    void onLoginButtonClicked();
+
+protected:
+    QObject *getQMLObject(const char *pageName);
+
+    void uiRequestLoginDetails();
+    void uiRequestTFALoginDetails(void *ctx);
+    void uiSetUserPass(const QString &user, const QString &pass, bool editable);
 
 private:
     QmlApplicationViewer m_view;
+
+    QObject *mainTabGroup;
+    QObject *loginExpand;
+    QObject *loginButton;
+    QObject *textUsername;
+    QObject *textPassword;
 };
 
 #endif // MAINWINDOW_H

@@ -34,10 +34,20 @@ public:
     virtual void init() = 0;
 
 protected slots:
-    virtual void onInitDone();
+    void onInitDone();
+    void resumeTFAAuth(void *ctx, int pin, bool useAlt);
+    void onQuit();
+
+private slots:
+    void onTFARequest(AsyncTaskToken *task);
     void loginCompleted(AsyncTaskToken *task);
 
 protected:
+    virtual void uiRequestLoginDetails() = 0;
+    virtual void uiRequestTFALoginDetails(void *ctx) = 0;
+    virtual void uiSetUserPass(const QString &user, const QString &pass,
+                               bool editable) = 0;
+
     void beginLogin(const QString &user, const QString &pass);
 
 protected:

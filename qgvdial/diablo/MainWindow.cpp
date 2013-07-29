@@ -31,21 +31,78 @@ createApplication(int argc, char *argv[])
 
 MainWindow::MainWindow(QObject *parent)
 : IMainWindow(parent)
-, m_d(new MainWindowPrivate)
+, d(new MainWindowPrivate)
 {
 }//MainWindow::MainWindow
 
 MainWindow::~MainWindow()
 {
-    delete m_d;
+    delete d;
 }//MainWindow::~MainWindow
 
 void
 MainWindow::init()
 {
     IMainWindow::init ();
-    m_d->setOrientation(MainWindowPrivate::ScreenOrientationAuto);
-    m_d->showExpanded();
+
+    d->setOrientation(MainWindowPrivate::ScreenOrientationAuto);
+    d->showExpanded();
+    connect(d->ui->loginButton, SIGNAL(clicked()),
+            this, SLOT(onLoginClicked()));
 
     QTimer::singleShot (1, this, SLOT(onInitDone()));
 }//MainWindow::init
+
+void
+MainWindow::uiRequestLoginDetails()
+{
+    QMessageBox msg;
+    msg.setText ("Please enter a user and password");
+    msg.exec ();
+
+    d->ui->tabWidget->setCurrentIndex (3);
+    d->ui->toolBox->setCurrentIndex (0);
+}//MainWindow::uiRequestLoginDetails
+
+void
+MainWindow::onLoginClicked()
+{
+    QString user, pass;
+    user = d->ui->textUsername->text ();
+    pass = d->ui->textPassword->text ();
+
+    if (user.isEmpty () || pass.isEmpty ()) {
+        Q_WARN("Invalid username or password");
+        QMessageBox msg;
+        msg.setText (tr("Invalid username or password"));
+        msg.exec ();
+        return;
+    }
+
+    beginLogin (user, pass);
+}//MainWindow::onLoginClicked
+
+void
+MainWindow::uiRequestTFALoginDetails(void *ctx)
+{
+    QString strPin = QInputDialog::getText(d, tr("Enter PIN"),
+                                           tr("Two factor authentication"));
+
+    int pin = strPin.toInt ();
+    if (pin == 0) {
+        resumeTFAAuth (ctx, pin, true);
+    } else {
+        resumeTFAAuth (ctx, pin, false);
+    }
+}//MainWindow::uiRequestTFALoginDetails
+
+void
+MainWindow::uiSetUserPass(const QString &user, const QString &pass,
+                          bool editable)
+{
+    d->ui->textUsername->setText (user);
+    d->ui->textPassword->setText (pass);
+
+    d->ui->textUsername->setReadOnly (!editable);
+    d->ui->textPassword->setReadOnly (!editable);
+}//MainWindow::uiSetUserPass

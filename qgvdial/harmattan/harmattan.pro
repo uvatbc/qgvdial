@@ -14,15 +14,17 @@ CONFIG += mobility
 MOBILITY +=
 
 # Speed up launching on MeeGo/Harmattan when using applauncherd daemon
-CONFIG += qdeclarative-boostable
+CONFIG += qdeclarative-boostable meegotouch
 
 # Add dependency to Symbian components
 # CONFIG += qt-components
 
 SOURCES  += MainWindow.cpp \
-            OsDependant.cpp
+            OsDependant.cpp \
+            UserPinDlg.cpp
 HEADERS  += MainWindow.h \
-            OsDependant.h
+            OsDependant.h \
+            UserPinDlg.h
 
 include(../common/common.pri)
 include(../../api/api.pri)

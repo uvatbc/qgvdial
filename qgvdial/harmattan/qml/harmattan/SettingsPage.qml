@@ -28,10 +28,6 @@ Page {
 
     objectName: "SettingsPage"
 
-    signal sigUserChanged(string username)
-    signal sigPassChanged(string password)
-    signal sigLogin
-    signal sigLogout
     signal sigLinkActivated(string strLink)
 
     signal sigProxyChanges(bool bEnable,
@@ -48,13 +44,6 @@ Page {
     signal sigSendLogs
 
     property real toolbarHeight: 50
-
-    function setUsername (strU) {
-        loginDetails.username = strU;
-    }
-    function setPassword (strP) {
-        loginDetails.password = strP;
-    }
 
     Timer {
         id: yAdjustTimer
@@ -91,6 +80,8 @@ Page {
 
         ExpandView {
             id: expandLoginDetails
+            objectName: "ExpandLoginDetails"
+
             anchors {
                 top: parent.top
                 left: parent.left
@@ -101,18 +92,9 @@ Page {
             content: loginDetails
             yTimer: yAdjustTimer
 
-            //property bool bShowLogindetails: g_bShowLoginSettings
-            //onBShowLogindetailsChanged: { if (bShowLogindetails) isExpanded = true; }
-
             LoginDetails {
                 id: loginDetails
-
                 width: parent.width - 1
-
-                onSigUserChanged: container.sigUserChanged(user);
-                onSigPassChanged: container.sigPassChanged(pass);
-                onSigLogin: container.sigLogin();
-                onSigLogout: container.sigLogout();
             }
         }//ExpandView (login/logout)
 

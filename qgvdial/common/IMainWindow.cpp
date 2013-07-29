@@ -28,13 +28,31 @@ IMainWindow::IMainWindow(QObject *parent)
 , api(true, this)
 , loginTask(NULL)
 {
+    connect(&api, SIGNAL(twoStepAuthentication(AsyncTaskToken*)),
+            this, SLOT(onTFARequest(AsyncTaskToken*)));
 }//IMainWindow::IMainWindow
 
 void
 IMainWindow::init()
 {
     db.init (Lib::ref().getDbDir());
+
+    QList<QNetworkCookie> cookies;
+    if (db.loadCookies (cookies)) {
+        api.setAllCookies (cookies);
+    }
+
+    connect (qApp, SIGNAL(aboutToQuit()), this, SLOT(onQuit()));
 }//IMainWindow::init
+
+void
+IMainWindow::onQuit()
+{
+    QList<QNetworkCookie> cookies = api.getAllCookies ();
+    db.saveCookies (cookies);
+
+    db.deinit ();
+}//IMainWindow::onQuit
 
 void
 IMainWindow::onInitDone()
@@ -43,11 +61,11 @@ IMainWindow::onInitDone()
 
     do {
         if (db.usernameIsCached () && db.getUserPass (user,pass)) {
-            // Begin logon
+            // Begin login
             beginLogin (user, pass);
         } else {
-            //TODO: Ask the user for login credentials
-            Q_DEBUG("TODO: Ask the user for login credentials");
+            // Ask the user for login credentials
+            uiRequestLoginDetails();
         }
     } while (0);
 }//IMainWindow::onInitDone
@@ -55,7 +73,7 @@ IMainWindow::onInitDone()
 void
 IMainWindow::beginLogin(const QString &user, const QString &pass)
 {
-    bool bOk;
+    bool ok;
     do {
         // Begin logon
         loginTask = new AsyncTaskToken(this);
@@ -64,16 +82,38 @@ IMainWindow::beginLogin(const QString &user, const QString &pass)
             break;
         }
 
-        bOk = connect(loginTask, SIGNAL(completed(AsyncTaskToken*)),
-                      this, SLOT(loginCompleted(AsyncTaskToken*)));
-        Q_ASSERT(bOk);
+        ok = connect(loginTask, SIGNAL(completed(AsyncTaskToken*)),
+                     this, SLOT(loginCompleted(AsyncTaskToken*)));
+        Q_ASSERT(ok);
 
         loginTask->inParams["user"] = user;
         loginTask->inParams["pass"] = pass;
 
         Q_DEBUG("Login using user ") << user;
+
+        api.login (loginTask);
     } while (0);
 }//IMainWindow::beginLogin
+
+void
+IMainWindow::onTFARequest(AsyncTaskToken *task)
+{
+    Q_ASSERT(loginTask == task);
+    uiRequestTFALoginDetails(task);
+}//IMainWindow::onTFARequest
+
+void
+IMainWindow::resumeTFAAuth(void *ctx, int pin, bool useAlt)
+{
+    Q_ASSERT(loginTask == ctx);
+
+    if (useAlt) {
+        api.resumeTFAAltLogin (loginTask);
+    } else {
+        loginTask->inParams["user_pin"] = QString::number (pin);
+        api.resumeTFALogin (loginTask);
+    }
+}//IMainWindow::resumeTFAAuth
 
 void
 IMainWindow::loginCompleted(AsyncTaskToken *task)
@@ -83,8 +123,12 @@ IMainWindow::loginCompleted(AsyncTaskToken *task)
 
     if (ATTS_SUCCESS == task->status) {
         Q_DEBUG("Login successful");
-        db.putUserPass (task->inParams["user"].toString(),
-                        task->inParams["pass"].toString());
+
+        QString user, pass;
+        user = task->inParams["user"].toString();
+        pass = task->inParams["pass"].toString();
+        db.putUserPass (user, pass);
+        uiSetUserPass(user, pass, false);
 
         //TODO: Begin contacts login
         //TODO: Fetch inbox, registered numbers and all that stuff

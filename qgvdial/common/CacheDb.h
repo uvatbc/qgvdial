@@ -40,6 +40,10 @@ public:
     bool getUserPass (QString &strUser, QString &strPass);
     bool putUserPass (const QString &strUser, const QString &strPass);
 
+    bool saveCookies(QList<QNetworkCookie> cookies);
+    bool loadCookies(QList<QNetworkCookie> &cookies);
+    bool clearCookies();
+
 private:
     void ensureCache();
     bool blowAwayCache();
