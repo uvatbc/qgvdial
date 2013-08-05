@@ -5,6 +5,7 @@ CONFIG += qt warn_on cascades10
 include(config.pri)
 include(api/api.pri)
 include(common/common.pri)
+include(features/openssl/openssl.pri)
 
 device {
     CONFIG(debug, debug|release) {

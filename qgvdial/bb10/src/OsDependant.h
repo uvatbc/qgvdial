@@ -24,8 +24,9 @@ Contact: yuvraaj@gmail.com
 
 #include "global.h"
 #include "IOsDependent.h"
+#include "OSDCipher.h"
 
-class OsDependant : public IOsDependant
+class OsDependant : public IOsDependant, public OsdCipher
 {
 public:
     OsDependant(QObject *parent = NULL);

@@ -3,7 +3,7 @@ folder_01.source = qml/maemo
 folder_01.target = qml
 DEPLOYMENTFOLDERS = folder_01
 
-# Additional import path used to resolve QML modules in Creator's code model
+# Additional import path used to resolve QML modules in Creators code model
 QML_IMPORT_PATH =
 
 # If your application uses the Qt Mobility libraries, uncomment the following
