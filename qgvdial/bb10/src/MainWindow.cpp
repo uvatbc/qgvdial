@@ -21,10 +21,6 @@ Contact: yuvraaj@gmail.com
 
 #include "MainWindow.h"
 
-#include <bb/cascades/Application>
-#include <bb/cascades/QmlDocument>
-#include <bb/cascades/AbstractPane>
-
 using namespace bb::cascades;
 
 QCoreApplication *
@@ -45,12 +41,13 @@ createApplication(int argc, char **argv)
 
 MainWindow::MainWindow(QCoreApplication *_app)
 : IMainWindow(_app)
+, qml(NULL)
 {
 	bb::cascades::Application *app = (bb::cascades::Application *) _app;
 	
     // create scene document from main.qml asset
     // set parent to created document to ensure it exists for the whole application lifetime
-    QmlDocument *qml = QmlDocument::create("asset:///main.qml").parent(this);
+    qml = QmlDocument::create("asset:///main.qml").parent(this);
 
     // create root object for the UI
     AbstractPane *root = qml->createRootObject<AbstractPane>();
@@ -63,3 +60,25 @@ MainWindow::init()
 {
     IMainWindow::init ();
 }//MainWindow::init
+
+void
+MainWindow::uiRequestLoginDetails()
+{
+	//TODO: Open the login page
+    Q_DEBUG("Open the login page");
+}
+
+void
+MainWindow::uiRequestTFALoginDetails(void*)
+{
+    //TODO: Open TFA dialog
+    Q_DEBUG("Open TFA dialog");
+}
+
+void
+MainWindow::uiSetUserPass(const QString &user, const QString &pass,
+                          bool editable)
+{
+    //TODO: Set user name and password
+    Q_DEBUG("Set user name and password");
+}

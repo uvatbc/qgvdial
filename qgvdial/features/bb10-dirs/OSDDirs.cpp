@@ -32,3 +32,10 @@ OsdDirs::_getDbDir()
 {
 	return QDir::homePath();
 }//OsdDirs::_getDbDir
+
+QString
+OsdDirs::_getLogsDir()
+{
+    QString base = QDir::currentPath();
+    return base + "/shared/documents";
+}//OsdDirs::_getLogsDir

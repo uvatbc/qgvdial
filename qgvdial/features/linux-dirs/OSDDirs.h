@@ -29,6 +29,7 @@ public:
     QString _getAppDirectory();
     QString _getTempDir();
     QString _getDbDir();
+    QString _getLogsDir();
 };
 
 #endif//OSDDIRS_H

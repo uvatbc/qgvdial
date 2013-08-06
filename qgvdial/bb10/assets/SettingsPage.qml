@@ -21,7 +21,32 @@ Contact: yuvraaj@gmail.com
 
 import bb.cascades 1.0
 
-Page {
-    Container {
-    }//Container
-}//Page
+NavigationPane {
+    id: container
+    
+    Page {
+        content: ListView {
+            dataModel: ArrayDataModel {
+                id: settingsModel
+            }
+            
+            onCreationCompleted: {
+                settingsModel.append("Login details");
+            }
+        }
+    }
+    
+    attachedObjects: [
+        Page {
+            id: loginDetails
+            Container {
+                Label {
+                    text: "Username"
+                }
+                Label {
+                    text: "Password"
+                }
+            }
+        }
+    ]
+}//NavigationPane

@@ -28,6 +28,7 @@ class OsdDirs {
 public:
     QString _getTempDir();
     QString _getDbDir();
+    QString _getLogsDir();
 };
 
 #endif//OSDDIRS_H

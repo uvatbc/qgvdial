@@ -26,6 +26,8 @@ Contact: yuvraaj@gmail.com
 #include "IMainWindow.h"
 
 #include <bb/cascades/Application>
+#include <bb/cascades/QmlDocument>
+#include <bb/cascades/AbstractPane>
 
 #include <QLocale>
 #include <QTranslator>
@@ -51,7 +53,16 @@ public:
     MainWindow(QCoreApplication *app);
     virtual ~MainWindow() {}
 
+    void uiRequestLoginDetails();
+    void uiRequestTFALoginDetails(void*);
+    void uiSetUserPass(const QString &user, const QString &pass,
+                       bool editable);
+
     void init();
+
+private:
+    QmlDocument *qml;
+    AbstractPane *root;
 };
 
 QCoreApplication *

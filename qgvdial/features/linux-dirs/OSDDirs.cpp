@@ -58,3 +58,9 @@ OsdDirs::_getDbDir()
 {
     return _getAppDirectory();
 }//OsdDirs::_getDbDir
+
+QString
+OsdDirs::_getLogsDir()
+{
+    return _getAppDirectory();
+}//OsdDirs::_getLogsDir
