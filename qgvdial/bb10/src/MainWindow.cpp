@@ -59,21 +59,28 @@ void
 MainWindow::init()
 {
     IMainWindow::init ();
+    QTimer::singleShot (1, this, SLOT(onInitDone()));
 }//MainWindow::init
+
+void
+MainWindow::log(QDateTime dt, int level, const QString &strLog)
+{
+    //TODO: Something meaningful
+}//MainWindow::log
 
 void
 MainWindow::uiRequestLoginDetails()
 {
 	//TODO: Open the login page
     Q_DEBUG("Open the login page");
-}
+}//MainWindow::uiRequestLoginDetails
 
 void
 MainWindow::uiRequestTFALoginDetails(void*)
 {
     //TODO: Open TFA dialog
     Q_DEBUG("Open TFA dialog");
-}
+}//MainWindow::uiRequestTFALoginDetails
 
 void
 MainWindow::uiSetUserPass(const QString &user, const QString &pass,
@@ -81,4 +88,4 @@ MainWindow::uiSetUserPass(const QString &user, const QString &pass,
 {
     //TODO: Set user name and password
     Q_DEBUG("Set user name and password");
-}
+}//MainWindow::uiSetUserPass

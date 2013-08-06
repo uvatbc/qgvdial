@@ -59,6 +59,7 @@ public:
                        bool editable);
 
     void init();
+    void log(QDateTime dt, int level, const QString &strLog);
 
 private:
     QmlDocument *qml;
