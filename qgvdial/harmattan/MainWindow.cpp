@@ -73,6 +73,11 @@ MainWindow::getQMLObject(const char *pageName)
 }//MainWindow::getQMLObject
 
 void
+MainWindow::log(QDateTime dt, int level, const QString &strLog)
+{
+}//MainWindow::log
+
+void
 MainWindow::declStatusChanged(QDeclarativeView::Status status)
 {
     do {

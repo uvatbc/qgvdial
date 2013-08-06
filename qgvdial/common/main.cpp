@@ -20,16 +20,140 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "MainWindow.h"
+#include "Lib.h"
+
+#include <iostream>
+using namespace std;
+
+QtMsgHandler    pOldHandler = NULL;
+MainWindow     *win = NULL;
+
+QFile fLogfile;       //! Logfile
+int   logLevel = 5;   //! Log level
+int   logCounter = 0; //! Number of log entries since the last log flush
+#define LOG_FLUSH_LEVEL 0
+
+QStringList arrLogFiles;
+
+const char *ignoreMsgs[] = {
+    "MPanRecognizerTouch",
+    "QGLWindowSurface",
+    "brokenTexSubImage",
+    "FullClearOnEveryFrame",
+    "hijackWindow"
+};
+
+void
+qgv_LogFlush()
+{
+    if (logCounter) {
+        logCounter = 0;
+        fLogfile.flush ();
+        cout.flush();
+    }
+}
+
+void
+myMessageOutput(QtMsgType type, const char *msg)
+{
+    int level = -1;
+    switch (type) {
+    case QtDebugMsg:
+        level = 3;
+        break;
+    case QtWarningMsg:
+        level = 2;
+        break;
+    case QtCriticalMsg:
+        level = 1;
+        break;
+    case QtFatalMsg:
+        level = 0;
+    }
+
+    QDateTime dt = QDateTime::currentDateTime ();
+    QString strLog = QString("%1 : %2 : %3")
+                     .arg(dt.toString ("yyyy-MM-dd hh:mm:ss.zzz"))
+                     .arg(level)
+                     .arg(msg);
+
+    // Ignore some log messages.
+    for (quint16 i = 0; i < COUNT_OF(ignoreMsgs); i++) {
+        if (strLog.contains(ignoreMsgs[i])) {
+            return;
+        }
+    }
+
+    // Send to standard output.
+    // I'm not using endl here because endl causes flushes
+    cout << strLog.toAscii().constData() << "\n";
+
+    if ((level <= logLevel) && (NULL != win)) {
+        win->log(dt, level, strLog);
+    }
+
+    strLog += '\n';
+    if (level <= logLevel) {
+        if (fLogfile.isOpen ()) {
+            // Append it to the file
+            fLogfile.write(strLog.toLatin1 ());
+
+            ++logCounter;
+            if (logCounter > LOG_FLUSH_LEVEL) {
+                qgv_LogFlush ();
+            }
+        }
+    }
+
+    if (QtFatalMsg == type) {
+        abort();
+    }
+}//myMessageOutput
 
 static void
 initLogging ()
 {
-}//initLogging ()
+    Lib &lib = Lib::ref ();
+    QString strLogfile = lib.getLogsDir ();
+    strLogfile += QDir::separator ();
+    strLogfile += "qgvdial-startup.log";
+
+    fLogfile.setFileName (strLogfile);
+    fLogfile.open (QIODevice::ReadWrite);
+
+    pOldHandler = qInstallMsgHandler(myMessageOutput);
+}//initLogging
+
+static void
+initLogRotate()
+{
+    Lib &lib = Lib::ref ();
+    QString strLogfile = lib.getLogsDir ();
+    strLogfile += QDir::separator ();
+    strLogfile += "qgvdial.log";
+
+    for (int i = 4; i >= 0; i--) {
+        arrLogFiles.append (QString("%1.%2").arg(strLogfile).arg(i));
+    }
+    arrLogFiles.append (strLogfile);
+
+    QFile::remove (arrLogFiles[0]);
+    for (int i = 1; i < arrLogFiles.count (); i++) {
+        if (QFile::exists (arrLogFiles[i])) {
+            QFile::rename (arrLogFiles[i], arrLogFiles[i-1]);
+        }
+    }
+
+    fLogfile.close ();
+    fLogfile.setFileName (strLogfile);
+    fLogfile.open (QIODevice::ReadWrite);
+}//initLogRotate
 
 static void
 deinitLogging ()
 {
-}//initLogging ()
+    fLogfile.close ();
+}//deinitLogging
 
 Q_DECL_EXPORT int
 main(int argc, char *argv[])
@@ -37,11 +161,13 @@ main(int argc, char *argv[])
     QCoreApplication *app = createApplication(argc, argv);
 
     initLogging ();
+    initLogRotate ();
 
-    MainWindow *win = new MainWindow(app);
+    win = new MainWindow(app);
     win->init();
 
     int rv = app->exec();
+
     deinitLogging ();
 
     delete win;

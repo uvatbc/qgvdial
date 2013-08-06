@@ -33,3 +33,8 @@ MainWindow::init()
     m_view.setMainQmlFile(QLatin1String("qml/symbian/main.qml"));
     m_view.showExpanded();
 }//MainWindow::init
+
+void
+MainWindow::log(QDateTime dt, int level, const QString &strLog)
+{
+}//MainWindow::log

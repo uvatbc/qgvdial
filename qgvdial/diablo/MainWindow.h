@@ -35,6 +35,7 @@ public:
     virtual ~MainWindow();
 
     void init();
+    void log(QDateTime dt, int level, const QString &strLog);
 
 public slots:
     void onLoginClicked();

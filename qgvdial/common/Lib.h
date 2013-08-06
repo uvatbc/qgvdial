@@ -37,6 +37,7 @@ public:
 
     inline QString getTempDir() { return m_osd->getTempDir(); }
     inline QString getDbDir()   { return m_osd->getDbDir(); }
+    inline QString getLogsDir() { return m_osd->getLogsDir(); }
 
     inline bool cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt) {
         return m_osd->cipher(byIn, byOut, bEncrypt);

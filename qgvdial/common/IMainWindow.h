@@ -43,6 +43,8 @@ private slots:
     void loginCompleted(AsyncTaskToken *task);
 
 protected:
+    virtual void log(QDateTime dt, int level, const QString &strLog) = 0;
+
     virtual void uiRequestLoginDetails() = 0;
     virtual void uiRequestTFALoginDetails(void *ctx) = 0;
     virtual void uiSetUserPass(const QString &user, const QString &pass,

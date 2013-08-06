@@ -34,8 +34,7 @@ class MainWindow : public IMainWindow
 public:
     explicit MainWindow(QObject *parent = 0);
     void init();
-
-signals:
+    void log(QDateTime dt, int level, const QString &strLog);
 
 protected slots:
     void declStatusChanged(QDeclarativeView::Status status);

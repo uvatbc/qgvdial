@@ -34,10 +34,7 @@ class MainWindow : public IMainWindow
 public:
     explicit MainWindow(QObject *parent = 0);
     void init();
-
-signals:
-
-public slots:
+    void log(QDateTime dt, int level, const QString &strLog);
 
 private:
     QmlApplicationViewer m_view;
