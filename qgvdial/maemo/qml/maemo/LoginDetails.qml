@@ -24,15 +24,10 @@ import Qt 4.7
 Item {
     id: container
 
-    signal sigUserChanged(string user)
-    signal sigPassChanged(string pass)
-    signal sigLogin
     signal sigLogout
 
     property alias username: textUsername.text
     property alias password: textPassword.text
-
-    property bool g_bIsLoggedIn:false
 
     height: (rowUser.height + rowPass.height + btnLogin.height + 6)
 
@@ -58,22 +53,22 @@ Item {
 
         TextOneLine {
             id: textUsername
+            objectName: "TextUsername"
+
             height: lblEmail.height
             width: parent.width - lblEmail.width - (parent.spacing * 2)
-            opacity: (g_bIsLoggedIn === true ? 0 : 1)
 
             placeholderText: "example@gmail.com"
 
             KeyNavigation.tab: textPassword
             onAccepted: btnLogin.doClick();
-            onTextChanged: container.sigUserChanged(text);
         }//QGVTextInput
 
         Text {
             id: lblUsername
             anchors.verticalCenter: parent.verticalCenter
             height: paintedHeight + 2
-            opacity: (g_bIsLoggedIn == true ? 1 : 0)
+            opacity: (1 - textUsername.opacity)
             text: container.username
             color: "white"
         }//Label (username)
@@ -102,15 +97,15 @@ Item {
 
         TextOneLine {
             id: textPassword
+            objectName: "TextPassword"
+
             height: lblPass.height
             width: parent.width - lblPass.width - (parent.spacing * 2)
-            opacity: (g_bIsLoggedIn == true ? 0 : 1)
             echoMode: TextInput.Password
 
             placeholderText: "Password"
 
             KeyNavigation.tab: textUsername
-            onTextChanged: container.sigPassChanged(text);
             onAccepted: btnLogin.doClick();
         }//QGVTextInput
 
@@ -118,7 +113,7 @@ Item {
             id: lblPassword
             anchors.verticalCenter: parent.verticalCenter
             height: paintedHeight + 2
-            opacity: (g_bIsLoggedIn == true ? 1 : 0)
+            opacity: (1 - textPassword.opacity)
             text: Array(container.password.length+1).join("*")
             color: "white"
         }//Label (password)
@@ -126,6 +121,9 @@ Item {
 
     Button {
         id: btnLogin
+        objectName: "LoginButton"
+
+        signal sigClicked
 
         anchors {
             horizontalCenter: parent.horizontalCenter
@@ -133,19 +131,13 @@ Item {
             topMargin: 2
         }
 
-        text: (g_bIsLoggedIn === true ? "Logout" : "Login")
+        text: "Login"
 
-        function doClick() {
-            if (g_bIsLoggedIn) {
-                container.sigLogout();
-            } else {
-                container.sigLogin();
-            }
-
-            textUsername.closeSoftwareInputPanel();
-            textPassword.closeSoftwareInputPanel();
+        onSigClicked: {
+            //textUsername.closeSoftwareInputPanel();
+            //textPassword.closeSoftwareInputPanel();
         }
 
-        onClicked: btnLogin.doClick();
+        onClicked: btnLogin.sigClicked();
     }//Button (login/logout)
 }//Item (container)

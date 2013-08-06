@@ -1,3 +1,5 @@
+TARGET = qgvdial
+
 # Add more folders to ship with the application, here
 folder_01.source = qml/maemo
 folder_01.target = qml

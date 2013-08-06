@@ -36,8 +36,26 @@ public:
     void init();
     void log(QDateTime dt, int level, const QString &strLog);
 
+protected slots:
+    void onUiReady();
+    void declStatusChanged(QDeclarativeView::Status status);
+    void onLoginButtonClicked();
+
+protected:
+    QObject *getQMLObject(const char *pageName);
+
+    void uiRequestLoginDetails();
+    void uiRequestTFALoginDetails(void *ctx);
+    void uiSetUserPass(const QString &user, const QString &pass, bool editable);
+
 private:
     QmlApplicationViewer m_view;
+
+    QObject *tabbedUI;
+    QObject *loginExpand;
+    QObject *loginButton;
+    QObject *textUsername;
+    QObject *textPassword;
 };
 
 #endif // MAINWINDOW_H

@@ -159,6 +159,7 @@ MainWindow::uiSetUserPass(const QString &user, const QString &pass,
     textUsername->setProperty ("text", user);
     textPassword->setProperty ("text", pass);
 
-    textUsername->setProperty ("opacity", editable ? 1 : 0);
-    textPassword->setProperty ("opacity", editable ? 1 : 0);
+    int val = editable ? 1 : 0;
+    textUsername->setProperty ("opacity", val);
+    textPassword->setProperty ("opacity", val);
 }//MainWindow::uiSetUserPass
