@@ -26,6 +26,11 @@ NavigationPane {
     
     Page {
         content: ListView {
+            function callMe() {
+                console.debug("Do mee");
+                container.push(loginDetails);
+            }
+            
             dataModel: ArrayDataModel {
                 id: settingsModel
             }
@@ -33,6 +38,19 @@ NavigationPane {
             onCreationCompleted: {
                 settingsModel.append("Login details");
             }
+            
+            listItemComponents: [
+                ListItemComponent {
+                    Label {
+                        text: ListItem.data
+                        onTouch: {
+                            if (ListItem.indexPath == 0) {
+                                ListItem.view.callMe();
+                            }
+                        }
+                    }
+                }
+            ]
         }
     }
     
