@@ -88,6 +88,7 @@ myMessageOutput(QtMsgType type, const char *msg)
     // Send to standard output.
     // I'm not using endl here because endl causes flushes
     cout << strLog.toAscii().constData() << "\n";
+    TOUCHME(strLog);
 
     if ((level <= logLevel) && (NULL != pw)) {
         pw->log(dt, level, strLog);
@@ -188,8 +189,6 @@ main (int argc, char *argv[])
     if (bQuit) {
         return (0);
     }
-    
-    TOUCHME("app created");
 
     // here's the log rotate
     initLogRotate ();
@@ -217,6 +216,7 @@ main (int argc, char *argv[])
     app.setApplicationName (APPLICATION_NAME);
 
     int rv = app.exec();
+
     deinitLogging ();
     return (rv);
 }//main

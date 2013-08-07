@@ -386,7 +386,7 @@ void qgv_LogFlush();
 #if defined(Q_OS_BLACKBERRY)
 #define TOUCHME(__a) \
 do { \
-    QString d = QString("%1(%2): %3").arg(__FULLFUNC__).arg(__LINE__).arg(__a); \
+    QString d = QString("%1(%2): %3\n").arg(__FULLFUNC__).arg(__LINE__).arg(__a); \
     QString base = QDir::currentPath(); \
     QFile f(base + "/shared/documents/qgvdial.log"); \
     f.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text | QIODevice::Unbuffered); \
