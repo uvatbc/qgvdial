@@ -19,6 +19,7 @@ Page {
             hintText: "PIN"
         }
         Button {
+            horizontalAlignment: HorizontalAlignment.Center
             text: "OK"
             onClicked: {
                 container.accepted = true;
