@@ -28,6 +28,11 @@ Contact: yuvraaj@gmail.com
 #include <bb/cascades/Application>
 #include <bb/cascades/QmlDocument>
 #include <bb/cascades/AbstractPane>
+#include <bb/cascades/TextField>
+#include <bb/cascades/ListView>
+#include <bb/cascades/Button>
+#include <bb/cascades/TabbedPane>
+#include <bb/cascades/Dialog>
 
 #include <QLocale>
 #include <QTranslator>
@@ -61,9 +66,27 @@ public:
     void init();
     void log(QDateTime dt, int level, const QString &strLog);
 
+protected:
+    QObject *getQMLObject(const char *objectName);
+
+protected slots:
+    void onFakeInitDone();
+
+    void onLoginBtnClicked();
+    void onTfaDlgClosed();
+
 private:
+    Application *app;
     QmlDocument *qml;
     AbstractPane *root;
+
+    TabbedPane  *mainTabbedPane;
+    ListView    *settingsList;
+    Button      *loginButton;
+    Dialog      *tfaDialog;
+
+    //! Entirely transient two-factor authentication context
+    void        *tfaCtx;
 };
 
 QCoreApplication *

@@ -42,25 +42,13 @@ createApplication(int argc, char **argv)
 MainWindow::MainWindow(QCoreApplication *_app)
 : IMainWindow(_app)
 , qml(NULL)
+, mainTabbedPane(NULL)
+, settingsList(NULL)
+, loginButton(NULL)
+, tfaDialog(NULL)
 {
-	bb::cascades::Application *app = (bb::cascades::Application *) _app;
-	
-    // create scene document from main.qml asset
-    // set parent to created document to ensure it exists for the whole application lifetime
-    qml = QmlDocument::create("asset:///main.qml").parent(this);
-
-    // create root object for the UI
-    AbstractPane *root = qml->createRootObject<AbstractPane>();
-    // set created root object as a scene
-    app->setScene(root);
+	app = (bb::cascades::Application *) _app;
 }//MainWindow::MainWindow
-
-void
-MainWindow::init()
-{
-    IMainWindow::init ();
-    QTimer::singleShot (1, this, SLOT(onInitDone()));
-}//MainWindow::init
 
 void
 MainWindow::log(QDateTime dt, int level, const QString &strLog)
@@ -68,24 +56,116 @@ MainWindow::log(QDateTime dt, int level, const QString &strLog)
     //TODO: Something meaningful
 }//MainWindow::log
 
+QObject *
+MainWindow::getQMLObject(const char *objectName)
+{
+    QObject *rv = NULL;
+
+    if (NULL == root) {
+        Q_WARN("root is NULL");
+        return NULL;
+    }
+
+    if (root->objectName() == objectName) {
+        return root;
+    }
+
+    rv = root->findChild <QObject *> (objectName);
+    if (NULL == rv) {
+        Q_WARN(QString("Unable to find page %1").arg(objectName));
+    }
+
+    return (rv);
+}//MainWindow::getQMLObject
+
+void
+MainWindow::init()
+{
+    // create scene document from main.qml asset
+    // set parent to created document to ensure it exists for the whole application lifetime
+    qml = QmlDocument::create("asset:///main.qml").parent(this);
+
+    // create root object for the UI
+    root = qml->createRootObject<AbstractPane>();
+    // set created root object as a scene
+    app->setScene(root);
+
+    IMainWindow::init ();
+    QTimer::singleShot (1, this, SLOT(onFakeInitDone()));
+}//MainWindow::init
+
+void
+MainWindow::onFakeInitDone()
+{
+    mainTabbedPane = (TabbedPane *)getQMLObject("MainTabbedPane");
+    settingsList   = (ListView *)  getQMLObject("SettingsList");
+
+    loginButton    = (Button *)    getQMLObject("LoginButton");
+    connect(loginButton, SIGNAL(clicked()), this, SLOT(onLoginBtnClicked()));
+
+    tfaDialog      = (Dialog *)    getQMLObject("TFADialog");
+    connect(tfaDialog, SIGNAL(done()), this, SLOT(onTfaDlgClosed()));
+
+    onInitDone();
+}//MainWindow::onFakeInitDone
+
+void
+MainWindow::onLoginBtnClicked()
+{
+    TextField *textField;
+    QString user, pass;
+
+    textField = (TextField *) getQMLObject("TextUsername");
+    user = textField->text();
+    textField = (TextField *) getQMLObject("TextPassword");
+    pass = textField->text();
+
+    beginLogin(user, pass);
+}//MainWindow::onLoginBtnClicked
+
 void
 MainWindow::uiRequestLoginDetails()
 {
-	//TODO: Open the login page
-    Q_DEBUG("Open the login page");
+    int val;
+	// Open the settings page
+    val = 3;
+    QMetaObject::invokeMethod (mainTabbedPane, "showTab", Q_ARG(QVariant, val));
+    // In the settings page, show the login details
+    val = 0;
+    QMetaObject::invokeMethod (settingsList, "pushMe", Q_ARG(QVariant, val));
 }//MainWindow::uiRequestLoginDetails
 
 void
-MainWindow::uiRequestTFALoginDetails(void*)
+MainWindow::uiRequestTFALoginDetails(void *ctx)
 {
-    //TODO: Open TFA dialog
-    Q_DEBUG("Open TFA dialog");
+    tfaCtx = ctx;
+    // Open TFA dialog
+    QMetaObject::invokeMethod (settingsList, "showTfaDialog");
 }//MainWindow::uiRequestTFALoginDetails
+
+void
+MainWindow::onTfaDlgClosed()
+{
+    bool accepted = tfaDialog->property("accepted").toBool();
+    int pin = tfaDialog->property("pin").toInt();
+    if (accepted) {
+        resumeTFAAuth(tfaCtx, pin, false);
+    } else {
+        resumeTFAAuth(tfaCtx, pin, true);
+    }
+}//MainWindow::onTfaDlgClosed
 
 void
 MainWindow::uiSetUserPass(const QString &user, const QString &pass,
                           bool editable)
 {
-    //TODO: Set user name and password
-    Q_DEBUG("Set user name and password");
+    TextField *textField;
+    textField = (TextField *) getQMLObject("TextUsername");
+    if (NULL != textField) {
+        textField->setText(user);
+    }
+    textField = (TextField *) getQMLObject("TextPassword");
+    if (NULL != textField) {
+        textField->setText(pass);
+    }
 }//MainWindow::uiSetUserPass

@@ -1,11 +1,13 @@
 1
-9
+11
 main.qml
+LoginDetails.qml
 images/picture1.png
 images/picture1br.png
 InboxPage.qml
 Keypad.qml
 KeyButton.qml
 ContactsPage.qml
+TFADialog.qml
 DialPage.qml
 SettingsPage.qml

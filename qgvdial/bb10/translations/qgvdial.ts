@@ -18,22 +18,22 @@
 <context>
     <name>main</name>
     <message>
-        <location filename="../assets/main.qml" line="27"/>
+        <location filename="../assets/main.qml" line="47"/>
         <source>Dialpad</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="33"/>
+        <location filename="../assets/main.qml" line="54"/>
         <source>Contacts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="39"/>
+        <location filename="../assets/main.qml" line="61"/>
         <source>Inbox</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="45"/>
+        <location filename="../assets/main.qml" line="68"/>
         <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>

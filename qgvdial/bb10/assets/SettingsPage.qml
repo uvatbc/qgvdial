@@ -26,9 +26,17 @@ NavigationPane {
     
     Page {
         content: ListView {
-            function callMe() {
-                console.debug("Do mee");
-                container.push(loginDetails);
+            objectName: "SettingsList"
+            
+            function pushMe(index) {
+                if (index == 0) {
+                    container.push(loginDetails);
+                }
+            }
+            function showTfaDialog() {
+                tfaDialog.pin = "";
+                tfaDialog.accepted = false;
+                container.push(tfaDialog);
             }
             
             dataModel: ArrayDataModel {
@@ -44,27 +52,22 @@ NavigationPane {
                     Label {
                         text: ListItem.data
                         onTouch: {
-                            if (ListItem.indexPath == 0) {
-                                ListItem.view.callMe();
-                            }
+                            ListItem.view.pushMe(ListItem.indexPath);
                         }
-                    }
-                }
-            ]
-        }
-    }
+                    }//Label
+                }//ListItemComponent
+            ]//listItemComponents
+        }//ListView
+    }//Page
     
     attachedObjects: [
-        Page {
+        LoginDetails {
             id: loginDetails
-            Container {
-                Label {
-                    text: "Username"
-                }
-                Label {
-                    text: "Password"
-                }
-            }
+            onDone: container.pop();
+        },
+        TFADialog {
+            id: tfaDialog
+            onDone: container.pop()
         }
     ]
 }//NavigationPane
