@@ -22,7 +22,8 @@ Contact: yuvraaj@gmail.com
 #include "MainWindow.h"
 
 MainWindow::MainWindow(QObject *parent)
-: IMainWindow(parent)
+//: IMainWindow(parent)
+: DummyMainWindow(parent)
 , m_view(NULL)
 {
 }//MainWindow::MainWindow

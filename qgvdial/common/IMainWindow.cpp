@@ -136,5 +136,6 @@ IMainWindow::loginCompleted(AsyncTaskToken *task)
         Q_WARN("Login failed");
     }
 
+    emit onLoginCompleted (task->status, task->errorString);
     delete task;
 }//IMainWindow::loginCompleted

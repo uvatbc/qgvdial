@@ -19,27 +19,27 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef DUMMYMAINWINDOW_H
+#define DUMMYMAINWINDOW_H
 
 #include <QObject>
-#include <QApplication>
-
 #include "IMainWindow.h"
-#include "qmlapplicationviewer.h"
 
-#include "DummyWindow.h"
-
-class MainWindow : public DummyMainWindow
+class DummyMainWindow : public IMainWindow
 {
     Q_OBJECT
 public:
-    explicit MainWindow(QObject *parent = 0);
-    void init();
-    void log(QDateTime dt, int level, const QString &strLog);
+    explicit DummyMainWindow(QObject *parent = 0);
+    virtual void init();
+    virtual void log(QDateTime dt, int level, const QString &strLog);
 
-private:
-    QmlApplicationViewer m_view;
+protected slots:
+    virtual void onLoginButtonClicked();
+
+protected:
+    virtual void uiRequestLoginDetails();
+    virtual void uiRequestTFALoginDetails(void *ctx);
+    virtual void uiSetUserPass(const QString &user, const QString &pass, bool editable);
 };
 
-#endif // MAINWINDOW_H
+#endif // DUMMYMAINWINDOW_H

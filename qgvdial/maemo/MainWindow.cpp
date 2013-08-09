@@ -127,16 +127,6 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
 }//MainWindow::declStatusChanged
 
 void
-MainWindow::onLoginButtonClicked()
-{
-    QString user, pass;
-    user = textUsername->property("text").toString();
-    pass = textPassword->property("text").toString();
-
-    beginLogin (user, pass);
-}//MainWindow::onLoginButtonClicked
-
-void
 MainWindow::uiRequestLoginDetails()
 {
     // Show the settings tab
@@ -147,6 +137,16 @@ MainWindow::uiRequestLoginDetails()
         loginExpand->setProperty("isExpanded", val);
     }
 }//MainWindow::uiRequestLoginDetails
+
+void
+MainWindow::onLoginButtonClicked()
+{
+    QString user, pass;
+    user = textUsername->property("text").toString();
+    pass = textPassword->property("text").toString();
+
+    beginLogin (user, pass);
+}//MainWindow::onLoginButtonClicked
 
 void
 MainWindow::uiRequestTFALoginDetails(void *ctx)
