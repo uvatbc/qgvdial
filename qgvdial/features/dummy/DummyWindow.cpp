@@ -76,3 +76,10 @@ DummyMainWindow::uiSetUserPass(const QString &user, const QString &pass,
     //TODO: Set the user and password into the UI.
     Q_ASSERT(0 == "Not implemented");
 }//DummyMainWindow::uiSetUserPass
+
+void
+DummyMainWindow::uiLoginDone(int status, const QString &errStr)
+{
+    //TODO: Set the user and password into the UI.
+    Q_ASSERT(0 == "Not implemented");
+}//DummyMainWindow::uiLoginDone

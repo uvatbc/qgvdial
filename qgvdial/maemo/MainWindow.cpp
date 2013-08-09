@@ -174,3 +174,13 @@ MainWindow::uiSetUserPass(const QString &user, const QString &pass,
     textUsername->setProperty ("opacity", val);
     textPassword->setProperty ("opacity", val);
 }//MainWindow::uiSetUserPass
+
+void
+MainWindow::uiLoginDone(int status, const QString &errStr)
+{
+    if (ATTS_SUCCESS == status) {
+        Q_DEBUG("Successful login!!");
+    } else {
+        Q_WARN(QString("Login failed: %1").arg (errStr));
+    }
+}//MainWindow::uiLoginDone

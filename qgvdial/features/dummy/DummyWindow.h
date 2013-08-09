@@ -40,6 +40,7 @@ protected:
     virtual void uiRequestLoginDetails();
     virtual void uiRequestTFALoginDetails(void *ctx);
     virtual void uiSetUserPass(const QString &user, const QString &pass, bool editable);
+    virtual void uiLoginDone(int status, const QString &errStr) = 0;
 };
 
 #endif // DUMMYMAINWINDOW_H

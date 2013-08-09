@@ -111,3 +111,19 @@ MainWindow::uiSetUserPass(const QString &user, const QString &pass,
     d->ui->textUsername->setReadOnly (!editable);
     d->ui->textPassword->setReadOnly (!editable);
 }//MainWindow::uiSetUserPass
+
+void
+MainWindow::uiLoginDone(int status, const QString &errStr)
+{
+    if (ATTS_SUCCESS == status) {
+        Q_DEBUG("Successful login!!");
+        d->ui->statusBar->showMessage ("Login successful");
+    } else {
+        Q_WARN(QString("Login failed: %1").arg (errStr));
+        QMessageBox msg;
+        msg.setIcon (QMessageBox::Critical);
+        msg.setText (errStr);
+        msg.setWindowTitle ("Login failed");
+        msg.exec ();
+    }
+}//MainWindow::uiLoginDone

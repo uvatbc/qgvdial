@@ -50,7 +50,7 @@ Contact: yuvraaj@gmail.com
  * Login credentials NOT saved:
  * onInitDone() -> uiRequestLoginDetails() -> beginLogin()
  *    [ -> uiRequestTFALoginDetails() -> resumeTFAAuth() ]
- *      -> emit onLoginCompleted(...)
+ *      -> uiLoginCompleted(...)
  *
  * -> onInitDone(): If the credentials are NOT saved in the cache, then I need
  *      to go ask the user for it. This varies based on the UI and thus must be
@@ -69,13 +69,13 @@ Contact: yuvraaj@gmail.com
  *      text message with the pin, then there is the option of asking Google
  *      Voice to provide the pin with an automated voice call. To do this, DC
  *      must call resumeTFAAuth(ctx, pin, true).
- * -> onLoginCompleted(): At the end of the login process, the BC will emit this
- *      signal - with either a success status or an error with a non-empty error
- *      string. Connecting to this is not mandatory, but it is preferred.
+ * -> uiLoginCompleted(): At the end of the login process, the BC will invoke
+ *      this function - with either a success status or an error with a
+ *      non-empty error string.
  *
  *==============================================================================
  * Login credentials saved:
- * Usually: onInitDone() -> emit onLoginCompleted(...)
+ * Usually: onInitDone() -> uiLoginCompleted(...)
  * Sometimes the api may invoke the TFA functions - depends on when Google
  * thinks it is necessary.
  *
@@ -87,9 +87,6 @@ class IMainWindow : public QObject
 public:
     explicit IMainWindow(QObject *parent = 0);
     virtual void init() = 0;
-
-signals:
-    void onLoginCompleted(int status, const QString &errStr);
 
 protected slots:
     void onInitDone();
@@ -109,6 +106,7 @@ protected:
                                bool editable) = 0;
 
     void beginLogin(const QString &user, const QString &pass);
+    virtual void uiLoginDone(int status, const QString &errStr) = 0;
 
 protected:
     CacheDb db;
