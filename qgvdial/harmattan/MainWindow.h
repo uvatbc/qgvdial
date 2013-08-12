@@ -51,11 +51,15 @@ protected:
 private:
     QmlApplicationViewer m_view;
 
+    QObject *mainPageStack;
     QObject *mainTabGroup;
     QObject *loginExpand;
     QObject *loginButton;
+    QObject *tfaPinDlg;
     QObject *textUsername;
     QObject *textPassword;
+
+    void    *loginCtx;
 };
 
 #endif // MAINWINDOW_H

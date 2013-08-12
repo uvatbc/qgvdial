@@ -24,9 +24,11 @@ Contact: yuvraaj@gmail.com
 MainWindow::MainWindow(QObject *parent)
 : IMainWindow(parent)
 , m_view(NULL)
+, mainPageStack(NULL)
 , mainTabGroup(NULL)
 , loginExpand(NULL)
 , loginButton(NULL)
+, tfaPinDlg(NULL)
 , textUsername(NULL)
 , textPassword(NULL)
 {
@@ -88,6 +90,11 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
             break;
         }
 
+        mainPageStack = getQMLObject ("MainPageStack");
+        if (NULL == mainPageStack) {
+            break;
+        }
+
         mainTabGroup = getQMLObject ("MainTabGroup");
         if (NULL == mainTabGroup) {
             break;
@@ -104,6 +111,11 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
         }
         connect(loginButton, SIGNAL(clicked()),
                 this, SLOT(onLoginButtonClicked()));
+
+        tfaPinDlg = getQMLObject ("TFAPinDialog");
+        if (NULL == tfaPinDlg) {
+            break;
+        }
 
         textUsername = getQMLObject ("TextUsername");
         if (NULL == textUsername) {
@@ -146,7 +158,11 @@ MainWindow::uiRequestLoginDetails()
 void
 MainWindow::uiRequestTFALoginDetails(void *ctx)
 {
-    //TODO: Look for a Harmattan specific message box api
+    loginCtx = ctx;
+
+    // Push the TFA dialog on to the main page
+    QMetaObject::invokeMethod (mainPageStack, "pushTfaDlg");
+
     //TODO: Fix this!!
     resumeTFAAuth (ctx, 0, false);
 }//MainWindow::uiRequestTFALoginDetails

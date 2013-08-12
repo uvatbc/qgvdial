@@ -33,7 +33,6 @@ Page {
         id: searchRow
         anchors {
             top: parent.top
-            topMargin: 40
         }
         width: parent.width
         spacing: 5

@@ -24,84 +24,89 @@ import com.nokia.meego 1.1
 
 PageStackWindow {
     id: appWindow
+    objectName: "MainPageStack"
 
     Component.onCompleted: {
         // Use the dark theme.
         theme.inverted = true;
     }
 
-    initialPage: Page {
-        tools: commonTools
+    function pushTfaDlg() {
+        pageStack.push(tfaPinDlg);
     }
 
-    TabGroup {
-        id: tabgroup
-        objectName: "MainTabGroup"
-        currentTab: dialTab
+    initialPage: Page {
+        tools: commonTools
 
-        function setTab(index) {
-            if (0 === index) {
-                currentTab = dialTab;
-            } else if (1 === index) {
-                currentTab = contactsTab;
-            } else if (2 === index) {
-                currentTab = inboxTab;
-            } else if (3 === index) {
-                currentTab = settingsTab;
-            }
-        }
+        TabGroup {
+            id: tabgroup
+            objectName: "MainTabGroup"
+            currentTab: dialTab
 
-        DialPage {
-            id: dialTab
-            toolbarHeight: appWindow.platformToolBarHeight
-        }
-        ContactsPage {
-            id: contactsTab
-            toolbarHeight: appWindow.platformToolBarHeight
-        }
-        InboxPage {
-            id: inboxTab
-            toolbarHeight: appWindow.platformToolBarHeight
-        }
-        SettingsPage {
-            id: settingsTab
-            toolbarHeight: appWindow.platformToolBarHeight
-        }
-    }//TabGroup
+            function setTab(index) {
+                if (0 === index) {
+                    currentTab = dialTab;
+                } else if (1 === index) {
+                    currentTab = contactsTab;
+                } else if (2 === index) {
+                    currentTab = inboxTab;
+                } else if (3 === index) {
+                    currentTab = settingsTab;
+                }
+            }
 
-    ToolBarLayout {
-        id: commonTools
-        visible: true
+            DialPage {
+                id: dialTab
+                toolbarHeight: appWindow.platformToolBarHeight
+            }
+            ContactsPage {
+                id: contactsTab
+                toolbarHeight: appWindow.platformToolBarHeight
+            }
+            InboxPage {
+                id: inboxTab
+                toolbarHeight: appWindow.platformToolBarHeight
+            }
+            SettingsPage {
+                id: settingsTab
+                toolbarHeight: appWindow.platformToolBarHeight
+            }
+        }//TabGroup
 
-        ToolIcon {
-            iconId: "toolbar-back";
-            onClicked: pageStack.pop();
-        }
+        ToolBarLayout {
+            id: commonTools
+            visible: true
 
-        ButtonRow {
-            TabButton {
-                iconSource: "qrc:/dialpad.svg"
-                tab: dialTab
+            ToolIcon {
+                iconId: "toolbar-back";
+                onClicked: pageStack.pop();
             }
-            TabButton {
-                iconSource: "qrc:/people.svg"
-                tab: contactsTab
+
+            ButtonRow {
+                TabButton {
+                    iconSource: "qrc:/dialpad.svg"
+                    tab: dialTab
+                }
+                TabButton {
+                    iconSource: "qrc:/people.svg"
+                    tab: contactsTab
+                }
+                TabButton {
+                    iconSource: "qrc:/history.svg"
+                    tab: inboxTab
+                }
+                TabButton {
+                    iconSource: "qrc:/settings.svg"
+                    tab: settingsTab
+                }
             }
-            TabButton {
-                iconSource: "qrc:/history.svg"
-                tab: inboxTab
+            ToolIcon {
+                platformIconId: "toolbar-view-menu"
+                anchors.right: (parent === undefined) ? undefined : parent.right
+                onClicked: (myMenu.status === DialogStatus.Closed) ? myMenu.open() : myMenu.close()
             }
-            TabButton {
-                iconSource: "qrc:/settings.svg"
-                tab: settingsTab
-            }
-        }
-        ToolIcon {
-            platformIconId: "toolbar-view-menu"
-            anchors.right: (parent === undefined) ? undefined : parent.right
-            onClicked: (myMenu.status === DialogStatus.Closed) ? myMenu.open() : myMenu.close()
-        }
-    }//ToolBarLayout
+        }//ToolBarLayout
+    }
 
     Menu {
         id: myMenu
@@ -112,4 +117,35 @@ PageStackWindow {
             }
         }
     }//Menu
+
+    Dialog {
+        id: tfaPinDlg
+        objectName: "TFAPinDialog"
+
+        property alias textPin: textTfaPin.text
+
+        content: Column {
+            Label {
+                text: "Enter the two-factor authentication PIN"
+            }
+
+            TextField {
+                id: textTfaPin
+                placeholderText: "PIN"
+            }
+        }//content Item
+
+        buttons: ButtonRow {
+            exclusive: false
+
+            Button {
+                text: "Cancel"
+                onClicked: appWindow.pageStack.pop();
+            }
+            Button {
+                text: "Submit"
+                onClicked: appWindow.pageStack.pop();
+            }
+        }
+    }//TFA Dialog
 }

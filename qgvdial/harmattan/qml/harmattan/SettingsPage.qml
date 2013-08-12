@@ -73,7 +73,6 @@ Page {
 
         anchors {
             top: parent.top
-            topMargin: 40
         }
         width: parent.width
         height: parent.height - container.toolbarHeight
@@ -289,4 +288,4 @@ Page {
         }//ExpandView (About)
         */
     }//Flickable
-}// Item (container)
+}//Page (SettingsPage)

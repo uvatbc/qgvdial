@@ -37,7 +37,6 @@ Page {
 
         anchors {
             top: parent.top
-            topMargin: 40
             horizontalCenter: parent.horizontalCenter
         }
 
