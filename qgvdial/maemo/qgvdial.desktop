@@ -1,11 +1,9 @@
 [Desktop Entry]
 Encoding=UTF-8
-Version=1.0
+Version=__QGVDIAL_VERSION__
 Type=Application
-Terminal=false
-Name=maemo
-Exec=/opt/maemo/bin/maemo
-Icon=maemo64
-X-Window-Icon=
+Name=qgvdial
+Exec=/opt/qgvdial/bin/qgvdial
+Icon=qgvdial
 X-HildonDesk-ShowInToolbar=true
 X-Osso-Type=application/x-executable

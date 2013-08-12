@@ -20,7 +20,6 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "MainWindow.h"
-#include "UserPinDlg.h"
 
 MainWindow::MainWindow(QObject *parent)
 : IMainWindow(parent)
@@ -148,9 +147,6 @@ void
 MainWindow::uiRequestTFALoginDetails(void *ctx)
 {
     //TODO: Look for a Harmattan specific message box api
-    UserPinDlg dlg;
-    dlg.exec ();
-
     //TODO: Fix this!!
     resumeTFAAuth (ctx, 0, false);
 }//MainWindow::uiRequestTFALoginDetails
