@@ -39,24 +39,23 @@ Item {
         }
 
         width: parent.width
-        height: lblEmail.height
+        height: textUsername.height
         spacing: 2
 
         Label {
             id: lblEmail
             text: "Email:"
             anchors.verticalCenter: parent.verticalCenter
-            height: paintedHeight + 2
         }//Label ("Email:")
 
         TextField {
             id: textUsername
             objectName: "TextUsername"
 
-            height: lblEmail.height
             width: parent.width - lblEmail.width - (parent.spacing * 2)
 
             placeholderText: "example@gmail.com"
+            inputMethodHints: Qt.ImhPreferLowercase | Qt.ImhNoPredictiveText
 
             KeyNavigation.tab: textPassword
             onAccepted: btnLogin.doClick();
@@ -65,7 +64,6 @@ Item {
         Label {
             id: lblUsername
             anchors.verticalCenter: parent.verticalCenter
-            height: paintedHeight + 2
             opacity: (1 - textUsername.opacity)
             text: container.username
         }//QGVLabel (username)
@@ -81,21 +79,19 @@ Item {
         }
 
         width: parent.width
-        height: lblPass.height
+        height: textPassword.height
         spacing: 2
 
         Label {
             id: lblPass
             text: "Password:"
             anchors.verticalCenter: parent.verticalCenter
-            height: paintedHeight + 2
         }//Label ("Password:")
 
         TextField {
             id: textPassword
             objectName: "TextPassword"
 
-            height: lblPass.height
             width: parent.width - lblPass.width - (parent.spacing * 2)
             echoMode: TextInput.Password
 
@@ -108,7 +104,6 @@ Item {
         Label {
             id: lblPassword
             anchors.verticalCenter: parent.verticalCenter
-            height: paintedHeight + 2
             opacity: (1 - textPassword.opacity)
             text: Array(container.password.length+1).join("*")
         }//Label (password)

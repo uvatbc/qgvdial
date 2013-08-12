@@ -32,18 +32,15 @@ void
 MainWindow::init()
 {
     IMainWindow::init ();
-    m_view.setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
-    m_view.setMainQmlFile(QLatin1String("qml/maemo/main.qml"));
-    m_view.showExpanded();
 
     bool rv =
     connect(&m_view, SIGNAL(statusChanged(QDeclarativeView::Status)),
             this, SLOT(declStatusChanged(QDeclarativeView::Status)));
     Q_ASSERT(rv); Q_UNUSED(rv);
 
-#if 1
-    QTimer::singleShot (100, this, SLOT(onUiReady()));
-#endif
+    m_view.setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
+    m_view.setMainQmlFile(QLatin1String("qml/maemo/main.qml"));
+    m_view.showExpanded();
 }//MainWindow::init
 
 QObject *
@@ -79,9 +76,14 @@ MainWindow::log(QDateTime dt, int level, const QString &strLog)
 }//MainWindow::log
 
 void
-MainWindow::onUiReady()
+MainWindow::declStatusChanged(QDeclarativeView::Status status)
 {
     do {
+        if (QDeclarativeView::Ready != status) {
+            Q_WARN(QString("status = %1").arg (status));
+            break;
+        }
+
         tabbedUI = getQMLObject ("TabbedUI");
         if (NULL == tabbedUI) {
             break;
@@ -113,17 +115,6 @@ MainWindow::onUiReady()
         return;
     } while(0);
     exit(-1);
-}//MainWindow::onUiReady
-
-void
-MainWindow::declStatusChanged(QDeclarativeView::Status status)
-{
-    if (QDeclarativeView::Ready != status) {
-        Q_WARN(QString("status = %1").arg (status));
-        exit(-1);
-        return;
-    }
-    onUiReady ();
 }//MainWindow::declStatusChanged
 
 void

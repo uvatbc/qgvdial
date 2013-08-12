@@ -37,7 +37,6 @@ public:
     void log(QDateTime dt, int level, const QString &strLog);
 
 protected slots:
-    void onUiReady();
     void declStatusChanged(QDeclarativeView::Status status);
     void onLoginButtonClicked();
 

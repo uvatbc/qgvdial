@@ -12,6 +12,6 @@ override_dh_install:
 	$(MAKE) INSTALL_ROOT="$(CURDIR)"/debian/qgvdial install
 
 override_dh_auto_configure:
-	cd qgv-tp/src ; ./create_ifaces.sh ; cd ../..
+	#cd qgv-tp/src ; ./create_ifaces.sh ; cd ../..
 	qmake
 

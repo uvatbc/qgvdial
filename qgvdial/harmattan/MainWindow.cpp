@@ -37,12 +37,15 @@ void
 MainWindow::init()
 {
     IMainWindow::init ();
+
+    bool rv =
+    connect(&m_view, SIGNAL(statusChanged(QDeclarativeView::Status)),
+            this, SLOT(declStatusChanged(QDeclarativeView::Status)));
+    Q_ASSERT(rv); Q_UNUSED(rv);
+
     m_view.setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
     m_view.setMainQmlFile(QLatin1String("qml/harmattan/main.qml"));
     m_view.showExpanded();
-
-    connect(&m_view, SIGNAL(statusChanged(QDeclarativeView::Status)),
-            this, SLOT(declStatusChanged(QDeclarativeView::Status)));
 }//MainWindow::init
 
 QObject *

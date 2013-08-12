@@ -12,34 +12,40 @@
 
 
 
+CFLAGS = -Wall -g
+
+ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
+	CFLAGS += -O0
+else
+	CFLAGS += -O2
+endif
 
 configure: configure-stamp
 configure-stamp:
 	dh_testdir
-	# qmake PREFIX=/usr# Uncomment this line for use without Qt Creator
-
+	# Add here commands to configure the package.
+	for i in `find . | grep Makefile` ; do echo $$i ; rm $$i; done
+	touch src/no-qt-components
+	cd qgv-tp/src ; ./create_ifaces.sh ; cd ../..
+	qmake
 	touch configure-stamp
 
 
 build: build-stamp
 
-build-stamp: configure-stamp  
+build-stamp: configure-stamp 
 	dh_testdir
-
 	# Add here commands to compile the package.
-	# $(MAKE) # Uncomment this line for use without Qt Creator
-	#docbook-to-man debian/maemo.sgml > maemo.1
-
+	$(MAKE)
+	#docbook-to-man debian/qgvdial.sgml > qgvdial.1
 	touch $@
 
-clean: 
+clean:
 	dh_testdir
 	dh_testroot
 	rm -f build-stamp configure-stamp
-
 	# Add here commands to clean up after the build process.
-	$(MAKE) clean
-
+	-$(MAKE) clean
 	dh_clean 
 
 install: build
@@ -47,9 +53,8 @@ install: build
 	dh_testroot
 	dh_clean -k 
 	dh_installdirs
-
-	# Add here commands to install the package into debian/maemo.
-	$(MAKE) INSTALL_ROOT="$(CURDIR)"/debian/maemo install
+	# Add here commands to install the package into debian/qgvdial.
+	$(MAKE) DESTDIR=$(CURDIR)/debian/qgvdial install
 
 
 # Build architecture-independent files here.
@@ -82,7 +87,7 @@ binary-arch: build install
 #	dh_perl
 #	dh_makeshlibs
 	dh_installdeb
-	# dh_shlibdeps # Uncomment this line for use without Qt Creator
+	dh_shlibdeps
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb
