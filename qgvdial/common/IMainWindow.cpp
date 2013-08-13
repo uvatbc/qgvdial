@@ -137,5 +137,21 @@ IMainWindow::loginCompleted(AsyncTaskToken *task)
     }
 
     uiLoginDone (task->status, task->errorString);
-    delete task;
+    task->deleteLater ();
 }//IMainWindow::loginCompleted
+
+void
+IMainWindow::onUserLogoutRequest()
+{
+    AsyncTaskToken *task = new AsyncTaskToken(this);
+    connect(loginTask, SIGNAL(completed(AsyncTaskToken*)),
+            this, SLOT(onLogoutDone(AsyncTaskToken*)));
+    api.logout (task);
+}//IMainWindow::onUserLogoutRequest
+
+void
+IMainWindow::onLogoutDone(AsyncTaskToken *task)
+{
+    onUserLogoutDone();
+    task->deleteLater ();
+}//IMainWindow::onLogoutDone

@@ -27,6 +27,7 @@ Contact: yuvraaj@gmail.com
 #include "GVApi.h"
 
 /*==============================================================================
+ *
  * IMainWindow: The class that drives the entire business logic of qgvdial.
  * Ever new platform MUST derive this class and have the actual UI class as a
  * private member (d_ptr pattern).
@@ -34,6 +35,7 @@ Contact: yuvraaj@gmail.com
  * derived class to complete the functionality on the UI side of things.
  *
  *==============================================================================
+ *
  * Initialization sequence:
  * Constructor -> init() -> onInitDone()
  * -> Constructor: You don't have to construct everything here.
@@ -47,6 +49,7 @@ Contact: yuvraaj@gmail.com
  *      they are not saved.
  *
  *==============================================================================
+ *
  * Login credentials NOT saved:
  * onInitDone() -> uiRequestLoginDetails() -> beginLogin()
  *    [ -> uiRequestTFALoginDetails() -> resumeTFAAuth() ]
@@ -72,12 +75,23 @@ Contact: yuvraaj@gmail.com
  * -> uiLoginCompleted(): At the end of the login process, the BC will invoke
  *      this function - with either a success status or an error with a
  *      non-empty error string.
+ * -> uiSetUserPass(): This is called by the BC when it needs the DC up
+ *      correctly update the user name and password and the nature of the fields
+ *      (editable or not) and therefore also provide a hint to the DC about
+ *      whether the login button should say "Login" or "Logout".
  *
  *==============================================================================
+ *
  * Login credentials saved:
  * Usually: onInitDone() -> uiLoginCompleted(...)
  * Sometimes the api may invoke the TFA functions - depends on when Google
  * thinks it is necessary.
+ *
+ *==============================================================================
+ *
+ * Logout sequence: When the user requests a logout, DC should tell the BC:
+ * -> onUserLogoutRequest(): This will invoke the GV API logout
+ * -> onUserLogoutDone(): To let the DC know that logout is done.
  *
  *==============================================================================
  */
@@ -94,9 +108,12 @@ protected slots:
     void resumeTFAAuth(void *ctx, int pin, bool useAlt);
     void onQuit();
 
+    void onUserLogoutRequest();
+
 private slots:
     void onTFARequest(AsyncTaskToken *task);
     void loginCompleted(AsyncTaskToken *task);
+    void onLogoutDone(AsyncTaskToken *task);
 
 protected:
     virtual void log(QDateTime dt, int level, const QString &strLog) = 0;
@@ -108,6 +125,8 @@ protected:
 
     void beginLogin(const QString &user, const QString &pass);
     virtual void uiLoginDone(int status, const QString &errStr) = 0;
+
+    void onUserLogoutDone() = 0;
 
 protected:
     CacheDb db;

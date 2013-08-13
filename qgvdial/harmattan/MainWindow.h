@@ -39,6 +39,7 @@ public:
 protected slots:
     void declStatusChanged(QDeclarativeView::Status status);
     void onLoginButtonClicked();
+    void onTfaPinDlg(bool accepted);
 
 protected:
     QObject *getQMLObject(const char *pageName);

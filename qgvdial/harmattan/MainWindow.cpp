@@ -116,6 +116,7 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
         if (NULL == tfaPinDlg) {
             break;
         }
+        connect(tfaPinDlg, SIGNAL(done(bool)), this, SLOT(onTfaPinDlg(bool)));
 
         textUsername = getQMLObject ("TextUsername");
         if (NULL == textUsername) {
@@ -136,11 +137,15 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
 void
 MainWindow::onLoginButtonClicked()
 {
-    QString user, pass;
-    user = textUsername->property("text").toString();
-    pass = textPassword->property("text").toString();
+    if ("Login" == loginButton->property("text").toString()) {
+        QString user, pass;
+        user = textUsername->property("text").toString();
+        pass = textPassword->property("text").toString();
 
-    beginLogin (user, pass);
+        beginLogin (user, pass);
+    } else {
+        //TODO: Do logout
+    }
 }//MainWindow::onLoginButtonClicked
 
 void
@@ -162,10 +167,22 @@ MainWindow::uiRequestTFALoginDetails(void *ctx)
 
     // Push the TFA dialog on to the main page
     QMetaObject::invokeMethod (mainPageStack, "pushTfaDlg");
-
-    //TODO: Fix this!!
-    resumeTFAAuth (ctx, 0, false);
 }//MainWindow::uiRequestTFALoginDetails
+
+void
+MainWindow::onTfaPinDlg(bool accepted)
+{
+    QString strPin = tfaPinDlg->property("textPin").toString();
+    int pin = strPin.toInt();
+
+    if (accepted) {
+        if (pin == 0) {
+            resumeTFAAuth (loginCtx, pin, true);
+        } else {
+            resumeTFAAuth (loginCtx, pin, false);
+        }
+    }
+}//MainWindow::onTfaPinDlg
 
 void
 MainWindow::uiSetUserPass(const QString &user, const QString &pass,
@@ -177,6 +194,8 @@ MainWindow::uiSetUserPass(const QString &user, const QString &pass,
     int val = editable ? 1 : 0;
     textUsername->setProperty ("opacity", val);
     textPassword->setProperty ("opacity", val);
+
+    loginButton->setProperty ("text", editable ? "Login" : "Logout");
 }//MainWindow::uiSetUserPass
 
 void

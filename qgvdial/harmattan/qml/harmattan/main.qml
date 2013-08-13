@@ -118,34 +118,10 @@ PageStackWindow {
         }
     }//Menu
 
-    Dialog {
+    TfaPinPage {
         id: tfaPinDlg
         objectName: "TFAPinDialog"
 
-        property alias textPin: textTfaPin.text
-
-        content: Column {
-            Label {
-                text: "Enter the two-factor authentication PIN"
-            }
-
-            TextField {
-                id: textTfaPin
-                placeholderText: "PIN"
-            }
-        }//content Item
-
-        buttons: ButtonRow {
-            exclusive: false
-
-            Button {
-                text: "Cancel"
-                onClicked: appWindow.pageStack.pop();
-            }
-            Button {
-                text: "Submit"
-                onClicked: appWindow.pageStack.pop();
-            }
-        }
+        onDone: appWindow.pageStack.pop();
     }//TFA Dialog
 }

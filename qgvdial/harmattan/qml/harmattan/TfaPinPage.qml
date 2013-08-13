@@ -19,27 +19,37 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#ifndef OSDEPENDANT_H
-#define OSDEPENDANT_H
+import QtQuick 1.1
+import com.nokia.meego 1.1
 
-#include "global.h"
-#include "IOsDependent.h"
-#include "OSDCipher.h"
-#include "OSDDirs.h"
+Page {
+    id: container
 
-class OsDependant : public IOsDependant, public OsdCipher, public OsdDirs
-{
-public:
-    OsDependant(QObject *parent = NULL);
+    property alias textPin: textTfaPin.text
+    signal done(bool accepted)
 
-    inline QString getTempDir() { return _getTempDir (); }
-    inline QString getDbDir() { return _getDbDir (); }
-    inline QString getLogsDir() { return _getLogsDir (); }
+    Column {
+        Label {
+            text: "Enter the two-factor authentication PIN"
+        }
 
-    inline bool
-    cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt) {
-        return _cipher (byIn, byOut, bEncrypt);
-    }
-};
+        TextField {
+            id: textTfaPin
+            placeholderText: "PIN"
+        }
 
-#endif // OSDEPENDANT_H
+        ButtonRow {
+            exclusive: false
+
+            Button {
+                text: "Cancel"
+                onClicked: container.done(false);
+            }
+            Button {
+                text: "Submit"
+                onClicked: container.done(true);
+            }//Button
+        }//ButtonRow
+    }//Column
+
+}//TFA Dialog
