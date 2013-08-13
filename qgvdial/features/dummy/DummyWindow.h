@@ -39,8 +39,9 @@ protected slots:
 protected:
     virtual void uiRequestLoginDetails();
     virtual void uiRequestTFALoginDetails(void *ctx);
-    virtual void uiSetUserPass(const QString &user, const QString &pass, bool editable);
+    virtual void uiSetUserPass(bool editable);
     virtual void uiLoginDone(int status, const QString &errStr);
+    virtual void onUserLogoutDone();
 };
 
 #endif // DUMMYMAINWINDOW_H

@@ -72,20 +72,30 @@ MainWindow::uiRequestLoginDetails()
 void
 MainWindow::onLoginClicked()
 {
-    QString user, pass;
-    user = d->ui->textUsername->text ();
-    pass = d->ui->textPassword->text ();
+    if ("Login" == d->ui->loginButton->text()) {
+        QString user, pass;
+        user = d->ui->textUsername->text ();
+        pass = d->ui->textPassword->text ();
 
-    if (user.isEmpty () || pass.isEmpty ()) {
-        Q_WARN("Invalid username or password");
-        QMessageBox msg;
-        msg.setText (tr("Invalid username or password"));
-        msg.exec ();
-        return;
+        if (user.isEmpty () || pass.isEmpty ()) {
+            Q_WARN("Invalid username or password");
+            QMessageBox msg;
+            msg.setText (tr("Invalid username or password"));
+            msg.exec ();
+            return;
+        }
+
+        beginLogin (user, pass);
+    } else {
+        onUserLogoutRequest ();
     }
-
-    beginLogin (user, pass);
 }//MainWindow::onLoginClicked
+
+void
+MainWindow::onUserLogoutDone()
+{
+    Q_DEBUG("Logout complete");
+}//MainWindow::onUserLogoutDone
 
 void
 MainWindow::uiRequestTFALoginDetails(void *ctx)
@@ -102,14 +112,15 @@ MainWindow::uiRequestTFALoginDetails(void *ctx)
 }//MainWindow::uiRequestTFALoginDetails
 
 void
-MainWindow::uiSetUserPass(const QString &user, const QString &pass,
-                          bool editable)
+MainWindow::uiSetUserPass(bool editable)
 {
-    d->ui->textUsername->setText (user);
-    d->ui->textPassword->setText (pass);
+    d->ui->textUsername->setText (m_user);
+    d->ui->textPassword->setText (m_pass);
 
     d->ui->textUsername->setReadOnly (!editable);
     d->ui->textPassword->setReadOnly (!editable);
+
+    d->ui->loginButton->setText (editable ? "Login" : "Logout");
 }//MainWindow::uiSetUserPass
 
 void

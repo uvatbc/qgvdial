@@ -144,9 +144,15 @@ MainWindow::onLoginButtonClicked()
 
         beginLogin (user, pass);
     } else {
-        //TODO: Do logout
+        onUserLogoutRequest ();
     }
 }//MainWindow::onLoginButtonClicked
+
+void
+MainWindow::onUserLogoutDone()
+{
+    Q_DEBUG("Logout complete");
+}//MainWindow::onUserLogoutDone
 
 void
 MainWindow::uiRequestLoginDetails()
@@ -185,11 +191,10 @@ MainWindow::onTfaPinDlg(bool accepted)
 }//MainWindow::onTfaPinDlg
 
 void
-MainWindow::uiSetUserPass(const QString &user, const QString &pass,
-                          bool editable)
+MainWindow::uiSetUserPass(bool editable)
 {
-    textUsername->setProperty ("text", user);
-    textPassword->setProperty ("text", pass);
+    textUsername->setProperty ("text", m_user);
+    textPassword->setProperty ("text", m_pass);
 
     int val = editable ? 1 : 0;
     textUsername->setProperty ("opacity", val);

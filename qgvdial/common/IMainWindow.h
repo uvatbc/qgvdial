@@ -120,19 +120,21 @@ protected:
 
     virtual void uiRequestLoginDetails() = 0;
     virtual void uiRequestTFALoginDetails(void *ctx) = 0;
-    virtual void uiSetUserPass(const QString &user, const QString &pass,
-                               bool editable) = 0;
+    virtual void uiSetUserPass(bool editable) = 0;
 
     void beginLogin(const QString &user, const QString &pass);
     virtual void uiLoginDone(int status, const QString &errStr) = 0;
 
-    void onUserLogoutDone() = 0;
+    virtual void onUserLogoutDone() = 0;
 
 protected:
     CacheDb db;
     GVApi   api;
 
-    AsyncTaskToken *loginTask;
+    QString m_user;
+    QString m_pass;
+
+    AsyncTaskToken *m_loginTask;
 };
 
 #endif // IMAINWINDOW_H

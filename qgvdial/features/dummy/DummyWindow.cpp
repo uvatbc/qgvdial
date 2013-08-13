@@ -70,8 +70,7 @@ DummyMainWindow::uiRequestTFALoginDetails(void *ctx)
 }//DummyMainWindow::uiRequestTFALoginDetails
 
 void
-DummyMainWindow::uiSetUserPass(const QString &user, const QString &pass,
-                          bool editable)
+DummyMainWindow::uiSetUserPass(bool editable)
 {
     //TODO: Set the user and password into the UI.
     Q_ASSERT(0 == "Not implemented");
@@ -83,3 +82,10 @@ DummyMainWindow::uiLoginDone(int status, const QString &errStr)
     //TODO: Set the user and password into the UI.
     Q_ASSERT(0 == "Not implemented");
 }//DummyMainWindow::uiLoginDone
+
+void
+DummyMainWindow::onUserLogoutDone()
+{
+    Q_DEBUG("Logout complete");
+    Q_ASSERT(0 == "Not implemented");
+}//DummyMainWindow::onUserLogoutDone

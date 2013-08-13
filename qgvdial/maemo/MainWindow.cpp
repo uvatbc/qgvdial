@@ -132,12 +132,22 @@ MainWindow::uiRequestLoginDetails()
 void
 MainWindow::onLoginButtonClicked()
 {
-    QString user, pass;
-    user = textUsername->property("text").toString();
-    pass = textPassword->property("text").toString();
+    if ("Login" == loginButton->property("text").toString()) {
+        QString user, pass;
+        user = textUsername->property("text").toString();
+        pass = textPassword->property("text").toString();
 
-    beginLogin (user, pass);
+        beginLogin (user, pass);
+    } else {
+        onUserLogoutRequest ();
+    }
 }//MainWindow::onLoginButtonClicked
+
+void
+MainWindow::onUserLogoutDone()
+{
+    Q_DEBUG("Logout complete");
+}//MainWindow::onUserLogoutDone
 
 void
 MainWindow::uiRequestTFALoginDetails(void *ctx)
@@ -155,15 +165,16 @@ MainWindow::uiRequestTFALoginDetails(void *ctx)
 }//MainWindow::uiRequestTFALoginDetails
 
 void
-MainWindow::uiSetUserPass(const QString &user, const QString &pass,
-                          bool editable)
+MainWindow::uiSetUserPass(bool editable)
 {
-    textUsername->setProperty ("text", user);
-    textPassword->setProperty ("text", pass);
+    textUsername->setProperty ("text", m_user);
+    textPassword->setProperty ("text", m_pass);
 
     int val = editable ? 1 : 0;
     textUsername->setProperty ("opacity", val);
     textPassword->setProperty ("opacity", val);
+
+    loginButton->setProperty ("text", editable ? "Login" : "Logout");
 }//MainWindow::uiSetUserPass
 
 void

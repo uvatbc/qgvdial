@@ -45,8 +45,9 @@ protected:
 
     void uiRequestLoginDetails();
     void uiRequestTFALoginDetails(void *ctx);
-    void uiSetUserPass(const QString &user, const QString &pass, bool editable);
+    void uiSetUserPass(bool editable);
     void uiLoginDone(int status, const QString &errStr);
+    void onUserLogoutDone();
 
 private:
     QmlApplicationViewer m_view;

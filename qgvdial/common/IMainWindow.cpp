@@ -26,7 +26,7 @@ IMainWindow::IMainWindow(QObject *parent)
 : QObject(parent)
 , db(this)
 , api(true, this)
-, loginTask(NULL)
+, m_loginTask(NULL)
 {
     connect(&api, SIGNAL(twoStepAuthentication(AsyncTaskToken*)),
             this, SLOT(onTFARequest(AsyncTaskToken*)));
@@ -76,64 +76,65 @@ IMainWindow::beginLogin(const QString &user, const QString &pass)
     bool ok;
     do {
         // Begin logon
-        loginTask = new AsyncTaskToken(this);
-        if (NULL == loginTask) {
+        m_loginTask = new AsyncTaskToken(this);
+        if (NULL == m_loginTask) {
             Q_WARN("Failed to allocate token");
             break;
         }
 
-        ok = connect(loginTask, SIGNAL(completed(AsyncTaskToken*)),
+        ok = connect(m_loginTask, SIGNAL(completed(AsyncTaskToken*)),
                      this, SLOT(loginCompleted(AsyncTaskToken*)));
         Q_ASSERT(ok);
 
-        loginTask->inParams["user"] = user;
-        loginTask->inParams["pass"] = pass;
+        m_loginTask->inParams["user"] = user;
+        m_loginTask->inParams["pass"] = pass;
 
         Q_DEBUG("Login using user ") << user;
 
-        api.login (loginTask);
+        api.login (m_loginTask);
     } while (0);
 }//IMainWindow::beginLogin
 
 void
 IMainWindow::onTFARequest(AsyncTaskToken *task)
 {
-    Q_ASSERT(loginTask == task);
+    Q_ASSERT(m_loginTask == task);
     uiRequestTFALoginDetails(task);
 }//IMainWindow::onTFARequest
 
 void
 IMainWindow::resumeTFAAuth(void *ctx, int pin, bool useAlt)
 {
-    Q_ASSERT(loginTask == ctx);
+    Q_ASSERT(m_loginTask == ctx);
 
     if (useAlt) {
-        api.resumeTFAAltLogin (loginTask);
+        api.resumeTFAAltLogin (m_loginTask);
     } else {
-        loginTask->inParams["user_pin"] = QString::number (pin);
-        api.resumeTFALogin (loginTask);
+        m_loginTask->inParams["user_pin"] = QString::number (pin);
+        api.resumeTFALogin (m_loginTask);
     }
 }//IMainWindow::resumeTFAAuth
 
 void
 IMainWindow::loginCompleted(AsyncTaskToken *task)
 {
-    Q_ASSERT(loginTask == task);
-    loginTask = NULL;
+    Q_ASSERT(m_loginTask == task);
+    m_loginTask = NULL;
 
     if (ATTS_SUCCESS == task->status) {
         Q_DEBUG("Login successful");
 
-        QString user, pass;
-        user = task->inParams["user"].toString();
-        pass = task->inParams["pass"].toString();
-        db.putUserPass (user, pass);
-        uiSetUserPass(user, pass, false);
+        m_user = task->inParams["user"].toString();
+        m_pass = task->inParams["pass"].toString();
+        db.putUserPass (m_user, m_pass);
+        uiSetUserPass(false);
 
         //TODO: Begin contacts login
         //TODO: Fetch inbox, registered numbers and all that stuff
     } else {
         Q_WARN("Login failed");
+        m_user.clear ();
+        m_pass.clear ();
     }
 
     uiLoginDone (task->status, task->errorString);
@@ -144,7 +145,7 @@ void
 IMainWindow::onUserLogoutRequest()
 {
     AsyncTaskToken *task = new AsyncTaskToken(this);
-    connect(loginTask, SIGNAL(completed(AsyncTaskToken*)),
+    connect(task, SIGNAL(completed(AsyncTaskToken*)),
             this, SLOT(onLogoutDone(AsyncTaskToken*)));
     api.logout (task);
 }//IMainWindow::onUserLogoutRequest
@@ -152,6 +153,7 @@ IMainWindow::onUserLogoutRequest()
 void
 IMainWindow::onLogoutDone(AsyncTaskToken *task)
 {
+    uiSetUserPass (true);
     onUserLogoutDone();
     task->deleteLater ();
 }//IMainWindow::onLogoutDone
