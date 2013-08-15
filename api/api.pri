@@ -5,17 +5,13 @@ SOURCES  += $$PWD/GVApi.cpp \
             $$PWD/AsyncTaskToken.cpp \
             $$PWD/CookieJar.cpp \
             $$PWD/GvXMLParser.cpp \
-            $$PWD/MyXmlErrorHandler.cpp \
-			$$PWD/ContactsModel.cpp \
-			$$PWD/ContactDetailsModel.cpp
+            $$PWD/MyXmlErrorHandler.cpp
 
 HEADERS  += $$PWD/GVApi.h \
             $$PWD/NwReqTracker.h \
             $$PWD/AsyncTaskToken.h \
             $$PWD/CookieJar.h \
             $$PWD/GvXMLParser.h \
-            $$PWD/MyXmlErrorHandler.h \
-			$$PWD/ContactsModel.h \
-			$$PWD/ContactDetailsModel.h
+            $$PWD/MyXmlErrorHandler.h
 
 QT *= network sql xml xmlpatterns script
