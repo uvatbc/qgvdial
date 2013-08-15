@@ -119,6 +119,8 @@ MainWindow::uiSetUserPass(bool editable)
 
     d->ui->textUsername->setReadOnly (!editable);
     d->ui->textPassword->setReadOnly (!editable);
+    d->ui->textUsername->setEnabled (editable);
+    d->ui->textPassword->setEnabled (editable);
 
     d->ui->loginButton->setText (editable ? "Login" : "Logout");
 }//MainWindow::uiSetUserPass
@@ -127,10 +129,12 @@ void
 MainWindow::uiLoginDone(int status, const QString &errStr)
 {
     if (ATTS_SUCCESS == status) {
-        Q_DEBUG("Successful login!!");
         d->ui->statusBar->showMessage ("Login successful");
+    } else if (ATTS_NW_ERROR == status) {
+        d->ui->statusBar->showMessage ("Network error. Try again later.");
+    } else if (ATTS_USER_CANCEL == status) {
+        d->ui->statusBar->showMessage ("User canceled login.");
     } else {
-        Q_WARN(QString("Login failed: %1").arg (errStr));
         QMessageBox msg;
         msg.setIcon (QMessageBox::Critical);
         msg.setText (errStr);

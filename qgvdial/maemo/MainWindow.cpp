@@ -22,6 +22,10 @@ Contact: yuvraaj@gmail.com
 #include "MainWindow.h"
 #include <QtGui>
 
+#ifdef Q_WS_MAEMO_5
+#include <QMaemo5InformationBox>
+#endif
+
 MainWindow::MainWindow(QObject *parent)
 : IMainWindow(parent)
 , m_view(NULL)
@@ -181,8 +185,19 @@ void
 MainWindow::uiLoginDone(int status, const QString &errStr)
 {
     if (ATTS_SUCCESS == status) {
-        Q_DEBUG("Successful login!!");
-    } else {
-        Q_WARN(QString("Login failed: %1").arg (errStr));
+        return;
     }
+
+    QString msg;
+    if (ATTS_NW_ERROR == status) {
+        msg = "Network error. Try again later.";
+    } else if (ATTS_USER_CANCEL == status) {
+        msg = "User canceled login.";
+    } else {
+        msg = QString("Login failed: %1").arg (errStr);
+    }
+
+#ifdef Q_WS_MAEMO_5
+    QMaemo5InformationBox::information(&m_view, msg);
+#endif
 }//MainWindow::uiLoginDone

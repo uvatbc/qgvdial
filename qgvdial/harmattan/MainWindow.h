@@ -60,6 +60,7 @@ private:
     QObject *tfaPinDlg;
     QObject *textUsername;
     QObject *textPassword;
+    QObject *infoBanner;
 
     void    *loginCtx;
 };

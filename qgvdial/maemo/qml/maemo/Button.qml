@@ -30,14 +30,16 @@ Rectangle {
 
     signal clicked
 
-    width: textItem.width + 40; height: textItem.height + 10
+    width: textItem.width + 40
+    height: textItem.height + 10
+
     border.width: 1
     radius: height/4
     smooth: true
 
     gradient: Gradient {
-        GradientStop { id: topGrad; position: 0.0; color: "lavender" }
-        GradientStop { id: bottomGrad; position: 1.0; color: "darkblue" }
+        GradientStop { id: topGrad; position: 0.0; color: "gray" }
+        GradientStop { id: bottomGrad; position: 1.0; color: "black" }
     }
 
     Image {
@@ -59,7 +61,7 @@ Rectangle {
         x: parent.width/2 - width/2 - (btnIcon.visible ? btnIcon.width/2 : 0)
         y: parent.height/2 - height/2
 
-        font.pixelSize: 18
+        //font.pixelSize: 18
         color: "white"
         style: Text.Raised
     }
@@ -72,8 +74,8 @@ Rectangle {
 
     states: State {
         name: "pressed"; when: mouseArea.pressed && mouseArea.containsMouse
-        PropertyChanges { target: topGrad; color: "darkblue" }
-        PropertyChanges { target: bottomGrad; color: "lightsteelblue" }
+        PropertyChanges { target: topGrad; color: "black" }
+        PropertyChanges { target: bottomGrad; color: "gray" }
         PropertyChanges { target: textItem; x: textItem.x + 1; y: textItem.y + 1; explicit: true }
     }
 }

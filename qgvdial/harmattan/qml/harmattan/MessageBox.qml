@@ -25,39 +25,22 @@ import com.nokia.meego 1.1
 Page {
     id: container
 
-    property alias textPin: textTfaPin.text
-    signal done(bool accepted)
+    property string message
+    signal done
 
     Column {
         anchors.centerIn: parent
         spacing: 5
 
         Label {
-            text: "Enter the two-factor authentication PIN"
+            text: container.message
             anchors.horizontalCenter: parent.horizontalCenter
         }
 
-        TextField {
-            id: textTfaPin
-            placeholderText: "PIN"
+        Button {
+            text: "OK"
             anchors.horizontalCenter: parent.horizontalCenter
-
-            onAccepted: container.done(true);
+            onClicked: container.done();
         }
-
-        ButtonRow {
-            exclusive: false
-            spacing: 5
-
-            Button {
-                text: "Cancel"
-                onClicked: container.done(false);
-            }
-            Button {
-                text: "Submit"
-                onClicked: container.done(true);
-            }//Button
-        }//ButtonRow
     }//Column
-
-}//TFA Dialog
+}//Message Box

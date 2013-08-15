@@ -8,8 +8,7 @@ DEPLOYMENTFOLDERS = folder_01
 # Additional import path used to resolve QML modules in Creators code model
 QML_IMPORT_PATH =
 
-# If your application uses the Qt Mobility libraries, uncomment the following
-# lines and add the respective components to the MOBILITY variable.
+QT *= maemo5
 CONFIG += mobility
 MOBILITY +=
 

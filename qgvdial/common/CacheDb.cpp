@@ -233,6 +233,14 @@ CacheDb::putUserPass (const QString &strUser, const QString &strPass)
 }//CacheDb::petUserPass
 
 bool
+CacheDb::clearUserPass()
+{
+    CacheDbPrivate &p = CacheDbPrivate::ref();
+    p.settings->remove (GV_S_VAR_USER);
+    p.settings->remove (GV_S_VAR_PASS);
+}//CacheDb::clearUserPass
+
+bool
 CacheDb::saveCookies(QList<QNetworkCookie> cookies)
 {
     CacheDbPrivate &p = CacheDbPrivate::ref ();

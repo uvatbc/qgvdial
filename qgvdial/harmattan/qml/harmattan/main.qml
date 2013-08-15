@@ -21,6 +21,7 @@ Contact: yuvraaj@gmail.com
 
 import QtQuick 1.1
 import com.nokia.meego 1.1
+import com.nokia.extras 1.1
 
 PageStackWindow {
     id: appWindow
@@ -33,6 +34,10 @@ PageStackWindow {
 
     function pushTfaDlg() {
         pageStack.push(tfaPinDlg);
+    }
+    function showMsgBox(msg) {
+        msgBox.message = msg;
+        pageStack.push(msgBox);
     }
 
     initialPage: Page {
@@ -124,4 +129,14 @@ PageStackWindow {
 
         onDone: appWindow.pageStack.pop();
     }//TFA Dialog
+
+    MessageBox {
+        id: msgBox
+        onDone: appWindow.pageStack.pop();
+    }
+
+    InfoBanner {
+        id: infoBanner
+        objectName: "InfoBanner"
+    }
 }

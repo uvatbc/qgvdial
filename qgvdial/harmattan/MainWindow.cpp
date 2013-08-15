@@ -31,6 +31,7 @@ MainWindow::MainWindow(QObject *parent)
 , tfaPinDlg(NULL)
 , textUsername(NULL)
 , textPassword(NULL)
+, infoBanner(NULL)
 {
 }//MainWindow::MainWindow
 
@@ -128,6 +129,11 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
             break;
         }
 
+        infoBanner = getQMLObject ("InfoBanner");
+        if (NULL == infoBanner) {
+            break;
+        }
+
         onInitDone();
         return;
     } while(0);
@@ -207,8 +213,18 @@ void
 MainWindow::uiLoginDone(int status, const QString &errStr)
 {
     if (ATTS_SUCCESS == status) {
-        Q_DEBUG("Successful login!!");
-    } else {
-        Q_WARN(QString("Login failed: %1").arg (errStr));
+        return;
     }
+
+    QString msg;
+    if (ATTS_NW_ERROR == status) {
+        msg = "Network error. Try again later.";
+    } else if (ATTS_USER_CANCEL == status) {
+        msg = "User canceled login.";
+    } else {
+        msg = QString("Login failed: %1").arg (errStr);
+    }
+
+    infoBanner->setProperty ("text", msg);
+    QMetaObject::invokeMethod (infoBanner, "show");
 }//MainWindow::uiLoginDone

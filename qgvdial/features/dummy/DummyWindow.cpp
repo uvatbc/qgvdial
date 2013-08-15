@@ -79,7 +79,7 @@ DummyMainWindow::uiSetUserPass(bool editable)
 void
 DummyMainWindow::uiLoginDone(int status, const QString &errStr)
 {
-    //TODO: Set the user and password into the UI.
+    //TODO: Inform the user that the login has failed.
     Q_ASSERT(0 == "Not implemented");
 }//DummyMainWindow::uiLoginDone
 

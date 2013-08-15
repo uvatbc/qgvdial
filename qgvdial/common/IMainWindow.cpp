@@ -91,7 +91,14 @@ IMainWindow::beginLogin(const QString &user, const QString &pass)
 
         Q_DEBUG("Login using user ") << user;
 
-        api.login (m_loginTask);
+        if (!api.login (m_loginTask)) {
+            Q_WARN("Failed to log in");
+            break;
+        }
+
+        m_user = user;
+        m_pass = pass;
+        uiSetUserPass(false);
     } while (0);
 }//IMainWindow::beginLogin
 
@@ -124,17 +131,23 @@ IMainWindow::loginCompleted(AsyncTaskToken *task)
     if (ATTS_SUCCESS == task->status) {
         Q_DEBUG("Login successful");
 
-        m_user = task->inParams["user"].toString();
-        m_pass = task->inParams["pass"].toString();
         db.putUserPass (m_user, m_pass);
-        uiSetUserPass(false);
 
         //TODO: Begin contacts login
         //TODO: Fetch inbox, registered numbers and all that stuff
+    } else if (ATTS_NW_ERROR == task->status) {
+        Q_WARN("Login failed because of network error");
+        uiSetUserPass (true);
+    } else if (ATTS_USER_CANCEL == task->status) {
+        Q_WARN("User canceled login");
+        uiSetUserPass (true);
+        db.clearCookies ();
     } else {
-        Q_WARN("Login failed");
-        m_user.clear ();
+        Q_WARN(QString("Login failed: %1").arg (task->errorString));
+
         m_pass.clear ();
+        uiSetUserPass(true);
+        db.clearCookies ();
     }
 
     uiLoginDone (task->status, task->errorString);
