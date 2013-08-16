@@ -367,6 +367,66 @@ CacheDb::clearCookies()
     return (rv);
 }//CacheDb::clearCookies
 
+void
+CacheDb::setTFAFlag(bool set)
+{
+    CacheDbPrivate &p = CacheDbPrivate::ref();
+    p.settings->setValue (GV_S_VAR_TFA, set);
+}//CacheDb::setTFAFlag
+
+bool
+CacheDb::getTFAFlag()
+{
+    CacheDbPrivate &p = CacheDbPrivate::ref();
+    return (p.settings->value(GV_S_VAR_TFA).toBool());
+}//CacheDb::getTFAFlag
+
+void
+CacheDb::clearTFAFlag()
+{
+    CacheDbPrivate &p = CacheDbPrivate::ref();
+    p.settings->remove (GV_S_VAR_TFA);
+}//CacheDb::clearTFAFlag
+
+bool
+CacheDb::getAppPass(QString &strPass)
+{
+    QByteArray byD;
+    Lib &lib = Lib::ref();
+    QString strResult;
+    CacheDbPrivate &p = CacheDbPrivate::ref();
+
+    if (p.settings->contains (GV_S_VAR_CPASS)) {
+        strResult = p.settings->value(GV_S_VAR_CPASS).toString();
+        lib.cipher (QByteArray::fromHex (strResult.toAscii ()), byD, false);
+        strPass = byD;
+
+        return (true);
+    }
+
+    return (false);
+}//CacheDb::getAppPass
+
+bool
+CacheDb::setAppPass(const QString &strPass)
+{
+    QByteArray byD;
+    Lib &lib = Lib::ref();
+    CacheDbPrivate &p = CacheDbPrivate::ref();
+
+    lib.cipher (strPass.toAscii (), byD, true);
+    p.settings->setValue (GV_S_VAR_CPASS, QString (byD.toHex ()));
+
+    return (true);
+}//CacheDb::setAppPass
+
+void
+CacheDb::clearAppPass()
+{
+    CacheDbPrivate &p = CacheDbPrivate::ref();
+    p.settings->remove (GV_S_VAR_CPASS);
+}//CacheDb::clearAppPass
+
 bool
 CacheDb::putTempFile(const QString &strLink, const QString &strPath)
 {

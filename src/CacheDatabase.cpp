@@ -343,7 +343,6 @@ CacheDatabase::setContactsPass(const QString &strPass)
 {
     QByteArray byD;
     OsDependent &osd = Singletons::getRef().getOSD ();
-    QString strQ;
 
     osd.cipher (strPass.toAscii (), byD, true);
     settings->setValue (GV_S_VAR_CPASS, QString (byD.toHex ()));

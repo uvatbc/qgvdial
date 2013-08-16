@@ -25,6 +25,7 @@ Contact: yuvraaj@gmail.com
 #include <QObject>
 #include "CacheDb.h"
 #include "GVApi.h"
+#include "LibContacts.h"
 
 /*==============================================================================
  *
@@ -125,11 +126,15 @@ protected:
     void beginLogin(const QString &user, const QString &pass);
     virtual void uiLoginDone(int status, const QString &errStr) = 0;
 
+    virtual void uiRequestApplicationPassword() = 0;
+    void onUiGotApplicationPassword(const QString &appPw);
+
     virtual void onUserLogoutDone() = 0;
 
 protected:
     CacheDb db;
-    GVApi   api;
+    GVApi   gvApi;
+    LibContacts oContacts;
 
     QString m_user;
     QString m_pass;

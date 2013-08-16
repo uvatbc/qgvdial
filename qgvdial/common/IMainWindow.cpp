@@ -25,10 +25,11 @@ Contact: yuvraaj@gmail.com
 IMainWindow::IMainWindow(QObject *parent)
 : QObject(parent)
 , db(this)
-, api(true, this)
+, gvApi(true, this)
+, oContacts(this)
 , m_loginTask(NULL)
 {
-    connect(&api, SIGNAL(twoStepAuthentication(AsyncTaskToken*)),
+    connect(&gvApi, SIGNAL(twoStepAuthentication(AsyncTaskToken*)),
             this, SLOT(onTFARequest(AsyncTaskToken*)));
 }//IMainWindow::IMainWindow
 
@@ -39,7 +40,7 @@ IMainWindow::init()
 
     QList<QNetworkCookie> cookies;
     if (db.loadCookies (cookies)) {
-        api.setAllCookies (cookies);
+        gvApi.setAllCookies (cookies);
     }
 
     connect (qApp, SIGNAL(aboutToQuit()), this, SLOT(onQuit()));
@@ -48,7 +49,7 @@ IMainWindow::init()
 void
 IMainWindow::onQuit()
 {
-    QList<QNetworkCookie> cookies = api.getAllCookies ();
+    QList<QNetworkCookie> cookies = gvApi.getAllCookies ();
     db.saveCookies (cookies);
 
     db.deinit ();
@@ -91,7 +92,7 @@ IMainWindow::beginLogin(const QString &user, const QString &pass)
 
         Q_DEBUG("Login using user ") << user;
 
-        if (!api.login (m_loginTask)) {
+        if (!gvApi.login (m_loginTask)) {
             Q_WARN("Failed to log in");
             break;
         }
@@ -115,10 +116,10 @@ IMainWindow::resumeTFAAuth(void *ctx, int pin, bool useAlt)
     Q_ASSERT(m_loginTask == ctx);
 
     if (useAlt) {
-        api.resumeTFAAltLogin (m_loginTask);
+        gvApi.resumeTFAAltLogin (m_loginTask);
     } else {
         m_loginTask->inParams["user_pin"] = QString::number (pin);
-        api.resumeTFALogin (m_loginTask);
+        gvApi.resumeTFALogin (m_loginTask);
     }
 }//IMainWindow::resumeTFAAuth
 
@@ -128,31 +129,53 @@ IMainWindow::loginCompleted(AsyncTaskToken *task)
     Q_ASSERT(m_loginTask == task);
     m_loginTask = NULL;
 
-    if (ATTS_SUCCESS == task->status) {
-        Q_DEBUG("Login successful");
+    do {
+        if (ATTS_SUCCESS == task->status) {
+            Q_DEBUG("Login successful");
 
-        db.putUserPass (m_user, m_pass);
+            db.putUserPass (m_user, m_pass);
+            if (task->inParams.contains ("user_pin")) {
+                db.setTFAFlag (true);
+                // Open UI to ask for application specific password
+                uiRequestApplicationPassword();
+            } else if (db.getTFAFlag ()) {
+                QString strAppPw;
+                if (db.getAppPass (strAppPw)) {
+                    onUiGotApplicationPassword (strAppPw);
+                } else {
+                    uiRequestApplicationPassword();
+                }
+            } else {
+                onUiGotApplicationPassword (m_pass);
+            }
+        } else if (ATTS_NW_ERROR == task->status) {
+            Q_WARN("Login failed because of network error");
+            uiSetUserPass (true);
+        } else if (ATTS_USER_CANCEL == task->status) {
+            Q_WARN("User canceled login");
+            uiSetUserPass (true);
+            db.clearCookies ();
+            db.clearTFAFlag ();
+        } else {
+            Q_WARN(QString("Login failed: %1").arg (task->errorString));
 
-        //TODO: Begin contacts login
-        //TODO: Fetch inbox, registered numbers and all that stuff
-    } else if (ATTS_NW_ERROR == task->status) {
-        Q_WARN("Login failed because of network error");
-        uiSetUserPass (true);
-    } else if (ATTS_USER_CANCEL == task->status) {
-        Q_WARN("User canceled login");
-        uiSetUserPass (true);
-        db.clearCookies ();
-    } else {
-        Q_WARN(QString("Login failed: %1").arg (task->errorString));
-
-        m_pass.clear ();
-        uiSetUserPass(true);
-        db.clearCookies ();
-    }
+            m_pass.clear ();
+            uiSetUserPass(true);
+            db.clearCookies ();
+            db.clearTFAFlag ();
+        }
+    } while (0);
 
     uiLoginDone (task->status, task->errorString);
     task->deleteLater ();
 }//IMainWindow::loginCompleted
+
+void
+IMainWindow::onUiGotApplicationPassword(const QString &appPw)
+{
+    //TODO: Begin contacts login
+    //TODO: Fetch inbox, registered numbers and all that stuff
+}//IMainWindow::onUiGotApplicationPassword
 
 void
 IMainWindow::onUserLogoutRequest()
@@ -160,7 +183,7 @@ IMainWindow::onUserLogoutRequest()
     AsyncTaskToken *task = new AsyncTaskToken(this);
     connect(task, SIGNAL(completed(AsyncTaskToken*)),
             this, SLOT(onLogoutDone(AsyncTaskToken*)));
-    api.logout (task);
+    gvApi.logout (task);
 }//IMainWindow::onUserLogoutRequest
 
 void
