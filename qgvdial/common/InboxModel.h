@@ -19,8 +19,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#ifndef CONTACTSMODEL_H
-#define CONTACTSMODEL_H
+#ifndef __INBOXMODEL_H__
+#define __INBOXMODEL_H__
 
 #include "global.h"
 #include "CacheDb.h"
@@ -29,39 +29,47 @@ Contact: yuvraaj@gmail.com
 // even though it is present in QtCore which is included in global.h
 #include <QObject>
 
-class ContactsModel : public QSqlQueryModel
+class InboxModel : public QSqlQueryModel
 {
-    Q_OBJECT
-
 public:
-    enum ContactsFieldRoles {
-        CT_NameRole = Qt::UserRole + 1,
-        CT_NotesRole,
-        CT_ContactsRole,
-        CT_ImagePathRole
+    enum InboxFieldRoles {
+        IN_TypeRole = Qt::UserRole + 1,
+        IN_TimeRole,
+        IN_NameRole,
+        IN_NumberRole,
+        IN_Link,
+        IN_TimeDetail,
+        IN_SmsText,
+        IN_ReadFlag
     };
 
-    explicit ContactsModel(QObject *parent = 0);
+    InboxModel (QObject * parent = 0);
+    QVariant data (const QModelIndex   &index,
+                         int            role = Qt::DisplayRole) const;
 
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+public:
+    static QString type_to_string (GVI_Entry_Type Type);
+    static GVI_Entry_Type string_to_type (const QString &strType);
 
-    bool insertContact (const ContactInfo &contactInfo);
-    bool deleteContact (const ContactInfo &contactInfo);
+    bool refresh (const QString &strSelected);
+    bool refresh ();
 
-    void clearAll ();
-    void refresh (const QString &query);
-    void refresh ();
-
-signals:
-    void noContactPhoto(const ContactInfo &contactInfo) const;
+    bool insertEntry (const GVInboxEntry &hEvent);
+    bool deleteEntry (const GVInboxEntry &hEvent);
+    bool markAsRead (const QString &msgId);
 
 private:
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    bool searchById(const QString &id, quint32 &foundRow);
 
-private:
-    CacheDb         db;
-    QSqlTableModel *modelContacts;
-    QString         strSearchQuery;
+    CacheDb db;
+    QString strSelectType;
+    GVI_Entry_Type eSelectType;
 };
 
-#endif // CONTACTSMODEL_H
+#define INBOX_ENTRY_READ_MASK  (1 << 0)
+#define INBOX_ENTRY_SPAM_MASK  (1 << 1)
+#define INBOX_ENTRY_TRASH_MASK (1 << 2)
+#define INBOX_ENTRY_STAR_MASK  (1 << 3)
+
+#endif //__INBOXMODEL_H__

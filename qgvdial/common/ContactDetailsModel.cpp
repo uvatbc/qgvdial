@@ -22,20 +22,10 @@ Contact: yuvraaj@gmail.com
 #include "ContactDetailsModel.h"
 #include "GVApi.h"
 
-static quint32 nChildren = 0;
-
-ContactDetailsModel::ContactDetailsModel (const ContactInfo &i,
-                                          QObject *parent)
+ContactDetailsModel::ContactDetailsModel (const ContactInfo &i, QObject *parent)
 : QAbstractListModel (parent)
 , info (i)
 {
-    nChildren++;
-    qDebug () << nChildren << ": ContactDetailsModel constructor" << (void *)this;
-
-    if (nChildren == 256) {
-        qDebug ("This is the point after which it usually crashes");
-    }
-
     QHash<int, QByteArray> roles;
     roles[CD_TypeRole]   = "type";
     roles[CD_NumberRole] = "number";
@@ -44,9 +34,7 @@ ContactDetailsModel::ContactDetailsModel (const ContactInfo &i,
 
 ContactDetailsModel::~ContactDetailsModel ()
 {
-    qDebug () << nChildren << ": ContactDetailsModel destructor" << (void *)this;
-    nChildren--;
-}
+}//ContactDetailsModel::~ContactDetailsModel
 
 int
 ContactDetailsModel::rowCount (const QModelIndex & /*parent*/) const

@@ -6,7 +6,8 @@ SOURCES  += $$PWD/main.cpp \
             $$PWD/CacheDb_p.cpp \
             $$PWD/Lib.cpp \
 			$$PWD/ContactsModel.cpp \
-			$$PWD/ContactDetailsModel.cpp
+			$$PWD/ContactDetailsModel.cpp \
+            $$PWD/InboxModel.cpp
 
 HEADERS  += $$PWD/global.h \
             $$PWD/IOsDependent.h \
@@ -15,4 +16,5 @@ HEADERS  += $$PWD/global.h \
             $$PWD/CacheDb_p.h \
             $$PWD/Lib.h \
 			$$PWD/ContactsModel.h \
-			$$PWD/ContactDetailsModel.h
+			$$PWD/ContactDetailsModel.h \
+            $$PWD/InboxModel.h

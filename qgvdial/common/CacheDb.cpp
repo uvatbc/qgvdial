@@ -23,7 +23,9 @@ Contact: yuvraaj@gmail.com
 #include "CacheDb_p.h"
 #include "Lib.h"
 #include "GVApi.h"
+
 #include "ContactsModel.h"
+#include "InboxModel.h"
 
 CacheDb::CacheDb(QObject *parent /* = NULL*/)
 : QObject (parent)
@@ -680,3 +682,314 @@ CacheDb::getContactFromLink (ContactInfo &info) const
 
     return (rv);
 }//CacheDb::getContactFromLink
+
+bool
+CacheDb::getContactFromNumber (const QString &strNumber,
+                                     ContactInfo &info) const
+{
+    CacheDbPrivate &p = CacheDbPrivate::ref ();
+    QSqlQuery query(p.db);
+    query.setForwardOnly (true);
+
+    bool rv = false;
+    QString strQ, scrubNumber = strNumber;
+    scrubNumber.replace ("'", "''");
+    strQ = QString ("SELECT " GV_L_LINK " FROM " GV_LINKS_TABLE " "
+                    "WHERE " GV_L_TYPE "='" GV_L_TYPE_NUMBER "' "
+                    "AND " GV_L_DATA " LIKE '%%%1%%'")
+                    .arg (scrubNumber);
+    query.exec (strQ);
+
+    if (query.next ())
+    {
+        info.strId = query.value(0).toString ();
+        rv = getContactFromLink (info);
+    }
+    return (rv);
+}//CacheDb::getContactFromNumber
+
+InboxModel *
+CacheDb::newInboxModel()
+{
+    InboxModel *modelInbox = new InboxModel(this);
+    this->refreshInboxModel (modelInbox, "all");
+
+    return (modelInbox);
+}//CacheDb::newInboxModel
+
+void
+CacheDb::clearInbox ()
+{
+    CacheDbPrivate &p = CacheDbPrivate::ref ();
+    QSqlQuery query(p.db);
+    query.setForwardOnly (true);
+    query.exec ("DELETE FROM " GV_INBOX_TABLE);
+}//CacheDb::clearInbox
+
+void
+CacheDb::refreshInboxModel (InboxModel *modelInbox,
+                                  const QString &strType)
+{
+    GVI_Entry_Type Type = modelInbox->string_to_type (strType);
+    QString strQ = "SELECT "
+                            GV_IN_ID      ","
+                            GV_IN_TYPE    ","
+                            GV_IN_ATTIME  ","
+                            GV_IN_DISPNUM ","
+                            GV_IN_PHONE   ","
+                            GV_IN_FLAGS   ","
+                            GV_IN_SMSTEXT ","
+                            GV_IN_NOTE    " "
+                   "FROM "  GV_INBOX_TABLE;
+    if (GVIE_Unknown != Type) {
+        strQ += QString (" WHERE " GV_IN_TYPE "=%1 ").arg (Type);
+    }
+    strQ += " ORDER BY " GV_IN_ATTIME " DESC";
+
+    CacheDbPrivate &p = CacheDbPrivate::ref ();
+    modelInbox->setQuery (strQ, p.db);
+}//CacheDb::refreshInboxModel
+
+quint32
+CacheDb::getInboxCount (GVI_Entry_Type Type) const
+{
+    quint32 nCountInbox = 0;
+    CacheDbPrivate &p = CacheDbPrivate::ref ();
+    QSqlQuery query(p.db);
+    query.setForwardOnly (true);
+    QString strQ;
+    if (GVIE_Unknown == Type) {
+        strQ = "SELECT COUNT (*) FROM " GV_INBOX_TABLE " ";
+    } else {
+        strQ = QString ("SELECT COUNT (*) FROM " GV_INBOX_TABLE " "
+                        "WHERE " GV_IN_TYPE "= %1")
+                        .arg (Type);
+    }
+    query.exec (strQ);
+    if (query.next ()) {
+        bool bOk = false;
+        int val = query.value (0).toInt (&bOk);
+        if (bOk) {
+            nCountInbox = val;
+        }
+    }
+
+    return (nCountInbox);
+}//CacheDb::getInboxCount
+
+bool
+CacheDb::existsInboxEntry (const GVInboxEntry &hEvent)
+{
+    CacheDbPrivate &p = CacheDbPrivate::ref ();
+    QSqlQuery query(p.db);
+    query.setForwardOnly (true);
+
+    QString scrubId = hEvent.id;
+    scrubId.replace ("'", "''");
+    query.exec (QString ("SELECT " GV_IN_ID " FROM " GV_INBOX_TABLE " "
+                         "WHERE " GV_IN_ID "='%1'")
+                .arg (scrubId));
+    if (query.next ()) {
+        return true;
+    }
+
+    return false;
+}//CacheDb::existsInboxEntry
+
+bool
+CacheDb::insertInboxEntry (const GVInboxEntry &hEvent)
+{
+    quint32 flags = (hEvent.bRead  ? INBOX_ENTRY_READ_MASK  : 0)
+                  | (hEvent.bSpam  ? INBOX_ENTRY_SPAM_MASK  : 0)
+                  | (hEvent.bTrash ? INBOX_ENTRY_TRASH_MASK : 0)
+                  | (hEvent.bStar  ? INBOX_ENTRY_STAR_MASK  : 0);
+    GVInboxEntry scrubEvent = hEvent;
+    scrubEvent.id.replace ("'", "''");
+    scrubEvent.strDisplayNumber.replace ("'", "''");
+    scrubEvent.strPhoneNumber.replace ("'", "''");
+    scrubEvent.strText.replace ("'", "''");
+    scrubEvent.strNote.replace ("'", "''");
+
+    if (scrubEvent.strText.contains ("Enter a new or existing contact name")) {
+        Q_CRIT("WHAA");
+    }
+
+    CacheDbPrivate &p = CacheDbPrivate::ref ();
+    QSqlQuery query(p.db);
+    query.setForwardOnly (true);
+
+    bool rv = false;
+    do { // Begin cleanup block (not a loop)
+        // Must send this function the unscrubbed inbox entry.
+        if (existsInboxEntry (hEvent)) {
+            query.exec (QString ("DELETE FROM " GV_INBOX_TABLE " "
+                                 "WHERE " GV_IN_ID "='%1'")
+                        .arg (scrubEvent.id));
+        }
+
+        rv = query.exec (QString ("INSERT INTO " GV_INBOX_TABLE ""
+                                  "(" GV_IN_ID
+                                  "," GV_IN_TYPE
+                                  "," GV_IN_ATTIME
+                                  "," GV_IN_DISPNUM
+                                  "," GV_IN_PHONE
+                                  "," GV_IN_FLAGS
+                                  "," GV_IN_SMSTEXT
+                                  "," GV_IN_NOTE ") VALUES "
+                                  "('%1', %2 , %3, '%4', '%5', %6, '%7', '%8')")
+                            .arg (scrubEvent.id)
+                            .arg (scrubEvent.Type)
+                            .arg (scrubEvent.startTime.toTime_t())
+                            .arg (scrubEvent.strDisplayNumber)
+                            .arg (scrubEvent.strPhoneNumber)
+                            .arg (flags)
+                            .arg (scrubEvent.strText)
+                            .arg (scrubEvent.strNote));
+        if (!rv) {
+            Q_WARN("Failed to insert row into inbox table");
+            break;
+        }
+
+        rv = true;
+    } while (0); // End cleanup block (not a loop)
+
+    return (rv);
+}//CacheDb::insertInboxEntry
+
+bool
+CacheDb::deleteInboxEntryById (const QString &id)
+{
+    QString scrubId = id;
+    scrubId.replace ("'", "''");
+
+    CacheDbPrivate &p = CacheDbPrivate::ref ();
+    QSqlQuery query(p.db);
+    query.setForwardOnly (true);
+
+    bool rv =
+    query.exec (QString ("DELETE FROM " GV_INBOX_TABLE " "
+                         "WHERE " GV_IN_ID "='%1'")
+                .arg (scrubId));
+
+    return (rv);
+}//CacheDb::deleteInboxEntryById
+
+bool
+CacheDb::markAsRead (const QString &msgId)
+{
+    QString scrubId = msgId;
+    scrubId.replace ("'", "''");
+
+    CacheDbPrivate &p = CacheDbPrivate::ref ();
+    QSqlQuery query(p.db);
+    query.setForwardOnly (true);
+
+    bool rv = false;
+    do { // Begin cleanup block (not a loop)
+        rv = query.exec (QString("SELECT " GV_IN_FLAGS " FROM " GV_INBOX_TABLE
+                                 " WHERE " GV_IN_ID "='%1'").arg (scrubId));
+        if (!rv || !query.next ()) {
+            rv = false;
+            Q_WARN("Failed to get the inbox entry to mark as read");
+            break;
+        }
+
+        quint32 flags = query.value (0).toInt (&rv);
+        if (!rv) {
+            Q_WARN("Failed to convert flags result into integer");
+            break;
+        }
+
+        if (flags & INBOX_ENTRY_READ_MASK) {
+            qDebug("Entry was already read. no need to re-mark.");
+            rv = false;
+            break;
+        }
+
+        flags |= INBOX_ENTRY_READ_MASK;
+
+        rv = query.exec (QString("UPDATE " GV_INBOX_TABLE " "
+                                 "SET " GV_IN_FLAGS "=%1 "
+                                 "WHERE " GV_IN_ID "='%2'")
+                         .arg(flags).arg (scrubId));
+        if (!rv) {
+            Q_WARN("Failed to update inbox table with a flag marked read");
+            break;
+        }
+
+        rv = true;
+    } while (0); // End cleanup block (not a loop)
+
+    return (rv);
+}//CacheDb::markAsRead
+
+bool
+CacheDb::getLatestContact (QDateTime &dateTime)
+{
+    CacheDbPrivate &p = CacheDbPrivate::ref ();
+    QSqlQuery query(p.db);
+    query.setForwardOnly (true);
+
+    dateTime = QDateTime();
+
+    bool rv = false;
+    query.exec ("SELECT "   GV_C_UPDATED " FROM " GV_CONTACTS_TABLE " "
+                "ORDER BY " GV_C_UPDATED " DESC");
+    do { // Begin cleanup block (not a loop)
+        if (!query.next ()) {
+            Q_WARN("Couldn't get the latest contact");
+            break;
+        }
+
+        // Convert to date time
+        bool bOk = false;
+        quint64 dtVal = query.value(0).toULongLong (&bOk);
+        if (!bOk) {
+            Q_WARN("Could not convert datetime for latest contact");
+            break;
+        }
+
+        dateTime = QDateTime::fromTime_t (dtVal);
+
+        rv = true;
+    } while (0); // End cleanup block (not a loop)
+
+    return (rv);
+}//CacheDb::getLatestContact
+
+bool
+CacheDb::getLatestInboxEntry (QDateTime &dateTime)
+{
+    CacheDbPrivate &p = CacheDbPrivate::ref ();
+    QSqlQuery query(p.db);
+    query.setForwardOnly (true);
+
+    dateTime = QDateTime();
+
+    bool rv = false;
+    query.exec ("SELECT "   GV_IN_ATTIME " FROM " GV_INBOX_TABLE " "
+                "ORDER BY " GV_IN_ATTIME " DESC");
+    do // Begin cleanup block (not a loop)
+    {
+        if (!query.next ())
+        {
+            Q_WARN("Couldn't get the latest inbox item");
+            break;
+        }
+
+        // Convert to date time
+        bool bOk = false;
+        quint64 dtVal = query.value(0).toULongLong (&bOk);
+        if (!bOk)
+        {
+            Q_WARN("Could not convert datetime for latest inbox update");
+            break;
+        }
+
+        dateTime = QDateTime::fromTime_t (dtVal);
+
+        rv = true;
+    } while (0); // End cleanup block (not a loop)
+
+    return (rv);
+}//CacheDb::getLatestInboxEntry

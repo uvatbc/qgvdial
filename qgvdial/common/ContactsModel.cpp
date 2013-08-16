@@ -27,9 +27,9 @@ ContactsModel::ContactsModel (QObject *parent)
 , modelContacts (NULL)
 {
     QHash<int, QByteArray> roles;
-    roles[CT_NameRole]     = "name";
-    roles[CT_NotesRole]    = "notes";
-    roles[CT_ContactsRole] = "contacts";
+    roles[CT_NameRole]      = "name";
+    roles[CT_NotesRole]     = "notes";
+    roles[CT_ContactsRole]  = "contacts";
     roles[CT_ImagePathRole] = "imagePath";
     setRoleNames(roles);
 }//ContactsModel::ContactsModel

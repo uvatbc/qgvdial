@@ -41,7 +41,7 @@ signals:
 public:
     enum ContactDetailRoles {
         CD_TypeRole = Qt::UserRole + 1,
-        CD_NumberRole,
+        CD_NumberRole
     };
 
     explicit ContactDetailsModel (const ContactInfo &i, QObject *parent = 0);

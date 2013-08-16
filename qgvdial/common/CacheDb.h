@@ -25,6 +25,8 @@ Contact: yuvraaj@gmail.com
 #include "global.h"
 
 class ContactsModel;
+class InboxModel;
+
 class CacheDbPrivate;
 class CacheDb : public QObject
 {
@@ -60,7 +62,26 @@ public:
     bool deleteContactInfo (const QString &strId);
     bool putContactInfo (const ContactInfo &info);
 
+    // Contact information based on contact identifier
     bool getContactFromLink (ContactInfo &info) const;
+    bool getContactFromNumber (const QString &strNumber,
+                               ContactInfo &info) const;
+
+    InboxModel * newInboxModel();
+    void clearInbox ();
+    void refreshInboxModel (InboxModel *modelInbox,
+                            const QString &strType);
+    quint32 getInboxCount (GVI_Entry_Type Type) const;
+
+    // Single inbox entry
+    bool existsInboxEntry (const GVInboxEntry &hEvent);
+    bool insertInboxEntry (const GVInboxEntry &hEvent);
+    bool deleteInboxEntryById (const QString &id);
+    bool markAsRead (const QString &msgId);
+
+    // Last update of contacts and inbox
+    bool getLatestContact (QDateTime &dateTime);
+    bool getLatestInboxEntry (QDateTime &dateTime);
 
 private:
     void ensureCache();
