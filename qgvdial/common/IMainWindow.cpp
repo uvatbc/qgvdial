@@ -173,6 +173,7 @@ IMainWindow::loginCompleted(AsyncTaskToken *task)
 void
 IMainWindow::onUiGotApplicationPassword(const QString &appPw)
 {
+    Q_DEBUG("User gave app specific password");
     //TODO: Begin contacts login
     //TODO: Fetch inbox, registered numbers and all that stuff
 }//IMainWindow::onUiGotApplicationPassword

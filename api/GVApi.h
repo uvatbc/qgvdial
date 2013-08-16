@@ -22,7 +22,7 @@ Contact: yuvraaj@gmail.com
 #ifndef GVAPI_H
 #define GVAPI_H
 
-#include "global.h"
+#include "api_common.h"
 #include "CookieJar.h"
 #include <QObject>
 

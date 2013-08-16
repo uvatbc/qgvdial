@@ -46,6 +46,7 @@ protected:
     void uiRequestLoginDetails();
     void uiRequestTFALoginDetails(void *ctx);
     void uiSetUserPass(bool editable);
+    void uiRequestApplicationPassword();
     void uiLoginDone(int status, const QString &errStr);
     void onUserLogoutDone();
 

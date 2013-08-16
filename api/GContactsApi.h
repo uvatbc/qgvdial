@@ -19,40 +19,22 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef GCONTACTSAPI_H
+#define GCONTACTSAPI_H
 
-#include "global.h"
-#include "IMainWindow.h"
+#include "api_common.h"
+#include <QObject>
 
-class MainWindowPrivate;
-class MainWindow : public IMainWindow
+class GContactsApi : public QObject
 {
     Q_OBJECT
-
 public:
-    explicit MainWindow(QObject *parent);
-    virtual ~MainWindow();
+    explicit GContactsApi(QObject *parent = 0);
 
-    void init();
-    void log(QDateTime dt, int level, const QString &strLog);
+signals:
 
 public slots:
-    void onLoginClicked();
 
-protected:
-    void uiRequestLoginDetails();
-    void uiRequestTFALoginDetails(void *ctx);
-    void uiSetUserPass(bool editable);
-    void uiRequestApplicationPassword();
-    void uiLoginDone(int status, const QString &errStr);
-    void onUserLogoutDone();
-
-private:
-    MainWindowPrivate *d;
 };
 
-QCoreApplication *
-createApplication(int argc, char *argv[]);
-
-#endif // MAINWINDOW_H
+#endif // GCONTACTSAPI_H

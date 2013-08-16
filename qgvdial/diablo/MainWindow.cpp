@@ -126,6 +126,19 @@ MainWindow::uiSetUserPass(bool editable)
 }//MainWindow::uiSetUserPass
 
 void
+MainWindow::uiRequestApplicationPassword()
+{
+    bool ok;
+    QString strAppPw =
+    QInputDialog::getText (d, "Application specific password",
+                           "Enter password for contacts", QLineEdit::Password,
+                           "", &ok);
+    if (ok) {
+        onUiGotApplicationPassword(strAppPw);
+    }
+}//MainWindow::uiRequestApplicationPassword
+
+void
 MainWindow::uiLoginDone(int status, const QString &errStr)
 {
     if (ATTS_SUCCESS == status) {
