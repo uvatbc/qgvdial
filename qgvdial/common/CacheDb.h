@@ -24,6 +24,7 @@ Contact: yuvraaj@gmail.com
 
 #include "global.h"
 
+class ContactsModel;
 class CacheDbPrivate;
 class CacheDb : public QObject
 {
@@ -44,6 +45,22 @@ public:
     bool saveCookies(QList<QNetworkCookie> cookies);
     bool loadCookies(QList<QNetworkCookie> &cookies);
     bool clearCookies();
+
+    bool putTempFile(const QString &strLink, const QString &strPath);
+    bool getTempFile(const QString &strLink, QString &strPath) const;
+
+    void clearContacts ();
+    void refreshContactsModel (ContactsModel *modelContacts,
+                               const QString &query);
+
+    bool existsContact (const QString &strId) const;
+    bool deleteContact (const QString &strId);
+    bool insertContact (const ContactInfo &info);
+    quint32 getContactsCount (const QString &filter) const;
+    bool deleteContactInfo (const QString &strId);
+    bool putContactInfo (const ContactInfo &info);
+
+    bool getContactFromLink (ContactInfo &info) const;
 
 private:
     void ensureCache();

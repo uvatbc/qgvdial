@@ -22,6 +22,8 @@ Contact: yuvraaj@gmail.com
 #include "CacheDb.h"
 #include "CacheDb_p.h"
 #include "Lib.h"
+#include "GVApi.h"
+#include "ContactsModel.h"
 
 CacheDb::CacheDb(QObject *parent /* = NULL*/)
 : QObject (parent)
@@ -238,6 +240,8 @@ CacheDb::clearUserPass()
     CacheDbPrivate &p = CacheDbPrivate::ref();
     p.settings->remove (GV_S_VAR_USER);
     p.settings->remove (GV_S_VAR_PASS);
+
+    return (true);
 }//CacheDb::clearUserPass
 
 bool
@@ -360,3 +364,319 @@ CacheDb::clearCookies()
 
     return (rv);
 }//CacheDb::clearCookies
+
+bool
+CacheDb::putTempFile(const QString &strLink, const QString &strPath)
+{
+    CacheDbPrivate &p = CacheDbPrivate::ref ();
+    QSqlQuery query(p.db);
+    query.setForwardOnly (true);
+
+    QString scrubLink = strLink;
+    QString scrubPath = strPath;
+    scrubLink.replace ("'", "''");
+    scrubPath.replace ("'", "''");
+
+    QString strOldPath;
+    if (getTempFile (strLink, strOldPath)) {
+        if (!strOldPath.isEmpty () && (QFileInfo(strOldPath).exists ())) {
+            QFile::remove (strOldPath);
+        }
+
+        query.exec (QString("DELETE FROM " GV_TEMP_TABLE
+                            " WHERE " GV_TT_LINK "='%1'").arg(scrubLink));
+    }
+
+    QString strCTime = QDateTime::currentDateTime().toString (Qt::ISODate);
+    query.exec (QString("INSERT INTO " GV_TEMP_TABLE " "
+                        "("GV_TT_CTIME","GV_TT_LINK","GV_TT_PATH") VALUES "
+                        "('%1','%2','%3')")
+                        .arg(strCTime).arg(scrubLink).arg(scrubPath));
+
+    return (true);
+}//CacheDb::putTempFile
+
+bool
+CacheDb::getTempFile(const QString &strLink, QString &strPath) const
+{
+    bool rv = false;
+    CacheDbPrivate &p = CacheDbPrivate::ref ();
+    QSqlQuery query(p.db);
+    query.setForwardOnly (true);
+
+    QString scrubLink = strLink;
+    scrubLink.replace ("'", "''");
+
+    rv = query.exec (QString("SELECT " GV_TT_PATH " FROM " GV_TEMP_TABLE
+                            " WHERE " GV_TT_LINK "='%1'").arg(scrubLink));
+    if (query.next ()) {
+        strPath = query.value(0).toString();
+        rv = true;
+    }
+
+    return (rv);
+}//CacheDb::getTempFile
+
+void
+CacheDb::clearContacts ()
+{
+    CacheDbPrivate &p = CacheDbPrivate::ref ();
+    QSqlQuery query(p.db);
+    query.setForwardOnly (true);
+    query.exec ("DELETE FROM " GV_CONTACTS_TABLE);
+    query.exec ("DELETE FROM " GV_LINKS_TABLE);
+}//CacheDb::clearContacts
+
+void
+CacheDb::refreshContactsModel (ContactsModel *modelContacts,
+                               const QString &query)
+{
+    QString strQ = "SELECT " GV_C_ID "," GV_C_NAME "," GV_C_NOTES ","
+                             GV_C_PICLINK "," GV_C_UPDATED " "
+                   "FROM " GV_CONTACTS_TABLE;
+    if (!query.isEmpty ()) {
+        QString scrubQuery = query;
+        scrubQuery.replace ("'", "''");
+        strQ += QString(" WHERE " GV_C_NAME " LIKE '%%%1%%'").arg (scrubQuery);
+    }
+    strQ += " ORDER BY " GV_C_NAME;
+
+    CacheDbPrivate &p = CacheDbPrivate::ref ();
+    modelContacts->setQuery (strQ, p.db);
+}//CacheDb::refreshContactsModel
+
+bool
+CacheDb::existsContact (const QString &strId) const
+{
+    CacheDbPrivate &p = CacheDbPrivate::ref ();
+    QSqlQuery query(p.db);
+    query.setForwardOnly (true);
+
+    QString scrubId = strId;
+    scrubId.replace ("'", "''");
+
+    query.exec (QString ("SELECT " GV_C_ID " FROM " GV_CONTACTS_TABLE " "
+                         "WHERE " GV_C_ID "='%1'")
+                .arg (scrubId));
+    if (query.next ()) {
+        return (true);
+    }
+    return (false);
+}//CacheDb::existsContact
+
+bool
+CacheDb::deleteContact (const QString &strId)
+{
+    CacheDbPrivate &p = CacheDbPrivate::ref ();
+    QSqlQuery query(p.db);
+    query.setForwardOnly (true);
+
+    QString scrubLink = strId;
+    scrubLink.replace ("'", "''");
+
+    query.exec (QString ("DELETE FROM " GV_CONTACTS_TABLE " "
+                         "WHERE " GV_C_ID "='%1'")
+                .arg (scrubLink));
+
+    return (deleteContactInfo (strId));
+}//CacheDb::deleteContact
+
+bool
+CacheDb::insertContact (const ContactInfo &info)
+{
+    CacheDbPrivate &p = CacheDbPrivate::ref ();
+    bool rv = false;
+    do { // Begin cleanup block (not a loop)
+        QSqlQuery query(p.db);
+        query.setForwardOnly (true);
+
+        // Delete always succeeds (whether the row exists or not)
+        deleteContact (info.strId);
+
+        ContactInfo scrubInfo = info;
+        scrubInfo.strId.replace ("'", "''");
+        scrubInfo.strNotes.replace ("'", "''");
+        scrubInfo.strTitle.replace ("'", "''");
+        scrubInfo.hrefPhoto.replace ("'", "''");
+
+        QString strQ = QString ("INSERT INTO " GV_CONTACTS_TABLE ""
+                                "(" GV_C_ID
+                                "," GV_C_NAME
+                                "," GV_C_NOTES
+                                "," GV_C_PICLINK
+                                "," GV_C_UPDATED
+                                ") VALUES ('%1', '%2', '%3', '%4', %5)")
+                        .arg (scrubInfo.strId)
+                        .arg (scrubInfo.strTitle)
+                        .arg (scrubInfo.strNotes)
+                        .arg (scrubInfo.hrefPhoto)
+                        .arg (scrubInfo.dtUpdate.toTime_t());
+        rv = query.exec (strQ);
+        if (!rv) {
+            Q_WARN(QString("Failed to insert row into contacts table. "
+                           "ID:[%1] name=[%2]").arg(info.strId, info.strTitle));
+            break;
+        }
+
+        rv = putContactInfo (info);
+        if (!rv) {
+            Q_WARN(QString("Failed to insert contact info into contacts table. "
+                           "ID:[%1] name=[%2]").arg(info.strId, info.strTitle));
+            break;
+        }
+
+        rv = putTempFile (info.hrefPhoto, info.strPhotoPath);
+        if (!rv) {
+            Q_WARN(QString("Failed to insert photo into contacts table. "
+                           "ID:[%1] name=[%2]").arg(info.strId, info.strTitle));
+            break;
+        }
+
+    } while (0); // End cleanup block (not a loop)
+
+    return (rv);
+}//CacheDb::insertContact
+
+quint32
+CacheDb::getContactsCount (const QString &filter) const
+{
+    QString strQ = "SELECT COUNT (*) FROM " GV_CONTACTS_TABLE;
+    if (!filter.isEmpty ()) {
+        QString scrubFilter = filter;
+        scrubFilter.replace ("'", "''");
+        strQ += QString(" WHERE " GV_C_NAME " LIKE '%%%1%%'").arg (scrubFilter);
+    }
+
+    quint32 nCountContacts = 0;
+    QSqlQuery query;
+
+    query.setForwardOnly (true);
+    query.exec (strQ);
+    if (query.next ()) {
+        bool bOk = false;
+        int val = query.value (0).toInt (&bOk);
+        if (bOk) {
+            nCountContacts = val;
+        }
+    }
+    return (nCountContacts);
+}//CacheDb::getContactsCount
+
+bool
+CacheDb::deleteContactInfo (const QString &strId)
+{
+    CacheDbPrivate &p = CacheDbPrivate::ref ();
+    QSqlQuery query(p.db);
+    QString strQ;
+    query.setForwardOnly (true);
+
+    QString scrubId = strId;
+    scrubId.replace ("'", "''");
+
+    strQ = QString ("DELETE FROM " GV_LINKS_TABLE " WHERE "
+                    GV_L_LINK "='%1'").arg (scrubId);
+    query.exec (strQ);
+
+    return (true);
+}//CacheDb::deleteContactInfo
+
+bool
+CacheDb::putContactInfo (const ContactInfo &info)
+{
+    CacheDbPrivate &p = CacheDbPrivate::ref ();
+    QSqlQuery query(p.db);
+    QString strQ, strTemplate;
+    query.setForwardOnly (true);
+
+    deleteContactInfo (info.strId);
+
+    ContactInfo scrubInfo = info;
+    scrubInfo.strId.replace ("'", "''");
+
+    strTemplate = QString ("INSERT INTO " GV_LINKS_TABLE
+                           " (" GV_L_LINK "," GV_L_TYPE "," GV_L_DATA ")"
+                           " VALUES ('%1', '%2', '%3')")
+                    .arg (scrubInfo.strId);
+
+    // Insert numbers
+    foreach (PhoneInfo entry, info.arrPhones)
+    {
+        QString strNum = entry.strNumber;
+        if (GVApi::isNumberValid (strNum)) {
+            GVApi::simplify_number (strNum);
+        }
+        strNum = PhoneInfo::typeToChar(entry.Type) + strNum;
+        strNum.replace ("'", "''");
+
+        strQ = strTemplate.arg (GV_L_TYPE_NUMBER).arg (strNum);
+        query.exec (strQ);
+    }
+    return (true);
+}//CacheDb::putContactInfo
+
+bool
+CacheDb::getContactFromLink (ContactInfo &info) const
+{
+    if (!existsContact (info.strId)) {
+        Q_WARN(QString("Contact with ID %1 is not cached.").arg(info.strId));
+        return false;
+    }
+
+    CacheDbPrivate &p = CacheDbPrivate::ref ();
+    QSqlQuery query(p.db);
+    query.setForwardOnly (true);
+
+    quint16 count = 0;
+    bool rv = false;
+
+    QString scrubId = info.strId;
+    scrubId.replace ("'", "''");
+
+    QString strQ;
+    strQ = QString ("SELECT " GV_C_NAME ", " GV_C_NOTES ", " GV_C_PICLINK
+                              ", " GV_C_UPDATED " "
+                    "FROM " GV_CONTACTS_TABLE " WHERE " GV_C_ID "='%1'")
+           .arg (scrubId);
+    query.exec (strQ);
+    if (!query.next ()) {
+        Q_CRIT("Contact not found!!!");
+        return false;
+    }
+    info.strTitle  = query.value(0).toString ();
+    info.strNotes  = query.value(1).toString ();
+    info.hrefPhoto = query.value(2).toString ();
+    info.dtUpdate  = QDateTime::fromTime_t (query.value(3).toInt());
+
+    getTempFile (info.hrefPhoto, info.strPhotoPath);
+
+    strQ = QString ("SELECT " GV_L_TYPE ", " GV_L_DATA
+                    " FROM " GV_LINKS_TABLE " WHERE "
+                    GV_L_LINK "='%1'").arg (scrubId);
+    query.exec (strQ);
+
+    info.arrPhones.clear ();
+
+    QString strType, strData;
+    while (query.next ())
+    {
+        strType = query.value (0).toString ();
+        strData = query.value(1).toString ();
+
+        if (strType == GV_L_TYPE_NUMBER)
+        {
+            PhoneInfo num;
+            num.Type      = PhoneInfo::charToType (strData[0].toAscii ());
+            num.strNumber = strData.mid (1);
+            info.arrPhones += num;
+        }
+        count++;
+    }
+
+    if (0 != count)
+    {
+        info.selected = 0;
+        rv = true;
+    }
+
+    return (rv);
+}//CacheDb::getContactFromLink
