@@ -25,6 +25,8 @@ Contact: yuvraaj@gmail.com
 LibContacts::LibContacts(IMainWindow *parent)
 : QObject(parent)
 {
+    connect (&api, SIGNAL(presentCaptcha(AsyncTaskToken*,QString)),
+             this, SLOT(onPresentCaptcha(AsyncTaskToken*,QString)));
 }//LibContacts::LibContacts
 
 bool
@@ -42,6 +44,8 @@ LibContacts::login(const QString &user, const QString &pass)
     token->inParams["user"] = user;
     token->inParams["pass"] = pass;
     api.login (token);
+
+    return (true);
 }//LibContacts::login
 
 void
@@ -55,3 +59,12 @@ LibContacts::loginCompleted(AsyncTaskToken *task)
 
     task->deleteLater ();
 }//LibContacts::loginCompleted
+
+void
+LibContacts::onPresentCaptcha(AsyncTaskToken *task, const QString &captchaUrl)
+{
+    Q_WARN(QString("Cannot show captcha %1").arg(captchaUrl));
+
+    task->status = ATTS_LOGIN_FAILURE;
+    task->emitCompleted ();
+}//LibContacts::onPresentCaptcha

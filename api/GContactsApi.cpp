@@ -32,8 +32,8 @@ GContactsApi::GContactsApi(QObject *parent)
 bool
 GContactsApi::doGet(QUrl url, void *ctx, QObject *obj, const char *method)
 {
-    AsyncTaskToken *token = (AsyncTaskToken *)ctx;
-    if (!token) {
+    AsyncTaskToken *task = (AsyncTaskToken *)ctx;
+    if (!task) {
         return false;
     }
 
@@ -58,11 +58,11 @@ GContactsApi::doGet(QUrl url, void *ctx, QObject *obj, const char *method)
     }
 
     tracker->setAutoRedirect (NULL, UA_IPHONE4, true);
-    token->apiCtx = tracker;
+    task->apiCtx = tracker;
 
     bool rv =
-    connect(tracker, SIGNAL (sigDone(bool, const QByteArray &,
-                                     QNetworkReply *, void*)),
+    connect(tracker,
+            SIGNAL(sigDone(bool,const QByteArray&,QNetworkReply*,void*)),
             obj, method);
     Q_ASSERT(rv);
 
@@ -73,8 +73,8 @@ bool
 GContactsApi::doPost(QUrl url, QByteArray postData, const char *contentType,
                      void *ctx, QObject *receiver, const char *method)
 {
-    AsyncTaskToken *token = (AsyncTaskToken *)ctx;
-    if (!token) {
+    AsyncTaskToken *task = (AsyncTaskToken *)ctx;
+    if (!task) {
         return false;
     }
 
@@ -96,7 +96,7 @@ GContactsApi::doPost(QUrl url, QByteArray postData, const char *contentType,
     }
 
     tracker->setAutoRedirect (NULL, UA_IPHONE4, true);
-    token->apiCtx = tracker;
+    task->apiCtx = tracker;
 
     bool rv = connect(tracker,
                       SIGNAL(sigDone(bool,QByteArray,QNetworkReply*,void*)),
@@ -107,34 +107,34 @@ GContactsApi::doPost(QUrl url, QByteArray postData, const char *contentType,
 }//GContactsApi::doPost
 
 bool
-GContactsApi::login(AsyncTaskToken *token)
+GContactsApi::login(AsyncTaskToken *task)
 {
-    if (!token) {
+    if (!task) {
         Q_WARN("NULL token");
         return false;
     }
 
-    if (!token->inParams.contains ("user") ||
-        !token->inParams.contains ("pass")) {
+    if (!task->inParams.contains ("user") ||
+        !task->inParams.contains ("pass")) {
         Q_WARN("User or pass not provided");
         return false;
     }
 
     QUrl url(GV_CLIENTLOGIN);
-    return (startLogin (token, url));
+    return (startLogin (task, url));
 }//GContactsApi::login
 
 bool
-GContactsApi::startLogin(AsyncTaskToken *token, QUrl url) {
+GContactsApi::startLogin(AsyncTaskToken *task, QUrl url) {
 
     url.addQueryItem ("accountType" , "GOOGLE");
-    url.addQueryItem ("Email"       , token->inParams["user"].toString());
-    url.addQueryItem ("Passwd"      , token->inParams["pass"].toString());
+    url.addQueryItem ("Email"       , task->inParams["user"].toString());
+    url.addQueryItem ("Passwd"      , task->inParams["pass"].toString());
     url.addQueryItem ("service"     , "cp"); // name for contacts service
     url.addQueryItem ("source"      , "MyCompany-qgvdial-ver01");
 
     bool rv = doPost(url, url.encodedQuery(),
-                     "application/x-www-form-urlencoded", token, this,
+                     "application/x-www-form-urlencoded", task, this,
                    SLOT(onLoginResponse(bool,QByteArray,QNetworkReply*,void*)));
     Q_ASSERT(rv);
 
@@ -145,14 +145,14 @@ void
 GContactsApi::onLoginResponse(bool success, const QByteArray &response,
                               QNetworkReply * /*reply*/, void *ctx)
 {
-    AsyncTaskToken *token = (AsyncTaskToken *) ctx;
+    AsyncTaskToken *task = (AsyncTaskToken *) ctx;
     QString strReply = response;
     QString strCaptchaToken, strCaptchaUrl;
 
     strGoogleAuth.clear ();
     do { // Begin cleanup block (not a loop)
         if (!success) {
-            token->status = ATTS_NW_ERROR;
+            task->status = ATTS_NW_ERROR;
             break;
         }
 
@@ -172,22 +172,22 @@ GContactsApi::onLoginResponse(bool success, const QByteArray &response,
             strCaptchaUrl = "http://www.google.com/accounts/"
                           + strCaptchaUrl;
 
-            emit presentCaptcha(strCaptchaUrl, token);
-            token = NULL;
+            emit presentCaptcha(task, strCaptchaUrl);
+            task = NULL;
             break;
         }
 
         if (strGoogleAuth.isEmpty ()) {
             Q_WARN("Failed to login!!");
-            token->status = ATTS_LOGIN_FAILURE;
+            task->status = ATTS_LOGIN_FAILURE;
             break;
         }
 
-        m_user = token->inParams["user"].toString();
-        m_pass = token->inParams["pass"].toString();
+        m_user = task->inParams["user"].toString();
+        m_pass = task->inParams["pass"].toString();
         m_isLoggedIn = true;
 
-        token->status = ATTS_SUCCESS;
+        task->status = ATTS_SUCCESS;
 
         Q_DEBUG("Login success");
     } while (0); // End cleanup block (not a loop)
@@ -196,7 +196,113 @@ GContactsApi::onLoginResponse(bool success, const QByteArray &response,
         m_pass.clear ();
     }
 
-    if (token) {
-        token->emitCompleted ();
+    if (task) {
+        task->emitCompleted ();
     }
 }//GContactsApi::onLoginResponse
+
+bool
+GContactsApi::getContacts(AsyncTaskToken *task)
+{
+    if (!task) {
+        Q_WARN("Invalid task token");
+        return false;
+    }
+
+    QDateTime updatedMin;
+    if (task->inParams.contains ("updatedMin")) {
+        updatedMin = task->inParams["updated-min"].toDateTime ();
+    }
+
+    QString temp = QString ("http://www.google.com/m8/feeds/contacts/%1/full")
+                            .arg (m_user);
+    QUrl url(temp);
+    url.addQueryItem ("max-results", "10000");
+
+    if (updatedMin.isValid ()) {
+        temp = updatedMin.toUTC().toString (Qt::ISODate);
+        url.addQueryItem ("updated-min", temp);
+    }
+
+    if (task->inParams["showDeleted"].toBool()) {
+        url.addQueryItem ("showdeleted", "true");
+    }
+
+    bool rv =
+    doGet(url, task, this,
+          SLOT(onGotContactsFeed(bool,const QByteArray&,QNetworkReply*,void*)));
+    Q_ASSERT(rv);
+
+    return (rv);
+}//GContactsApi::getContacts
+
+void
+GContactsApi::onGotContactsFeed(bool success, const QByteArray &response,
+                                QNetworkReply *reply, void *ctx)
+{
+    AsyncTaskToken *task = (AsyncTaskToken *) ctx;
+
+    do { // Begin cleanup block (not a loop)
+        if (!success) {
+            break;
+        }
+
+        if (response.contains ("Authorization required")) {
+            task->status = ATTS_LOGIN_FAILURE;
+            break;
+        }
+
+#if 0
+        QFile temp("contacts.txt");
+        temp.open (QIODevice::ReadWrite);
+        temp.write (response);
+        temp.close ();
+#endif
+
+#if 0
+        QThread *workerThread = new QThread(this);
+        ContactsParserObject *pObj = new ContactsParserObject(response);
+        pObj->moveToThread (workerThread);
+        success =
+        connect (workerThread, SIGNAL(started()), pObj, SLOT(doWork()));
+        Q_ASSERT(success);
+        success =
+        connect (pObj, SIGNAL(done(bool, quint32, quint32)),
+                 this, SLOT  (onContactsParsed(bool, quint32, quint32)));
+        Q_ASSERT(success);
+        success =
+        connect (pObj, SIGNAL(done(bool, quint32, quint32)),
+                 pObj, SLOT  (deleteLater ()));
+        Q_ASSERT(success);
+        success =
+        connect (pObj        , SIGNAL(done(bool, quint32, quint32)),
+                 workerThread, SLOT  (quit()));
+        Q_ASSERT(success);
+        success =
+        connect (workerThread, SIGNAL(terminated()),
+                 pObj        , SLOT  (deleteLater()));
+        Q_ASSERT(success);
+        success =
+        connect (workerThread, SIGNAL(terminated()),
+                 workerThread, SLOT  (deleteLater()));
+        Q_ASSERT(success);
+        success =
+        connect (pObj, SIGNAL (status(const QString &, int)),
+                 this, SIGNAL (status(const QString &, int)));
+        Q_ASSERT(success);
+        success =
+        connect (pObj, SIGNAL (gotOneContact (const ContactInfo &)),
+                 this, SLOT   (gotOneContact (const ContactInfo &)));
+        Q_ASSERT(success);
+
+        QMutexLocker locker(&mutex);
+        refCount = 1;
+        bBeginDrain = false;
+        workerThread->start ();
+#endif
+    } while (0); // End cleanup block (not a loop)
+
+    if (task) {
+        delete task;
+    }
+}//GContactsApi::onGotContactsFeed

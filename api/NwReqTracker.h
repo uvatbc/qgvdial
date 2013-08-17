@@ -22,7 +22,7 @@ Contact: yuvraaj@gmail.com
 #ifndef NWREQTRACKER_H
 #define NWREQTRACKER_H
 
-#include "global.h"
+#include "api_common.h"
 #include <QObject>
 
 #define NW_REPLY_TIMEOUT (30 * 1000)

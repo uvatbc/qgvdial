@@ -22,7 +22,7 @@ Contact: yuvraaj@gmail.com
 #ifndef __MYXMLERRORHANDLER__
 #define __MYXMLERRORHANDLER__
 
-#include "global.h"
+#include "api_common.h"
 #include <QObject>
 #include <QtXmlPatterns>
 

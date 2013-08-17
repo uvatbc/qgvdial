@@ -31,21 +31,24 @@ class GContactsApi : public QObject
 public:
     explicit GContactsApi(QObject *parent = 0);
 
-    bool login(AsyncTaskToken *token);
+    bool login(AsyncTaskToken *task);
+    bool getContacts(AsyncTaskToken *task);
 
 signals:
-    bool presentCaptcha(const QString &captchaUrl, void *ctx);
+    void presentCaptcha(AsyncTaskToken *task, const QString &captchaUrl);
 
 private:
     bool doGet(QUrl url, void *ctx, QObject *obj, const char *method);
     bool doPost(QUrl url, QByteArray postData, const char *contentType,
                 void *ctx, QObject *receiver, const char *method);
 
-    bool startLogin(AsyncTaskToken *token, QUrl url);
+    bool startLogin(AsyncTaskToken *task, QUrl url);
 
 private slots:
     void onLoginResponse(bool success, const QByteArray &response,
                          QNetworkReply *reply, void *ctx);
+    void onGotContactsFeed(bool success, const QByteArray &response,
+                           QNetworkReply *reply, void *ctx);
 
 private:
     //! The network manager for contacts API

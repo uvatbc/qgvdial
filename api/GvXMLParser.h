@@ -22,7 +22,7 @@ Contact: yuvraaj@gmail.com
 #ifndef GVXMLPARSER_H
 #define GVXMLPARSER_H
 
-#include "global.h"
+#include "api_common.h"
 #include <QObject>
 
 class GvXMLParser : public QObject, public QXmlDefaultHandler

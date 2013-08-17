@@ -280,4 +280,19 @@ struct ContactInfo
 Q_DECLARE_METATYPE(ContactInfo)
 ////////////////////////////////////////////////////////////////////////////////
 
+
+////////////////////////////////////////////////////////////////////////////////
+// Debugging
+////////////////////////////////////////////////////////////////////////////////
+
+#if defined(Q_WS_X11)
+#define __FULLFUNC__ __PRETTY_FUNCTION__
+#else
+#define __FULLFUNC__ __FUNCTION__
+#endif
+
+#define Q_DEBUG(_s) qDebug() << QString("%1(%2): %3").arg(__FULLFUNC__).arg(__LINE__).arg(_s)
+#define Q_WARN(_s) qWarning() << QString("%1(%2): %3").arg(__FULLFUNC__).arg(__LINE__).arg(_s)
+#define Q_CRIT(_s) qCritical() << QString("%1(%2): %3").arg(__FULLFUNC__).arg(__LINE__).arg(_s)
+
 #endif //GAPI_COMMON_H

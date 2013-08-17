@@ -38,6 +38,7 @@ public:
 
 private slots:
     void loginCompleted(AsyncTaskToken *task);
+    void onPresentCaptcha(AsyncTaskToken *task, const QString &captchaUrl);
 
 private:
     GContactsApi api;

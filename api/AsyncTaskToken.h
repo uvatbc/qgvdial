@@ -22,7 +22,7 @@ Contact: yuvraaj@gmail.com
 #ifndef ASYNCTASKTOKEN_H
 #define ASYNCTASKTOKEN_H
 
-#include "global.h"
+#include "api_common.h"
 #include <QObject>
 
 #define ATTS_SUCCESS            0

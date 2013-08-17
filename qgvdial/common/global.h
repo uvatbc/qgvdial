@@ -98,46 +98,18 @@ void qgv_LogFlush();
 #define HAS_SINGLE_APP 1
 #endif
 
-#if defined(Q_WS_X11)
-#define __FULLFUNC__ __PRETTY_FUNCTION__
-#else
-#define __FULLFUNC__ __FUNCTION__
-#endif
-
 #if defined(Q_OS_BLACKBERRY)
 #define PHONON_ENABLED 0
 #else
 #define PHONON_ENABLED 1
 #endif
 
-#define Q_DEBUG(_s) qDebug() << QString("%1(%2): %3").arg(__FULLFUNC__).arg(__LINE__).arg(_s)
-#define Q_WARN(_s) qWarning() << QString("%1(%2): %3").arg(__FULLFUNC__).arg(__LINE__).arg(_s)
-#define Q_CRIT(_s) qCritical() << QString("%1(%2): %3").arg(__FULLFUNC__).arg(__LINE__).arg(_s)
-
 //#include "PhoneIntegrationIface.h"
 //#include "TpHeaders.h"
-
-////////////////////////////////////////////////////////////////////////////////
-// Debugging
-////////////////////////////////////////////////////////////////////////////////
 
 // To test MMKit:
 //#undef PHONON_ENABLED
 //#define PHONON_ENABLED 0
-
-#if defined(Q_OS_BLACKBERRY)
-#define TOUCHME(__a) \
-do { \
-    QString d = QString("%1(%2): %3").arg(__FULLFUNC__).arg(__LINE__).arg(__a); \
-    QString base = QDir::currentPath(); \
-    QFile f(base + "/shared/documents/qgvdial.log"); \
-    f.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text | QIODevice::Unbuffered); \
-    f.write(d.toLatin1()); \
-    f.close(); \
-} while (0)
-#else
-#define TOUCHME(__a)
-#endif
 
 #endif //__cplusplus
 #endif //__GLOBAL_H__
