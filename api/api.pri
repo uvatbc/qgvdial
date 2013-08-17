@@ -6,7 +6,9 @@ SOURCES  += $$PWD/GVApi.cpp \
             $$PWD/CookieJar.cpp \
             $$PWD/GvXMLParser.cpp \
             $$PWD/MyXmlErrorHandler.cpp \
-            $$PWD/GContactsApi.cpp
+            $$PWD/GContactsApi.cpp \
+            $$PWD/ContactsParser.cpp \
+            $$PWD/ContactsXmlHandler.cpp
 
 HEADERS  += $$PWD/api_common.h \
             $$PWD/GVApi.h \
@@ -15,6 +17,8 @@ HEADERS  += $$PWD/api_common.h \
             $$PWD/CookieJar.h \
             $$PWD/GvXMLParser.h \
             $$PWD/MyXmlErrorHandler.h \
-            $$PWD/GContactsApi.h
+            $$PWD/GContactsApi.h \
+            $$PWD/ContactsParser.h \
+            $$PWD/ContactsXmlHandler.h
 
 QT *= network sql xml xmlpatterns script
