@@ -210,6 +210,12 @@ MainWindow::uiSetUserPass(bool editable)
 }//MainWindow::uiSetUserPass
 
 void
+MainWindow::uiRequestApplicationPassword()
+{
+    Q_ASSERT(0 == "Not implemented");
+}//MainWindow::uiRequestApplicationPassword
+
+void
 MainWindow::uiLoginDone(int status, const QString &errStr)
 {
     if (ATTS_SUCCESS == status) {

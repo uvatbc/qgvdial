@@ -89,3 +89,9 @@ DummyMainWindow::onUserLogoutDone()
     Q_DEBUG("Logout complete");
     Q_ASSERT(0 == "Not implemented");
 }//DummyMainWindow::onUserLogoutDone
+
+void
+DummyMainWindow::uiRequestApplicationPassword()
+{
+    Q_ASSERT(0 == "Not implemented");
+}//DummyMainWindow::uiRequestApplicationPassword()

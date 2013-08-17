@@ -42,6 +42,7 @@ protected:
     virtual void uiSetUserPass(bool editable);
     virtual void uiLoginDone(int status, const QString &errStr);
     virtual void onUserLogoutDone();
+    virtual void uiRequestApplicationPassword();
 };
 
 #endif // DUMMYMAINWINDOW_H

@@ -186,7 +186,7 @@ MainWindow::uiRequestApplicationPassword()
 {
     bool ok;
     QString strAppPw =
-    QInputDialog::getText (d, "Application specific password",
+    QInputDialog::getText (&m_view, "Application specific password",
                            "Enter password for contacts", QLineEdit::Password,
                            "", &ok);
     if (ok) {
