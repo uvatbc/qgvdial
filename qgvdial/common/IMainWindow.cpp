@@ -174,7 +174,9 @@ void
 IMainWindow::onUiGotApplicationPassword(const QString &appPw)
 {
     Q_DEBUG("User gave app specific password");
-    //TODO: Begin contacts login
+    // Begin contacts login
+    oContacts.login (m_user, appPw);
+
     //TODO: Fetch inbox, registered numbers and all that stuff
 }//IMainWindow::onUiGotApplicationPassword
 

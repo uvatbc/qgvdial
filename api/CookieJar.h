@@ -22,7 +22,7 @@ Contact: yuvraaj@gmail.com
 #ifndef COOKIEJAR_H
 #define COOKIEJAR_H
 
-#include "global.h"
+#include "api_common.h"
 
 // For some reason the symbian MOC doesn't like it if I don't include QObject
 // even though it is present in QtCore which is included in global.h

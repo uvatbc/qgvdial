@@ -212,13 +212,13 @@ GVApi::doGet(QUrl url, AsyncTaskToken *token, QObject *receiver,
     NwReqTracker::setCookies (jar, req);
 
     QNetworkReply *reply = nwMgr->get(req);
-    if (!reply) {
+    if (reply == NULL) {
         return false;
     }
 
     NwReqTracker *tracker = new NwReqTracker(reply, *nwMgr, token,
                                         NW_REPLY_TIMEOUT, emitLog, true, this);
-    if (!tracker) {
+    if (tracker == NULL) {
         reply->abort ();
         reply->deleteLater ();
         return false;

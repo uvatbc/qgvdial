@@ -24,6 +24,7 @@ Contact: yuvraaj@gmail.com
 
 #include <QObject>
 #include "global.h"
+#include "GContactsApi.h"
 
 class IMainWindow;
 class LibContacts : public QObject
@@ -33,10 +34,13 @@ class LibContacts : public QObject
 public:
     explicit LibContacts(IMainWindow *parent);
 
-signals:
+    bool login(const QString &user, const QString &pass);
 
-public slots:
+private slots:
+    void loginCompleted(AsyncTaskToken *task);
 
+private:
+    GContactsApi api;
 };
 
 #endif // LIBCONTACTS_H

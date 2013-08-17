@@ -31,10 +31,34 @@ class GContactsApi : public QObject
 public:
     explicit GContactsApi(QObject *parent = 0);
 
+    bool login(AsyncTaskToken *token);
+
 signals:
+    bool presentCaptcha(const QString &captchaUrl, void *ctx);
 
-public slots:
+private:
+    bool doGet(QUrl url, void *ctx, QObject *obj, const char *method);
+    bool doPost(QUrl url, QByteArray postData, const char *contentType,
+                void *ctx, QObject *receiver, const char *method);
 
+    bool startLogin(AsyncTaskToken *token, QUrl url);
+
+private slots:
+    void onLoginResponse(bool success, const QByteArray &response,
+                         QNetworkReply *reply, void *ctx);
+
+private:
+    //! The network manager for contacts API
+    QNetworkAccessManager nwMgr;
+
+    //! User name and password (may be application specific)
+    QString m_user, m_pass;
+
+    //! The authentication string returned by the contacts API
+    QString strGoogleAuth;
+
+    //! Have we successfully logged in?
+    bool    m_isLoggedIn;
 };
 
 #endif // GCONTACTSAPI_H

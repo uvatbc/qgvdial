@@ -114,10 +114,8 @@ void qgv_LogFlush();
 #define Q_WARN(_s) qWarning() << QString("%1(%2): %3").arg(__FULLFUNC__).arg(__LINE__).arg(_s)
 #define Q_CRIT(_s) qCritical() << QString("%1(%2): %3").arg(__FULLFUNC__).arg(__LINE__).arg(_s)
 
-#include "NwReqTracker.h"
 //#include "PhoneIntegrationIface.h"
 //#include "TpHeaders.h"
-#include "AsyncTaskToken.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Debugging

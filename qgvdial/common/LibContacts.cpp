@@ -26,3 +26,32 @@ LibContacts::LibContacts(IMainWindow *parent)
 : QObject(parent)
 {
 }//LibContacts::LibContacts
+
+bool
+LibContacts::login(const QString &user, const QString &pass)
+{
+    AsyncTaskToken *token = new AsyncTaskToken(this);
+    if (!token) {
+        Q_WARN("Failed to allocate token");
+        return false;
+    }
+
+    connect(token, SIGNAL(completed(AsyncTaskToken*)),
+            this, SLOT(loginCompleted(AsyncTaskToken*)));
+
+    token->inParams["user"] = user;
+    token->inParams["pass"] = pass;
+    api.login (token);
+}//LibContacts::login
+
+void
+LibContacts::loginCompleted(AsyncTaskToken *task)
+{
+    if (ATTS_SUCCESS == task->status) {
+        Q_DEBUG("Login successful");
+    } else {
+        Q_WARN("Login failed");
+    }
+
+    task->deleteLater ();
+}//LibContacts::loginCompleted
