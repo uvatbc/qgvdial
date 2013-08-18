@@ -121,26 +121,18 @@ ContactsXmlHandler::endElement (const QString & /*namespaceURI*/,
         // If execution reaches here then it means it's the end of an entry.
         bEntryStarted = false;
 
-        if (currInfo.bDeleted)
-        {
-            if (bEmitLog)
-                qDebug () << QString("GV reports deleted contact : "
-                                     "id = %1, name = %2")
+        if (currInfo.bDeleted) {
+            if (bEmitLog) {
+                Q_DEBUG(QString("GV reports deleted contact : "
+                                "id = %1, name = %2")
                                 .arg (currInfo.strId)
-                                .arg (currInfo.strTitle);
+                                .arg (currInfo.strTitle));
+            }
         }
 
-        if ((0 == currInfo.arrPhones.size ()) && (!currInfo.bDeleted))
-        {
-            if (bEmitLog)
-                qDebug() << "Contact does not have any phone numbers :"
-                         << currInfo.strTitle;
+        if ((0 == currInfo.arrPhones.size ()) && (!currInfo.bDeleted)) {
             // Just in case, delete it!
             currInfo.bDeleted = true;
-        } else {
-            if (bEmitLog)
-                qDebug() << "Pulled one contact from Google with valid numbers:"
-                         << currInfo.strTitle;
         }
 
 #ifdef DBG_VERBOSE

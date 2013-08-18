@@ -22,9 +22,10 @@ Contact: yuvraaj@gmail.com
 #include "ContactsParser.h"
 #include "ContactsXmlHandler.h"
 
-ContactsParser::ContactsParser (QByteArray data,
-                                            QObject *parent /*= 0*/)
+ContactsParser::ContactsParser (AsyncTaskToken *task, QByteArray data,
+                                QObject *parent /*= 0*/)
 : QObject(parent)
+, m_task (task)
 , byData (data)
 , bEmitLog (true)
 {
@@ -38,6 +39,8 @@ ContactsParser::doXmlWork ()
     QXmlSimpleReader simpleReader;
     ContactsXmlHandler contactsHandler;
     contactsHandler.setEmitLog (bEmitLog);
+
+    QDateTime startTime = QDateTime::currentDateTime ();
 
     inputSource.setData (byData);
 
@@ -54,6 +57,10 @@ ContactsParser::doXmlWork ()
 
     rv = simpleReader.parse (&inputSource, false);
 
+    QDateTime endTime = QDateTime::currentDateTime ();
+    Q_DEBUG(QString("XML parse took %1 msec")
+            .arg(endTime.toMSecsSinceEpoch() - startTime.toMSecsSinceEpoch()));
+
     if (!rv) {
         Q_WARN(QString("Contacts parser failed to parse. Data = %1")
                .arg (QString(byData)));
@@ -61,7 +68,7 @@ ContactsParser::doXmlWork ()
 
     quint32 total = contactsHandler.getTotalContacts ();
     quint32 usable = contactsHandler.getUsableContacts ();
-    emit done(rv, total, usable);
+    emit done(m_task, rv, total, usable);
 
     if (bEmitLog || (contactsHandler.getUsableContacts () != 0)) {
         QString msg = QString("Total contacts: %1. Usable: %2")
@@ -73,9 +80,13 @@ ContactsParser::doXmlWork ()
 void
 ContactsParser::doJsonWork ()
 {
+    QDateTime startTime = QDateTime::currentDateTime ();
+
     QScriptEngine e;
     QString cmd = QString("var o = %1").arg (QString(byData));
     QString rStr, tmpl;
+
+    quint32 total, usable;
 
     do {
         e.evaluate (cmd);
@@ -91,43 +102,51 @@ ContactsParser::doJsonWork ()
             break;
         }
 
-        quint32 max = rStr.toUInt ();
-        if (0 == max) {
+        total = rStr.toUInt ();
+        if (0 == total) {
             Q_DEBUG("No contacts present");
             break;
         }
 
         ContactInfo ci;
-        for (quint32 i = 0; i < max; i++) {
+        for (quint32 i = 0; i < total; i++) {
             ci.init ();
 
-            tmpl = QString("o.feed.entry[%1]").arg (i);
+            cmd = QString("var e = o.feed.entry[%1]").arg (i);
+            e.evaluate (cmd);
+            if (e.hasUncaughtException ()) {
+                Q_WARN("Failed to evaluate contact entry");
+                continue;
+            }
 
-            cmd = tmpl + ".id.$t";
+            cmd = "e.id.$t";
             ci.strId = e.evaluate (cmd).toString ();
             if (e.hasUncaughtException ()) {
                 Q_WARN("Failed to evaluate contact id");
                 continue;
             }
 
-            cmd = tmpl + ".title.$t";
+            cmd = "e.title.$t";
             ci.strTitle = e.evaluate (cmd).toString ();
             if (e.hasUncaughtException ()) {
                 Q_WARN("Failed to evaluate contact title");
                 continue;
             }
 
-            tmpl = QString("o.feed.entry[%1].gd$phoneNumber").arg (i);
-            cmd = tmpl + ".length";
+            cmd = "e.gd$phoneNumber.length";
             quint32 max1 = e.evaluate (cmd).toUInt32 ();
-            if (e.hasUncaughtException ()) {
-                Q_DEBUG(QString("%1 has no phones").arg (ci.strTitle));
-            } else {
+            while (!e.hasUncaughtException ()) {
+                cmd = "var pi = e.gd$phoneNumber";
+                e.evaluate (cmd);
+                if (e.hasUncaughtException ()) {
+                    Q_WARN("Failed to evaluate contact phone info");
+                    break;
+                }
+
                 PhoneInfo pi;
                 for (quint32 j = 0; j < max1; j++) {
                     pi.init ();
-                    tmpl = QString("o.feed.entry[%1].gd$phoneNumber[%2]")
-                            .arg(i).arg(j);
+                    tmpl = QString("pi[%1]").arg(j);
 
                     cmd = tmpl + ".$t";
                     pi.strNumber = e.evaluate (cmd).toString ();
@@ -154,19 +173,25 @@ ContactsParser::doJsonWork ()
                     }
                     ci.arrPhones += pi;
                 }
+
+                break;
             }
 
             tmpl = QString("o.feed.entry[%1].gd$email").arg (i);
             cmd = tmpl + ".length";
             max1 = e.evaluate (cmd).toUInt32 ();
-            if (e.hasUncaughtException ()) {
-                Q_DEBUG(QString("%1 has no emails").arg (ci.strTitle));
-            } else {
+            if (!e.hasUncaughtException ()) {
+                cmd = "var ei = e.gd$email";
+                e.evaluate (cmd);
+                if (e.hasUncaughtException ()) {
+                    Q_WARN("Failed to evaluate contact email info");
+                    break;
+                }
+
                 EmailInfo ei;
                 for (quint32 j = 0; j < max1; j++) {
                     ei.init ();
-                    tmpl = QString("o.feed.entry[%1].gd$email[%2]")
-                            .arg(i).arg(j);
+                    tmpl = QString("ei[%1]").arg(j);
 
                     cmd = tmpl + ".address";
                     ei.address = e.evaluate (cmd).toString ();
@@ -194,6 +219,12 @@ ContactsParser::doJsonWork ()
             emit gotOneContact (ci);
         }
     } while (0);
+
+    QDateTime endTime = QDateTime::currentDateTime ();
+    Q_DEBUG(QString("JSON parse took %1 msec")
+            .arg(endTime.toMSecsSinceEpoch() - startTime.toMSecsSinceEpoch()));
+
+    emit done(m_task, rv, total, total);
 }//ContactsParser::doJsonWork
 
 ContactsParser::~ContactsParser()

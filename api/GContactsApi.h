@@ -52,6 +52,8 @@ private slots:
     void onGotContactsFeed(bool success, const QByteArray &response,
                            QNetworkReply *reply, void *ctx);
     void onGotOneContact(const ContactInfo &cinfo);
+    void onContactsParsed(AsyncTaskToken *task, bool rv, quint32 total,
+                          quint32 usable);
 
 private:
     //! The network manager for contacts API

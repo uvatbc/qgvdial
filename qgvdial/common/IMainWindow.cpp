@@ -29,6 +29,7 @@ IMainWindow::IMainWindow(QObject *parent)
 , oContacts(this)
 , m_loginTask(NULL)
 {
+    qRegisterMetaType<ContactInfo>("ContactInfo");
     connect(&gvApi, SIGNAL(twoStepAuthentication(AsyncTaskToken*)),
             this, SLOT(onTFARequest(AsyncTaskToken*)));
 }//IMainWindow::IMainWindow

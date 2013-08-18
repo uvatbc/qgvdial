@@ -51,9 +51,10 @@ LibContacts::login(const QString &user, const QString &pass)
 void
 LibContacts::loginCompleted(AsyncTaskToken *task)
 {
+    IMainWindow *parent = (IMainWindow *) this->parent ();
+
     if (ATTS_SUCCESS == task->status) {
         Q_DEBUG("Login successful");
-        IMainWindow *parent = (IMainWindow *) this->parent ();
         if (parent->db.getTFAFlag ()) {
             parent->db.setAppPass (task->inParams["pass"].toString());
         }
@@ -71,6 +72,7 @@ LibContacts::loginCompleted(AsyncTaskToken *task)
         }
     } else {
         Q_WARN("Login failed");
+        parent->uiRequestApplicationPassword ();
     }
 
     if (task) {

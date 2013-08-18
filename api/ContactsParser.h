@@ -33,7 +33,7 @@ class ContactsParser : public QObject
     Q_OBJECT
 
 public:
-    ContactsParser(QByteArray data, QObject *parent = 0);
+    ContactsParser(AsyncTaskToken *task, QByteArray data, QObject *parent = 0);
     void setEmitLog (bool enable = true);
     ~ContactsParser();
 
@@ -43,13 +43,15 @@ signals:
     // Emitted when one contact is parsed out of the XML
     void gotOneContact (const ContactInfo &contactInfo);
     // Emitted when work is done
-    void done(bool rv, quint32 total, quint32 usable);
+    void done(AsyncTaskToken *task, bool rv, quint32 total, quint32 usable);
 
 public slots:
     void doXmlWork ();
     void doJsonWork ();
 
 private:
+    AsyncTaskToken *m_task;
+
     QByteArray  byData;
 
     bool        bEmitLog;

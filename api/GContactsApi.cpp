@@ -22,6 +22,8 @@ Contact: yuvraaj@gmail.com
 #include "GContactsApi.h"
 #include "ContactsParser.h"
 
+#define USE_JSON_FEED 0
+
 GContactsApi::GContactsApi(QObject *parent)
 : QObject(parent)
 , m_isLoggedIn(false)
@@ -227,7 +229,9 @@ GContactsApi::getContacts(AsyncTaskToken *task)
         url.addQueryItem ("showdeleted", "true");
     }
 
+#if USE_JSON_FEED
     url.addQueryItem ("alt", "json");
+#endif
 
     bool rv =
     doGet(url, task, this,
@@ -255,30 +259,32 @@ GContactsApi::onGotContactsFeed(bool success, const QByteArray &response,
             break;
         }
 
-#if 0
+#if 1
         QFile temp("contacts.txt");
         temp.open (QIODevice::ReadWrite);
         temp.write (response);
         temp.close ();
 #endif
 
-#if 1
         QThread *workerThread = new QThread(this);
-        ContactsParser *parser = new ContactsParser(response);
+        ContactsParser *parser = new ContactsParser(task, response);
         parser->moveToThread (workerThread);
 
         //- Init -//
-        // Thread start -> parser->doXmlWork
-//        success =
-//        connect (workerThread, SIGNAL(started()), parser, SLOT(doXmlWork()));
-//        Q_ASSERT(success);
+        // Thread start -> parser->doWork
+#if USE_JSON_FEED
         success =
         connect (workerThread, SIGNAL(started()), parser, SLOT(doJsonWork()));
         Q_ASSERT(success);
+#else
+        success =
+        connect (workerThread, SIGNAL(started()), parser, SLOT(doXmlWork()));
+        Q_ASSERT(success);
+#endif
         // parser.done -> this.onContactsParsed
         success =
-        connect (parser, SIGNAL(done(bool,quint32,quint32)),
-                 this, SIGNAL(contactsParsed(bool,quint32,quint32)));
+        connect (parser, SIGNAL(done(AsyncTaskToken*,bool,quint32,quint32)),
+                 this, SLOT(onContactsParsed(AsyncTaskToken*,bool,quint32,quint32)));
         Q_ASSERT(success);
 
         //- Cleanup -//
@@ -321,7 +327,6 @@ GContactsApi::onGotContactsFeed(bool success, const QByteArray &response,
         workerThread->start ();
 
         task = NULL;
-#endif
     } while (0); // End cleanup block (not a loop)
 
     if (task) {
@@ -335,3 +340,10 @@ GContactsApi::onGotOneContact(const ContactInfo &cinfo)
 {
     emit oneContact(cinfo);
 }//GContactsApi::onGotOneContact
+
+void
+GContactsApi::onContactsParsed(AsyncTaskToken *task, bool rv, quint32 total,
+                               quint32 usable)
+{
+    emit contactsParsed (rv, total, usable);
+}//GContactsApi::onContactsParsed
