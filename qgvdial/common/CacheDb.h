@@ -39,6 +39,8 @@ public:
     bool init(const QString &dbDir);
     void deinit();
 
+    void setQuickAndDirty(bool beDirty = true);
+
     bool usernameIsCached();
     bool getUserPass (QString &strUser, QString &strPass);
     bool putUserPass (const QString &strUser, const QString &strPass);
@@ -61,7 +63,7 @@ public:
 
     void clearContacts ();
     void refreshContactsModel (ContactsModel *modelContacts,
-                               const QString &query);
+                               const QString &query = QString());
 
     bool existsContact (const QString &strId) const;
     bool deleteContact (const QString &strId);

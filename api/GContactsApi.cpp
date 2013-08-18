@@ -345,5 +345,12 @@ void
 GContactsApi::onContactsParsed(AsyncTaskToken *task, bool rv, quint32 total,
                                quint32 usable)
 {
-    emit contactsParsed (rv, total, usable);
+    task->outParams["total"] = total;
+    task->outParams["usable"] = usable;
+    if (rv) {
+        task->status = ATTS_SUCCESS;
+    } else {
+        task->status = ATTS_FAILURE;
+    }
+    task->emitCompleted ();
 }//GContactsApi::onContactsParsed

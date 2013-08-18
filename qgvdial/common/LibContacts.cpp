@@ -25,6 +25,8 @@ Contact: yuvraaj@gmail.com
 LibContacts::LibContacts(IMainWindow *parent)
 : QObject(parent)
 {
+    Q_ASSERT(NULL != parent);
+
     connect (&api, SIGNAL(presentCaptcha(AsyncTaskToken*,QString)),
              this, SLOT(onPresentCaptcha(AsyncTaskToken*,QString)));
     connect (&api, SIGNAL(oneContact(ContactInfo)),
@@ -53,33 +55,21 @@ LibContacts::login(const QString &user, const QString &pass)
 void
 LibContacts::loginCompleted(AsyncTaskToken *task)
 {
-    IMainWindow *parent = (IMainWindow *) this->parent ();
+    IMainWindow *win = (IMainWindow *) this->parent ();
 
     if (ATTS_SUCCESS == task->status) {
         Q_DEBUG("Login successful");
-        if (parent->db.getTFAFlag ()) {
-            parent->db.setAppPass (task->inParams["pass"].toString());
+        if (win->db.getTFAFlag ()) {
+            win->db.setAppPass (task->inParams["pass"].toString());
         }
 
-        task->reinit ();
-
-        connect (task, SIGNAL(completed(AsyncTaskToken*)),
-                 this, SLOT(onContactsFetched(AsyncTaskToken*)));
-
-        bool bval = true;
-        task->inParams["showDeleted"] = bval;
-
-        if (api.getContacts(task)) {
-            task = NULL;
-        }
+        refresh ();
     } else {
         Q_WARN("Login failed");
-        parent->uiRequestApplicationPassword ();
+        win->uiRequestApplicationPassword ();
     }
 
-    if (task) {
-        task->deleteLater ();
-    }
+    task->deleteLater ();
 }//LibContacts::loginCompleted
 
 void
@@ -91,14 +81,60 @@ LibContacts::onPresentCaptcha(AsyncTaskToken *task, const QString &captchaUrl)
     task->emitCompleted ();
 }//LibContacts::onPresentCaptcha
 
+bool
+LibContacts::refresh(QDateTime after /*= QDateTime()*/)
+{
+    AsyncTaskToken *task = new AsyncTaskToken(this);
+    if (!task) {
+        Q_WARN("Failed to allocate token");
+        return false;
+    }
+
+    connect (task, SIGNAL(completed(AsyncTaskToken*)),
+             this, SLOT(onContactsFetched(AsyncTaskToken*)));
+
+    bool bval = true;
+    task->inParams["showDeleted"] = bval;
+    task->inParams["updatedMin"] = after;
+
+    if ((bval = api.getContacts(task))) {
+        IMainWindow *win = (IMainWindow *) this->parent ();
+        win->db.setQuickAndDirty (true);
+    }
+
+    return (bval);
+}//LibContacts::refresh
+
 void
 LibContacts::onOneContact(ContactInfo cinfo)
 {
-    Q_DEBUG(QString("Name: %1").arg (cinfo.strTitle));
+    IMainWindow *win = (IMainWindow *) this->parent ();
+    win->db.deleteContact (cinfo.strId);
+    win->db.insertContact (cinfo);
 }//LibContacts::onOneContact
 
 void
 LibContacts::onContactsFetched(AsyncTaskToken *task)
 {
+    IMainWindow *win = (IMainWindow *) this->parent ();
+    win->db.setQuickAndDirty (false);
+
+    if (ATTS_SUCCESS == task->status) {
+        emit sigRefreshed ();
+    } else {
+        Q_WARN("Failed to update contacts");
+    }
+
     task->deleteLater ();
 }//LibContacts::onContactsFetched
+
+ContactsModel *
+LibContacts::createModel()
+{
+    IMainWindow *win = (IMainWindow *) this->parent ();
+    ContactsModel *modelContacts = new ContactsModel(this);
+
+    win->db.refreshContactsModel (modelContacts);
+
+    return (modelContacts);
+}//LibContacts::createModel

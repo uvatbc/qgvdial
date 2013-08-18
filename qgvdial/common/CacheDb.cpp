@@ -81,6 +81,17 @@ CacheDb::deinit()
     CacheDbPrivate::deref ();
 }//CacheDb::deinit
 
+void
+CacheDb::setQuickAndDirty(bool beDirty /*= true*/)
+{
+    CacheDbPrivate &p = CacheDbPrivate::ref ();
+    QSqlQuery query(p.db);
+    if (beDirty) {
+        query.exec ("PRAGMA synchronous=off;");
+    } else {
+        query.exec ("PRAGMA synchronous=full;");
+    }
+}//CacheDb::setQuickAndDirty
 
 bool
 CacheDb::blowAwayCache()

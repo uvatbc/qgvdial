@@ -32,6 +32,8 @@ IMainWindow::IMainWindow(QObject *parent)
     qRegisterMetaType<ContactInfo>("ContactInfo");
     connect(&gvApi, SIGNAL(twoStepAuthentication(AsyncTaskToken*)),
             this, SLOT(onTFARequest(AsyncTaskToken*)));
+    connect(&oContacts, SIGNAL(sigRefreshed()),
+            this, SLOT(onContactsRefreshed()));
 }//IMainWindow::IMainWindow
 
 void
@@ -197,3 +199,9 @@ IMainWindow::onLogoutDone(AsyncTaskToken *task)
     onUserLogoutDone();
     task->deleteLater ();
 }//IMainWindow::onLogoutDone
+
+void
+IMainWindow::onContactsRefreshed()
+{
+    uiRefreshContacts ();
+}//IMainWindow::onContactsRefreshed

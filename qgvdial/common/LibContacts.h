@@ -25,6 +25,7 @@ Contact: yuvraaj@gmail.com
 #include <QObject>
 #include "global.h"
 #include "GContactsApi.h"
+#include "ContactsModel.h"
 
 class IMainWindow;
 class LibContacts : public QObject
@@ -35,14 +36,20 @@ public:
     explicit LibContacts(IMainWindow *parent);
 
     bool login(const QString &user, const QString &pass);
+    bool refresh(QDateTime after = QDateTime());
 
-private slots:
+    ContactsModel *createModel();
+
+signals:
+    void sigRefreshed();
+
+protected slots:
     void loginCompleted(AsyncTaskToken *task);
     void onPresentCaptcha(AsyncTaskToken *task, const QString &captchaUrl);
     void onOneContact(ContactInfo cinfo);
     void onContactsFetched(AsyncTaskToken *task);
 
-private:
+protected:
     GContactsApi api;
 };
 

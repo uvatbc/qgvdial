@@ -162,10 +162,6 @@ NwReqTracker::onReplyFinished()
             break;
         }
 
-        if (emitLog) {
-            Q_DEBUG(urlMoved.toString());
-        }
-
         QNetworkRequest req(urlMoved);
         req.setRawHeader("User-Agent", uaString);
 

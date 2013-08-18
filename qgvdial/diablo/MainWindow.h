@@ -47,9 +47,12 @@ protected:
     void uiRequestApplicationPassword();
     void uiLoginDone(int status, const QString &errStr);
     void onUserLogoutDone();
+    void uiRefreshContacts();
 
 private:
     MainWindowPrivate *d;
+
+    ContactsModel *contactsModel;
 };
 
 QCoreApplication *

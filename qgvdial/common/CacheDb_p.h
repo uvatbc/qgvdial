@@ -89,7 +89,7 @@ protected:
 // Registered numbers table changed to get more fields
 //#define GV_S_VALUE_DB_VER   "2013-04-15 16:49:28"
 // Brand new qgvdial
-#define GV_S_VALUE_DB_VER   "2013-07-26 08:53:58"
+#define GV_S_VALUE_DB_VER   "2013-08-18 08:53:58"
 ////////////////////////////////////////////////////////////////////////////////
 // Started using versioning for the settings
 //#define GV_SETTINGS_VER     "2011-05-13 16:33:50"

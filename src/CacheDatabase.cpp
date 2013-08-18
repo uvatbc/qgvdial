@@ -216,7 +216,7 @@ CacheDatabase::setQuickAndDirty (bool bBeDirty)
     if (bBeDirty) {
         query.exec ("PRAGMA synchronous=off");
     } else {
-        query.exec ("PRAGMA synchronous=on");
+        query.exec ("PRAGMA synchronous=full");
     }
 }//CacheDatabase::setQuickAndDirty
 

@@ -37,7 +37,6 @@ public:
 signals:
     void presentCaptcha(AsyncTaskToken *task, const QString &captchaUrl);
     void oneContact(ContactInfo cinfo);
-    void contactsParsed(bool rv, quint32 total, quint32 usable);
 
 private:
     bool doGet(QUrl url, void *ctx, QObject *obj, const char *method);

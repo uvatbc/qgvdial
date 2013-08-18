@@ -32,6 +32,7 @@ createApplication(int argc, char *argv[])
 MainWindow::MainWindow(QObject *parent)
 : IMainWindow(parent)
 , d(new MainWindowPrivate)
+, contactsModel(NULL)
 {
 }//MainWindow::MainWindow
 
@@ -141,17 +142,35 @@ MainWindow::uiRequestApplicationPassword()
 void
 MainWindow::uiLoginDone(int status, const QString &errStr)
 {
-    if (ATTS_SUCCESS == status) {
+    do {
+        if (ATTS_NW_ERROR == status) {
+            d->ui->statusBar->showMessage ("Network error. Try again later.");
+            break;
+        } else if (ATTS_USER_CANCEL == status) {
+            d->ui->statusBar->showMessage ("User canceled login.");
+            break;
+        } else if (ATTS_SUCCESS != status) {
+            QMessageBox msg;
+            msg.setIcon (QMessageBox::Critical);
+            msg.setText (errStr);
+            msg.setWindowTitle ("Login failed");
+            msg.exec ();
+            break;
+        }
+
         d->ui->statusBar->showMessage ("Login successful");
-    } else if (ATTS_NW_ERROR == status) {
-        d->ui->statusBar->showMessage ("Network error. Try again later.");
-    } else if (ATTS_USER_CANCEL == status) {
-        d->ui->statusBar->showMessage ("User canceled login.");
-    } else {
-        QMessageBox msg;
-        msg.setIcon (QMessageBox::Critical);
-        msg.setText (errStr);
-        msg.setWindowTitle ("Login failed");
-        msg.exec ();
-    }
+    } while (0);
 }//MainWindow::uiLoginDone
+
+void
+MainWindow::uiRefreshContacts()
+{
+    Q_DEBUG("aalo re!");
+    contactsModel = oContacts.createModel ();
+    QAbstractItemModel *oldModel = d->ui->contactsView->model ();
+    d->ui->contactsView->setModel (contactsModel);
+    if (NULL != oldModel) {
+        delete oldModel;
+    }
+    Q_DEBUG("gelo re!");
+}//MainWindow::uiRefreshContacts
