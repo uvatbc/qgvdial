@@ -1,5 +1,5 @@
 1
-11
+13
 main.qml
 LoginDetails.qml
 images/picture1.png
@@ -9,5 +9,7 @@ Keypad.qml
 KeyButton.qml
 ContactsPage.qml
 TFADialog.qml
+AppPwDialog.qml
+MessagePage.qml
 DialPage.qml
 SettingsPage.qml

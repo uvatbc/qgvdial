@@ -43,6 +43,10 @@ NavigationPane {
                 appPwDialog.accepted = false;
                 container.push(appPwDialog);
             }
+            function showMessage(msg) {
+                messagePage.message = msg;
+                container.push(messagePage)
+            }
 
             dataModel: ArrayDataModel {
                 id: settingsModel
@@ -77,6 +81,9 @@ NavigationPane {
         AppPwDialog {
             id: appPwDialog
             onDone: container.pop()
+        },
+        MessagePage {
+            id: messagePage
         }
     ]
 }//NavigationPane

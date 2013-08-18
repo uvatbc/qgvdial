@@ -104,11 +104,6 @@ MainWindow::onFakeInitDone()
     loginButton    = (Button *)    getQMLObject("LoginButton");
     connect(loginButton, SIGNAL(clicked()), this, SLOT(onLoginBtnClicked()));
 
-    tfaDialog      = (Page *)    getQMLObject("TFADialog");
-    connect(tfaDialog, SIGNAL(done()), this, SLOT(onTfaDlgClosed()));
-
-    appPwDialog    = (Page *)    getQMLObject("TFADialog");
-    connect(appPwDialog, SIGNAL(done()), this, SLOT(onAppPwDlgClosed()));
 
     onInitDone();
 }//MainWindow::onFakeInitDone
@@ -145,6 +140,10 @@ MainWindow::uiRequestTFALoginDetails(void *ctx)
     tfaCtx = ctx;
     // Open TFA dialog
     QMetaObject::invokeMethod (settingsList, "showTfaDialog");
+
+    tfaDialog = (Page *) getQMLObject("TFADialog");
+    disconnect(tfaDialog, SIGNAL(done()), this, SLOT(onTfaDlgClosed()));
+    connect(tfaDialog, SIGNAL(done()), this, SLOT(onTfaDlgClosed()));
 }//MainWindow::uiRequestTFALoginDetails
 
 void
@@ -157,6 +156,8 @@ MainWindow::onTfaDlgClosed()
     } else {
         resumeTFAAuth(tfaCtx, pin, true);
     }
+
+    tfaDialog = NULL;
 }//MainWindow::onTfaDlgClosed
 
 void
@@ -178,18 +179,21 @@ MainWindow::uiRequestApplicationPassword()
 {
     // Open app specific password dialog
     QMetaObject::invokeMethod (settingsList, "showAppPwDialog");
+
+    appPwDialog = (Page *) getQMLObject("AppPwDialog");
+    disconnect(appPwDialog, SIGNAL(done()), this, SLOT(onAppPwDlgClosed()));
+    connect(appPwDialog, SIGNAL(done()), this, SLOT(onAppPwDlgClosed()));
 }//MainWindow::uiRequestApplicationPassword
 
 void
 MainWindow::onAppPwDlgClosed()
 {
-    bool accepted = tfaDialog->property("accepted").toBool();
-    int pin = tfaDialog->property("pin").toInt();
+    bool accepted = appPwDialog->property("accepted").toBool();
+    QString appPw = appPwDialog->property("appPw").toString();
     if (accepted) {
-        resumeTFAAuth(tfaCtx, pin, false);
-    } else {
-        resumeTFAAuth(tfaCtx, pin, true);
+        onUiGotApplicationPassword(appPw);
     }
+    appPwDialog = NULL;
 }//MainWindow::onAppPwDlgClosed
 
 void
@@ -197,13 +201,22 @@ MainWindow::uiLoginDone(int status, const QString &errStr)
 {
     if (ATTS_SUCCESS == status) {
         Q_DEBUG("Login successful");
-    } else if (ATTS_NW_ERROR == status) {
-        Q_WARN("Network error. Try again later.");
-    } else if (ATTS_USER_CANCEL == status) {
-        Q_WARN("User canceled login.");
-    } else {
-        Q_WARN("Login failed");
+        return;
     }
+
+    QString msg;
+    if (ATTS_NW_ERROR == status) {
+        msg = "Network error. Try again later.";
+    } else if (ATTS_USER_CANCEL == status) {
+        msg = "User canceled login.";
+    } else {
+        msg = "Login failed";
+    }
+    Q_WARN(msg);
+
+    msg += QString(" Error string:\n%1").arg(errStr);
+    QMetaObject::invokeMethod (settingsList, "showAppPwDialog",
+                               Q_ARG(QVariant, msg));
 }//MainWindow::uiLoginDone
 
 void
