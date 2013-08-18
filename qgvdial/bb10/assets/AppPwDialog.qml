@@ -23,28 +23,29 @@ import bb.cascades 1.0
 
 Page {
     id: container
-    objectName: "TFADialog"
-    
+    objectName: "AppPwDialog"
+
     property bool accepted: false
-    property string pin
+    property string appPw
 
     signal done
 
     Container {
         Label {
             horizontalAlignment: HorizontalAlignment.Center
-            text: "Enter two factor authentication PIN"
+            text: "Enter application specific password"
         }
         TextField {
             id: textPin
-            hintText: "PIN"
+            hintText: "Password"
+            inputMode: TextFieldInputMode.Password
         }
         Button {
             horizontalAlignment: HorizontalAlignment.Center
             text: "OK"
             onClicked: {
                 container.accepted = true;
-                container.pin = textPin.text;
+                container.appPw = textPin.text;
                 container.done();
             }
         }

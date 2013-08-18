@@ -38,7 +38,12 @@ NavigationPane {
                 tfaDialog.accepted = false;
                 container.push(tfaDialog);
             }
-            
+            function showAppPwDialog() {
+                appPwDialog.appPw = "";
+                appPwDialog.accepted = false;
+                container.push(appPwDialog);
+            }
+
             dataModel: ArrayDataModel {
                 id: settingsModel
             }
@@ -67,6 +72,10 @@ NavigationPane {
         },
         TFADialog {
             id: tfaDialog
+            onDone: container.pop()
+        },
+        AppPwDialog {
+            id: appPwDialog
             onDone: container.pop()
         }
     ]

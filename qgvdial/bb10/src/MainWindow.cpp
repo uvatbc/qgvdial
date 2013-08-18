@@ -46,6 +46,7 @@ MainWindow::MainWindow(QCoreApplication *_app)
 , settingsList(NULL)
 , loginButton(NULL)
 , tfaDialog(NULL)
+, appPwDialog(NULL)
 {
 	app = (bb::cascades::Application *) _app;
 }//MainWindow::MainWindow
@@ -103,8 +104,11 @@ MainWindow::onFakeInitDone()
     loginButton    = (Button *)    getQMLObject("LoginButton");
     connect(loginButton, SIGNAL(clicked()), this, SLOT(onLoginBtnClicked()));
 
-    tfaDialog      = (Dialog *)    getQMLObject("TFADialog");
+    tfaDialog      = (Page *)    getQMLObject("TFADialog");
     connect(tfaDialog, SIGNAL(done()), this, SLOT(onTfaDlgClosed()));
+
+    appPwDialog    = (Page *)    getQMLObject("TFADialog");
+    connect(appPwDialog, SIGNAL(done()), this, SLOT(onAppPwDlgClosed()));
 
     onInitDone();
 }//MainWindow::onFakeInitDone
@@ -156,16 +160,54 @@ MainWindow::onTfaDlgClosed()
 }//MainWindow::onTfaDlgClosed
 
 void
-MainWindow::uiSetUserPass(const QString &user, const QString &pass,
-                          bool editable)
+MainWindow::uiSetUserPass(bool editable)
 {
     TextField *textField;
     textField = (TextField *) getQMLObject("TextUsername");
     if (NULL != textField) {
-        textField->setText(user);
+        textField->setText(m_user);
     }
     textField = (TextField *) getQMLObject("TextPassword");
     if (NULL != textField) {
-        textField->setText(pass);
+        textField->setText(m_pass);
     }
 }//MainWindow::uiSetUserPass
+
+void
+MainWindow::uiRequestApplicationPassword()
+{
+    // Open app specific password dialog
+    QMetaObject::invokeMethod (settingsList, "showAppPwDialog");
+}//MainWindow::uiRequestApplicationPassword
+
+void
+MainWindow::onAppPwDlgClosed()
+{
+    bool accepted = tfaDialog->property("accepted").toBool();
+    int pin = tfaDialog->property("pin").toInt();
+    if (accepted) {
+        resumeTFAAuth(tfaCtx, pin, false);
+    } else {
+        resumeTFAAuth(tfaCtx, pin, true);
+    }
+}//MainWindow::onAppPwDlgClosed
+
+void
+MainWindow::uiLoginDone(int status, const QString &errStr)
+{
+    if (ATTS_SUCCESS == status) {
+        Q_DEBUG("Login successful");
+    } else if (ATTS_NW_ERROR == status) {
+        Q_WARN("Network error. Try again later.");
+    } else if (ATTS_USER_CANCEL == status) {
+        Q_WARN("User canceled login.");
+    } else {
+        Q_WARN("Login failed");
+    }
+}//MainWindow::uiLoginDone
+
+void
+MainWindow::onUserLogoutDone()
+{
+    Q_DEBUG("Logout complete");
+}//MainWindow::onUserLogoutDone

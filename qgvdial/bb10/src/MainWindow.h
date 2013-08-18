@@ -32,7 +32,7 @@ Contact: yuvraaj@gmail.com
 #include <bb/cascades/ListView>
 #include <bb/cascades/Button>
 #include <bb/cascades/TabbedPane>
-#include <bb/cascades/Dialog>
+#include <bb/cascades/Page>
 
 #include <QLocale>
 #include <QTranslator>
@@ -60,8 +60,10 @@ public:
 
     void uiRequestLoginDetails();
     void uiRequestTFALoginDetails(void*);
-    void uiSetUserPass(const QString &user, const QString &pass,
-                       bool editable);
+    void uiSetUserPass(bool editable);
+    void uiRequestApplicationPassword();
+    void uiLoginDone(int status, const QString &errStr);
+    void onUserLogoutDone();
 
     void init();
     void log(QDateTime dt, int level, const QString &strLog);
@@ -74,6 +76,7 @@ protected slots:
 
     void onLoginBtnClicked();
     void onTfaDlgClosed();
+    void onAppPwDlgClosed();
 
 private:
     Application *app;
@@ -83,7 +86,8 @@ private:
     TabbedPane  *mainTabbedPane;
     ListView    *settingsList;
     Button      *loginButton;
-    Dialog      *tfaDialog;
+    Page        *tfaDialog;
+    Page        *appPwDialog;
 
     //! Entirely transient two-factor authentication context
     void        *tfaCtx;
