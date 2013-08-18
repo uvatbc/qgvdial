@@ -140,6 +140,8 @@ protected:
     QString m_pass;
 
     AsyncTaskToken *m_loginTask;
+
+    friend class LibContacts;
 };
 
 #endif // IMAINWINDOW_H

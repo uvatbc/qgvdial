@@ -183,7 +183,9 @@ enum PhoneType {
     PType_Unknown = 0,
     PType_Mobile,
     PType_Home,
-    PType_Other,
+    PType_Work,
+    PType_Pager,
+    PType_Other
 };
 
 struct PhoneInfo
@@ -204,6 +206,10 @@ struct PhoneInfo
             return PType_Mobile;
         case 'H':
             return PType_Home;
+        case 'W':
+            return PType_Work;
+        case 'P':
+            return PType_Pager;
         case 'O':
             return PType_Other;
         default:
@@ -216,6 +222,10 @@ struct PhoneInfo
             return 'M';
         case PType_Home:
             return 'H';
+        case PType_Work:
+            return 'W';
+        case PType_Pager:
+            return 'P';
         case PType_Other:
             return 'O';
         default:
@@ -228,6 +238,10 @@ struct PhoneInfo
             return "Mobile";
         case PType_Home:
             return "Home";
+        case PType_Work:
+            return "Work";
+        case PType_Pager:
+            return "Pager";
         case PType_Other:
             return "Other";
         default:
@@ -236,6 +250,27 @@ struct PhoneInfo
     }
 };
 typedef QVector<PhoneInfo> PhoneInfoArray;
+
+enum EmailType {
+    EType_Unknown = 0,
+    EType_Home,
+    EType_Work,
+    EType_Other
+};
+
+struct EmailInfo {
+    EmailType type;
+    QString   address;
+    bool      primary;
+
+    EmailInfo() { init(); }
+    void init() {
+        type = EType_Unknown;
+        address.clear ();
+        primary = false;
+    }
+};
+typedef QVector<EmailInfo> EmailInfoArray;
 
 struct ContactInfo
 {
@@ -248,6 +283,8 @@ struct ContactInfo
     PhoneInfoArray  arrPhones;
     // Which number is selected
     int             selected;
+
+    EmailInfoArray  arrEmails;
 
     //! The notes that the user may have added to the contact
     QString         strNotes;
@@ -269,6 +306,7 @@ struct ContactInfo
         strId.clear ();
         strTitle.clear ();
         arrPhones.clear ();
+        arrEmails.clear ();
         strNotes.clear ();
         hrefPhoto.clear ();
         strPhotoPath.clear();

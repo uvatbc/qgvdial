@@ -46,7 +46,8 @@ signals:
     void done(bool rv, quint32 total, quint32 usable);
 
 public slots:
-    void doWork ();
+    void doXmlWork ();
+    void doJsonWork ();
 
 private:
     QByteArray  byData;

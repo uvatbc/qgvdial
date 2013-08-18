@@ -23,10 +23,8 @@ Contact: yuvraaj@gmail.com
 
 AsyncTaskToken::AsyncTaskToken(QObject *parent)
 : QObject(parent)
-, status(ATTS_SUCCESS)
-, callerCtx(NULL)
-, apiCtx(NULL)
 {
+    reinit ();
 }//AsyncTaskToken::AsyncTaskToken
 
 void
@@ -34,3 +32,15 @@ AsyncTaskToken::emitCompleted()
 {
    emit completed (this);
 }//AsyncTaskToken::emitCompleted
+
+void
+AsyncTaskToken::reinit()
+{
+    inParams.clear ();
+    outParams.clear ();
+    status = ATTS_SUCCESS;
+    callerCtx = NULL;
+    apiCtx = NULL;
+
+    this->disconnect (SIGNAL(completed(AsyncTaskToken*)));
+}//AsyncTaskToken::reinit

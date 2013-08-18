@@ -152,6 +152,7 @@ initLogRotate()
 static void
 deinitLogging ()
 {
+    win = NULL;
     fLogfile.close ();
 }//deinitLogging
 
@@ -168,9 +169,11 @@ main(int argc, char *argv[])
 
     int rv = app->exec();
 
+    // Safety...
+    MainWindow *temp = win;
     deinitLogging ();
 
-    delete win;
+    delete temp;
     delete app;
     return rv;
 }

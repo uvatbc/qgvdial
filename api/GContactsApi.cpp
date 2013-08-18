@@ -20,8 +20,7 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "GContactsApi.h"
-
-#define NO_CONTACTS_CAPTCHA 1
+#include "ContactsParser.h"
 
 GContactsApi::GContactsApi(QObject *parent)
 : QObject(parent)
@@ -228,6 +227,8 @@ GContactsApi::getContacts(AsyncTaskToken *task)
         url.addQueryItem ("showdeleted", "true");
     }
 
+    url.addQueryItem ("alt", "json");
+
     bool rv =
     doGet(url, task, this,
           SLOT(onGotContactsFeed(bool,const QByteArray&,QNetworkReply*,void*)));
@@ -244,6 +245,8 @@ GContactsApi::onGotContactsFeed(bool success, const QByteArray &response,
 
     do { // Begin cleanup block (not a loop)
         if (!success) {
+            Q_WARN("Failed to get contacts feed");
+            task->status = ATTS_NW_ERROR;
             break;
         }
 
@@ -259,50 +262,76 @@ GContactsApi::onGotContactsFeed(bool success, const QByteArray &response,
         temp.close ();
 #endif
 
-#if 0
+#if 1
         QThread *workerThread = new QThread(this);
-        ContactsParserObject *pObj = new ContactsParserObject(response);
-        pObj->moveToThread (workerThread);
+        ContactsParser *parser = new ContactsParser(response);
+        parser->moveToThread (workerThread);
+
+        //- Init -//
+        // Thread start -> parser->doXmlWork
+//        success =
+//        connect (workerThread, SIGNAL(started()), parser, SLOT(doXmlWork()));
+//        Q_ASSERT(success);
         success =
-        connect (workerThread, SIGNAL(started()), pObj, SLOT(doWork()));
+        connect (workerThread, SIGNAL(started()), parser, SLOT(doJsonWork()));
         Q_ASSERT(success);
+        // parser.done -> this.onContactsParsed
         success =
-        connect (pObj, SIGNAL(done(bool, quint32, quint32)),
-                 this, SLOT  (onContactsParsed(bool, quint32, quint32)));
+        connect (parser, SIGNAL(done(bool,quint32,quint32)),
+                 this, SIGNAL(contactsParsed(bool,quint32,quint32)));
         Q_ASSERT(success);
+
+        //- Cleanup -//
+        // parser.done -> parser.deleteLater
         success =
-        connect (pObj, SIGNAL(done(bool, quint32, quint32)),
-                 pObj, SLOT  (deleteLater ()));
+        connect (parser, SIGNAL(done(bool,quint32,quint32)),
+                 parser, SLOT(deleteLater()));
         Q_ASSERT(success);
+        // parser done -> thread.quit
         success =
-        connect (pObj        , SIGNAL(done(bool, quint32, quint32)),
+        connect (parser      , SIGNAL(done(bool,quint32,quint32)),
                  workerThread, SLOT  (quit()));
         Q_ASSERT(success);
-        success =
-        connect (workerThread, SIGNAL(terminated()),
-                 pObj        , SLOT  (deleteLater()));
-        Q_ASSERT(success);
+        // thread.quit -> thread.deleteLater
         success =
         connect (workerThread, SIGNAL(terminated()),
                  workerThread, SLOT  (deleteLater()));
         Q_ASSERT(success);
+
+        //- status -//
+        /*
         success =
-        connect (pObj, SIGNAL (status(const QString &, int)),
-                 this, SIGNAL (status(const QString &, int)));
+        connect (parser, SIGNAL(status(const QString&,int)),
+                 this  , SIGNAL(status(const QString&,int)));
         Q_ASSERT(success);
+        */
+
+        //- Plumb the parsed contact signal -//
+        // parser.gotOneContact -> this.gotOneContact
         success =
-        connect (pObj, SIGNAL (gotOneContact (const ContactInfo &)),
-                 this, SLOT   (gotOneContact (const ContactInfo &)));
+        connect (parser, SIGNAL (gotOneContact(const ContactInfo&)),
+                 this  , SLOT (onGotOneContact(const ContactInfo&)));
         Q_ASSERT(success);
 
+        /*
         QMutexLocker locker(&mutex);
         refCount = 1;
         bBeginDrain = false;
+        */
         workerThread->start ();
+
+        task = NULL;
 #endif
     } while (0); // End cleanup block (not a loop)
 
     if (task) {
-        delete task;
+        task->emitCompleted ();
+        task->deleteLater ();
     }
 }//GContactsApi::onGotContactsFeed
+
+void
+GContactsApi::onGotOneContact(const ContactInfo &cinfo)
+{
+    emit oneContact(cinfo);
+}//GContactsApi::onGotOneContact

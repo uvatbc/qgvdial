@@ -31,7 +31,7 @@ ContactsParser::ContactsParser (QByteArray data,
 }//ContactsParser::ContactsParser
 
 void
-ContactsParser::doWork ()
+ContactsParser::doXmlWork ()
 {
     bool rv;
     QXmlInputSource inputSource;
@@ -46,7 +46,7 @@ ContactsParser::doWork ()
     Q_ASSERT(rv);
     rv = connect (
             &contactsHandler, SIGNAL   (oneContact(const ContactInfo&)),
-            this,            SIGNAL(gotOneContact(const ContactInfo&)));
+            this,             SIGNAL(gotOneContact(const ContactInfo&)));
     Q_ASSERT(rv);
 
     simpleReader.setContentHandler (&contactsHandler);
@@ -68,7 +68,133 @@ ContactsParser::doWork ()
                 .arg (total).arg (usable);
         emit status(msg);
     }
-}//ContactsParser::doWork
+}//ContactsParser::doXmlWork
+
+void
+ContactsParser::doJsonWork ()
+{
+    QScriptEngine e;
+    QString cmd = QString("var o = %1").arg (QString(byData));
+    QString rStr, tmpl;
+
+    do {
+        e.evaluate (cmd);
+        if (e.hasUncaughtException ()) {
+            Q_WARN("Failed to evaluate contacts JSON");
+            break;
+        }
+
+        cmd = "o.feed.entry.length";
+        rStr = e.evaluate (cmd).toString ();
+        if (e.hasUncaughtException ()) {
+            Q_WARN("Failed to evaluate contacts JSON");
+            break;
+        }
+
+        quint32 max = rStr.toUInt ();
+        if (0 == max) {
+            Q_DEBUG("No contacts present");
+            break;
+        }
+
+        ContactInfo ci;
+        for (quint32 i = 0; i < max; i++) {
+            ci.init ();
+
+            tmpl = QString("o.feed.entry[%1]").arg (i);
+
+            cmd = tmpl + ".id.$t";
+            ci.strId = e.evaluate (cmd).toString ();
+            if (e.hasUncaughtException ()) {
+                Q_WARN("Failed to evaluate contact id");
+                continue;
+            }
+
+            cmd = tmpl + ".title.$t";
+            ci.strTitle = e.evaluate (cmd).toString ();
+            if (e.hasUncaughtException ()) {
+                Q_WARN("Failed to evaluate contact title");
+                continue;
+            }
+
+            tmpl = QString("o.feed.entry[%1].gd$phoneNumber").arg (i);
+            cmd = tmpl + ".length";
+            quint32 max1 = e.evaluate (cmd).toUInt32 ();
+            if (e.hasUncaughtException ()) {
+                Q_DEBUG(QString("%1 has no phones").arg (ci.strTitle));
+            } else {
+                PhoneInfo pi;
+                for (quint32 j = 0; j < max1; j++) {
+                    pi.init ();
+                    tmpl = QString("o.feed.entry[%1].gd$phoneNumber[%2]")
+                            .arg(i).arg(j);
+
+                    cmd = tmpl + ".$t";
+                    pi.strNumber = e.evaluate (cmd).toString ();
+                    if (e.hasUncaughtException ()) {
+                        Q_WARN("Failed to evaluate contact phone number");
+                        continue;
+                    }
+
+                    cmd = tmpl + ".rel";
+                    rStr = e.evaluate (cmd).toString ();
+                    if (e.hasUncaughtException ()) {
+                        Q_WARN("Failed to evaluate contact phone type");
+                    }
+                    if (rStr.contains ("mobile")) {
+                        pi.Type = PType_Mobile;
+                    } else if (rStr.contains ("home")) {
+                        pi.Type = PType_Home;
+                    } else if (rStr.contains ("work")) {
+                        pi.Type = PType_Work;
+                    } else if (rStr.contains ("pager")) {
+                        pi.Type = PType_Pager;
+                    } else {
+                        pi.Type = PType_Other;
+                    }
+                    ci.arrPhones += pi;
+                }
+            }
+
+            tmpl = QString("o.feed.entry[%1].gd$email").arg (i);
+            cmd = tmpl + ".length";
+            max1 = e.evaluate (cmd).toUInt32 ();
+            if (e.hasUncaughtException ()) {
+                Q_DEBUG(QString("%1 has no emails").arg (ci.strTitle));
+            } else {
+                EmailInfo ei;
+                for (quint32 j = 0; j < max1; j++) {
+                    ei.init ();
+                    tmpl = QString("o.feed.entry[%1].gd$email[%2]")
+                            .arg(i).arg(j);
+
+                    cmd = tmpl + ".address";
+                    ei.address = e.evaluate (cmd).toString ();
+                    if (e.hasUncaughtException ()) {
+                        Q_WARN("Failed to evaluate contact email");
+                        continue;
+                    }
+
+                    cmd = tmpl + ".rel";
+                    rStr = e.evaluate (cmd).toString ();
+                    if (e.hasUncaughtException ()) {
+                        Q_WARN("Failed to evaluate contact email type");
+                    }
+                    if (rStr.contains ("home")) {
+                        ei.type = EType_Home;
+                    } else if (rStr.contains ("work")) {
+                        ei.type = EType_Work;
+                    } else {
+                        ei.type = EType_Other;
+                    }
+                    ci.arrEmails += ei;
+                }
+            }
+
+            emit gotOneContact (ci);
+        }
+    } while (0);
+}//ContactsParser::doJsonWork
 
 ContactsParser::~ContactsParser()
 {

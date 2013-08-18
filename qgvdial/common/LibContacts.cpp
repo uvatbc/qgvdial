@@ -53,11 +53,29 @@ LibContacts::loginCompleted(AsyncTaskToken *task)
 {
     if (ATTS_SUCCESS == task->status) {
         Q_DEBUG("Login successful");
+        IMainWindow *parent = (IMainWindow *) this->parent ();
+        if (parent->db.getTFAFlag ()) {
+            parent->db.setAppPass (task->inParams["pass"].toString());
+        }
+
+        task->reinit ();
+
+        connect (task, SIGNAL(completed(AsyncTaskToken*)),
+                 this, SLOT(onContactsFetched(AsyncTaskToken*)));
+
+        bool bval = true;
+        task->inParams["showDeleted"] = bval;
+
+        if (api.getContacts(task)) {
+            task = NULL;
+        }
     } else {
         Q_WARN("Login failed");
     }
 
-    task->deleteLater ();
+    if (task) {
+        task->deleteLater ();
+    }
 }//LibContacts::loginCompleted
 
 void
@@ -68,3 +86,15 @@ LibContacts::onPresentCaptcha(AsyncTaskToken *task, const QString &captchaUrl)
     task->status = ATTS_LOGIN_FAILURE;
     task->emitCompleted ();
 }//LibContacts::onPresentCaptcha
+
+void
+LibContacts::onOneContact(const ContactInfo &cinfo)
+{
+    Q_DEBUG(QString("Name: %1").arg (cinfo.strTitle));
+}//LibContacts::onOneContact
+
+void
+LibContacts::onContactsFetched(AsyncTaskToken *task)
+{
+    task->deleteLater ();
+}//LibContacts::onContactsFetched

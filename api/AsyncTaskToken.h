@@ -42,6 +42,9 @@ public:
     explicit AsyncTaskToken(QObject *parent = 0);
     void emitCompleted();
 
+    //! Reinitialize the token for reuse.
+    void reinit();
+
 signals:
     void completed(AsyncTaskToken *self);
     void cancel(AsyncTaskToken *self);

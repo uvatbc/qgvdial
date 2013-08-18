@@ -36,6 +36,8 @@ public:
 
 signals:
     void presentCaptcha(AsyncTaskToken *task, const QString &captchaUrl);
+    void oneContact(const ContactInfo &cinfo);
+    void contactsParsed(bool rv, quint32 total, quint32 usable);
 
 private:
     bool doGet(QUrl url, void *ctx, QObject *obj, const char *method);
@@ -49,6 +51,7 @@ private slots:
                          QNetworkReply *reply, void *ctx);
     void onGotContactsFeed(bool success, const QByteArray &response,
                            QNetworkReply *reply, void *ctx);
+    void onGotOneContact(const ContactInfo &cinfo);
 
 private:
     //! The network manager for contacts API
