@@ -272,6 +272,25 @@ struct EmailInfo {
 };
 typedef QVector<EmailInfo> EmailInfoArray;
 
+enum PostalType {
+    PAType_Unknown = 0,
+    PAType_Home,
+    PAType_Work,
+    PAType_Other
+};
+
+struct PostalInfo {
+    PostalType type;
+    QString    address;
+
+    PostalInfo() { init(); }
+    void init() {
+        type = PAType_Unknown;
+        address.clear ();
+    }
+};
+typedef QVector<PostalInfo> PostalInfoArray;
+
 struct ContactInfo
 {
     //! Unique ID for this contact
@@ -284,7 +303,11 @@ struct ContactInfo
     // Which number is selected
     int             selected;
 
+    //! Array of email addresses for this contact
     EmailInfoArray  arrEmails;
+
+    //! Array of postal addresses for this contact
+    PostalInfoArray arrPostal;
 
     //! The notes that the user may have added to the contact
     QString         strNotes;
@@ -307,6 +330,7 @@ struct ContactInfo
         strTitle.clear ();
         arrPhones.clear ();
         arrEmails.clear ();
+        arrPostal.clear ();
         strNotes.clear ();
         hrefPhoto.clear ();
         strPhotoPath.clear();

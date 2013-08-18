@@ -41,7 +41,7 @@ signals:
     //! Status emitter for status bar
     void status(const QString &strText, int timeout = 2000);
     // Emitted when one contact is parsed out of the XML
-    void gotOneContact (const ContactInfo &contactInfo);
+    void gotOneContact (ContactInfo contactInfo);
     // Emitted when work is done
     void done(AsyncTaskToken *task, bool rv, quint32 total, quint32 usable);
 

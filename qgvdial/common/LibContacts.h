@@ -39,7 +39,7 @@ public:
 private slots:
     void loginCompleted(AsyncTaskToken *task);
     void onPresentCaptcha(AsyncTaskToken *task, const QString &captchaUrl);
-    void onOneContact(const ContactInfo &cinfo);
+    void onOneContact(ContactInfo cinfo);
     void onContactsFetched(AsyncTaskToken *task);
 
 private:

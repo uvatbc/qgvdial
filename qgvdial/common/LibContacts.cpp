@@ -27,6 +27,8 @@ LibContacts::LibContacts(IMainWindow *parent)
 {
     connect (&api, SIGNAL(presentCaptcha(AsyncTaskToken*,QString)),
              this, SLOT(onPresentCaptcha(AsyncTaskToken*,QString)));
+    connect (&api, SIGNAL(oneContact(ContactInfo)),
+             this, SLOT(onOneContact(ContactInfo)));
 }//LibContacts::LibContacts
 
 bool
@@ -90,7 +92,7 @@ LibContacts::onPresentCaptcha(AsyncTaskToken *task, const QString &captchaUrl)
 }//LibContacts::onPresentCaptcha
 
 void
-LibContacts::onOneContact(const ContactInfo &cinfo)
+LibContacts::onOneContact(ContactInfo cinfo)
 {
     Q_DEBUG(QString("Name: %1").arg (cinfo.strTitle));
 }//LibContacts::onOneContact

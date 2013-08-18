@@ -41,10 +41,10 @@ ContactsXmlHandler::startElement (const QString        & /*namespaceURI*/,
                                   const QString        &qName       ,
                                   const QXmlAttributes &atts        )
 {
-    do // Begin cleanup block (not a loop)
-    {
-        strCurrentChars.clear ();
+    QString rel;
+    strCurrentChars.clear ();
 
+    do { // Begin cleanup block (not a loop)
         if (localName == "entry") {
             bEntryStarted = true;
             countContacts++;
@@ -59,18 +59,43 @@ ContactsXmlHandler::startElement (const QString        & /*namespaceURI*/,
 
         if (localName == "phoneNumber") {
             currPhone.init ();
-            QString rel = atts.value ("rel");
-            if (rel.endsWith ("mobile"))
-            {
+            rel = atts.value ("rel");
+            if (rel.endsWith ("mobile")) {
                 currPhone.Type = PType_Mobile;
-            }
-            else if (rel.endsWith ("home"))
-            {
+            } else if (rel.endsWith ("home")) {
                 currPhone.Type = PType_Home;
-            }
-            else
-            {
+            } else if (rel.endsWith ("work")) {
+                currPhone.Type = PType_Work;
+            } else if (rel.endsWith ("pager")) {
+                currPhone.Type = PType_Pager;
+            } else {
                 currPhone.Type = PType_Other;
+            }
+        }
+
+        if (localName == "email") {
+            currEmail.init ();
+            currEmail.address = atts.value ("address");
+            currEmail.primary = (atts.value ("primary") == "true");
+            rel = atts.value ("rel");
+            if (rel.endsWith ("home")) {
+                currEmail.type = EType_Home;
+            } else if (rel.endsWith ("work")) {
+                currEmail.type = EType_Work;
+            } else {
+                currEmail.type = EType_Other;
+            }
+        }
+
+        if (localName == "postalAddress") {
+            currPostal.init ();
+            rel = atts.value ("rel");
+            if (rel.endsWith ("home")) {
+                currPostal.type = PAType_Home;
+            } else if (rel.endsWith ("work")) {
+                currPostal.type = PAType_Work;
+            } else {
+                currPostal.type = PAType_Other;
             }
         }
 
@@ -79,8 +104,8 @@ ContactsXmlHandler::startElement (const QString        & /*namespaceURI*/,
         }
 
         if (qName == "link") {
-            QString rel = atts.value ("rel");
-            if (rel.endsWith ("photo")) {
+            rel = atts.value ("rel");
+            if (rel.endsWith ("#photo")) {
                 currInfo.hrefPhoto = atts.value ("href");
             }
         }
@@ -103,10 +128,22 @@ ContactsXmlHandler::endElement (const QString & /*namespaceURI*/,
             currInfo.strTitle = strCurrentChars.trimmed ();
             break;
         }
-        if (localName == "phoneNumber") {
-            currPhone.strNumber = strCurrentChars.trimmed ();
-            currInfo.arrPhones += currPhone;
-            break;
+        if (bEntryStarted) {
+            if (localName == "postalAddress") {
+                currPostal.address = strCurrentChars.trimmed ();
+                currPostal.address.replace ("\\n", "\n");
+                currInfo.arrPostal += currPostal;
+                break;
+            }
+            if (localName == "email") {
+                currInfo.arrEmails += currEmail;
+                break;
+            }
+            if (localName == "phoneNumber") {
+                currPhone.strNumber = strCurrentChars.trimmed ();
+                currInfo.arrPhones += currPhone;
+                break;
+            }
         }
         if (localName == "content") {
             currInfo.strNotes = strCurrentChars.trimmed ();
@@ -120,15 +157,6 @@ ContactsXmlHandler::endElement (const QString & /*namespaceURI*/,
         if (localName != "entry") break;
         // If execution reaches here then it means it's the end of an entry.
         bEntryStarted = false;
-
-        if (currInfo.bDeleted) {
-            if (bEmitLog) {
-                Q_DEBUG(QString("GV reports deleted contact : "
-                                "id = %1, name = %2")
-                                .arg (currInfo.strId)
-                                .arg (currInfo.strTitle));
-            }
-        }
 
         if ((0 == currInfo.arrPhones.size ()) && (!currInfo.bDeleted)) {
             // Just in case, delete it!
@@ -145,7 +173,10 @@ ContactsXmlHandler::endElement (const QString & /*namespaceURI*/,
         countUsableContacts ++;
 
         currInfo.hrefPhoto.replace ("%40", "@");
+
         emit oneContact (currInfo);
+
+        currInfo.init ();
     } while (0); // End cleanup block (not a loop)
     return (true);
 }//ContactsXmlHandler::endElement

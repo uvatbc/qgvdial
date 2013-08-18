@@ -45,7 +45,7 @@ signals:
     void status (const QString &text, int timeout = 2000);
 
     //! Emitted for every contact parsed from the XML
-    void oneContact (const ContactInfo &contactInfo);
+    void oneContact (ContactInfo contactInfo);
 
 protected:
     bool startElement (const QString        &namespaceURI,
@@ -67,6 +67,8 @@ protected:
 
     QString     strCurrentChars;
 
+    PostalInfo  currPostal;
+    EmailInfo   currEmail;
     PhoneInfo   currPhone;
     ContactInfo currInfo;
 

@@ -259,7 +259,7 @@ GContactsApi::onGotContactsFeed(bool success, const QByteArray &response,
             break;
         }
 
-#if 1
+#if 0
         QFile temp("contacts.txt");
         temp.open (QIODevice::ReadWrite);
         temp.write (response);
@@ -290,12 +290,12 @@ GContactsApi::onGotContactsFeed(bool success, const QByteArray &response,
         //- Cleanup -//
         // parser.done -> parser.deleteLater
         success =
-        connect (parser, SIGNAL(done(bool,quint32,quint32)),
+        connect (parser, SIGNAL(done(AsyncTaskToken*,bool,quint32,quint32)),
                  parser, SLOT(deleteLater()));
         Q_ASSERT(success);
         // parser done -> thread.quit
         success =
-        connect (parser      , SIGNAL(done(bool,quint32,quint32)),
+        connect (parser      , SIGNAL(done(AsyncTaskToken*,bool,quint32,quint32)),
                  workerThread, SLOT  (quit()));
         Q_ASSERT(success);
         // thread.quit -> thread.deleteLater
@@ -315,8 +315,8 @@ GContactsApi::onGotContactsFeed(bool success, const QByteArray &response,
         //- Plumb the parsed contact signal -//
         // parser.gotOneContact -> this.gotOneContact
         success =
-        connect (parser, SIGNAL (gotOneContact(const ContactInfo&)),
-                 this  , SLOT (onGotOneContact(const ContactInfo&)));
+        connect (parser, SIGNAL (gotOneContact(ContactInfo)),
+                 this  , SLOT (onGotOneContact(ContactInfo)));
         Q_ASSERT(success);
 
         /*
@@ -336,7 +336,7 @@ GContactsApi::onGotContactsFeed(bool success, const QByteArray &response,
 }//GContactsApi::onGotContactsFeed
 
 void
-GContactsApi::onGotOneContact(const ContactInfo &cinfo)
+GContactsApi::onGotOneContact(ContactInfo cinfo)
 {
     emit oneContact(cinfo);
 }//GContactsApi::onGotOneContact

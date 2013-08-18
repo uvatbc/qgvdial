@@ -48,8 +48,8 @@ ContactsParser::doXmlWork ()
                   this,             SIGNAL(status(const QString&,int)));
     Q_ASSERT(rv);
     rv = connect (
-            &contactsHandler, SIGNAL   (oneContact(const ContactInfo&)),
-            this,             SIGNAL(gotOneContact(const ContactInfo&)));
+            &contactsHandler, SIGNAL   (oneContact(ContactInfo)),
+            this,             SIGNAL(gotOneContact(ContactInfo)));
     Q_ASSERT(rv);
 
     simpleReader.setContentHandler (&contactsHandler);
@@ -86,7 +86,7 @@ ContactsParser::doJsonWork ()
     QString cmd = QString("var o = %1").arg (QString(byData));
     QString rStr, tmpl;
 
-    quint32 total, usable;
+    quint32 total;
 
     do {
         e.evaluate (cmd);
@@ -224,7 +224,7 @@ ContactsParser::doJsonWork ()
     Q_DEBUG(QString("JSON parse took %1 msec")
             .arg(endTime.toMSecsSinceEpoch() - startTime.toMSecsSinceEpoch()));
 
-    emit done(m_task, rv, total, total);
+    emit done(m_task, true, total, total);
 }//ContactsParser::doJsonWork
 
 ContactsParser::~ContactsParser()
