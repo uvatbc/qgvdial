@@ -39,13 +39,6 @@ IMainWindow::IMainWindow(QObject *parent)
 void
 IMainWindow::init()
 {
-    db.init (Lib::ref().getDbDir());
-
-    QList<QNetworkCookie> cookies;
-    if (db.loadCookies (cookies)) {
-        gvApi.setAllCookies (cookies);
-    }
-
     connect (qApp, SIGNAL(aboutToQuit()), this, SLOT(onQuit()));
 }//IMainWindow::init
 
@@ -64,6 +57,13 @@ IMainWindow::onInitDone()
     QString user, pass;
 
     do {
+        db.init (Lib::ref().getDbDir());
+
+        QList<QNetworkCookie> cookies;
+        if (db.loadCookies (cookies)) {
+            gvApi.setAllCookies (cookies);
+        }
+
         if (db.usernameIsCached () && db.getUserPass (user,pass)) {
             // Begin login
             beginLogin (user, pass);

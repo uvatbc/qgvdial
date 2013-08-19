@@ -104,7 +104,6 @@ MainWindow::onFakeInitDone()
     loginButton    = (Button *)    getQMLObject("LoginButton");
     connect(loginButton, SIGNAL(clicked()), this, SLOT(onLoginBtnClicked()));
 
-
     onInitDone();
 }//MainWindow::onFakeInitDone
 

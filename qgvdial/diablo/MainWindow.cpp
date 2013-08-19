@@ -165,12 +165,14 @@ MainWindow::uiLoginDone(int status, const QString &errStr)
 void
 MainWindow::uiRefreshContacts()
 {
-    Q_DEBUG("aalo re!");
     contactsModel = oContacts.createModel ();
     QAbstractItemModel *oldModel = d->ui->contactsView->model ();
     d->ui->contactsView->setModel (contactsModel);
     if (NULL != oldModel) {
         delete oldModel;
     }
-    Q_DEBUG("gelo re!");
+
+    d->ui->contactsView->hideColumn (0);
+    d->ui->contactsView->hideColumn (3);
+    d->ui->contactsView->hideColumn (4);
 }//MainWindow::uiRefreshContacts

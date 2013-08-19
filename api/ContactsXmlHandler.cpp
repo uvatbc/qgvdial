@@ -158,11 +158,6 @@ ContactsXmlHandler::endElement (const QString & /*namespaceURI*/,
         // If execution reaches here then it means it's the end of an entry.
         bEntryStarted = false;
 
-        if ((0 == currInfo.arrPhones.size ()) && (!currInfo.bDeleted)) {
-            // Just in case, delete it!
-            currInfo.bDeleted = true;
-        }
-
 #ifdef DBG_VERBOSE
         // For debug
         if (currInfo.strTitle.contains ("Jamie", Qt::CaseInsensitive)) {

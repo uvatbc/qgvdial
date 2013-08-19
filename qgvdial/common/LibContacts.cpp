@@ -109,8 +109,11 @@ void
 LibContacts::onOneContact(ContactInfo cinfo)
 {
     IMainWindow *win = (IMainWindow *) this->parent ();
-    win->db.deleteContact (cinfo.strId);
-    win->db.insertContact (cinfo);
+    if (cinfo.bDeleted || (0 == cinfo.arrPhones.count ())) {
+        win->db.deleteContact (cinfo.strId);
+    } else {
+        win->db.insertContact (cinfo);
+    }
 }//LibContacts::onOneContact
 
 void

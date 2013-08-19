@@ -22,7 +22,6 @@ Contact: yuvraaj@gmail.com
 #include "CacheDb_p.h"
 
 #define DB_DRIVER           "QSQLITE"
-#define DB_CONNECTION_NAME  "qgv_connection"
 #define DB_FILENAME         "qgvdial.sqlite.db"
 #define SETTINGS_FILENAME   "qgvdial.ini"
 
@@ -41,8 +40,7 @@ CacheDbPrivate::ref() {
         cdbp_singleton = new CacheDbPrivate;
 
         QString path = g_dbDir + QDir::separator() + DB_FILENAME;
-        cdbp_singleton->db = QSqlDatabase::addDatabase(DB_DRIVER,
-                                                       DB_CONNECTION_NAME);
+        cdbp_singleton->db = QSqlDatabase::addDatabase(DB_DRIVER);
         cdbp_singleton->db.setDatabaseName (path);
         if (!cdbp_singleton->db.open ()) {
             Q_CRIT("Failed to create database object");
@@ -65,7 +63,12 @@ void
 CacheDbPrivate::deref() {
     if (NULL != cdbp_singleton) {
         cdbp_singleton->db.close ();
-        cdbp_singleton->db.removeDatabase (DB_CONNECTION_NAME);
+
+        QStringList names = cdbp_singleton->db.connectionNames ();
+        foreach (QString name, names) {
+            cdbp_singleton->db.removeDatabase (name);
+        }
+
         delete cdbp_singleton;
         cdbp_singleton = NULL;
     }
