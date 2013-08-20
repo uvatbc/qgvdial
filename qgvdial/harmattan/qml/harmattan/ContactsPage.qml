@@ -53,9 +53,72 @@ Page {
 
     ListView {
         id: contactsList
+        objectName: "ContactsList"
+
+        function setMyModel() {
+            if (contactsList.model == null) {
+                console.debug("null model");
+                contactsList.model = g_ContactsModel;
+            }
+        }
+
         anchors {
             top: searchRow.bottom
+            bottom: parent.bottom
         }
         width: parent.width
-    }
+
+        delegate: Rectangle {
+            id: listDelegate
+
+            color: "#202020"
+            border.color: "darkslategray"
+            radius: 5
+
+            width:  (allContacts.width - border.width)
+            height: contactImage.height + 2
+
+            Row {
+                anchors {
+                    left: parent.left
+                    leftMargin: 2
+                    right: parent.right
+                    rightMargin: 2
+                }
+
+                spacing: 2
+
+                Image {
+                    id: contactImage
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    height: 24
+                    width: height
+
+                    source: imagePath ? imagePath : "unknown_contact.png"
+                    smooth: true
+                }//Image (contact images)
+
+                Label {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: name
+                }//Label (contact name)
+            }//Row (image and contact name)
+
+            MouseArea {
+                anchors.fill: parent
+
+                onClicked: {
+                    console.debug("Traas!");
+                    /*
+                    contactDetails.model = contacts;
+                    contactDetails.notesText = notes;
+                    contactDetails.name = name;
+                    contactDetails.imageSource = (imagePath ? imagePath : "unknown_contact.png");
+                    container.state = "Details";
+                    */
+                }
+            }
+        }// delegate Rectangle
+    }// ListView (contacts list)
 }

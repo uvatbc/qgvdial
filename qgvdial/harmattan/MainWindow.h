@@ -50,6 +50,7 @@ protected:
     void uiRequestApplicationPassword();
     void uiLoginDone(int status, const QString &errStr);
     void onUserLogoutDone();
+    void uiRefreshContacts();
 
 private:
     QmlApplicationViewer m_view;
@@ -62,6 +63,9 @@ private:
     QObject *textUsername;
     QObject *textPassword;
     QObject *infoBanner;
+    QObject *contactsList;
+
+    ContactsModel *contactsModel;
 
     void    *loginCtx;
 };

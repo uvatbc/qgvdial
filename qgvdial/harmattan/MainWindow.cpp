@@ -20,6 +20,7 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "MainWindow.h"
+#include "QtDeclarative"
 
 MainWindow::MainWindow(QObject *parent)
 : IMainWindow(parent)
@@ -32,6 +33,8 @@ MainWindow::MainWindow(QObject *parent)
 , textUsername(NULL)
 , textPassword(NULL)
 , infoBanner(NULL)
+, contactsList(NULL)
+, contactsModel(NULL)
 {
 }//MainWindow::MainWindow
 
@@ -78,8 +81,9 @@ MainWindow::getQMLObject(const char *pageName)
 }//MainWindow::getQMLObject
 
 void
-MainWindow::log(QDateTime dt, int level, const QString &strLog)
+MainWindow::log(QDateTime /*dt*/, int /*level*/, const QString & /*strLog*/)
 {
+    //TODO: Show it in the logs view
 }//MainWindow::log
 
 void
@@ -131,6 +135,11 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
 
         infoBanner = getQMLObject ("InfoBanner");
         if (NULL == infoBanner) {
+            break;
+        }
+
+        contactsList = getQMLObject ("ContactsList");
+        if (NULL == contactsList) {
             break;
         }
 
@@ -234,3 +243,16 @@ MainWindow::uiLoginDone(int status, const QString &errStr)
     infoBanner->setProperty ("text", msg);
     QMetaObject::invokeMethod (infoBanner, "show");
 }//MainWindow::uiLoginDone
+
+void
+MainWindow::uiRefreshContacts()
+{
+    ContactsModel *oldModel = contactsModel;
+    contactsModel = oContacts.createModel ();
+    m_view.engine()->rootContext()->setContextProperty("g_ContactsModel",
+                                                       contactsModel);
+    QMetaObject::invokeMethod (contactsList, "setMyModel");
+    if (NULL != oldModel) {
+        delete oldModel;
+    }
+}//MainWindow::uiRefreshContacts
