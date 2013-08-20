@@ -67,6 +67,7 @@ Page {
             bottom: parent.bottom
         }
         width: parent.width
+        clip: true
 
         delegate: Rectangle {
             id: listDelegate

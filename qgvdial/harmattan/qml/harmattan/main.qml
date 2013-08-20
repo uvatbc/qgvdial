@@ -35,6 +35,9 @@ PageStackWindow {
     function pushTfaDlg() {
         pageStack.push(tfaPinDlg);
     }
+    function pushAppPwDlg() {
+        pageStack.push(appPwDlg);
+    }
     function showMsgBox(msg) {
         msgBox.message = msg;
         pageStack.push(msgBox);
@@ -129,6 +132,13 @@ PageStackWindow {
 
         onDone: appWindow.pageStack.pop();
     }//TFA Dialog
+
+    AppPwPage {
+        id: appPwDlg
+        objectName: "AppPwDialog"
+
+        onDone: appWindow.pageStack.pop();
+    }
 
     MessageBox {
         id: msgBox

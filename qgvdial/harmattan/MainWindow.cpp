@@ -35,6 +35,7 @@ MainWindow::MainWindow(QObject *parent)
 , infoBanner(NULL)
 , contactsList(NULL)
 , contactsModel(NULL)
+, appPwDlg(NULL)
 {
 }//MainWindow::MainWindow
 
@@ -143,6 +144,12 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
             break;
         }
 
+        appPwDlg = getQMLObject ("AppPwDialog");
+        if (NULL == appPwDlg) {
+            break;
+        }
+        connect(appPwDlg, SIGNAL(done(bool)), this, SLOT(onAppPwDlg(bool)));
+
         onInitDone();
         return;
     } while(0);
@@ -221,8 +228,15 @@ MainWindow::uiSetUserPass(bool editable)
 void
 MainWindow::uiRequestApplicationPassword()
 {
-    Q_ASSERT(0 == "Not implemented");
+    QMetaObject::invokeMethod (mainPageStack, "pushAppPwDlg");
 }//MainWindow::uiRequestApplicationPassword
+
+void
+MainWindow::onAppPwDlg(bool accepted)
+{
+    QString appPw = appPwDlg->property("appPw").toString();
+    oContacts.login (m_user, appPw);
+}//MainWindow::onAppPwDlg
 
 void
 MainWindow::uiLoginDone(int status, const QString &errStr)
