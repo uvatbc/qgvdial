@@ -46,8 +46,8 @@ public:
     void reinit();
 
 signals:
-    void completed(AsyncTaskToken *self);
-    void cancel(AsyncTaskToken *self);
+    void completed();
+    void cancel();
 
 public slots:
 

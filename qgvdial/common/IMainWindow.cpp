@@ -87,8 +87,8 @@ IMainWindow::beginLogin(const QString &user, const QString &pass)
             break;
         }
 
-        ok = connect(m_loginTask, SIGNAL(completed(AsyncTaskToken*)),
-                     this, SLOT(loginCompleted(AsyncTaskToken*)));
+        ok = connect(m_loginTask, SIGNAL(completed()),
+                     this, SLOT(loginCompleted()));
         Q_ASSERT(ok);
 
         m_loginTask->inParams["user"] = user;
@@ -128,8 +128,9 @@ IMainWindow::resumeTFAAuth(void *ctx, int pin, bool useAlt)
 }//IMainWindow::resumeTFAAuth
 
 void
-IMainWindow::loginCompleted(AsyncTaskToken *task)
+IMainWindow::loginCompleted()
 {
+    AsyncTaskToken *task = (AsyncTaskToken *) QObject::sender ();
     Q_ASSERT(m_loginTask == task);
     m_loginTask = NULL;
 
@@ -188,14 +189,15 @@ void
 IMainWindow::onUserLogoutRequest()
 {
     AsyncTaskToken *task = new AsyncTaskToken(this);
-    connect(task, SIGNAL(completed(AsyncTaskToken*)),
-            this, SLOT(onLogoutDone(AsyncTaskToken*)));
+    connect(task, SIGNAL(completed()),
+            this, SLOT(onLogoutDone()));
     gvApi.logout (task);
 }//IMainWindow::onUserLogoutRequest
 
 void
-IMainWindow::onLogoutDone(AsyncTaskToken *task)
+IMainWindow::onLogoutDone()
 {
+    AsyncTaskToken *task = (AsyncTaskToken *) QObject::sender ();
     uiSetUserPass (true);
     onUserLogoutDone();
     task->deleteLater ();

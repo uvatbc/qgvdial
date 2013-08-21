@@ -22,6 +22,7 @@ Contact: yuvraaj@gmail.com
 #include "MainWindow.h"
 #include "MainWindow_p.h"
 #include "ui_mainwindow.h"
+#include "ContactsModel.h"
 
 QCoreApplication *
 createApplication(int argc, char *argv[])

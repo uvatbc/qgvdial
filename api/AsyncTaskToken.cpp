@@ -30,7 +30,7 @@ AsyncTaskToken::AsyncTaskToken(QObject *parent)
 void
 AsyncTaskToken::emitCompleted()
 {
-   emit completed (this);
+   emit completed();
 }//AsyncTaskToken::emitCompleted
 
 void
@@ -42,5 +42,5 @@ AsyncTaskToken::reinit()
     callerCtx = NULL;
     apiCtx = NULL;
 
-    this->disconnect (SIGNAL(completed(AsyncTaskToken*)));
+    this->disconnect (SIGNAL(completed()));
 }//AsyncTaskToken::reinit

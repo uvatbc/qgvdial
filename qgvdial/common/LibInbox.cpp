@@ -38,3 +38,33 @@ LibInbox::createModel()
 
     return (modelInbox);
 }//LibInbox::createModel
+
+bool
+LibInbox::refresh(const char *type, QDateTime after)
+{
+    AsyncTaskToken *task = new AsyncTaskToken(this);
+    if (NULL == task) {
+        Q_WARN("Failed to allocate task");
+        return false;
+    }
+
+    task->inParams["type"] = type;
+    task->inParams["page"] = 1;
+
+    connect (task, SIGNAL(completed()), this, SLOT(onRefreshDone()));
+
+    IMainWindow *win = (IMainWindow *) this->parent ();
+    bool rv = win->gvApi.getInbox (task);
+
+    if (!rv) {
+        delete task;
+    }
+
+    return (rv);
+}//LibInbox::refresh
+
+void
+LibInbox::onRefreshDone()
+{
+    AsyncTaskToken *task = (AsyncTaskToken *) QObject::sender ();
+}//LibInbox::onRefreshDone

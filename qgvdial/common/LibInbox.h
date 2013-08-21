@@ -34,12 +34,14 @@ class LibInbox : public QObject
 public:
     explicit LibInbox(IMainWindow *parent);
 
+    bool refresh(const char *type = "all", QDateTime after = QDateTime());
+
     InboxModel *createModel();
 
 signals:
 
-public slots:
-
+private slots:
+    void onRefreshDone();
 };
 
 #endif // LIBINBOX_H

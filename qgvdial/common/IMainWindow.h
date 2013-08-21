@@ -114,8 +114,8 @@ protected slots:
 
 private slots:
     void onTFARequest(AsyncTaskToken *task);
-    void loginCompleted(AsyncTaskToken *task);
-    void onLogoutDone(AsyncTaskToken *task);
+    void loginCompleted();
+    void onLogoutDone();
     void onContactsRefreshed();
 
 protected:

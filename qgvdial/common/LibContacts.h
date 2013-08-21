@@ -44,10 +44,10 @@ signals:
     void sigRefreshed();
 
 protected slots:
-    void loginCompleted(AsyncTaskToken *task);
+    void loginCompleted();
     void onPresentCaptcha(AsyncTaskToken *task, const QString &captchaUrl);
     void onOneContact(ContactInfo cinfo);
-    void onContactsFetched(AsyncTaskToken *task);
+    void onContactsFetched();
 
 protected:
     GContactsApi api;

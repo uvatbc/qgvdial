@@ -43,8 +43,8 @@ LibContacts::login(const QString &user, const QString &pass)
         return false;
     }
 
-    connect(token, SIGNAL(completed(AsyncTaskToken*)),
-            this, SLOT(loginCompleted(AsyncTaskToken*)));
+    connect(token, SIGNAL(completed()),
+            this, SLOT(loginCompleted()));
 
     token->inParams["user"] = user;
     token->inParams["pass"] = pass;
@@ -54,8 +54,9 @@ LibContacts::login(const QString &user, const QString &pass)
 }//LibContacts::login
 
 void
-LibContacts::loginCompleted(AsyncTaskToken *task)
+LibContacts::loginCompleted()
 {
+    AsyncTaskToken *task = (AsyncTaskToken *) QObject::sender ();
     IMainWindow *win = (IMainWindow *) this->parent ();
 
     if (ATTS_SUCCESS == task->status) {
@@ -91,8 +92,8 @@ LibContacts::refresh(QDateTime after /*= QDateTime()*/)
         return false;
     }
 
-    connect (task, SIGNAL(completed(AsyncTaskToken*)),
-             this, SLOT(onContactsFetched(AsyncTaskToken*)));
+    connect (task, SIGNAL(completed()),
+             this, SLOT(onContactsFetched()));
 
     bool bval = true;
     task->inParams["showDeleted"] = bval;
@@ -118,8 +119,9 @@ LibContacts::onOneContact(ContactInfo cinfo)
 }//LibContacts::onOneContact
 
 void
-LibContacts::onContactsFetched(AsyncTaskToken *task)
+LibContacts::onContactsFetched()
 {
+    AsyncTaskToken *task = (AsyncTaskToken *) QObject::sender ();
     IMainWindow *win = (IMainWindow *) this->parent ();
     win->db.setQuickAndDirty (false);
 
