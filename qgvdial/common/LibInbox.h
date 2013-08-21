@@ -39,9 +39,14 @@ public:
     InboxModel *createModel();
 
 signals:
+    void sigRefreshed(bool success);
 
 private slots:
     void onRefreshDone();
+    void onOneInboxEntry (AsyncTaskToken *task, const GVInboxEntry &hevent);
+
+    bool beginRefresh(AsyncTaskToken *task, QString type, QDateTime after,
+                      int page);
 };
 
 #endif // LIBINBOX_H

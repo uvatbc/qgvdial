@@ -116,7 +116,8 @@ private slots:
     void onTFARequest(AsyncTaskToken *task);
     void loginCompleted();
     void onLogoutDone();
-    void onContactsRefreshed();
+    void onContactsRefreshed(bool success);
+    void onInboxRefreshed(bool success);
 
 protected:
     virtual void log(QDateTime dt, int level, const QString &strLog) = 0;
@@ -134,6 +135,7 @@ protected:
     virtual void onUserLogoutDone() = 0;
 
     virtual void uiRefreshContacts() = 0;
+    virtual void uiRefreshInbox() = 0;
 
 protected:
     CacheDb db;

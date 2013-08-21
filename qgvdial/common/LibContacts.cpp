@@ -125,11 +125,10 @@ LibContacts::onContactsFetched()
     IMainWindow *win = (IMainWindow *) this->parent ();
     win->db.setQuickAndDirty (false);
 
-    if (ATTS_SUCCESS == task->status) {
-        emit sigRefreshed ();
-    } else {
+    if (ATTS_SUCCESS != task->status) {
         Q_WARN("Failed to update contacts");
     }
+    emit sigRefreshed (ATTS_SUCCESS == task->status);
 
     task->deleteLater ();
 }//LibContacts::onContactsFetched

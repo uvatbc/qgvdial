@@ -74,7 +74,7 @@ signals:
     //! Emitted for each registered phone number
     void registeredPhone (const GVRegisteredNumber &info);
     //! Emitted for every inbox entry
-    void oneInboxEntry (const GVInboxEntry &hevent);
+    void oneInboxEntry (AsyncTaskToken *token, const GVInboxEntry &hevent);
 
     //! Emitted by the nw class to give updates about the current progress
     void sigProgress(double percent);
@@ -162,8 +162,8 @@ private:
     bool doSendSms(QUrl url, AsyncTaskToken *token);
 
     // Inbox related
-    bool parseInboxJson(const QString &strJson, const QString &strHtml,
-                        qint32 &msgCount);
+    bool parseInboxJson(AsyncTaskToken *token, const QString &strJson,
+                        const QString &strHtml, qint32 &msgCount);
     bool execXQuery(const QString &strQuery, QString &result);
     bool parseMessageRow(QString strRow, GVInboxEntry &entry);
 

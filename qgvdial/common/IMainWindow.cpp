@@ -33,8 +33,10 @@ IMainWindow::IMainWindow(QObject *parent)
     qRegisterMetaType<ContactInfo>("ContactInfo");
     connect(&gvApi, SIGNAL(twoStepAuthentication(AsyncTaskToken*)),
             this, SLOT(onTFARequest(AsyncTaskToken*)));
-    connect(&oContacts, SIGNAL(sigRefreshed()),
-            this, SLOT(onContactsRefreshed()));
+    connect(&oContacts, SIGNAL(sigRefreshed(bool)),
+            this, SLOT(onContactsRefreshed(bool)));
+    connect(&oInbox, SIGNAL(sigRefreshed(bool)),
+            this, SLOT(onInboxRefreshed(bool)));
 }//IMainWindow::IMainWindow
 
 void
@@ -153,6 +155,8 @@ IMainWindow::loginCompleted()
             } else {
                 onUiGotApplicationPassword (m_pass);
             }
+
+            oInbox.refresh ();
         } else if (ATTS_NW_ERROR == task->status) {
             Q_WARN("Login failed because of network error");
             uiSetUserPass (true);
@@ -204,7 +208,17 @@ IMainWindow::onLogoutDone()
 }//IMainWindow::onLogoutDone
 
 void
-IMainWindow::onContactsRefreshed()
+IMainWindow::onContactsRefreshed(bool success)
 {
-    uiRefreshContacts ();
+    if (success) {
+        uiRefreshContacts ();
+    }
 }//IMainWindow::onContactsRefreshed
+
+void
+IMainWindow::onInboxRefreshed(bool success)
+{
+    if (success) {
+        uiRefreshInbox ();
+    }
+}//IMainWindow::onInboxRefreshed

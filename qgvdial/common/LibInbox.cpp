@@ -26,6 +26,10 @@ Contact: yuvraaj@gmail.com
 LibInbox::LibInbox(IMainWindow *parent)
 : QObject(parent)
 {
+    connect (&parent->gvApi,
+             SIGNAL(oneInboxEntry(AsyncTaskToken*,GVInboxEntry)),
+             this,
+             SLOT(onOneInboxEntry(AsyncTaskToken*,GVInboxEntry)));
 }//LibInbox::LibInbox
 
 InboxModel *
@@ -48,23 +52,85 @@ LibInbox::refresh(const char *type, QDateTime after)
         return false;
     }
 
+    return beginRefresh (task, type, after, 1);
+}//LibInbox::refresh
+
+bool
+LibInbox::beginRefresh(AsyncTaskToken *task, QString type, QDateTime after,
+                       int page)
+{
+    task->reinit ();
+
     task->inParams["type"] = type;
-    task->inParams["page"] = 1;
+    task->inParams["page"] = page;
+    task->inParams["after"] = after;
 
     connect (task, SIGNAL(completed()), this, SLOT(onRefreshDone()));
 
     IMainWindow *win = (IMainWindow *) this->parent ();
     bool rv = win->gvApi.getInbox (task);
 
+    win->db.setQuickAndDirty (true);
+
     if (!rv) {
-        delete task;
+        task->status = ATTS_FAILURE;
+        task->emitCompleted ();
+        rv = true;
     }
 
     return (rv);
-}//LibInbox::refresh
+}//LibInbox::beginRefresh
+
+void
+LibInbox::onOneInboxEntry (AsyncTaskToken *task, const GVInboxEntry &hevent)
+{
+    QDateTime after = task->inParams["after"].toDateTime();
+
+    if ((!after.isValid ()) || (hevent.startTime >= after)) {
+        // Stuff this into the DB only if it is after "after"
+        IMainWindow *win = (IMainWindow *) this->parent ();
+        win->db.insertInboxEntry (hevent);
+    }
+
+    if (after.isValid () && (hevent.startTime >= after)) {
+        bool overflow = true;
+        task->inParams["overflow"] = overflow;
+    }
+}//LibInbox::onOneInboxEntry
 
 void
 LibInbox::onRefreshDone()
 {
+    IMainWindow *win = (IMainWindow *) this->parent ();
     AsyncTaskToken *task = (AsyncTaskToken *) QObject::sender ();
+
+    win->db.setQuickAndDirty (false);
+
+    do {
+        if (ATTS_SUCCESS != task->status) {
+            Q_WARN(QString("Failed to get inbox page")
+                   .arg(task->inParams["page"].toInt()));
+        }
+
+        int page = task->inParams["page"].toInt();
+        bool overflow = task->inParams["overflow"].toBool();
+        if ((page > 30) || overflow) {
+            task->status = ATTS_SUCCESS;
+            break;
+        }
+
+        QString type = task->inParams["type"].toString();
+        QDateTime after = task->inParams["after"].toDateTime();
+
+        page++;
+
+        if (beginRefresh (task, type, after, page)) {
+            task = NULL;
+        }
+    } while (0);
+
+    if (task) {
+        emit sigRefreshed (ATTS_SUCCESS == task->status);
+        task->deleteLater ();
+    }
 }//LibInbox::onRefreshDone

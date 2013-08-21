@@ -21,7 +21,7 @@
        <enum>QTabWidget::East</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="dialTab">
        <attribute name="title">
@@ -143,6 +143,11 @@
        <attribute name="title">
         <string>Inbox</string>
        </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QTreeView" name="inboxView"/>
+        </item>
+       </layout>
       </widget>
       <widget class="QWidget" name="settingsTab">
        <attribute name="title">

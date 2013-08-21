@@ -41,7 +41,7 @@ public:
     ContactsModel *createModel();
 
 signals:
-    void sigRefreshed();
+    void sigRefreshed(bool success);
 
 protected slots:
     void loginCompleted();

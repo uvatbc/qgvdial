@@ -1379,7 +1379,8 @@ GVApi::onGetInbox(bool success, const QByteArray &response, QNetworkReply *,
         }
 
         qint32 msgCount = 0;
-        if (!parseInboxJson(xmlHandler.strJson, xmlHandler.strHtml, msgCount)) {
+        if (!parseInboxJson(token, xmlHandler.strJson, xmlHandler.strHtml,
+                            msgCount)) {
             Q_WARN("Failed to parse GV Inbox JSON. Data =") << strReply;
             break;
         }
@@ -1403,8 +1404,8 @@ GVApi::onGetInbox(bool success, const QByteArray &response, QNetworkReply *,
 }//GVApi::onGetInbox
 
 bool
-GVApi::parseInboxJson(const QString &strJson, const QString &strHtml,
-                      qint32 &msgCount)
+GVApi::parseInboxJson(AsyncTaskToken *token, const QString &strJson,
+                      const QString &strHtml, qint32 &msgCount)
 {
     bool rv = false;
 
@@ -1594,7 +1595,7 @@ GVApi::parseInboxJson(const QString &strJson, const QString &strHtml,
             }
 
             // emit the inbox element
-            emit oneInboxEntry (inboxEntry);
+            emit oneInboxEntry (token, inboxEntry);
         }
 
         rv = true;

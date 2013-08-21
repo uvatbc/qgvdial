@@ -26,6 +26,7 @@ Contact: yuvraaj@gmail.com
 #include "IMainWindow.h"
 
 class ContactsModel;
+class InboxModel;
 class MainWindowPrivate;
 class MainWindow : public IMainWindow
 {
@@ -49,11 +50,13 @@ protected:
     void uiLoginDone(int status, const QString &errStr);
     void onUserLogoutDone();
     void uiRefreshContacts();
+    void uiRefreshInbox();
 
 private:
     MainWindowPrivate *d;
 
-    ContactsModel *contactsModel;
+    ContactsModel  *contactsModel;
+    InboxModel     *inboxModel;
 };
 
 QCoreApplication *

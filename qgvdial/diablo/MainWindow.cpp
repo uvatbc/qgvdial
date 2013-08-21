@@ -23,6 +23,7 @@ Contact: yuvraaj@gmail.com
 #include "MainWindow_p.h"
 #include "ui_mainwindow.h"
 #include "ContactsModel.h"
+#include "InboxModel.h"
 
 QCoreApplication *
 createApplication(int argc, char *argv[])
@@ -34,6 +35,7 @@ MainWindow::MainWindow(QObject *parent)
 : IMainWindow(parent)
 , d(new MainWindowPrivate)
 , contactsModel(NULL)
+, inboxModel(NULL)
 {
 }//MainWindow::MainWindow
 
@@ -46,6 +48,12 @@ void
 MainWindow::init()
 {
     IMainWindow::init ();
+
+    // Desktop only ?
+    Qt::WindowFlags flags = d->windowFlags ();
+    flags &= ~(Qt::WindowMaximizeButtonHint);
+    d->setWindowFlags (flags);
+    d->setFixedSize (d->size ());
 
     d->setOrientation(MainWindowPrivate::ScreenOrientationAuto);
     d->showExpanded();
@@ -177,3 +185,19 @@ MainWindow::uiRefreshContacts()
     d->ui->contactsView->hideColumn (3);
     d->ui->contactsView->hideColumn (4);
 }//MainWindow::uiRefreshContacts
+
+void
+MainWindow::uiRefreshInbox()
+{
+    inboxModel = oInbox.createModel ();
+    QAbstractItemModel *oldModel = d->ui->inboxView->model ();
+    d->ui->inboxView->setModel (inboxModel);
+    if (NULL != oldModel) {
+        delete oldModel;
+    }
+
+    d->ui->inboxView->hideColumn (0);
+    d->ui->inboxView->hideColumn (4);
+    d->ui->inboxView->hideColumn (5);
+    d->ui->inboxView->hideColumn (7);
+}//MainWindow::uiRefreshInbox
