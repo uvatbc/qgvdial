@@ -21,6 +21,7 @@ Contact: yuvraaj@gmail.com
 
 #include "MainWindow.h"
 #include "QtDeclarative"
+#include "ContactsModel.h"
 
 MainWindow::MainWindow(QObject *parent)
 : IMainWindow(parent)
@@ -34,8 +35,8 @@ MainWindow::MainWindow(QObject *parent)
 , textPassword(NULL)
 , infoBanner(NULL)
 , contactsList(NULL)
-, contactsModel(NULL)
 , appPwDlg(NULL)
+, contactsModel(NULL)
 {
 }//MainWindow::MainWindow
 
@@ -234,8 +235,10 @@ MainWindow::uiRequestApplicationPassword()
 void
 MainWindow::onAppPwDlg(bool accepted)
 {
-    QString appPw = appPwDlg->property("appPw").toString();
-    oContacts.login (m_user, appPw);
+    if (accepted) {
+        QString appPw = appPwDlg->property("appPw").toString();
+        oContacts.login (m_user, appPw);
+    }
 }//MainWindow::onAppPwDlg
 
 void

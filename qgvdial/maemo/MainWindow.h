@@ -28,6 +28,7 @@ Contact: yuvraaj@gmail.com
 #include "IMainWindow.h"
 #include "qmlapplicationviewer.h"
 
+class ContactsModel;
 class MainWindow : public IMainWindow
 {
     Q_OBJECT
@@ -49,6 +50,7 @@ protected:
     void uiRequestApplicationPassword();
     void uiLoginDone(int status, const QString &errStr);
     void onUserLogoutDone();
+    void uiRefreshContacts();
 
 private:
     QmlApplicationViewer m_view;
@@ -58,6 +60,9 @@ private:
     QObject *loginButton;
     QObject *textUsername;
     QObject *textPassword;
+    QObject *contactsList;
+
+    ContactsModel *contactsModel;
 };
 
 #endif // MAINWINDOW_H

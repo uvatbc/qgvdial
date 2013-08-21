@@ -54,8 +54,11 @@ Rectangle {
 
     ListView {
         id: contactsList
+        objectName: "ContactsList"
+
         anchors {
             top: searchRow.bottom
+            bottom: parent.bottom
         }
         width: parent.width
     }

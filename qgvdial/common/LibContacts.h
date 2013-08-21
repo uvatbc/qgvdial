@@ -25,8 +25,8 @@ Contact: yuvraaj@gmail.com
 #include <QObject>
 #include "global.h"
 #include "GContactsApi.h"
-#include "ContactsModel.h"
 
+class ContactsModel;
 class IMainWindow;
 class LibContacts : public QObject
 {

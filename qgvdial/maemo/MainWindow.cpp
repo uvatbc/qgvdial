@@ -19,8 +19,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#include "MainWindow.h"
 #include <QtGui>
+#include "QtDeclarative"
+
+#include "MainWindow.h"
+#include "ContactsModel.h"
 
 #ifdef Q_WS_MAEMO_5
 #include <QMaemo5InformationBox>
@@ -29,6 +32,12 @@ Contact: yuvraaj@gmail.com
 MainWindow::MainWindow(QObject *parent)
 : IMainWindow(parent)
 , m_view(NULL)
+, tabbedUI(NULL)
+, loginExpand(NULL)
+, loginButton(NULL)
+, textUsername(NULL)
+, textPassword(NULL)
+, contactsList(NULL)
 {
 }//MainWindow::MainWindow
 
@@ -112,6 +121,11 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
 
         textPassword = getQMLObject ("TextPassword");
         if (NULL == textPassword) {
+            break;
+        }
+
+        contactsList = getQMLObject ("ContactsList");
+        if (NULL == contactsList) {
             break;
         }
 
@@ -214,3 +228,16 @@ MainWindow::uiLoginDone(int status, const QString &errStr)
     QMaemo5InformationBox::information(&m_view, msg);
 #endif
 }//MainWindow::uiLoginDone
+
+void
+MainWindow::uiRefreshContacts()
+{
+    ContactsModel *oldModel = contactsModel;
+    contactsModel = oContacts.createModel ();
+    m_view.engine()->rootContext()->setContextProperty("g_ContactsModel",
+                                                       contactsModel);
+    QMetaObject::invokeMethod (contactsList, "setMyModel");
+    if (NULL != oldModel) {
+        delete oldModel;
+    }
+}//MainWindow::uiRefreshContacts
