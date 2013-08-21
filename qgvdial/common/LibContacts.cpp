@@ -23,7 +23,6 @@ Contact: yuvraaj@gmail.com
 #include "IMainWindow.h"
 #include "ContactsModel.h"
 
-
 LibContacts::LibContacts(IMainWindow *parent)
 : QObject(parent)
 {

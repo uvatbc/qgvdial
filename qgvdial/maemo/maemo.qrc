@@ -9,5 +9,7 @@
         <file alias="close.png">../../icons/close.png</file>
         <file alias="search.png">../../icons/search.png</file>
         <file alias="play.svg">../../icons/play.svg</file>
+
+        <file alias="unknown_contact.png">../../icons/unknown_contact.png</file>
     </qresource>
 </RCC>

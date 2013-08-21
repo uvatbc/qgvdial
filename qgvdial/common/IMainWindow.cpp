@@ -27,6 +27,7 @@ IMainWindow::IMainWindow(QObject *parent)
 , db(this)
 , gvApi(true, this)
 , oContacts(this)
+, oInbox(this)
 , m_loginTask(NULL)
 {
     qRegisterMetaType<ContactInfo>("ContactInfo");

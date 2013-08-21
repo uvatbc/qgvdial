@@ -38,6 +38,7 @@ MainWindow::MainWindow(QObject *parent)
 , textUsername(NULL)
 , textPassword(NULL)
 , contactsList(NULL)
+, contactsModel(NULL)
 {
 }//MainWindow::MainWindow
 

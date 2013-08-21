@@ -26,6 +26,7 @@ Contact: yuvraaj@gmail.com
 #include "CacheDb.h"
 #include "GVApi.h"
 #include "LibContacts.h"
+#include "LibInbox.h"
 
 /*==============================================================================
  *
@@ -137,7 +138,9 @@ protected:
 protected:
     CacheDb db;
     GVApi   gvApi;
+
     LibContacts oContacts;
+    LibInbox    oInbox;
 
     QString m_user;
     QString m_pass;
@@ -145,6 +148,7 @@ protected:
     AsyncTaskToken *m_loginTask;
 
     friend class LibContacts;
+    friend class LibInbox;
 };
 
 #endif // IMAINWINDOW_H

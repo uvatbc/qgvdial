@@ -19,31 +19,22 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#ifndef DUMMYMAINWINDOW_H
-#define DUMMYMAINWINDOW_H
-
-#include <QObject>
+#include "LibInbox.h"
 #include "IMainWindow.h"
+#include "InboxModel.h"
 
-class DummyMainWindow : public IMainWindow
+LibInbox::LibInbox(IMainWindow *parent)
+: QObject(parent)
 {
-    Q_OBJECT
-public:
-    explicit DummyMainWindow(QObject *parent = 0);
-    virtual void init();
-    virtual void log(QDateTime dt, int level, const QString &strLog);
+}//LibInbox::LibInbox
 
-protected slots:
-    virtual void onLoginButtonClicked();
+InboxModel *
+LibInbox::createModel()
+{
+    IMainWindow *win = (IMainWindow *) this->parent ();
+    InboxModel *modelInbox = new InboxModel(this);
 
-protected:
-    virtual void uiRequestLoginDetails();
-    virtual void uiRequestTFALoginDetails(void *ctx);
-    virtual void uiSetUserPass(bool editable);
-    virtual void uiLoginDone(int status, const QString &errStr);
-    virtual void onUserLogoutDone();
-    virtual void uiRequestApplicationPassword();
-    virtual void uiRefreshContacts();
-};
+    win->db.refreshInboxModel (modelInbox, "all");
 
-#endif // DUMMYMAINWINDOW_H
+    return (modelInbox);
+}//LibInbox::createModel

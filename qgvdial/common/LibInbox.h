@@ -19,31 +19,27 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#ifndef DUMMYMAINWINDOW_H
-#define DUMMYMAINWINDOW_H
+#ifndef LIBINBOX_H
+#define LIBINBOX_H
 
 #include <QObject>
-#include "IMainWindow.h"
+#include "global.h"
+#include "GContactsApi.h"
 
-class DummyMainWindow : public IMainWindow
+class InboxModel;
+class IMainWindow;
+class LibInbox : public QObject
 {
     Q_OBJECT
 public:
-    explicit DummyMainWindow(QObject *parent = 0);
-    virtual void init();
-    virtual void log(QDateTime dt, int level, const QString &strLog);
+    explicit LibInbox(IMainWindow *parent);
 
-protected slots:
-    virtual void onLoginButtonClicked();
+    InboxModel *createModel();
 
-protected:
-    virtual void uiRequestLoginDetails();
-    virtual void uiRequestTFALoginDetails(void *ctx);
-    virtual void uiSetUserPass(bool editable);
-    virtual void uiLoginDone(int status, const QString &errStr);
-    virtual void onUserLogoutDone();
-    virtual void uiRequestApplicationPassword();
-    virtual void uiRefreshContacts();
+signals:
+
+public slots:
+
 };
 
-#endif // DUMMYMAINWINDOW_H
+#endif // LIBINBOX_H

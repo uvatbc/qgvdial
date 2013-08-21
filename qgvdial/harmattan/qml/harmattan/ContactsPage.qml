@@ -76,8 +76,8 @@ Page {
             border.color: "darkslategray"
             radius: 5
 
-            width:  (allContacts.width - border.width)
-            height: contactImage.height + 2
+            width:  (contactsList.width - border.width)
+            height: contactImage.height + 4
 
             Row {
                 anchors {
@@ -93,10 +93,10 @@ Page {
                     id: contactImage
                     anchors.verticalCenter: parent.verticalCenter
 
-                    height: 24
+                    height: 60
                     width: height
 
-                    source: imagePath ? imagePath : "unknown_contact.png"
+                    source: imagePath ? imagePath : "qrc:/unknown_contact.png"
                     smooth: true
                 }//Image (contact images)
 
@@ -115,7 +115,7 @@ Page {
                     contactDetails.model = contacts;
                     contactDetails.notesText = notes;
                     contactDetails.name = name;
-                    contactDetails.imageSource = (imagePath ? imagePath : "unknown_contact.png");
+                    contactDetails.imageSource = (imagePath ? imagePath : "qrc:/unknown_contact.png");
                     container.state = "Details";
                     */
                 }
