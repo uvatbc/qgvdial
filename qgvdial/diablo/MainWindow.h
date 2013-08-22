@@ -25,8 +25,6 @@ Contact: yuvraaj@gmail.com
 #include "global.h"
 #include "IMainWindow.h"
 
-class ContactsModel;
-class InboxModel;
 class MainWindowPrivate;
 class MainWindow : public IMainWindow
 {

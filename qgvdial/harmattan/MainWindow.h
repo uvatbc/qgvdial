@@ -52,6 +52,7 @@ protected:
     void uiLoginDone(int status, const QString &errStr);
     void onUserLogoutDone();
     void uiRefreshContacts();
+    void uiRefreshInbox();
 
 private:
     QmlApplicationViewer m_view;
@@ -64,10 +65,12 @@ private:
     QObject *textUsername;
     QObject *textPassword;
     QObject *infoBanner;
-    QObject *contactsList;
     QObject *appPwDlg;
+    QObject *contactsList;
+    QObject *inboxList;
 
-    ContactsModel *contactsModel;
+    ContactsModel  *contactsModel;
+    InboxModel     *inboxModel;
 
     void    *loginCtx;
 };

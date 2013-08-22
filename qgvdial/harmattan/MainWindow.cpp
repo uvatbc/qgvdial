@@ -21,7 +21,9 @@ Contact: yuvraaj@gmail.com
 
 #include "MainWindow.h"
 #include "QtDeclarative"
+
 #include "ContactsModel.h"
+#include "InboxModel.h"
 
 MainWindow::MainWindow(QObject *parent)
 : IMainWindow(parent)
@@ -34,9 +36,11 @@ MainWindow::MainWindow(QObject *parent)
 , textUsername(NULL)
 , textPassword(NULL)
 , infoBanner(NULL)
-, contactsList(NULL)
 , appPwDlg(NULL)
+, contactsList(NULL)
+, inboxList(NULL)
 , contactsModel(NULL)
+, inboxModel(NULL)
 {
 }//MainWindow::MainWindow
 
@@ -142,6 +146,11 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
 
         contactsList = getQMLObject ("ContactsList");
         if (NULL == contactsList) {
+            break;
+        }
+
+        inboxList = getQMLObject ("InboxList");
+        if (NULL == inboxList) {
             break;
         }
 
@@ -273,3 +282,16 @@ MainWindow::uiRefreshContacts()
         delete oldModel;
     }
 }//MainWindow::uiRefreshContacts
+
+void
+MainWindow::uiRefreshInbox()
+{
+    InboxModel *oldModel = inboxModel;
+    inboxModel = oInbox.createModel ();
+    m_view.engine()->rootContext()->setContextProperty("g_InboxModel",
+                                                       inboxModel);
+    QMetaObject::invokeMethod (inboxList, "setMyModel");
+    if (NULL != oldModel) {
+        delete oldModel;
+    }
+}//MainWindow::uiRefreshInbox
