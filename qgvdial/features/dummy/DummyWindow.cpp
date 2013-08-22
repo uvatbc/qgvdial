@@ -101,3 +101,9 @@ DummyMainWindow::uiRefreshContacts()
 {
     Q_ASSERT(0 == "Not implemented");
 }//DummyMainWindow::uiRefreshContacts
+
+void
+DummyMainWindow::uiRefreshInbox()
+{
+    Q_ASSERT(0 == "Not implemented");
+}//DummyMainWindow::uiRefreshInbox

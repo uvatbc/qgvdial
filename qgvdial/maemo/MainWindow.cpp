@@ -242,3 +242,9 @@ MainWindow::uiRefreshContacts()
         delete oldModel;
     }
 }//MainWindow::uiRefreshContacts
+
+void
+MainWindow::uiRefreshInbox()
+{
+    Q_ASSERT(0 == "Not implemented");
+}//MainWindow::uiRefreshInbox()

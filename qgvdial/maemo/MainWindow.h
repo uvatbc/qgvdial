@@ -51,6 +51,7 @@ protected:
     void uiLoginDone(int status, const QString &errStr);
     void onUserLogoutDone();
     void uiRefreshContacts();
+    void uiRefreshInbox();
 
 private:
     QmlApplicationViewer m_view;

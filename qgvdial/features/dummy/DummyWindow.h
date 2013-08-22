@@ -44,6 +44,7 @@ protected:
     virtual void onUserLogoutDone();
     virtual void uiRequestApplicationPassword();
     virtual void uiRefreshContacts();
+    virtual void uiRefreshInbox();
 };
 
 #endif // DUMMYMAINWINDOW_H
