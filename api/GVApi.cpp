@@ -1145,7 +1145,7 @@ GVApi::onGetPhones(bool success, const QByteArray &response, QNetworkReply *,
         simpleReader.parse (&inputSource, false);
 
         QString strTemp;
-        strTemp = "var obj = " + xmlHandler.strJson;
+        strTemp = "var o = " + xmlHandler.strJson;
         scriptEngine.evaluate (strTemp);
         if (scriptEngine.hasUncaughtException ()) {
             strTemp = QString ("Could not assign json to obj : %1")
@@ -1158,7 +1158,7 @@ GVApi::onGetPhones(bool success, const QByteArray &response, QNetworkReply *,
         }
 
         strSelfNumber =
-        scriptEngine.evaluate("obj[\"settings\"][\"primaryDid\"]").toString();
+        scriptEngine.evaluate("o[\"settings\"][\"primaryDid\"]").toString();
         if (scriptEngine.hasUncaughtException ()) {
             strTemp = QString ("Could not parse primaryDid from obj : %1")
                       .arg (scriptEngine.uncaughtException().toString());
@@ -1177,7 +1177,7 @@ GVApi::onGetPhones(bool success, const QByteArray &response, QNetworkReply *,
 
         strTemp = "var phoneParams = []; "
                   "var phoneList = []; "
-                  "for (var phoneId in obj[\"phones\"]) { "
+                  "for (var phoneId in o[\"phones\"]) { "
                   "    phoneList.push(phoneId); "
                   "}";
         scriptEngine.evaluate (strTemp);
@@ -1199,7 +1199,7 @@ GVApi::onGetPhones(bool success, const QByteArray &response, QNetworkReply *,
         for (qint32 i = 0; i < nPhoneCount; i++) {
             strTemp = QString(
                     "phoneParams = []; "
-                    "for (var params in obj[\"phones\"][phoneList[%1]]) { "
+                    "for (var params in o[\"phones\"][phoneList[%1]]) { "
                     "    phoneParams.push(params); "
                     "}").arg(i);
             scriptEngine.evaluate (strTemp);
@@ -1221,7 +1221,7 @@ GVApi::onGetPhones(bool success, const QByteArray &response, QNetworkReply *,
                 strTemp = QString("phoneParams[%1];").arg (j);
                 QString strPName = scriptEngine.evaluate (strTemp).toString ();
                 strTemp = QString(
-                          "obj[\"phones\"][phoneList[%1]][phoneParams[%2]];")
+                          "o[\"phones\"][phoneList[%1]][phoneParams[%2]];")
                             .arg (i)
                             .arg (j);
                 QString strVal = scriptEngine.evaluate (strTemp).toString ();

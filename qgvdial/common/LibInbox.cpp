@@ -130,7 +130,9 @@ LibInbox::onRefreshDone()
     } while (0);
 
     if (task) {
-        emit sigRefreshed (ATTS_SUCCESS == task->status);
+        if (ATTS_SUCCESS == task->status) {
+            win->uiRefreshInbox ();
+        }
         task->deleteLater ();
     }
 }//LibInbox::onRefreshDone

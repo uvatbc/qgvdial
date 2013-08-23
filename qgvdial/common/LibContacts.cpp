@@ -129,8 +129,9 @@ LibContacts::onContactsFetched()
 
     if (ATTS_SUCCESS != task->status) {
         Q_WARN("Failed to update contacts");
+    } else {
+        win->uiRefreshContacts ();
     }
-    emit sigRefreshed (ATTS_SUCCESS == task->status);
 
     task->deleteLater ();
 }//LibContacts::onContactsFetched

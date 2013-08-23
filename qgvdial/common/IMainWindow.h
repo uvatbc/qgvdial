@@ -27,6 +27,7 @@ Contact: yuvraaj@gmail.com
 #include "GVApi.h"
 #include "LibContacts.h"
 #include "LibInbox.h"
+#include "LibGvPhones.h"
 
 /*==============================================================================
  *
@@ -116,8 +117,6 @@ private slots:
     void onTFARequest(AsyncTaskToken *task);
     void loginCompleted();
     void onLogoutDone();
-    void onContactsRefreshed(bool success);
-    void onInboxRefreshed(bool success);
 
 protected:
     virtual void log(QDateTime dt, int level, const QString &strLog) = 0;
@@ -143,6 +142,7 @@ protected:
 
     LibContacts oContacts;
     LibInbox    oInbox;
+    LibGvPhones oPhones;
 
     QString m_user;
     QString m_pass;
@@ -151,6 +151,7 @@ protected:
 
     friend class LibContacts;
     friend class LibInbox;
+    friend class LibGvPhones;
 };
 
 #endif // IMAINWINDOW_H

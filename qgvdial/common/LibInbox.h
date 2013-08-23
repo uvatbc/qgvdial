@@ -38,9 +38,6 @@ public:
 
     InboxModel *createModel();
 
-signals:
-    void sigRefreshed(bool success);
-
 private slots:
     void onRefreshDone();
     void onOneInboxEntry (AsyncTaskToken *task, const GVInboxEntry &hevent);

@@ -9,7 +9,8 @@ SOURCES  += $$PWD/main.cpp \
             $$PWD/ContactDetailsModel.cpp \
             $$PWD/InboxModel.cpp \
             $$PWD/LibContacts.cpp \
-            $$PWD/LibInbox.cpp
+            $$PWD/LibInbox.cpp \
+    ../common/LibGvPhones.cpp
 
 HEADERS  += $$PWD/global.h \
             $$PWD/IOsDependent.h \
@@ -21,4 +22,5 @@ HEADERS  += $$PWD/global.h \
             $$PWD/ContactDetailsModel.h \
             $$PWD/InboxModel.h \
             $$PWD/LibContacts.h \
-            $$PWD/LibInbox.h
+            $$PWD/LibInbox.h \
+    ../common/LibGvPhones.h

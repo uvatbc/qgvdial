@@ -19,35 +19,27 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#ifndef LIBCONTACTS_H
-#define LIBCONTACTS_H
+#ifndef LIBGVPHONES_H
+#define LIBGVPHONES_H
 
 #include <QObject>
 #include "global.h"
-#include "GContactsApi.h"
 
-class ContactsModel;
 class IMainWindow;
-class LibContacts : public QObject
+class LibGvPhones : public QObject
 {
     Q_OBJECT
+public:
+    explicit LibGvPhones(IMainWindow *parent);
+    bool refresh();
+
+private slots:
+    void onGotRegisteredPhone (const GVRegisteredNumber &info);
+    void onGotPhones();
 
 public:
-    explicit LibContacts(IMainWindow *parent);
-
-    bool login(const QString &user, const QString &pass);
-    bool refresh(QDateTime after = QDateTime());
-
-    ContactsModel *createModel();
-
-protected slots:
-    void loginCompleted();
-    void onPresentCaptcha(AsyncTaskToken *task, const QString &captchaUrl);
-    void onOneContact(ContactInfo cinfo);
-    void onContactsFetched();
-
-protected:
-    GContactsApi api;
+    GVRegisteredNumberArray dialBack;
+    GVRegisteredNumberArray dialOut;
 };
 
-#endif // LIBCONTACTS_H
+#endif // LIBGVPHONES_H
