@@ -98,14 +98,14 @@ private slots:
     //! Invoked when the user clicks the login button on QML.
     void doLogin ();
     //! Called when the GV Api completes login - with success or failure
-    void loginCompleted (AsyncTaskToken *token);
+    void loginCompleted ();
 
     //! Called when the logout button is clicked
     void doCancelLogin ();
     //! Called when the logout button is clicked
     void doLogout ();
     //! Called when the GV Api completes logoff - with success or failure
-    void logoutCompleted (AsyncTaskToken *token);
+    void logoutCompleted ();
 
     //! Invoked when the system ray is clicked
     void systray_activated (QSystemTrayIcon::ActivationReason reason);
@@ -125,7 +125,7 @@ private slots:
     //! Invoked by the context when either observers or the user says.
     void onSigDialComplete (DialContext *ctx, bool ok);
     //! Invoked when a number dial is completed.
-    void dialComplete (AsyncTaskToken *token);
+    void dialComplete ();
 
     //! Invoked when the user finally clicks on the send SMS button
     void sendSMS (const QStringList &arrNumbers, const QString &strText);
@@ -135,7 +135,7 @@ private slots:
     //! Invoked every time a new registered phone is retrieved
     void gotRegisteredPhone (const GVRegisteredNumber &info);
     //! Invoked every time a new registered phone is retrieved
-    void gotAllRegisteredPhones (AsyncTaskToken *token);
+    void gotAllRegisteredPhones ();
 
     //! Invoked by QML when the user selects a new phone method
     void onRegPhoneSelectionChange (int index);
@@ -253,6 +253,8 @@ private:
 
     void initInbox ();
     void deinitInbox ();
+
+    void logoutWork(AsyncTaskToken *token);
 
     bool findInfo (const QString &strNumber, ContactInfo &info);
 

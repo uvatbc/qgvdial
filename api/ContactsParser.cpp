@@ -22,6 +22,8 @@ Contact: yuvraaj@gmail.com
 #include "ContactsParser.h"
 #include "ContactsXmlHandler.h"
 
+#define QGC_MEASURE_TIME 0
+
 ContactsParser::ContactsParser (AsyncTaskToken *task, QByteArray data,
                                 QObject *parent /*= 0*/)
 : QObject(parent)
@@ -40,7 +42,9 @@ ContactsParser::doXmlWork ()
     ContactsXmlHandler contactsHandler;
     contactsHandler.setEmitLog (bEmitLog);
 
+#if QGC_MEASURE_TIME
     QDateTime startTime = QDateTime::currentDateTime ();
+#endif
 
     inputSource.setData (byData);
 
@@ -57,9 +61,11 @@ ContactsParser::doXmlWork ()
 
     rv = simpleReader.parse (&inputSource, false);
 
+#if QGC_MEASURE_TIME
     QDateTime endTime = QDateTime::currentDateTime ();
     Q_DEBUG(QString("XML parse took %1 msec")
             .arg(endTime.toMSecsSinceEpoch() - startTime.toMSecsSinceEpoch()));
+#endif
 
     if (!rv) {
         Q_WARN(QString("Contacts parser failed to parse. Data = %1")
@@ -80,7 +86,9 @@ ContactsParser::doXmlWork ()
 void
 ContactsParser::doJsonWork ()
 {
+#if QGC_MEASURE_TIME
     QDateTime startTime = QDateTime::currentDateTime ();
+#endif
 
     QScriptEngine e;
     QString cmd = QString("var o = %1").arg (QString(byData));
@@ -220,9 +228,11 @@ ContactsParser::doJsonWork ()
         }
     } while (0);
 
+#if QGC_MEASURE_TIME
     QDateTime endTime = QDateTime::currentDateTime ();
     Q_DEBUG(QString("JSON parse took %1 msec")
             .arg(endTime.toMSecsSinceEpoch() - startTime.toMSecsSinceEpoch()));
+#endif
 
     emit done(m_task, true, total, total);
 }//ContactsParser::doJsonWork

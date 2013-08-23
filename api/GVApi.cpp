@@ -2101,8 +2101,7 @@ GVApi::onSendSms(bool success, const QByteArray &response, QNetworkReply *,
             strTemp = strTemp.mid (strTemp.indexOf ('{'));
         }
 
-        strTemp = QString("var obj = %1; obj.send_sms_response.status.status;")
-                    .arg(strTemp);
+        strTemp = QString("var o = %1; o.send_sms_response;").arg(strTemp);
         strTemp = scriptEngine.evaluate (strTemp).toString ();
         if (scriptEngine.hasUncaughtException ()) {
             Q_WARN("Failed to parse call out response: ") << strReply;

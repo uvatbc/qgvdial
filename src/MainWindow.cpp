@@ -477,7 +477,7 @@ MainWindow::init ()
         this->setUsername (strUser);
         this->setPassword (strPass);
 
-        logoutCompleted (NULL);
+        logoutWork (NULL);
         // Login without popping up the "enter user/pass" dialog
         doLogin ();
     } else {
@@ -876,8 +876,7 @@ MainWindow::getContactsDone (bool bOk)
 void
 MainWindow::initContacts (const QString &contactsPass)
 {
-    oContacts->setUserPass (strUser, contactsPass);
-    oContacts->loginSuccess ();
+    oContacts->login (strUser, contactsPass);
     oContacts->initModel ();
     oContacts->refreshContacts ();
 }//MainWindow::initContacts
@@ -886,7 +885,7 @@ void
 MainWindow::deinitContacts ()
 {
     oContacts->deinitModel ();
-    oContacts->loggedOut ();
+    oContacts->logout ();
 }//MainWindow::deinitContacts
 
 void
@@ -924,8 +923,8 @@ MainWindow::refreshRegisteredNumbers ()
             break;
         }
 
-        rv = connect (token, SIGNAL(completed(AsyncTaskToken*)),
-                      this, SLOT(gotAllRegisteredPhones(AsyncTaskToken*)));
+        rv = connect (token, SIGNAL(completed()),
+                      this, SLOT(gotAllRegisteredPhones()));
         Q_ASSERT(rv);
 
         rv = gvApi.getPhones (token);
@@ -952,8 +951,10 @@ MainWindow::gotRegisteredPhone (const GVRegisteredNumber &info)
 }//MainWindow::gotRegisteredPhone
 
 void
-MainWindow::gotAllRegisteredPhones (AsyncTaskToken *token)
+MainWindow::gotAllRegisteredPhones ()
 {
+    AsyncTaskToken *token = (AsyncTaskToken *) QObject::sender ();
+
     do { // Begin cleanup block (not a loop)
         if (ATTS_SUCCESS != token->status) {
             this->showMsgBox ("Failed to retrieve registered phones");

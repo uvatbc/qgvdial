@@ -25,6 +25,13 @@ Contact: yuvraaj@gmail.com
 #include "api_common.h"
 #include <QObject>
 
+enum GContactPhotoType {
+    GCPT_Unknown = 0,
+    GCPT_BMP,
+    GCPT_PNG,
+    GCPT_JPEG
+};
+
 class GContactsApi : public QObject
 {
     Q_OBJECT
@@ -32,7 +39,11 @@ public:
     explicit GContactsApi(QObject *parent = 0);
 
     bool login(AsyncTaskToken *task);
+    inline bool isLoggedIn() { return m_isLoggedIn; }
+    bool logout(AsyncTaskToken *task);
+
     bool getContacts(AsyncTaskToken *task);
+    bool getPhotoFromLink(AsyncTaskToken *task);
 
 signals:
     void presentCaptcha(AsyncTaskToken *task, const QString &captchaUrl);
@@ -54,6 +65,9 @@ private slots:
     void onContactsParsed(AsyncTaskToken *task, bool rv, quint32 total,
                           quint32 usable);
 
+    void onGotPhoto(bool success, const QByteArray &response,
+                    QNetworkReply *reply, void *ctx);
+
 private:
     //! The network manager for contacts API
     QNetworkAccessManager nwMgr;
@@ -62,7 +76,7 @@ private:
     QString m_user, m_pass;
 
     //! The authentication string returned by the contacts API
-    QString strGoogleAuth;
+    QString m_GoogleAuthToken;
 
     //! Have we successfully logged in?
     bool    m_isLoggedIn;

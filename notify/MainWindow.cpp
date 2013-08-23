@@ -360,8 +360,8 @@ MainWindow::doLogin ()
 
         //loadCookies ();
 
-        bOk = connect(token, SIGNAL(completed(AsyncTaskToken*)),
-                      this , SLOT(loginCompleted(AsyncTaskToken*)));
+        bOk = connect(token, SIGNAL(completed()),
+                      this , SLOT(loginCompleted()));
 
         token->inParams["user"] = strUser;
         token->inParams["pass"] = strPass;
@@ -387,17 +387,16 @@ MainWindow::doLogin ()
         strUser.clear ();
         strPass.clear ();
 
-        logoutCompleted (NULL);
         qApp->quit ();
     }
 }//MainWindow::doLogin
 
 void
-MainWindow::loginCompleted (AsyncTaskToken *token)
+MainWindow::loginCompleted()
 {
-    if (!token || (token->status != ATTS_SUCCESS)) {
-        logoutCompleted (NULL);
+    AsyncTaskToken *token = (AsyncTaskToken *) QObject::sender ();
 
+    if (!token || (token->status != ATTS_SUCCESS)) {
         Q_CRIT("User login failed");
         qApp->quit ();
     } else {
@@ -427,8 +426,7 @@ MainWindow::loginCompleted (AsyncTaskToken *token)
 
         //saveCookies ();
 
-        oContacts.setUserPass (strUser, strCPass);
-        oContacts.loginSuccess ();
+        oContacts.login (strUser, strCPass);
         oInbox.loginSuccess ();
 
         QTimer::singleShot (100, this, SLOT(doWork ()));
@@ -443,8 +441,8 @@ void
 MainWindow::doLogout ()
 {
     AsyncTaskToken *token = new AsyncTaskToken(this);
-    connect (token, SIGNAL(completed(AsyncTaskToken*)),
-             this, SLOT(logoutCompleted(AsyncTaskToken*)));
+    connect (token, SIGNAL(completed()),
+             this, SLOT(logoutCompleted()));
 
     if (!gvApi.logout (token)) {
         token->deleteLater ();
@@ -453,16 +451,18 @@ MainWindow::doLogout ()
 }//MainWindow::doLogout
 
 void
-MainWindow::logoutCompleted (AsyncTaskToken *token)
+MainWindow::logoutCompleted ()
 {
+    AsyncTaskToken *token = (AsyncTaskToken *) QObject::sender ();
+
     // This clears out the table and the view as well
-    oContacts.loggedOut ();
+    oContacts.logout ();
     oInbox.loggedOut ();
 
     bIsLoggedIn = false;
 
     if (token) {
-        delete token;
+        token->deleteLater ();
     }
 }//MainWindow::logoutCompleted
 

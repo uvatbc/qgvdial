@@ -42,8 +42,6 @@ SOURCES  += main.cpp                        \
             NotifyGVContactsTable.cpp       \
             NotifyGVInbox.cpp               \
             MqPublisher.cpp                 \
-            ../src/ContactsParserObject.cpp \
-            ../src/ContactsXmlHandler.cpp   \
             dbusinterface/qgvn_adapter.cpp  \
             dbusinterface/qgvn_proxy.cpp
 
@@ -52,8 +50,6 @@ HEADERS  += ../src/global.h                 \
             NotifyGVContactsTable.h         \
             NotifyGVInbox.h                 \
             MqPublisher.h                   \
-            ../src/ContactsParserObject.h   \
-            ../src/ContactsXmlHandler.h     \
             dbusinterface/qgvn_adapter.h    \
             dbusinterface/qgvn_proxy.h
 
@@ -69,14 +65,14 @@ maemo5 {
         PREFIX = ../maemo/debian/qgvnotify/usr
         message(Build using qtcreator)
     }
-    
+
     OPTPREFIX  = $$PREFIX/../opt
     DATADIR    = $$PREFIX/share
 }
 
 contains(MEEGO_EDITION,harmattan) {
     message(Harmattan install)
-    
+
     OPTPREFIX  = /opt
     DATADIR    = /usr/share
 }

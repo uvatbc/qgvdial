@@ -58,8 +58,8 @@ MainWindow::doLogin ()
             break;
         }
 
-        bOk = connect(token, SIGNAL(completed(AsyncTaskToken*)),
-                      this , SLOT(loginCompleted(AsyncTaskToken*)));
+        bOk = connect(token, SIGNAL(completed()),
+                      this , SLOT(loginCompleted()));
 
         token->inParams["user"] = strUser;
         token->inParams["pass"] = strPass;
@@ -90,7 +90,7 @@ MainWindow::doLogin ()
         strUser.clear ();
         strPass.clear ();
 
-        logoutCompleted (NULL);
+        logoutWork (NULL);
     }
 }//MainWindow::doLogin
 
@@ -144,8 +144,11 @@ MainWindow::on_action_Login_triggered ()
 }//MainWindow::on_action_Login_triggered
 
 void
-MainWindow::loginCompleted (AsyncTaskToken *token)
+MainWindow::loginCompleted ()
 {
+    AsyncTaskToken *token = (AsyncTaskToken *) QObject::sender ();
+
+    Q_ASSERT(token == loginTask);
     loginTask = NULL;
     gvApiProgressString.clear ();
 
@@ -244,7 +247,7 @@ MainWindow::loginCompleted (AsyncTaskToken *token)
         // Fill up the pin settings
         refreshPinSettings ();
     } else {
-        logoutCompleted (NULL);
+        logoutWork (NULL);
 
         OsDependent &osd = Singletons::getRef().getOSD ();
         osd.setLongWork (this, false);
@@ -279,7 +282,7 @@ MainWindow::loginCompleted (AsyncTaskToken *token)
     }
 
     if (token) {
-        delete token;
+        token->deleteLater ();
     }
 }//MainWindow::loginCompleted
 
@@ -296,8 +299,7 @@ void
 MainWindow::doLogout ()
 {
     AsyncTaskToken *token = new AsyncTaskToken(this);
-    connect (token, SIGNAL(completed(AsyncTaskToken*)),
-             this, SLOT(logoutCompleted(AsyncTaskToken*)));
+    connect (token, SIGNAL(completed()), this, SLOT(logoutCompleted()));
 
     if (!gvApi.logout (token)) {
         token->deleteLater ();
@@ -316,7 +318,14 @@ MainWindow::doLogout ()
 }//MainWindow::doLogout
 
 void
-MainWindow::logoutCompleted (AsyncTaskToken *token)
+MainWindow::logoutCompleted ()
+{
+    AsyncTaskToken *token = (AsyncTaskToken *) QObject::sender ();
+    logoutWork (token);
+}//MainWindow::logoutCompleted
+
+void
+MainWindow::logoutWork(AsyncTaskToken *token)
 {
     // This clears out the table and the view as well
     deinitContacts ();

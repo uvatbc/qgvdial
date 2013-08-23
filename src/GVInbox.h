@@ -78,12 +78,14 @@ public slots:
 
     void onSigDeleteInboxEntry(const QString &id);
 
+    void cleanupAfterInboxDone(AsyncTaskToken *token);
+
 private slots:
-    void oneInboxEntry (const GVInboxEntry &hevent);
-    void getInboxDone (AsyncTaskToken *token);
-    void onInboxEntryMarked (AsyncTaskToken *token);
-    void onInboxEntryDeleted (AsyncTaskToken *token);
-    void onCheckRecentCompleted(AsyncTaskToken *token);
+    void oneInboxEntry (AsyncTaskToken *token, const GVInboxEntry &hevent);
+    void getInboxDone ();
+    void onInboxEntryMarked ();
+    void onInboxEntryDeleted ();
+    void onCheckRecentCompleted();
 
 private:
     void prepView ();

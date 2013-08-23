@@ -90,10 +90,8 @@ SOURCES  += ../src/main.cpp                 \
             ../src/CalloutInitiator.cpp     \
             ../src/CallInitiatorFactory.cpp \
             ../src/InboxModel.cpp           \
-            ../src/GvXMLParser.cpp          \
             ../src/PhoneNumberValidator.cpp \
             ../src/GVContactsTable.cpp      \
-            ../src/ContactsXmlHandler.cpp   \
             ../src/SMSEntryDeleteButton.cpp \
             ../src/ChildWindowBase.cpp      \
             ../src/GVInbox.cpp              \
@@ -101,12 +99,6 @@ SOURCES  += ../src/main.cpp                 \
             ../src/ContactsModel.cpp        \
             ../src/ContactDetailsModel.cpp  \
             ../src/DialContext.cpp          \
-            ../src/ContactsParserObject.cpp \
-            ../src/CookieJar.cpp            \
-            ../src/NwReqTracker.cpp         \
-            ../src/AsyncTaskToken.cpp       \
-            ../src/GVApi.cpp                \
-            ../src/MyXmlErrorHandler.cpp    \
             ../src/FuzzyTimer.cpp           \
             ../src/NwInfo.cpp               \
             ../src/SkypeClientFactory.cpp   \
@@ -125,10 +117,8 @@ HEADERS  += ../src/global.h                 \
             ../src/CalloutInitiator.h       \
             ../src/CallInitiatorFactory.h   \
             ../src/InboxModel.h             \
-            ../src/GvXMLParser.h            \
             ../src/PhoneNumberValidator.h   \
             ../src/GVContactsTable.h        \
-            ../src/ContactsXmlHandler.h     \
             ../src/SMSEntryDeleteButton.h   \
             ../src/ChildWindowBase.h        \
             ../src/GVInbox.h                \
@@ -136,12 +126,6 @@ HEADERS  += ../src/global.h                 \
             ../src/ContactsModel.h          \
             ../src/ContactDetailsModel.h    \
             ../src/DialContext.h            \
-            ../src/ContactsParserObject.h   \
-            ../src/CookieJar.h              \
-            ../src/NwReqTracker.h           \
-            ../src/AsyncTaskToken.h         \
-            ../src/GVApi.h                  \
-            ../src/MyXmlErrorHandler.h      \
             ../src/FuzzyTimer.h             \
             ../src/NwInfo.h                 \
             ../src/PhoneIntegrationIface.h  \
@@ -149,6 +133,8 @@ HEADERS  += ../src/global.h                 \
             ../src/SkypeClientFactory.h     \
             ../src/SkypeClient.h            \
             ../src/Vmail.h
+
+include(../api/api.pri)
 
 contains(DEFINES,MEEGO_HARMATTAN) | contains(DEFINES,IS_S3_BELLE) {
     DEFINES += ENABLE_FUZZY_TIMER

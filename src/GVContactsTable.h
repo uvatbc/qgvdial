@@ -23,6 +23,7 @@ Contact: yuvraaj@gmail.com
 #define __GVCONTACTSTABLE_H__
 
 #include "global.h"
+#include "GContactsApi.h"
 
 // For some reason the symbian MOC doesn't like it if I don't include QObject
 // even though it is present in QtCore which is included in global.h
@@ -45,13 +46,10 @@ public:
     void deinitModel ();
     void initModel ();
 
-    //! Use this to set the username and password for the contacts API login
-    void setUserPass (const QString &strU, const QString &strP);
-
     //! Use this to login
-    void loginSuccess ();
+    void login (const QString &strU, const QString &strP);
     //! Use this to logout
-    void loggedOut ();
+    void logout ();
 
 signals:
     //! Status emitter for status bar
@@ -72,66 +70,40 @@ public slots:
     void mqUpdateContacts(const QDateTime &dtUpdate);
 
 private slots:
+    void onPresentCaptcha(AsyncTaskToken *task, const QString &captchaUrl);
+
     //! Invoked on response to login to contacts API
-    void onLoginResponse(bool success, const QByteArray &response,
-                         QNetworkReply *reply, void *ctx);
+    void onLoginDone();
 
-#ifndef NO_CONTACTS_CAPTCHA
-    //! Invoked when the captcha is done
-    void onCaptchaDone (bool bOk, const QString &strCaptcha);
-#endif
-
-    // Invoked when the google contacts API responds with the contacts
-    void onGotContactsFeed(bool success, const QByteArray &response,
-                           QNetworkReply *reply, void *ctx);
     // Invoked when one contact is parsed out of the XML
-    void gotOneContact (const ContactInfo &contactInfo);
+    void gotOneContact (ContactInfo contactInfo);
     //! Invoked when all the contacts are parsed
-    void onContactsParsed(bool rv, quint32 total, quint32 usable);
+    void onContactsParsed();
 
     //! Invoked when the contact model tells us that the photo is not present
     void onNoContactPhoto(const ContactInfo &contactInfo);
 
     //! Finished getting the photo
-    void onGotPhoto(bool success, const QByteArray &response,
-                    QNetworkReply *reply, void *ctx);
+    void onGotPhoto();
 
 private:
-    bool doGet(QUrl url, void *ctx, QObject *obj, const char *method);
-    bool doPost(QUrl url, QByteArray postData, const char *contentType,
-                void *ctx, QObject *receiver, const char *method);
-
     void decRef (bool rv = true);
 
-    QUrl hasMoved(QNetworkReply *reply);
-
-    bool startLogin(QUrl url);
-    bool getContactsFeed(QUrl url);
     void updateModelWithContact(const ContactInfo &contactInfo);
 
 private:
-    ContactsModel *modelContacts;
-    ContactsModel *modelSearchContacts;
+    GContactsApi    api;
+    ContactsModel  *modelContacts;
+    ContactsModel  *modelSearchContacts;
 
     //! Path to the temp directory to store all contact photos
     QString         strTempStore;
 
-    //! Username and password for google authentication
-    QString         strUser, strPass;
-    //! The authentication string returned by the contacts API
-    QString         strGoogleAuth;
-
     //! Refcount for in-flight network requests
     QAtomicInt      refCount;
 
-    //! The network manager for contacts API
-    QNetworkAccessManager nwMgr;
-
     //! Mutex protecting the following variable
     QMutex          mutex;
-
-    //! Is the user logged in?
-    bool            bLoggedIn;
 
     //! Refresh requested but waiting for login
     bool            bRefreshRequested;

@@ -55,7 +55,7 @@ public slots:
     //! Invoked when the app is to be quit
     void onExit();
     //! Invoked by GVApi when the voice mail download has completed
-    void onVmailDownloaded (AsyncTaskToken *token);
+    void onVmailDownloaded ();
     //! Invoked when the QML sends us a vmail play/pause/stop signal
     void onSigVmailPlayback (int newstate);
 

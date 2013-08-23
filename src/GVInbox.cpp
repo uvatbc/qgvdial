@@ -34,9 +34,11 @@ GVInbox::GVInbox (MainWindow *parent)
 , modelInbox (NULL)
 , bRecentCheckInProgress(false)
 {
-    bool rv = connect (
-                &parent->gvApi, SIGNAL(oneInboxEntry(const GVInboxEntry&)),
-                this, SLOT(oneInboxEntry(const GVInboxEntry&)));
+    bool rv =
+    connect (&parent->gvApi,
+             SIGNAL(oneInboxEntry(AsyncTaskToken*,GVInboxEntry)),
+             this,
+             SLOT(oneInboxEntry(AsyncTaskToken*,GVInboxEntry)));
     Q_ASSERT(rv); Q_UNUSED(rv);
 
     // Initially, all are to be selected
@@ -135,8 +137,7 @@ GVInbox::refresh (const QDateTime &dtUpdate)
 
     Q_DEBUG(QString ("Water level = %1").arg(dateWaterLevel.toString()));
 
-    bool rv = connect(token, SIGNAL(completed(AsyncTaskToken*)),
-                      this, SLOT(getInboxDone(AsyncTaskToken*)));
+    bool rv = connect(token, SIGNAL(completed()), this, SLOT(getInboxDone()));
     Q_ASSERT(rv); Q_UNUSED(rv);
 
     bRefreshInProgress = true;
@@ -144,8 +145,7 @@ GVInbox::refresh (const QDateTime &dtUpdate)
 
     MainWindow *mainWin = (MainWindow *) parent();
     if (!mainWin->gvApi.getInbox (token)) {
-        getInboxDone (NULL);
-        delete token;
+        cleanupAfterInboxDone (token);
     }
 }//GVInbox::refresh
 
@@ -173,23 +173,30 @@ GVInbox::checkRecent()
         Q_WARN("Current check inbox in process");
         return;
     }
-    bRecentCheckInProgress = true;
 
     AsyncTaskToken *token = new AsyncTaskToken(this);
-    bool rv = connect(token, SIGNAL(completed(AsyncTaskToken*)),
-                      this, SLOT(onCheckRecentCompleted(AsyncTaskToken*)));
+    if (NULL == token) {
+        Q_WARN("Failed to allocate task to check for recent");
+        return;
+    }
+
+    bool rv = connect(token, SIGNAL(completed()),
+                      this, SLOT(onCheckRecentCompleted()));
     Q_ASSERT(rv); Q_UNUSED(rv);
 
     MainWindow *mainWin = (MainWindow *) parent ();
     if (!mainWin->gvApi.checkRecentInbox (token)) {
-        onCheckRecentCompleted (NULL);
         delete token;
+    } else {
+        bRecentCheckInProgress = true;
     }
 }//GVInbox::checkRecent
 
 void
-GVInbox::onCheckRecentCompleted(AsyncTaskToken *token)
+GVInbox::onCheckRecentCompleted()
 {
+    AsyncTaskToken *token = (AsyncTaskToken *) QObject::sender ();
+
     do { // Begin cleanup block (not a loop)
         if (!token) {
             Q_WARN("No token provided. Failure!!");
@@ -216,7 +223,7 @@ GVInbox::onCheckRecentCompleted(AsyncTaskToken *token)
 }//GVInbox::onCheckRecentCompleted
 
 void
-GVInbox::oneInboxEntry (const GVInboxEntry &hevent)
+GVInbox::oneInboxEntry (AsyncTaskToken * /*token*/, const GVInboxEntry &hevent)
 {
     if (!bRetrieveTrash) {
         if (GVIE_Unknown == hevent.Type) {
@@ -244,8 +251,10 @@ GVInbox::oneInboxEntry (const GVInboxEntry &hevent)
 }//GVInbox::oneInboxEntry
 
 void
-GVInbox::getInboxDone (AsyncTaskToken *token)
+GVInbox::getInboxDone ()
 {
+    AsyncTaskToken *token = (AsyncTaskToken *) QObject::sender ();
+
     bool nextpage = false;
     bool ok = false;
     do { // Begin cleanup block (not a loop)
@@ -299,11 +308,12 @@ GVInbox::getInboxDone (AsyncTaskToken *token)
         return;
     }
 
-    if (token) {
-        delete token;
-        token = NULL;
-    }
+    cleanupAfterInboxDone (token);
+}//GVInbox::getInboxDone
 
+void
+GVInbox::cleanupAfterInboxDone(AsyncTaskToken *token)
+{
     QMutexLocker locker(&mutex);
     bRefreshInProgress = false;
 
@@ -321,7 +331,11 @@ GVInbox::getInboxDone (AsyncTaskToken *token)
         bRetrieveTrash = true;
         getTrash ();
     }
-}//GVInbox::getInboxDone
+
+    if (token) {
+        token->deleteLater ();
+    }
+}//GVInbox::cleanupAfterInboxDone
 
 void
 GVInbox::getTrash()
@@ -332,8 +346,7 @@ GVInbox::getTrash()
     token->inParams["page"] = page;
     passedWaterLevel = false;
 
-    bool rv = connect(token, SIGNAL(completed(AsyncTaskToken*)),
-                      this, SLOT(getInboxDone(AsyncTaskToken*)));
+    bool rv = connect(token, SIGNAL(completed()), this, SLOT(getInboxDone()));
     Q_ASSERT(rv); Q_UNUSED(rv);
 
     bRefreshInProgress = true;
@@ -341,8 +354,7 @@ GVInbox::getTrash()
 
     MainWindow *mainWin = (MainWindow *) parent ();
     if (!mainWin->gvApi.getInbox (token)) {
-        getInboxDone (NULL);
-        delete token;
+        cleanupAfterInboxDone (token);
     }
 }//GVInbox::getTrash
 
@@ -378,20 +390,21 @@ GVInbox::onSigMarkAsRead(const QString &msgId)
     AsyncTaskToken *token = new AsyncTaskToken(this);
     token->inParams["id"] = msgId;
 
-    bool rv = connect (token, SIGNAL(completed(AsyncTaskToken*)),
-                       this , SLOT(onInboxEntryMarked(AsyncTaskToken*)));
+    bool rv = connect (token, SIGNAL(completed()),
+                       this , SLOT(onInboxEntryMarked()));
     Q_ASSERT(rv); Q_UNUSED(rv);
 
     MainWindow *mainWin = (MainWindow *) parent ();
     if (!mainWin->gvApi.markInboxEntryAsRead (token)) {
-        token->status = ATTS_FAILURE;
-        onInboxEntryMarked(token);
+        Q_WARN(QString("Failed to mark read: ID =").arg (msgId));
+        delete token;
     }
 }//GVInbox::onSigMarkAsRead
 
 void
-GVInbox::onInboxEntryMarked (AsyncTaskToken *token)
+GVInbox::onInboxEntryMarked ()
 {
+    AsyncTaskToken *token = (AsyncTaskToken *) QObject::sender ();
     QString id = token->inParams["id"].toString();
 
     if (ATTS_SUCCESS != token->status) {
@@ -400,7 +413,7 @@ GVInbox::onInboxEntryMarked (AsyncTaskToken *token)
         modelInbox->markAsRead (id);
     }
 
-    delete token;
+    token->deleteLater ();
 }//GVInbox::onInboxEntryMarked
 
 void
@@ -409,20 +422,22 @@ GVInbox::onSigDeleteInboxEntry(const QString &id)
     AsyncTaskToken *token = new AsyncTaskToken(this);
     token->inParams["id"] = id;
 
-    bool rv = connect (token, SIGNAL(completed(AsyncTaskToken*)),
-                       this , SLOT(onInboxEntryDeleted(AsyncTaskToken*)));
+    bool rv = connect (token, SIGNAL(completed()),
+                       this , SLOT(onInboxEntryDeleted()));
     Q_ASSERT(rv); Q_UNUSED(rv);
 
     MainWindow *mainWin = (MainWindow *) parent ();
     if (!mainWin->gvApi.deleteInboxEntry (token)) {
-        token->status = ATTS_FAILURE;
-        onInboxEntryDeleted(token);
+        Q_WARN(QString("Failed to delete: ID = %1").arg (id));
+        delete token;
     }
 }//GVInbox::onSigDeleteInboxEntry
 
 void
-GVInbox::onInboxEntryDeleted (AsyncTaskToken *token)
+GVInbox::onInboxEntryDeleted ()
 {
+    AsyncTaskToken *token = (AsyncTaskToken *) QObject::sender ();
+
     QString id = token->inParams["id"].toString();
 
     if (ATTS_SUCCESS != token->status) {

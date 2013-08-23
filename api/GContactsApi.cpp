@@ -41,7 +41,7 @@ GContactsApi::doGet(QUrl url, void *ctx, QObject *obj, const char *method)
     QNetworkRequest req(url);
 
     QByteArray byAuth = QString("GoogleLogin auth=%1")
-                                .arg(strGoogleAuth).toAscii ();
+                                .arg(m_GoogleAuthToken).toAscii ();
     req.setRawHeader ("Authorization", byAuth);
     req.setRawHeader("User-Agent", UA_IPHONE4);
 
@@ -150,7 +150,7 @@ GContactsApi::onLoginResponse(bool success, const QByteArray &response,
     QString strReply = response;
     QString strCaptchaToken, strCaptchaUrl;
 
-    strGoogleAuth.clear ();
+    m_GoogleAuthToken.clear ();
     do { // Begin cleanup block (not a loop)
         if (!success) {
             task->status = ATTS_NW_ERROR;
@@ -161,7 +161,7 @@ GContactsApi::onLoginResponse(bool success, const QByteArray &response,
         foreach (QString strPair, arrParsed) {
             QStringList arrPair = strPair.split ('=');
             if (arrPair[0] == "Auth") {
-                strGoogleAuth = arrPair[1];
+                m_GoogleAuthToken = arrPair[1];
             } else if (arrPair[0] == "CaptchaToken") {
                 strCaptchaToken = arrPair[1];
             } else if (arrPair[0] == "CaptchaUrl") {
@@ -178,7 +178,7 @@ GContactsApi::onLoginResponse(bool success, const QByteArray &response,
             break;
         }
 
-        if (strGoogleAuth.isEmpty ()) {
+        if (m_GoogleAuthToken.isEmpty ()) {
             Q_WARN("Failed to login!!");
             task->status = ATTS_LOGIN_FAILURE;
             break;
@@ -201,6 +201,20 @@ GContactsApi::onLoginResponse(bool success, const QByteArray &response,
         task->emitCompleted ();
     }
 }//GContactsApi::onLoginResponse
+
+bool
+GContactsApi::logout(AsyncTaskToken *task)
+{
+    m_isLoggedIn = false;
+    m_user.clear ();
+    m_pass.clear ();
+    m_GoogleAuthToken.clear ();
+
+    task->status = ATTS_SUCCESS;
+    task->emitCompleted ();
+
+    return true;
+}//GContactsApi::logout
 
 bool
 GContactsApi::getContacts(AsyncTaskToken *task)
@@ -354,3 +368,70 @@ GContactsApi::onContactsParsed(AsyncTaskToken *task, bool rv, quint32 total,
     }
     task->emitCompleted ();
 }//GContactsApi::onContactsParsed
+
+bool
+GContactsApi::getPhotoFromLink(AsyncTaskToken *task)
+{
+    if (!task) {
+        Q_WARN("Invalid task token");
+        return false;
+    }
+
+    if (!m_isLoggedIn) {
+        Q_WARN("Not logged in. Cannot download");
+        return false;
+    }
+
+    if (!task->inParams.contains ("href")) {
+        Q_WARN("href not provided. Cannot download");
+        return false;
+    }
+
+    QUrl url(task->inParams["href"].toString());
+    bool ok =
+    doGet (url, task, this,
+           SLOT(onGotPhoto(bool,QByteArray,QNetworkReply*,void*)));
+
+    return (ok);
+}//GContactsApi::getPhotoFromLink
+
+void
+GContactsApi::onGotPhoto(bool success, const QByteArray &response,
+                         QNetworkReply * /*reply*/, void *ctx)
+{
+    AsyncTaskToken *token = (AsyncTaskToken *) ctx;
+
+    do { // Begin cleanup block (not a loop)
+        if (!token) {
+            Q_WARN("NULL token!!");
+            return;
+        }
+        if (!success) {
+            token->status = ATTS_FAILURE;
+            break;
+        }
+        if (response.isEmpty ()) {
+            Q_WARN("Zero length response for photo");
+            token->status = ATTS_FAILURE;
+            break;
+        }
+
+        quint8 sPng[] = {0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a};
+        QByteArray baPng((char*)sPng, sizeof(sPng));
+        quint8 sBmp[] = {'B', 'M'};
+        QByteArray baBmp((char*)sBmp, sizeof(sBmp));
+
+        if (response.startsWith (baPng)) {
+            token->outParams["type"] = GCPT_PNG;
+        } else if (response.startsWith (baBmp)) {
+            token->outParams["type"] = GCPT_BMP;
+        } else {
+            token->outParams["type"] = GCPT_JPEG;
+        }
+
+        token->outParams["data"] = response;
+        token->status = ATTS_SUCCESS;
+    } while (0); // End cleanup block (not a loop)
+
+    token->emitCompleted ();
+}//GContactsApi::onGotPhoto

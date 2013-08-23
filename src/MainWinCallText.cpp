@@ -144,8 +144,8 @@ MainWindow::dialNow (const QString &strTarget)
         success = connect (ctx , SIGNAL(sigDialComplete(DialContext*,bool)),
                            this, SLOT(onSigDialComplete(DialContext*,bool)));
         Q_ASSERT(success);
-        success = connect (token, SIGNAL(completed(AsyncTaskToken*)),
-                           this , SLOT(dialComplete(AsyncTaskToken*)));
+        success = connect (token, SIGNAL(completed()),
+                           this , SLOT(dialComplete()));
         Q_ASSERT(success);
 
         token->inParams["destination"] = strTarget;
@@ -162,7 +162,7 @@ MainWindow::dialNow (const QString &strTarget)
         if (bDialout) {
             ctx->ci = ci;
             QString assocNum = ci->getAssociatedNumber ();
-            
+
             if (assocNum.isEmpty()) {
                 setStatus ("Dial out needs source number.");
                 Q_WARN ("Dial out needs source number.");
@@ -264,8 +264,10 @@ MainWindow::onSigDialComplete (DialContext *ctx, bool ok)
 }//MainWindow::onSigDialComplete
 
 void
-MainWindow::dialComplete (AsyncTaskToken *token)
+MainWindow::dialComplete ()
 {
+    AsyncTaskToken *token = (AsyncTaskToken *) QObject::sender ();
+
     gvApiProgressString.clear ();
 
     QMutexLocker locker (&mtxDial);

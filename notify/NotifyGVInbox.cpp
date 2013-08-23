@@ -33,8 +33,8 @@ GVInbox::refresh ()
         Q_WARN("Failed to allocate token for gvapi call");
         return;
     }
-    bool rv = connect(token, SIGNAL(completed(AsyncTaskToken*)),
-                      this, SLOT(onCheckInboxDone(AsyncTaskToken*)));
+    bool rv = connect(token, SIGNAL(completed()),
+                      this, SLOT(onCheckInboxDone()));
     Q_ASSERT(rv);
     if (!rv) {
         qApp->quit ();
@@ -42,16 +42,17 @@ GVInbox::refresh ()
     }
 
     m_bRefreshInProgress = true;
-
     if (!gvApi.checkRecentInbox (token)) {
-        onCheckInboxDone (NULL);
-        delete token;
+        token->deleteLater ();
+        m_bRefreshInProgress = false;
     }
 }//GVInbox::refresh
 
 void
-GVInbox::onCheckInboxDone (AsyncTaskToken *token)
+GVInbox::onCheckInboxDone ()
 {
+    AsyncTaskToken *token = (AsyncTaskToken *) QObject::sender ();
+
     bool bInboxChanged = false;
     do { // Begin cleanup block (not a loop)
         if (!token) {

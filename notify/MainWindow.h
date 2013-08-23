@@ -22,8 +22,8 @@ private slots:
     void doWork();
     void setStatus(const QString &strText, int timeout  = 3000);
 
-    void loginCompleted (AsyncTaskToken *token);
-    void logoutCompleted (AsyncTaskToken *token);
+    void loginCompleted ();
+    void logoutCompleted ();
 
     void onTwoStepAuthentication(AsyncTaskToken *token);
 

@@ -175,8 +175,8 @@ qgvVmail::retrieveVoicemail (const QString &strVmailLink)
             break;
         }
 
-        rv = connect (token, SIGNAL(completed(AsyncTaskToken*)),
-                      this , SLOT(onVmailDownloaded(AsyncTaskToken*)));
+        rv = connect (token, SIGNAL(completed()),
+                      this , SLOT(onVmailDownloaded()));
 
         MainWindow *mainWin = (MainWindow *) parent();
         mainWin->gvApiProgressString = "Voicemail progress";
@@ -197,8 +197,10 @@ qgvVmail::retrieveVoicemail (const QString &strVmailLink)
 }//qgvVmail::retrieveVoicemail
 
 void
-qgvVmail::onVmailDownloaded (AsyncTaskToken *token)
+qgvVmail::onVmailDownloaded ()
 {
+    AsyncTaskToken *token = (AsyncTaskToken *) QObject::sender ();
+
     MainWindow *mainWin = (MainWindow *) parent();
     mainWin->gvApiProgressString.clear ();
 
@@ -221,6 +223,8 @@ qgvVmail::onVmailDownloaded (AsyncTaskToken *token)
     } else {
         QFile::remove (strFilename);
     }
+
+    token->deleteLater ();
 }//qgvVmail::onVmailDownloaded
 
 #if PHONON_ENABLED

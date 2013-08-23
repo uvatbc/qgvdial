@@ -3,229 +3,144 @@
 
 GVContactsTable::GVContactsTable (QObject *parent)
 : QObject (parent)
-, nwMgr (this)
+, api(this)
 , mutex(QMutex::Recursive)
-, bLoggedIn(false)
 , bRefreshRequested (false)
 {
+    connect(&api, SIGNAL(oneContact(ContactInfo)),
+            this, SLOT(gotOneContact(ContactInfo)));
 }//GVContactsTable::GVContactsTable
 
 GVContactsTable::~GVContactsTable ()
 {
 }//GVContactsTable::~GVContactsTable
 
-QNetworkReply *
-GVContactsTable::postRequest (QString         strUrl,
-                              QStringPairList arrPairs,
-                              QObject        *receiver,
-                              const char     *method)
+void
+GVContactsTable::login(const QString &strU, const QString &strP)
 {
-    QStringList arrParams;
-    foreach (QStringPair pairParam, arrPairs) {
-        arrParams += QString("%1=%2")
-                        .arg(pairParam.first)
-                        .arg(pairParam.second);
+    QMutexLocker locker(&mutex);
+    strUser = strU;
+    strPass = strP;
+
+    AsyncTaskToken *task = new AsyncTaskToken(this);
+    if (NULL == task) {
+        Q_WARN("Failed to allocate contacts task");
+        qApp->quit ();
+        return;
     }
-    QString strParams = arrParams.join ("&");
 
-    QUrl url (strUrl);
-    QNetworkRequest request(url);
-    request.setHeader (QNetworkRequest::ContentTypeHeader,
-                       "application/x-www-form-urlencoded");
-    if (0 != strGoogleAuth.size ()) {
-        QByteArray byAuth = QString("GoogleLogin auth=%1")
-                                    .arg(strGoogleAuth).toAscii ();
-        request.setRawHeader ("Authorization", byAuth);
+    task->inParams["user"] = strUser;
+    task->inParams["pass"] = strPass;
+
+    if (!api.login (task)) {
+        Q_WARN("Failed to start contacts login");
+        qApp->quit ();
+        return;
     }
-    QByteArray byPostData = strParams.toAscii ();
+}//GVContactsTable::loginSuccess
 
-    QObject::connect (&nwMgr   , SIGNAL (finished (QNetworkReply *)),
-                       receiver, method);
-    QNetworkReply *reply = nwMgr.post (request, byPostData);
-    return (reply);
-}//GVContactsTable::postRequest
-
-QNetworkReply *
-GVContactsTable::getRequest (QString         strUrl,
-                             QObject        *receiver,
-                             const char     *method)
+void
+GVContactsTable::logout ()
 {
-    QUrl url (strUrl);
-    QNetworkRequest request(url);
-    request.setHeader (QNetworkRequest::ContentTypeHeader,
-                       "application/x-www-form-urlencoded");
-    if (0 != strGoogleAuth.size ()) {
-        QByteArray byAuth = QString("GoogleLogin auth=%1")
-                                    .arg(strGoogleAuth).toAscii ();
-        request.setRawHeader ("Authorization", byAuth);
+    AsyncTaskToken *task = new AsyncTaskToken(this);
+    if (NULL == task) {
+        Q_WARN("Failed to logout");
+        return;
     }
 
-    QObject::connect (&nwMgr   , SIGNAL (finished (QNetworkReply *)),
-                       receiver, method);
-    QNetworkReply *reply = nwMgr.get (request);
-    return (reply);
-}//GVContactsTable::getRequest
+    connect(task, SIGNAL(completed()), task, SLOT(deleteLater()));
+    if (!api.logout (task)) {
+        Q_WARN("Failed to logout");
+        delete task;
+    }
+}//GVContactsTable::logout
+
+void
+GVContactsTable::onPresentCaptcha(AsyncTaskToken *task,
+                                  const QString & /*captchaUrl*/)
+{
+    Q_WARN("No way to handle a captcha!!");
+    task->deleteLater ();
+    qApp->quit ();
+}//GVContactsTable::onPresentCaptcha
+
+void
+GVContactsTable::onLoginDone()
+{
+    AsyncTaskToken *task = (AsyncTaskToken *) QObject::sender ();
+
+    if (NULL == task) {
+        Q_WARN("invalid task");
+        qApp->quit();
+        return;
+    }
+
+    if (ATTS_SUCCESS != task->status) {
+        Q_WARN("Failed to login to contacts");
+        task->deleteLater ();
+        qApp->quit();
+        return;
+    }
+
+    QMutexLocker locker (&mutex);
+    if (bRefreshRequested) {
+        refreshContacts ();
+    }
+
+    task->deleteLater ();
+}//GVContactsTable::onLoginDone
 
 void
 GVContactsTable::refreshContacts ()
 {
     QMutexLocker locker(&mutex);
-    if (!bLoggedIn) {
+    if (!api.isLoggedIn ()) {
         bRefreshRequested = true;
         return;
     }
-    bRefreshRequested = false;
-    bChangedSinceRefresh = false;
 
-    QString strUrl = QString ("http://www.google.com/m8/feeds/contacts/%1/full"
-                              "?max-results=10000")
-                        .arg (strUser);
-
-    bRefreshIsUpdate = false;
-    if (dtUpdate.isValid ()) {
-        QString strUpdate = dtUpdate.toString ("yyyy-MM-dd")
-                          + "T"
-                          + dtUpdate.toString ("hh:mm:ss");
-        strUrl += QString ("&updated-min=%1&showdeleted=true").arg (strUpdate);
-        bRefreshIsUpdate = true;
+    AsyncTaskToken *task = new AsyncTaskToken(this);
+    if (NULL == task) {
+        Q_WARN("Failed to allocate task for refresh");
+        qApp->quit();
+        return;
     }
 
-    getRequest (strUrl, this , SLOT (onGotContacts (QNetworkReply *)));
+    bool showDeleted = true;
+    task->inParams["updatedMin"] = dtUpdate;
+    task->inParams["showDeleted"] = showDeleted;
+    connect(task, SIGNAL(completed()), this, SLOT(onContactsParsed()));
+    if (!api.getContacts (task)) {
+        Q_WARN("Failed to get contacts");
+        delete task;
+        qApp->quit ();
+        return;
+    } else {
+        bRefreshRequested = false;
+        bChangedSinceRefresh = false;
+    }
 }//GVContactsTable::refreshContacts
 
 void
-GVContactsTable::setUserPass (const QString &strU, const QString &strP)
+GVContactsTable::gotOneContact (ContactInfo contactInfo)
 {
     QMutexLocker locker(&mutex);
-    strUser = strU;
-    strPass = strP;
-}//GVContactsTable::setUserPass
-
-void
-GVContactsTable::loginSuccess ()
-{
-    QMutexLocker locker(&mutex);
-
-    QStringPairList arrPairs;
-    arrPairs += QStringPair("accountType", "GOOGLE");
-    arrPairs += QStringPair("Email"      , strUser);
-    arrPairs += QStringPair("Passwd"     , strPass);
-    arrPairs += QStringPair("service"    , "cp"); // name for contacts service
-    arrPairs += QStringPair("source"     , "MyCompany-qgvdial-ver01");
-    postRequest (GV_CLIENTLOGIN, arrPairs,
-                 this , SLOT (onLoginResponse (QNetworkReply *)));
-}//GVContactsTable::loginSuccess
-
-void
-GVContactsTable::loggedOut ()
-{
-    QMutexLocker locker(&mutex);
-    bLoggedIn = false;
-
-    strGoogleAuth.clear ();
-}//GVContactsTable::loggedOut
-
-void
-GVContactsTable::onLoginResponse (QNetworkReply *reply)
-{
-    QObject::disconnect (&nwMgr, SIGNAL (finished (QNetworkReply *)),
-                          this , SLOT   (onLoginResponse (QNetworkReply *)));
-
-    QString msg;
-    QString strReply = reply->readAll ();
-    QString strCaptchaToken, strCaptchaUrl;
-
-    strGoogleAuth.clear ();
-    do { // Begin cleanup block (not a loop)
-        QStringList arrParsed = strReply.split ('\n');
-        foreach (QString strPair, arrParsed) {
-            QStringList arrPair = strPair.split ('=');
-            if (arrPair[0] == "Auth") {
-                strGoogleAuth = arrPair[1];
-            } else if (arrPair[0] == "CaptchaToken") {
-                strCaptchaToken = arrPair[1];
-            } else if (arrPair[0] == "CaptchaUrl") {
-                strCaptchaUrl = arrPair[1];
-            }
-        }
-
-        if (0 != strCaptchaUrl.size ()) {
-            Q_CRIT ("Google requested CAPTCHA!!");
-            qApp->quit ();
-
-            break;
-        }
-
-        if (0 == strGoogleAuth.size ()) {
-            Q_WARN ("Failed to login!!");
-            break;
-        }
-
-        QMutexLocker locker (&mutex);
-        bLoggedIn = true;
-
-        if (bRefreshRequested) {
-            refreshContacts ();
-        }
-    } while (0); // End cleanup block (not a loop)
-    reply->deleteLater ();
-}//GVContactsTable::onLoginResponse
-
-void
-GVContactsTable::onGotContacts (QNetworkReply *reply)
-{
-    QObject::disconnect (&nwMgr, SIGNAL (finished (QNetworkReply *)),
-                          this , SLOT   (onGotContacts (QNetworkReply *)));
-
-    do { // Begin cleanup block (not a loop)
-        QByteArray byData = reply->readAll ();
-        if (byData.contains ("Authorization required")) {
-            emit status("Authorization failed.");
-            break;
-        }
-
-#if 0
-        QFile temp("dump.txt");
-        temp.open (QIODevice::ReadWrite);
-        temp.write (byData);
-        temp.close ();
-#endif
-
-        dtUpdate = QDateTime::currentDateTime().toUTC ();
-
-        QThread *workerThread = new QThread(this);
-        ContactsParserObject *pObj = new ContactsParserObject(byData);
-        pObj->setEmitLog (false);
-        pObj->moveToThread (workerThread);
-        QObject::connect (workerThread, SIGNAL(started()),
-                          pObj        , SLOT  (doWork()));
-        QObject::connect (pObj, SIGNAL(done(bool, quint32, quint32)),
-                          this, SLOT  (onContactsParsed(bool)));
-        QObject::connect (pObj        , SIGNAL(done(bool, quint32, quint32)),
-                          workerThread, SLOT  (quit()));
-        QObject::connect (workerThread, SIGNAL(terminated()),
-                          pObj        , SLOT  (deleteLater()));
-        QObject::connect (workerThread, SIGNAL(terminated()),
-                          workerThread, SLOT  (deleteLater()));
-        QObject::connect (pObj, SIGNAL (status(const QString &, int)),
-                          this, SIGNAL (status(const QString &, int)));
-        QObject::connect (pObj, SIGNAL (gotOneContact (const ContactInfo &)),
-                          this, SLOT   (gotOneContact (const ContactInfo &)));
-        workerThread->start ();
-    } while (0); // End cleanup block (not a loop)
-
-    reply->deleteLater ();
-}//GVContactsTable::onGotContacts
-
-void
-GVContactsTable::gotOneContact (const ContactInfo & /*contactInfo*/)
-{
-    QMutexLocker locker(&mutex);
-    bChangedSinceRefresh = true;
+    if (contactInfo.dtUpdate > dtUpdate) {
+        dtUpdate = contactInfo.dtUpdate;
+        bChangedSinceRefresh = true;
+    }
 }//GVContactsTable::gotOneContact
 
 void
-GVContactsTable::onContactsParsed (bool rv)
+GVContactsTable::onContactsParsed ()
 {
-    emit allContacts (bChangedSinceRefresh, rv);
+    AsyncTaskToken *task = (AsyncTaskToken *) QObject::sender ();
+
+    if (NULL == task) {
+        Q_WARN("invalid task");
+        qApp->quit();
+        return;
+    }
+
+    emit allContacts (bChangedSinceRefresh, (ATTS_SUCCESS == task->status));
 }//GVContactsTable::onContactsParsed

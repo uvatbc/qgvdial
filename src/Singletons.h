@@ -56,7 +56,6 @@ private:
     virtual ~Singletons ();
 };
 
-#include "GVDataAccess.h"
 #include "OsDependent.h"
 #include "CacheDatabase.h"
 #include "ObserverFactory.h"

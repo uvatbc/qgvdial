@@ -25,7 +25,7 @@ public slots:
     void loggedOut ();
 
 private slots:
-    void onCheckInboxDone (AsyncTaskToken *token);
+    void onCheckInboxDone ();
 
 private:
     GVApi          &gvApi;
