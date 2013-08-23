@@ -65,7 +65,9 @@ LibContacts::loginCompleted()
             win->db.setAppPass (task->inParams["pass"].toString());
         }
 
-        refresh ();
+        QDateTime after;
+        win->db.getLatestContact (after);
+        refresh (after);
     } else {
         Q_WARN("Login failed");
         win->uiRequestApplicationPassword ();

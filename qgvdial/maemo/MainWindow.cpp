@@ -24,6 +24,7 @@ Contact: yuvraaj@gmail.com
 
 #include "MainWindow.h"
 #include "ContactsModel.h"
+#include "InboxModel.h"
 
 #ifdef Q_WS_MAEMO_5
 #include <QMaemo5InformationBox>
@@ -38,7 +39,9 @@ MainWindow::MainWindow(QObject *parent)
 , textUsername(NULL)
 , textPassword(NULL)
 , contactsList(NULL)
+, inboxList(NULL)
 , contactsModel(NULL)
+, inboxModel(NULL)
 {
 }//MainWindow::MainWindow
 
@@ -127,6 +130,11 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
 
         contactsList = getQMLObject ("ContactsList");
         if (NULL == contactsList) {
+            break;
+        }
+
+        inboxList = getQMLObject ("InboxList");
+        if (NULL == inboxList) {
             break;
         }
 
@@ -246,5 +254,12 @@ MainWindow::uiRefreshContacts()
 void
 MainWindow::uiRefreshInbox()
 {
-    Q_ASSERT(0 == "Not implemented");
+    InboxModel *oldModel = inboxModel;
+    inboxModel = oInbox.createModel ();
+    m_view.engine()->rootContext()->setContextProperty("g_InboxModel",
+                                                       inboxModel);
+    QMetaObject::invokeMethod (inboxList, "setMyModel");
+    if (NULL != oldModel) {
+        delete oldModel;
+    }
 }//MainWindow::uiRefreshInbox()

@@ -28,7 +28,6 @@ Contact: yuvraaj@gmail.com
 #include "IMainWindow.h"
 #include "qmlapplicationviewer.h"
 
-class ContactsModel;
 class MainWindow : public IMainWindow
 {
     Q_OBJECT
@@ -62,8 +61,10 @@ private:
     QObject *textUsername;
     QObject *textPassword;
     QObject *contactsList;
+    QObject *inboxList;
 
-    ContactsModel *contactsModel;
+    ContactsModel  *contactsModel;
+    InboxModel     *inboxModel;
 };
 
 #endif // MAINWINDOW_H

@@ -58,7 +58,6 @@ Rectangle {
 
         function setMyModel() {
             if (contactsList.model == null) {
-                console.debug("null model");
                 contactsList.model = g_ContactsModel;
             }
         }

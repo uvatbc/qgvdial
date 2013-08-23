@@ -1042,8 +1042,7 @@ CacheDb::getLatestInboxEntry (QDateTime &dateTime)
                 "ORDER BY " GV_IN_ATTIME " DESC");
     do // Begin cleanup block (not a loop)
     {
-        if (!query.next ())
-        {
+        if (!query.next ()) {
             Q_WARN("Couldn't get the latest inbox item");
             break;
         }
@@ -1051,8 +1050,7 @@ CacheDb::getLatestInboxEntry (QDateTime &dateTime)
         // Convert to date time
         bool bOk = false;
         quint64 dtVal = query.value(0).toULongLong (&bOk);
-        if (!bOk)
-        {
+        if (!bOk) {
             Q_WARN("Could not convert datetime for latest inbox update");
             break;
         }

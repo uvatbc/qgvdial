@@ -25,33 +25,32 @@ Rectangle {
     id: container
 
     property bool isSearchResults: false
-    property real toolbarHeight: 50
 
     color: "black"
 
-/*
     Button {
         id: inboxSelectorBtn
         anchors {
             top: parent.top
-            topMargin: 40
+            topMargin: 5
             horizontalCenter: parent.horizontalCenter
         }
 
         width: parent.width - 10
 
         text: inboxSelection.model.get(inboxSelection.selectedIndex).name
-        onClicked: inboxSelection.open();
+        onClicked: inboxSelection.isOpen() ? inboxSelection.close() : inboxSelection.open();
     }
 
     SelectionDialog {
         id: inboxSelection
         anchors {
-            top: parent.top
+            top: inboxSelectorBtn.bottom
+            bottom: parent.bottom
         }
         width: parent.width
 
-        selectedIndex: 0
+        selectedIndex: 1
 
         model: ListModel {
             ListElement { name: "All" }
@@ -61,13 +60,22 @@ Rectangle {
             ListElement { name: "Voicemail" }
             ListElement { name: "SMS" }
         }
-    }
-*/
+    }//SelectionDialog
 
     ListView {
         id: inboxList
-        //anchors.top: inboxSelectorBtn.bottom
-        anchors.fill: parent
+        objectName: "InboxList"
+
+        function setMyModel() {
+            if (inboxList.model == null) {
+                inboxList.model = g_InboxModel;
+            }
+        }
+
+        anchors {
+            top: inboxSelectorBtn.bottom
+            bottom: parent.bottom
+        }
         width: parent.width
-    }
+    }//ListView
 }

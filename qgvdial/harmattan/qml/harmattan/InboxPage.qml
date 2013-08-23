@@ -67,7 +67,6 @@ Page {
 
         function setMyModel() {
             if (inboxList.model == null) {
-                console.debug("null model");
                 inboxList.model = g_InboxModel;
             }
         }

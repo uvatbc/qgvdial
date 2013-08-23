@@ -78,12 +78,7 @@ Rectangle {
         contentWidth: width
         clip: true
 
-        anchors {
-            top: parent.top
-            topMargin: 40
-        }
-        width: parent.width
-        height: parent.height - container.toolbarHeight
+        anchors.fill: parent
 
         ExpandView {
             id: expandLoginDetails

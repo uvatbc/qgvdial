@@ -156,7 +156,9 @@ IMainWindow::loginCompleted()
                 onUiGotApplicationPassword (m_pass);
             }
 
-            oInbox.refresh ();
+            QDateTime after;
+            db.getLatestInboxEntry (after);
+            oInbox.refresh ("all", after);
         } else if (ATTS_NW_ERROR == task->status) {
             Q_WARN("Login failed because of network error");
             uiSetUserPass (true);
@@ -185,8 +187,6 @@ IMainWindow::onUiGotApplicationPassword(const QString &appPw)
     Q_DEBUG("User gave app specific password");
     // Begin contacts login
     oContacts.login (m_user, appPw);
-
-    //TODO: Fetch inbox, registered numbers and all that stuff
 }//IMainWindow::onUiGotApplicationPassword
 
 void

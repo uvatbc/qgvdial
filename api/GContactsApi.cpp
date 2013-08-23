@@ -212,7 +212,7 @@ GContactsApi::getContacts(AsyncTaskToken *task)
 
     QDateTime updatedMin;
     if (task->inParams.contains ("updatedMin")) {
-        updatedMin = task->inParams["updated-min"].toDateTime ();
+        updatedMin = task->inParams["updatedMin"].toDateTime ();
     }
 
     QString temp = QString ("http://www.google.com/m8/feeds/contacts/%1/full")
