@@ -223,3 +223,13 @@ MainWindow::onUserLogoutDone()
 {
     Q_DEBUG("Logout complete");
 }//MainWindow::onUserLogoutDone
+
+void
+MainWindow::uiRefreshContacts()
+{
+}//MainWindow::uiRefreshContacts
+
+void
+MainWindow::uiRefreshInbox()
+{
+}//MainWindow::uiRefreshInbox

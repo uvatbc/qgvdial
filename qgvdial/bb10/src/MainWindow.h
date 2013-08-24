@@ -65,6 +65,9 @@ public:
     void uiLoginDone(int status, const QString &errStr);
     void onUserLogoutDone();
 
+    void uiRefreshContacts();
+    void uiRefreshInbox();
+
     void init();
     void log(QDateTime dt, int level, const QString &strLog);
 
