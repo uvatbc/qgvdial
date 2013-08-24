@@ -56,7 +56,7 @@ OsdCipher::_cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt)
                                 (quint8 *) &cipherOut, &outl,
                                  (quint8 *) &cipherIn , inl);
         if (1 != iEVP) {
-            qWarning ("Cipher update failed. Aborting");
+            Q_WARN ("Cipher update failed. Aborting");
             break;
         }
         byOut += QByteArray(cipherOut, outl);

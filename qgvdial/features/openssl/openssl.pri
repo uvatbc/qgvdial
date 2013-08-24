@@ -10,6 +10,9 @@ win32 {
 blackberry {
     LIBS += -lcrypto
 } else {
+symbian {
+LIBS += -llibcrypto
+} else {
 # For all Linux variants, add openssl
     LIBS += -lssl -lcrypto
-} }
+} } }
