@@ -69,6 +69,7 @@ myMessageOutput(QtMsgType type, const char *msg)
         break;
     case QtFatalMsg:
         level = 0;
+        break;
     }
 
     QDateTime dt = QDateTime::currentDateTime ();

@@ -86,7 +86,7 @@ LibContacts::onPresentCaptcha(AsyncTaskToken *task, const QString &captchaUrl)
 }//LibContacts::onPresentCaptcha
 
 bool
-LibContacts::refresh(QDateTime after /*= QDateTime()*/)
+LibContacts::refresh(QDateTime after /* = QDateTime()*/)
 {
     AsyncTaskToken *task = new AsyncTaskToken(this);
     if (!task) {

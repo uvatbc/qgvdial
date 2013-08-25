@@ -82,7 +82,7 @@ CacheDb::deinit()
 }//CacheDb::deinit
 
 void
-CacheDb::setQuickAndDirty(bool beDirty /*= true*/)
+CacheDb::setQuickAndDirty(bool beDirty /* = true*/)
 {
     CacheDbPrivate &p = CacheDbPrivate::ref ();
     QSqlQuery query(p.db);
