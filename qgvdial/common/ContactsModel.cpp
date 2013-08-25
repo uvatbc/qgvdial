@@ -27,9 +27,8 @@ ContactsModel::ContactsModel (QObject *parent)
 , modelContacts (NULL)
 {
     QHash<int, QByteArray> roles;
+    roles[CT_IDRole]        = "id";
     roles[CT_NameRole]      = "name";
-    roles[CT_NotesRole]     = "notes";
-    roles[CT_ContactsRole]  = "contacts";
     roles[CT_ImagePathRole] = "imagePath";
     setRoleNames(roles);
 }//ContactsModel::ContactsModel
@@ -40,55 +39,24 @@ ContactsModel::data (const QModelIndex &index, int role) const
     QVariant retVar;
 
     do { // Begin cleanup block (not a loop)
+        if (CT_IDRole == role) {
+            retVar =
+            QSqlQueryModel::data (index.sibling(index.row(), 0), Qt::EditRole);
+            break;
+        }
+
         if (CT_NameRole == role) {
             retVar =
             QSqlQueryModel::data (index.sibling(index.row(), 1), Qt::EditRole);
             break;
         }
 
-        if (CT_NotesRole == role) {
+        if (CT_ImagePathRole == role) {
             retVar =
             QSqlQueryModel::data (index.sibling(index.row(), 2), Qt::EditRole);
             break;
         }
 
-        ContactInfo info;
-        info.strId = QSqlQueryModel::data (index.sibling(index.row(), 0),
-                        Qt::EditRole).toString ();
-        if (info.strId.isEmpty ()) {
-            Q_WARN("This link is empty!");
-            retVar = "";
-            break;
-        }
-        db.getContactFromLink (info);
-
-        if (CT_ContactsRole == role) {
-            QObject *pNonConst = (QObject *) this;
-            ContactDetailsModel *pCdm = new ContactDetailsModel (info,
-                                                                 pNonConst);
-            if (NULL != pCdm) {
-                retVar = qVariantFromValue<QObject *> (pCdm);
-            } else {
-                qWarning ("Failed to allocate contact detail");
-            }
-
-            break;
-        }
-
-        if (CT_ImagePathRole == role) {
-            retVar.clear ();
-            if ((!info.strPhotoPath.isEmpty ()) &&
-                (QFileInfo(info.strPhotoPath).exists ())) {
-                retVar = QUrl::fromLocalFile (info.strPhotoPath);
-            } else {
-                if (!info.strPhotoPath.isEmpty ()) {
-                    emit noContactPhoto(info);
-                }
-            }
-            break;
-        }
-
-        // This role can be handled by the base class
         retVar = QSqlQueryModel::data (index, role);
     } while (0); // End cleanup block (not a loop)
 

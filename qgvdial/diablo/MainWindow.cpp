@@ -182,8 +182,7 @@ MainWindow::uiRefreshContacts()
     }
 
     d->ui->contactsView->hideColumn (0);
-    d->ui->contactsView->hideColumn (3);
-    d->ui->contactsView->hideColumn (4);
+    d->ui->contactsView->hideColumn (2);
 }//MainWindow::uiRefreshContacts
 
 void

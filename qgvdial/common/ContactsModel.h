@@ -35,9 +35,8 @@ class ContactsModel : public QSqlQueryModel
 
 public:
     enum ContactsFieldRoles {
-        CT_NameRole = Qt::UserRole + 1,
-        CT_NotesRole,
-        CT_ContactsRole,
+        CT_IDRole = Qt::UserRole + 1,
+        CT_NameRole,
         CT_ImagePathRole
     };
 

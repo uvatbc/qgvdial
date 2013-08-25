@@ -504,8 +504,7 @@ void
 CacheDb::refreshContactsModel (ContactsModel *modelContacts,
                                const QString &query)
 {
-    QString strQ = "SELECT " GV_C_ID "," GV_C_NAME "," GV_C_NOTES ","
-                             GV_C_PICLINK "," GV_C_UPDATED " "
+    QString strQ = "SELECT " GV_C_ID "," GV_C_NAME "," GV_C_PICLINK " "
                    "FROM " GV_CONTACTS_TABLE;
     if (!query.isEmpty ()) {
         QString scrubQuery = query;
