@@ -41,10 +41,13 @@ Page {
             
             listItemComponents: [
                 ListItemComponent {
-                    type: ""
-
-                    StandardListItem {
-                        title: ListItemData.display
+                    Container {
+                        ImageView {
+                            image: len(ListItemData.imagePath) == 0 ? "qrc://unknown_contact.png" : ListItemData.imagePath; 
+                        }
+                        Label {
+                            text: ListItemData.name
+                        }
                     }
                 }
             ]
