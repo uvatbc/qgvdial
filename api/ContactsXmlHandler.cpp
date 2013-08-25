@@ -197,7 +197,7 @@ ContactsXmlHandler::getUsableContacts ()
 }//ContactsXmlHandler::getUsableContacts
 
 void
-ContactsXmlHandler::setEmitLog (bool enable /*= true*/)
+ContactsXmlHandler::setEmitLog (bool enable /* = true*/)
 {
     bEmitLog = enable;
 }//ContactsXmlHandler::setEmitLog

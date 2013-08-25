@@ -25,7 +25,7 @@ Contact: yuvraaj@gmail.com
 #define QGC_MEASURE_TIME 0
 
 ContactsParser::ContactsParser (AsyncTaskToken *task, QByteArray data,
-                                QObject *parent /*= 0*/)
+                                QObject *parent /* = 0*/)
 : QObject(parent)
 , m_task (task)
 , byData (data)
@@ -242,7 +242,7 @@ ContactsParser::~ContactsParser()
 }//ContactsParser::~ContactsParser
 
 void
-ContactsParser::setEmitLog (bool enable /*= true*/)
+ContactsParser::setEmitLog (bool enable /* = true*/)
 {
     bEmitLog = enable;
 }//ContactsParser::setEmitLog
