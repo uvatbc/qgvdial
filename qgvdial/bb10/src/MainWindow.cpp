@@ -22,6 +22,7 @@ Contact: yuvraaj@gmail.com
 #include "MainWindow.h"
 #include "AbstractItemModel.hpp"
 #include "ContactsModel.h"
+#include "InboxModel.h"
 
 using namespace bb::cascades;
 
@@ -244,4 +245,10 @@ MainWindow::uiRefreshContacts()
 void
 MainWindow::uiRefreshInbox()
 {
+    InboxModel *oldModel = m_inboxModel;
+    m_inboxModel = oInbox.createModel();
+    qml->setContextProperty("g_inboxModel", m_inboxModel);
+    if (NULL != oldModel) {
+        delete oldModel;
+    }
 }//MainWindow::uiRefreshInbox
