@@ -20,8 +20,34 @@ Contact: yuvraaj@gmail.com
 */
 
 import bb.cascades 1.0
+import com.kdab.components 1.0
 
 Page {
+    attachedObjects: [
+        AbstractItemModel {
+            id: contactsModel
+
+            sourceModel: g_contactsModel
+        }
+    ]
+    
     Container {
+        TextField {
+            hintText: "Search"
+        }
+        
+        ListView {
+            dataModel: contactsModel
+            
+            listItemComponents: [
+                ListItemComponent {
+                    type: ""
+
+                    StandardListItem {
+                        title: ListItemData.display
+                    }
+                }
+            ]
+        }
     }//Container
 }//Page

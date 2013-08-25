@@ -45,6 +45,8 @@ using namespace bb::cascades;
 
 namespace bb { namespace cascades { class Application; }}
 
+class ContactsModel;
+
 /*!
  * @brief Application pane object
  *

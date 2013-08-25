@@ -20,6 +20,8 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "MainWindow.h"
+#include "AbstractItemModel.hpp"
+#include "ContactsModel.h"
 
 using namespace bb::cascades;
 
@@ -82,7 +84,11 @@ MainWindow::getQMLObject(const char *objectName)
 void
 MainWindow::init()
 {
-    // create scene document from main.qml asset
+    qmlRegisterType<QAbstractItemModel>();
+    qmlRegisterType<AbstractItemModel>("com.kdab.components", 1, 0,
+                                       "AbstractItemModel");
+
+        // create scene document from main.qml asset
     // set parent to created document to ensure it exists for the whole application lifetime
     qml = QmlDocument::create("asset:///main.qml").parent(this);
 
@@ -227,6 +233,12 @@ MainWindow::onUserLogoutDone()
 void
 MainWindow::uiRefreshContacts()
 {
+    ContactsModel *oldModel = m_contactsModel;
+    m_contactsModel = oContacts.createModel();
+    qml->setContextProperty("g_contactsModel", m_contactsModel);
+    if (NULL != oldModel) {
+        delete oldModel;
+    }
 }//MainWindow::uiRefreshContacts
 
 void
