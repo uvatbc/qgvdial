@@ -21,6 +21,7 @@ Contact: yuvraaj@gmail.com
 
 #include "IMainWindow.h"
 #include "Lib.h"
+#include "ContactsModel.h"
 
 IMainWindow::IMainWindow(QObject *parent)
 : QObject(parent)
@@ -30,6 +31,7 @@ IMainWindow::IMainWindow(QObject *parent)
 , oInbox(this)
 , oPhones(this)
 , m_loginTask(NULL)
+, m_contactsModel(NULL)
 {
     qRegisterMetaType<ContactInfo>("ContactInfo");
     connect(&gvApi, SIGNAL(twoStepAuthentication(AsyncTaskToken*)),

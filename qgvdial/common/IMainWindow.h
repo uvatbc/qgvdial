@@ -29,6 +29,8 @@ Contact: yuvraaj@gmail.com
 #include "LibInbox.h"
 #include "LibGvPhones.h"
 
+class ContactsModel;
+
 /*==============================================================================
  *
  * IMainWindow: The class that drives the entire business logic of qgvdial.
@@ -148,6 +150,8 @@ protected:
     QString m_pass;
 
     AsyncTaskToken *m_loginTask;
+
+    ContactsModel *m_contactsModel;
 
     friend class LibContacts;
     friend class LibInbox;
