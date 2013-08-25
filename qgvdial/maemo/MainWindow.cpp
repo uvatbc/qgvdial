@@ -40,8 +40,6 @@ MainWindow::MainWindow(QObject *parent)
 , textPassword(NULL)
 , contactsList(NULL)
 , inboxList(NULL)
-, contactsModel(NULL)
-, inboxModel(NULL)
 {
 }//MainWindow::MainWindow
 
@@ -241,10 +239,10 @@ MainWindow::uiLoginDone(int status, const QString &errStr)
 void
 MainWindow::uiRefreshContacts()
 {
-    ContactsModel *oldModel = contactsModel;
-    contactsModel = oContacts.createModel ();
+    ContactsModel *oldModel = m_contactsModel;
+    m_contactsModel = oContacts.createModel ();
     m_view.engine()->rootContext()->setContextProperty("g_ContactsModel",
-                                                       contactsModel);
+                                                       m_contactsModel);
     QMetaObject::invokeMethod (contactsList, "setMyModel");
     if (NULL != oldModel) {
         delete oldModel;
@@ -254,10 +252,10 @@ MainWindow::uiRefreshContacts()
 void
 MainWindow::uiRefreshInbox()
 {
-    InboxModel *oldModel = inboxModel;
-    inboxModel = oInbox.createModel ();
+    InboxModel *oldModel = m_inboxModel;
+    m_inboxModel = oInbox.createModel ();
     m_view.engine()->rootContext()->setContextProperty("g_InboxModel",
-                                                       inboxModel);
+                                                       m_inboxModel);
     QMetaObject::invokeMethod (inboxList, "setMyModel");
     if (NULL != oldModel) {
         delete oldModel;

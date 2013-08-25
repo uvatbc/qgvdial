@@ -52,9 +52,6 @@ protected:
 
 private:
     MainWindowPrivate *d;
-
-    ContactsModel  *contactsModel;
-    InboxModel     *inboxModel;
 };
 
 QCoreApplication *

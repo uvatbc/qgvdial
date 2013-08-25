@@ -62,9 +62,6 @@ private:
     QObject *textPassword;
     QObject *contactsList;
     QObject *inboxList;
-
-    ContactsModel  *contactsModel;
-    InboxModel     *inboxModel;
 };
 
 #endif // MAINWINDOW_H

@@ -34,8 +34,6 @@ createApplication(int argc, char *argv[])
 MainWindow::MainWindow(QObject *parent)
 : IMainWindow(parent)
 , d(new MainWindowPrivate)
-, contactsModel(NULL)
-, inboxModel(NULL)
 {
 }//MainWindow::MainWindow
 
@@ -174,9 +172,9 @@ MainWindow::uiLoginDone(int status, const QString &errStr)
 void
 MainWindow::uiRefreshContacts()
 {
-    contactsModel = oContacts.createModel ();
-    QAbstractItemModel *oldModel = d->ui->contactsView->model ();
-    d->ui->contactsView->setModel (contactsModel);
+    QAbstractItemModel *oldModel = m_contactsModel;
+    m_contactsModel = oContacts.createModel ();
+    d->ui->contactsView->setModel (m_contactsModel);
     if (NULL != oldModel) {
         delete oldModel;
     }
@@ -188,9 +186,9 @@ MainWindow::uiRefreshContacts()
 void
 MainWindow::uiRefreshInbox()
 {
-    inboxModel = oInbox.createModel ();
-    QAbstractItemModel *oldModel = d->ui->inboxView->model ();
-    d->ui->inboxView->setModel (inboxModel);
+    QAbstractItemModel *oldModel = m_inboxModel;
+    m_inboxModel = oInbox.createModel ();
+    d->ui->inboxView->setModel (m_inboxModel);
     if (NULL != oldModel) {
         delete oldModel;
     }

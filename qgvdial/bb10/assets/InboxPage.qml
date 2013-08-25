@@ -22,6 +22,41 @@ Contact: yuvraaj@gmail.com
 import bb.cascades 1.0
 
 Page {
+    attachedObjects: [
+        AbstractItemModel {
+            id: inboxModel
+            
+            sourceModel: g_inboxModel
+        }
+    ]
+    
     Container {
+        ListView {
+            dataModel: inboxModel
+            
+            listItemComponents: [
+                ListItemComponent {
+                    Container {
+                        layout: StackLayout {
+                            orientation: LayoutOrientation.LeftToRight
+                        }
+  /*                      
+                        ImageView {
+                            image: {
+                                if ((ListItemData.imagePath != null) && ListItemData.imagePath.length != 0) {
+                                    return ListItemData.imagePath;  
+                                } else {
+                                    return "assets:///icons/unknown_contact.png";
+                                }
+                            }
+                        }
+*/
+                        Label {
+                            text: ListItemData.name
+                        }
+                    }
+                }
+            ]
+        }
     }//Container
 }//Page

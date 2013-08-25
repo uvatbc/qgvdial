@@ -32,6 +32,7 @@ IMainWindow::IMainWindow(QObject *parent)
 , oPhones(this)
 , m_loginTask(NULL)
 , m_contactsModel(NULL)
+, m_inboxModel(NULL)
 {
     qRegisterMetaType<ContactInfo>("ContactInfo");
     connect(&gvApi, SIGNAL(twoStepAuthentication(AsyncTaskToken*)),

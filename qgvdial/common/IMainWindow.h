@@ -30,6 +30,7 @@ Contact: yuvraaj@gmail.com
 #include "LibGvPhones.h"
 
 class ContactsModel;
+class InboxModel;
 
 /*==============================================================================
  *
@@ -152,6 +153,7 @@ protected:
     AsyncTaskToken *m_loginTask;
 
     ContactsModel *m_contactsModel;
+    InboxModel    *m_inboxModel;
 
     friend class LibContacts;
     friend class LibInbox;

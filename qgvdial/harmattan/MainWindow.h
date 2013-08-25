@@ -69,9 +69,6 @@ private:
     QObject *contactsList;
     QObject *inboxList;
 
-    ContactsModel  *contactsModel;
-    InboxModel     *inboxModel;
-
     void    *loginCtx;
 };
 

@@ -42,8 +42,18 @@ Page {
             listItemComponents: [
                 ListItemComponent {
                     Container {
+                        layout: StackLayout {
+                            orientation: LayoutOrientation.LeftToRight
+                        }
+                        
                         ImageView {
-                            image: ListItemData.imagePath.length == 0 ? "assets:///icons/unknown_contact.png" : ListItemData.imagePath
+                            image: {
+                                if ((ListItemData.imagePath != null) && ListItemData.imagePath.length != 0) {
+                                    return ListItemData.imagePath;  
+                                } else {
+                                    return "assets:///icons/unknown_contact.png";
+                                }
+                            }
                         }
                         Label {
                             text: ListItemData.name
@@ -52,5 +62,5 @@ Page {
                 }
             ]
         }
-    } //Container
+    }//Container
 }//Page
