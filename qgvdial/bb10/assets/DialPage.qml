@@ -37,15 +37,35 @@ Page {
             }
         ] //attachedObjects
         
-        Label {
-            id: textNumber
-            textStyle { base: tsd.style }
-            preferredHeight: 200
+        Container {
+            layout: StackLayout {
+                orientation: LayoutOrientation.RightToLeft
+            }
+            Button {
+                text: "\u232B"
+                onClicked: textNumber.text = textNumber.text.substr(0, textNumber.text.length-1);
+                maxWidth: 130
+                preferredHeight: 200
+            }
+            TextField {
+                id: textNumber
+                textStyle { base: tsd.style }
+                preferredHeight: 200
+                minWidth: 630
+                inputMode: TextFieldInputMode.PhoneNumber
+                onFocusedChanged: {
+                    if (focused) {
+                        keypad.visible = false;
+                    } else {
+                        keypad.visible = true;
+                    }
+                }
+            }
         }
         
         Keypad {
+            id: keypad
             onKeyPress: textNumber.text += text;
-            onDel: textNumber.text = textNumber.text.substr(0, textNumber.text.length-1);
             onCall: container.call(textNumber.text);
             onText: container.text(textNumber.text);
         }

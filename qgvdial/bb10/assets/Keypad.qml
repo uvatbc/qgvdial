@@ -27,7 +27,6 @@ Container {
     signal keyPress(string text)
     signal call
     signal text
-    signal del
 
     layout: StackLayout { orientation: LayoutOrientation.TopToBottom }
     
@@ -124,10 +123,6 @@ Container {
         Button {
             text: "Text"
             onClicked: container.text();
-        }
-        Button {
-            text: "\u232B"
-            onClicked: container.del();
         }
     }//Row 5
 }//Container

@@ -31,7 +31,7 @@ Container {
     signal pressAndHold
     signal doubleClicked
     
-    preferredWidth: 225
+    preferredWidth: 240
     preferredHeight: 210
     
     layout: DockLayout { }

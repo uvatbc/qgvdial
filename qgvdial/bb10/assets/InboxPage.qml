@@ -41,17 +41,22 @@ Page {
                         layout: StackLayout {
                             orientation: LayoutOrientation.LeftToRight
                         }
-  /*                      
                         ImageView {
                             image: {
-                                if ((ListItemData.imagePath != null) && ListItemData.imagePath.length != 0) {
-                                    return ListItemData.imagePath;  
-                                } else {
-                                    return "assets:///icons/unknown_contact.png";
+                                switch (ListItemData.type) {
+                                    case 1: // GVIE_Placed
+                                        return "assets://icons/in_Placed.png";
+                                    case 2: // GVIE_Received
+                                        return "assets://icons/in_Received.png";
+                                    case 3: // GVIE_Missed
+                                        return "assets://icons/in_Missed.png";
+                                    case 4: // GVIE_Voicemail
+                                        return "assets://icons/in_Voicemail.png";
+                                    case 5: // GVIE_TextMessage
+                                        return "assets://icons/in_Sms.png";
                                 }
                             }
                         }
-*/
                         Label {
                             text: ListItemData.name
                         }
