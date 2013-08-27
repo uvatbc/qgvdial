@@ -19,26 +19,24 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#ifndef IOSDEPENDENT_H
-#define IOSDEPENDENT_H
+#ifndef DIABLOPHONEFACTORY_H
+#define DIABLOPHONEFACTORY_H
 
 #include <QObject>
-#include "global.h"
+#include "IPhoneAccountFactory.h"
 
-class IOsDependant : public QObject
+class DiabloPhoneFactory : public IPhoneAccountFactory
 {
     Q_OBJECT
 public:
-    explicit IOsDependant(QObject *parent = 0) : QObject(parent) {}
-    virtual ~IOsDependant() {}
+    explicit DiabloPhoneFactory(QObject *parent = 0);
 
-    virtual QString getTempDir() = 0;
-    virtual QString getDbDir() = 0;
-    virtual QString getLogsDir() = 0;
+    bool identifyAll(AsyncTaskToken *task);
 
-    virtual bool cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt) = 0;
+signals:
+
+public slots:
+
 };
 
-IOsDependant *createOSD(QObject *parent = NULL);
-
-#endif // IOSDEPENDENT_H
+#endif // DIABLOPHONEFACTORY_H

@@ -10,7 +10,9 @@ SOURCES  += $$PWD/main.cpp \
             $$PWD/InboxModel.cpp \
             $$PWD/LibContacts.cpp \
             $$PWD/LibInbox.cpp \
-    ../common/LibGvPhones.cpp
+            $$PWD/LibGvPhones.cpp \
+            $$PWD/IPhoneAccount.cpp \
+            $$PWD/IPhoneAccountFactory.cpp
 
 HEADERS  += $$PWD/global.h \
             $$PWD/IOsDependent.h \
@@ -23,4 +25,6 @@ HEADERS  += $$PWD/global.h \
             $$PWD/InboxModel.h \
             $$PWD/LibContacts.h \
             $$PWD/LibInbox.h \
-    ../common/LibGvPhones.h
+            $$PWD/LibGvPhones.h \
+            $$PWD/IPhoneAccount.h \
+            $$PWD/IPhoneAccountFactory.h

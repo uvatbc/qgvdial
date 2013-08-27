@@ -19,26 +19,31 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#ifndef IOSDEPENDENT_H
-#define IOSDEPENDENT_H
+#ifndef IPHONEACCOUNTFACTORY_H
+#define IPHONEACCOUNTFACTORY_H
 
 #include <QObject>
 #include "global.h"
+#include "IPhoneAccount.h"
 
-class IOsDependant : public QObject
+class IPhoneAccountFactory : public QObject
 {
     Q_OBJECT
+
 public:
-    explicit IOsDependant(QObject *parent = 0) : QObject(parent) {}
-    virtual ~IOsDependant() {}
+    explicit IPhoneAccountFactory(QObject *parent = 0);
 
-    virtual QString getTempDir() = 0;
-    virtual QString getDbDir() = 0;
-    virtual QString getLogsDir() = 0;
+    virtual bool identifyAll(AsyncTaskToken *task) = 0;
 
-    virtual bool cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt) = 0;
+protected:
+    //! ID -> Account
+    QMap <QString, IPhoneAccount *> m_accounts;
+
+    friend IPhoneAccountFactory *
+    createPhoneAccountFactory(QObject *parent);
 };
 
-IOsDependant *createOSD(QObject *parent = NULL);
+IPhoneAccountFactory *
+createPhoneAccountFactory(QObject *parent);
 
-#endif // IOSDEPENDENT_H
+#endif // IPHONEACCOUNTFACTORY_H

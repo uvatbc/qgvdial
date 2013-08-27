@@ -33,6 +33,7 @@ IMainWindow::IMainWindow(QObject *parent)
 , m_loginTask(NULL)
 , m_contactsModel(NULL)
 , m_inboxModel(NULL)
+, m_acctFactory(createPhoneAccountFactory (this))
 {
     qRegisterMetaType<ContactInfo>("ContactInfo");
     connect(&gvApi, SIGNAL(twoStepAuthentication(AsyncTaskToken*)),
@@ -73,6 +74,17 @@ IMainWindow::onInitDone()
         } else {
             // Ask the user for login credentials
             uiRequestLoginDetails();
+        }
+
+        //! Begin the work to identify all phone accounts
+        AsyncTaskToken *task = new AsyncTaskToken(this);
+        if (NULL == task) {
+            Q_WARN("Failed to allocate task token for account identification");
+            break;
+        }
+        connect(task, SIGNAL(completed()), this, SLOT(onAccountsIdentified()));
+        if (!m_acctFactory->identifyAll (task)) {
+            delete task;
         }
     } while (0);
 }//IMainWindow::onInitDone
@@ -208,3 +220,11 @@ IMainWindow::onLogoutDone()
     onUserLogoutDone();
     task->deleteLater ();
 }//IMainWindow::onLogoutDone
+
+void
+IMainWindow::onAccountsIdentified()
+{
+    AsyncTaskToken *task = (AsyncTaskToken *) QObject::sender ();
+
+    task->deleteLater ();
+}//IMainWindow::onAccountsIdentified

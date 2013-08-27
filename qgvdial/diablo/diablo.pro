@@ -12,10 +12,12 @@ DEPLOYMENTFOLDERS = # file1 dir1
 
 SOURCES  += MainWindow.cpp \
             MainWindow_p.cpp \
-            OsDependant.cpp
+            OsDependant.cpp \
+            DiabloPhoneFactory.cpp
 HEADERS  += MainWindow.h \
             MainWindow_p.h \
-            OsDependant.h
+            OsDependant.h \
+            DiabloPhoneFactory.h
 
 FORMS   += mainwindow.ui
 

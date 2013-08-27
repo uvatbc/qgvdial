@@ -19,26 +19,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#ifndef IOSDEPENDENT_H
-#define IOSDEPENDENT_H
+#include "IPhoneAccountFactory.h"
 
-#include <QObject>
-#include "global.h"
-
-class IOsDependant : public QObject
+IPhoneAccountFactory::IPhoneAccountFactory(QObject *parent)
+: QObject(parent)
 {
-    Q_OBJECT
-public:
-    explicit IOsDependant(QObject *parent = 0) : QObject(parent) {}
-    virtual ~IOsDependant() {}
-
-    virtual QString getTempDir() = 0;
-    virtual QString getDbDir() = 0;
-    virtual QString getLogsDir() = 0;
-
-    virtual bool cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt) = 0;
-};
-
-IOsDependant *createOSD(QObject *parent = NULL);
-
-#endif // IOSDEPENDENT_H
+}//IPhoneAccountFactory::IPhoneAccountFactory
