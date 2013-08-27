@@ -23,9 +23,11 @@ CONFIG += qdeclarative-boostable
 # CONFIG += qt-components
 
 SOURCES  += MainWindow.cpp \
-            OsDependant.cpp
+            OsDependant.cpp \
+            HarmattanPhoneFactory.cpp
 HEADERS  += MainWindow.h \
-            OsDependant.h
+            OsDependant.h \
+            HarmattanPhoneFactory.h
 
 include(../common/common.pri)
 include(../../api/api.pri)

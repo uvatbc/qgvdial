@@ -13,9 +13,11 @@ CONFIG += mobility
 MOBILITY +=
 
 SOURCES  += MainWindow.cpp \
-            OsDependant.cpp
+            OsDependant.cpp \
+            MaemoPhoneFactory.cpp
 HEADERS  += MainWindow.h \
-            OsDependant.h
+            OsDependant.h \
+            MaemoPhoneFactory.h
 
 include(../common/common.pri)
 include(../../api/api.pri)

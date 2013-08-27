@@ -27,9 +27,11 @@ MOBILITY +=
 CONFIG += qt-components
 
 SOURCES  += MainWindow.cpp \
-            OsDependant.cpp
+            OsDependant.cpp \
+            SymbianPhoneFactory.cpp
 HEADERS  += MainWindow.h \
-            OsDependant.h
+            OsDependant.h \
+            SymbianPhoneFactory.h
 
 include(../common/common.pri)
 include(../../api/api.pri)
