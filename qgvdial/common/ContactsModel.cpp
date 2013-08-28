@@ -57,6 +57,25 @@ ContactsModel::data (const QModelIndex &index, int role) const
             break;
         }
 
+        // Everything other than the name: let it just pass
+        if (1 != index.column ()) {
+            retVar = QSqlQueryModel::data (index, role);
+            break;
+        }
+
+
+        // For the decoration role, return the pixmap if the path isnt empty
+        if (Qt::DecorationRole == role) {
+            QString path = QSqlQueryModel::data(index.sibling(index.row(), 2),
+                                                Qt::DisplayRole).toString();
+            if (!path.isEmpty ()) {
+                QPixmap pixmap(path);
+                retVar = pixmap;
+                break;
+            }
+        }
+
+        // If it isnt the decoration role, then just return the default data.
         retVar = QSqlQueryModel::data (index, role);
     } while (0); // End cleanup block (not a loop)
 
