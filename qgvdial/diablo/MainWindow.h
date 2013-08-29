@@ -39,6 +39,7 @@ public:
 
 public slots:
     void onLoginClicked();
+    void someTimeAfterGettingTheLastPhoto();
 
 protected:
     void uiRequestLoginDetails();

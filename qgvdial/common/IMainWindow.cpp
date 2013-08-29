@@ -94,6 +94,11 @@ IMainWindow::beginLogin(const QString &user, const QString &pass)
 {
     bool ok;
     do {
+        if (m_loginTask) {
+            Q_WARN("Login is in progress");
+            break;
+        }
+
         // Begin logon
         m_loginTask = new AsyncTaskToken(this);
         if (NULL == m_loginTask) {
@@ -144,6 +149,7 @@ IMainWindow::resumeTFAAuth(void *ctx, int pin, bool useAlt)
 void
 IMainWindow::loginCompleted()
 {
+    QString strAppPw;
     AsyncTaskToken *task = (AsyncTaskToken *) QObject::sender ();
     Q_ASSERT(m_loginTask == task);
     m_loginTask = NULL;
@@ -157,14 +163,12 @@ IMainWindow::loginCompleted()
                 db.setTFAFlag (true);
                 // Open UI to ask for application specific password
                 uiRequestApplicationPassword();
-            } else if (db.getTFAFlag ()) {
-                QString strAppPw;
-                if (db.getAppPass (strAppPw)) {
-                    onUiGotApplicationPassword (strAppPw);
-                } else {
-                    uiRequestApplicationPassword();
-                }
+            } else if (db.getAppPass (strAppPw)) {
+                onUiGotApplicationPassword (strAppPw);
             } else {
+                // Assume that the GV password is the contacts password.
+                // If this is not true then the login will fail and the
+                // application password will be requested.
                 onUiGotApplicationPassword (m_pass);
             }
 
@@ -176,9 +180,11 @@ IMainWindow::loginCompleted()
         } else if (ATTS_NW_ERROR == task->status) {
             Q_WARN("Login failed because of network error");
             uiSetUserPass (true);
+            uiRequestLoginDetails();
         } else if (ATTS_USER_CANCEL == task->status) {
             Q_WARN("User canceled login");
             uiSetUserPass (true);
+            uiRequestLoginDetails();
             db.clearCookies ();
             db.clearTFAFlag ();
         } else {
@@ -186,6 +192,7 @@ IMainWindow::loginCompleted()
 
             m_pass.clear ();
             uiSetUserPass(true);
+            uiRequestLoginDetails();
             db.clearCookies ();
             db.clearTFAFlag ();
         }

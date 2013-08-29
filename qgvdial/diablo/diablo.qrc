@@ -1,0 +1,21 @@
+<RCC>
+    <qresource prefix="/">
+        <!-- Main tab icons -->
+        <file alias="dialpad.svg">../../icons/dialpad.svg</file>
+        <file alias="people.svg">../../icons/people.svg</file>
+        <file alias="history.svg">../../icons/history.svg</file>
+        <file alias="settings.svg">../../icons/settings.svg</file>
+
+        <file alias="close.png">../../icons/close.png</file>
+        <file alias="search.png">../../icons/search.png</file>
+        <file alias="play.svg">../../icons/play.svg</file>
+
+        <file alias="unknown_contact.png">../../icons/unknown_contact.png</file>
+
+        <file alias="in_Missed.png">../../icons/in_Missed.png</file>
+        <file alias="in_Placed.png">../../icons/in_Placed.png</file>
+        <file alias="in_Received.png">../../icons/in_Received.png</file>
+        <file alias="in_Sms.png">../../icons/in_Sms.png</file>
+        <file alias="in_Voicemail.png">../../icons/in_Voicemail.png</file>
+    </qresource>
+</RCC>

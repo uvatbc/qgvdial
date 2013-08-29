@@ -450,15 +450,7 @@ CacheDb::putTempFile(const QString &strLink, const QString &strPath)
     scrubLink.replace ("'", "''");
     scrubPath.replace ("'", "''");
 
-    QString strOldPath;
-    if (getTempFile (strLink, strOldPath)) {
-        if (!strOldPath.isEmpty () && (QFileInfo(strOldPath).exists ())) {
-            QFile::remove (strOldPath);
-        }
-
-        query.exec (QString("DELETE FROM " GV_TEMP_TABLE
-                            " WHERE " GV_TT_LINK "='%1'").arg(scrubLink));
-    }
+    clearTempFile (strLink, true);
 
     QString strCTime = QDateTime::currentDateTime().toString (Qt::ISODate);
     query.exec (QString("INSERT INTO " GV_TEMP_TABLE " "
@@ -485,10 +477,44 @@ CacheDb::getTempFile(const QString &strLink, QString &strPath) const
     if (query.next ()) {
         strPath = query.value(0).toString();
         rv = true;
+    } else {
+        rv = false;
     }
 
     return (rv);
 }//CacheDb::getTempFile
+
+bool
+CacheDb::clearTempFile(const QString &strLink, bool deleteFile)
+{
+    CacheDbPrivate &p = CacheDbPrivate::ref ();
+    QSqlQuery query(p.db);
+    query.setForwardOnly (true);
+
+    QString scrubLink = strLink;
+    scrubLink.replace ("'", "''");
+
+    int deletions = 0;
+
+    QString strOldPath;
+    while (getTempFile (strLink, strOldPath)) {
+        if (deleteFile &&
+            !strOldPath.isEmpty () && (QFileInfo(strOldPath).exists ()) &&
+            !strOldPath.startsWith (":/") &&
+            !strOldPath.startsWith ("assets://")) {
+            QFile::remove (strOldPath);
+        }
+
+        strOldPath.replace ("'", "''");
+        query.exec (QString("DELETE FROM " GV_TEMP_TABLE
+                            " WHERE " GV_TT_LINK "='%1' AND "
+                            GV_TT_PATH "='%2';").arg(scrubLink, strOldPath));
+
+        deletions++;
+    }
+
+    return (deletions != 0);
+}//CacheDb::clearTempFile
 
 void
 CacheDb::clearContacts ()
@@ -504,14 +530,16 @@ void
 CacheDb::refreshContactsModel (ContactsModel *modelContacts,
                                const QString &query)
 {
-    QString strQ = "SELECT " GV_C_ID "," GV_C_NAME "," GV_C_PICLINK " "
-                   "FROM " GV_CONTACTS_TABLE;
+    QString strQ = "SELECT c."GV_C_ID",c."GV_C_NAME",c."GV_C_PICLINK
+                   ",t."GV_TT_PATH " FROM "
+                   GV_CONTACTS_TABLE" c LEFT JOIN "GV_TEMP_TABLE" t "
+                   "WHERE c."GV_C_PICLINK"=t."GV_TT_LINK;
     if (!query.isEmpty ()) {
         QString scrubQuery = query;
         scrubQuery.replace ("'", "''");
-        strQ += QString(" WHERE " GV_C_NAME " LIKE '%%%1%%'").arg (scrubQuery);
+        strQ += QString(" WHERE c."GV_C_NAME" LIKE '%%%1%%'").arg (scrubQuery);
     }
-    strQ += " ORDER BY " GV_C_NAME;
+    strQ += " ORDER BY c." GV_C_NAME ";";
 
     CacheDbPrivate &p = CacheDbPrivate::ref ();
     modelContacts->setQuery (strQ, p.db);

@@ -38,7 +38,11 @@ public:
     bool login(const QString &user, const QString &pass);
     bool refresh(QDateTime after = QDateTime());
 
-    ContactsModel *createModel();
+    ContactsModel *createModel(bool mandatoryLocalPic = false);
+    void refreshModel(ContactsModel *contactModel);
+
+signals:
+    void someTimeAfterGettingTheLastPhoto();
 
 protected slots:
     void loginCompleted();
@@ -46,8 +50,14 @@ protected slots:
     void onOneContact(ContactInfo cinfo);
     void onContactsFetched();
 
+    void onNoContactPhoto(QString contactId, QString photoUrl);
+    void onGotPhoto();
+
 protected:
     GContactsApi api;
+
+    QString     m_unknownContactPath;
+    QTimer      m_gotPhotoTimer;
 };
 
 #endif // LIBCONTACTS_H

@@ -22,8 +22,12 @@ Contact: yuvraaj@gmail.com
 #include "ContactsModel.h"
 #include "ContactDetailsModel.h"
 
-ContactsModel::ContactsModel (QObject *parent)
+#define PIXMAP_SCALED_W 25
+#define PIXMAP_SCALED_H 25
+
+ContactsModel::ContactsModel (bool bLocalPic, QObject *parent)
 : QSqlQueryModel (parent)
+, mandatoryLocalPic(bLocalPic)
 , modelContacts (NULL)
 {
     QHash<int, QByteArray> roles;
@@ -37,6 +41,7 @@ QVariant
 ContactsModel::data (const QModelIndex &index, int role) const
 {
     QVariant retVar;
+    QString photoUrl, localPath;
 
     do { // Begin cleanup block (not a loop)
         if (CT_IDRole == role) {
@@ -51,9 +56,43 @@ ContactsModel::data (const QModelIndex &index, int role) const
             break;
         }
 
+        photoUrl  = QSqlQueryModel::data(index.sibling(index.row(), 2),
+                                         Qt::EditRole).toString();
+        localPath = QSqlQueryModel::data(index.sibling(index.row(), 3),
+                                         Qt::EditRole).toString();
+
         if (CT_ImagePathRole == role) {
-            retVar =
-            QSqlQueryModel::data (index.sibling(index.row(), 2), Qt::EditRole);
+            if (photoUrl.isEmpty ()) {
+                if (m_unknownContactLocalPath.isEmpty ()) {
+                    // I don't have a URL, nor do I have a default local path...
+                    // Game over man, game over.
+                } else {
+                    retVar = m_unknownContactLocalPath;
+                }
+                break;
+            }
+
+            if (mandatoryLocalPic) {
+                if (localPath.isEmpty ()) {
+                    // Local path is empty and image path is not empty.
+                    QString contactId =
+                    QSqlQueryModel::data (index.sibling(index.row(), 0),
+                                          Qt::EditRole).toString();
+                    emit noContactPhoto (contactId, photoUrl);
+
+                    // even if it is empty:
+                    retVar = m_unknownContactLocalPath;
+                } else {
+                    // Local path is mandatory, and I *do* have it:
+                    retVar = localPath;
+                }
+                break;
+            }
+
+            Q_ASSERT(!mandatoryLocalPic);
+            Q_ASSERT(!photoUrl.isEmpty ());
+
+            retVar = photoUrl;
             break;
         }
 
@@ -63,20 +102,38 @@ ContactsModel::data (const QModelIndex &index, int role) const
             break;
         }
 
-
-        // For the decoration role, return the pixmap if the path isnt empty
+        // For the decoration role, return a pixmap. Pixmap require local paths
         if (Qt::DecorationRole == role) {
-            QString path = QSqlQueryModel::data(index.sibling(index.row(), 2),
-                                                Qt::DisplayRole).toString();
-            if (!path.isEmpty ()) {
-                QPixmap pixmap(path);
-                retVar = pixmap;
-                break;
+            if (!photoUrl.isEmpty ()) {
+                if (localPath.isEmpty ()) {
+                    // Local path is empty and image path is not empty.
+                    QString contactId =
+                    QSqlQueryModel::data (index.sibling(index.row(), 0),
+                                          Qt::EditRole).toString();
+                    emit noContactPhoto (contactId, photoUrl);
+                } else {
+                    QPixmap pixmap(localPath);
+                    retVar = pixmap.scaled (PIXMAP_SCALED_W, PIXMAP_SCALED_H,
+                                            Qt::KeepAspectRatio);
+                }
+            } else if (!m_unknownContactLocalPath.isEmpty ()){
+                // No contact photo at all, but there is a default...
+                QPixmap pixmap(m_unknownContactLocalPath);
+                retVar = pixmap.scaled (PIXMAP_SCALED_W, PIXMAP_SCALED_H,
+                                        Qt::KeepAspectRatio);
+            } else {
+                // No photo URL, no local path, no default local path.
+                // I give up.
             }
+        } else if (Qt::DecorationPropertyRole == role) {
+            QSize size(PIXMAP_SCALED_W, PIXMAP_SCALED_H);
+            retVar = size;
+        } else {
+            retVar = QSqlQueryModel::data (index, role);
         }
 
-        // If it isnt the decoration role, then just return the default data.
-        retVar = QSqlQueryModel::data (index, role);
+        // At this point I either have valid data in retVar or it is empty.
+        // There's no need to get data from the base model.
     } while (0); // End cleanup block (not a loop)
 
     return (retVar);
@@ -85,7 +142,7 @@ ContactsModel::data (const QModelIndex &index, int role) const
 int
 ContactsModel::rowCount (const QModelIndex & /*parent*/) const
 {
-    return (db.getContactsCount (strSearchQuery));
+    return (db.getContactsCount (m_strSearchQuery));
 }//ContactsModel::rowCount
 
 bool
@@ -137,7 +194,7 @@ ContactsModel::clearAll ()
 void
 ContactsModel::refresh (const QString &query)
 {
-    strSearchQuery = query;
+    m_strSearchQuery = query;
 
     beginResetModel ();
     db.refreshContactsModel (this, query);
@@ -151,5 +208,11 @@ ContactsModel::refresh (const QString &query)
 void
 ContactsModel::refresh ()
 {
-    refresh (strSearchQuery);
+    refresh (m_strSearchQuery);
 }//ContactsModel::refresh
+
+void
+ContactsModel::setUnknownContactPath(const QString &localPath)
+{
+    m_unknownContactLocalPath = localPath;
+}//ContactsModel::setUnknownContactPath

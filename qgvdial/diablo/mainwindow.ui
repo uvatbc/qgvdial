@@ -21,7 +21,7 @@
        <enum>QTabWidget::East</enum>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="dialTab">
        <attribute name="title">
@@ -233,5 +233,22 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>textPassword</sender>
+   <signal>editingFinished()</signal>
+   <receiver>loginButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>237</x>
+     <y>159</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>237</x>
+     <y>210</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

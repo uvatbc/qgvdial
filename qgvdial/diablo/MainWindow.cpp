@@ -69,10 +69,7 @@ MainWindow::log(QDateTime dt, int level, const QString &strLog)
 void
 MainWindow::uiRequestLoginDetails()
 {
-    QMessageBox msg;
-    msg.setText ("Please enter a user and password");
-    msg.exec ();
-
+    d->ui->statusBar->showMessage ("Please enter a user and password");
     d->ui->tabWidget->setCurrentIndex (3);
     d->ui->toolBox->setCurrentIndex (0);
 }//MainWindow::uiRequestLoginDetails
@@ -173,7 +170,11 @@ void
 MainWindow::uiRefreshContacts()
 {
     QAbstractItemModel *oldModel = m_contactsModel;
-    m_contactsModel = oContacts.createModel ();
+    m_contactsModel = oContacts.createModel (true);
+    connect(m_contactsModel, SIGNAL(noContactPhoto(QString,QString)),
+            &oContacts, SLOT(onNoContactPhoto(QString,QString)));
+    connect(&oContacts, SIGNAL(someTimeAfterGettingTheLastPhoto()),
+            this, SLOT(someTimeAfterGettingTheLastPhoto()));
     d->ui->contactsView->setModel (m_contactsModel);
     if (NULL != oldModel) {
         delete oldModel;
@@ -181,6 +182,7 @@ MainWindow::uiRefreshContacts()
 
     d->ui->contactsView->hideColumn (0);
     d->ui->contactsView->hideColumn (2);
+    d->ui->contactsView->hideColumn (3);
 }//MainWindow::uiRefreshContacts
 
 void
@@ -198,3 +200,9 @@ MainWindow::uiRefreshInbox()
     d->ui->inboxView->hideColumn (5);
     d->ui->inboxView->hideColumn (7);
 }//MainWindow::uiRefreshInbox
+
+void
+MainWindow::someTimeAfterGettingTheLastPhoto()
+{
+    oContacts.refreshModel (m_contactsModel);
+}//MainWindow::someTimeAfterGettingTheLastPhoto

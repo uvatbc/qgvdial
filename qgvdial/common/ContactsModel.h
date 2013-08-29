@@ -40,7 +40,7 @@ public:
         CT_ImagePathRole
     };
 
-    explicit ContactsModel(QObject *parent = 0);
+    explicit ContactsModel(bool bLocalPic, QObject *parent = 0);
 
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
@@ -51,16 +51,21 @@ public:
     void refresh (const QString &query);
     void refresh ();
 
+    void setUnknownContactPath(const QString &localPath);
+
 signals:
-    void noContactPhoto(const ContactInfo &contactInfo) const;
+    void noContactPhoto(QString contactId, QString photoUrl) const;
 
 private:
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
 private:
+    bool            mandatoryLocalPic;
     CacheDb         db;
     QSqlTableModel *modelContacts;
-    QString         strSearchQuery;
+    QString         m_strSearchQuery;
+
+    QString         m_unknownContactLocalPath;
 };
 
 #endif // CONTACTSMODEL_H

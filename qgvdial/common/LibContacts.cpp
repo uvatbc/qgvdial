@@ -19,9 +19,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
+#include "Lib.h"
 #include "LibContacts.h"
 #include "IMainWindow.h"
 #include "ContactsModel.h"
+
+#define UNKNOWN_CONTACT_QRC_PATH ":/unknown_contact.png"
+#define GOT_PHOTO_TIMEOUT (5000)  // 5 seconds
 
 LibContacts::LibContacts(IMainWindow *parent)
 : QObject(parent)
@@ -32,6 +36,15 @@ LibContacts::LibContacts(IMainWindow *parent)
              this, SLOT(onPresentCaptcha(AsyncTaskToken*,QString)));
     connect (&api, SIGNAL(oneContact(ContactInfo)),
              this, SLOT(onOneContact(ContactInfo)));
+
+    if (QFile::exists (UNKNOWN_CONTACT_QRC_PATH)) {
+        m_unknownContactPath = UNKNOWN_CONTACT_QRC_PATH;
+    }
+
+    m_gotPhotoTimer.setSingleShot (true);
+    m_gotPhotoTimer.setInterval (GOT_PHOTO_TIMEOUT);
+    connect (&m_gotPhotoTimer, SIGNAL(timeout()),
+             this, SIGNAL(someTimeAfterGettingTheLastPhoto()));
 }//LibContacts::LibContacts
 
 bool
@@ -61,9 +74,7 @@ LibContacts::loginCompleted()
 
     if (ATTS_SUCCESS == task->status) {
         Q_DEBUG("Login successful");
-        if (win->db.getTFAFlag ()) {
-            win->db.setAppPass (task->inParams["pass"].toString());
-        }
+        win->db.setAppPass (task->inParams["pass"].toString());
 
         QDateTime after;
         win->db.getLatestContact (after);
@@ -137,12 +148,92 @@ LibContacts::onContactsFetched()
 }//LibContacts::onContactsFetched
 
 ContactsModel *
-LibContacts::createModel()
+LibContacts::createModel(bool mandatoryLocalPic /* = false*/)
 {
     IMainWindow *win = (IMainWindow *) this->parent ();
-    ContactsModel *modelContacts = new ContactsModel(this);
+    ContactsModel *model = new ContactsModel(mandatoryLocalPic, this);
+    model->setUnknownContactPath (m_unknownContactPath);
 
-    win->db.refreshContactsModel (modelContacts);
+    win->db.refreshContactsModel (model);
 
-    return (modelContacts);
+    return (model);
 }//LibContacts::createModel
+
+void
+LibContacts::onNoContactPhoto(QString contactId, QString photoUrl)
+{
+    if (photoUrl.isEmpty ()) {
+        Q_WARN("Empty photo URL");
+        return;
+    }
+
+    AsyncTaskToken *task = new AsyncTaskToken(this);
+    if (NULL == task) {
+        Q_WARN("Failed to allocate task to download photo");
+        return;
+    }
+
+    task->inParams["id"] = contactId;
+    task->inParams["href"] = photoUrl;
+    connect(task, SIGNAL(completed()), this, SLOT(onGotPhoto()));
+
+    if (!api.getPhotoFromLink (task)) {
+        Q_WARN("Unable to get photo");
+        delete task;
+    }
+}//LibContacts::onNoContactPhoto
+
+void
+LibContacts::onGotPhoto()
+{
+    AsyncTaskToken *task = (AsyncTaskToken *) QObject::sender ();
+    IMainWindow *win = (IMainWindow *) this->parent ();
+    QString id   = task->inParams["id"].toString();
+    QString href = task->inParams["href"].toString();
+
+    do {
+        if (ATTS_SUCCESS != task->status) {
+            Q_WARN(QString("Failed to get photo for ID %1").arg (id));
+            win->db.putTempFile (href, m_unknownContactPath);
+            break;
+        }
+
+        Lib &lib = Lib::ref();
+        QString tempPath = lib.getTempDir () + QDir::separator()
+                         + tr("qgv_XXXXXX.tmp.");
+
+        switch (task->outParams["type"].toInt()) {
+        case GCPT_PNG:
+            tempPath += "png";
+            break;
+        case GCPT_BMP:
+            tempPath += "bmp";
+            break;
+        case GCPT_JPEG:
+        default:
+            tempPath += "jpg";
+            break;
+        }
+
+        QTemporaryFile tempFile (tempPath);
+        if (!tempFile.open ()) {
+            Q_WARN("Failed to get a temp file name for the photo");
+            break;
+        }
+
+        tempFile.setAutoRemove (false);
+        tempFile.write (task->outParams["data"].toByteArray());
+
+        win->db.putTempFile (href, tempFile.fileName ());
+    } while(0);
+    task->deleteLater ();
+
+    m_gotPhotoTimer.start ();
+}//LibContacts::onGotPhoto
+
+void
+LibContacts::refreshModel(ContactsModel *contactModel)
+{
+    IMainWindow *win = (IMainWindow *) this->parent ();
+    win->db.refreshContactsModel (contactModel);
+}//LibContacts::refreshModel

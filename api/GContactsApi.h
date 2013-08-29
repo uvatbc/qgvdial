@@ -27,9 +27,9 @@ Contact: yuvraaj@gmail.com
 
 enum GContactPhotoType {
     GCPT_Unknown = 0,
-    GCPT_BMP,
-    GCPT_PNG,
-    GCPT_JPEG
+    GCPT_BMP,  //= 1
+    GCPT_PNG,  //= 2
+    GCPT_JPEG  //= 3
 };
 
 class GContactsApi : public QObject

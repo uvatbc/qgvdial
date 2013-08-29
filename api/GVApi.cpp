@@ -278,9 +278,11 @@ GVApi::doPost(QUrl url, QByteArray postData, const char *contentType,
     token->apiCtx = tracker;
     token->status = ATTS_SUCCESS;
 
-    bool rv = connect(tracker, SIGNAL(sigDone(bool, const QByteArray &,
-                                              QNetworkReply *, void *)),
-                      receiver, method);
+    bool rv =
+    connect(tracker,
+            SIGNAL(sigDone(bool,const QByteArray&,QNetworkReply*,void*)),
+            receiver,
+            method);
     Q_ASSERT(rv);
     rv = connect(tracker, SIGNAL(sigProgress(double)),
                     this, SIGNAL(sigProgress(double)));
@@ -480,6 +482,10 @@ GVApi::onLogin1(bool success, const QByteArray &response, QNetworkReply *,
             Q_WARN("Failed to get login form");
             success = false;
             break;
+        }
+        if (!nextAction.startsWith ("http")) {
+            Q_DEBUG(QString("nextAction %1").arg (nextAction));
+            nextAction = GOOGLE_ACCOUNTS "/" + nextAction;
         }
 
         Q_DEBUG("Starting service login");

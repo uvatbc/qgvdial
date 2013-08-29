@@ -60,6 +60,7 @@ public:
 
     bool putTempFile(const QString &strLink, const QString &strPath);
     bool getTempFile(const QString &strLink, QString &strPath) const;
+    bool clearTempFile(const QString &strLink, bool deleteFile);
 
     void clearContacts ();
     void refreshContactsModel (ContactsModel *modelContacts,

@@ -20,6 +20,7 @@ HEADERS  += MainWindow.h \
             DiabloPhoneFactory.h
 
 FORMS   += mainwindow.ui
+RESOURCES += diablo.qrc
 
 include(../common/common.pri)
 include(../../api/api.pri)
