@@ -27,3 +27,4 @@ RESOURCES += qtnotqml.qrc
 include(../common/common.pri)
 include(../../api/api.pri)
 include(../features/openssl/openssl.pri)
+include(../features/qtsingleapplication/qtsingleapplication.pri)

@@ -49,7 +49,7 @@ symbian | contains(DEFINES,MEEGO_HARMATTAN) {
 # Except for Symbian S3 and S3 Belle add single application
 !contains(DEFINES,IS_S3) : !contains(DEFINES,IS_S3_BELLE) : !blackberry {
     message(Single application library added)
-    include(qtsingleapplication/qtsingleapplication.pri)
+    include(../qgvdial/features/qtsingleapplication/qtsingleapplication.pri)
 }
 
 INCLUDEPATH += .

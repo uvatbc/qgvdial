@@ -19,17 +19,39 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
+#include "QtSingleApplication"
 #include "MainWindow.h"
 #include "MainWindow_p.h"
 #include "ui_mainwindow.h"
 #include "ContactsModel.h"
 #include "InboxModel.h"
 
+#ifdef Q_WS_WIN32
+#include "WinMainApp.h"
+#endif
+
 QCoreApplication *
 createApplication(int argc, char *argv[])
 {
-    return new QApplication(argc, argv);
-}
+    QtSingleApplication *app;
+#ifdef Q_WS_WIN32
+    app = new MainApp(argc, argv);
+#else
+    app = new QtSingleApplication(argc, argv);
+#endif
+
+    if (NULL == app) {
+        return app;
+    }
+
+    if (app->isRunning ()) {
+        app->sendMessage ("show");
+        delete app;
+        app = NULL;
+    }
+
+    return app;
+}//createApplication
 
 MainWindow::MainWindow(QObject *parent)
 : IMainWindow(parent)
@@ -39,7 +61,9 @@ MainWindow::MainWindow(QObject *parent)
 
 MainWindow::~MainWindow()
 {
-    delete d;
+    if (d) {
+        delete d;
+    }
 }//MainWindow::~MainWindow
 
 void
