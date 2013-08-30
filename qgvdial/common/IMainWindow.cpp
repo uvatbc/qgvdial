@@ -109,6 +109,9 @@ IMainWindow::beginLogin(const QString &user, const QString &pass)
         ok = connect(m_loginTask, SIGNAL(completed()),
                      this, SLOT(loginCompleted()));
         Q_ASSERT(ok);
+        if (!ok) {
+            Q_CRIT("Failed to connect signal");
+        }
 
         m_loginTask->inParams["user"] = user;
         m_loginTask->inParams["pass"] = pass;
@@ -137,6 +140,9 @@ void
 IMainWindow::resumeTFAAuth(void *ctx, int pin, bool useAlt)
 {
     Q_ASSERT(m_loginTask == ctx);
+    if (m_loginTask != ctx) {
+        Q_CRIT("Context mismatch!!");
+    }
 
     if (useAlt) {
         gvApi.resumeTFAAltLogin (m_loginTask);
