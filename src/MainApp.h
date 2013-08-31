@@ -25,7 +25,7 @@ Contact: yuvraaj@gmail.com
 #include "global.h"
 
 #if HAS_SINGLE_APP
-#include "qtsingleapplication/inc/QtSingleApplication"
+#include "QtSingleApplication"
 #endif
 
 #ifdef Q_WS_WIN32
