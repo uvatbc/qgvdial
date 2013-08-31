@@ -43,7 +43,7 @@ GVApi::getSystemProxies (QNetworkProxy &http, QNetworkProxy &https)
     QNetworkProxyFactory::setUseSystemConfiguration (true);
 #endif
 
-    do { // Begin cleanup block (not a loop)
+    do {
         QList<QNetworkProxy> netProxies =
         QNetworkProxyFactory::systemProxyForQuery (
             QNetworkProxyQuery(QUrl("http://www.google.com")));
@@ -83,9 +83,9 @@ GVApi::getSystemProxies (QNetworkProxy &http, QNetworkProxy &https)
             http.setType (QNetworkProxy::HttpProxy);
         }
 #endif
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
 
-    do { // Begin cleanup block (not a loop)
+    do {
         QList<QNetworkProxy> netProxies =
         QNetworkProxyFactory::systemProxyForQuery (
             QNetworkProxyQuery(QUrl("https://www.google.com")));
@@ -125,7 +125,7 @@ GVApi::getSystemProxies (QNetworkProxy &http, QNetworkProxy &https)
             https.setType (QNetworkProxy::HttpProxy);
         }
 #endif
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
 
     return (true);
 }//GVApi::getSystemProxies
@@ -136,8 +136,7 @@ GVApi::simplify_number (QString &strNumber, bool bAddIntPrefix /* = true*/)
     strNumber.remove(QChar(' ')).remove(QChar('(')).remove(QChar(')'));
     strNumber.remove(QChar('-'));
 
-    do // Begin cleanup block (not a loop)
-    {
+    do  {
         if (!bAddIntPrefix) {
             break;
         }
@@ -161,7 +160,7 @@ GVApi::simplify_number (QString &strNumber, bool bAddIntPrefix /* = true*/)
         }
 
         strNumber = "+1" + strNumber;
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
 }//GVApi::simplify_number
 
 bool
@@ -178,7 +177,7 @@ GVApi::isNumberValid (const QString &strNumber)
 void
 GVApi::beautify_number (QString &strNumber)
 {
-    do { // Begin cleanup block (not a loop)
+    do {
         if (!GVApi::isNumberValid (strNumber))   break;
 
         QString strTemp = strNumber;
@@ -195,7 +194,7 @@ GVApi::beautify_number (QString &strNumber)
                   + strTemp.mid (5, 3)
                   + " "
                   + strTemp.mid (8);
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
 }//GVApi::beautify_number
 
 bool
@@ -321,8 +320,7 @@ GVApi::setProxySettings (bool bEnable,
                          const QString &user, const QString &pass)
 {
     QNetworkProxy proxySettings;
-    do // Begin cleanup block (not a loop)
-    {
+    do {
         if (!bEnable) {
             if (emitLog) {
                 Q_DEBUG("Clearing all proxy information");
@@ -351,7 +349,7 @@ GVApi::setProxySettings (bool bEnable,
         if (emitLog) {
             Q_DEBUG("Using user defined proxy settings.");
         }
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
     QNetworkProxy::setApplicationProxy (proxySettings);
 
     return (true);
@@ -428,13 +426,13 @@ GVApi::login(AsyncTaskToken *token)
 }//GVApi::login
 
 void
-GVApi::onLogin1(bool success, const QByteArray &response, QNetworkReply *,
+GVApi::onLogin1(bool success, const QByteArray &response, QNetworkReply *reply,
                 void *ctx)
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QString strResponse = response;
 
-    do { // Begin cleanup block (not a loop)
+    do {
         if (!success) {
             token->status = ATTS_NW_ERROR;
             break;
@@ -453,6 +451,7 @@ GVApi::onLogin1(bool success, const QByteArray &response, QNetworkReply *,
             success = getRnr (token);
             break;
         }
+
 
         hiddenLoginFields.clear ();
         if (!parseHiddenLoginFields (strResponse, hiddenLoginFields)) {
@@ -490,8 +489,20 @@ GVApi::onLogin1(bool success, const QByteArray &response, QNetworkReply *,
 
         Q_DEBUG("Starting service login");
         QUrl url(nextAction);
+
+        QUrl oldUrl = reply->request().url();
+        QStringList qiVal = oldUrl.allQueryItemValues ("continue");
+        if (qiVal.length () != 0) {
+            url.addQueryItem ("continue", qiVal[qiVal.length () - 1]);
+        }
+
+        qiVal = oldUrl.allQueryItemValues ("followup");
+        if (qiVal.length () != 0) {
+            url.addQueryItem ("followup", qiVal[qiVal.length () - 1]);
+        }
+
         success = postLogin (url, token);
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
 
     if (!success) {
         Q_WARN(QString("Login failed: %1").arg(strResponse));
@@ -657,7 +668,7 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
 #endif
 
     token->errorString.clear();
-    do { // Begin cleanup block (not a loop)
+    do {
         if (!success) {
             token->status = ATTS_NW_ERROR;
             break;
@@ -680,12 +691,28 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
                 success = false;
 
                 // Dump out cookie names
-                QString msg = "Cookie names: ";
+                QString msg;
                 QStringList cookieNames;
+
+#if 0
+                msg = "Cookies:\n";
+                foreach (QNetworkCookie cookie, jar->getAllCookies ()) {
+                    cookieNames += QString("[%1] = %2")
+                                    .arg(QString(cookie.name()))
+                                    .arg(QString(cookie.value()));
+                }
+                msg += cookieNames.join ("\n");
+#else
+                msg = "Cookie names: ";
                 foreach (QNetworkCookie cookie, jar->getAllCookies ()) {
                     cookieNames += cookie.name();
                 }
                 msg += cookieNames.join (", ");
+#endif
+                Q_DEBUG(msg);
+
+                msg = QString("Last request URL = %1")
+                        .arg (reply->request ().url ().toString ());
                 Q_DEBUG(msg);
 
                 break;
@@ -758,7 +785,7 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
         token->inParams["tfaAction"] = nextAction;
         emit twoStepAuthentication(token);
         success = true;
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
 
     if (!success) {
         if (token->status == ATTS_NW_ERROR) {
@@ -798,7 +825,7 @@ GVApi::resumeTFALogin(AsyncTaskToken *token)
     bool foundgalx = false;
     bool rv = false;
 
-    do { // Begin cleanup block (not a loop)
+    do {
         QString smsUserPin = token->inParams["user_pin"].toString();
         if (smsUserPin.isEmpty ()) {
             Q_WARN("User didn't enter 2-step auth pin");
@@ -833,7 +860,7 @@ GVApi::resumeTFALogin(AsyncTaskToken *token)
         rv = doPostForm(twoFactorUrl, content.encodedQuery(), token, this,
               SLOT(onTFAAutoPost(bool,const QByteArray&,QNetworkReply*,void*)));
         Q_ASSERT(rv);
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
 
     if (!rv) {
         Q_WARN("Two factor authentication failed.");
@@ -855,13 +882,13 @@ GVApi::resumeTFAAltLogin(AsyncTaskToken *token)
     bool rv = false;
     QString strUrl;
 
-    do { // Begin cleanup block (not a loop)
+    do {
         strUrl = token->inParams["tfaAlternate"].toString ();
         strUrl.replace ("&amp;", "&");
         QUrl url = QUrl::fromPercentEncoding (strUrl.toLatin1 ());
         rv = doGet (url, token, this,
                     SLOT(onTFAAltLoginResp(bool,QByteArray,QNetworkReply*,void*)));
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
 
     if (!rv) {
         token->status = ATTS_LOGIN_FAILURE;
@@ -879,7 +906,7 @@ GVApi::onTFAAltLoginResp(bool success, const QByteArray &response,
     QString strResponse = response;
     QString strReplyUrl = reply->url().toString();
 
-    do { // Begin cleanup block (not a loop)
+    do {
         if (!success) {
             token->status = ATTS_NW_ERROR;
             break;
@@ -888,7 +915,7 @@ GVApi::onTFAAltLoginResp(bool success, const QByteArray &response,
         emit twoStepAuthentication(token);
 
         success = true;
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
 
     if (!success) {
         QString msg = QString("Failed to get response to alternate login! "
@@ -912,7 +939,7 @@ GVApi::onTFAAutoPost(bool success, const QByteArray &response,
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QString strResponse = response;
 
-    do { // Begin cleanup block (not a loop)
+    do {
         if (!success) {
             token->status = ATTS_NW_ERROR;
             break;
@@ -944,7 +971,7 @@ GVApi::onTFAAutoPost(bool success, const QByteArray &response,
         }
 
         success = postLogin (nextUrl, token);
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
 
     if (!success) {
         Q_WARN("Login failed.") << strResponse;
@@ -976,7 +1003,7 @@ GVApi::onGotRnr(bool success, const QByteArray &response, QNetworkReply *reply,
     QString strResponse = response;
     QString strReplyUrl = reply->url().toString();
 
-    do { // Begin cleanup block (not a loop)
+    do {
         if (!success) {
             token->status = ATTS_NW_ERROR;
             break;
@@ -1003,8 +1030,8 @@ GVApi::onGotRnr(bool success, const QByteArray &response, QNetworkReply *reply,
             internalLogoutTask->callerCtx = token;
 
             success =
-            connect(internalLogoutTask, SIGNAL(completed(AsyncTaskToken*)),
-                    this,  SLOT(internalLogoutForReLogin(AsyncTaskToken*)));
+            connect(internalLogoutTask, SIGNAL(completed()),
+                    this,  SLOT(internalLogoutForReLogin()));
             Q_ASSERT(success);
 
             success = logout(internalLogoutTask);
@@ -1040,7 +1067,7 @@ GVApi::onGotRnr(bool success, const QByteArray &response, QNetworkReply *reply,
         token = NULL;
 
         success = true;
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
 
     if (!success) {
         QString msg = QString("Failed to get RNR. User cannot be "
@@ -1058,8 +1085,9 @@ GVApi::onGotRnr(bool success, const QByteArray &response, QNetworkReply *reply,
 }//GVApi::onGotRnr
 
 void
-GVApi::internalLogoutForReLogin(AsyncTaskToken *token)
+GVApi::internalLogoutForReLogin()
 {
+    AsyncTaskToken *token = (AsyncTaskToken *) QObject::sender ();
     AsyncTaskToken *origToken = (AsyncTaskToken *) token->callerCtx;
 
     // User is logged out. Make sure all associated cookies are also thrown out
@@ -1133,7 +1161,7 @@ GVApi::onGetPhones(bool success, const QByteArray &response, QNetworkReply *,
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QString strReply = response;
 
-    do { // Begin cleanup block (not a loop)
+    do {
         if (!success) {
             token->status = ATTS_NW_ERROR;
             break;
@@ -1305,7 +1333,7 @@ GVApi::onGetPhones(bool success, const QByteArray &response, QNetworkReply *,
         token = NULL;
 
         success = true;
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
 
     if (!success) {
         if (token) {
@@ -1359,7 +1387,7 @@ GVApi::onGetInbox(bool success, const QByteArray &response, QNetworkReply *,
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QString strReply = QString::fromUtf8(response.constData(),response.length());
 
-    do { // Begin cleanup block (not a loop)
+    do {
         if (!success) {
             token->status = ATTS_NW_ERROR;
             break;
@@ -1397,7 +1425,7 @@ GVApi::onGetInbox(bool success, const QByteArray &response, QNetworkReply *,
         token = NULL;
 
         success = true;
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
 
     if (!success) {
         if (token) {
@@ -1430,7 +1458,7 @@ GVApi::parseInboxJson(AsyncTaskToken *token, const QString &strJson,
     fHtml.write(strFixedHtml.toUtf8());
     fHtml.seek(0);
 
-    do { // Begin cleanup block (not a loop)
+    do {
         QString strTemp;
         strTemp = "var obj = " + strJson;
         scriptEngine.evaluate (strTemp);
@@ -1605,7 +1633,7 @@ GVApi::parseInboxJson(AsyncTaskToken *token, const QString &strJson,
         }
 
         rv = true;
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
 
     return (rv);
 }//GVApi::parseInboxJson
@@ -1662,7 +1690,7 @@ GVApi::parseMessageRow(QString strRow, GVInboxEntry &entry)
     QString strSmsRow;
     ConversationEntry convEntry;
 
-    do { // Begin cleanup block (not a loop)
+    do {
         QDomDocument doc;
         doc.setContent (strRow);
         QDomElement rootElement = doc.documentElement();
@@ -1795,7 +1823,7 @@ GVApi::parseMessageRow(QString strRow, GVInboxEntry &entry)
 
         entry.strText = strSmsRow;
         rv = true;
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
 
     return rv;
 }//GVApi::parseMessageRow
@@ -1869,7 +1897,7 @@ GVApi::onCallout(bool success, const QByteArray &response, QNetworkReply *,
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QString strReply = response;
 
-    do { // Begin cleanup block (not a loop)
+    do {
         if (!success) {
             Q_WARN("Failed to call out");
             token->status = ATTS_NW_ERROR;
@@ -1903,7 +1931,7 @@ GVApi::onCallout(bool success, const QByteArray &response, QNetworkReply *,
         token = NULL;
 
         success = true;
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
 
     if (!success) {
         if (token) {
@@ -1978,7 +2006,7 @@ GVApi::onCallback(bool success, const QByteArray &response, QNetworkReply *,
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QString strReply = response;
 
-    do { // Begin cleanup block (not a loop)
+    do {
         if (!success) {
             Q_WARN("Failed to call back");
             token->status = ATTS_NW_ERROR;
@@ -2013,7 +2041,7 @@ GVApi::onCallback(bool success, const QByteArray &response, QNetworkReply *,
         token = NULL;
 
         success = true;
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
 
     if (!success) {
         if (token) {
@@ -2090,7 +2118,7 @@ GVApi::onSendSms(bool success, const QByteArray &response, QNetworkReply *,
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QString strReply = response;
 
-    do { // Begin cleanup block (not a loop)
+    do {
         if (!success) {
             Q_WARN("Failed to send text");
             token->status = ATTS_NW_ERROR;
@@ -2125,7 +2153,7 @@ GVApi::onSendSms(bool success, const QByteArray &response, QNetworkReply *,
         token = NULL;
 
         success = true;
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
 
     if (!success) {
         if (token) {
@@ -2173,7 +2201,7 @@ GVApi::onVmail(bool success, const QByteArray &response, QNetworkReply *,
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QString strReply = response;
 
-    do { // Begin cleanup block (not a loop)
+    do {
         if (!success) {
             Q_WARN("Failed to get voicemail");
             token->status = ATTS_NW_ERROR;
@@ -2199,7 +2227,7 @@ GVApi::onVmail(bool success, const QByteArray &response, QNetworkReply *,
         token->status = ATTS_SUCCESS;
 
         success = true;
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
 
     if (NULL != token) {
         if (!success) {
@@ -2252,7 +2280,7 @@ GVApi::onMarkAsRead(bool success, const QByteArray &response, QNetworkReply *,
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QString strReply = response;
 
-    do { // Begin cleanup block (not a loop)
+    do {
         if (!success) {
             Q_WARN("Failed to mark entry as read");
             token->status = ATTS_NW_ERROR;
@@ -2287,7 +2315,7 @@ GVApi::onMarkAsRead(bool success, const QByteArray &response, QNetworkReply *,
         token = NULL;
 
         success = true;
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
 
     if (!success) {
         if (token) {
@@ -2347,7 +2375,7 @@ GVApi::onEntryDeleted(bool success, const QByteArray &response, QNetworkReply *,
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QString strReply = response;
 
-    do { // Begin cleanup block (not a loop)
+    do {
         if (!success) {
             Q_WARN("Failed to delete entry");
             token->status = ATTS_NW_ERROR;
@@ -2382,7 +2410,7 @@ GVApi::onEntryDeleted(bool success, const QByteArray &response, QNetworkReply *,
         token = NULL;
 
         success = true;
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
 
     if (!success) {
         if (token) {
@@ -2423,7 +2451,7 @@ GVApi::onCheckRecentInbox(bool success, const QByteArray &response,
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QString strReply = response;
 
-    do { // Begin cleanup block (not a loop)
+    do {
         if (!success) {
             Q_WARN("Failed to get recent inbox");
             token->status = ATTS_NW_ERROR;
@@ -2550,7 +2578,7 @@ GVApi::onCheckRecentInbox(bool success, const QByteArray &response,
         token = NULL;
 
         success = true;
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
 
     if (!success) {
         if (token) {

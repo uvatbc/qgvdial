@@ -586,7 +586,7 @@ CacheDb::insertContact (const ContactInfo &info)
 {
     CacheDbPrivate &p = CacheDbPrivate::ref ();
     bool rv = false;
-    do { // Begin cleanup block (not a loop)
+    do {
         QSqlQuery query(p.db);
         query.setForwardOnly (true);
 
@@ -631,8 +631,7 @@ CacheDb::insertContact (const ContactInfo &info)
                            "ID:[%1] name=[%2]").arg(info.strId, info.strTitle));
             break;
         }
-
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
 
     return (rv);
 }//CacheDb::insertContact
@@ -917,7 +916,7 @@ CacheDb::insertInboxEntry (const GVInboxEntry &hEvent)
     query.setForwardOnly (true);
 
     bool rv = false;
-    do { // Begin cleanup block (not a loop)
+    do {
         // Must send this function the unscrubbed inbox entry.
         if (existsInboxEntry (hEvent)) {
             query.exec (QString ("DELETE FROM " GV_INBOX_TABLE " "
@@ -949,7 +948,7 @@ CacheDb::insertInboxEntry (const GVInboxEntry &hEvent)
         }
 
         rv = true;
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
 
     return (rv);
 }//CacheDb::insertInboxEntry
@@ -983,7 +982,7 @@ CacheDb::markAsRead (const QString &msgId)
     query.setForwardOnly (true);
 
     bool rv = false;
-    do { // Begin cleanup block (not a loop)
+    do {
         rv = query.exec (QString("SELECT " GV_IN_FLAGS " FROM " GV_INBOX_TABLE
                                  " WHERE " GV_IN_ID "='%1'").arg (scrubId));
         if (!rv || !query.next ()) {
@@ -1016,7 +1015,7 @@ CacheDb::markAsRead (const QString &msgId)
         }
 
         rv = true;
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
 
     return (rv);
 }//CacheDb::markAsRead
@@ -1033,7 +1032,7 @@ CacheDb::getLatestContact (QDateTime &dateTime)
     bool rv = false;
     query.exec ("SELECT "   GV_C_UPDATED " FROM " GV_CONTACTS_TABLE " "
                 "ORDER BY " GV_C_UPDATED " DESC");
-    do { // Begin cleanup block (not a loop)
+    do {
         if (!query.next ()) {
             Q_WARN("Couldn't get the latest contact");
             break;
@@ -1067,8 +1066,7 @@ CacheDb::getLatestInboxEntry (QDateTime &dateTime)
     bool rv = false;
     query.exec ("SELECT "   GV_IN_ATTIME " FROM " GV_INBOX_TABLE " "
                 "ORDER BY " GV_IN_ATTIME " DESC");
-    do // Begin cleanup block (not a loop)
-    {
+    do {
         if (!query.next ()) {
             Q_WARN("Couldn't get the latest inbox item");
             break;
@@ -1085,7 +1083,7 @@ CacheDb::getLatestInboxEntry (QDateTime &dateTime)
         dateTime = QDateTime::fromTime_t (dtVal);
 
         rv = true;
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
 
     return (rv);
 }//CacheDb::getLatestInboxEntry

@@ -43,7 +43,7 @@ ContactsModel::data (const QModelIndex &index, int role) const
     QVariant retVar;
     QString photoUrl, localPath;
 
-    do { // Begin cleanup block (not a loop)
+    do {
         if (CT_IDRole == role) {
             retVar =
             QSqlQueryModel::data (index.sibling(index.row(), 0), Qt::EditRole);
@@ -134,7 +134,7 @@ ContactsModel::data (const QModelIndex &index, int role) const
 
         // At this point I either have valid data in retVar or it is empty.
         // There's no need to get data from the base model.
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
 
     return (retVar);
 }//ContactsModel::data

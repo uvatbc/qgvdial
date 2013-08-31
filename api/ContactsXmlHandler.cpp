@@ -44,7 +44,7 @@ ContactsXmlHandler::startElement (const QString        & /*namespaceURI*/,
     QString rel;
     strCurrentChars.clear ();
 
-    do { // Begin cleanup block (not a loop)
+    do {
         if (localName == "entry") {
             bEntryStarted = true;
             countContacts++;
@@ -109,7 +109,7 @@ ContactsXmlHandler::startElement (const QString        & /*namespaceURI*/,
                 currInfo.hrefPhoto = atts.value ("href");
             }
         }
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
     return (true);
 }//ContactsXmlHandler::startElement
 
@@ -118,8 +118,7 @@ ContactsXmlHandler::endElement (const QString & /*namespaceURI*/,
                                 const QString &localName        ,
                                 const QString & /*qName*/       )
 {
-    do // Begin cleanup block (not a loop)
-    {
+    do {
         if (localName == "id") {
             currInfo.strId = strCurrentChars.trimmed ();
             break;
@@ -172,7 +171,7 @@ ContactsXmlHandler::endElement (const QString & /*namespaceURI*/,
         emit oneContact (currInfo);
 
         currInfo.init ();
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
     return (true);
 }//ContactsXmlHandler::endElement
 

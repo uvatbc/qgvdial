@@ -151,7 +151,7 @@ GContactsApi::onLoginResponse(bool success, const QByteArray &response,
     QString strCaptchaToken, strCaptchaUrl;
 
     m_GoogleAuthToken.clear ();
-    do { // Begin cleanup block (not a loop)
+    do {
         if (!success) {
             task->status = ATTS_NW_ERROR;
             break;
@@ -191,7 +191,7 @@ GContactsApi::onLoginResponse(bool success, const QByteArray &response,
         task->status = ATTS_SUCCESS;
 
         Q_DEBUG("Login success");
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
 
     if (!m_isLoggedIn) {
         m_pass.clear ();
@@ -261,7 +261,7 @@ GContactsApi::onGotContactsFeed(bool success, const QByteArray &response,
 {
     AsyncTaskToken *task = (AsyncTaskToken *) ctx;
 
-    do { // Begin cleanup block (not a loop)
+    do {
         if (!success) {
             Q_WARN("Failed to get contacts feed");
             task->status = ATTS_NW_ERROR;
@@ -341,7 +341,7 @@ GContactsApi::onGotContactsFeed(bool success, const QByteArray &response,
         workerThread->start ();
 
         task = NULL;
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
 
     if (task) {
         task->emitCompleted ();
@@ -401,7 +401,7 @@ GContactsApi::onGotPhoto(bool success, const QByteArray &response,
 {
     AsyncTaskToken *token = (AsyncTaskToken *) ctx;
 
-    do { // Begin cleanup block (not a loop)
+    do {
         if (!token) {
             Q_WARN("NULL token!!");
             return;
@@ -431,7 +431,7 @@ GContactsApi::onGotPhoto(bool success, const QByteArray &response,
 
         token->outParams["data"] = response;
         token->status = ATTS_SUCCESS;
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
 
     token->emitCompleted ();
 }//GContactsApi::onGotPhoto

@@ -47,7 +47,7 @@ ContactDetailsModel::data (const QModelIndex &index, int role) const
 {
     QVariant var;
 
-    do { // Begin cleanup block (not a loop)
+    do {
         int row = index.row();
         PhoneInfo data;
         if (!getAt (row, data)) {
@@ -64,8 +64,7 @@ ContactDetailsModel::data (const QModelIndex &index, int role) const
             var = data.strNumber;
             break;
         }
-
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
 
     return (var);
 }//ContactDetailsModel::data
@@ -74,7 +73,7 @@ bool
 ContactDetailsModel::getAt (int index, PhoneInfo &data) const
 {
     bool rv = false;
-    do { // Begin cleanup block (not a loop)
+    do {
         if ((index < 0) || (index >= rowCount ())) {
             qWarning ("Requested an index out of range");
             break;
@@ -88,6 +87,6 @@ ContactDetailsModel::getAt (int index, PhoneInfo &data) const
         data = info.arrPhones.at (index);
 
         rv = true;
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
     return (rv);
 }//ContactDetailsModel::getAt

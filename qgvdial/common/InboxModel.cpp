@@ -50,8 +50,7 @@ InboxModel::data (const QModelIndex &index, int role) const
 {
     QVariant var;
 
-    do // Begin cleanup block (not a loop)
-    {
+    do {
         int column = -1;
         switch (role) {
         case IN_Link:
@@ -218,7 +217,7 @@ InboxModel::data (const QModelIndex &index, int role) const
 //            Q_WARN(QString("Invalid data column: %1. Actual: %2. Role = %3")
 //                   .arg(column).arg(index.column ()).arg(role));
         }
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
 
     return (var);
 }//InboxModel::data
@@ -255,34 +254,28 @@ InboxModel::string_to_type (const QString &strType)
 {
     GVI_Entry_Type Type = GVIE_Unknown;
 
-    do // Begin cleanup block (not a loop)
-    {
-        if (0 == strType.compare ("Placed", Qt::CaseInsensitive))
-        {
+    do {
+        if (0 == strType.compare ("Placed", Qt::CaseInsensitive)) {
             Type = GVIE_Placed;
             break;
         }
-        if (0 == strType.compare ("Received", Qt::CaseInsensitive))
-        {
+        if (0 == strType.compare ("Received", Qt::CaseInsensitive)) {
             Type = GVIE_Received;
             break;
         }
-        if (0 == strType.compare ("Missed", Qt::CaseInsensitive))
-        {
+        if (0 == strType.compare ("Missed", Qt::CaseInsensitive)) {
             Type = GVIE_Missed;
             break;
         }
-        if (0 == strType.compare ("Voicemail", Qt::CaseInsensitive))
-        {
+        if (0 == strType.compare ("Voicemail", Qt::CaseInsensitive)) {
             Type = GVIE_Voicemail;
             break;
         }
-        if (0 == strType.compare ("SMS", Qt::CaseInsensitive))
-        {
+        if (0 == strType.compare ("SMS", Qt::CaseInsensitive)) {
             Type = GVIE_TextMessage;
             break;
         }
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
 
     return (Type);
 }//InboxModel::string_to_type

@@ -129,7 +129,7 @@ NwReqTracker::onReplyFinished()
     QByteArray response;
     QNetworkReply *origReply = reply;
 
-    do { // Begin cleanup block (not a loop)
+    do {
         rv = done = false;
 
         if (aborted) {
@@ -144,9 +144,9 @@ NwReqTracker::onReplyFinished()
 
         response = origReply->readAll ();
         rv = true;
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
 
-    do { // Begin cleanup block (not a loop)
+    do {
         done = true;
 
         if (!rv) {
@@ -162,6 +162,14 @@ NwReqTracker::onReplyFinished()
             break;
         }
 
+#if 1
+        if (emitLog) {
+            Q_DEBUG(QString("Orig: %1 *** New: %2")
+                    .arg (origReply->request().url().toString(),
+                          urlMoved.toString()));
+        }
+#endif
+
         QNetworkRequest req(urlMoved);
         req.setRawHeader("User-Agent", uaString);
 
@@ -176,7 +184,7 @@ NwReqTracker::onReplyFinished()
         autoRedirect = true;
 
         done = false;
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
 
     if (done) {
         if (!autoRedirect && response.contains ("Moved Temporarily")) {
@@ -308,7 +316,7 @@ NwReqTracker::hasMoved(QNetworkReply *reply)
     QUrl url = reply->attribute(QNetworkRequest::RedirectionTargetAttribute)
                      .toUrl ();
 
-    do { // Begin cleanup block (not a loop)
+    do {
         if (url.isEmpty ()) {
             break;
         }
@@ -329,6 +337,6 @@ NwReqTracker::hasMoved(QNetworkReply *reply)
 
         url = QUrl(result.remove (0, pos));
         Q_DEBUG(url.toString ());
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
     return url;
 }//NwReqTracker::hasMoved

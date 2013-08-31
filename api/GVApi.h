@@ -96,7 +96,7 @@ private slots:
     void onTFAAltLoginResp(bool success, const QByteArray &response,
                            QNetworkReply *reply, void *ctx);
 
-    void internalLogoutForReLogin(AsyncTaskToken *token);
+    void internalLogoutForReLogin();
 
     // Logout
     void onLogout(bool success, const QByteArray &response,
