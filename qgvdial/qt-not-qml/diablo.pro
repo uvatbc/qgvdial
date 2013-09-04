@@ -1,6 +1,10 @@
 include(./common-code.pri)
 include(../features/dirs/linux/linux-dirs.pri)
 
+INCLUDEPATH += diablo
+SOURCES  += diablo/DiabloPhoneFactory.cpp
+HEADERS  += diablo/DiabloPhoneFactory.h
+
 # Please do not modify the following two lines. Required for deployment.
 include(deployment.pri)
 qtcAddDeployment()

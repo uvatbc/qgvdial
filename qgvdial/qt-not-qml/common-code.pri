@@ -14,12 +14,10 @@ DEPLOYMENTFOLDERS = # file1 dir1
 
 SOURCES  += MainWindow.cpp \
             MainWindow_p.cpp \
-            OsDependant.cpp \
-            DiabloPhoneFactory.cpp
+            OsDependant.cpp
 HEADERS  += MainWindow.h \
             MainWindow_p.h \
-            OsDependant.h \
-            DiabloPhoneFactory.h
+            OsDependant.h
 
 FORMS   += mainwindow.ui
 RESOURCES += qtnotqml.qrc

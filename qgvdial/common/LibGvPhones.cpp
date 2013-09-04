@@ -41,13 +41,8 @@ LibGvPhones::refresh()
     connect(task, SIGNAL(completed()), this, SLOT(onGotPhones()));
 
     IMainWindow *win = (IMainWindow *) this->parent ();
-    bool rv = win->gvApi.getPhones (task);
-
-    if (rv) {
-        dialBack.clear ();
-    }
-
-    return (rv);
+    dialBack.clear ();
+    return (win->gvApi.getPhones (task));
 }//LibGvPhones::refresh
 
 void
