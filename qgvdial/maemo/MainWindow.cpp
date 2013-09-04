@@ -86,7 +86,7 @@ MainWindow::getQMLObject(const char *pageName)
 }//MainWindow::getQMLObject
 
 void
-MainWindow::log(QDateTime dt, int level, const QString &strLog)
+MainWindow::log(QDateTime /*dt*/, int /*level*/, const QString & /*strLog*/)
 {
 }//MainWindow::log
 

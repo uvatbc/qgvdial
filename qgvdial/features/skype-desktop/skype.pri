@@ -1,4 +1,5 @@
 INCLUDEPATH += $$PWD
+QT *= dbus
 
 SOURCES  += $$PWD/SkypeClient.cpp \
             $$PWD/SkypeClientFactory.cpp \

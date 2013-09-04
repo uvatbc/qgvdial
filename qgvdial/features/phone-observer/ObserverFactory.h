@@ -19,23 +19,37 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#include "MainWindow.h"
+#ifndef OBSERVERFACTORY_H
+#define OBSERVERFACTORY_H
 
-MainWindow::MainWindow(QObject *parent)
-//: IMainWindow(parent)
-: DummyMainWindow(parent)
-, m_view(NULL)
-{
-}//MainWindow::MainWindow
+#include <QObject>
+#include "IObserver.h"
 
-void
-MainWindow::init()
+class ObserverFactory : public QObject
 {
-    m_view.setMainQmlFile(QLatin1String("qml/symbian/main.qml"));
-    m_view.showExpanded();
-}//MainWindow::init
+    Q_OBJECT
 
-void
-MainWindow::log(QDateTime /*dt*/, int /*level*/, const QString & /*strLog*/)
-{
-}//MainWindow::log
+private:
+    explicit ObserverFactory(QObject *parent = 0);
+    ~ObserverFactory();
+
+public:
+    bool init ();
+
+    void startObservers (const QString &strContact,
+                               QObject *receiver  ,
+                         const char    *method    );
+    void stopObservers ();
+
+signals:
+    void status(const QString &strText, int timeout = 2000);
+
+public slots:
+
+private:
+    IObserverList listObservers;
+
+    friend class Singletons;
+};
+
+#endif // OBSERVERFACTORY_H

@@ -86,7 +86,7 @@ MainWindow::init()
 }//MainWindow::init
 
 void
-MainWindow::log(QDateTime dt, int level, const QString &strLog)
+MainWindow::log(QDateTime /*dt*/, int /*level*/, const QString & /*strLog*/)
 {
 }//MainWindow::log
 

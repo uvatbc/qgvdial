@@ -34,7 +34,7 @@ DummyMainWindow::init()
 }//DummyMainWindow::init
 
 void
-DummyMainWindow::log(QDateTime dt, int level, const QString &strLog)
+DummyMainWindow::log(QDateTime /*dt*/, int /*level*/, const QString & /*strLog*/)
 {
     Q_ASSERT(0 == "Not implemented");
 }//DummyMainWindow::log
@@ -70,14 +70,14 @@ DummyMainWindow::uiRequestTFALoginDetails(void *ctx)
 }//DummyMainWindow::uiRequestTFALoginDetails
 
 void
-DummyMainWindow::uiSetUserPass(bool editable)
+DummyMainWindow::uiSetUserPass(bool /*editable*/)
 {
     //TODO: Set the user and password into the UI.
     Q_ASSERT(0 == "Not implemented");
 }//DummyMainWindow::uiSetUserPass
 
 void
-DummyMainWindow::uiLoginDone(int status, const QString &errStr)
+DummyMainWindow::uiLoginDone(int /*status*/, const QString & /*errStr*/)
 {
     //TODO: Inform the user that the login has failed.
     Q_ASSERT(0 == "Not implemented");
