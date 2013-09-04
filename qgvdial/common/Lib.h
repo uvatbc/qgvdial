@@ -43,6 +43,9 @@ public:
         return m_osd->cipher(byIn, byOut, bEncrypt);
     }
 
+    // BE VERY CAREFUL USING THIS FUNCTION
+    IOsDependant *osd() { return m_osd; }
+
 protected:
     IOsDependant *m_osd;
 };

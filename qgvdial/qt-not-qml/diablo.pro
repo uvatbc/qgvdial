@@ -1,6 +1,8 @@
 include(./common-code.pri)
 include(../features/dirs/linux/linux-dirs.pri)
 
+DEFINES += OS_DIABLO
+
 INCLUDEPATH += diablo
 SOURCES  += diablo/DiabloPhoneFactory.cpp
 HEADERS  += diablo/DiabloPhoneFactory.h

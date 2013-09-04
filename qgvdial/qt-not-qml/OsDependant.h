@@ -27,6 +27,10 @@ Contact: yuvraaj@gmail.com
 #include "OSDCipher.h"
 #include "OSDDirs.h"
 
+#if DESKTOP_OS
+class SkypeClientFactory;
+#endif
+
 class OsDependant : public IOsDependant, public OsdCipher, public OsdDirs
 {
 public:
@@ -40,6 +44,15 @@ public:
     cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt) {
         return _cipher (byIn, byOut, bEncrypt);
     }
+
+#if DESKTOP_OS
+    SkypeClientFactory &skypeClientFactory();
+#endif
+
+private:
+#if DESKTOP_OS
+    SkypeClientFactory *m_skypeClientFactory;
+#endif
 };
 
 #endif // OSDEPENDANT_H

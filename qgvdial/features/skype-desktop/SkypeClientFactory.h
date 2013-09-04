@@ -23,13 +23,10 @@ Contact: yuvraaj@gmail.com
 #define SKYPECLIENTFACTORY_H
 
 #include "global.h"
+#include <QObject>
 
 class SkypeClient;
 typedef QMap<QString, SkypeClient *> SkypeClientMap;
-
-// For some reason the symbian MOC doesn't like it if I don't include QObject
-// even though it is present in QtCore which is included in global.h
-#include <QObject>
 
 class SkypeClientFactory : public QObject
 {
@@ -50,10 +47,9 @@ signals:
 
 private:
     SkypeClientMap mapClients;
-
     QWidget *mainwin;
 
-    friend class Singletons;
+    friend class OsDependant;
 };
 
 #endif // SKYPECLIENTFACTORY_H

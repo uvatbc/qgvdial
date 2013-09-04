@@ -38,13 +38,13 @@ void qgv_LogFlush();
 #error Invalid target
 #endif
 
-#if defined(Q_WS_HILDON) && !defined(Q_WS_MAEMO_5)
+#if (defined(Q_WS_HILDON) && !defined(Q_WS_MAEMO_5)) || defined(OS_DIABLO)
 #define DIABLO_OS 1
 #else
 #define DIABLO_OS 0
 #endif
 
-#if defined(Q_WS_X11) && !defined(Q_WS_MAEMO_5) && !defined(MEEGO_HARMATTAN) && !defined(Q_OS_BLACKBERRY)
+#if defined(Q_WS_X11) && !defined(Q_WS_MAEMO_5) && !defined(MEEGO_HARMATTAN) && !defined(Q_OS_BLACKBERRY) && !DIABLO_OS
 #define LINUX_DESKTOP 1
 #else
 #define LINUX_DESKTOP 0

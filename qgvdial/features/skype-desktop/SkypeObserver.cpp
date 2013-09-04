@@ -20,6 +20,8 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "SkypeObserver.h"
+#include "Lib.h"
+#include "OsDependant.h"
 
 SkypeObserver::SkypeObserver (QObject *parent)
 : IObserver(parent)
@@ -35,31 +37,29 @@ SkypeObserver::~SkypeObserver(void)
 void
 SkypeObserver::initClient ()
 {
-    if (NULL != skypeClient)
-    {
-        Q_DEBUG("SkypeObserver: Skype client is already running.");
+    if (NULL != skypeClient) {
+        Q_DEBUG("Skype client is already running.");
         return;
     }
 
-    SkypeClientFactory &skypeFactory = Singletons::getRef().getSkypeFactory ();
+    OsDependant *osd = (OsDependant *) Lib::ref().osd ();
+    SkypeClientFactory &skypeFactory = osd->skypeClientFactory();
     skypeClient = skypeFactory.ensureSkypeClient (APPLICATION_NAME);
-    if (NULL == skypeClient)
-    {
-        qWarning ("SkypeObserver: Failed to create skype client");
+    if (NULL == skypeClient) {
+        Q_WARN("Failed to create skype client");
         return;
     }
 
     bool rv = connect (
-        skypeClient, SIGNAL (status (const QString &, int)),
-        this       , SIGNAL (status (const QString &, int)));
+        skypeClient, SIGNAL(status(const QString&,int)),
+        this       , SIGNAL(status(const QString&,int)));
     Q_ASSERT(rv);
 
     QVariantList l;
     rv = skypeClient->enqueueWork (SW_Connect, l,
-                   this, SLOT (onInitSkype (bool, const QVariantList &)));
-    if (!rv)
-    {
-        qWarning ("SkypeObserver: Failed to initiate skype client init!");
+                   this, SLOT(onInitSkype(bool,const QVariantList&)));
+    if (!rv) {
+        Q_WARN("Failed to initiate skype client init!");
         skypeFactory.deleteClient (APPLICATION_NAME);
         skypeClient = NULL;
     }
@@ -68,18 +68,14 @@ SkypeObserver::initClient ()
 void
 SkypeObserver::onInitSkype (bool bSuccess, const QVariantList & /*params*/)
 {
-    if (!bSuccess)
-    {
-        qWarning ("SkypeObserver: Failed to init skype. Deleting");
+    if (!bSuccess) {
+        Q_WARN("Failed to init skype. Deleting");
 
-        SkypeClientFactory &skypeFactory =
-        Singletons::getRef().getSkypeFactory ();
-
+        OsDependant *osd = (OsDependant *) Lib::ref().osd ();
+        SkypeClientFactory &skypeFactory = osd->skypeClientFactory();
         skypeFactory.deleteClient (APPLICATION_NAME);
         skypeClient = NULL;
-    }
-    else
-    {
+    } else {
         Q_DEBUG("Skype initialized");
 
         bool rv = connect (
@@ -110,19 +106,15 @@ SkypeObserver::stopMonitoring ()
 void
 SkypeObserver::onCallStatusChanged (uint callId, const QString &strStatus)
 {
-    do // Begin cleanup block (not a loop)
-    {
-        if (NULL == skypeClient)
-        {
-            qWarning ("SkypeObserver: WTF?? skypeClient == NULL");
+    do {
+        if (NULL == skypeClient) {
+            Q_WARN("WTF?? skypeClient == NULL");
             break;
         }
 
-        if (arrCalls.contains (callId))
-        {
+        if (arrCalls.contains (callId)) {
             QString strText = strStatus;
-            if (strStatus.contains ("STATUS "))
-            {
+            if (strStatus.contains ("STATUS ")) {
                 strText.remove ("STATUS ");
                 if ((strText.contains ("MISSED")) ||
                     (strText.contains ("FINISHED")))
@@ -142,28 +134,25 @@ SkypeObserver::onCallStatusChanged (uint callId, const QString &strStatus)
         QVariantList l;
         l += QVariant(callId);
         bool rv = skypeClient->enqueueWork(SW_GetCallInfo, l, this,
-                    SLOT (onCallInfoDone(bool, const QVariantList &)));
+                    SLOT(onCallInfoDone(bool, const QVariantList&)));
         if (!rv) {
-            qWarning ("SkypeObserver: Failed to get call info");
+            Q_WARN("Failed to get call info");
         }
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
 }//SkypeObserver::onCallStatusChanged
 
 void
 SkypeObserver::onCallInfoDone (bool bOk, const QVariantList &params)
 {
-    do // Begin cleanup block (not a loop)
-    {
-        if (!bOk)
-        {
-            qWarning ("SkypeObserver: Failed to add call");
+    do {
+        if (!bOk) {
+            Q_WARN("Failed to add call");
             break;
         }
 
         Skype_CallInfo callInfo;
-        if (!params[1].canConvert<Skype_CallInfo> ())
-        {
-            qWarning ("SkypeObserver: QVariant cannot convert call info");
+        if (!params[1].canConvert<Skype_CallInfo> ()) {
+            Q_WARN("QVariant cannot convert call info");
             break;
         }
 
@@ -177,21 +166,19 @@ SkypeObserver::onCallInfoDone (bool bOk, const QVariantList &params)
             break;
         }
 
-        if (0 == strContact.size ())
-        {
+        if (0 == strContact.size ()) {
             Q_DEBUG("We have not been asked to observe");
             break;
         }
 
-        if (!callInfo.strPartnerHandle.contains(strContact))
-        {
+        if (!callInfo.strPartnerHandle.contains(strContact)) {
             Q_DEBUG("Incoming call not from our number");
             break;
         }
 
         Q_DEBUG("Call is of interest to us!");
         emit callStarted ();
-    } while (0); // End cleanup block (not a loop)
+    } while (0);
 }//SkypeObserver::onCallInfoDone
 
 QString

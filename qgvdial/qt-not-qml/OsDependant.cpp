@@ -21,6 +21,10 @@ Contact: yuvraaj@gmail.com
 
 #include "OsDependant.h"
 
+#if DESKTOP_OS
+#include "SkypeClientFactory.h"
+#endif
+
 IOsDependant *
 createOSD(QObject *parent /* = NULL*/)
 {
@@ -29,5 +33,16 @@ createOSD(QObject *parent /* = NULL*/)
 
 OsDependant::OsDependant(QObject *parent /* = NULL*/)
 : IOsDependant(parent)
+#if DESKTOP_OS
+, m_skypeClientFactory(new SkypeClientFactory(this))
+#endif
 {
 }//OsDependant::OsDependant
+
+#if DESKTOP_OS
+SkypeClientFactory &
+OsDependant::skypeClientFactory()
+{
+    return (*m_skypeClientFactory);
+}//OsDependant::skypeClientFactory
+#endif

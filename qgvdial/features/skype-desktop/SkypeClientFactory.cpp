@@ -38,8 +38,7 @@ SkypeClientFactory::SkypeClientFactory(QObject *parent)
 
 SkypeClientFactory::~SkypeClientFactory ()
 {
-    while (0 != mapClients.size ())
-    {
+    while (0 != mapClients.size ()) {
         deleteClient (mapClients.begin().key ());
     }
 }//SkypeClientFactory::~SkypeClientFactory
@@ -54,7 +53,7 @@ SkypeClient *
 SkypeClientFactory::ensureSkypeClient (const QString &name)
 {
     if (NULL == mainwin) {
-        qWarning ("Main window not set");
+        Q_WARN("Main window not set");
         return (NULL);
     }
 
@@ -75,12 +74,14 @@ SkypeClientFactory::ensureSkypeClient (const QString &name)
     client = new SkypeWinClient (*mainwin, name);
 #endif
 
-    if (NULL != client)
-    {
+    if (NULL != client) {
         bool rv = connect (
-            client, SIGNAL (status (const QString &, int)),
-            this  , SIGNAL (status (const QString &, int)));
-        Q_ASSERT(rv); Q_UNUSED(rv);
+            client, SIGNAL(status(const QString&,int)),
+            this  , SIGNAL(status(const QString&,int)));
+        if (!rv) {
+            Q_WARN("Failed to connect status signal");
+        }
+        Q_ASSERT(rv);
 
         mapClients[name] = client;
         client->start ();
