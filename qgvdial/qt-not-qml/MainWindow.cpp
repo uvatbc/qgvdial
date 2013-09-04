@@ -27,7 +27,7 @@ Contact: yuvraaj@gmail.com
 #include "InboxModel.h"
 
 #ifdef Q_WS_WIN32
-#include "WinMainApp.h"
+#include "MainApp.h"
 #endif
 
 QCoreApplication *

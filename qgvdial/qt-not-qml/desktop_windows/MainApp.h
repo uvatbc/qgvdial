@@ -22,39 +22,17 @@ Contact: yuvraaj@gmail.com
 #ifndef __MAINAPP_H__
 #define __MAINAPP_H__
 
-#include "global.h"
-
-#if HAS_SINGLE_APP
-#include "qtsingleapplication/inc/QtSingleApplication"
-#endif
-
-#ifdef Q_WS_WIN32
 #include <windows.h>
-#endif
-
-// For some reason the symbian MOC doesn't like it if I don't include QObject
-// even though it is present in QtCore which is included in global.h
+#include "global.h"
+#include "QtSingleApplication"
 #include <QObject>
 
-class MainApp
-#if HAS_SINGLE_APP
-: public QtSingleApplication
-#else
-: public QApplication
-#endif
+class MainApp : public QtSingleApplication
 {
     Q_OBJECT
 
 public:
     MainApp (int &argc, char **argv);
-
-#if !HAS_SINGLE_APP
-    inline bool isRunning() { return false; }
-    inline bool sendMessage(const QString & /*message*/, int /*timeout*/ = 5000) {
-        return false;
-    }
-    inline void setActivationWindow(QWidget *, bool /*activateOnMessage*/ = true){}
-#endif
 
 #ifdef Q_WS_WIN32
 signals:

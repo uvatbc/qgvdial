@@ -21,7 +21,6 @@ Contact: yuvraaj@gmail.com
 
 #include "MainApp.h"
 
-#ifdef Q_WS_WIN32
 #pragma comment(lib, "user32.lib")
 
 enum {
@@ -39,24 +38,14 @@ enum {
     SKYPECONTROLAPI_ATTACH_API_AVAILABLE        = 0x8001
 };
 
-#endif
-
 MainApp::MainApp (int &argc, char **argv)
-#if HAS_SINGLE_APP
 : QtSingleApplication (argc, argv)
-#else
-: QApplication (argc, argv)
-#endif
 {
-#ifdef Q_WS_WIN32
     uidDiscover  = RegisterWindowMessageA ("SkypeControlAPIDiscover");
     uidAttach    = RegisterWindowMessageA ("SkypeControlAPIAttach");
     hSkypeWindow = NULL;
-#endif
 }//MainApp::MainApp
 
-
-#ifdef Q_WS_WIN32
 bool
 MainApp::winEventFilter (MSG *msg, long *result)
 {
@@ -143,5 +132,3 @@ MainApp::clearSkypeHandle ()
 {
     hSkypeWindow = NULL;
 }//MainApp::clearSkypeHandle
-
-#endif //Q_WS_WIN32

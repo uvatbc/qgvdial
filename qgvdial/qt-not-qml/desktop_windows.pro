@@ -1,14 +1,14 @@
 include(./common-code.pri)
 include(../features/skype-desktop/skype.pri)
 
-#TODO: Change this!
-include(../features/linux-dirs/linux-dirs.pri)
+# Surprisingly enough, this works just perfectly in Windows
+include(../features/dirs/linux/linux-dirs.pri)
 
 INCLUDEPATH += desktop_windows
-SOURCES  += WinMainApp.cpp \
+SOURCES  += desktop_windows/MainApp.cpp \
             desktop_windows/PhoneFactory.cpp \
             desktop_windows/ObserverFactory.cpp
-HEADERS  += WinMainApp.h \
+HEADERS  += desktop_windows/MainApp.h \
             desktop_windows/PhoneFactory.h \
             desktop_windows/ObserverFactory.h
 
