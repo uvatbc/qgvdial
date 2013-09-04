@@ -19,13 +19,42 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
+#ifndef SKYPEACCOUNT_H
+#define SKYPEACCOUNT_H
+
 #include "IPhoneAccount.h"
 
-IPhoneAccount::IPhoneAccount(QObject *parent)
-: QObject(parent)
+class SkypeClient;
+class SkypeAccount : public IPhoneAccount
 {
-}//IPhoneAccount::IPhoneAccount
+    Q_OBJECT
 
-IPhoneAccount::~IPhoneAccount()
-{
-}//IPhoneAccount::~IPhoneAccount
+private:
+    explicit SkypeAccount(QObject *parent = 0);
+
+public:
+    QString id ();
+    QString name ();
+    QString selfNumber ();
+    bool isValid ();
+
+public slots:
+    bool initiateCall (AsyncTaskToken *task);
+    bool sendDTMF(const QString &strTones);
+
+private slots:
+    void onSkypeConnected (bool bSuccess, const QVariantList &params);
+    void onCallInitiated (bool bSuccess, const QVariantList &params);
+    void onDTMFSent (bool bSuccess, const QVariantList &params);
+
+private:
+    void attemptCreateSkypeClient ();
+
+private:
+    SkypeClient *m_skypeClient;
+    AsyncTaskToken *m_callTask;
+
+    friend class CallInitiatorFactory;
+};
+
+#endif // SKYPEACCOUNT_H

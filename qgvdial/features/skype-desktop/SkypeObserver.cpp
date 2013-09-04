@@ -25,7 +25,7 @@ Contact: yuvraaj@gmail.com
 
 SkypeObserver::SkypeObserver (QObject *parent)
 : IObserver(parent)
-, skypeClient (NULL)
+, m_skypeClient (NULL)
 {
     initClient ();
 }//SkypeObserver::SkypeObserver
@@ -37,31 +37,31 @@ SkypeObserver::~SkypeObserver(void)
 void
 SkypeObserver::initClient ()
 {
-    if (NULL != skypeClient) {
+    if (NULL != m_skypeClient) {
         Q_DEBUG("Skype client is already running.");
         return;
     }
 
     OsDependant *osd = (OsDependant *) Lib::ref().osd ();
     SkypeClientFactory &skypeFactory = osd->skypeClientFactory();
-    skypeClient = skypeFactory.ensureSkypeClient (APPLICATION_NAME);
-    if (NULL == skypeClient) {
+    m_skypeClient = skypeFactory.ensureSkypeClient (APPLICATION_NAME);
+    if (NULL == m_skypeClient) {
         Q_WARN("Failed to create skype client");
         return;
     }
 
     bool rv = connect (
-        skypeClient, SIGNAL(status(const QString&,int)),
+        m_skypeClient, SIGNAL(status(const QString&,int)),
         this       , SIGNAL(status(const QString&,int)));
     Q_ASSERT(rv);
 
     QVariantList l;
-    rv = skypeClient->enqueueWork (SW_Connect, l,
+    rv = m_skypeClient->enqueueWork (SW_Connect, l,
                    this, SLOT(onInitSkype(bool,const QVariantList&)));
     if (!rv) {
         Q_WARN("Failed to initiate skype client init!");
         skypeFactory.deleteClient (APPLICATION_NAME);
-        skypeClient = NULL;
+        m_skypeClient = NULL;
     }
 }//SkypeObserver::initClient
 
@@ -74,12 +74,12 @@ SkypeObserver::onInitSkype (bool bSuccess, const QVariantList & /*params*/)
         OsDependant *osd = (OsDependant *) Lib::ref().osd ();
         SkypeClientFactory &skypeFactory = osd->skypeClientFactory();
         skypeFactory.deleteClient (APPLICATION_NAME);
-        skypeClient = NULL;
+        m_skypeClient = NULL;
     } else {
         Q_DEBUG("Skype initialized");
 
         bool rv = connect (
-            skypeClient, SIGNAL(callStatusChanged(uint,const QString&)),
+            m_skypeClient, SIGNAL(callStatusChanged(uint,const QString&)),
             this, SLOT(onCallStatusChanged(uint,const QString&)));
         if (!rv) {
             Q_WARN("Failed to connect callStatusChanged");
@@ -107,7 +107,7 @@ void
 SkypeObserver::onCallStatusChanged (uint callId, const QString &strStatus)
 {
     do {
-        if (NULL == skypeClient) {
+        if (NULL == m_skypeClient) {
             Q_WARN("WTF?? skypeClient == NULL");
             break;
         }
@@ -133,7 +133,7 @@ SkypeObserver::onCallStatusChanged (uint callId, const QString &strStatus)
         // Invoke get call info
         QVariantList l;
         l += QVariant(callId);
-        bool rv = skypeClient->enqueueWork(SW_GetCallInfo, l, this,
+        bool rv = m_skypeClient->enqueueWork(SW_GetCallInfo, l, this,
                     SLOT(onCallInfoDone(bool, const QVariantList&)));
         if (!rv) {
             Q_WARN("Failed to get call info");

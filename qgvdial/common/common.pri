@@ -1,4 +1,5 @@
 INCLUDEPATH += $$PWD
+PRECOMPILED_HEADER = $$PWD/global.h
 
 SOURCES  += $$PWD/main.cpp \
             $$PWD/IMainWindow.cpp \

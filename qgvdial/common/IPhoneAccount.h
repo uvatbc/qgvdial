@@ -31,6 +31,7 @@ class IPhoneAccount : public QObject
 
 public:
     explicit IPhoneAccount(QObject *parent = 0);
+    virtual ~IPhoneAccount();
 
     //! An ID that is unique across reboots
     virtual QString id() = 0;
@@ -38,6 +39,10 @@ public:
     virtual QString name() = 0;
 
     virtual bool initiateCall(AsyncTaskToken *task) = 0;
+
+signals:
+    void changed();
+    void status(const QString &strText, int timeout = 2000);
 };
 
 #endif // IPHONEACCOUNT_H

@@ -56,7 +56,7 @@ private slots:
 
 private:
     //! The skype client if one can be created
-    SkypeClient    *skypeClient;
+    SkypeClient    *m_skypeClient;
     //! Array of active call IDs
     QVector<ulong>  arrCalls;
 
