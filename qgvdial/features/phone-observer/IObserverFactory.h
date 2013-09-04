@@ -47,4 +47,7 @@ private:
     IObserverList listObservers;
 };
 
+IObserverFactory *
+createObserverFactory(QObject *parent);
+
 #endif // IOBSERVERFACTORY_H
