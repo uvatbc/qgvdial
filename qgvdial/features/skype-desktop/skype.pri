@@ -15,4 +15,3 @@ HEADERS  += $$PWD/SkypeWinClient.h
 SOURCES  += $$PWD/SkypeLinuxClient.cpp
 HEADERS  += $$PWD/SkypeLinuxClient.h
 }
-

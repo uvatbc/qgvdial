@@ -19,7 +19,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#include "IIObserverFactory.h"
+#include "global.h"
+#include "IObserverFactory.h"
 
 IObserverFactory::IObserverFactory(QObject *parent)
 : QObject(parent)

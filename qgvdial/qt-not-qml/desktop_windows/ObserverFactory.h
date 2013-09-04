@@ -19,36 +19,19 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#ifndef IOBSERVER_H
-#define IOBSERVER_H
+#ifndef OBSERVERFACTORY_H
+#define OBSERVERFACTORY_H
 
 #include <QObject>
-#include <QtCore>
+#include "IObserverFactory.h"
 
-class IObserver : public QObject
+class ObserverFactory : public QObject
 {
     Q_OBJECT
 
 public:
-    virtual QString name() = 0;
-
-protected:
-    IObserver (QObject *parent = NULL) : QObject(parent) {}
-
-signals:
-    void status(const QString &strText, int timeout = 2000);
-
-    void callStarted ();
-
-protected:
-    virtual void startMonitoring (const QString &strC) = 0;
-    virtual void stopMonitoring () = 0;
-
-protected:
-    QString strContact;
-
-    friend class ObserverFactory;
+    explicit ObserverFactory(QObject *parent = 0);
+    ~ObserverFactory();
 };
-typedef QList<IObserver *> IObserverList;
 
-#endif // IOBSERVER_H
+#endif // OBSERVERFACTORY_H
