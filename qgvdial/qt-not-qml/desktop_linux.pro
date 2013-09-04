@@ -1,5 +1,6 @@
 include(./common-code.pri)
 include(../features/dirs/linux/linux-dirs.pri)
+include(../features/skype-desktop/skype.pri)
 
 INCLUDEPATH += desktop_linux
 SOURCES  += desktop_linux/PhoneFactory.cpp

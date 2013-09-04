@@ -1,4 +1,5 @@
 include(./common-code.pri)
+include(../features/skype-desktop/skype.pri)
 
 #TODO: Change this!
 include(../features/linux-dirs/linux-dirs.pri)
