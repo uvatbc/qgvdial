@@ -259,3 +259,12 @@ IMainWindow::onUiProxyChanged(const ProxyInfo &info)
                             info.port, info.authRequired, info.user, info.pass);
     Q_DEBUG("Updated proxy settings");
 }//IMainWindow::onUiProxyChanged
+
+void
+IMainWindow::onUserProxyRevert()
+{
+    ProxyInfo info;
+    db.getProxyInfo (info);
+
+    uiUpdateProxySettings(info);
+}//IMainWindow::onUserProxyRevert

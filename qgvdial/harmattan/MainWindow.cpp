@@ -25,6 +25,8 @@ Contact: yuvraaj@gmail.com
 #include "ContactsModel.h"
 #include "InboxModel.h"
 
+#define UNKNOWN_CONTACT_QRC_PATH "qrc:/unknown_contact.png"
+
 MainWindow::MainWindow(QObject *parent)
 : IMainWindow(parent)
 , m_view(NULL)
@@ -39,7 +41,9 @@ MainWindow::MainWindow(QObject *parent)
 , appPwDlg(NULL)
 , contactsList(NULL)
 , inboxList(NULL)
+, proxySettingsPage(NULL)
 {
+    oContacts.setUnknownContactLocalPath (UNKNOWN_CONTACT_QRC_PATH);
 }//MainWindow::MainWindow
 
 void
@@ -158,11 +162,52 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
         }
         connect(appPwDlg, SIGNAL(done(bool)), this, SLOT(onAppPwDlg(bool)));
 
+        proxySettingsPage = getQMLObject ("ProxySettingsPage");
+        if (NULL == proxySettingsPage) {
+            break;
+        }
+        connect(proxySettingsPage,
+                SIGNAL(sigProxyChanges(bool,bool,QString,int,bool,QString,QString)),
+                this,
+                SLOT(onSigProxyChanges(bool,bool,QString,int,bool,QString,QString)));
+        connect(proxySettingsPage, SIGNAL(sigRevertChanges()),
+                this, SLOT(onUserProxyRevert()));
+
         onInitDone();
         return;
     } while(0);
     exit(-1);
 }//MainWindow::declStatusChanged
+
+void
+MainWindow::uiUpdateProxySettings(const ProxyInfo &info)
+{
+    QMetaObject::invokeMethod (proxySettingsPage, "setValues",
+                               Q_ARG (QVariant, QVariant(info.enableProxy)),
+                               Q_ARG (QVariant, QVariant(info.useSystemProxy)),
+                               Q_ARG (QVariant, QVariant(info.server)),
+                               Q_ARG (QVariant, QVariant(info.port)),
+                               Q_ARG (QVariant, QVariant(info.authRequired)),
+                               Q_ARG (QVariant, QVariant(info.user)),
+                               Q_ARG (QVariant, QVariant(info.pass)));
+}//MainWindow::uiUpdateProxySettings
+
+void
+MainWindow::onSigProxyChanges(bool enable, bool useSystemProxy, QString server,
+                              int port, bool authRequired, QString user,
+                              QString pass)
+{
+    ProxyInfo info;
+    info.enableProxy    = enable;
+    info.useSystemProxy = useSystemProxy;
+    info.server         = server;
+    info.port           = port;
+    info.authRequired   = authRequired;
+    info.user           = user;
+    info.pass           = pass;
+
+    onUiProxyChanged (info);
+}//MainWindow::onSigProxyChanges
 
 void
 MainWindow::onLoginButtonClicked()

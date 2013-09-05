@@ -30,12 +30,6 @@ Page {
 
     signal sigLinkActivated(string strLink)
 
-    signal sigProxyChanges(bool bEnable,
-                           bool bUseSystemProxy,
-                           string host, int port,
-                           bool bRequiresAuth,
-                           string user, string pass)
-    signal sigProxyRefresh
     signal sigMosquittoChanges(bool bEnable, string host, int port, string topic)
     signal sigMosquittoRefresh
     signal sigPinSettingChanges(bool bEnable, string pin)
@@ -97,6 +91,24 @@ Page {
             }
         }//ExpandView (login/logout)
 
+        ExpandView {
+            id: expandProxySettings
+            anchors {
+                top: expandLoginDetails.bottom
+                left: parent.left
+            }
+            width: parent.width
+
+            mainTitle: "Proxy"
+            content: proxySettings
+            yTimer: yAdjustTimer
+
+            Proxy {
+                id: proxySettings
+                width: parent.width
+            }
+        }//ExpandView (proxy)
+
 /*
         ExpandView {
             id: expandDialSettings
@@ -120,40 +132,6 @@ Page {
                 opacity: parent.containedOpacity
             }
         }//ExpandView (dial settings)
-
-        ExpandView {
-            id: expandProxySettings
-            anchors {
-                top: expandDialSettings.bottom
-                left: parent.left
-            }
-
-            width: parent.width
-            contentHeight: proxySettings.height;
-
-            onClicked: if (isExpanded) yAdjustTimer.setY = y;
-
-            mainTitle: "Proxy"
-
-            Proxy {
-                id: proxySettings
-                y: parent.startY
-
-                width: parent.width - 1
-                opacity: parent.containedOpacity
-
-                onSigProxyChanges: container.sigProxyChanges(bEnable, bUseSystemProxy,
-                                                             host, port,
-                                                             bRequiresAuth,
-                                                             user, pass);
-                onSigDone: {
-                    if (!bSave) {
-                        container.sigProxyRefresh();
-                    }
-                    parent.isExpanded = false;
-                }
-            }
-        }//ExpandView (proxy)
 
         ExpandView {
             id: expandRefreshSettings

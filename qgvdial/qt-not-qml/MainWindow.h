@@ -45,7 +45,6 @@ public slots:
     void onUserUseSystemProxyChanged(bool newValue);
     void onUserProxyAuthRequiredChanged(bool newValue);
     void onUserProxyChange();
-    void onUserProxyRevert();
 
 protected:
     void uiUpdateProxySettings(const ProxyInfo &info);

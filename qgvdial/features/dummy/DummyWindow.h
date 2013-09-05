@@ -37,6 +37,7 @@ protected slots:
     virtual void onLoginButtonClicked();
 
 protected:
+    virtual void uiUpdateProxySettings(const ProxyInfo &info);
     virtual void uiRequestLoginDetails();
     virtual void uiRequestTFALoginDetails(void *ctx);
     virtual void uiSetUserPass(bool editable);

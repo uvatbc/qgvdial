@@ -240,7 +240,7 @@ void
 MainWindow::uiRefreshContacts()
 {
     ContactsModel *oldModel = m_contactsModel;
-    m_contactsModel = oContacts.createModel (true);
+    m_contactsModel = oContacts.createModel ();
     m_view.engine()->rootContext()->setContextProperty("g_ContactsModel",
                                                        m_contactsModel);
     QMetaObject::invokeMethod (contactsList, "setMyModel");

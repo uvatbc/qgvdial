@@ -40,6 +40,12 @@ DummyMainWindow::log(QDateTime /*dt*/, int /*level*/, const QString & /*strLog*/
 }//DummyMainWindow::log
 
 void
+DummyMainWindow::uiUpdateProxySettings(const ProxyInfo &info)
+{
+    Q_ASSERT(0 == "Not implemented");
+}//DummyMainWindow::uiUpdateProxySettings
+
+void
 DummyMainWindow::uiRequestLoginDetails()
 {
     //TODO: Show the settings tab

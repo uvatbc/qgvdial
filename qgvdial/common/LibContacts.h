@@ -38,8 +38,10 @@ public:
     bool login(const QString &user, const QString &pass);
     bool refresh(QDateTime after = QDateTime());
 
-    ContactsModel *createModel(bool mandatoryLocalPic = false);
+    ContactsModel *createModel(bool mandatoryLocalPic = true);
     void refreshModel(ContactsModel *contactModel);
+
+    void setUnknownContactLocalPath(const QString &path);
 
 signals:
     void someTimeAfterGettingTheLastPhoto();

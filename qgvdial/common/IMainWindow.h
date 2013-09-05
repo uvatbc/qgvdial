@@ -116,6 +116,7 @@ protected slots:
     void onQuit();
 
     void onUserLogoutRequest();
+    void onUserProxyRevert();
 
 private slots:
     void onTFARequest(AsyncTaskToken *task);

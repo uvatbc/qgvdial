@@ -24,7 +24,6 @@ Contact: yuvraaj@gmail.com
 #include "IMainWindow.h"
 #include "ContactsModel.h"
 
-#define UNKNOWN_CONTACT_QRC_PATH ":/unknown_contact.png"
 #define GOT_PHOTO_TIMEOUT (5000)  // 5 seconds
 
 LibContacts::LibContacts(IMainWindow *parent)
@@ -36,10 +35,6 @@ LibContacts::LibContacts(IMainWindow *parent)
              this, SLOT(onPresentCaptcha(AsyncTaskToken*,QString)));
     connect (&api, SIGNAL(oneContact(ContactInfo)),
              this, SLOT(onOneContact(ContactInfo)));
-
-    if (QFile::exists (UNKNOWN_CONTACT_QRC_PATH)) {
-        m_unknownContactPath = UNKNOWN_CONTACT_QRC_PATH;
-    }
 
     m_gotPhotoTimer.setSingleShot (true);
     m_gotPhotoTimer.setInterval (GOT_PHOTO_TIMEOUT);
@@ -148,7 +143,7 @@ LibContacts::onContactsFetched()
 }//LibContacts::onContactsFetched
 
 ContactsModel *
-LibContacts::createModel(bool mandatoryLocalPic /* = false*/)
+LibContacts::createModel(bool mandatoryLocalPic /* = true*/)
 {
     IMainWindow *win = (IMainWindow *) this->parent ();
     ContactsModel *model = new ContactsModel(mandatoryLocalPic, this);
@@ -237,3 +232,9 @@ LibContacts::refreshModel(ContactsModel *contactModel)
     IMainWindow *win = (IMainWindow *) this->parent ();
     win->db.refreshContactsModel (contactModel);
 }//LibContacts::refreshModel
+
+void
+LibContacts::setUnknownContactLocalPath(const QString &path)
+{
+    m_unknownContactPath = path;
+}//LibContacts::setUnknownContactLocalPath

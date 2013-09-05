@@ -30,6 +30,8 @@ Contact: yuvraaj@gmail.com
 #include "MainApp.h"
 #endif
 
+#define UNKNOWN_CONTACT_QRC_PATH ":/unknown_contact.png"
+
 QCoreApplication *
 createApplication(int argc, char *argv[])
 {
@@ -57,6 +59,7 @@ MainWindow::MainWindow(QObject *parent)
 : IMainWindow(parent)
 , d(new MainWindowPrivate)
 {
+    oContacts.setUnknownContactLocalPath (UNKNOWN_CONTACT_QRC_PATH);
 }//MainWindow::MainWindow
 
 MainWindow::~MainWindow()
@@ -240,7 +243,7 @@ void
 MainWindow::uiRefreshContacts()
 {
     QAbstractItemModel *oldModel = m_contactsModel;
-    m_contactsModel = oContacts.createModel (true);
+    m_contactsModel = oContacts.createModel ();
     connect(m_contactsModel, SIGNAL(noContactPhoto(QString,QString)),
             &oContacts, SLOT(onNoContactPhoto(QString,QString)));
     connect(&oContacts, SIGNAL(someTimeAfterGettingTheLastPhoto()),
@@ -336,12 +339,3 @@ MainWindow::onUserProxyChange()
 
     onUiProxyChanged (info);
 }//MainWindow::onUserProxyChange
-
-void
-MainWindow::onUserProxyRevert()
-{
-    ProxyInfo info;
-    db.getProxyInfo (info);
-
-    uiUpdateProxySettings(info);
-}//MainWindow::onUserProxyRevert

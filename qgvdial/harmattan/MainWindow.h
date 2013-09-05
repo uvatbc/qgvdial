@@ -42,9 +42,14 @@ protected slots:
     void onTfaPinDlg(bool accepted);
     void onAppPwDlg(bool accepted);
 
+    void onSigProxyChanges(bool enable, bool useSystemProxy, QString server,
+                           int port, bool authRequired, QString user,
+                           QString pass);
+
 protected:
     QObject *getQMLObject(const char *pageName);
 
+    void uiUpdateProxySettings(const ProxyInfo &info);
     void uiRequestLoginDetails();
     void uiRequestTFALoginDetails(void *ctx);
     void uiSetUserPass(bool editable);
@@ -68,6 +73,7 @@ private:
     QObject *appPwDlg;
     QObject *contactsList;
     QObject *inboxList;
+    QObject *proxySettingsPage;
 
     void    *loginCtx;
 };
