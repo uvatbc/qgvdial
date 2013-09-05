@@ -30,6 +30,16 @@ Contact: yuvraaj@gmail.com
 #define LOGS_SERVER "http://www.yuvraaj.net"
 #define COUNT_OF(x) ((sizeof(x)/sizeof(0[x])) / ((size_t)(!(sizeof(x) % sizeof(0[x])))))
 
+struct ProxyInfo {
+    bool enableProxy;
+    bool useSystemProxy;
+    QString server;
+    int port;
+    bool authRequired;
+    QString user;
+    QString pass;
+};
+
 extern QFile fLogfile;   //! Logfile
 extern int   logLevel;   //! Log level
 void qgv_LogFlush();

@@ -1172,8 +1172,6 @@ CacheDatabase::getProxySettings (bool &bEnable,
                                  bool &bRequiresAuth,
                                  QString &user, QString &pass)
 {
-    QSqlQuery query(dbMain);
-    query.setForwardOnly (true);
     bool rv = false;
 
     settings->beginGroup (GV_PROXY_TABLE);

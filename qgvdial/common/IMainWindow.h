@@ -141,6 +141,9 @@ protected:
     virtual void uiRefreshContacts() = 0;
     virtual void uiRefreshInbox() = 0;
 
+    void onUiProxyChanged(const ProxyInfo &info);
+    virtual void uiUpdateProxySettings(const ProxyInfo &info) = 0;
+
 protected:
     CacheDb db;
     GVApi   gvApi;

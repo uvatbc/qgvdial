@@ -41,7 +41,14 @@ public slots:
     void onLoginClicked();
     void someTimeAfterGettingTheLastPhoto();
 
+    void onUserProxyEnableChanged(bool newValue);
+    void onUserUseSystemProxyChanged(bool newValue);
+    void onUserProxyAuthRequiredChanged(bool newValue);
+    void onUserProxyChange();
+    void onUserProxyRevert();
+
 protected:
+    void uiUpdateProxySettings(const ProxyInfo &info);
     void uiRequestLoginDetails();
     void uiRequestTFALoginDetails(void *ctx);
     void uiSetUserPass(bool editable);
@@ -50,6 +57,9 @@ protected:
     void onUserLogoutDone();
     void uiRefreshContacts();
     void uiRefreshInbox();
+
+protected slots:
+    void messageReceived(const QString &msg);
 
 private:
     MainWindowPrivate *d;

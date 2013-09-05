@@ -71,16 +71,46 @@ MainWindow::init()
 {
     IMainWindow::init ();
 
+    bool rv = connect(qApp, SIGNAL(messageReceived(QString)),
+                      this, SLOT(messageReceived(QString)));
+    if (!rv) {
+        Q_WARN("Failed to connect to message received signal");
+        qApp->quit ();
+        exit(-1);
+        return;
+    }
+
+    ((QtSingleApplication *)qApp)->setActivationWindow (this->d);
+
+#if DESKTOP_OS
     // Desktop only ?
     Qt::WindowFlags flags = d->windowFlags ();
     flags &= ~(Qt::WindowMaximizeButtonHint);
     d->setWindowFlags (flags);
     d->setFixedSize (d->size ());
+#endif
 
     d->setOrientation(MainWindowPrivate::ScreenOrientationAuto);
     d->showExpanded();
     connect(d->ui->loginButton, SIGNAL(clicked()),
             this, SLOT(onLoginClicked()));
+
+    connect(d->ui->enableProxy, SIGNAL(clicked(bool)),
+            this, SLOT(onUserProxyEnableChanged(bool)));
+    onUserProxyEnableChanged(false);
+
+    connect(d->ui->useSystemProxy, SIGNAL(clicked(bool)),
+            this, SLOT(onUserUseSystemProxyChanged(bool)));
+    onUserUseSystemProxyChanged(false);
+
+    connect(d->ui->proxyAuthRequired, SIGNAL(clicked(bool)),
+            this, SLOT(onUserProxyAuthRequiredChanged(bool)));
+    onUserProxyAuthRequiredChanged(false);
+
+    connect (d->ui->proxyButtonBox, SIGNAL(accepted()),
+             this, SLOT(onUserProxyChange()));
+    connect (d->ui->proxyButtonBox, SIGNAL(rejected()),
+             this, SLOT(onUserProxyRevert()));
 
     QTimer::singleShot (1, this, SLOT(onInitDone()));
 }//MainWindow::init
@@ -89,6 +119,22 @@ void
 MainWindow::log(QDateTime /*dt*/, int /*level*/, const QString & /*strLog*/)
 {
 }//MainWindow::log
+
+void
+MainWindow::uiUpdateProxySettings(const ProxyInfo &info)
+{
+    d->ui->enableProxy->setChecked (info.enableProxy);
+    d->ui->useSystemProxy->setChecked (info.useSystemProxy);
+    d->ui->proxyServer->setText (info.server);
+    d->ui->proxyPort->setText (QString::number (info.port));
+    d->ui->proxyAuthRequired->setChecked (info.authRequired);
+    d->ui->proxyUser->setText (info.user);
+    d->ui->proxyPass->setText (info.pass);
+
+    onUserProxyEnableChanged(info.enableProxy);
+    onUserUseSystemProxyChanged (info.useSystemProxy);
+    onUserProxyAuthRequiredChanged (info.authRequired);
+}//MainWindow::uiUpdateProxySettings
 
 void
 MainWindow::uiRequestLoginDetails()
@@ -230,3 +276,72 @@ MainWindow::someTimeAfterGettingTheLastPhoto()
 {
     oContacts.refreshModel (m_contactsModel);
 }//MainWindow::someTimeAfterGettingTheLastPhoto
+
+void
+MainWindow::messageReceived(const QString &msg)
+{
+    if (msg == "show") {
+        Q_DEBUG ("Second instance asked us to show");
+        d->show ();
+    } else if (msg == "quit") {
+        Q_DEBUG ("Second instance asked us to quit");
+        qApp->quit ();
+    }
+}//MainWindow::messageReceived
+
+void
+MainWindow::onUserProxyEnableChanged(bool newValue)
+{
+    d->ui->useSystemProxy->setVisible (newValue);
+
+    if (newValue) {
+        if (d->ui->useSystemProxy->isEnabled ()) {
+            d->ui->frameProxyServerPort->setVisible (false);
+        } else {
+            d->ui->frameProxyServerPort->setVisible (true);
+        }
+    } else {
+        d->ui->frameProxyServerPort->setVisible (false);
+    }
+}//MainWindow::onUserProxyEnableChanged
+
+void
+MainWindow::onUserUseSystemProxyChanged(bool newValue)
+{
+    if (newValue) {
+        d->ui->frameProxyServerPort->setVisible (false);
+    } else {
+        d->ui->frameProxyServerPort->setVisible (true);
+    }
+}//MainWindow::onUserUseSystemProxyChanged
+
+void
+MainWindow::onUserProxyAuthRequiredChanged(bool newValue)
+{
+    d->ui->proxyUser->setVisible (newValue);
+    d->ui->proxyPass->setVisible (newValue);
+}//MainWindow::onUserProxyAuthRequiredChanged
+
+void
+MainWindow::onUserProxyChange()
+{
+    ProxyInfo info;
+    info.enableProxy    = d->ui->enableProxy->isChecked ();
+    info.useSystemProxy = d->ui->useSystemProxy->isChecked ();
+    info.server         = d->ui->proxyServer->text ();
+    info.port           = d->ui->proxyPort->text ().toInt ();
+    info.authRequired   = d->ui->proxyAuthRequired->isChecked ();
+    info.user           = d->ui->proxyUser->text ();
+    info.pass           = d->ui->proxyPass->text ();
+
+    onUiProxyChanged (info);
+}//MainWindow::onUserProxyChange
+
+void
+MainWindow::onUserProxyRevert()
+{
+    ProxyInfo info;
+    db.getProxyInfo (info);
+
+    uiUpdateProxySettings(info);
+}//MainWindow::onUserProxyRevert

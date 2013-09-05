@@ -94,6 +94,9 @@ public:
     bool getLatestContact (QDateTime &dateTime);
     bool getLatestInboxEntry (QDateTime &dateTime);
 
+    bool setProxyInfo(const ProxyInfo &info);
+    bool getProxyInfo(ProxyInfo &info);
+
 private:
     void ensureCache();
     bool blowAwayCache();

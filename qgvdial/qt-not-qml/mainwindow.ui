@@ -157,15 +157,15 @@
         <item>
          <widget class="QToolBox" name="toolBox">
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="loginDetails">
            <property name="geometry">
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>436</width>
-             <height>177</height>
+             <width>98</width>
+             <height>99</height>
             </rect>
            </property>
            <attribute name="label">
@@ -198,18 +198,141 @@
             </item>
            </layout>
           </widget>
+          <widget class="QWidget" name="proxyDetails">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>418</width>
+             <height>231</height>
+            </rect>
+           </property>
+           <attribute name="label">
+            <string>Proxy details</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_2">
+            <item row="0" column="1">
+             <widget class="QCheckBox" name="useSystemProxy">
+              <property name="text">
+               <string>Use System Proxy</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QCheckBox" name="enableProxy">
+              <property name="text">
+               <string>Enable Proxy</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0" colspan="2">
+             <widget class="QFrame" name="frameProxyServerPort">
+              <property name="frameShape">
+               <enum>QFrame::StyledPanel</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Raised</enum>
+              </property>
+              <layout class="QFormLayout" name="formLayout">
+               <item row="0" column="0">
+                <widget class="QLabel" name="label">
+                 <property name="text">
+                  <string>Server</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QLineEdit" name="proxyServer">
+                 <property name="placeholderText">
+                  <string>Proxy server name or address</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="label_2">
+                 <property name="text">
+                  <string>Port</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QLineEdit" name="proxyPort">
+                 <property name="placeholderText">
+                  <string>Proxy port</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="0">
+                <widget class="QLabel" name="label_3">
+                 <property name="text">
+                  <string>User</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="1">
+                <widget class="QLineEdit" name="proxyUser">
+                 <property name="placeholderText">
+                  <string>Username for proxy</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="0">
+                <widget class="QLabel" name="label_4">
+                 <property name="text">
+                  <string>Password</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="1">
+                <widget class="QLineEdit" name="proxyPass">
+                 <property name="echoMode">
+                  <enum>QLineEdit::Password</enum>
+                 </property>
+                 <property name="placeholderText">
+                  <string>Password for proxy</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0" colspan="2">
+                <widget class="QCheckBox" name="proxyAuthRequired">
+                 <property name="text">
+                  <string>Requires authentication</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item row="2" column="0" colspan="2">
+             <widget class="QDialogButtonBox" name="proxyButtonBox">
+              <property name="standardButtons">
+               <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
           <widget class="QWidget" name="aboutDetails">
            <property name="geometry">
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>96</width>
-             <height>26</height>
+             <width>98</width>
+             <height>88</height>
             </rect>
            </property>
            <attribute name="label">
             <string>About</string>
            </attribute>
+           <layout class="QVBoxLayout" name="verticalLayout_4">
+            <item>
+             <widget class="QPlainTextEdit" name="plainTextEdit">
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </widget>
          </widget>
         </item>
@@ -225,7 +348,7 @@
      <x>0</x>
      <y>0</y>
      <width>497</width>
-     <height>25</height>
+     <height>20</height>
     </rect>
    </property>
   </widget>

@@ -1087,3 +1087,84 @@ CacheDb::getLatestInboxEntry (QDateTime &dateTime)
 
     return (rv);
 }//CacheDb::getLatestInboxEntry
+
+bool
+CacheDb::setProxyInfo(const ProxyInfo &info)
+{
+    int flags = (info.enableProxy ? GV_P_F_ENABLE : 0)
+              | (info.useSystemProxy ? GV_P_F_USE_SYSTEM : 0)
+              | (info.authRequired ? GV_P_F_NEEDS_AUTH : 0);
+
+    CacheDbPrivate &p = CacheDbPrivate::ref();
+    p.settings->beginGroup (GV_PROXY_TABLE);
+    p.settings->setValue (GV_P_FLAGS, flags);
+    p.settings->setValue (GV_P_HOST , info.server);
+    p.settings->setValue (GV_P_PORT , info.port);
+    p.settings->setValue (GV_P_USER , info.user);
+    p.settings->setValue (GV_P_PASS , info.pass);
+    p.settings->endGroup ();
+
+    return true;
+}//CacheDb::setProxyInfo
+
+bool
+CacheDb::getProxyInfo(ProxyInfo &info)
+{
+    bool rv = false;
+
+    CacheDbPrivate &p = CacheDbPrivate::ref();
+    p.settings->beginGroup (GV_PROXY_TABLE);
+    do { // Begin cleanup block (not a loop)
+        info.server = "proxy.example.com";
+        if (p.settings->contains (GV_P_HOST)) {
+            info.server = p.settings->value (GV_P_HOST).toString ();
+        }
+
+        info.port = 80;
+        if (p.settings->contains (GV_P_PORT)) {
+            info.port = p.settings->value (GV_P_PORT).toInt ();
+        }
+
+        info.user = "example_user";
+        if (p.settings->contains (GV_P_USER)) {
+            info.user = p.settings->value (GV_P_USER).toString ();
+        }
+
+        info.pass.clear ();
+        if (p.settings->contains (GV_P_PASS)) {
+            info.pass = p.settings->value (GV_P_PASS).toString ();
+        }
+
+        // Everything after this is proxy related. So if the proxy flags are
+        // not present there's no point doing the rest of the code. If there
+        // are other settings, this method will need to change.
+        info.enableProxy = info.useSystemProxy = info.authRequired = false;
+        if (!p.settings->contains (GV_P_FLAGS)) {
+            Q_WARN("Failed to pull the proxy flags from the DB");
+            break;
+        }
+
+        int flags = p.settings->value (GV_P_FLAGS).toInt ();
+        rv = true;
+
+        info.enableProxy = (flags & GV_P_F_ENABLE ? true : false);
+        if (!info.enableProxy) {
+            Q_DEBUG ("Proxy not enabled.");
+            break;
+        }
+        info.useSystemProxy = (flags & GV_P_F_USE_SYSTEM ? true : false);
+        if (info.useSystemProxy) {
+            Q_DEBUG ("Use system settings");
+            break;
+        }
+
+        info.authRequired = (flags & GV_P_F_NEEDS_AUTH ? true : false);
+        if (!info.authRequired) {
+            Q_DEBUG ("Proxy does not require authentication");
+            break;
+        }
+    } while (0); // End cleanup block (not a loop)
+    p.settings->endGroup ();
+
+    return (rv);
+}//CacheDb::getProxyInfo

@@ -68,6 +68,15 @@ IMainWindow::onInitDone()
             gvApi.setAllCookies (cookies);
         }
 
+        ProxyInfo info;
+        if (db.getProxyInfo (info)) {
+            gvApi.setProxySettings (info.enableProxy, info.useSystemProxy,
+                                    info.server, info.port, info.authRequired,
+                                    info.user, info.pass);
+            uiUpdateProxySettings(info);
+            Q_DEBUG("Updated proxy settings");
+        }
+
         if (db.usernameIsCached () && db.getUserPass (user,pass)) {
             // Begin login
             beginLogin (user, pass);
@@ -241,3 +250,12 @@ IMainWindow::onAccountsIdentified()
 
     task->deleteLater ();
 }//IMainWindow::onAccountsIdentified
+
+void
+IMainWindow::onUiProxyChanged(const ProxyInfo &info)
+{
+    db.setProxyInfo (info);
+    gvApi.setProxySettings (info.enableProxy, info.useSystemProxy, info.server,
+                            info.port, info.authRequired, info.user, info.pass);
+    Q_DEBUG("Updated proxy settings");
+}//IMainWindow::onUiProxyChanged
