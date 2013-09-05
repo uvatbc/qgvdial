@@ -94,15 +94,30 @@ Rectangle {
             content: loginDetails
             yTimer: yAdjustTimer
 
-            //property bool bShowLogindetails: g_bShowLoginSettings
-            //onBShowLogindetailsChanged: { if (bShowLogindetails) isExpanded = true; }
-
             LoginDetails {
                 id: loginDetails
 
                 width: parent.width - 1
             }
         }//ExpandView (login/logout)
+
+        ExpandView {
+            id: expandProxySettings
+            anchors {
+                top: expandLoginDetails.bottom
+                left: parent.left
+            }
+            width: parent.width
+
+            mainTitle: "Proxy"
+            content: proxySettings
+            yTimer: yAdjustTimer
+
+            Proxy {
+                id: proxySettings
+                width: parent.width
+            }
+        }//ExpandView (proxy)
 
 /*
         ExpandView {
@@ -127,40 +142,6 @@ Rectangle {
                 opacity: parent.containedOpacity
             }
         }//ExpandView (dial settings)
-
-        ExpandView {
-            id: expandProxySettings
-            anchors {
-                top: expandDialSettings.bottom
-                left: parent.left
-            }
-
-            width: parent.width
-            contentHeight: proxySettings.height;
-
-            onClicked: if (isExpanded) yAdjustTimer.setY = y;
-
-            mainTitle: "Proxy"
-
-            Proxy {
-                id: proxySettings
-                y: parent.startY
-
-                width: parent.width - 1
-                opacity: parent.containedOpacity
-
-                onSigProxyChanges: container.sigProxyChanges(bEnable, bUseSystemProxy,
-                                                             host, port,
-                                                             bRequiresAuth,
-                                                             user, pass);
-                onSigDone: {
-                    if (!bSave) {
-                        container.sigProxyRefresh();
-                    }
-                    parent.isExpanded = false;
-                }
-            }
-        }//ExpandView (proxy)
 
         ExpandView {
             id: expandRefreshSettings
