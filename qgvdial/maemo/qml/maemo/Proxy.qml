@@ -39,7 +39,7 @@ Item {
         textUserProxyPass.text = pass;
     }
 
-    signal sigDone(bool bSave)
+    signal sigRevertChanges
     signal sigProxyChanges(bool bEnable,
                            bool bUseSystemProxy,
                            string host, int port,
@@ -50,13 +50,6 @@ Item {
     property bool bSystemProxy: proxySystem.checked
     property bool bProxyUserPass: proxyUserPassRequired.checked
     property real internalPointSize: (8 * g_fontMul)
-
-    onSigDone: {
-        textUserProxyHost.closeSoftwareInputPanel();
-        textUserProxyPort.closeSoftwareInputPanel();
-        textUserProxyUser.closeSoftwareInputPanel();
-        textUserProxyPass.closeSoftwareInputPanel();
-    }
 
     Column {
         id: mainColumn
@@ -98,6 +91,7 @@ Item {
                 id: lblHost
                 text: "Host:"
                 anchors.verticalCenter: parent.verticalCenter
+                color: "white"
             }//QGVLabel ("Host:")
 
             TextOneLine {
@@ -122,6 +116,7 @@ Item {
             Text {
                 id: lblPort
                 text: "Port:"
+                color: "white"
                 anchors.verticalCenter: parent.verticalCenter
             }//QGVLabel ("Port:")
 
@@ -157,6 +152,7 @@ Item {
             Text {
                 id: lblProxyUser
                 text: "Proxy user:"
+                color: "white"
                 anchors.verticalCenter: parent.verticalCenter
             }//QGVLabel ("Proxy user:")
 
@@ -182,6 +178,7 @@ Item {
             Text {
                 id: lblProxyPass
                 text: "Proxy password:"
+                color: "white"
                 anchors.verticalCenter: parent.verticalCenter
             }//QGVLabel ("Proxy password:")
 
@@ -196,25 +193,30 @@ Item {
             }//QGVTextInput (proxy password)
         }// Row (user proxy password)
 
-        SaveCancel {
-            anchors {
-                left: parent.left
-                leftMargin: 1
-            }
-            width: parent.width - 1
+        Row {
+            width: parent.width
+            spacing: 4
 
-            onSigSave: {
-                container.sigProxyChanges (bEnableProxy,
-                                           bSystemProxy,
-                                           textUserProxyHost.text,
-                                           textUserProxyPort.text,
-                                           bProxyUserPass,
-                                           textUserProxyUser.text,
-                                           textUserProxyPass.text);
-                container.sigDone(true);
+            Button {
+                width: (parent.width-parent.spacing) / 2
+                text: "Revert"
+                onClicked: container.sigRevertChanges(false);
             }
 
-            onSigCancel: container.sigDone(false);
-        }// Save and cancel buttons
+            Button {
+                text: "Submit"
+                width: (parent.width-parent.spacing) / 2
+
+                onClicked: {
+                    container.sigProxyChanges (bEnableProxy,
+                                               bSystemProxy,
+                                               textUserProxyHost.text,
+                                               textUserProxyPort.text,
+                                               bProxyUserPass,
+                                               textUserProxyUser.text,
+                                               textUserProxyPass.text);
+                }
+            }
+        }//Row of buttons
     }// Column
 }// Item (top level)

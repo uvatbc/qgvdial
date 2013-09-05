@@ -1115,17 +1115,17 @@ CacheDb::getProxyInfo(ProxyInfo &info)
     CacheDbPrivate &p = CacheDbPrivate::ref();
     p.settings->beginGroup (GV_PROXY_TABLE);
     do { // Begin cleanup block (not a loop)
-        info.server = "proxy.example.com";
+        info.server.clear ();
         if (p.settings->contains (GV_P_HOST)) {
             info.server = p.settings->value (GV_P_HOST).toString ();
         }
 
-        info.port = 80;
+        info.port = 0;
         if (p.settings->contains (GV_P_PORT)) {
             info.port = p.settings->value (GV_P_PORT).toInt ();
         }
 
-        info.user = "example_user";
+        info.user.clear ();
         if (p.settings->contains (GV_P_USER)) {
             info.user = p.settings->value (GV_P_USER).toString ();
         }

@@ -40,9 +40,14 @@ protected slots:
     void declStatusChanged(QDeclarativeView::Status status);
     void onLoginButtonClicked();
 
+    void onSigProxyChanges(bool enable, bool useSystemProxy, QString server,
+                           int port, bool authRequired, QString user,
+                           QString pass);
+
 protected:
     QObject *getQMLObject(const char *pageName);
 
+    void uiUpdateProxySettings(const ProxyInfo &info);
     void uiRequestLoginDetails();
     void uiRequestTFALoginDetails(void *ctx);
     void uiSetUserPass(bool editable);
@@ -62,6 +67,7 @@ private:
     QObject *textPassword;
     QObject *contactsList;
     QObject *inboxList;
+    QObject *proxySettingsPage;
 };
 
 #endif // MAINWINDOW_H
