@@ -21,20 +21,29 @@
        <enum>QTabWidget::East</enum>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="dialTab">
        <attribute name="title">
         <string>Dialpad</string>
        </attribute>
-       <layout class="QHBoxLayout" name="horizontalLayout">
+       <layout class="QGridLayout" name="gridLayout_3">
         <property name="sizeConstraint">
          <enum>QLayout::SetDefaultConstraint</enum>
         </property>
-        <item>
-         <widget class="QWidget" name="numDisp" native="true"/>
+        <item row="0" column="0" rowspan="2">
+         <widget class="QWidget" name="numDisp" native="true">
+          <layout class="QVBoxLayout" name="verticalLayout_5">
+           <item>
+            <widget class="QComboBox" name="comboBox"/>
+           </item>
+           <item>
+            <widget class="QPlainTextEdit" name="dispNum"/>
+           </item>
+          </layout>
+         </widget>
         </item>
-        <item>
+        <item row="0" column="1">
          <widget class="QWidget" name="keypad" native="true">
           <layout class="QGridLayout" name="gridLayout">
            <property name="sizeConstraint">
@@ -42,6 +51,12 @@
            </property>
            <item row="4" column="3">
             <widget class="QPushButton" name="k4">
+             <property name="minimumSize">
+              <size>
+               <width>75</width>
+               <height>0</height>
+              </size>
+             </property>
              <property name="text">
               <string>4</string>
              </property>
@@ -49,6 +64,12 @@
            </item>
            <item row="4" column="6">
             <widget class="QPushButton" name="k5">
+             <property name="minimumSize">
+              <size>
+               <width>75</width>
+               <height>0</height>
+              </size>
+             </property>
              <property name="text">
               <string>5</string>
              </property>
@@ -56,6 +77,12 @@
            </item>
            <item row="4" column="9">
             <widget class="QPushButton" name="k6">
+             <property name="minimumSize">
+              <size>
+               <width>75</width>
+               <height>0</height>
+              </size>
+             </property>
              <property name="text">
               <string>6</string>
              </property>
@@ -63,6 +90,12 @@
            </item>
            <item row="7" column="6">
             <widget class="QPushButton" name="k8">
+             <property name="minimumSize">
+              <size>
+               <width>75</width>
+               <height>0</height>
+              </size>
+             </property>
              <property name="text">
               <string>8</string>
              </property>
@@ -70,6 +103,12 @@
            </item>
            <item row="7" column="9">
             <widget class="QPushButton" name="k9">
+             <property name="minimumSize">
+              <size>
+               <width>75</width>
+               <height>0</height>
+              </size>
+             </property>
              <property name="text">
               <string>9</string>
              </property>
@@ -77,6 +116,12 @@
            </item>
            <item row="9" column="3">
             <widget class="QPushButton" name="kstar">
+             <property name="minimumSize">
+              <size>
+               <width>75</width>
+               <height>0</height>
+              </size>
+             </property>
              <property name="text">
               <string>*</string>
              </property>
@@ -84,6 +129,12 @@
            </item>
            <item row="9" column="6">
             <widget class="QPushButton" name="k0">
+             <property name="minimumSize">
+              <size>
+               <width>75</width>
+               <height>0</height>
+              </size>
+             </property>
              <property name="text">
               <string>0</string>
              </property>
@@ -91,6 +142,12 @@
            </item>
            <item row="9" column="9">
             <widget class="QPushButton" name="khash">
+             <property name="minimumSize">
+              <size>
+               <width>75</width>
+               <height>0</height>
+              </size>
+             </property>
              <property name="text">
               <string>#</string>
              </property>
@@ -98,6 +155,12 @@
            </item>
            <item row="3" column="3">
             <widget class="QPushButton" name="k1">
+             <property name="minimumSize">
+              <size>
+               <width>75</width>
+               <height>0</height>
+              </size>
+             </property>
              <property name="text">
               <string>1</string>
              </property>
@@ -105,6 +168,12 @@
            </item>
            <item row="3" column="6">
             <widget class="QPushButton" name="k2">
+             <property name="minimumSize">
+              <size>
+               <width>75</width>
+               <height>0</height>
+              </size>
+             </property>
              <property name="text">
               <string>2</string>
              </property>
@@ -112,6 +181,12 @@
            </item>
            <item row="3" column="9">
             <widget class="QPushButton" name="k3">
+             <property name="minimumSize">
+              <size>
+               <width>75</width>
+               <height>0</height>
+              </size>
+             </property>
              <property name="text">
               <string>3</string>
              </property>
@@ -119,8 +194,34 @@
            </item>
            <item row="7" column="3">
             <widget class="QPushButton" name="k7">
+             <property name="minimumSize">
+              <size>
+               <width>75</width>
+               <height>0</height>
+              </size>
+             </property>
              <property name="text">
               <string>7</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QWidget" name="widget" native="true">
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <widget class="QPushButton" name="btnText">
+             <property name="text">
+              <string>Text</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnCall">
+             <property name="text">
+              <string>Call</string>
              </property>
             </widget>
            </item>
@@ -164,8 +265,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>98</width>
-             <height>99</height>
+             <width>93</width>
+             <height>98</height>
             </rect>
            </property>
            <attribute name="label">
@@ -203,8 +304,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>418</width>
-             <height>231</height>
+             <width>421</width>
+             <height>234</height>
             </rect>
            </property>
            <attribute name="label">
@@ -317,8 +418,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>98</width>
-             <height>88</height>
+             <width>112</width>
+             <height>112</height>
             </rect>
            </property>
            <attribute name="label">
@@ -348,7 +449,7 @@
      <x>0</x>
      <y>0</y>
      <width>497</width>
-     <height>20</height>
+     <height>24</height>
     </rect>
    </property>
   </widget>

@@ -115,6 +115,19 @@ MainWindow::init()
     connect (d->ui->proxyButtonBox, SIGNAL(rejected()),
              this, SLOT(onUserProxyRevert()));
 
+    connect(d->ui->k0, SIGNAL(clicked()), this, SLOT(onKeypadKeyClicked()));
+    connect(d->ui->k1, SIGNAL(clicked()), this, SLOT(onKeypadKeyClicked()));
+    connect(d->ui->k2, SIGNAL(clicked()), this, SLOT(onKeypadKeyClicked()));
+    connect(d->ui->k3, SIGNAL(clicked()), this, SLOT(onKeypadKeyClicked()));
+    connect(d->ui->k4, SIGNAL(clicked()), this, SLOT(onKeypadKeyClicked()));
+    connect(d->ui->k5, SIGNAL(clicked()), this, SLOT(onKeypadKeyClicked()));
+    connect(d->ui->k6, SIGNAL(clicked()), this, SLOT(onKeypadKeyClicked()));
+    connect(d->ui->k7, SIGNAL(clicked()), this, SLOT(onKeypadKeyClicked()));
+    connect(d->ui->k8, SIGNAL(clicked()), this, SLOT(onKeypadKeyClicked()));
+    connect(d->ui->k9, SIGNAL(clicked()), this, SLOT(onKeypadKeyClicked()));
+    connect(d->ui->kstar, SIGNAL(clicked()), this, SLOT(onKeypadKeyClicked()));
+    connect(d->ui->khash, SIGNAL(clicked()), this, SLOT(onKeypadKeyClicked()));
+
     QTimer::singleShot (1, this, SLOT(onInitDone()));
 }//MainWindow::init
 
@@ -339,3 +352,10 @@ MainWindow::onUserProxyChange()
 
     onUiProxyChanged (info);
 }//MainWindow::onUserProxyChange
+
+void
+MainWindow::onKeypadKeyClicked()
+{
+    QPushButton *btn = (QPushButton *) QObject::sender ();
+    d->ui->dispNum->insertPlainText (btn->text ());
+}//MainWindow::onKeypadKeyClicked

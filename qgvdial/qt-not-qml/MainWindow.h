@@ -46,6 +46,8 @@ public slots:
     void onUserProxyAuthRequiredChanged(bool newValue);
     void onUserProxyChange();
 
+    void onKeypadKeyClicked();
+
 protected:
     void uiUpdateProxySettings(const ProxyInfo &info);
     void uiRequestLoginDetails();
