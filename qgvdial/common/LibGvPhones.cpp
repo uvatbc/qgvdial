@@ -21,9 +21,11 @@ Contact: yuvraaj@gmail.com
 
 #include "LibGvPhones.h"
 #include "IMainWindow.h"
+#include "GVNumModel.h"
 
 LibGvPhones::LibGvPhones(IMainWindow *parent)
 : QObject(parent)
+, m_numModel(new GVNumModel(this))
 {
     IMainWindow *win = (IMainWindow *) this->parent ();
     connect(&win->gvApi, SIGNAL(registeredPhone(const GVRegisteredNumber &)),
@@ -41,14 +43,14 @@ LibGvPhones::refresh()
     connect(task, SIGNAL(completed()), this, SLOT(onGotPhones()));
 
     IMainWindow *win = (IMainWindow *) this->parent ();
-    dialBack.clear ();
+    m_numModel->dialBack.clear ();
     return (win->gvApi.getPhones (task));
 }//LibGvPhones::refresh
 
 void
 LibGvPhones::onGotRegisteredPhone (const GVRegisteredNumber &info)
 {
-    dialBack += info;
+    m_numModel->dialBack += info;
 }//LibGvPhones::onGotRegisteredPhone
 
 void

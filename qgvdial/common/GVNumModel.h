@@ -19,28 +19,33 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#ifndef LIBGVPHONES_H
-#define LIBGVPHONES_H
+#ifndef GVNUMMODEL_H
+#define GVNUMMODEL_H
 
 #include <QObject>
 #include "global.h"
 
-class IMainWindow;
-class GVNumModel;
-
-class LibGvPhones : public QObject
+class GVNumModel : public QAbstractListModel
 {
     Q_OBJECT
 public:
-    explicit LibGvPhones(IMainWindow *parent);
-    bool refresh();
+    enum GVNumberRoles {
+        IdRole = Qt::UserRole + 1,
+        TypeRole,
+        FriendlyNameRole,
+        NumberRole
+    };
 
-private slots:
-    void onGotRegisteredPhone (const GVRegisteredNumber &info);
-    void onGotPhones();
+    explicit GVNumModel(QObject *parent = 0);
 
-public:
-    GVNumModel *m_numModel;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    QVariant data (const QModelIndex &index, int role = Qt::DisplayRole) const;
+
+private:
+    GVRegisteredNumberArray dialBack;
+    GVRegisteredNumberArray dialOut;
+
+    friend class LibGvPhones;
 };
 
-#endif // LIBGVPHONES_H
+#endif // GVNUMMODEL_H
