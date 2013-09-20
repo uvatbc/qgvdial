@@ -138,7 +138,7 @@ NwReqTracker::onReplyFinished()
         }
 
         if (QNetworkReply::NoError != origReply->error ()) {
-            Q_WARN("Response error: ") << origReply->errorString ();
+            Q_WARN(QString("Response error: %1").arg(origReply->errorString()));
             break;
         }
 
@@ -294,7 +294,7 @@ NwReqTracker::setAutoRedirect(QNetworkCookieJar *j, const QByteArray &ua,
 void
 NwReqTracker::setCookies(QNetworkCookieJar *jar, QNetworkRequest &req)
 {
-    if (jar) return;
+    if (!jar) return;
 
     // Different version of Qt mess up the cookie setup logic. Do it myself
     // to be absolutely sure.
@@ -313,13 +313,26 @@ NwReqTracker::setCookies(QNetworkCookieJar *jar, QNetworkRequest &req)
 QUrl
 NwReqTracker::hasMoved(QNetworkReply *reply)
 {
-    QUrl url = reply->attribute(QNetworkRequest::RedirectionTargetAttribute)
-                     .toUrl ();
+    QUrl url = reply->header (QNetworkRequest::LocationHeader).toUrl ();
 
     do {
         if (url.isEmpty ()) {
-            break;
+            url = reply->attribute(QNetworkRequest::RedirectionTargetAttribute)
+                        .toUrl ();
+            if (url.isEmpty ()) {
+                break;
+            }
+
+            Q_DEBUG("Location empty. Got RedirectionTargetAttribute");
         }
+
+        if (url.isRelative ()) {
+            QUrl orig = url;
+            url = url.resolved (reply->request().url());
+            Q_DEBUG(QString("unresolved = %1, resolved = %2")
+                    .arg(orig.toString(), url.toString()));
+        }
+
         if ((url.scheme () == "https") || (url.scheme () == "http")) {
             break;
         }

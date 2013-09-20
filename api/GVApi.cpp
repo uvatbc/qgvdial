@@ -505,7 +505,8 @@ GVApi::onLogin1(bool success, const QByteArray &response, QNetworkReply *reply,
     } while (0);
 
     if (!success) {
-        Q_WARN(QString("Login failed: %1").arg(strResponse));
+        Q_WARN(QString("Login failed: %1. Hidden fields : ").arg(strResponse))
+                << hiddenLoginFields;
 
         if (token->status == ATTS_SUCCESS) {
             token->status = ATTS_LOGIN_FAILURE;
@@ -572,10 +573,6 @@ gonext:
         return false;
     }
 
-    if (emitLog) {
-        Q_DEBUG("login fields =") << ret;
-    }
-
     return true;
 }//GVApi::parseHiddenLoginFields
 
@@ -608,35 +605,21 @@ GVApi::postLogin(QUrl url, AsyncTaskToken *token)
         allLoginFields[key] = hiddenLoginFields[key];
     }
 
-    if (!allLoginFields.contains ("Email")) {
-        allLoginFields["Email"] = token->inParams["user"];
-    }
-    if (!allLoginFields.contains ("Passwd")) {
-        allLoginFields["Passwd"] = token->inParams["pass"];
-    }
-    if (!allLoginFields.contains ("PersistentCookie")) {
-        allLoginFields["PersistentCookie"] = "yes";
-    }
+    allLoginFields["Email"] = token->inParams["user"];
+    allLoginFields["Passwd"] = token->inParams["pass"];
+    allLoginFields["PersistentCookie"] = "yes";
+    allLoginFields["signIn"] = "Sign+in";
+    allLoginFields["service"] = "grandcentral";
+
     if (!allLoginFields.contains ("passive")) {
         allLoginFields["passive"] = "true";
-    }
-    if (!allLoginFields.contains ("timeStmp")) {
-        allLoginFields["timeStmp"] = "";
-    }
-    if (!allLoginFields.contains ("secTok")) {
-        allLoginFields["secTok"] = "";
     }
     if (!allLoginFields.contains ("GALX")) {
         allLoginFields["GALX"] = galx.value ();
     }
-    if (!allLoginFields.contains ("rmShown")) {
-        allLoginFields["rmShown"] = "1";
-    }
-    if (!allLoginFields.contains ("signIn")) {
-        allLoginFields["signIn"] = "Sign+in";
-    }
 
     keys = allLoginFields.keys();
+
     foreach (QString key, keys) {
         if (key != "dsh") {
             content.addQueryItem(key, allLoginFields[key].toString());
@@ -663,6 +646,8 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
 #if 0
     QFile fTemp("login2.html");
     fTemp.open (QFile::ReadWrite);
+    fTemp.write(reply->request().url().toString().toLatin1());
+    fTemp.write ("\n");
     fTemp.write (response);
     fTemp.close ();
 #endif
@@ -678,7 +663,8 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
         QString strReplyUrl = replyUrl.toString();
 
         // Check to see if 2 factor auth is expected or rquired.
-        if (!strReplyUrl.contains ("SmsAuth")) {
+        if (!strReplyUrl.contains ("SmsAuth") &&
+            !strReplyUrl.contains ("SecondFactor")) {
             foreach (QNetworkCookie cookie, jar->getAllCookies ()) {
                 if (cookie.name() == "gvx") {
                     loggedIn = true;
@@ -790,7 +776,7 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
     if (!success) {
         if (token->status == ATTS_NW_ERROR) {
         } else if (accountConfigured) {
-            Q_WARN("Login failed.") << strResponse;
+            Q_WARN("Login failed.") << strResponse << hiddenLoginFields;
 
             if (token->errorString.isEmpty()) {
                 token->errorString = tr("The username or password you entered "
@@ -934,10 +920,22 @@ GVApi::onTFAAltLoginResp(bool success, const QByteArray &response,
 
 void
 GVApi::onTFAAutoPost(bool success, const QByteArray &response,
-                     QNetworkReply * /*reply*/, void *ctx)
+                     QNetworkReply * reply, void *ctx)
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QString strResponse = response;
+    QString strRequestUrl;
+
+    strRequestUrl = reply->request().url().toString();
+
+#if 0
+    QFile fTemp("login3.html");
+    fTemp.open (QFile::ReadWrite);
+    fTemp.write(strRequestUrl.toLatin1 ());
+    fTemp.write ("\n");
+    fTemp.write (response);
+    fTemp.close ();
+#endif
 
     do {
         if (!success) {

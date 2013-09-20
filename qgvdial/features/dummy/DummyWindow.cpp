@@ -40,7 +40,7 @@ DummyMainWindow::log(QDateTime /*dt*/, int /*level*/, const QString & /*strLog*/
 }//DummyMainWindow::log
 
 void
-DummyMainWindow::uiUpdateProxySettings(const ProxyInfo &info)
+DummyMainWindow::uiUpdateProxySettings(const ProxyInfo & /*info*/)
 {
     Q_ASSERT(0 == "Not implemented");
 }//DummyMainWindow::uiUpdateProxySettings
