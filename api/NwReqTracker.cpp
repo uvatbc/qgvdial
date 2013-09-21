@@ -21,6 +21,8 @@ Contact: yuvraaj@gmail.com
 
 #include "NwReqTracker.h"
 
+#define DEBUG_ONLY 1
+
 NwReqTracker::NwReqTracker(QNetworkReply *r, QNetworkAccessManager &nwManager,
                            void *c, quint32 timeout, bool bEmitlog,
                            bool autoDel, QObject *parent)
@@ -159,10 +161,13 @@ NwReqTracker::onReplyFinished()
 
         QUrl urlMoved = hasMoved (origReply);
         if (urlMoved.isEmpty ()) {
+#if DEBUG_ONLY
+            dumpReplyInfo (origReply);
+#endif
             break;
         }
 
-#if 1
+#if DEBUG_ONLY
         if (emitLog) {
             Q_DEBUG(QString("Orig: %1 *** New: %2")
                     .arg (origReply->request().url().toString(),
@@ -171,13 +176,22 @@ NwReqTracker::onReplyFinished()
 #endif
 
         QNetworkRequest req(urlMoved);
-        req.setRawHeader("User-Agent", uaString);
 
+        // Redirected request has the same UA as the original request
+        req.setRawHeader("User-Agent", uaString);
+        // The referer field is the location that redirected us
+        req.setRawHeader ("Referer", origReply->url().toString().toLatin1());
+        // Set cookies based on the URL
         NwReqTracker::setCookies (jar, req);
+
         QNetworkReply *nextReply = nwMgr.get(req);
         if (!nextReply) {
             break;
         }
+
+#if DEBUG_ONLY
+        NwReqTracker::dumpRequestInfo (req);
+#endif
 
         disconnectReply ();
         init (nextReply, ctx, emitLog, autoDelete);
@@ -353,3 +367,51 @@ NwReqTracker::hasMoved(QNetworkReply *reply)
     } while (0);
     return url;
 }//NwReqTracker::hasMoved
+
+void
+NwReqTracker::dumpRequestInfo(const QNetworkRequest &req,
+                              const QByteArray &postData)
+{
+    QString msg;
+    msg = QString("\nRequest URL = %1\n").arg (req.url().toString());
+
+    // Headers
+    QList<QByteArray> rawHeaders = req.rawHeaderList ();
+    if (rawHeaders.count() != 0) {
+        msg += "Headers:\n";
+        foreach (QByteArray rawHeader, rawHeaders) {
+            msg += QString("\t%1 = %2\n")
+                    .arg(QString(rawHeader),
+                         QString(req.rawHeader (rawHeader)));
+        }
+    } else {
+        msg += "No headers!!\n";
+    }
+
+    if (postData.count () != 0) {
+        msg += QString("Post data: %1").arg (QString(postData));
+    }
+    Q_DEBUG(msg);
+}//NwReqTracker::dumpRequestInfo
+
+void
+NwReqTracker::dumpReplyInfo(QNetworkReply *reply)
+{
+    QString msg;
+    msg = QString("\nResponse URL = %1\n").arg (reply->url().toString());
+
+    // Headers
+    QList<QByteArray> rawHeaders = reply->rawHeaderList ();
+    if (rawHeaders.count() != 0) {
+        msg += "Headers:\n";
+        foreach (QByteArray rawHeader, rawHeaders) {
+            msg += QString("\t%1 = %2\n")
+                    .arg(QString(rawHeader),
+                         QString(reply->rawHeader (rawHeader)));
+        }
+    } else {
+        msg += "No headers!!";
+    }
+
+    Q_DEBUG(msg);
+}//NwReqTracker::dumpReplyInfo

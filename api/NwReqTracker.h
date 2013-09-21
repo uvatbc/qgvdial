@@ -46,6 +46,10 @@ public:
     static void setCookies(QNetworkCookieJar *jar, QNetworkRequest &req);
     static QUrl hasMoved(QNetworkReply *reply);
 
+    static void dumpRequestInfo(const QNetworkRequest &req,
+                                const QByteArray &postData = QByteArray());
+    static void dumpReplyInfo(QNetworkReply *reply);
+
 signals:
     void sigDone(bool success, QByteArray response, QNetworkReply *r, void *ctx);
     void sigProgress(double percent);

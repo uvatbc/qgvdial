@@ -23,6 +23,8 @@ Contact: yuvraaj@gmail.com
 #include "GvXMLParser.h"
 #include "MyXmlErrorHandler.h"
 
+#define DEBUG_ONLY 1
+
 GVApi::GVApi(bool bEmitLog, QObject *parent)
 : QObject(parent)
 , emitLog(bEmitLog)
@@ -215,6 +217,10 @@ GVApi::doGet(QUrl url, AsyncTaskToken *token, QObject *receiver,
         return false;
     }
 
+#if DEBUG_ONLY
+    NwReqTracker::dumpRequestInfo (req);
+#endif
+
     NwReqTracker *tracker = new NwReqTracker(reply, *nwMgr, token,
                                         NW_REPLY_TIMEOUT, emitLog, true, this);
     if (tracker == NULL) {
@@ -264,6 +270,10 @@ GVApi::doPost(QUrl url, QByteArray postData, const char *contentType,
     if (!reply) {
         return false;
     }
+
+#if DEBUG_ONLY
+    NwReqTracker::dumpRequestInfo (req, postData);
+#endif
 
     NwReqTracker *tracker =
     new NwReqTracker(reply, *nwMgr, token, NW_REPLY_TIMEOUT, emitLog, this);
@@ -452,7 +462,6 @@ GVApi::onLogin1(bool success, const QByteArray &response, QNetworkReply *reply,
             break;
         }
 
-
         hiddenLoginFields.clear ();
         if (!parseHiddenLoginFields (strResponse, hiddenLoginFields)) {
             Q_WARN("Failed to parse hidden fields");
@@ -487,7 +496,8 @@ GVApi::onLogin1(bool success, const QByteArray &response, QNetworkReply *reply,
             nextAction = GOOGLE_ACCOUNTS "/" + nextAction;
         }
 
-        Q_DEBUG("Starting service login");
+        Q_DEBUG(QString("Starting service login by posting login to %1")
+                .arg(nextAction));
         QUrl url(nextAction);
 
         QUrl oldUrl = reply->request().url();
@@ -562,6 +572,13 @@ GVApi::parseHiddenLoginFields(const QString &strResponse, QVariantMap &ret)
             value = rx2.cap (1);
         }
 
+#if DEBUG_ONLY
+        if (ret.contains (name) &&
+           (ret[name].toString() != value)) {
+            Q_DEBUG(QString("Overwriting %1 value %2 with value %3")
+                    .arg (name, ret[name].toString(), value));
+        }
+#endif
         ret[name] = value;
 
 gonext:
@@ -643,14 +660,21 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
     bool accountConfigured = true;
     bool accountReviewRequested = false;
 
+    QUrl replyUrl = reply->url ();
+    QString strReplyUrl = replyUrl.toString();
+
 #if 0
     QFile fTemp("login2.html");
     fTemp.open (QFile::ReadWrite);
-    fTemp.write(reply->request().url().toString().toLatin1());
+    fTemp.write(strReplyUrl.toLatin1());
     fTemp.write ("\n");
     fTemp.write (response);
     fTemp.close ();
 #endif
+
+    if (strResponse.contains ("FinishSignIn")) {
+        Q_DEBUG("Here!!");
+    }
 
     token->errorString.clear();
     do {
@@ -658,9 +682,6 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
             token->status = ATTS_NW_ERROR;
             break;
         }
-
-        QUrl replyUrl = reply->url ();
-        QString strReplyUrl = replyUrl.toString();
 
         // Check to see if 2 factor auth is expected or rquired.
         if (!strReplyUrl.contains ("SmsAuth") &&
@@ -920,18 +941,18 @@ GVApi::onTFAAltLoginResp(bool success, const QByteArray &response,
 
 void
 GVApi::onTFAAutoPost(bool success, const QByteArray &response,
-                     QNetworkReply * reply, void *ctx)
+                     QNetworkReply *reply, void *ctx)
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QString strResponse = response;
-    QString strRequestUrl;
+    QString strResponseUrl;
 
-    strRequestUrl = reply->request().url().toString();
+    strResponseUrl = reply->url().toString();
 
 #if 0
     QFile fTemp("login3.html");
     fTemp.open (QFile::ReadWrite);
-    fTemp.write(strRequestUrl.toLatin1 ());
+    fTemp.write(strResponseUrl.toLatin1 ());
     fTemp.write ("\n");
     fTemp.write (response);
     fTemp.close ();
