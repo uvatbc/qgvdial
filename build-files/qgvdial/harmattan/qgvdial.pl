@@ -57,7 +57,7 @@ print "$cmd\n";
 system($cmd);
 
 # Put all the debianization files into the debian folder
-system("cd $basedir/build-files/qgvdial/harmattan ; mv postinst prerm control qgvdial.aegis rules $basedir/debian/");
+system("cd $basedir/build-files/qgvdial/harmattan ; mv compat postinst prerm control qgvdial.aegis rules $basedir/debian/");
 
 # Fix the changelog and put it into the correct location
 system("head -1 $basedir/debian/changelog >dest.txt && cat $basedir/build-files/qgvdial/changelog >>dest.txt && tail -2 $basedir/debian/changelog | sed 's/unknown/Yuvraaj Kelkar/g' >>dest.txt && mv dest.txt $basedir/debian/changelog");
