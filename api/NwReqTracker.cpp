@@ -21,7 +21,7 @@ Contact: yuvraaj@gmail.com
 
 #include "NwReqTracker.h"
 
-#define DEBUG_ONLY 1
+#define DEBUG_ONLY 0
 
 NwReqTracker::NwReqTracker(QNetworkReply *r, QNetworkAccessManager &nwManager,
                            void *c, quint32 timeout, bool bEmitlog,
@@ -373,7 +373,7 @@ NwReqTracker::dumpRequestInfo(const QNetworkRequest &req,
                               const QByteArray &postData)
 {
     QString msg;
-    msg = QString("\nRequest URL = %1\n").arg (req.url().toString());
+    msg = QString("\nRequest = %1\n").arg (req.url().toString());
 
     // Headers
     QList<QByteArray> rawHeaders = req.rawHeaderList ();
@@ -398,7 +398,7 @@ void
 NwReqTracker::dumpReplyInfo(QNetworkReply *reply)
 {
     QString msg;
-    msg = QString("\nResponse URL = %1\n").arg (reply->url().toString());
+    msg = QString("\nResponse = %1\n").arg (reply->url().toString());
 
     // Headers
     QList<QByteArray> rawHeaders = reply->rawHeaderList ();

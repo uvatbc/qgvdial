@@ -89,8 +89,6 @@ private slots:
                   QNetworkReply *reply, void *ctx);
     void onLogin2(bool success, const QByteArray &response,
                   QNetworkReply *reply, void *ctx);
-    void onTFAAutoPost(bool success, const QByteArray &response,
-                       QNetworkReply *reply, void *ctx);
     void onGotRnr(bool success, const QByteArray &response,
                   QNetworkReply *reply, void *ctx);
     void onTFAAltLoginResp(bool success, const QByteArray &response,

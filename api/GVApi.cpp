@@ -23,7 +23,7 @@ Contact: yuvraaj@gmail.com
 #include "GvXMLParser.h"
 #include "MyXmlErrorHandler.h"
 
-#define DEBUG_ONLY 1
+#define DEBUG_ONLY 0
 
 GVApi::GVApi(bool bEmitLog, QObject *parent)
 : QObject(parent)
@@ -615,9 +615,8 @@ GVApi::postLogin(QUrl url, AsyncTaskToken *token)
 
     // HTTPS POST the user credentials along with the cookie values as post data
 
-    QStringList keys;
     QVariantMap allLoginFields;
-    keys = hiddenLoginFields.keys();
+    QStringList keys = hiddenLoginFields.keys();
     foreach (QString key, keys) {
         allLoginFields[key] = hiddenLoginFields[key];
     }
@@ -862,10 +861,15 @@ GVApi::resumeTFALogin(AsyncTaskToken *token)
         content.addQueryItem("smsUserPin"      , smsUserPin);
         content.addQueryItem("smsVerifyPin"    , "Verify");
         content.addQueryItem("PersistentCookie", "yes");
-        content.addQueryItem("GALX"            , galx.value());
+//        content.addQueryItem("GALX"            , galx.value());
+
+        QStringList keys = hiddenLoginFields.keys();
+        foreach (QString key, keys) {
+            content.addQueryItem(key, hiddenLoginFields[key].toString());
+        }
 
         rv = doPostForm(twoFactorUrl, content.encodedQuery(), token, this,
-              SLOT(onTFAAutoPost(bool,const QByteArray&,QNetworkReply*,void*)));
+              SLOT(onLogin2(bool,QByteArray,QNetworkReply*,void*)));
         Q_ASSERT(rv);
     } while (0);
 
@@ -938,69 +942,6 @@ GVApi::onTFAAltLoginResp(bool success, const QByteArray &response,
         }
     }
 }//GVApi::onTFAAltLoginResp
-
-void
-GVApi::onTFAAutoPost(bool success, const QByteArray &response,
-                     QNetworkReply *reply, void *ctx)
-{
-    AsyncTaskToken *token = (AsyncTaskToken *)ctx;
-    QString strResponse = response;
-    QString strResponseUrl;
-
-    strResponseUrl = reply->url().toString();
-
-#if 0
-    QFile fTemp("login3.html");
-    fTemp.open (QFile::ReadWrite);
-    fTemp.write(strResponseUrl.toLatin1 ());
-    fTemp.write ("\n");
-    fTemp.write (response);
-    fTemp.close ();
-#endif
-
-    do {
-        if (!success) {
-            token->status = ATTS_NW_ERROR;
-            break;
-        }
-
-        success = false;
-        QRegExp rx1("<form(.*)>");
-        rx1.setMinimal (true);
-        if ((rx1.indexIn (strResponse) == -1) || (rx1.numCaptures () != 1)) {
-            Q_WARN("Failed to login.");
-            break;
-        }
-
-        QString cap = rx1.cap(1);
-        QRegExp rx2("action\\s*=\\s*\"(.*)\"");
-        rx2.setMinimal (true);
-        if ((rx2.indexIn (cap) == -1) || (rx2.numCaptures () != 1)) {
-            Q_WARN("Failed to login.");
-            break;
-        }
-        cap = rx2.cap (1);
-
-        QUrl nextUrl = QUrl::fromPercentEncoding (cap.toLatin1 ());
-
-        hiddenLoginFields.clear ();
-        if (!parseHiddenLoginFields (strResponse, hiddenLoginFields)) {
-            Q_WARN("Failed to login.");
-            break;
-        }
-
-        success = postLogin (nextUrl, token);
-    } while (0);
-
-    if (!success) {
-        Q_WARN("Login failed.") << strResponse;
-
-        if (token->status == ATTS_SUCCESS) {
-            token->status = ATTS_LOGIN_FAILURE;
-        }
-        token->emitCompleted ();
-    }
-}//GVApi::onTFAAutoPost
 
 bool
 GVApi::getRnr(AsyncTaskToken *token)
