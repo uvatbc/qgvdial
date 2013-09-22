@@ -58,5 +58,8 @@ LibGvPhones::onGotPhones()
 {
     AsyncTaskToken *task = (AsyncTaskToken *) QObject::sender ();
 
+    IMainWindow *win = (IMainWindow *) this->parent ();
+    win->uiRefreshNumbers ();
+
     task->deleteLater ();
 }//LibGvPhones::onGotPhones

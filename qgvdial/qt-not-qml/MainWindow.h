@@ -58,12 +58,14 @@ protected:
     void onUserLogoutDone();
     void uiRefreshContacts();
     void uiRefreshInbox();
+    void uiRefreshNumbers();
 
 protected slots:
     void messageReceived(const QString &msg);
 
 private:
     MainWindowPrivate *d;
+    bool    m_numberFirstRefresh;
 };
 
 QCoreApplication *

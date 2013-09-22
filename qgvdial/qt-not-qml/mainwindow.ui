@@ -35,7 +35,7 @@
          <widget class="QWidget" name="numDisp" native="true">
           <layout class="QVBoxLayout" name="verticalLayout_5">
            <item>
-            <widget class="QComboBox" name="comboBox"/>
+            <widget class="QComboBox" name="cbNumbers"/>
            </item>
            <item>
             <widget class="QPlainTextEdit" name="dispNum"/>
@@ -265,8 +265,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>93</width>
-             <height>98</height>
+             <width>96</width>
+             <height>101</height>
             </rect>
            </property>
            <attribute name="label">
@@ -304,8 +304,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>421</width>
-             <height>234</height>
+             <width>420</width>
+             <height>240</height>
             </rect>
            </property>
            <attribute name="label">
@@ -449,7 +449,7 @@
      <x>0</x>
      <y>0</y>
      <width>497</width>
-     <height>24</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>

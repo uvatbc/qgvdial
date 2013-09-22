@@ -21,7 +21,6 @@ Contact: yuvraaj@gmail.com
 
 #include "IMainWindow.h"
 #include "Lib.h"
-#include "ContactsModel.h"
 
 IMainWindow::IMainWindow(QObject *parent)
 : QObject(parent)

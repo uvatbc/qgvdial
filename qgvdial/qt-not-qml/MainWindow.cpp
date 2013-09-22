@@ -25,6 +25,7 @@ Contact: yuvraaj@gmail.com
 #include "ui_mainwindow.h"
 #include "ContactsModel.h"
 #include "InboxModel.h"
+#include "GVNumModel.h"
 
 #ifdef Q_WS_WIN32
 #include "MainApp.h"
@@ -58,6 +59,7 @@ createApplication(int argc, char *argv[])
 MainWindow::MainWindow(QObject *parent)
 : IMainWindow(parent)
 , d(new MainWindowPrivate)
+, m_numberFirstRefresh(true)
 {
     oContacts.setUnknownContactLocalPath (UNKNOWN_CONTACT_QRC_PATH);
 }//MainWindow::MainWindow
@@ -286,6 +288,21 @@ MainWindow::uiRefreshInbox()
     d->ui->inboxView->hideColumn (5);
     d->ui->inboxView->hideColumn (7);
 }//MainWindow::uiRefreshInbox
+
+void
+MainWindow::uiRefreshNumbers()
+{
+    if (NULL == oPhones.m_numModel) {
+        Q_CRIT("m_numModel is NULL!");
+        return;
+    }
+
+    if (m_numberFirstRefresh) {
+        d->ui->cbNumbers->setModel (oPhones.m_numModel);
+        //d->ui->cbNumbers->setModelColumn (3);
+        m_numberFirstRefresh = false;
+    }
+}//MainWindow::uiRefreshNumbers
 
 void
 MainWindow::someTimeAfterGettingTheLastPhoto()

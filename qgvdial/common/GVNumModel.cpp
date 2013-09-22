@@ -44,6 +44,7 @@ GVNumModel::data (const QModelIndex &index, int role) const
     QVariant var;
     do { // Begin cleanup block (not a loop)
         int row = index.row();
+        int col = index.column();
         GVRegisteredNumber num;
 
         if (row < dialBack.count ()) {
@@ -75,11 +76,10 @@ GVNumModel::data (const QModelIndex &index, int role) const
             break;
         }
 
-        if ((Qt::EditRole != role) || (Qt::DisplayRole != role)) {
+        if ((Qt::EditRole != role) && (Qt::DisplayRole != role)) {
             break;
         }
 
-        int col = index.column ();
         switch (col) {
         case 0:
             var = num.id;
