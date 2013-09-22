@@ -76,22 +76,14 @@ GVNumModel::data (const QModelIndex &index, int role) const
             break;
         }
 
-        if ((Qt::EditRole != role) && (Qt::DisplayRole != role)) {
+        // This code path is only for QComboBox.
+        // QComboBox only asks for the 0th column.
+        if (col != 0) {
             break;
         }
 
-        switch (col) {
-        case 0:
-            var = num.id;
-            break;
-        case 1:
-            var = num.chType;
-            break;
-        case 2:
-            var = num.name;
-            break;
-        case 3:
-            var = num.number;
+        if (Qt::DisplayRole == role) {
+            var = QString("%1\n(%2)").arg(num.name, num.number);
             break;
         }
     } while (0); // End cleanup block (not a loop)

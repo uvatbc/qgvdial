@@ -130,6 +130,8 @@ MainWindow::init()
     connect(d->ui->kstar, SIGNAL(clicked()), this, SLOT(onKeypadKeyClicked()));
     connect(d->ui->khash, SIGNAL(clicked()), this, SLOT(onKeypadKeyClicked()));
 
+    connect(d->ui->cbNumbers, SIGNAL(currentIndexChanged(int)),
+            &oPhones, SLOT(onUserSelectPhone(int)));
     QTimer::singleShot (1, this, SLOT(onInitDone()));
 }//MainWindow::init
 

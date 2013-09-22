@@ -35,6 +35,12 @@ public:
     explicit LibGvPhones(IMainWindow *parent);
     bool refresh();
 
+public slots:
+    bool onUserSelectPhone(int index);
+
+private:
+    bool findById(const QString &id, bool &dialBack, int &index);
+
 private slots:
     void onGotRegisteredPhone (const GVRegisteredNumber &info);
     void onGotPhones();

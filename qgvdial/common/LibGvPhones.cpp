@@ -63,3 +63,59 @@ LibGvPhones::onGotPhones()
 
     task->deleteLater ();
 }//LibGvPhones::onGotPhones
+
+bool
+LibGvPhones::onUserSelectPhone(int index)
+{
+    if (NULL == m_numModel) {
+        return (false);
+    }
+
+    do {
+        if (index < m_numModel->dialBack.count()) {
+            m_numModel->m_selectedId = m_numModel->dialBack[index].id;
+            break;
+        }
+        index -= m_numModel->dialBack.count();
+
+        if (index < m_numModel->dialOut.count()) {
+            m_numModel->m_selectedId = m_numModel->dialOut[index].id;
+            break;
+        }
+
+        Q_WARN("Array index out of bounds");
+        return (false);
+    } while (0);
+
+    return (true);
+}//LibGvPhones::onUserSelectPhone
+
+bool
+LibGvPhones::findById(const QString &id, bool &dialBack, int &index)
+{
+    if (NULL == m_numModel) {
+        Q_WARN("Number model is NULL");
+        return false;
+    }
+
+    int i;
+    for (i = 0; i < m_numModel->dialBack.count(); i++) {
+        if (m_numModel->dialBack[i].id == id) {
+            // Found it.
+            dialBack = (true);
+            index = i;
+            return true;
+        }
+    }
+
+    for (i = 0; i < m_numModel->dialOut.count(); i++) {
+        if (m_numModel->dialOut[i].id == id) {
+            // Found it.
+            dialBack = false;
+            index = i;
+            return (true);
+        }
+    }
+
+    return (false);
+}//LibGvPhones::findById

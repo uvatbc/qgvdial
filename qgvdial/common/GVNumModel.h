@@ -45,6 +45,8 @@ private:
     GVRegisteredNumberArray dialBack;
     GVRegisteredNumberArray dialOut;
 
+    QString                 m_selectedId;
+
     friend class LibGvPhones;
 };
 
