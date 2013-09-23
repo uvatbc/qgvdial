@@ -132,6 +132,9 @@ MainWindow::init()
 
     connect(d->ui->cbNumbers, SIGNAL(currentIndexChanged(int)),
             &oPhones, SLOT(onUserSelectPhone(int)));
+
+    connect(d->ui->btnCall, SIGNAL(clicked()),
+            this, SLOT(onUserCallBtnClicked()));
     QTimer::singleShot (1, this, SLOT(onInitDone()));
 }//MainWindow::init
 
@@ -378,3 +381,9 @@ MainWindow::onKeypadKeyClicked()
     QPushButton *btn = (QPushButton *) QObject::sender ();
     d->ui->dispNum->insertPlainText (btn->text ());
 }//MainWindow::onKeypadKeyClicked
+
+void
+MainWindow::onUserCallBtnClicked()
+{
+    onUserCall (d->ui->dispNum->toPlainText ());
+}//MainWindow::onUserCallBtnClicked

@@ -1285,6 +1285,8 @@ GVApi::onGetPhones(bool success, const QByteArray &response, QNetworkReply *,
                         .arg (regNumber.name, regNumber.number)
                         .arg (QString(regNumber.chType)));
             }
+
+            regNumber.dialBack = true;
             emit registeredPhone (regNumber);
         }
 
@@ -1919,8 +1921,8 @@ GVApi::callBack(AsyncTaskToken *token)
     }
 
     // Ensure that the params  are valid
-    if (!token->inParams.contains ("destination"))
-    {
+    if (!token->inParams.contains ("destination") ||
+        !token->inParams.contains ("source")) {
         token->status = ATTS_INVALID_PARAMS;
         token->emitCompleted ();
         return true;

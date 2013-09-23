@@ -267,3 +267,29 @@ IMainWindow::onUserProxyRevert()
 
     uiUpdateProxySettings(info);
 }//IMainWindow::onUserProxyRevert
+
+void
+IMainWindow::onUserCall(QString number)
+{
+    GVRegisteredNumber num;
+    if (!oPhones.getSelected (num)) {
+        Q_WARN("Couldn't get number to dial with; failed to make call.");
+        return;
+    }
+
+    AsyncTaskToken *task = new AsyncTaskToken(this);
+    if (NULL == task) {
+        Q_WARN("Failed to allocate task!");
+        return;
+    }
+
+    task->inParams["destination"] = number;
+    task->inParams["source"] = num.number;
+
+    if (num.dialBack) {
+        task->inParams["sourceType"] = QString(num.chType);
+        gvApi.callBack (task);
+    } else {
+        gvApi.callOut (task);
+    }
+}//IMainWindow::onUserCall

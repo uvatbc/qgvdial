@@ -35,6 +35,8 @@ public:
     explicit LibGvPhones(IMainWindow *parent);
     bool refresh();
 
+    bool getSelected(GVRegisteredNumber &num);
+
 public slots:
     bool onUserSelectPhone(int index);
 

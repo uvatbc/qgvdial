@@ -67,6 +67,7 @@ struct GVRegisteredNumber
     quint64     reverifyNeeded      : 1;
     quint64     smsEnabled          : 1;
     quint64     telephonyVerified   : 1;
+    quint64     dialBack            : 1;
 
     QString     forwardingCountry;
     QString     displayUnverifyScheduledDateTime;
@@ -79,6 +80,7 @@ struct GVRegisteredNumber
         number.clear ();
         active = verified = inVerification = reverifyNeeded = smsEnabled
                = telephonyVerified = 0;
+        dialBack = 1;
         forwardingCountry.clear ();
         displayUnverifyScheduledDateTime.clear ();
     }

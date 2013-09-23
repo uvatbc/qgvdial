@@ -87,6 +87,8 @@ LibGvPhones::onUserSelectPhone(int index)
         return (false);
     } while (0);
 
+    Q_DEBUG(QString("Selected phone ID: %1").arg(m_numModel->m_selectedId));
+
     return (true);
 }//LibGvPhones::onUserSelectPhone
 
@@ -119,3 +121,26 @@ LibGvPhones::findById(const QString &id, bool &dialBack, int &index)
 
     return (false);
 }//LibGvPhones::findById
+
+bool
+LibGvPhones::getSelected(GVRegisteredNumber &num)
+{
+    bool dialback = false;
+    int index;
+
+    bool rv = findById (m_numModel->m_selectedId, dialback, index);
+    if (!rv) {
+        Q_WARN("Failed to find currently selected phone number");
+        return (rv);
+    }
+
+    if (dialback) {
+        num = m_numModel->dialBack[index];
+    } else {
+        num = m_numModel->dialOut[index];
+    }
+
+    Q_ASSERT(num.dialBack == dialback);
+
+    return (true);
+}//LibGvPhones::getSelected

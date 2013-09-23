@@ -118,6 +118,8 @@ protected slots:
     void onUserLogoutRequest();
     void onUserProxyRevert();
 
+    void onUserCall(QString number);
+
 private slots:
     void onTFARequest(AsyncTaskToken *task);
     void loginCompleted();
