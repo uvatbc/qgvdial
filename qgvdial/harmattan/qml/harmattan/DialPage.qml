@@ -29,63 +29,61 @@ Page {
     signal sigHaptic
     property real toolbarHeight: 50
 
-    TextField {
-        id: numberField
+    Column {
+        anchors.fill: parent
 
-        inputMethodHints: Qt.ImhDialableCharactersOnly
-        placeholderText: "Enter number here"
-
-        anchors {
-            top: parent.top
-            horizontalCenter: parent.horizontalCenter
-        }
-
-        width: parent.width
-        height: 290
-        font.pointSize: 14
-    }
-
-    Keypad {
-        id: keypad
-
-        anchors {
-            top: numberField.bottom
-            topMargin: 2
-            horizontalCenter: parent.horizontalCenter
-        }
-
-        width: parent.width - 8
-        height: parent.height * 7/18
-
-        onBtnClick: {
-            var origStart = numberField.selectionStart;
-            var result = numberField.text.substr(0, origStart);
-            result += strText;
-            result += numberField.text.substr(numberField.selectionEnd);
-            numberField.text = result;
-            numberField.cursorPosition = origStart + strText.length;
-        }
-        onSigHaptic: container.sigHaptic();
-    }
-
-    ButtonRow {
-        id: btnRow
-        anchors {
-            top: keypad.bottom
-            topMargin: 8
-            horizontalCenter: parent.horizontalCenter
-        }
-
-        exclusive: false
         Button {
-            text: "Text"
-            height: 100
-            font.pixelSize: 35
+            id: cbBoxNumbers
+        }//currently selected phone
+
+        TextField {
+            id: numberField
+
+            inputMethodHints: Qt.ImhDialableCharactersOnly
+            placeholderText: "Enter number here"
+
+            anchors.horizontalCenter: parent.horizontalCenter
+
+            width: parent.width
+            height: 290
+            font.pointSize: 14
         }
-        Button {
-            text: "Call"
-            height: 100
-            font.pixelSize: 35
+
+        Keypad {
+            id: keypad
+
+            anchors.horizontalCenter: parent.horizontalCenter
+
+            width: parent.width - 8
+            height: parent.height * 7/18
+
+            onBtnClick: {
+                var origStart = numberField.selectionStart;
+                var result = numberField.text.substr(0, origStart);
+                result += strText;
+                result += numberField.text.substr(numberField.selectionEnd);
+                numberField.text = result;
+                numberField.cursorPosition = origStart + strText.length;
+            }
+            onSigHaptic: container.sigHaptic();
         }
-    }
+
+        ButtonRow {
+            id: btnRow
+
+            anchors.horizontalCenter: parent.horizontalCenter
+
+            exclusive: false
+            Button {
+                text: "Text"
+                height: 100
+                font.pixelSize: 35
+            }
+            Button {
+                text: "Call"
+                height: 100
+                font.pixelSize: 35
+            }
+        }//Buttonrow
+    }//Column
 }

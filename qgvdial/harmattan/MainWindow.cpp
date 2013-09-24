@@ -338,3 +338,8 @@ MainWindow::uiRefreshInbox()
         delete oldModel;
     }
 }//MainWindow::uiRefreshInbox
+
+void
+MainWindow::uiRefreshNumbers()
+{
+}//MainWindow::uiRefreshNumbers

@@ -58,6 +58,7 @@ protected:
     void onUserLogoutDone();
     void uiRefreshContacts();
     void uiRefreshInbox();
+    void uiRefreshNumbers();
 
 private:
     QmlApplicationViewer m_view;
