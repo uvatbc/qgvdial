@@ -26,6 +26,7 @@ Contact: yuvraaj@gmail.com
 LibGvPhones::LibGvPhones(IMainWindow *parent)
 : QObject(parent)
 , m_numModel(new GVNumModel(this))
+, m_ignoreSelectedNumberChanges(false)
 {
     IMainWindow *win = (IMainWindow *) this->parent ();
     connect(&win->gvApi, SIGNAL(registeredPhone(const GVRegisteredNumber &)),
@@ -43,14 +44,14 @@ LibGvPhones::refresh()
     connect(task, SIGNAL(completed()), this, SLOT(onGotPhones()));
 
     IMainWindow *win = (IMainWindow *) this->parent ();
-    m_numModel->dialBack.clear ();
+    m_numModel->m_dialBack.clear ();
     return (win->gvApi.getPhones (task));
 }//LibGvPhones::refresh
 
 void
 LibGvPhones::onGotRegisteredPhone (const GVRegisteredNumber &info)
 {
-    m_numModel->dialBack += info;
+    m_numModel->m_dialBack += info;
 }//LibGvPhones::onGotRegisteredPhone
 
 void
@@ -59,6 +60,23 @@ LibGvPhones::onGotPhones()
     AsyncTaskToken *task = (AsyncTaskToken *) QObject::sender ();
 
     IMainWindow *win = (IMainWindow *) this->parent ();
+
+    QString id;
+    do {
+        bool dialBack;
+        int index;
+
+        if (win->db.getSelectedPhone (id)) {
+            if (m_numModel->findById (id, dialBack, index)) {
+                break;
+            }
+        }
+
+        // Either id not found, or nothing saved:
+        id = m_numModel->m_dialBack[0].id;
+    } while(0);
+    m_numModel->m_selectedId = id;
+
     win->uiRefreshNumbers ();
 
     task->deleteLater ();
@@ -71,15 +89,19 @@ LibGvPhones::onUserSelectPhone(int index)
         return (false);
     }
 
+    if (m_ignoreSelectedNumberChanges) {
+        return false;
+    }
+
     do {
-        if (index < m_numModel->dialBack.count()) {
-            m_numModel->m_selectedId = m_numModel->dialBack[index].id;
+        if (index < m_numModel->m_dialBack.count()) {
+            m_numModel->m_selectedId = m_numModel->m_dialBack[index].id;
             break;
         }
-        index -= m_numModel->dialBack.count();
+        index -= m_numModel->m_dialBack.count();
 
-        if (index < m_numModel->dialOut.count()) {
-            m_numModel->m_selectedId = m_numModel->dialOut[index].id;
+        if (index < m_numModel->m_dialOut.count()) {
+            m_numModel->m_selectedId = m_numModel->m_dialOut[index].id;
             break;
         }
 
@@ -88,39 +110,11 @@ LibGvPhones::onUserSelectPhone(int index)
     } while (0);
 
     Q_DEBUG(QString("Selected phone ID: %1").arg(m_numModel->m_selectedId));
+    IMainWindow *win = (IMainWindow *) this->parent ();
+    win->db.putSelectedPhone (m_numModel->m_selectedId);
 
     return (true);
 }//LibGvPhones::onUserSelectPhone
-
-bool
-LibGvPhones::findById(const QString &id, bool &dialBack, int &index)
-{
-    if (NULL == m_numModel) {
-        Q_WARN("Number model is NULL");
-        return false;
-    }
-
-    int i;
-    for (i = 0; i < m_numModel->dialBack.count(); i++) {
-        if (m_numModel->dialBack[i].id == id) {
-            // Found it.
-            dialBack = (true);
-            index = i;
-            return true;
-        }
-    }
-
-    for (i = 0; i < m_numModel->dialOut.count(); i++) {
-        if (m_numModel->dialOut[i].id == id) {
-            // Found it.
-            dialBack = false;
-            index = i;
-            return (true);
-        }
-    }
-
-    return (false);
-}//LibGvPhones::findById
 
 bool
 LibGvPhones::getSelected(GVRegisteredNumber &num)
@@ -128,16 +122,16 @@ LibGvPhones::getSelected(GVRegisteredNumber &num)
     bool dialback = false;
     int index;
 
-    bool rv = findById (m_numModel->m_selectedId, dialback, index);
+    bool rv = m_numModel->findById (m_numModel->m_selectedId, dialback, index);
     if (!rv) {
         Q_WARN("Failed to find currently selected phone number");
         return (rv);
     }
 
     if (dialback) {
-        num = m_numModel->dialBack[index];
+        num = m_numModel->m_dialBack[index];
     } else {
-        num = m_numModel->dialOut[index];
+        num = m_numModel->m_dialOut[index];
     }
 
     Q_ASSERT(num.dialBack == dialback);

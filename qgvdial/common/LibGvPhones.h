@@ -40,15 +40,13 @@ public:
 public slots:
     bool onUserSelectPhone(int index);
 
-private:
-    bool findById(const QString &id, bool &dialBack, int &index);
-
 private slots:
     void onGotRegisteredPhone (const GVRegisteredNumber &info);
     void onGotPhones();
 
 public:
     GVNumModel *m_numModel;
+    bool        m_ignoreSelectedNumberChanges;
 };
 
 #endif // LIBGVPHONES_H

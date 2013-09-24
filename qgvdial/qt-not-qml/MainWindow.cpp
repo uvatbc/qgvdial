@@ -303,9 +303,18 @@ MainWindow::uiRefreshNumbers()
     }
 
     if (m_numberFirstRefresh) {
-        d->ui->cbNumbers->setModel (oPhones.m_numModel);
-        //d->ui->cbNumbers->setModelColumn (3);
         m_numberFirstRefresh = false;
+
+        oPhones.m_ignoreSelectedNumberChanges = true;
+        d->ui->cbNumbers->setModel (oPhones.m_numModel);
+        oPhones.m_ignoreSelectedNumberChanges = false;
+    }
+
+    int index = oPhones.m_numModel->getSelectedIndex();
+    if (-1 != index) {
+        oPhones.m_ignoreSelectedNumberChanges = true;
+        d->ui->cbNumbers->setCurrentIndex (index);
+        oPhones.m_ignoreSelectedNumberChanges = false;
     }
 }//MainWindow::uiRefreshNumbers
 

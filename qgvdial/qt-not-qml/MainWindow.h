@@ -62,6 +62,7 @@ protected:
 
 protected slots:
     void messageReceived(const QString &msg);
+
     void onUserCallBtnClicked();
 
 private:

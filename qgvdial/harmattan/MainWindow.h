@@ -75,6 +75,7 @@ private:
     QObject *contactsList;
     QObject *inboxList;
     QObject *proxySettingsPage;
+    QObject *selectedNumberButton;
 
     void    *loginCtx;
 };

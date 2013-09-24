@@ -41,9 +41,13 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data (const QModelIndex &index, int role = Qt::DisplayRole) const;
 
+    bool findById(const QString &id, bool &m_dialBack, int &index);
+    int getSelectedIndex();
+    bool getSelectedNumber(GVRegisteredNumber &num);
+
 private:
-    GVRegisteredNumberArray dialBack;
-    GVRegisteredNumberArray dialOut;
+    GVRegisteredNumberArray m_dialBack;
+    GVRegisteredNumberArray m_dialOut;
 
     QString                 m_selectedId;
 

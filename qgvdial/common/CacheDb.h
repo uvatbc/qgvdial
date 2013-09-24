@@ -97,6 +97,9 @@ public:
     bool setProxyInfo(const ProxyInfo &info);
     bool getProxyInfo(ProxyInfo &info);
 
+    bool getSelectedPhone (QString &id);
+    bool putSelectedPhone (const QString &id);
+
 private:
     void ensureCache();
     bool blowAwayCache();

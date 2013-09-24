@@ -27,13 +27,15 @@ Page {
     tools: commonTools
 
     signal sigHaptic
-    property real toolbarHeight: 50
 
     Column {
         anchors.fill: parent
+        spacing: 8
 
         Button {
-            id: cbBoxNumbers
+            id: btnSelectedNumber
+            objectName: "SelectedNumberButton"
+            width: parent.width
         }//currently selected phone
 
         TextField {

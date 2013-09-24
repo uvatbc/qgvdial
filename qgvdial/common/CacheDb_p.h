@@ -45,7 +45,7 @@ protected:
 //////////////////////////////// Settings table ////////////////////////////////
 #define GV_S_VAR_USER           "user"
 #define GV_S_VAR_PASS           "password"
-#define GV_S_VAR_CALLBACK       "callback"
+#define GV_S_VAR_SELECTED_PHONE "selected_phone"
 #define GV_S_VAR_INBOX_SEL      "inbox_sel"
 #define GV_S_VAR_PIN            "gvpin"
 #define GV_S_VAR_PIN_ENABLE     "gvpin_enable"

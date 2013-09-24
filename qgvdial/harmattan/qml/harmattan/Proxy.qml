@@ -50,7 +50,6 @@ Item {
     property bool bEnableProxy: proxySupport.checked
     property bool bSystemProxy: proxySystem.checked
     property bool bProxyUserPass: proxyUserPassRequired.checked
-    property real internalPointSize: (8 * g_fontMul)
 
     Column {
         id: mainColumn

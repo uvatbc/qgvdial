@@ -65,7 +65,6 @@ PageStackWindow {
 
             DialPage {
                 id: dialTab
-                toolbarHeight: appWindow.platformToolBarHeight
             }
             ContactsPage {
                 id: contactsTab

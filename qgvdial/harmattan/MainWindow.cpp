@@ -24,6 +24,7 @@ Contact: yuvraaj@gmail.com
 
 #include "ContactsModel.h"
 #include "InboxModel.h"
+#include "GVNumModel.h"
 
 #define UNKNOWN_CONTACT_QRC_PATH "qrc:/unknown_contact.png"
 
@@ -42,6 +43,7 @@ MainWindow::MainWindow(QObject *parent)
 , contactsList(NULL)
 , inboxList(NULL)
 , proxySettingsPage(NULL)
+, selectedNumberButton(NULL)
 {
     oContacts.setUnknownContactLocalPath (UNKNOWN_CONTACT_QRC_PATH);
 }//MainWindow::MainWindow
@@ -172,6 +174,11 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
                 SLOT(onSigProxyChanges(bool,bool,QString,int,bool,QString,QString)));
         connect(proxySettingsPage, SIGNAL(sigRevertChanges()),
                 this, SLOT(onUserProxyRevert()));
+
+        selectedNumberButton = getQMLObject ("SelectedNumberButton");
+        if (NULL == selectedNumberButton) {
+            break;
+        }
 
         onInitDone();
         return;
@@ -342,4 +349,17 @@ MainWindow::uiRefreshInbox()
 void
 MainWindow::uiRefreshNumbers()
 {
+    if (NULL == oPhones.m_numModel) {
+        Q_CRIT("m_numModel is NULL!");
+        return;
+    }
+
+    GVRegisteredNumber num;
+    if (!oPhones.m_numModel->getSelectedNumber (num)) {
+        Q_WARN("No selected number!!");
+        return;
+    }
+
+    QString btnText = QString("%1\n(%2)").arg(num.name, num.number);
+    selectedNumberButton->setProperty ("text", btnText);
 }//MainWindow::uiRefreshNumbers

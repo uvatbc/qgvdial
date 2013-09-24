@@ -35,7 +35,7 @@ GVNumModel::GVNumModel(QObject *parent)
 int
 GVNumModel::rowCount (const QModelIndex & /*parent*/) const
 {
-    return (dialBack.count () + dialOut.count ());
+    return (m_dialBack.count () + m_dialOut.count ());
 }//GVNumModel::rowCount
 
 QVariant
@@ -47,12 +47,12 @@ GVNumModel::data (const QModelIndex &index, int role) const
         int col = index.column();
         GVRegisteredNumber num;
 
-        if (row < dialBack.count ()) {
-            num = dialBack[row];
+        if (row < m_dialBack.count ()) {
+            num = m_dialBack[row];
         } else {
-            row -= dialBack.count ();
-            if (row < dialOut.count ()) {
-                num = dialOut[row];
+            row -= m_dialBack.count ();
+            if (row < m_dialOut.count ()) {
+                num = m_dialOut[row];
             } else {
                 Q_WARN("Array index out of bounds!");
                 break;
@@ -89,3 +89,69 @@ GVNumModel::data (const QModelIndex &index, int role) const
     } while (0); // End cleanup block (not a loop)
     return (var);
 }//GVNumModel::data
+
+bool
+GVNumModel::findById(const QString &id, bool &dialBack, int &index)
+{
+    int i;
+    for (i = 0; i < m_dialBack.count(); i++) {
+        if (m_dialBack[i].id == id) {
+            // Found it.
+            dialBack = (true);
+            index = i;
+            return true;
+        }
+    }
+
+    for (i = 0; i < m_dialOut.count(); i++) {
+        if (m_dialOut[i].id == id) {
+            // Found it.
+            dialBack = false;
+            index = i;
+            return (true);
+        }
+    }
+
+    return (false);
+}//GVNumModel::findById
+
+int
+GVNumModel::getSelectedIndex()
+{
+    int index;
+    bool dialBack;
+
+    if (!findById (m_selectedId, dialBack, index)) {
+        index = -1;
+    } else {
+        if (!dialBack) {
+            index += m_dialBack.count ();
+        }
+    }
+
+    return (index);
+}//GVNumModel::getSelectedIndex
+
+bool
+GVNumModel::getSelectedNumber(GVRegisteredNumber &num)
+{
+    int index;
+    bool dialBack;
+
+    if (!findById (m_selectedId, dialBack, index)) {
+        if (m_dialBack.count () == 0) {
+            return (false);
+        }
+
+        num = m_dialBack[0];
+        return (true);
+    }
+
+    if (dialBack) {
+        num = m_dialBack[index];
+    } else {
+        num = m_dialOut[index];
+    }
+
+    return (true);
+}//GVNumModel::getSelectedNumber

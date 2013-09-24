@@ -1168,3 +1168,22 @@ CacheDb::getProxyInfo(ProxyInfo &info)
 
     return (rv);
 }//CacheDb::getProxyInfo
+
+bool
+CacheDb::getSelectedPhone (QString &id)
+{
+    CacheDbPrivate &p = CacheDbPrivate::ref();
+    if (p.settings->contains (GV_S_VAR_SELECTED_PHONE)) {
+        id = p.settings->value (GV_S_VAR_SELECTED_PHONE).toString ();
+        return true;
+    }
+    return false;
+}//CacheDb::getSelectedPhone
+
+bool
+CacheDb::putSelectedPhone (const QString &id)
+{
+    CacheDbPrivate &p = CacheDbPrivate::ref();
+    p.settings->setValue (GV_S_VAR_SELECTED_PHONE, id);
+    return (true);
+}//CacheDb::putSelectedPhone

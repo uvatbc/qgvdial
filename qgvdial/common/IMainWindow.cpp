@@ -124,7 +124,7 @@ IMainWindow::beginLogin(const QString &user, const QString &pass)
         m_loginTask->inParams["user"] = user;
         m_loginTask->inParams["pass"] = pass;
 
-        Q_DEBUG("Login using user ") << user;
+        Q_DEBUG(QString("Login using user %1").arg(user));
 
         if (!gvApi.login (m_loginTask)) {
             Q_WARN("Failed to log in");

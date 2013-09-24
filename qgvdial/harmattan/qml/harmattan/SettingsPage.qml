@@ -49,7 +49,7 @@ Page {
         }
 
         interval: 300; repeat: false; running: false
-        onTriggered: container.contentY = setY;
+        //onTriggered: container.contentY = setY;
     }//Timer for delayed setting of contentY so that when you click on an
     // ExpandView, it gets into focus. Expecially important for the logs
 
