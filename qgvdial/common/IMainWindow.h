@@ -143,7 +143,7 @@ protected:
 
     virtual void uiRefreshContacts() = 0;
     virtual void uiRefreshInbox() = 0;
-    virtual void uiRefreshNumbers() = 0;
+    virtual void uiRefreshNumbers(bool firstRefresh) = 0;
 
     void onUiProxyChanged(const ProxyInfo &info);
     virtual void uiUpdateProxySettings(const ProxyInfo &info) = 0;

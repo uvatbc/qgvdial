@@ -65,6 +65,7 @@ PageStackWindow {
 
             DialPage {
                 id: dialTab
+                onRegNumBtnClicked: appWindow.pageStack.push(regNumberSelector);
             }
             ContactsPage {
                 id: contactsTab
@@ -137,6 +138,13 @@ PageStackWindow {
         objectName: "AppPwDialog"
 
         onDone: appWindow.pageStack.pop();
+    }
+
+    RegNumberSelector {
+        id: regNumberSelector
+        objectName: "RegNumberSelector"
+
+        onSelected: appWindow.pageStack.pop();
     }
 
     MessageBox {

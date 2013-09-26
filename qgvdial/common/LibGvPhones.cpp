@@ -77,7 +77,7 @@ LibGvPhones::onGotPhones()
     } while(0);
     m_numModel->m_selectedId = id;
 
-    win->uiRefreshNumbers ();
+    win->uiRefreshNumbers (true);
 
     task->deleteLater ();
 }//LibGvPhones::onGotPhones
@@ -117,24 +117,31 @@ LibGvPhones::onUserSelectPhone(int index)
 }//LibGvPhones::onUserSelectPhone
 
 bool
-LibGvPhones::getSelected(GVRegisteredNumber &num)
+LibGvPhones::onUserSelectPhone(QString id)
 {
-    bool dialback = false;
+    if (NULL == m_numModel) {
+        return (false);
+    }
+
+    if (m_ignoreSelectedNumberChanges) {
+        return (false);
+    }
+
+    bool rv;
     int index;
+    IMainWindow *win = (IMainWindow *) this->parent ();
 
-    bool rv = m_numModel->findById (m_numModel->m_selectedId, dialback, index);
-    if (!rv) {
-        Q_WARN("Failed to find currently selected phone number");
-        return (rv);
-    }
+    do {
+        if (!m_numModel->findById (id, rv, index)) {
+            rv = false;
+            break;
+        }
 
-    if (dialback) {
-        num = m_numModel->m_dialBack[index];
-    } else {
-        num = m_numModel->m_dialOut[index];
-    }
+        m_numModel->m_selectedId = id;
+        win->db.putSelectedPhone (id);
+        rv = true;
+    } while (0);
 
-    Q_ASSERT(num.dialBack == dialback);
-
-    return (true);
-}//LibGvPhones::getSelected
+    win->uiRefreshNumbers (false);
+    return (rv);
+}//LibGvPhones::onUserSelectPhone

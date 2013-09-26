@@ -19,33 +19,35 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#ifndef LIBGVPHONES_H
-#define LIBGVPHONES_H
+import QtQuick 1.1
+import com.nokia.meego 1.1
 
-#include <QObject>
-#include "global.h"
+Page {
+    id: container
+    tools: commonTools
 
-class IMainWindow;
-class GVNumModel;
+    anchors.fill: parent
 
-class LibGvPhones : public QObject
-{
-    Q_OBJECT
-public:
-    explicit LibGvPhones(IMainWindow *parent);
-    bool refresh();
+    property alias model: regNumList.model
+    signal selected(string id);
 
-public slots:
-    bool onUserSelectPhone(int index);
-    bool onUserSelectPhone(QString id);
+    function setMyModel() {
+        if (container.model == null) {
+            container.model = g_RegNumberModel;
+        }
+    }
 
-private slots:
-    void onGotRegisteredPhone (const GVRegisteredNumber &info);
-    void onGotPhones();
+    ListView {
+        id: regNumList
+        anchors.fill: parent
 
-public:
-    GVNumModel *m_numModel;
-    bool        m_ignoreSelectedNumberChanges;
-};
+        delegate: Label {
+            text: name + "\n(" + number + ")"
 
-#endif // LIBGVPHONES_H
+            MouseArea {
+                anchors.fill: parent
+                onClicked: container.selected(id);
+            }
+        }
+    }
+}

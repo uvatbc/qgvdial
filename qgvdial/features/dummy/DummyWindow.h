@@ -46,6 +46,7 @@ protected:
     virtual void uiRequestApplicationPassword();
     virtual void uiRefreshContacts();
     virtual void uiRefreshInbox();
+    virtual void uiRefreshNumbers(bool firstRefresh);
 };
 
 #endif // DUMMYMAINWINDOW_H

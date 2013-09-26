@@ -32,7 +32,7 @@ public:
     enum GVNumberRoles {
         IdRole = Qt::UserRole + 1,
         TypeRole,
-        FriendlyNameRole,
+        NameRole,
         NumberRole
     };
 
@@ -42,6 +42,8 @@ public:
     QVariant data (const QModelIndex &index, int role = Qt::DisplayRole) const;
 
     bool findById(const QString &id, bool &m_dialBack, int &index);
+    bool findById(const QString &id, GVRegisteredNumber &num);
+
     int getSelectedIndex();
     bool getSelectedNumber(GVRegisteredNumber &num);
 

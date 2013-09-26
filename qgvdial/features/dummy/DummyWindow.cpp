@@ -113,3 +113,9 @@ DummyMainWindow::uiRefreshInbox()
 {
     Q_ASSERT(0 == "Not implemented");
 }//DummyMainWindow::uiRefreshInbox
+
+void
+DummyMainWindow::uiRefreshNumbers(bool /*firstRefresh*/)
+{
+    Q_ASSERT(0 == "Not implemented");
+}//DummyMainWindow::uiRefreshNumbers

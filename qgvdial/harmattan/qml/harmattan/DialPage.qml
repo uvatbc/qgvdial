@@ -27,6 +27,7 @@ Page {
     tools: commonTools
 
     signal sigHaptic
+    signal regNumBtnClicked
 
     Column {
         anchors.fill: parent
@@ -36,6 +37,8 @@ Page {
             id: btnSelectedNumber
             objectName: "SelectedNumberButton"
             width: parent.width
+
+            onClicked: container.regNumBtnClicked();
         }//currently selected phone
 
         TextField {

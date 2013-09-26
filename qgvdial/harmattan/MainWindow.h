@@ -58,7 +58,7 @@ protected:
     void onUserLogoutDone();
     void uiRefreshContacts();
     void uiRefreshInbox();
-    void uiRefreshNumbers();
+    void uiRefreshNumbers(bool firstRefresh);
 
 private:
     QmlApplicationViewer m_view;
@@ -76,6 +76,7 @@ private:
     QObject *inboxList;
     QObject *proxySettingsPage;
     QObject *selectedNumberButton;
+    QObject *regNumberSelector;
 
     void    *loginCtx;
 };

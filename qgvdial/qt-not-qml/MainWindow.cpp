@@ -59,7 +59,6 @@ createApplication(int argc, char *argv[])
 MainWindow::MainWindow(QObject *parent)
 : IMainWindow(parent)
 , d(new MainWindowPrivate)
-, m_numberFirstRefresh(true)
 {
     oContacts.setUnknownContactLocalPath (UNKNOWN_CONTACT_QRC_PATH);
 }//MainWindow::MainWindow
@@ -295,16 +294,14 @@ MainWindow::uiRefreshInbox()
 }//MainWindow::uiRefreshInbox
 
 void
-MainWindow::uiRefreshNumbers()
+MainWindow::uiRefreshNumbers(bool firstRefresh)
 {
     if (NULL == oPhones.m_numModel) {
         Q_CRIT("m_numModel is NULL!");
         return;
     }
 
-    if (m_numberFirstRefresh) {
-        m_numberFirstRefresh = false;
-
+    if (firstRefresh) {
         oPhones.m_ignoreSelectedNumberChanges = true;
         d->ui->cbNumbers->setModel (oPhones.m_numModel);
         oPhones.m_ignoreSelectedNumberChanges = false;

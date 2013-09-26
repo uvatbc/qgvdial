@@ -21,6 +21,7 @@ Contact: yuvraaj@gmail.com
 
 #include "IMainWindow.h"
 #include "Lib.h"
+#include "GVNumModel.h"
 
 IMainWindow::IMainWindow(QObject *parent)
 : QObject(parent)
@@ -272,7 +273,7 @@ void
 IMainWindow::onUserCall(QString number)
 {
     GVRegisteredNumber num;
-    if (!oPhones.getSelected (num)) {
+    if (!oPhones.m_numModel->getSelectedNumber (num)) {
         Q_WARN("Couldn't get number to dial with; failed to make call.");
         return;
     }

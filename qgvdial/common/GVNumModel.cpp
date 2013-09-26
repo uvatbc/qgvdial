@@ -25,10 +25,10 @@ GVNumModel::GVNumModel(QObject *parent)
 : QAbstractListModel(parent)
 {
     QHash<int, QByteArray> roles;
-    roles[IdRole] = "id";
-    roles[TypeRole] = "type";
-    roles[FriendlyNameRole] = "friendlyName";
-    roles[NumberRole] = "number";
+    roles[IdRole]       = "id";
+    roles[TypeRole]     = "type";
+    roles[NameRole]     = "name";
+    roles[NumberRole]   = "number";
     setRoleNames(roles);
 }//GVNumModel::GVNumModel
 
@@ -67,7 +67,7 @@ GVNumModel::data (const QModelIndex &index, int role) const
             var = num.chType;
             break;
         }
-        if (FriendlyNameRole == role) {
+        if (NameRole == role) {
             var = num.name;
             break;
         }
@@ -115,6 +115,25 @@ GVNumModel::findById(const QString &id, bool &dialBack, int &index)
     return (false);
 }//GVNumModel::findById
 
+bool
+GVNumModel::findById(const QString &id, GVRegisteredNumber &num)
+{
+    bool dialBack;
+    int index;
+
+    if (!findById (id, dialBack, index)) {
+        return (false);
+    }
+
+    if (dialBack) {
+        num = m_dialBack[index];
+    } else {
+        num = m_dialOut[index];
+    }
+
+    return (true);
+}//GVNumModel::findById
+
 int
 GVNumModel::getSelectedIndex()
 {
@@ -135,22 +154,12 @@ GVNumModel::getSelectedIndex()
 bool
 GVNumModel::getSelectedNumber(GVRegisteredNumber &num)
 {
-    int index;
-    bool dialBack;
-
-    if (!findById (m_selectedId, dialBack, index)) {
+    if (!findById (m_selectedId, num)) {
         if (m_dialBack.count () == 0) {
             return (false);
         }
 
         num = m_dialBack[0];
-        return (true);
-    }
-
-    if (dialBack) {
-        num = m_dialBack[index];
-    } else {
-        num = m_dialOut[index];
     }
 
     return (true);
