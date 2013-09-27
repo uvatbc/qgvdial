@@ -25,6 +25,7 @@ Contact: yuvraaj@gmail.com
 #include "MainWindow.h"
 #include "ContactsModel.h"
 #include "InboxModel.h"
+#include "GVNumModel.h"
 
 #ifdef Q_WS_MAEMO_5
 #include <QMaemo5InformationBox>
@@ -43,6 +44,8 @@ MainWindow::MainWindow(QObject *parent)
 , contactsList(NULL)
 , inboxList(NULL)
 , proxySettingsPage(NULL)
+, selectedNumberButton(NULL)
+, regNumberSelector(NULL)
 {
     oContacts.setUnknownContactLocalPath (UNKNOWN_CONTACT_QRC_PATH);
 }//MainWindow::MainWindow
@@ -150,6 +153,18 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
                 SLOT(onSigProxyChanges(bool,bool,QString,int,bool,QString,QString)));
         connect(proxySettingsPage, SIGNAL(sigRevertChanges()),
                 this, SLOT(onUserProxyRevert()));
+
+        selectedNumberButton = getQMLObject ("SelectedNumberButton");
+        if (NULL == selectedNumberButton) {
+            break;
+        }
+
+        regNumberSelector = getQMLObject ("RegNumberSelector");
+        if (NULL == regNumberSelector) {
+            break;
+        }
+        connect (regNumberSelector, SIGNAL(selected(QString)),
+                 &oPhones, SLOT(onUserSelectPhone(QString)));
 
         onInitDone();
         return;
@@ -306,3 +321,27 @@ MainWindow::uiRefreshInbox()
         delete oldModel;
     }
 }//MainWindow::uiRefreshInbox()
+
+void
+MainWindow::uiRefreshNumbers(bool firstRefresh)
+{
+    if (NULL == oPhones.m_numModel) {
+        Q_CRIT("m_numModel is NULL!");
+        return;
+    }
+
+    GVRegisteredNumber num;
+    if (!oPhones.m_numModel->getSelectedNumber (num)) {
+        Q_WARN("No selected number!!");
+        return;
+    }
+
+    QString btnText = QString("%1\n(%2)").arg(num.name, num.number);
+    selectedNumberButton->setProperty ("text", btnText);
+
+    if (firstRefresh) {
+        m_view.engine()->rootContext()->setContextProperty("g_RegNumberModel",
+                                                           oPhones.m_numModel);
+        QMetaObject::invokeMethod (regNumberSelector, "setMyModel");
+    }
+}//MainWindow::uiRefreshNumbers

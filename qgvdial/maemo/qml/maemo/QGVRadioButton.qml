@@ -30,7 +30,7 @@ Rectangle {
 
     property string text: "Yes or no question?"
     property bool checked: false
-    property real pointSize: (10 * g_fontMul)
+    property real pointSize: 10
     property bool autoChange: true
 
     signal clicked

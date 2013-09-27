@@ -42,6 +42,15 @@ Rectangle {
         anchors.fill: parent
         spacing: 2
 
+        MyButton {
+            objectName: "SelectedNumberButton"
+            width: parent.width
+
+            onClicked: {
+                regNumberSelector.visible = true;
+            }
+        }
+
         TextOneLine {
             id: numberField
 
@@ -79,4 +88,16 @@ Rectangle {
             }
         }//Row
     }//Column
+
+    RegNumberSelector {
+        id: regNumberSelector
+        objectName: "RegNumberSelector"
+
+        anchors.fill: parent
+        visible: false
+
+        onSelected: {
+            regNumberSelector.visible = false;
+        }
+    }
 }//Item

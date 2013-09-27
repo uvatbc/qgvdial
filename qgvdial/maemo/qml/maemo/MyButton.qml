@@ -24,7 +24,7 @@ import com.nokia.meego 1.1
 
 Rectangle {
     id: button
-    border.color: activeFocus?"orange":"white"
+    border.color: activeFocus? "orange" : "white"
     color: "#202020"
     smooth: true
 

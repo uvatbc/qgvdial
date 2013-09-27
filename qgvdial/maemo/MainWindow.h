@@ -56,6 +56,7 @@ protected:
     void onUserLogoutDone();
     void uiRefreshContacts();
     void uiRefreshInbox();
+    void uiRefreshNumbers(bool firstRefresh);
 
 private:
     QmlApplicationViewer m_view;
@@ -68,6 +69,8 @@ private:
     QObject *contactsList;
     QObject *inboxList;
     QObject *proxySettingsPage;
+    QObject *selectedNumberButton;
+    QObject *regNumberSelector;
 };
 
 #endif // MAINWINDOW_H
