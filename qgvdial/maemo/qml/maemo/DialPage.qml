@@ -45,6 +45,7 @@ Rectangle {
         MyButton {
             objectName: "SelectedNumberButton"
             width: parent.width
+            mainPixelSize: 30
 
             onClicked: {
                 regNumberSelector.visible = true;
@@ -58,7 +59,7 @@ Rectangle {
             placeholderText: "Enter number here"
 
             width: parent.width
-            height: 290
+            height: 200
             font.pointSize: 14
         }
 
@@ -78,13 +79,15 @@ Rectangle {
 
             Button {
                 text: "Text"
-                height: 100
+                height: 80
                 font.pixelSize: 35
+                width: container.width/2 - 20
             }
             Button {
                 text: "Call"
-                height: 100
+                height: 80
                 font.pixelSize: 35
+                width: container.width/2 - 20
             }
         }//Row
     }//Column

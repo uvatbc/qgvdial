@@ -337,7 +337,7 @@ MainWindow::uiRefreshNumbers(bool firstRefresh)
     }
 
     QString btnText = QString("%1\n(%2)").arg(num.name, num.number);
-    selectedNumberButton->setProperty ("text", btnText);
+    selectedNumberButton->setProperty ("mainText", btnText);
 
     if (firstRefresh) {
         m_view.engine()->rootContext()->setContextProperty("g_RegNumberModel",
