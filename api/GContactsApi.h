@@ -26,10 +26,10 @@ Contact: yuvraaj@gmail.com
 #include <QObject>
 
 enum GContactPhotoType {
-    GCPT_Unknown = 0,
-    GCPT_BMP,  //= 1
-    GCPT_PNG,  //= 2
-    GCPT_JPEG  //= 3
+    GCPT_Unknown    = 0,
+    GCPT_BMP,   //  = 1
+    GCPT_PNG,   //  = 2
+    GCPT_JPEG   //  = 3
 };
 
 class GContactsApi : public QObject
