@@ -47,6 +47,8 @@ public:
     int getSelectedIndex();
     bool getSelectedNumber(GVRegisteredNumber &num);
 
+    GVRegisteredNumberArray getAll();
+
 private:
     GVRegisteredNumberArray m_dialBack;
     GVRegisteredNumberArray m_dialOut;

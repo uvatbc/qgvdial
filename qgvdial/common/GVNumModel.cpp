@@ -164,3 +164,12 @@ GVNumModel::getSelectedNumber(GVRegisteredNumber &num)
 
     return (true);
 }//GVNumModel::getSelectedNumber
+
+GVRegisteredNumberArray
+GVNumModel::getAll()
+{
+    GVRegisteredNumberArray rv = m_dialBack;
+    rv += m_dialOut;
+
+    return (rv);
+}//GVNumModel::getAll

@@ -23,6 +23,7 @@ Contact: yuvraaj@gmail.com
 #include "AbstractItemModel.hpp"
 #include "ContactsModel.h"
 #include "InboxModel.h"
+#include "GVNumModel.h"
 
 using namespace bb::cascades;
 
@@ -46,10 +47,12 @@ MainWindow::MainWindow(QCoreApplication *_app)
 : IMainWindow(_app)
 , qml(NULL)
 , mainTabbedPane(NULL)
+, dialPage(NULL)
 , settingsList(NULL)
 , loginButton(NULL)
 , tfaDialog(NULL)
 , appPwDialog(NULL)
+, regNumberDropDown(NULL)
 {
 	app = (bb::cascades::Application *) _app;
 }//MainWindow::MainWindow
@@ -105,11 +108,18 @@ MainWindow::init()
 void
 MainWindow::onFakeInitDone()
 {
-    mainTabbedPane = (TabbedPane *)getQMLObject("MainTabbedPane");
-    settingsList   = (ListView *)  getQMLObject("SettingsList");
+    dialPage       = (Page *)       getQMLObject("DialPage");
+    connect(dialPage, SIGNAL(call(QString)), this, SLOT(onUserCall(QString)));
 
-    loginButton    = (Button *)    getQMLObject("LoginButton");
+    mainTabbedPane = (TabbedPane *) getQMLObject("MainTabbedPane");
+    settingsList   = (ListView *)   getQMLObject("SettingsList");
+
+    loginButton    = (Button *)     getQMLObject("LoginButton");
     connect(loginButton, SIGNAL(clicked()), this, SLOT(onLoginBtnClicked()));
+
+    regNumberDropDown = (DropDown *)getQMLObject("RegNumberDropDown");
+    connect(regNumberDropDown, SIGNAL(selectedOptionChanged(bb::cascades::Option*)),
+            this, SLOT(onUserRegSelectedOptionChanged(bb::cascades::Option*)));
 
     onInitDone();
 }//MainWindow::onFakeInitDone
@@ -167,7 +177,7 @@ MainWindow::onTfaDlgClosed()
 }//MainWindow::onTfaDlgClosed
 
 void
-MainWindow::uiSetUserPass(bool editable)
+MainWindow::uiSetUserPass(bool /*editable*/)
 {
     TextField *textField;
     textField = (TextField *) getQMLObject("TextUsername");
@@ -252,3 +262,45 @@ MainWindow::uiRefreshInbox()
         delete oldModel;
     }
 }//MainWindow::uiRefreshInbox
+
+void
+MainWindow::uiRefreshNumbers(bool /*firstRefresh*/)
+{
+    Option *option;
+    QString name;
+
+    GVRegisteredNumber selectedNum;
+    oPhones.m_numModel->getSelectedNumber(selectedNum);
+
+    oPhones.m_ignoreSelectedNumberChanges = true;
+    regNumberDropDown->removeAll();
+    GVRegisteredNumberArray all = oPhones.m_numModel->getAll();
+    foreach (GVRegisteredNumber num, all) {
+        name = QString("%1 (%2)").arg(num.name, num.number);
+        option = Option::create().text(name)
+                                 .selected(num.id == selectedNum.id)
+                                 .value(num.id);
+
+        regNumberDropDown->add(option);
+    }
+    oPhones.m_ignoreSelectedNumberChanges = false;
+}//MainWindow::uiRefreshNumbers
+
+void
+MainWindow::onUserRegSelectedOptionChanged(bb::cascades::Option *option)
+{
+    if (NULL == option) {
+        Q_WARN("No option selected");
+        return;
+    }
+
+    QString id = option->value().toString();
+    if (oPhones.onUserSelectPhone(id)) {
+        Q_DEBUG(QString("User selected phone with id %1").arg(id));
+    }
+}//MainWindow::onUserRegSelectedOptionChanged
+
+void
+MainWindow::uiUpdateProxySettings(const ProxyInfo &info)
+{
+}//MainWindow::uiUpdateProxySettings

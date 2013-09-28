@@ -4,14 +4,22 @@
 <context>
     <name>GVApi</name>
     <message>
-        <location filename="../api/GVApi.cpp" line="763"/>
-        <location filename="../api/GVApi.cpp" line="836"/>
+        <location filename="../api/GVApi.cpp" line="802"/>
+        <location filename="../api/GVApi.cpp" line="880"/>
         <source>The username or password you entered is incorrect.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../api/GVApi.cpp" line="775"/>
+        <location filename="../api/GVApi.cpp" line="814"/>
         <source>The username that you have entered is not configured for Google Voice. Please go to www.google.com/voice on a desktop browser and complete the setup of your Google Voice account.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LibContacts</name>
+    <message>
+        <location filename="../common/LibContacts.cpp" line="198"/>
+        <source>qgv_XXXXXX.tmp.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -33,6 +33,8 @@ Contact: yuvraaj@gmail.com
 #include <bb/cascades/Button>
 #include <bb/cascades/TabbedPane>
 #include <bb/cascades/Page>
+#include <bb/cascades/DropDown>
+#include "bb/cascades/Option"
 
 #include <QLocale>
 #include <QTranslator>
@@ -69,6 +71,9 @@ public:
 
     void uiRefreshContacts();
     void uiRefreshInbox();
+    void uiRefreshNumbers(bool firstRefresh);
+
+    void uiUpdateProxySettings(const ProxyInfo &info);
 
     void init();
     void log(QDateTime dt, int level, const QString &strLog);
@@ -83,16 +88,20 @@ protected slots:
     void onTfaDlgClosed();
     void onAppPwDlgClosed();
 
+    void onUserRegSelectedOptionChanged(bb::cascades::Option *option);
+
 private:
     Application *app;
     QmlDocument *qml;
     AbstractPane *root;
 
     TabbedPane  *mainTabbedPane;
+    Page        *dialPage;
     ListView    *settingsList;
     Button      *loginButton;
     Page        *tfaDialog;
     Page        *appPwDialog;
+    DropDown    *regNumberDropDown;
 
     //! Entirely transient two-factor authentication context
     void        *tfaCtx;

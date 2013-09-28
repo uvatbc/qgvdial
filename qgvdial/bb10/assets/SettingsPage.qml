@@ -31,7 +31,10 @@ NavigationPane {
             function pushMe(index) {
                 if (index == 0) {
                     container.push(loginDetails);
-                }
+                } else if (index == 1) {
+                    //container.push(loginDetails);
+                    console.debug("Proxy settings please!");
+                } 
             }
             function showTfaDialog() {
                 tfaDialog.pin = "";
@@ -54,16 +57,18 @@ NavigationPane {
             
             onCreationCompleted: {
                 settingsModel.append("Login details");
+                settingsModel.append("Proxy details");
             }
             
             listItemComponents: [
                 ListItemComponent {
-                    Label {
+                    Button {
                         text: ListItem.data
-                        onTouch: {
+                        horizontalAlignment: HorizontalAlignment.Center
+                        onClicked: {
                             ListItem.view.pushMe(ListItem.indexPath);
                         }
-                    }//Label
+                    }//Button
                 }//ListItemComponent
             ]//listItemComponents
         }//ListView
@@ -72,6 +77,10 @@ NavigationPane {
     attachedObjects: [
         LoginDetails {
             id: loginDetails
+            onDone: container.pop();
+        },
+        ProxyPage {
+            id: proxyDetails
             onDone: container.pop();
         },
         TFADialog {

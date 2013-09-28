@@ -23,6 +23,7 @@ import bb.cascades 1.0
 
 Page {
     id: container
+    objectName: "DialPage"
     
     signal call(string num)
     signal text(string num)
@@ -36,6 +37,10 @@ Page {
                 fontSize: FontSize.XXLarge
             }
         ] //attachedObjects
+        
+        DropDown {
+            objectName: "RegNumberDropDown"
+        }
         
         Container {
             layout: StackLayout {
