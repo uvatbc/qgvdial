@@ -26,14 +26,17 @@ NavigationPane {
     
     Page {
         content: ListView {
+            id: settingsListView
             objectName: "SettingsList"
+            
+            signal sigShowProxy
             
             function pushMe(index) {
                 if (index == 0) {
                     container.push(loginDetails);
                 } else if (index == 1) {
-                    //container.push(loginDetails);
                     console.debug("Proxy settings please!");
+                    settingsListView.sigShowProxy();
                 } 
             }
             function showTfaDialog() {
@@ -49,6 +52,10 @@ NavigationPane {
             function showMessage(msg) {
                 messagePage.message = msg;
                 container.push(messagePage)
+            }
+            function showProxyPage(bEnable, bUseSystemProxy, host, port, bRequiresAuth, user, pass) {
+                proxyDetails.setValues(bEnable, bUseSystemProxy, host, port, bRequiresAuth, user, pass);
+                container.push(proxyDetails);
             }
 
             dataModel: ArrayDataModel {

@@ -89,6 +89,7 @@ protected slots:
     void onAppPwDlgClosed();
 
     void onUserRegSelectedOptionChanged(bb::cascades::Option *option);
+    void onUserShowProxyPage();
 
 private:
     Application *app;

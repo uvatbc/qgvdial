@@ -112,7 +112,10 @@ MainWindow::onFakeInitDone()
     connect(dialPage, SIGNAL(call(QString)), this, SLOT(onUserCall(QString)));
 
     mainTabbedPane = (TabbedPane *) getQMLObject("MainTabbedPane");
+
     settingsList   = (ListView *)   getQMLObject("SettingsList");
+    connect(settingsList, SIGNAL(sigShowProxy()),
+            this, SLOT(onUserShowProxyPage()));
 
     loginButton    = (Button *)     getQMLObject("LoginButton");
     connect(loginButton, SIGNAL(clicked()), this, SLOT(onLoginBtnClicked()));
@@ -301,6 +304,30 @@ MainWindow::onUserRegSelectedOptionChanged(bb::cascades::Option *option)
 }//MainWindow::onUserRegSelectedOptionChanged
 
 void
-MainWindow::uiUpdateProxySettings(const ProxyInfo &info)
+MainWindow::onUserShowProxyPage()
 {
+    ProxyInfo info;
+    if (!db.getProxyInfo (info)) {
+        info.enableProxy = false;
+        info.useSystemProxy = false;
+        info.server.clear();
+        info.port = 0;
+        info.authRequired = false;
+        info.user.clear();
+        info.pass.clear();
+    }
+    QMetaObject::invokeMethod (settingsList, "showProxyPage",
+                               Q_ARG(QVariant, info.enableProxy),
+                               Q_ARG(QVariant, info.useSystemProxy),
+                               Q_ARG(QVariant, info.server),
+                               Q_ARG(QVariant, info.port),
+                               Q_ARG(QVariant, info.authRequired),
+                               Q_ARG(QVariant, info.user),
+                               Q_ARG(QVariant, info.pass));
+}//MainWindow::onUserShowProxyPage
+
+void
+MainWindow::uiUpdateProxySettings(const ProxyInfo & /*info*/)
+{
+    // This is not the place to set the proxy info...
 }//MainWindow::uiUpdateProxySettings

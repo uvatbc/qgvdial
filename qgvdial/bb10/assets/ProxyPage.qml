@@ -23,9 +23,76 @@ import bb.cascades 1.0
 
 Page {
     id: container
+    objectName: "ProxySettingsPage"
+
+    function setValues(bEnable, bUseSystemProxy, host, port, bRequiresAuth, user, pass) {
+        console.debug ("QML: Setting proxy settings");
+        proxySupport.checked = bEnable;
+        proxySystem.checked = bUseSystemProxy;
+        textUserProxyHost.text = host;
+        textUserProxyPort.text = port;
+        proxyUserPassRequired.checked = bRequiresAuth;
+        textUserProxyUser.text = user;
+        textUserProxyPass.text = pass;
+    }
+    
     signal done
+    signal sigProxyChanges(bool bEnable,
+                           bool bUseSystemProxy,
+                           string host, int port,
+                           bool bRequiresAuth,
+                           string user, string pass)
 
     Container {
+        CheckBox {
+            id: proxySupport
+            text: "Enable proxy support"
+        }
         
+        CheckBox {
+            id: proxySystem
+            text: "Use system proxy settings"
+            visible: proxySupport.checked
+        }
+        TextField {
+            id: textUserProxyHost
+            hintText: "Proxy host"
+            visible: proxySupport.checked && !proxySystem.checked
+        }
+        TextField {
+            id: textUserProxyPort
+            hintText: "Proxy port"
+            visible: proxySupport.checked && !proxySystem.checked
+        }
+
+        CheckBox {
+            id: proxyUserPassRequired
+            text: "Requires user and pass"
+            visible: proxySupport.checked && !proxySystem.checked
+        }
+        TextField {
+            id: textUserProxyUser
+            hintText: "Proxy username"
+            visible: proxyUserPassRequired.visible && proxyUserPassRequired.checked 
+        }
+        TextField {
+            id: textUserProxyPass
+            hintText: "Proxy password"
+            visible: proxyUserPassRequired.visible && proxyUserPassRequired.checked
+        }
+        
+        Button {
+            text: "Submit changes"
+            onClicked: {
+                container.sigProxyChanges (proxySupport.checked,
+                                           proxySystem.checked,
+                                           textUserProxyHost.text,
+                                           textUserProxyPort.text,
+                                           proxyUserPassRequired.checked,
+                                           textUserProxyUser.text,
+                                           textUserProxyPass.text);
+                container.done();
+            }
+        }
     }
 }
