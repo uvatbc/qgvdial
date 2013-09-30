@@ -9,7 +9,8 @@ device {
 
         HEADERS +=  $$quote($$BASEDIR/src/BB10PhoneFactory.h) \
                  $$quote($$BASEDIR/src/MainWindow.h) \
-                 $$quote($$BASEDIR/src/OsDependant.h)
+                 $$quote($$BASEDIR/src/OsDependant.h) \
+                 $$quote($$BASEDIR/src/platform_specific.h)
     }
 
     CONFIG(release, debug|release) {
@@ -19,7 +20,8 @@ device {
 
         HEADERS +=  $$quote($$BASEDIR/src/BB10PhoneFactory.h) \
                  $$quote($$BASEDIR/src/MainWindow.h) \
-                 $$quote($$BASEDIR/src/OsDependant.h)
+                 $$quote($$BASEDIR/src/OsDependant.h) \
+                 $$quote($$BASEDIR/src/platform_specific.h)
     }
 }
 
@@ -31,7 +33,8 @@ simulator {
 
         HEADERS +=  $$quote($$BASEDIR/src/BB10PhoneFactory.h) \
                  $$quote($$BASEDIR/src/MainWindow.h) \
-                 $$quote($$BASEDIR/src/OsDependant.h)
+                 $$quote($$BASEDIR/src/OsDependant.h) \
+                 $$quote($$BASEDIR/src/platform_specific.h)
     }
 }
 
