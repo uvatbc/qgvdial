@@ -20,7 +20,6 @@
  */
 
 #include "ContactsModel.h"
-#include "ContactDetailsModel.h"
 
 #define PIXMAP_SCALED_W 25
 #define PIXMAP_SCALED_H 25

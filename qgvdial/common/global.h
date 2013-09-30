@@ -127,6 +127,8 @@ void qgv_LogFlush();
 #define UNKNOWN_CONTACT_QRC_PATH "qrc:/unknown_contact.png"
 #elif DESKTOP_OS
 #define UNKNOWN_CONTACT_QRC_PATH ":/unknown_contact.png"
+#elif DIABLO_OS
+#define UNKNOWN_CONTACT_QRC_PATH ":/unknown_contact.png"
 #endif
 
 #endif //__cplusplus
