@@ -530,6 +530,8 @@ void
 CacheDb::refreshContactsModel (ContactsModel *modelContacts,
                                const QString &query)
 {
+    //  0,    1,       2,         3
+    // id, name, piclink, localpath
     QString strQ = "SELECT c."GV_C_ID",c."GV_C_NAME",c."GV_C_PICLINK
                    ",t."GV_TT_PATH " FROM "
                    GV_CONTACTS_TABLE" c LEFT JOIN "GV_TEMP_TABLE" t "
@@ -698,8 +700,7 @@ CacheDb::putContactInfo (const ContactInfo &info)
                     .arg (scrubInfo.strId);
 
     // Insert numbers
-    foreach (PhoneInfo entry, info.arrPhones)
-    {
+    foreach (PhoneInfo entry, info.arrPhones) {
         QString strNum = entry.strNumber;
         if (GVApi::isNumberValid (strNum)) {
             GVApi::simplify_number (strNum);
@@ -756,13 +757,11 @@ CacheDb::getContactFromLink (ContactInfo &info) const
     info.arrPhones.clear ();
 
     QString strType, strData;
-    while (query.next ())
-    {
-        strType = query.value (0).toString ();
+    while (query.next ()) {
+        strType = query.value(0).toString ();
         strData = query.value(1).toString ();
 
-        if (strType == GV_L_TYPE_NUMBER)
-        {
+        if (strType == GV_L_TYPE_NUMBER) {
             PhoneInfo num;
             num.Type      = PhoneInfo::charToType (strData[0].toAscii ());
             num.strNumber = strData.mid (1);
@@ -771,8 +770,7 @@ CacheDb::getContactFromLink (ContactInfo &info) const
         count++;
     }
 
-    if (0 != count)
-    {
+    if (0 != count) {
         info.selected = 0;
         rv = true;
     }

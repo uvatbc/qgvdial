@@ -27,11 +27,15 @@ Contact: yuvraaj@gmail.com
 #include "InboxModel.h"
 #include "GVNumModel.h"
 
+#include "ContactDialog.h"
+
 #ifdef Q_WS_WIN32
 #include "MainApp.h"
 #endif
 
-#define UNKNOWN_CONTACT_QRC_PATH ":/unknown_contact.png"
+#ifndef UNKNOWN_CONTACT_QRC_PATH
+#error Must define the unknown contact QRC path
+#endif
 
 QCoreApplication *
 createApplication(int argc, char *argv[])
@@ -134,6 +138,9 @@ MainWindow::init()
 
     connect(d->ui->btnCall, SIGNAL(clicked()),
             this, SLOT(onUserCallBtnClicked()));
+
+    connect (d->ui->contactsView, SIGNAL(doubleClicked(const QModelIndex &)),
+             this, SLOT(onContactDoubleClicked(const QModelIndex &)));
     QTimer::singleShot (1, this, SLOT(onInitDone()));
 }//MainWindow::init
 
@@ -272,9 +279,9 @@ MainWindow::uiRefreshContacts()
         delete oldModel;
     }
 
-    d->ui->contactsView->hideColumn (0);
-    d->ui->contactsView->hideColumn (2);
-    d->ui->contactsView->hideColumn (3);
+    d->ui->contactsView->hideColumn (0);    // id
+    d->ui->contactsView->hideColumn (2);    // pic link
+    d->ui->contactsView->hideColumn (3);    // local path
 }//MainWindow::uiRefreshContacts
 
 void
@@ -393,3 +400,24 @@ MainWindow::onUserCallBtnClicked()
 {
     onUserCall (d->ui->dispNum->toPlainText ());
 }//MainWindow::onUserCallBtnClicked
+
+void
+MainWindow::onContactDoubleClicked(const QModelIndex &index)
+{
+    QModelIndex idIndex = index.sibling (index.row (), 0);
+    QString id = idIndex.data ().toString ();
+    ContactInfo cinfo;
+
+    cinfo.strId = id;
+    if (!db.getContactFromLink (cinfo)) {
+        Q_WARN("Invalid contact link");
+        return;
+    }
+
+    Q_DEBUG(QString("User clicked contact for %1 with %2 phone number%3")
+            .arg (cinfo.strTitle).arg(cinfo.arrPhones.count ())
+            .arg(cinfo.arrPhones.count () == 1 ? "" : "s"));
+
+    ContactDialog dlg;
+    dlg.fillAndExec (cinfo);
+}//MainWindow::onContactDoubleClicked

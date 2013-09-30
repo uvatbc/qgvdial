@@ -64,6 +64,7 @@ protected slots:
     void messageReceived(const QString &msg);
 
     void onUserCallBtnClicked();
+    void onContactDoubleClicked(const QModelIndex &index);
 
 private:
     MainWindowPrivate *d;

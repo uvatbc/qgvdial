@@ -31,7 +31,9 @@ Contact: yuvraaj@gmail.com
 #include <QMaemo5InformationBox>
 #endif
 
-#define UNKNOWN_CONTACT_QRC_PATH "qrc:/unknown_contact.png"
+#ifndef UNKNOWN_CONTACT_QRC_PATH
+#error Must define the unknown contact QRC path
+#endif
 
 MainWindow::MainWindow(QObject *parent)
 : IMainWindow(parent)

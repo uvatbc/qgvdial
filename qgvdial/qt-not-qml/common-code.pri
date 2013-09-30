@@ -14,12 +14,15 @@ DEPLOYMENTFOLDERS = # file1 dir1
 
 SOURCES  += MainWindow.cpp \
             MainWindow_p.cpp \
-            OsDependant.cpp
+            OsDependant.cpp \
+            ContactDialog.cpp
 HEADERS  += MainWindow.h \
             MainWindow_p.h \
-            OsDependant.h
+            OsDependant.h \
+            ContactDialog.h
 
-FORMS   += mainwindow.ui
+FORMS    += mainwindow.ui \
+            ContactDialog.ui
 RESOURCES += qtnotqml.qrc
 
 include(../common/common.pri)
