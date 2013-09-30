@@ -8,7 +8,8 @@ INCLUDEPATH += desktop_windows
 SOURCES  += desktop_windows/MainApp.cpp \
             desktop_windows/PhoneFactory.cpp \
             desktop_windows/ObserverFactory.cpp
-HEADERS  += desktop_windows/MainApp.h \
+HEADERS  += desktop_windows/platform_specific.h \
+            desktop_windows/MainApp.h \
             desktop_windows/PhoneFactory.h \
             desktop_windows/ObserverFactory.h
 

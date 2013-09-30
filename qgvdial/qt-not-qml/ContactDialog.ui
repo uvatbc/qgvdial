@@ -48,9 +48,12 @@
    </item>
    <item>
     <widget class="QTreeView" name="listNumbers">
-     <attribute name="headerVisible">
+     <property name="rootIsDecorated">
       <bool>false</bool>
-     </attribute>
+     </property>
+     <property name="headerHidden">
+      <bool>true</bool>
+     </property>
     </widget>
    </item>
   </layout>

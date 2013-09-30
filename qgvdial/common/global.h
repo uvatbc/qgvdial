@@ -121,15 +121,7 @@ void qgv_LogFlush();
 //#undef PHONON_ENABLED
 //#define PHONON_ENABLED 0
 
-#if defined(MEEGO_HARMATTAN)
-#define UNKNOWN_CONTACT_QRC_PATH "qrc:/unknown_contact.png"
-#elif defined(Q_WS_MAEMO_5)
-#define UNKNOWN_CONTACT_QRC_PATH "qrc:/unknown_contact.png"
-#elif DESKTOP_OS
-#define UNKNOWN_CONTACT_QRC_PATH ":/unknown_contact.png"
-#elif DIABLO_OS
-#define UNKNOWN_CONTACT_QRC_PATH ":/unknown_contact.png"
-#endif
+#include "platform_specific.h"
 
 #endif //__cplusplus
 #endif //__GLOBAL_H__

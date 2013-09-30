@@ -5,7 +5,8 @@ DEFINES += OS_DIABLO
 
 INCLUDEPATH += diablo
 SOURCES  += diablo/DiabloPhoneFactory.cpp
-HEADERS  += diablo/DiabloPhoneFactory.h
+HEADERS  += diablo/platform_specific.h \
+            diablo/DiabloPhoneFactory.h
 
 # Please do not modify the following two lines. Required for deployment.
 include(deployment.pri)

@@ -25,7 +25,8 @@ CONFIG += qdeclarative-boostable
 SOURCES  += MainWindow.cpp \
             OsDependant.cpp \
             HarmattanPhoneFactory.cpp
-HEADERS  += MainWindow.h \
+HEADERS  += platform_specific.h \
+            MainWindow.h \
             OsDependant.h \
             HarmattanPhoneFactory.h
 

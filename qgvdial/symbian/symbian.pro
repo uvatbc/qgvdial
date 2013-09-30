@@ -29,7 +29,8 @@ CONFIG += qt-components
 SOURCES  += MainWindow.cpp \
             OsDependant.cpp \
             SymbianPhoneFactory.cpp
-HEADERS  += MainWindow.h \
+HEADERS  += platform_specific.h \
+            MainWindow.h \
             OsDependant.h \
             SymbianPhoneFactory.h
 
