@@ -38,9 +38,17 @@ public:
     ~ContactDialog();
 
     int fillAndExec(const ContactInfo &cinfo);
+
+signals:
+    void selected(QString number);
+
+private slots:
+    void onDoubleClicked(const QModelIndex &index);
     
 private:
     Ui::ContactDialog *ui;
+
+    PhoneInfoArray m_nums;
 };
 
 #endif // CONTACTDIALOG_H

@@ -21,6 +21,7 @@ Contact: yuvraaj@gmail.com
 
 #include "ContactDialog.h"
 #include "ui_ContactDialog.h"
+#include "ContactNumbersModel.h"
 
 #define PIXMAP_SCALED_W 85
 #define PIXMAP_SCALED_H 85
@@ -30,6 +31,9 @@ ContactDialog::ContactDialog(QWidget *parent)
 , ui(new Ui::ContactDialog)
 {
     ui->setupUi(this);
+
+    connect(ui->listNumbers, SIGNAL(doubleClicked(const QModelIndex &)),
+            this, SLOT(onDoubleClicked(const QModelIndex &)));
 }
 
 ContactDialog::~ContactDialog()
@@ -51,7 +55,25 @@ ContactDialog::fillAndExec(const ContactInfo &cinfo)
     ui->lblImage->setPixmap (pixmap.scaled(PIXMAP_SCALED_W, PIXMAP_SCALED_H,
                                            Qt::KeepAspectRatio));
 
-    ui->txtNotes->setPlainText (cinfo.strNotes);
+    ui->txtNotes->setText (cinfo.strNotes);
+
+    ContactNumbersModel *cNum = new ContactNumbersModel(cinfo, this);
+    QAbstractItemModel *oldModel = ui->listNumbers->model ();
+    ui->listNumbers->setModel (cNum);
+    if (NULL != oldModel) {
+        oldModel->deleteLater ();
+    }
+
+    m_nums = cinfo.arrPhones;
 
     return (exec());
 }//ContactDialog::fillAndExec
+
+void
+ContactDialog::onDoubleClicked(const QModelIndex &index)
+{
+    int row = index.row();
+    emit selected (m_nums[row].strNumber);
+
+    this->accept ();
+}//ContactDialog::onDoubleClicked

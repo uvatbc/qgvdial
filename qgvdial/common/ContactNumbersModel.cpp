@@ -19,31 +19,31 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#include "ContactDetailsModel.h"
+#include "ContactNumbersModel.h"
 #include "GVApi.h"
 
-ContactDetailsModel::ContactDetailsModel (const ContactInfo &i, QObject *parent)
+ContactNumbersModel::ContactNumbersModel (const ContactInfo &i, QObject *parent)
 : QAbstractListModel (parent)
-, info (i)
+, m_numbers (i.arrPhones)
 {
     QHash<int, QByteArray> roles;
     roles[CD_TypeRole]   = "type";
     roles[CD_NumberRole] = "number";
     setRoleNames(roles);
-}//ContactDetailsModel::ContactDetailsModel
+}//ContactNumbersModel::ContactNumbersModel
 
-ContactDetailsModel::~ContactDetailsModel ()
+ContactNumbersModel::~ContactNumbersModel ()
 {
-}//ContactDetailsModel::~ContactDetailsModel
+}//ContactNumbersModel::~ContactNumbersModel
 
 int
-ContactDetailsModel::rowCount (const QModelIndex & /*parent*/) const
+ContactNumbersModel::rowCount (const QModelIndex & /*parent*/) const
 {
-    return (info.arrPhones.count ());
-}//ContactDetailsModel::rowCount
+    return (m_numbers.count ());
+}//ContactNumbersModel::rowCount
 
 QVariant
-ContactDetailsModel::data (const QModelIndex &index, int role) const
+ContactNumbersModel::data (const QModelIndex &index, int role) const
 {
     QVariant var;
 
@@ -64,29 +64,39 @@ ContactDetailsModel::data (const QModelIndex &index, int role) const
             var = data.strNumber;
             break;
         }
+
+        int col = index.column ();
+        if (col > 0) {
+            break;
+        }
+
+        if (Qt::DisplayRole == role) {
+            var = data.strNumber;
+            break;
+        }
     } while (0);
 
     return (var);
-}//ContactDetailsModel::data
+}//ContactNumbersModel::data
 
 bool
-ContactDetailsModel::getAt (int index, PhoneInfo &data) const
+ContactNumbersModel::getAt (int index, PhoneInfo &data) const
 {
     bool rv = false;
     do {
         if ((index < 0) || (index >= rowCount ())) {
-            qWarning ("Requested an index out of range");
+            Q_WARN ("Requested an index out of range");
             break;
         }
 
         if (0 == rowCount ()) {
-            qWarning ("List is empty");
+            Q_WARN ("List is empty");
             break;
         }
 
-        data = info.arrPhones.at (index);
+        data = m_numbers.at (index);
 
         rv = true;
     } while (0);
     return (rv);
-}//ContactDetailsModel::getAt
+}//ContactNumbersModel::getAt

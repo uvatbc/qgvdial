@@ -21,7 +21,7 @@
        <enum>QTabWidget::East</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="dialTab">
        <attribute name="title">
@@ -243,7 +243,11 @@
        </attribute>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
-         <widget class="QTreeView" name="contactsView"/>
+         <widget class="QTreeView" name="contactsView">
+          <attribute name="headerVisible">
+           <bool>false</bool>
+          </attribute>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -272,8 +276,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>96</width>
-             <height>101</height>
+             <width>98</width>
+             <height>106</height>
             </rect>
            </property>
            <attribute name="label">
@@ -311,8 +315,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>420</width>
-             <height>240</height>
+             <width>421</width>
+             <height>251</height>
             </rect>
            </property>
            <attribute name="label">
@@ -425,8 +429,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>112</width>
-             <height>112</height>
+             <width>96</width>
+             <height>93</height>
             </rect>
            </property>
            <attribute name="label">
@@ -456,7 +460,7 @@
      <x>0</x>
      <y>0</y>
      <width>497</width>
-     <height>25</height>
+     <height>23</height>
     </rect>
    </property>
   </widget>

@@ -419,5 +419,14 @@ MainWindow::onContactDoubleClicked(const QModelIndex &index)
             .arg(cinfo.arrPhones.count () == 1 ? "" : "s"));
 
     ContactDialog dlg;
+    connect(&dlg, SIGNAL(selected(QString)),
+            this, SLOT(setNumberToDial(QString)));
     dlg.fillAndExec (cinfo);
 }//MainWindow::onContactDoubleClicked
+
+void
+MainWindow::setNumberToDial(QString num)
+{
+    d->ui->dispNum->setPlainText (num);
+    d->ui->tabWidget->setCurrentIndex (0);
+}//MainWindow::setNumberToDial

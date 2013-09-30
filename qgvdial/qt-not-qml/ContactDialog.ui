@@ -40,14 +40,18 @@
     </widget>
    </item>
    <item>
-    <widget class="QPlainTextEdit" name="txtNotes">
-     <property name="readOnly">
-      <bool>true</bool>
+    <widget class="QLabel" name="txtNotes">
+     <property name="text">
+      <string>TextLabel</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QListView" name="listNumbers"/>
+    <widget class="QTreeView" name="listNumbers">
+     <attribute name="headerVisible">
+      <bool>false</bool>
+     </attribute>
+    </widget>
    </item>
   </layout>
  </widget>

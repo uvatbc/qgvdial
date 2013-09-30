@@ -19,8 +19,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#ifndef CONTACTDETAILSMODEL_H
-#define CONTACTDETAILSMODEL_H
+#ifndef CONTACTNUMBERSMODEL_H
+#define CONTACTNUMBERSMODEL_H
 
 #include "global.h"
 
@@ -28,7 +28,7 @@ Contact: yuvraaj@gmail.com
 // even though it is present in QtCore which is included in global.h
 #include <QObject>
 
-class ContactDetailsModel : public QAbstractListModel
+class ContactNumbersModel : public QAbstractListModel
 {
     Q_OBJECT
 
@@ -44,8 +44,8 @@ public:
         CD_NumberRole
     };
 
-    explicit ContactDetailsModel (const ContactInfo &i, QObject *parent = 0);
-    ~ContactDetailsModel ();
+    explicit ContactNumbersModel (const ContactInfo &i, QObject *parent = 0);
+    ~ContactNumbersModel ();
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
@@ -53,7 +53,7 @@ public:
     bool getAt (int index, PhoneInfo &data) const;
 
 private:
-    ContactInfo info;
+    PhoneInfoArray m_numbers;
 };
 
-#endif // CONTACTDETAILSMODEL_H
+#endif // CONTACTNUMBERSMODEL_H
