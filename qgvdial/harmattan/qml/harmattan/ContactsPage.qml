@@ -49,11 +49,13 @@ Page {
             width: 70
             anchors.verticalCenter: parent.verticalCenter
         }
-    }
+    }//Search row: text and button
 
     ListView {
         id: contactsList
         objectName: "ContactsList"
+
+        signal contactClicked(string id)
 
         function setMyModel() {
             if (contactsList.model == null) {
@@ -107,18 +109,20 @@ Page {
 
             MouseArea {
                 anchors.fill: parent
-
-                onClicked: {
-                    console.debug("Traas!");
-                    /*
-                    contactDetails.model = contacts;
-                    contactDetails.notesText = notes;
-                    contactDetails.name = name;
-                    contactDetails.imageSource = (imagePath ? imagePath : "qrc:/unknown_contact.png");
-                    container.state = "Details";
-                    */
-                }
+                onClicked: contactsList.contactClicked(id);
+                onPressed: { listDelegate.state = "pressed"; }
+                onReleased: { listDelegate.state = ''; }
             }
+
+            states: [
+                State {
+                    name: "pressed"
+                    PropertyChanges {
+                        target: listDelegate.border
+                        color: "orange"
+                    }
+                }
+            ]
         }// delegate Rectangle
     }// ListView (contacts list)
 }

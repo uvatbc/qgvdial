@@ -45,6 +45,7 @@ protected slots:
     void onSigProxyChanges(bool enable, bool useSystemProxy, QString server,
                            int port, bool authRequired, QString user,
                            QString pass);
+    void onUserContactClicked(QString id);
 
 protected:
     QObject *getQMLObject(const char *pageName);

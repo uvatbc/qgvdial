@@ -155,6 +155,8 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
         if (NULL == contactsList) {
             break;
         }
+        connect(contactsList, SIGNAL(contactClicked(QString)),
+                this, SLOT(onUserContactClicked(QString)));
 
         inboxList = getQMLObject ("InboxList");
         if (NULL == inboxList) {
@@ -379,3 +381,17 @@ MainWindow::uiRefreshNumbers(bool firstRefresh)
         QMetaObject::invokeMethod (regNumberSelector, "setMyModel");
     }
 }//MainWindow::uiRefreshNumbers
+
+void
+MainWindow::onUserContactClicked(QString id)
+{
+    ContactInfo cinfo;
+    cinfo.strId = id;
+
+    if (!db.getContactFromLink (cinfo)) {
+        Q_WARN(QString("Couldn't find contact with ID %1").arg (id));
+        return;
+    }
+
+    Q_DEBUG(QString("Found contact %1").arg(cinfo.strTitle));
+}//MainWindow::onUserContactClicked
