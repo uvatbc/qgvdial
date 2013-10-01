@@ -36,6 +36,10 @@ Rectangle {
         numberField.cursorPosition = origStart + strText.length;
     }
 
+    function setNumberToDial(number) {
+        numberField.text = number;
+    }
+
     color: "black"
 
     Column {

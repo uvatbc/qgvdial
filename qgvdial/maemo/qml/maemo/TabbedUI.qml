@@ -27,6 +27,7 @@ Rectangle {
     signal longPress
     signal sigHide
     signal sigClose
+    signal setNumberToDial(string number)
 
     // height of the tab bar
     property int tabsHeight : 50
@@ -57,6 +58,25 @@ Rectangle {
 
         // show the new tab view
         tabsModel.children[tabIndex].state = "Visible";
+    }
+
+    function showContactDetails(imgSource, name) {
+        contactDetails.imageSource = imgSource;
+        contactDetails.name = name;
+        if (contactDetails.phonesModel == null) {
+            contactDetails.phonesModel = g_ContactPhonesModel;
+        }
+        contactDetails.visible = true;
+        imgClose.state = "back";
+    }
+
+    function doBack() {
+        if (imgClose.state != "back") {
+            return;
+        }
+
+        contactDetails.visible = false;
+        imgClose.state = '';
     }
 
     Component {
@@ -120,13 +140,34 @@ Rectangle {
                 width: parent.width / 2
                 height: parent.height / 2
                 fillMode: Image.Stretch
+
+                states: [
+                    State {
+                        name: "back"
+                        PropertyChanges {
+                            target: imgClose
+                            source: "qrc:/left_arrow.png"
+                        }
+                    }
+                ]
             }
 
             MouseArea {
                 id: xMouseArea
                 anchors.fill: parent
-                onClicked: container.sigHide();
-                onPressAndHold: container.sigClose();
+                onPressAndHold: {
+                    if (imgClose.state != "back") {
+                        container.sigClose();
+                    }
+                }
+
+                onClicked: {
+                    if (imgClose.state != "back") {
+                        container.sigHide();
+                    } else {
+                        container.doBack();
+                    }
+                }
             }
 
             states: State {
@@ -170,5 +211,20 @@ Rectangle {
         Repeater {
             model: tabsModel
         }
-    }// Tab Content
-}
+    }//Tab Content
+
+    ContactDetailsPage {
+        id: contactDetails
+
+        visible: false
+
+        anchors {
+            top: tabBar.bottom
+            bottom: parent.bottom
+        }
+        width: parent.width
+
+        onSetNumberToDial: { container.setNumberToDial(number); }
+        onDone: { container.doBack(); }
+    }//ContactDetailsPage
+}//Rectangle

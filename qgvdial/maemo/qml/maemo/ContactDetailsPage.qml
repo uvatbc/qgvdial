@@ -32,6 +32,9 @@ Rectangle {
     property alias name: contactName.text
     property alias phonesModel: detailsView.model
 
+    opacity: visible ? 1 : 0
+    Behavior on opacity { PropertyAnimation { duration: 1000 } }
+
     Column {
         anchors.fill: parent
         spacing: 5

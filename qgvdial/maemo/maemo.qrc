@@ -19,5 +19,7 @@
         <file alias="in_Voicemail.png">../../icons/in_Voicemail.png</file>
 
         <file alias="tick.png">../../icons/tick.png</file>
+
+        <file alias="left_arrow.png">../../icons/left_arrow.png</file>
     </qresource>
 </RCC>
