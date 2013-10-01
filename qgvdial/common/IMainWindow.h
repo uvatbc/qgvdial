@@ -149,6 +149,9 @@ protected:
     void onUiProxyChanged(const ProxyInfo &info);
     virtual void uiUpdateProxySettings(const ProxyInfo &info) = 0;
 
+    virtual void uiSetNewContactDetailsModel() = 0;
+    virtual void uiShowContactDetails(const ContactInfo &cinfo) = 0;
+
 protected:
     CacheDb db;
     GVApi   gvApi;
@@ -164,7 +167,6 @@ protected:
 
     ContactsModel *m_contactsModel;
     InboxModel    *m_inboxModel;
-    ContactNumbersModel *m_contactPhonesModel;
 
     IPhoneAccountFactory *m_acctFactory;
 

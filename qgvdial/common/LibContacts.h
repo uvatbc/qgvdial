@@ -28,6 +28,8 @@ Contact: yuvraaj@gmail.com
 
 class ContactsModel;
 class IMainWindow;
+class ContactNumbersModel;
+
 class LibContacts : public QObject
 {
     Q_OBJECT
@@ -41,7 +43,8 @@ public:
     ContactsModel *createModel(bool mandatoryLocalPic = true);
     void refreshModel(ContactsModel *contactModel);
 
-    void setUnknownContactLocalPath(const QString &path);
+public slots:
+    bool getContactInfoAndModel(QString id);
 
 signals:
     void someTimeAfterGettingTheLastPhoto();
@@ -57,9 +60,10 @@ protected slots:
 
 protected:
     GContactsApi api;
-
-    QString     m_unknownContactPath;
     QTimer      m_gotPhotoTimer;
+
+public:
+    ContactNumbersModel *m_contactPhonesModel;
 };
 
 #endif // LIBCONTACTS_H

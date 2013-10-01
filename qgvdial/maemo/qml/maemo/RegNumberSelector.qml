@@ -23,7 +23,10 @@ import Qt 4.7
 
 Item {
     id: container
-    anchors.fill: parent
+
+    visible: false
+    opacity: visible ? 1 : 0
+    Behavior on opacity { PropertyAnimation { duration: 500 } }
 
     signal selected(string id);
 

@@ -45,7 +45,6 @@ protected slots:
     void onSigProxyChanges(bool enable, bool useSystemProxy, QString server,
                            int port, bool authRequired, QString user,
                            QString pass);
-    void onUserContactClicked(QString id);
 
 protected:
     QObject *getQMLObject(const char *pageName);
@@ -55,11 +54,16 @@ protected:
     void uiRequestTFALoginDetails(void *ctx);
     void uiSetUserPass(bool editable);
     void uiRequestApplicationPassword();
+
     void uiLoginDone(int status, const QString &errStr);
     void onUserLogoutDone();
+
     void uiRefreshContacts();
     void uiRefreshInbox();
     void uiRefreshNumbers(bool firstRefresh);
+
+    void uiSetNewContactDetailsModel();
+    void uiShowContactDetails(const ContactInfo &cinfo);
 
 private:
     QmlApplicationViewer m_view;

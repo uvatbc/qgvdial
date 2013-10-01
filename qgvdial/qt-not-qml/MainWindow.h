@@ -54,11 +54,16 @@ protected:
     void uiRequestTFALoginDetails(void *ctx);
     void uiSetUserPass(bool editable);
     void uiRequestApplicationPassword();
+
     void uiLoginDone(int status, const QString &errStr);
     void onUserLogoutDone();
+
     void uiRefreshContacts();
     void uiRefreshInbox();
     void uiRefreshNumbers(bool firstRefresh);
+
+    void uiSetNewContactDetailsModel();
+    void uiShowContactDetails(const ContactInfo &cinfo);
 
 protected slots:
     void messageReceived(const QString &msg);

@@ -23,11 +23,13 @@ Contact: yuvraaj@gmail.com
 #include "LibContacts.h"
 #include "IMainWindow.h"
 #include "ContactsModel.h"
+#include "ContactNumbersModel.h"
 
 #define GOT_PHOTO_TIMEOUT (5000)  // 5 seconds
 
 LibContacts::LibContacts(IMainWindow *parent)
 : QObject(parent)
+, m_contactPhonesModel(NULL)
 {
     Q_ASSERT(NULL != parent);
 
@@ -147,10 +149,7 @@ LibContacts::createModel(bool mandatoryLocalPic /* = true*/)
 {
     IMainWindow *win = (IMainWindow *) this->parent ();
     ContactsModel *model = new ContactsModel(mandatoryLocalPic, this);
-    model->setUnknownContactPath (m_unknownContactPath);
-
     win->db.refreshContactsModel (model);
-
     return (model);
 }//LibContacts::createModel
 
@@ -189,7 +188,7 @@ LibContacts::onGotPhoto()
     do {
         if (ATTS_SUCCESS != task->status) {
             Q_WARN(QString("Failed to get photo for ID %1").arg (id));
-            win->db.putTempFile (href, m_unknownContactPath);
+            win->db.putTempFile (href, UNKNOWN_CONTACT_QRC_PATH);
             break;
         }
 
@@ -233,8 +232,34 @@ LibContacts::refreshModel(ContactsModel *contactModel)
     win->db.refreshContactsModel (contactModel);
 }//LibContacts::refreshModel
 
-void
-LibContacts::setUnknownContactLocalPath(const QString &path)
+bool
+LibContacts::getContactInfoAndModel(QString id)
 {
-    m_unknownContactPath = path;
-}//LibContacts::setUnknownContactLocalPath
+    IMainWindow *win = (IMainWindow *) this->parent ();
+    ContactInfo cinfo;
+
+    cinfo.strId = id;
+    if (!win->db.getContactFromLink (cinfo)) {
+        Q_WARN(QString("Couldn't find contact with ID %1").arg (id));
+        return (false);
+    }
+
+    if (cinfo.strPhotoPath.isEmpty ()) {
+        cinfo.strPhotoPath = UNKNOWN_CONTACT_QRC_PATH;
+    }
+
+    if (NULL == m_contactPhonesModel) {
+        m_contactPhonesModel = new ContactNumbersModel(this);
+        if (NULL == m_contactPhonesModel) {
+            Q_WARN("Failed to create contact numbers model");
+            return (false);
+        }
+
+        win->uiSetNewContactDetailsModel ();
+    }
+    m_contactPhonesModel->setPhones (cinfo);
+
+    win->uiShowContactDetails (cinfo);
+
+    return (true);
+}//LibContacts::getContactInfoAndModel

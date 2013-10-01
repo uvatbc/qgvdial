@@ -28,6 +28,7 @@ Contact: yuvraaj@gmail.com
 #include "GVNumModel.h"
 
 #include "ContactDialog.h"
+#include "ContactNumbersModel.h"
 
 #ifdef Q_WS_WIN32
 #include "MainApp.h"
@@ -64,7 +65,6 @@ MainWindow::MainWindow(QObject *parent)
 : IMainWindow(parent)
 , d(new MainWindowPrivate)
 {
-    oContacts.setUnknownContactLocalPath (UNKNOWN_CONTACT_QRC_PATH);
 }//MainWindow::MainWindow
 
 MainWindow::~MainWindow()
@@ -405,24 +405,25 @@ void
 MainWindow::onContactDoubleClicked(const QModelIndex &index)
 {
     QModelIndex idIndex = index.sibling (index.row (), 0);
-    QString id = idIndex.data ().toString ();
-    ContactInfo cinfo;
+    oContacts.getContactInfoAndModel(idIndex.data().toString());
+}//MainWindow::onContactDoubleClicked
 
-    cinfo.strId = id;
-    if (!db.getContactFromLink (cinfo)) {
-        Q_WARN("Invalid contact link");
-        return;
-    }
+void
+MainWindow::uiSetNewContactDetailsModel()
+{
+    Q_ASSERT(oContacts.m_contactPhonesModel != NULL);
+    oContacts.m_contactPhonesModel->deleteLater ();
+    oContacts.m_contactPhonesModel = NULL;
+}//MainWindow::uiSetNewContactDetailsModel
 
-    Q_DEBUG(QString("User clicked contact for %1 with %2 phone number%3")
-            .arg (cinfo.strTitle).arg(cinfo.arrPhones.count ())
-            .arg(cinfo.arrPhones.count () == 1 ? "" : "s"));
-
+void
+MainWindow::uiShowContactDetails(const ContactInfo &cinfo)
+{
     ContactDialog dlg;
     connect(&dlg, SIGNAL(selected(QString)),
             this, SLOT(setNumberToDial(QString)));
     dlg.fillAndExec (cinfo);
-}//MainWindow::onContactDoubleClicked
+}//MainWindow::uiShowContactDetails
 
 void
 MainWindow::setNumberToDial(QString num)

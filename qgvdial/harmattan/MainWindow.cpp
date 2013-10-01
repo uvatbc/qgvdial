@@ -49,7 +49,6 @@ MainWindow::MainWindow(QObject *parent)
 , selectedNumberButton(NULL)
 , regNumberSelector(NULL)
 {
-    oContacts.setUnknownContactLocalPath (UNKNOWN_CONTACT_QRC_PATH);
 }//MainWindow::MainWindow
 
 void
@@ -157,7 +156,7 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
             break;
         }
         connect(contactsList, SIGNAL(contactClicked(QString)),
-                this, SLOT(onUserContactClicked(QString)));
+                &oContacts, SLOT(getContactInfoAndModel(QString)));
 
         inboxList = getQMLObject ("InboxList");
         if (NULL == inboxList) {
@@ -384,29 +383,17 @@ MainWindow::uiRefreshNumbers(bool firstRefresh)
 }//MainWindow::uiRefreshNumbers
 
 void
-MainWindow::onUserContactClicked(QString id)
+MainWindow::uiSetNewContactDetailsModel()
 {
-    ContactInfo cinfo;
-    cinfo.strId = id;
+    m_view.engine()->rootContext()
+                   ->setContextProperty("g_ContactPhonesModel",
+                                        oContacts.m_contactPhonesModel);
+}//MainWindow::uiSetNewContactDetailsModel
 
-    if (!db.getContactFromLink (cinfo)) {
-        Q_WARN(QString("Couldn't find contact with ID %1").arg (id));
-        return;
-    }
-
-    QString localPath = UNKNOWN_CONTACT_QRC_PATH;
-    if (!cinfo.strPhotoPath.isEmpty ()) {
-        localPath = cinfo.strPhotoPath;
-    }
-
-    if (NULL == m_contactPhonesModel) {
-        m_contactPhonesModel = new ContactNumbersModel(this);
-        m_view.engine()->rootContext()
-                       ->setContextProperty("g_ContactPhonesModel",
-                                            m_contactPhonesModel);
-    }
-    m_contactPhonesModel->setPhones (cinfo);
+void
+MainWindow::uiShowContactDetails(const ContactInfo &cinfo)
+{
     QMetaObject::invokeMethod (mainPageStack, "showContactDetails",
-                               Q_ARG (QVariant, QVariant(localPath)),
+                               Q_ARG (QVariant, QVariant(cinfo.strPhotoPath)),
                                Q_ARG (QVariant, QVariant(cinfo.strTitle)));
-}//MainWindow::onUserContactClicked
+}//MainWindow::uiShowContactDetails

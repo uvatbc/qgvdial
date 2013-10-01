@@ -60,6 +60,11 @@ Rectangle {
         tabsModel.children[tabIndex].state = "Visible";
     }
 
+    function showRegNumSeletor() {
+        regNumberSelector.visible = true;
+        imgClose.state = "back";
+    }
+
     function showContactDetails(imgSource, name) {
         contactDetails.imageSource = imgSource;
         contactDetails.name = name;
@@ -75,7 +80,13 @@ Rectangle {
             return;
         }
 
-        contactDetails.visible = false;
+        if (regNumberSelector.visible) {
+            regNumberSelector.visible = false;
+        }
+        if (contactDetails.visible) {
+            contactDetails.visible = false;
+        }
+
         imgClose.state = '';
     }
 
@@ -216,8 +227,6 @@ Rectangle {
     ContactDetailsPage {
         id: contactDetails
 
-        visible: false
-
         anchors {
             top: tabBar.bottom
             bottom: parent.bottom
@@ -227,4 +236,17 @@ Rectangle {
         onSetNumberToDial: { container.setNumberToDial(number); }
         onDone: { container.doBack(); }
     }//ContactDetailsPage
+
+    RegNumberSelector {
+        id: regNumberSelector
+        objectName: "RegNumberSelector"
+
+        anchors {
+            top: tabBar.bottom
+            bottom: parent.bottom
+        }
+        width: parent.width
+
+        onSelected: { container.doBack(); }
+    }
 }//Rectangle

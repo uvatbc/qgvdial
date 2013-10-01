@@ -50,7 +50,6 @@ MainWindow::MainWindow(QObject *parent)
 , selectedNumberButton(NULL)
 , regNumberSelector(NULL)
 {
-    oContacts.setUnknownContactLocalPath (UNKNOWN_CONTACT_QRC_PATH);
 }//MainWindow::MainWindow
 
 void
@@ -141,7 +140,7 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
             break;
         }
         connect(contactsList, SIGNAL(contactClicked(QString)),
-                this, SLOT(onContactClicked(QString)));
+                &oContacts, SLOT(getContactInfoAndModel(QString)));
 
         inboxList = getQMLObject ("InboxList");
         if (NULL == inboxList) {
@@ -163,6 +162,8 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
         if (NULL == selectedNumberButton) {
             break;
         }
+        connect(selectedNumberButton, SIGNAL(clicked(QString)),
+                this, SLOT(onUserClickedRegNumBtn()));
 
         regNumberSelector = getQMLObject ("RegNumberSelector");
         if (NULL == regNumberSelector) {
@@ -352,29 +353,23 @@ MainWindow::uiRefreshNumbers(bool firstRefresh)
 }//MainWindow::uiRefreshNumbers
 
 void
-MainWindow::onContactClicked(QString id)
+MainWindow::onUserClickedRegNumBtn()
 {
-    ContactInfo cinfo;
-    cinfo.strId = id;
+    QMetaObject::invokeMethod (tabbedUI, "showRegNumSeletor");
+}//MainWindow::onUserClickedRegNumBtn
 
-    if (!db.getContactFromLink (cinfo)) {
-        Q_WARN(QString("Couldn't find contact with ID %1").arg (id));
-        return;
-    }
+void
+MainWindow::uiSetNewContactDetailsModel()
+{
+    m_view.engine()->rootContext()
+                   ->setContextProperty("g_ContactPhonesModel",
+                                        oContacts.m_contactPhonesModel);
+}//MainWindow::uiSetNewContactDetailsModel
 
-    QString localPath = UNKNOWN_CONTACT_QRC_PATH;
-    if (!cinfo.strPhotoPath.isEmpty ()) {
-        localPath = cinfo.strPhotoPath;
-    }
-
-    if (NULL == m_contactPhonesModel) {
-        m_contactPhonesModel = new ContactNumbersModel(this);
-        m_view.engine()->rootContext()
-                       ->setContextProperty("g_ContactPhonesModel",
-                                            m_contactPhonesModel);
-    }
-    m_contactPhonesModel->setPhones (cinfo);
+void
+MainWindow::uiShowContactDetails(const ContactInfo &cinfo)
+{
     QMetaObject::invokeMethod (tabbedUI, "showContactDetails",
-                               Q_ARG (QVariant, QVariant(localPath)),
+                               Q_ARG (QVariant, QVariant(cinfo.strPhotoPath)),
                                Q_ARG (QVariant, QVariant(cinfo.strTitle)));
-}//MainWindow::onContactClicked
+}//MainWindow::uiShowContactDetails

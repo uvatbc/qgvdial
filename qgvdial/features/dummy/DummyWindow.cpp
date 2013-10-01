@@ -119,3 +119,15 @@ DummyMainWindow::uiRefreshNumbers(bool /*firstRefresh*/)
 {
     Q_ASSERT(0 == "Not implemented");
 }//DummyMainWindow::uiRefreshNumbers
+
+void
+DummyMainWindow::uiSetNewContactDetailsModel()
+{
+    Q_ASSERT(0 == "Not implemented");
+}//DummyMainWindow::uiSetNewContactDetailsModel
+
+void
+DummyMainWindow::uiShowContactDetails(const ContactInfo &cinfo)
+{
+    Q_ASSERT(0 == "Not implemented");
+}//DummyMainWindow::uiShowContactDetails

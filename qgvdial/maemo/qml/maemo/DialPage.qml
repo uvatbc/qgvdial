@@ -50,10 +50,6 @@ Rectangle {
             objectName: "SelectedNumberButton"
             width: parent.width
             mainPixelSize: 30
-
-            onClicked: {
-                regNumberSelector.visible = true;
-            }
         }
 
         TextOneLine {
@@ -95,16 +91,4 @@ Rectangle {
             }
         }//Row
     }//Column
-
-    RegNumberSelector {
-        id: regNumberSelector
-        objectName: "RegNumberSelector"
-
-        anchors.fill: parent
-        visible: false
-
-        onSelected: {
-            regNumberSelector.visible = false;
-        }
-    }
 }//Item

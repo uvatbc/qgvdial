@@ -47,6 +47,8 @@ protected:
     virtual void uiRefreshContacts();
     virtual void uiRefreshInbox();
     virtual void uiRefreshNumbers(bool firstRefresh);
+    virtual void uiSetNewContactDetailsModel();
+    virtual void uiShowContactDetails(const ContactInfo &cinfo);
 };
 
 #endif // DUMMYMAINWINDOW_H
