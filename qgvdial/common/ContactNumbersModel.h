@@ -44,8 +44,10 @@ public:
         CD_NumberRole
     };
 
-    explicit ContactNumbersModel (const ContactInfo &i, QObject *parent = 0);
+    explicit ContactNumbersModel (QObject *parent = 0);
     ~ContactNumbersModel ();
+
+    void setPhones(const ContactInfo &i);
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;

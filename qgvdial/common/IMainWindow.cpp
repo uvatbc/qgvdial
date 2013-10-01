@@ -33,6 +33,7 @@ IMainWindow::IMainWindow(QObject *parent)
 , m_loginTask(NULL)
 , m_contactsModel(NULL)
 , m_inboxModel(NULL)
+, m_contactPhonesModel(NULL)
 , m_acctFactory(createPhoneAccountFactory (this))
 {
     qRegisterMetaType<ContactInfo>("ContactInfo");

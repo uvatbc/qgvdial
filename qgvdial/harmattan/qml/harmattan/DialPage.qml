@@ -29,6 +29,10 @@ Page {
     signal sigHaptic
     signal regNumBtnClicked
 
+    function setNumberInDisp(number) {
+        numberField.text = number;
+    }
+
     Column {
         anchors.fill: parent
         spacing: 8

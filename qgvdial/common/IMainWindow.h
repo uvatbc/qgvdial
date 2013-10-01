@@ -32,6 +32,7 @@ Contact: yuvraaj@gmail.com
 
 class ContactsModel;
 class InboxModel;
+class ContactNumbersModel;
 
 /*==============================================================================
  *
@@ -163,6 +164,7 @@ protected:
 
     ContactsModel *m_contactsModel;
     InboxModel    *m_inboxModel;
+    ContactNumbersModel *m_contactPhonesModel;
 
     IPhoneAccountFactory *m_acctFactory;
 

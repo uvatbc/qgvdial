@@ -80,6 +80,7 @@ private:
     QObject *regNumberSelector;
 
     void    *loginCtx;
+
 };
 
 #endif // MAINWINDOW_H

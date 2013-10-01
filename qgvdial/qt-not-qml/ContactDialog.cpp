@@ -57,7 +57,8 @@ ContactDialog::fillAndExec(const ContactInfo &cinfo)
 
     ui->txtNotes->setText (cinfo.strNotes);
 
-    ContactNumbersModel *cNum = new ContactNumbersModel(cinfo, this);
+    ContactNumbersModel *cNum = new ContactNumbersModel(this);
+    cNum->setPhones (cinfo);
     QAbstractItemModel *oldModel = ui->listNumbers->model ();
     ui->listNumbers->setModel (cNum);
     if (NULL != oldModel) {

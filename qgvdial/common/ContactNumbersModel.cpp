@@ -22,9 +22,8 @@ Contact: yuvraaj@gmail.com
 #include "ContactNumbersModel.h"
 #include "GVApi.h"
 
-ContactNumbersModel::ContactNumbersModel (const ContactInfo &i, QObject *parent)
+ContactNumbersModel::ContactNumbersModel (QObject *parent)
 : QAbstractListModel (parent)
-, m_numbers (i.arrPhones)
 {
     QHash<int, QByteArray> roles;
     roles[CD_TypeRole]   = "type";
@@ -35,6 +34,14 @@ ContactNumbersModel::ContactNumbersModel (const ContactInfo &i, QObject *parent)
 ContactNumbersModel::~ContactNumbersModel ()
 {
 }//ContactNumbersModel::~ContactNumbersModel
+
+void
+ContactNumbersModel::setPhones(const ContactInfo &i)
+{
+    beginResetModel ();
+    m_numbers = i.arrPhones;
+    endResetModel ();
+}//ContactNumbersModel::setPhones
 
 int
 ContactNumbersModel::rowCount (const QModelIndex & /*parent*/) const

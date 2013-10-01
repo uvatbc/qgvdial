@@ -41,27 +41,17 @@ GVApi::GVApi(bool bEmitLog, QObject *parent)
 bool
 GVApi::getSystemProxies (QNetworkProxy &http, QNetworkProxy &https)
 {
+    bool httpDone, httpsDone;
+
+    httpDone = httpsDone = false;
+
 #if !DIABLO_OS
     QNetworkProxyFactory::setUseSystemConfiguration (true);
 #endif
 
+#if defined(Q_WS_X11) || defined(Q_WS_SIMULATOR)
     do {
-        QList<QNetworkProxy> netProxies =
-        QNetworkProxyFactory::systemProxyForQuery (
-            QNetworkProxyQuery(QUrl("http://www.google.com")));
-        if (netProxies.count() != 0) {
-            http = netProxies[0];
-            if (QNetworkProxy::NoProxy != http.type ()) {
-                if (emitLog) {
-                    Q_DEBUG(QString("Got proxy: host = %1, port = %2")
-                            .arg(http.hostName ()).arg (http.port ()));
-                }
-                break;
-            }
-        }
-
-        // Otherwise Confirm it
-#if defined(Q_WS_X11)
+        // Environment variables first
         QString strHttpProxy = getenv ("http_proxy");
         if (strHttpProxy.isEmpty ()) {
             break;
@@ -83,27 +73,13 @@ GVApi::getSystemProxies (QNetworkProxy &http, QNetworkProxy &https)
             http.setHostName (strHost);
             http.setPort (port);
             http.setType (QNetworkProxy::HttpProxy);
+
+            httpDone = true;
         }
-#endif
     } while (0);
 
     do {
-        QList<QNetworkProxy> netProxies =
-        QNetworkProxyFactory::systemProxyForQuery (
-            QNetworkProxyQuery(QUrl("https://www.google.com")));
-        if (netProxies.count () != 0) {
-            https = netProxies[0];
-            if (QNetworkProxy::NoProxy != https.type ()) {
-                if (emitLog) {
-                    Q_DEBUG(QString("Got proxy: host = %1, port = %2")
-                            .arg(https.hostName ()).arg (https.port ()));
-                }
-                break;
-            }
-        }
-
-        // Otherwise Confirm it
-#if defined(Q_WS_X11)
+        // Environment variables first
         QString strHttpProxy = getenv ("https_proxy");
         if (strHttpProxy.isEmpty ()) {
             break;
@@ -125,8 +101,46 @@ GVApi::getSystemProxies (QNetworkProxy &http, QNetworkProxy &https)
             https.setHostName (strHost);
             https.setPort (port);
             https.setType (QNetworkProxy::HttpProxy);
+
+            httpsDone = true;
         }
+    } while (0);
 #endif
+
+    do {
+        if (httpDone) break;
+
+        QList<QNetworkProxy> netProxies =
+        QNetworkProxyFactory::systemProxyForQuery (
+            QNetworkProxyQuery(QUrl("http://www.google.com")));
+        if (netProxies.count() != 0) {
+            http = netProxies[0];
+            if (QNetworkProxy::NoProxy != http.type ()) {
+                if (emitLog) {
+                    Q_DEBUG(QString("Got proxy: host = %1, port = %2")
+                            .arg(http.hostName ()).arg (http.port ()));
+                }
+                break;
+            }
+        }
+    } while (0);
+
+    do {
+        if (httpsDone) break;
+
+        QList<QNetworkProxy> netProxies =
+        QNetworkProxyFactory::systemProxyForQuery (
+            QNetworkProxyQuery(QUrl("https://www.google.com")));
+        if (netProxies.count () != 0) {
+            https = netProxies[0];
+            if (QNetworkProxy::NoProxy != https.type ()) {
+                if (emitLog) {
+                    Q_DEBUG(QString("Got proxy: host = %1, port = %2")
+                            .arg(https.hostName ()).arg (https.port ()));
+                }
+                break;
+            }
+        }
     } while (0);
 
     return (true);

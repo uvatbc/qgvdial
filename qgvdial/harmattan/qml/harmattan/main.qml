@@ -42,6 +42,14 @@ PageStackWindow {
         msgBox.message = msg;
         pageStack.push(msgBox);
     }
+    function showContactDetails(imgSource, name) {
+        contactDetails.imageSource = imgSource;
+        contactDetails.name = name;
+        if (contactDetails.phonesModel == null) {
+            contactDetails.phonesModel = g_ContactPhonesModel;
+        }
+        pageStack.push(contactDetails);
+    }
 
     initialPage: Page {
         tools: commonTools
@@ -129,14 +137,12 @@ PageStackWindow {
     TfaPinPage {
         id: tfaPinDlg
         objectName: "TFAPinDialog"
-
         onDone: appWindow.pageStack.pop();
     }//TFA Dialog
 
     AppPwPage {
         id: appPwDlg
         objectName: "AppPwDialog"
-
         onDone: appWindow.pageStack.pop();
     }
 
@@ -145,6 +151,15 @@ PageStackWindow {
         objectName: "RegNumberSelector"
 
         onSelected: appWindow.pageStack.pop();
+    }
+
+    ContactDetailsPage {
+        id: contactDetails
+        onDone: appWindow.pageStack.pop();
+        onSetNumberToDial: {
+            dialTab.setNumberInDisp(number);
+            tabgroup.setTab(0);
+        }
     }
 
     MessageBox {
