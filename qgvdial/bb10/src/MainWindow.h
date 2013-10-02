@@ -71,9 +71,14 @@ public:
 
     void uiRefreshContacts();
     void uiRefreshInbox();
-    void uiRefreshNumbers(bool firstRefresh);
+
+    void uiSetNewRegNumbersModel();
+    void uiRefreshNumbers();
 
     void uiUpdateProxySettings(const ProxyInfo &info);
+
+    void uiSetNewContactDetailsModel();
+    void uiShowContactDetails(const ContactInfo &cinfo);
 
     void init();
     void log(QDateTime dt, int level, const QString &strLog);

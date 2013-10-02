@@ -53,12 +53,13 @@ MainWindow::MainWindow(QCoreApplication *_app)
 , tfaDialog(NULL)
 , appPwDialog(NULL)
 , regNumberDropDown(NULL)
+, tfaCtx(NULL)
 {
 	app = (bb::cascades::Application *) _app;
 }//MainWindow::MainWindow
 
 void
-MainWindow::log(QDateTime dt, int level, const QString &strLog)
+MainWindow::log(QDateTime /*dt*/, int /*level*/, const QString & /*strLog*/)
 {
     //TODO: Something meaningful
 }//MainWindow::log
@@ -267,7 +268,13 @@ MainWindow::uiRefreshInbox()
 }//MainWindow::uiRefreshInbox
 
 void
-MainWindow::uiRefreshNumbers(bool /*firstRefresh*/)
+MainWindow::uiSetNewRegNumbersModel()
+{
+    // Absolutely nothing to do here...
+}//MainWindow::uiSetNewRegNumbersModel
+
+void
+MainWindow::uiRefreshNumbers()
 {
     Option *option;
     QString name;
@@ -331,3 +338,13 @@ MainWindow::uiUpdateProxySettings(const ProxyInfo & /*info*/)
 {
     // This is not the place to set the proxy info...
 }//MainWindow::uiUpdateProxySettings
+
+void
+MainWindow::uiSetNewContactDetailsModel()
+{
+}//MainWindow::uiSetNewContactDetailsModel
+
+void
+MainWindow::uiShowContactDetails(const ContactInfo &cinfo)
+{
+}//MainWindow::uiShowContactDetails
