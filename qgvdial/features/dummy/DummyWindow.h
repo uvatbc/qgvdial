@@ -41,12 +41,17 @@ protected:
     virtual void uiRequestLoginDetails();
     virtual void uiRequestTFALoginDetails(void *ctx);
     virtual void uiSetUserPass(bool editable);
-    virtual void uiLoginDone(int status, const QString &errStr);
-    virtual void onUserLogoutDone();
     virtual void uiRequestApplicationPassword();
+    virtual void uiLoginDone(int status, const QString &errStr);
+
+    virtual void onUserLogoutDone();
+
     virtual void uiRefreshContacts();
     virtual void uiRefreshInbox();
-    virtual void uiRefreshNumbers(bool firstRefresh);
+
+    virtual void uiSetNewRegNumbersModel();
+    virtual void uiRefreshNumbers();
+
     virtual void uiSetNewContactDetailsModel();
     virtual void uiShowContactDetails(const ContactInfo &cinfo);
 };

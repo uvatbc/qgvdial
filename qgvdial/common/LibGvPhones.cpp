@@ -27,6 +27,7 @@ LibGvPhones::LibGvPhones(IMainWindow *parent)
 : QObject(parent)
 , m_numModel(new GVNumModel(this))
 , m_ignoreSelectedNumberChanges(false)
+, s_Refresh(0)
 {
     IMainWindow *win = (IMainWindow *) this->parent ();
     connect(&win->gvApi, SIGNAL(registeredPhone(const GVRegisteredNumber &)),
@@ -77,7 +78,13 @@ LibGvPhones::onGotPhones()
     } while(0);
     m_numModel->m_selectedId = id;
 
-    win->uiRefreshNumbers (true);
+    s_Refresh++;
+    if (s_Refresh == 1) {
+        win->uiSetNewRegNumbersModel ();
+    }
+
+    m_numModel->informViewsOfNewData ();
+    win->uiRefreshNumbers ();
 
     task->deleteLater ();
 }//LibGvPhones::onGotPhones
@@ -142,6 +149,7 @@ LibGvPhones::onUserSelectPhone(QString id)
         rv = true;
     } while (0);
 
-    win->uiRefreshNumbers (false);
+    m_numModel->informViewsOfNewData ();
+    win->uiRefreshNumbers ();
     return (rv);
 }//LibGvPhones::onUserSelectPhone

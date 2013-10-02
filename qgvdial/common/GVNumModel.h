@@ -48,6 +48,7 @@ public:
     bool getSelectedNumber(GVRegisteredNumber &num);
 
     GVRegisteredNumberArray getAll();
+    void informViewsOfNewData();
 
 private:
     GVRegisteredNumberArray m_dialBack;

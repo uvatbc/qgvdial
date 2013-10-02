@@ -173,3 +173,10 @@ GVNumModel::getAll()
 
     return (rv);
 }//GVNumModel::getAll
+
+void
+GVNumModel::informViewsOfNewData()
+{
+    beginResetModel ();
+    endResetModel ();
+}//GVNumModel::informViewsOfNewData

@@ -60,7 +60,9 @@ protected:
 
     void uiRefreshContacts();
     void uiRefreshInbox();
-    void uiRefreshNumbers(bool firstRefresh);
+
+    void uiSetNewRegNumbersModel();
+    void uiRefreshNumbers();
 
     void uiSetNewContactDetailsModel();
     void uiShowContactDetails(const ContactInfo &cinfo);

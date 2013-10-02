@@ -301,17 +301,20 @@ MainWindow::uiRefreshInbox()
 }//MainWindow::uiRefreshInbox
 
 void
-MainWindow::uiRefreshNumbers(bool firstRefresh)
+MainWindow::uiSetNewRegNumbersModel()
 {
+    oPhones.m_ignoreSelectedNumberChanges = true;
+    d->ui->cbNumbers->setModel (oPhones.m_numModel);
+    oPhones.m_ignoreSelectedNumberChanges = false;
+}//MainWindow::uiSetNewRegNumbersModel
+
+void
+MainWindow::uiRefreshNumbers()
+{
+    Q_ASSERT(NULL != oPhones.m_numModel);
     if (NULL == oPhones.m_numModel) {
         Q_CRIT("m_numModel is NULL!");
         return;
-    }
-
-    if (firstRefresh) {
-        oPhones.m_ignoreSelectedNumberChanges = true;
-        d->ui->cbNumbers->setModel (oPhones.m_numModel);
-        oPhones.m_ignoreSelectedNumberChanges = false;
     }
 
     int index = oPhones.m_numModel->getSelectedIndex();

@@ -329,8 +329,17 @@ MainWindow::uiRefreshInbox()
 }//MainWindow::uiRefreshInbox()
 
 void
-MainWindow::uiRefreshNumbers(bool firstRefresh)
+MainWindow::uiSetNewRegNumbersModel()
 {
+    m_view.engine()->rootContext()->setContextProperty("g_RegNumberModel",
+                                                       oPhones.m_numModel);
+    QMetaObject::invokeMethod (regNumberSelector, "setMyModel");
+}//MainWindow::uiSetNewRegNumbersModel
+
+void
+MainWindow::uiRefreshNumbers()
+{
+    Q_ASSERT(NULL != oPhones.m_numModel);
     if (NULL == oPhones.m_numModel) {
         Q_CRIT("m_numModel is NULL!");
         return;
@@ -344,12 +353,6 @@ MainWindow::uiRefreshNumbers(bool firstRefresh)
 
     QString btnText = QString("%1\n(%2)").arg(num.name, num.number);
     selectedNumberButton->setProperty ("mainText", btnText);
-
-    if (firstRefresh) {
-        m_view.engine()->rootContext()->setContextProperty("g_RegNumberModel",
-                                                           oPhones.m_numModel);
-        QMetaObject::invokeMethod (regNumberSelector, "setMyModel");
-    }
 }//MainWindow::uiRefreshNumbers
 
 void

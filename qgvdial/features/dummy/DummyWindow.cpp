@@ -115,8 +115,15 @@ DummyMainWindow::uiRefreshInbox()
 }//DummyMainWindow::uiRefreshInbox
 
 void
-DummyMainWindow::uiRefreshNumbers(bool /*firstRefresh*/)
+DummyMainWindow::uiSetNewRegNumbersModel()
 {
+    Q_ASSERT(0 == "Not implemented");
+}//DummyMainWindow::uiSetNewRegNumbersModel
+
+void
+DummyMainWindow::uiRefreshNumbers()
+{
+    Q_ASSERT(NULL != oPhones.m_numModel);
     Q_ASSERT(0 == "Not implemented");
 }//DummyMainWindow::uiRefreshNumbers
 
@@ -127,7 +134,7 @@ DummyMainWindow::uiSetNewContactDetailsModel()
 }//DummyMainWindow::uiSetNewContactDetailsModel
 
 void
-DummyMainWindow::uiShowContactDetails(const ContactInfo &cinfo)
+DummyMainWindow::uiShowContactDetails(const ContactInfo & /*cinfo*/)
 {
     Q_ASSERT(0 == "Not implemented");
 }//DummyMainWindow::uiShowContactDetails

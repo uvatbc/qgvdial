@@ -46,6 +46,9 @@ private slots:
 public:
     GVNumModel *m_numModel;
     bool        m_ignoreSelectedNumberChanges;
+
+    //! Number of times this was refreshed successfully
+    quint32     s_Refresh;
 };
 
 #endif // LIBGVPHONES_H
