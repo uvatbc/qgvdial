@@ -268,16 +268,14 @@ MainWindow::uiLoginDone(int status, const QString &errStr)
 void
 MainWindow::uiRefreshContacts()
 {
-    QAbstractItemModel *oldModel = m_contactsModel;
-    m_contactsModel = oContacts.createModel ();
-    connect(m_contactsModel, SIGNAL(noContactPhoto(QString,QString)),
+    Q_ASSERT(NULL != oContacts.m_contactsModel);
+
+    connect(oContacts.m_contactsModel, SIGNAL(noContactPhoto(QString,QString)),
             &oContacts, SLOT(onNoContactPhoto(QString,QString)));
     connect(&oContacts, SIGNAL(someTimeAfterGettingTheLastPhoto()),
             this, SLOT(someTimeAfterGettingTheLastPhoto()));
-    d->ui->contactsView->setModel (m_contactsModel);
-    if (NULL != oldModel) {
-        delete oldModel;
-    }
+
+    d->ui->contactsView->setModel (oContacts.m_contactsModel);
 
     d->ui->contactsView->hideColumn (0);    // id
     d->ui->contactsView->hideColumn (2);    // pic link
@@ -287,12 +285,7 @@ MainWindow::uiRefreshContacts()
 void
 MainWindow::uiRefreshInbox()
 {
-    QAbstractItemModel *oldModel = m_inboxModel;
-    m_inboxModel = oInbox.createModel ();
-    d->ui->inboxView->setModel (m_inboxModel);
-    if (NULL != oldModel) {
-        delete oldModel;
-    }
+    d->ui->inboxView->setModel (oInbox.m_inboxModel);
 
     d->ui->inboxView->hideColumn (0);
     d->ui->inboxView->hideColumn (4);
@@ -328,7 +321,7 @@ MainWindow::uiRefreshNumbers()
 void
 MainWindow::someTimeAfterGettingTheLastPhoto()
 {
-    oContacts.refreshModel (m_contactsModel);
+    oContacts.refreshModel ();
 }//MainWindow::someTimeAfterGettingTheLastPhoto
 
 void

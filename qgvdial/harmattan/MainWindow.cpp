@@ -335,27 +335,21 @@ MainWindow::uiLoginDone(int status, const QString &errStr)
 void
 MainWindow::uiRefreshContacts()
 {
-    ContactsModel *oldModel = m_contactsModel;
-    m_contactsModel = oContacts.createModel ();
-    m_view.engine()->rootContext()->setContextProperty("g_ContactsModel",
-                                                       m_contactsModel);
+    Q_ASSERT(NULL != oContacts.m_contactsModel);
+
+    m_view.engine()->rootContext()
+                   ->setContextProperty("g_ContactsModel",
+                                        oContacts.m_contactsModel);
     QMetaObject::invokeMethod (contactsList, "setMyModel");
-    if (NULL != oldModel) {
-        delete oldModel;
-    }
 }//MainWindow::uiRefreshContacts
 
 void
 MainWindow::uiRefreshInbox()
 {
-    InboxModel *oldModel = m_inboxModel;
-    m_inboxModel = oInbox.createModel ();
-    m_view.engine()->rootContext()->setContextProperty("g_InboxModel",
-                                                       m_inboxModel);
+    m_view.engine()->rootContext()
+                   ->setContextProperty("g_InboxModel",
+                                        oInbox.m_inboxModel);
     QMetaObject::invokeMethod (inboxList, "setMyModel");
-    if (NULL != oldModel) {
-        delete oldModel;
-    }
 }//MainWindow::uiRefreshInbox
 
 void

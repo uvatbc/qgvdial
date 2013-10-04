@@ -44,6 +44,9 @@ private slots:
 
     bool beginRefresh(AsyncTaskToken *task, QString type, QDateTime after,
                       int page);
+
+public:
+    InboxModel    *m_inboxModel;
 };
 
 #endif // LIBINBOX_H

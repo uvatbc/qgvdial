@@ -25,6 +25,7 @@ Contact: yuvraaj@gmail.com
 
 LibInbox::LibInbox(IMainWindow *parent)
 : QObject(parent)
+, m_inboxModel(NULL)
 {
     connect (&parent->gvApi,
              SIGNAL(oneInboxEntry(AsyncTaskToken*,GVInboxEntry)),
@@ -131,7 +132,14 @@ LibInbox::onRefreshDone()
 
     if (task) {
         if (ATTS_SUCCESS == task->status) {
-            win->uiRefreshInbox ();
+            InboxModel *oldModel = m_inboxModel;
+            m_inboxModel = this->createModel ();
+            if (NULL != m_inboxModel) {
+                win->uiRefreshInbox ();
+                oldModel->deleteLater ();
+            } else {
+                m_inboxModel = oldModel;
+            }
         }
         task->deleteLater ();
     }

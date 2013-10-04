@@ -30,10 +30,6 @@ Contact: yuvraaj@gmail.com
 #include "LibGvPhones.h"
 #include "IPhoneAccountFactory.h"
 
-class ContactsModel;
-class InboxModel;
-class ContactNumbersModel;
-
 /*==============================================================================
  *
  * IMainWindow: The class that drives the entire business logic of qgvdial.
@@ -166,9 +162,6 @@ protected:
     QString m_pass;
 
     AsyncTaskToken *m_loginTask;
-
-    ContactsModel *m_contactsModel;
-    InboxModel    *m_inboxModel;
 
     IPhoneAccountFactory *m_acctFactory;
 

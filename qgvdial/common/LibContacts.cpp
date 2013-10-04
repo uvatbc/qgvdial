@@ -29,6 +29,7 @@ Contact: yuvraaj@gmail.com
 
 LibContacts::LibContacts(IMainWindow *parent)
 : QObject(parent)
+, m_contactsModel(NULL)
 , m_contactPhonesModel(NULL)
 {
     Q_ASSERT(NULL != parent);
@@ -138,8 +139,15 @@ LibContacts::onContactsFetched()
     if (ATTS_SUCCESS != task->status) {
         Q_WARN("Failed to update contacts");
     } else {
-        win->uiRefreshContacts ();
-    }
+        ContactsModel *oldModel = m_contactsModel;
+        m_contactsModel = this->createModel ();
+        if (NULL != m_contactsModel) {
+            win->uiRefreshContacts ();
+            oldModel->deleteLater ();
+        } else {
+            m_contactsModel = oldModel;
+        }
+   }
 
     task->deleteLater ();
 }//LibContacts::onContactsFetched
@@ -226,10 +234,10 @@ LibContacts::onGotPhoto()
 }//LibContacts::onGotPhoto
 
 void
-LibContacts::refreshModel(ContactsModel *contactModel)
+LibContacts::refreshModel()
 {
     IMainWindow *win = (IMainWindow *) this->parent ();
-    win->db.refreshContactsModel (contactModel);
+    win->db.refreshContactsModel (m_contactsModel);
 }//LibContacts::refreshModel
 
 bool

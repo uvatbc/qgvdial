@@ -41,7 +41,7 @@ public:
     bool refresh(QDateTime after = QDateTime());
 
     ContactsModel *createModel(bool mandatoryLocalPic = true);
-    void refreshModel(ContactsModel *contactModel);
+    void refreshModel();
 
 public slots:
     bool getContactInfoAndModel(QString id);
@@ -63,6 +63,7 @@ protected:
     QTimer      m_gotPhotoTimer;
 
 public:
+    ContactsModel       *m_contactsModel;
     ContactNumbersModel *m_contactPhonesModel;
 };
 
