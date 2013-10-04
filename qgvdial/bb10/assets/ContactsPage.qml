@@ -23,6 +23,11 @@ import bb.cascades 1.0
 import com.kdab.components 1.0
 
 Page {
+    id: container
+    objectName: "ContactsPage"
+    
+    signal contactClicked(string id);
+    
     attachedObjects: [
         AbstractItemModel {
             id: contactsModel
@@ -47,17 +52,39 @@ Page {
                         }
                         
                         ImageView {
-                            image: {
-                                if ((ListItemData.imagePath != null) && ListItemData.imagePath.length != 0) {
+                            imageSource: {
+                                if ((ListItemData.imagePath != null) && (ListItemData.imagePath.length != 0)) {
                                     return ListItemData.imagePath;  
                                 } else {
-                                    return "assets:///icons/unknown_contact.png";
+                                    return "asset:///icons/unknown_contact.png";
                                 }
                             }
+                            
+                            scalingMethod: ScalingMethod.AspectFit
+                            horizontalAlignment: HorizontalAlignment.Center
+                            verticalAlignment: VerticalAlignment.Center
+                            
+                            preferredHeight: 80
+                            preferredWidth: 80
                         }
+                        
                         Label {
                             text: ListItemData.name
+                            textStyle { base: tsdxlarge.style }
+                            verticalAlignment: VerticalAlignment.Center
                         }
+                        
+                        onTouch: {
+                            console.debug("Click on " + ListItemData.name);
+                        }
+
+                        attachedObjects: [
+                            TextStyleDefinition {
+                                id: tsdxlarge
+                                base: SystemDefaults.TextStyles.BodyText
+                                fontSize: FontSize.XLarge
+                            }
+                        ]//attachedObjects
                     }
                 }
             ]

@@ -45,7 +45,9 @@ createApplication(int argc, char **argv)
 
 MainWindow::MainWindow(QCoreApplication *_app)
 : IMainWindow(_app)
+, app ((bb::cascades::Application *) _app)
 , qml(NULL)
+, root(NULL)
 , mainTabbedPane(NULL)
 , dialPage(NULL)
 , settingsList(NULL)
@@ -53,9 +55,9 @@ MainWindow::MainWindow(QCoreApplication *_app)
 , tfaDialog(NULL)
 , appPwDialog(NULL)
 , regNumberDropDown(NULL)
+, contactsPage(NULL)
 , tfaCtx(NULL)
 {
-	app = (bb::cascades::Application *) _app;
 }//MainWindow::MainWindow
 
 void
@@ -124,6 +126,10 @@ MainWindow::onFakeInitDone()
     regNumberDropDown = (DropDown *)getQMLObject("RegNumberDropDown");
     connect(regNumberDropDown, SIGNAL(selectedOptionChanged(bb::cascades::Option*)),
             this, SLOT(onUserRegSelectedOptionChanged(bb::cascades::Option*)));
+
+    contactsPage   = (Page *)       getQMLObject("ContactsPage");
+    connect(contactsPage, SIGNAL(contactClicked(QString)),
+            &oContacts, SLOT(getContactInfoAndModel(QString)));
 
     onInitDone();
 }//MainWindow::onFakeInitDone
@@ -248,23 +254,13 @@ MainWindow::onUserLogoutDone()
 void
 MainWindow::uiRefreshContacts()
 {
-    ContactsModel *oldModel = m_contactsModel;
-    m_contactsModel = oContacts.createModel();
-    qml->setContextProperty("g_contactsModel", m_contactsModel);
-    if (NULL != oldModel) {
-        delete oldModel;
-    }
+    qml->setContextProperty("g_contactsModel", oContacts.m_contactsModel);
 }//MainWindow::uiRefreshContacts
 
 void
 MainWindow::uiRefreshInbox()
 {
-    InboxModel *oldModel = m_inboxModel;
-    m_inboxModel = oInbox.createModel();
-    qml->setContextProperty("g_inboxModel", m_inboxModel);
-    if (NULL != oldModel) {
-        delete oldModel;
-    }
+    qml->setContextProperty("g_inboxModel", oInbox.m_inboxModel);
 }//MainWindow::uiRefreshInbox
 
 void
@@ -342,9 +338,11 @@ MainWindow::uiUpdateProxySettings(const ProxyInfo & /*info*/)
 void
 MainWindow::uiSetNewContactDetailsModel()
 {
+    Q_DEBUG("Got new contact details model");
 }//MainWindow::uiSetNewContactDetailsModel
 
 void
 MainWindow::uiShowContactDetails(const ContactInfo &cinfo)
 {
+    Q_DEBUG("Time to show the contact details");
 }//MainWindow::uiShowContactDetails

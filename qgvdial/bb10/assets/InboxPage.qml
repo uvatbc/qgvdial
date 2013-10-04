@@ -42,24 +42,47 @@ Page {
                             orientation: LayoutOrientation.LeftToRight
                         }
                         ImageView {
-                            image: {
+                            imageSource: {
                                 switch (ListItemData.type) {
-                                    case 1: // GVIE_Placed
-                                        return "assets://icons/in_Placed.png";
-                                    case 2: // GVIE_Received
-                                        return "assets://icons/in_Received.png";
-                                    case 3: // GVIE_Missed
-                                        return "assets://icons/in_Missed.png";
-                                    case 4: // GVIE_Voicemail
-                                        return "assets://icons/in_Voicemail.png";
-                                    case 5: // GVIE_TextMessage
-                                        return "assets://icons/in_Sms.png";
+                                    case "Placed":
+                                        return "asset:///icons/in_Placed.png";
+                                    case "Received":
+                                        return "asset:///icons/in_Received.png";
+                                    case "Missed":
+                                        return "asset:///icons/in_Missed.png";
+                                    case "Voicemail":
+                                        return "asset:///icons/in_Voicemail.png";
+                                    case "SMS":
+                                        return "asset:///icons/in_Sms.png";
+                                    default:
+                                        console.debug("Invalid type value: " + ListItemData.type);                                            
                                 }
                             }
+                            
+                            scalingMethod: ScalingMethod.AspectFit
+                            horizontalAlignment: HorizontalAlignment.Center
+                            verticalAlignment: VerticalAlignment.Center
+                            
+                            preferredHeight: 80
+                            preferredWidth: 80
                         }
+
                         Label {
                             text: ListItemData.name
+                            textStyle { base: tsdxlarge.style }
                         }
+                        
+                        onTouch: {
+                            console.debug("Click on " + ListItemData.name);
+                        }
+
+                        attachedObjects: [
+                            TextStyleDefinition {
+                                id: tsdxlarge
+                                base: SystemDefaults.TextStyles.BodyText
+                                fontSize: FontSize.XLarge
+                            }
+                        ]//attachedObjects
                     }
                 }
             ]

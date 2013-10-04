@@ -66,9 +66,10 @@ public:
     void uiRequestTFALoginDetails(void*);
     void uiSetUserPass(bool editable);
     void uiRequestApplicationPassword();
-    void uiLoginDone(int status, const QString &errStr);
-    void onUserLogoutDone();
 
+    void uiLoginDone(int status, const QString &errStr);
+
+    void onUserLogoutDone();
     void uiRefreshContacts();
     void uiRefreshInbox();
 
@@ -108,6 +109,7 @@ private:
     Page        *tfaDialog;
     Page        *appPwDialog;
     DropDown    *regNumberDropDown;
+    Page        *contactsPage;
 
     //! Entirely transient two-factor authentication context
     void        *tfaCtx;
