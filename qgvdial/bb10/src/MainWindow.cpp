@@ -344,5 +344,5 @@ MainWindow::uiSetNewContactDetailsModel()
 void
 MainWindow::uiShowContactDetails(const ContactInfo &cinfo)
 {
-    Q_DEBUG("Time to show the contact details");
+    Q_DEBUG(QString("Show contact details for %1").arg(cinfo.strTitle));
 }//MainWindow::uiShowContactDetails

@@ -75,7 +75,8 @@ Page {
                         }
                         
                         onTouch: {
-                            console.debug("Click on " + ListItemData.name);
+                            // Unknown object: "container"... WTF?
+                            container.contactClicked(ListItemData.id);
                         }
 
                         attachedObjects: [
@@ -87,7 +88,7 @@ Page {
                         ]//attachedObjects
                     }
                 }
-            ]
-        }
+            ]//listItemComponents
+        }//ListView
     }//Container
 }//Page
