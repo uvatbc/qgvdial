@@ -56,6 +56,7 @@ MainWindow::MainWindow(QCoreApplication *_app)
 , appPwDialog(NULL)
 , regNumberDropDown(NULL)
 , contactsPage(NULL)
+, contactsList(NULL)
 , tfaCtx(NULL)
 {
 }//MainWindow::MainWindow
@@ -128,7 +129,9 @@ MainWindow::onFakeInitDone()
             this, SLOT(onUserRegSelectedOptionChanged(bb::cascades::Option*)));
 
     contactsPage   = (Page *)       getQMLObject("ContactsPage");
-    connect(contactsPage, SIGNAL(contactClicked(QString)),
+
+    contactsList   = (ListView *)   getQMLObject("ContactsList");
+    connect(contactsList, SIGNAL(contactClicked(QString)),
             &oContacts, SLOT(getContactInfoAndModel(QString)));
 
     onInitDone();

@@ -110,6 +110,7 @@ private:
     Page        *appPwDialog;
     DropDown    *regNumberDropDown;
     Page        *contactsPage;
+    ListView    *contactsList;
 
     //! Entirely transient two-factor authentication context
     void        *tfaCtx;

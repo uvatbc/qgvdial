@@ -26,7 +26,6 @@ Page {
     id: container
     objectName: "ContactsPage"
     
-    signal contactClicked(string id);
     
     attachedObjects: [
         AbstractItemModel {
@@ -42,11 +41,18 @@ Page {
         }
 
         ListView {
+            objectName: "ContactsList"
+
+            signal contactClicked(string id);
+
             dataModel: contactsModel
 
             listItemComponents: [
                 ListItemComponent {
+                    
                     Container {
+                        id:  listItem
+
                         layout: StackLayout {
                             orientation: LayoutOrientation.LeftToRight
                         }
@@ -73,12 +79,15 @@ Page {
                             textStyle { base: tsdxlarge.style }
                             verticalAlignment: VerticalAlignment.Center
                         }
-                        
-                        onTouch: {
-                            // Unknown object: "container"... WTF?
-                            container.contactClicked(ListItemData.id);
-                        }
 
+                        gestureHandlers: [
+                            TapHandler {
+                                onTapped: {
+                                    listItem.ListItem.view.contactClicked(ListItemData.id);
+                                }                                
+                            }
+                        ]
+                                                 
                         attachedObjects: [
                             TextStyleDefinition {
                                 id: tsdxlarge

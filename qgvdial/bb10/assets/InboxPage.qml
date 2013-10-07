@@ -38,49 +38,77 @@ Page {
             listItemComponents: [
                 ListItemComponent {
                     Container {
-                        layout: StackLayout {
-                            orientation: LayoutOrientation.LeftToRight
-                        }
-                        ImageView {
-                            imageSource: {
-                                switch (ListItemData.type) {
-                                    case "Placed":
-                                        return "asset:///icons/in_Placed.png";
-                                    case "Received":
-                                        return "asset:///icons/in_Received.png";
-                                    case "Missed":
-                                        return "asset:///icons/in_Missed.png";
-                                    case "Voicemail":
-                                        return "asset:///icons/in_Voicemail.png";
-                                    case "SMS":
-                                        return "asset:///icons/in_Sms.png";
-                                    default:
-                                        console.debug("Invalid type value: " + ListItemData.type);                                            
-                                }
+                        layout: DockLayout {}
+                        
+                        Container {
+                            verticalAlignment: VerticalAlignment.Center
+                            horizontalAlignment: HorizontalAlignment.Left
+                            
+                            layout: StackLayout {
+                                orientation: LayoutOrientation.LeftToRight
                             }
                             
-                            scalingMethod: ScalingMethod.AspectFit
-                            horizontalAlignment: HorizontalAlignment.Center
-                            verticalAlignment: VerticalAlignment.Center
+                            ImageView {
+                                imageSource: {
+                                    switch (ListItemData.type) {
+                                        case "Placed":
+                                            return "asset:///icons/in_Placed.png";
+                                        case "Received":
+                                            return "asset:///icons/in_Received.png";
+                                        case "Missed":
+                                            return "asset:///icons/in_Missed.png";
+                                        case "Voicemail":
+                                            return "asset:///icons/in_Voicemail.png";
+                                        case "SMS":
+                                            return "asset:///icons/in_Sms.png";
+                                        default:
+                                            console.debug("Invalid type value: " + ListItemData.type);                                            
+                                    }
+                                }
+                                
+                                scalingMethod: ScalingMethod.AspectFit
+                                horizontalAlignment: HorizontalAlignment.Center
+                                verticalAlignment: VerticalAlignment.Center
+                                
+                                preferredHeight: 80
+                                preferredWidth: 80
+                            }
                             
-                            preferredHeight: 80
-                            preferredWidth: 80
-                        }
-
-                        Label {
-                            text: ListItemData.name
-                            textStyle { base: tsdxlarge.style }
+                            Label {
+                                text: ListItemData.name
+                                textStyle { base: tsdxlarge.style }
+                            }
                         }
                         
-                        onTouch: {
-                            console.debug("Click on " + ListItemData.name);
-                        }
+                        Container {
+                            horizontalAlignment: HorizontalAlignment.Right
+                            verticalAlignment: VerticalAlignment.Center
+
+                            Label {
+                                text: ListItemData.time
+                                textStyle { base: tsdxsmall.style }
+                                //preferredWidth: 100
+                            }
+                        }                        
+                        
+                        gestureHandlers: [
+                            TapHandler {
+                                onTapped: {
+                                    console.debug("Click on " + ListItemData.name);
+                                }                                
+                            }
+                        ]
 
                         attachedObjects: [
                             TextStyleDefinition {
                                 id: tsdxlarge
                                 base: SystemDefaults.TextStyles.BodyText
                                 fontSize: FontSize.XLarge
+                            },
+                            TextStyleDefinition {
+                                id: tsdxsmall
+                                base: SystemDefaults.TextStyles.BodyText
+                                fontSize: FontSize.XXSmall
                             }
                         ]//attachedObjects
                     }
