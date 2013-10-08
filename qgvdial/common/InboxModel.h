@@ -33,13 +33,12 @@ class InboxModel : public QSqlQueryModel
 {
 public:
     enum InboxFieldRoles {
-        IN_TypeRole = Qt::UserRole + 1,
-        IN_TimeRole,
+        IN_IdRole = Qt::UserRole + 1,
+        IN_TypeRole,
         IN_NameRole,
         IN_NumberRole,
-        IN_Link,
+        IN_TimeRole,
         IN_TimeDetail,
-        IN_SmsText,
         IN_ReadFlag
     };
 

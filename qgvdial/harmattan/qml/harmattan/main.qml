@@ -82,6 +82,11 @@ PageStackWindow {
             InboxPage {
                 id: inboxTab
                 toolbarHeight: appWindow.platformToolBarHeight
+
+                onSetNumberToDial: {
+                    dialTab.setNumberInDisp(number);
+                    tabgroup.setTab(0);
+                }
             }
             SettingsPage {
                 id: settingsTab

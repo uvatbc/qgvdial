@@ -33,9 +33,7 @@ TabbedPane {
         } else if (index == 2) {
             container.setActiveTab(inboxTab);
         } else if (index == 3) {
-            console.debug("Set 3 before");
             container.setActiveTab(settingsTab);
-            console.debug("Set 3 after");
         } else {
             console.debug("Array index out of bounds for tab selector");
         }
@@ -61,6 +59,11 @@ TabbedPane {
         title: qsTr("Inbox")
         InboxPage {
             id: inboxPage
+
+            onSetNumberToDial: {
+                dialTab.setNumberInDisp(number);
+                container.showTab(0);
+            }
         }
     }//InboxPage
     Tab {

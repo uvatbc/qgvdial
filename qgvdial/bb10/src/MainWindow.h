@@ -111,6 +111,7 @@ private:
     DropDown    *regNumberDropDown;
     Page        *contactsPage;
     ListView    *contactsList;
+    ListView    *inboxList;
 
     //! Entirely transient two-factor authentication context
     void        *tfaCtx;

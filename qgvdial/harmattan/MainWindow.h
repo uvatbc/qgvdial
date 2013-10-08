@@ -46,6 +46,8 @@ protected slots:
                            int port, bool authRequired, QString user,
                            QString pass);
 
+    void onInboxClicked(QString id);
+
 protected:
     QObject *getQMLObject(const char *pageName);
 

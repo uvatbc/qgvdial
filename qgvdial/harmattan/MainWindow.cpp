@@ -162,6 +162,8 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
         if (NULL == inboxList) {
             break;
         }
+        connect(inboxList, SIGNAL(clicked(QString)),
+                this, SLOT(onInboxClicked(QString)));
 
         appPwDlg = getQMLObject ("AppPwDialog");
         if (NULL == appPwDlg) {
@@ -394,3 +396,14 @@ MainWindow::uiShowContactDetails(const ContactInfo &cinfo)
                                Q_ARG (QVariant, QVariant(cinfo.strPhotoPath)),
                                Q_ARG (QVariant, QVariant(cinfo.strTitle)));
 }//MainWindow::uiShowContactDetails
+
+void
+MainWindow::onInboxClicked(QString id)
+{
+//TODO: Something like
+    /*
+    QMetaObject::invokeMethod (mainPageStack, "showContactDetails",
+                               Q_ARG (QVariant, QVariant(cinfo.strPhotoPath)),
+                               Q_ARG (QVariant, QVariant(cinfo.strTitle)));
+    */
+}//MainWindow::onInboxClicked

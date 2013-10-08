@@ -23,6 +23,9 @@ import bb.cascades 1.0
 import com.kdab.components 1.0
 
 Page {
+    id: container
+    signal setNumberToDial(string number)
+
     attachedObjects: [
         AbstractItemModel {
             id: inboxModel
@@ -33,11 +36,19 @@ Page {
     
     Container {
         ListView {
+            objectName: "InboxList"
+            signal clicked(string id);
+            
+            function setNumberToDial(string number) {
+                container.setNumberToDial(number);
+            }
+
             dataModel: inboxModel
             
             listItemComponents: [
                 ListItemComponent {
                     Container {
+                        id:  listItem
                         layout: DockLayout {}
                         
                         Container {
@@ -95,6 +106,11 @@ Page {
                             TapHandler {
                                 onTapped: {
                                     console.debug("Click on " + ListItemData.name);
+                                }                                
+                            }, 
+                            LongPressHandler {
+                                longPressed: {
+                                    listItem.ListItem.view.setNumberToDial(ListItemData.number);
                                 }                                
                             }
                         ]

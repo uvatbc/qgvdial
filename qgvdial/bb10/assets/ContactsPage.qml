@@ -42,14 +42,12 @@ Page {
 
         ListView {
             objectName: "ContactsList"
-
-            signal contactClicked(string id);
+            signal clicked(string id);
 
             dataModel: contactsModel
 
             listItemComponents: [
                 ListItemComponent {
-                    
                     Container {
                         id:  listItem
 
@@ -83,7 +81,7 @@ Page {
                         gestureHandlers: [
                             TapHandler {
                                 onTapped: {
-                                    listItem.ListItem.view.contactClicked(ListItemData.id);
+                                    listItem.ListItem.view.clicked(ListItemData.id);
                                 }                                
                             }
                         ]

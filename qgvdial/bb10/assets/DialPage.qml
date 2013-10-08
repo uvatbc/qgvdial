@@ -27,6 +27,10 @@ Page {
     
     signal call(string num)
     signal text(string num)
+    
+    function setNumberInDisp(number) {
+        textNumber.text = number;
+    }
 
     Container {
         attachedObjects: [

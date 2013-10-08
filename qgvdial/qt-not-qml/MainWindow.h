@@ -74,6 +74,9 @@ protected slots:
     void onContactDoubleClicked(const QModelIndex &index);
     void setNumberToDial(QString num);
 
+    void onInboxClicked(const QModelIndex &index);
+    void onInboxDoubleClicked(const QModelIndex &index);
+
 private:
     MainWindowPrivate *d;
 };

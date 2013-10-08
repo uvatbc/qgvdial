@@ -139,8 +139,14 @@ MainWindow::init()
     connect(d->ui->btnCall, SIGNAL(clicked()),
             this, SLOT(onUserCallBtnClicked()));
 
-    connect (d->ui->contactsView, SIGNAL(doubleClicked(const QModelIndex &)),
-             this, SLOT(onContactDoubleClicked(const QModelIndex &)));
+    connect(d->ui->contactsView, SIGNAL(doubleClicked(const QModelIndex&)),
+            this, SLOT(onContactDoubleClicked(const QModelIndex&)));
+
+    connect(d->ui->inboxView, SIGNAL(clicked(const QModelIndex&)),
+            this, SLOT(onInboxClicked(const QModelIndex&)));
+    connect(d->ui->inboxView, SIGNAL(doubleClicked(const QModelIndex&)),
+            this, SLOT(onInboxDoubleClicked(const QModelIndex&)));
+
     QTimer::singleShot (1, this, SLOT(onInitDone()));
 }//MainWindow::init
 
@@ -288,9 +294,8 @@ MainWindow::uiRefreshInbox()
     d->ui->inboxView->setModel (oInbox.m_inboxModel);
 
     d->ui->inboxView->hideColumn (0);
-    d->ui->inboxView->hideColumn (4);
+    d->ui->inboxView->hideColumn (1);
     d->ui->inboxView->hideColumn (5);
-    d->ui->inboxView->hideColumn (7);
 }//MainWindow::uiRefreshInbox
 
 void
@@ -408,8 +413,7 @@ void
 MainWindow::uiSetNewContactDetailsModel()
 {
     Q_ASSERT(oContacts.m_contactPhonesModel != NULL);
-    oContacts.m_contactPhonesModel->deleteLater ();
-    oContacts.m_contactPhonesModel = NULL;
+    // I don't use this model
 }//MainWindow::uiSetNewContactDetailsModel
 
 void
@@ -427,3 +431,21 @@ MainWindow::setNumberToDial(QString num)
     d->ui->dispNum->setPlainText (num);
     d->ui->tabWidget->setCurrentIndex (0);
 }//MainWindow::setNumberToDial
+
+void
+MainWindow::onInboxClicked(const QModelIndex &index)
+{
+    QModelIndex idIndex = index.sibling (index.row (), 0);
+    GVInboxEntry hEvent;
+    hEvent.id = idIndex.data().toString();
+    if (db.getInboxEntryById (hEvent)) {
+        //TODO: Show inbox details
+    }
+}//MainWindow::onInboxClicked
+
+void
+MainWindow::onInboxDoubleClicked(const QModelIndex &index)
+{
+    QModelIndex numIndex = index.sibling (index.row (), 3);
+    setNumberToDial (numIndex.data().toString());
+}//MainWindow::onInboxClicked

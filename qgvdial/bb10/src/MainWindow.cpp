@@ -57,6 +57,7 @@ MainWindow::MainWindow(QCoreApplication *_app)
 , regNumberDropDown(NULL)
 , contactsPage(NULL)
 , contactsList(NULL)
+, inboxList(NULL)
 , tfaCtx(NULL)
 {
 }//MainWindow::MainWindow
@@ -131,8 +132,12 @@ MainWindow::onFakeInitDone()
     contactsPage   = (Page *)       getQMLObject("ContactsPage");
 
     contactsList   = (ListView *)   getQMLObject("ContactsList");
-    connect(contactsList, SIGNAL(contactClicked(QString)),
+    connect(contactsList, SIGNAL(clicked(QString)),
             &oContacts, SLOT(getContactInfoAndModel(QString)));
+
+    contactsList   = (ListView *)   getQMLObject("InboxList");
+    //connect(contactsList, SIGNAL(clicked(QString)),
+    //        &oInbox, SLOT(getContactInfoAndModel(QString)));
 
     onInitDone();
 }//MainWindow::onFakeInitDone

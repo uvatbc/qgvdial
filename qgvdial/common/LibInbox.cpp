@@ -79,6 +79,14 @@ LibInbox::beginRefresh(AsyncTaskToken *task, QString type, QDateTime after,
         rv = true;
     }
 
+    if (after.isValid ()) {
+        Q_DEBUG(QString("Looking for %1 inbox entries until %2")
+                .arg (type).arg (after.toString ()));
+    } else {
+        Q_DEBUG(QString("Looking for 30 pages of %1 inbox entries")
+                .arg (type));
+    }
+
     return (rv);
 }//LibInbox::beginRefresh
 
@@ -93,7 +101,7 @@ LibInbox::onOneInboxEntry (AsyncTaskToken *task, const GVInboxEntry &hevent)
         win->db.insertInboxEntry (hevent);
     }
 
-    if (after.isValid () && (hevent.startTime >= after)) {
+    if (after.isValid () && (hevent.startTime < after)) {
         bool overflow = true;
         task->inParams["overflow"] = overflow;
     }

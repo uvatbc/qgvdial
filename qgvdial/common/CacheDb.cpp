@@ -825,17 +825,16 @@ void
 CacheDb::refreshInboxModel (InboxModel *modelInbox,
                                   const QString &strType)
 {
+    //  0,    1,    2,      3,    4,     5
+    // id, type, name, number, time, flags
     GVI_Entry_Type Type = modelInbox->string_to_type (strType);
-    QString strQ = "SELECT "
-                            GV_IN_ID      ","
-                            GV_IN_TYPE    ","
-                            GV_IN_ATTIME  ","
-                            GV_IN_DISPNUM ","
-                            GV_IN_PHONE   ","
-                            GV_IN_FLAGS   ","
-                            GV_IN_SMSTEXT ","
-                            GV_IN_NOTE    " "
-                   "FROM "  GV_INBOX_TABLE;
+    QString strQ = "SELECT " GV_IN_ID
+                         "," GV_IN_TYPE
+                         "," GV_IN_DISPNUM
+                         "," GV_IN_PHONE
+                         "," GV_IN_ATTIME
+                         "," GV_IN_FLAGS
+                   " FROM "   GV_INBOX_TABLE;
     if (GVIE_Unknown != Type) {
         strQ += QString (" WHERE " GV_IN_TYPE "=%1 ").arg (Type);
     }
@@ -1017,6 +1016,65 @@ CacheDb::markAsRead (const QString &msgId)
 
     return (rv);
 }//CacheDb::markAsRead
+
+bool
+CacheDb::getInboxEntryById (GVInboxEntry &hEvent)
+{
+    CacheDbPrivate &p = CacheDbPrivate::ref ();
+    QSqlQuery query(p.db);
+    query.setForwardOnly (true);
+
+    bool ok;
+    quint32 flags;
+    QString scrubId = hEvent.id;
+    scrubId.replace ("'", "''");
+    query.exec (QString ("SELECT " GV_IN_TYPE","GV_IN_ATTIME","GV_IN_DISPNUM","
+                                   GV_IN_PHONE","GV_IN_FLAGS","GV_IN_SMSTEXT","
+                                   GV_IN_NOTE" "
+                         "FROM " GV_INBOX_TABLE " "
+                         "WHERE " GV_IN_ID "='%1'")
+                .arg (scrubId));
+    while (query.next ()) {
+        hEvent.Type = (GVI_Entry_Type) query.value(0).toInt(&ok);
+        if (!ok) { break; }
+
+        hEvent.startTime = QDateTime::fromTime_t(query.value(1).toULongLong(&ok));
+        if (!ok) { break; }
+
+        hEvent.strDisplayNumber = query.value(2).toString();
+        if (0 != hEvent.strDisplayNumber.length()) {
+            if (GVApi::isNumberValid (hEvent.strDisplayNumber)) {
+                QString strSimplified = hEvent.strDisplayNumber;
+                GVApi::simplify_number (strSimplified, false);
+
+                ContactInfo info;
+                if (getContactFromNumber (strSimplified, info)) {
+                    hEvent.strDisplayNumber = info.strTitle;
+                } else {
+                    GVApi::simplify_number (hEvent.strDisplayNumber);
+                }
+            } else {
+                hEvent.strDisplayNumber = "Unknown";
+            }
+        }
+
+        hEvent.strPhoneNumber = query.value(3).toString();
+
+        flags = query.value(4).toUInt(&ok);
+        if (!ok) { break; }
+        hEvent.bRead  = (flags & INBOX_ENTRY_READ_MASK)  ? true : false;
+        hEvent.bSpam  = (flags & INBOX_ENTRY_SPAM_MASK)  ? true : false;
+        hEvent.bTrash = (flags & INBOX_ENTRY_TRASH_MASK) ? true : false;
+        hEvent.bStar  = (flags & INBOX_ENTRY_STAR_MASK)  ? true : false;
+
+        hEvent.strText = query.value(5).toString();
+
+        hEvent.strNote = query.value(6).toString();
+        break;
+    }
+
+    return ok;
+}//CacheDb::getInboxEntryById
 
 bool
 CacheDb::getLatestContact (QDateTime &dateTime)

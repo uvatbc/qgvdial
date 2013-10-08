@@ -101,6 +101,10 @@ LibGvPhones::onUserSelectPhone(int index)
     }
 
     do {
+        if (index < 0) {
+            return (false);
+        }
+
         if (index < m_numModel->m_dialBack.count()) {
             m_numModel->m_selectedId = m_numModel->m_dialBack[index].id;
             break;

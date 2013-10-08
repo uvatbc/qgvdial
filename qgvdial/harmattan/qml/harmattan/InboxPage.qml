@@ -29,6 +29,8 @@ Page {
     property bool isSearchResults: false
     property real toolbarHeight: 50
 
+    signal setNumberToDial(string number)
+
     Button {
         id: inboxSelectorBtn
         anchors {
@@ -64,6 +66,8 @@ Page {
     ListView {
         id: inboxList
         objectName: "InboxList"
+
+        signal clicked(string id)
 
         function setMyModel() {
             if (inboxList.model == null) {
@@ -104,42 +108,22 @@ Page {
                     id: imgReceived
                     height: imageItem.width
                     fillMode: Image.PreserveAspectFit
-                    source: "qrc:/in_Received.png"
-                    opacity: type == "Received" ? 1 : 0
+                    source: {
+                        switch (type) {
+                        case "Received":
+                            return "qrc:/in_Received.png";
+                        case "Placed":
+                            return "qrc:/in_Placed.png";
+                        case "Missed":
+                            return "qrc:/in_Missed.png";
+                        case "Voicemail":
+                            return "qrc:/in_Voicemail.png";
+                        case "SMS":
+                            return "qrc:/in_Sms.png";
+                        }
+                    }
                     smooth: true
-                }// green arrow
-                Image {
-                    id: imgPlaced
-                    height: imageItem.width
-                    fillMode: Image.PreserveAspectFit
-                    source: "qrc:/in_Placed.png"
-                    opacity: type == "Placed" ? 1 : 0
-                    smooth: true
-                }// green arrow out
-                Image {
-                    id: imgMissed
-                    height: imageItem.width
-                    fillMode: Image.PreserveAspectFit
-                    source: "qrc:/in_Missed.png"
-                    opacity: type == "Missed" ? 1 : 0
-                    smooth: true
-                }// red arrow
-                Image {
-                    id: imgVmail
-                    height: imageItem.width
-                    fillMode: Image.PreserveAspectFit
-                    source: "qrc:/in_Voicemail.png"
-                    opacity: type == "Voicemail" ? 1 : 0
-                    smooth: true
-                }// vmail icon
-                Image {
-                    id: imgSMS
-                    height: imageItem.width
-                    fillMode: Image.PreserveAspectFit
-                    source: "qrc:/in_Sms.png"
-                    opacity: type == "SMS" ? 1 : 0
-                    smooth: true
-                }// SMS icon
+                }//Image (incoming / outgoing / text / voicemail)
             }//Item (the inbox entry image)
 
             Label {
@@ -170,28 +154,8 @@ Page {
             MouseArea {
                 anchors.fill: parent
 
-                onClicked: {
-                    console.debug("Clicked inbox item");
-                    /*
-                    container.strDetailsTime = type + " " + time_detail
-                    container.strDetailsName = name;
-                    container.strNumber = number;
-                    container.strLink = link;
-                    container.strSmsText = smstext;
-
-                    if (type == "Voicemail") {
-                        container.isVoicemail = true;
-                    } else {
-                        container.isVoicemail = false;
-                    }
-
-                    if (!is_read) {
-                        container.sigMarkAsRead(link);
-                    }
-
-                    container.state = "Details"
-                    */
-                }
+                onClicked: { inboxList.clicked(id); }
+                onPressAndHold: { container.setNumberToDial(number); }
             }
         }// delegate Rectangle
     }//ListView

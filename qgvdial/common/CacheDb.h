@@ -89,6 +89,7 @@ public:
     bool insertInboxEntry (const GVInboxEntry &hEvent);
     bool deleteInboxEntryById (const QString &id);
     bool markAsRead (const QString &msgId);
+    bool getInboxEntryById (GVInboxEntry &hEvent);
 
     // Last update of contacts and inbox
     bool getLatestContact (QDateTime &dateTime);

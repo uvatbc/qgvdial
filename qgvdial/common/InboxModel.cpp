@@ -28,13 +28,12 @@ InboxModel::InboxModel (QObject * parent)
 , eSelectType (GVIE_Unknown)
 {
     QHash<int, QByteArray> roles;
+    roles[IN_IdRole]    = "id";
     roles[IN_TypeRole]  = "type";
-    roles[IN_TimeRole]  = "time";
     roles[IN_NameRole]  = "name";
     roles[IN_NumberRole]= "number";
-    roles[IN_Link]      = "link";
+    roles[IN_TimeRole]  = "time";
     roles[IN_TimeDetail]= "time_detail";
-    roles[IN_SmsText]   = "smstext";
     roles[IN_ReadFlag]  = "is_read";
     setRoleNames(roles);
 }//InboxModel::InboxModel
@@ -53,27 +52,24 @@ InboxModel::data (const QModelIndex &index, int role) const
     do {
         int column = -1;
         switch (role) {
-        case IN_Link:
+        case IN_IdRole:
             column = 0;
             break;
         case IN_TypeRole:
             column = 1;
             break;
-        case IN_TimeRole:
-        case IN_TimeDetail:
+        case IN_NameRole:
             column = 2;
             break;
-        case IN_NameRole:
+        case IN_NumberRole:
             column = 3;
             break;
-        case IN_NumberRole:
+        case IN_TimeRole:
+        case IN_TimeDetail:
             column = 4;
             break;
         case IN_ReadFlag:
             column = 5;
-            break;
-        case IN_SmsText:
-            column = 6;
             break;
         case Qt::DisplayRole:
         case Qt::EditRole:
@@ -86,12 +82,7 @@ InboxModel::data (const QModelIndex &index, int role) const
                                     Qt::EditRole);
 
         if (0 == column) {          // GV_IN_ID
-            QString strLink = var.toString ();
-            if (0 == strLink.size ()) {
-                Q_WARN("Invalid link: Blank!");
-                var.clear ();
-                break;
-            }
+            // Nothing
         } else if (1 == column) {   // GV_IN_TYPE
             char chType = var.toChar().toAscii ();
             QString strDisp = type_to_string ((GVI_Entry_Type) chType);
@@ -103,11 +94,53 @@ InboxModel::data (const QModelIndex &index, int role) const
             }
 
             var = strDisp;
-        } else if (2 == column) {   // GV_IN_ATTIME
-            bool bOk = false;
-            quint64 num = var.toULongLong (&bOk);
+        } else if (2 == column) {   // GV_IN_DISPNUM
+            QString strNum = var.toString ();
             var.clear ();
-            if (!bOk) break;
+            if (0 == strNum.length()) {
+                Q_WARN("Friendly number is blank in entry");
+                break;
+            }
+
+            if (!GVApi::isNumberValid (strNum)) {
+                Q_WARN("Inbox: Display phone number is invalid : ") << strNum;
+                var = "Unknown";
+                break;
+            }
+
+            QString strSimplified = strNum;
+            GVApi::simplify_number (strSimplified, false);
+            GVApi::simplify_number (strNum);
+
+            ContactInfo info;
+            if (db.getContactFromNumber (strSimplified, info)) {
+                var = info.strTitle;
+            } else {
+                var = strNum;
+            }
+        } else if (3 == column) {   // GV_IN_PHONE
+            QString strNum = var.toString ();
+            var.clear ();
+            if (0 == strNum.size ()) {
+                Q_WARN("Number is blank in entry");
+                break;
+            }
+            if (strNum.startsWith ("Unknown")) {
+                var = "Unknown";
+            }
+            if (!GVApi::isNumberValid (strNum)) {
+                Q_WARN(QString("Actual phone number is invalid: %1")
+                       .arg (strNum));
+                break;
+            }
+
+            GVApi::beautify_number (strNum);
+            var = strNum;
+        } else if (4 == column) {   // GV_IN_ATTIME
+            bool ok = false;
+            quint64 num = var.toULongLong (&ok);
+            var.clear ();
+            if (!ok) break;
 
             QDateTime dt = QDateTime::fromTime_t (num);
             QString strDisp;
@@ -137,48 +170,6 @@ InboxModel::data (const QModelIndex &index, int role) const
             }
 
             var = strDisp;
-        } else if (3 == column) {   // GV_IN_DISPNUM
-            QString strNum = var.toString ();
-            var.clear ();
-            if (0 == strNum.size ()) {
-                Q_WARN("Friendly number is blank in entry");
-                break;
-            }
-
-            if (!GVApi::isNumberValid (strNum)) {
-                Q_WARN("Inbox: Display phone number is invalid : ") << strNum;
-                var = "Unknown";
-                break;
-            }
-
-            QString strSimplified = strNum;
-            GVApi::simplify_number (strSimplified, false);
-            GVApi::simplify_number (strNum);
-
-            ContactInfo info;
-            if (db.getContactFromNumber (strSimplified, info)) {
-                var = info.strTitle;
-            } else {
-                var = strNum;
-            }
-        } else if (4 == column) {   // GV_IN_PHONE
-            QString strNum = var.toString ();
-            var.clear ();
-            if (0 == strNum.size ()) {
-                Q_WARN("Number is blank in entry");
-                break;
-            }
-            if (strNum.startsWith ("Unknown")) {
-                var = "Unknown";
-            }
-            if (!GVApi::isNumberValid (strNum)) {
-                Q_WARN(QString("Actual phone number is invalid: %1")
-                       .arg (strNum));
-                break;
-            }
-
-            GVApi::beautify_number (strNum);
-            var = strNum;
         } else if (5 == column) {   // GV_IN_FLAGS
             if (IN_ReadFlag == role) {
                 var = QVariant(bool(var.toInt() & INBOX_ENTRY_READ_MASK ?
@@ -186,32 +177,6 @@ InboxModel::data (const QModelIndex &index, int role) const
             } else {
                 var.clear ();
             }
-        } else if (6 == column) {   // GV_IN_SMSTEXT
-#define GPLUS_LINK1 "See more: "
-#define GPLUS_LINK2 "http://goo.gl/"
-#define GPLUS_LINK GPLUS_LINK1 GPLUS_LINK2
-            QString strText = var.toString();
-            int pos = strText.indexOf (GPLUS_LINK);
-            if (pos == -1) {
-                // Return the data as is
-                break;
-            }
-
-            int linkend = pos + sizeof(GPLUS_LINK) - 1;
-            QString link = strText.mid(linkend);
-            QString rem;
-
-            linkend = link.indexOf(QRegExp("\\s+"));
-            if (linkend == -1) {
-                // No spaces found... End of text = end of link
-            } else {
-                link = link.mid (0, linkend);
-                rem = strText.mid (pos + sizeof(GPLUS_LINK)-1 + linkend);
-            }
-            link = QString("<a href=http://goo.gl/%1>See more.</a>").arg(link);
-
-            strText = strText.mid (0, pos) + link + rem;
-            var = strText;
         } else {
             var.clear ();
 //            Q_WARN(QString("Invalid data column: %1. Actual: %2. Role = %3")
