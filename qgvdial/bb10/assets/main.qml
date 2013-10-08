@@ -25,20 +25,6 @@ TabbedPane {
     id: container
     objectName: "MainTabbedPane"
     
-    function showTab(index) {
-        if (index == 0) {
-            container.setActiveTab(dialTab);
-        } else if (index == 1) {
-            container.setActiveTab(contactsTab);
-        } else if (index == 2) {
-            container.setActiveTab(inboxTab);
-        } else if (index == 3) {
-            container.setActiveTab(settingsTab);
-        } else {
-            console.debug("Array index out of bounds for tab selector");
-        }
-    }
-    
     showTabsOnActionBar: true
     Tab {
         id: dialTab
@@ -59,11 +45,6 @@ TabbedPane {
         title: qsTr("Inbox")
         InboxPage {
             id: inboxPage
-
-            onSetNumberToDial: {
-                dialTab.setNumberInDisp(number);
-                container.showTab(0);
-            }
         }
     }//InboxPage
     Tab {
@@ -73,6 +54,15 @@ TabbedPane {
             id: settingsPage
         }
     }//SettingsPage tab
+    
+    function showTab(index) {
+        if ((index < 0) || (index > 3)) {
+            console.debug("Array index out of bounds for tab selector");
+            return;
+        }
+        
+        container.activeTab = container.at(index);
+    }
 
     onCreationCompleted: {
         // this slot is called when declarative scene is created

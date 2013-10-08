@@ -135,9 +135,11 @@ MainWindow::onFakeInitDone()
     connect(contactsList, SIGNAL(clicked(QString)),
             &oContacts, SLOT(getContactInfoAndModel(QString)));
 
-    contactsList   = (ListView *)   getQMLObject("InboxList");
-    //connect(contactsList, SIGNAL(clicked(QString)),
+    inboxList      = (ListView *)   getQMLObject("InboxList");
+    //connect(inboxList, SIGNAL(clicked(QString)),
     //        &oInbox, SLOT(getContactInfoAndModel(QString)));
+    connect(inboxList, SIGNAL(setNumberToDial(QString)),
+            this, SLOT(onInboxSetNumberToDial(QString)));
 
     onInitDone();
 }//MainWindow::onFakeInitDone
@@ -354,3 +356,13 @@ MainWindow::uiShowContactDetails(const ContactInfo &cinfo)
 {
     Q_DEBUG(QString("Show contact details for %1").arg(cinfo.strTitle));
 }//MainWindow::uiShowContactDetails
+
+void
+MainWindow::onInboxSetNumberToDial(QString number)
+{
+    QMetaObject::invokeMethod (dialPage, "setNumberInDisp",
+                               Q_ARG(QVariant, number));
+                               
+    int val = 0;
+    QMetaObject::invokeMethod (mainTabbedPane, "showTab", Q_ARG(QVariant, val));
+}//MainWindow::onInboxSetNumberToDial

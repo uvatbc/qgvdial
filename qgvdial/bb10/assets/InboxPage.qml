@@ -24,7 +24,6 @@ import com.kdab.components 1.0
 
 Page {
     id: container
-    signal setNumberToDial(string number)
 
     attachedObjects: [
         AbstractItemModel {
@@ -38,11 +37,8 @@ Page {
         ListView {
             objectName: "InboxList"
             signal clicked(string id);
+            signal setNumberToDial(string number);
             
-            function setNumberToDial(string number) {
-                container.setNumberToDial(number);
-            }
-
             dataModel: inboxModel
             
             listItemComponents: [
@@ -109,7 +105,7 @@ Page {
                                 }                                
                             }, 
                             LongPressHandler {
-                                longPressed: {
+                                onLongPressed: {
                                     listItem.ListItem.view.setNumberToDial(ListItemData.number);
                                 }                                
                             }

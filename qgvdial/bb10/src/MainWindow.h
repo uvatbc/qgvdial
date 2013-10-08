@@ -97,6 +97,8 @@ protected slots:
     void onUserRegSelectedOptionChanged(bb::cascades::Option *option);
     void onUserShowProxyPage();
 
+    void onInboxSetNumberToDial(QString number);
+
 private:
     Application *app;
     QmlDocument *qml;
