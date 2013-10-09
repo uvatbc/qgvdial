@@ -109,6 +109,10 @@ LibGvPhones::onUserSelectPhone(int index)
         return false;
     }
 
+    if (index < 0) {
+        return false;
+    }
+
     do {
         if (index < 0) {
             return (false);

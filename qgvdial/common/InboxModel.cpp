@@ -143,33 +143,7 @@ InboxModel::data (const QModelIndex &index, int role) const
             if (!ok) break;
 
             QDateTime dt = QDateTime::fromTime_t (num);
-            QString strDisp;
-            QDate currentDate = QDate::currentDate ();
-            int daysTo = dt.daysTo (QDateTime::currentDateTime ());
-            if (IN_TimeDetail == role) {
-                if (0 == daysTo) {
-                    strDisp = dt.toString ("hh:mm:ss")  + " today";
-                } else if (1 == daysTo) {
-                    strDisp = dt.toString ("hh:mm:ss") + " yesterday";
-                } else {
-                    strDisp = dt.toString ("dddd, dd-MMM")
-                            + " at "
-                            + dt.toString ("hh:mm:ss");
-                }
-            } else {
-                if (0 == daysTo) {
-                    strDisp = dt.toString ("hh:mm");
-                } else if (1 == daysTo) {
-                    strDisp = dt.toString ("hh:mm") + "\nyesterday";
-                } else if (daysTo < currentDate.dayOfWeek ()) {
-                    strDisp = dt.toString ("hh:mm\ndddd");
-                } else {
-                    strDisp = dt.toString ("hh:mm:ss") + "\n"
-                            + dt.toString ("dd-MMM");
-                }
-            }
-
-            var = strDisp;
+            var = dateToString (dt, (IN_TimeDetail == role));
         } else if (5 == column) {   // GV_IN_FLAGS
             if (IN_ReadFlag == role) {
                 var = QVariant(bool(var.toInt() & INBOX_ENTRY_READ_MASK ?
@@ -244,6 +218,38 @@ InboxModel::string_to_type (const QString &strType)
 
     return (Type);
 }//InboxModel::string_to_type
+
+QString
+InboxModel::dateToString(QDateTime dt, bool detailed)
+{
+    QString strDisp;
+    QDate currentDate = QDate::currentDate ();
+    int daysTo = dt.daysTo (QDateTime::currentDateTime ());
+    if (detailed) {
+        if (0 == daysTo) {
+            strDisp = dt.toString ("hh:mm:ss")  + " today";
+        } else if (1 == daysTo) {
+            strDisp = dt.toString ("hh:mm:ss") + " yesterday";
+        } else {
+            strDisp = dt.toString ("dddd, dd-MMM")
+                    + " at "
+                    + dt.toString ("hh:mm:ss");
+        }
+    } else {
+        if (0 == daysTo) {
+            strDisp = dt.toString ("hh:mm");
+        } else if (1 == daysTo) {
+            strDisp = dt.toString ("hh:mm") + "\nyesterday";
+        } else if (daysTo < currentDate.dayOfWeek ()) {
+            strDisp = dt.toString ("hh:mm\ndddd");
+        } else {
+            strDisp = dt.toString ("hh:mm:ss") + "\n"
+                    + dt.toString ("dd-MMM");
+        }
+    }
+
+    return strDisp;
+}//InboxModel::dateToString
 
 bool
 InboxModel::searchById(const QString &id, quint32 &foundRow)

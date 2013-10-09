@@ -57,6 +57,8 @@ public:
     bool deleteEntry (const GVInboxEntry &hEvent);
     bool markAsRead (const QString &msgId);
 
+    static QString dateToString(QDateTime dt, bool detailed);
+
 private:
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     bool searchById(const QString &id, quint32 &foundRow);

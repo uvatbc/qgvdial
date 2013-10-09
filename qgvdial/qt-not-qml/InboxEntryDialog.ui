@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ContactDialog</class>
- <widget class="QDialog" name="ContactDialog">
+ <class>InboxEntryDialog</class>
+ <widget class="QDialog" name="InboxEntryDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Inbox Entry</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -40,20 +40,24 @@
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="txtNotes">
-     <property name="text">
-      <string>Notes</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QTreeView" name="listNumbers">
-     <property name="rootIsDecorated">
-      <bool>false</bool>
-     </property>
-     <property name="headerHidden">
-      <bool>true</bool>
-     </property>
+    <widget class="QWidget" name="widget_2" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QLabel" name="lblNumber">
+        <property name="text">
+         <string>Number</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="lblTime">
+        <property name="text">
+         <string>Happened
+at this time</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
   </layout>

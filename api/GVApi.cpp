@@ -1368,7 +1368,8 @@ GVApi::onGetInbox(bool success, const QByteArray &response, QNetworkReply *,
                   void *ctx)
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
-    QString strReply = QString::fromUtf8(response.constData(),response.length());
+    QString strReply = QString::fromUtf8(response.constData(),
+                                         response.length());
 
     do {
         if (!success) {
@@ -1379,6 +1380,10 @@ GVApi::onGetInbox(bool success, const QByteArray &response, QNetworkReply *,
 
 #if 0
         Q_DEBUG(strReply);
+        QFile fTemp("inbox.html");
+        fTemp.open (QFile::ReadWrite);
+        fTemp.write (response);
+        fTemp.close ();
 #endif
 
         QXmlInputSource inputSource;

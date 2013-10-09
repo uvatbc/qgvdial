@@ -43,6 +43,8 @@ public:
     ContactsModel *createModel(bool mandatoryLocalPic = true);
     void refreshModel();
 
+    bool getContactInfoAndModel(ContactInfo &cinfo);
+
 public slots:
     bool getContactInfoAndModel(QString id);
 

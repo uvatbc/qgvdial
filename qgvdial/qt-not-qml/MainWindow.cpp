@@ -30,6 +30,8 @@ Contact: yuvraaj@gmail.com
 #include "ContactDialog.h"
 #include "ContactNumbersModel.h"
 
+#include "InboxEntryDialog.h"
+
 #ifdef Q_WS_WIN32
 #include "MainApp.h"
 #endif
@@ -436,10 +438,19 @@ void
 MainWindow::onInboxClicked(const QModelIndex &index)
 {
     QModelIndex idIndex = index.sibling (index.row (), 0);
-    GVInboxEntry hEvent;
-    hEvent.id = idIndex.data().toString();
-    if (db.getInboxEntryById (hEvent)) {
+    GVInboxEntry event;
+    event.id = idIndex.data().toString();
+    if (db.getInboxEntryById (event)) {
+        InboxEntryDialog dlg;
+        dlg.fill (event);
+
+        ContactInfo cinfo;
+        if (db.getContactFromNumber (event.strPhoneNumber, cinfo)) {
+            dlg.fill (cinfo);
+        }
+
         //TODO: Show inbox details
+        dlg.exec ();
     }
 }//MainWindow::onInboxClicked
 

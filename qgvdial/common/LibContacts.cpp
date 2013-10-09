@@ -241,19 +241,32 @@ LibContacts::refreshModel()
 }//LibContacts::refreshModel
 
 bool
-LibContacts::getContactInfoAndModel(QString id)
+LibContacts::getContactInfoAndModel(ContactInfo &cinfo)
 {
     IMainWindow *win = (IMainWindow *) this->parent ();
-    ContactInfo cinfo;
 
-    cinfo.strId = id;
     if (!win->db.getContactFromLink (cinfo)) {
-        Q_WARN(QString("Couldn't find contact with ID %1").arg (id));
+        Q_WARN(QString("Couldn't find contact with ID %1").arg (cinfo.strId));
         return (false);
     }
 
     if (cinfo.strPhotoPath.isEmpty ()) {
         cinfo.strPhotoPath = UNKNOWN_CONTACT_QRC_PATH;
+    }
+
+    return true;
+}//LibContacts::getContactInfoAndModel
+
+bool
+LibContacts::getContactInfoAndModel(QString id)
+{
+    IMainWindow *win = (IMainWindow *) this->parent ();
+
+    ContactInfo cinfo;
+    cinfo.strId = id;
+    if (!getContactInfoAndModel (cinfo)) {
+        Q_WARN(QString("Couldn't find contact with ID %1").arg (id));
+        return (false);
     }
 
     if (NULL == m_contactPhonesModel) {
