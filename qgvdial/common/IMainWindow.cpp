@@ -31,7 +31,6 @@ IMainWindow::IMainWindow(QObject *parent)
 , oInbox(this)
 , oPhones(this)
 , m_loginTask(NULL)
-, m_acctFactory(createPhoneAccountFactory (this))
 {
     qRegisterMetaType<ContactInfo>("ContactInfo");
     connect(&gvApi, SIGNAL(twoStepAuthentication(AsyncTaskToken*)),
@@ -81,17 +80,6 @@ IMainWindow::onInitDone()
         } else {
             // Ask the user for login credentials
             uiRequestLoginDetails();
-        }
-
-        //! Begin the work to identify all phone accounts
-        AsyncTaskToken *task = new AsyncTaskToken(this);
-        if (NULL == task) {
-            Q_WARN("Failed to allocate task token for account identification");
-            break;
-        }
-        connect(task, SIGNAL(completed()), this, SLOT(onAccountsIdentified()));
-        if (!m_acctFactory->identifyAll (task)) {
-            delete task;
         }
     } while (0);
 }//IMainWindow::onInitDone
@@ -188,8 +176,8 @@ IMainWindow::loginCompleted()
             QDateTime after;
             db.getLatestInboxEntry (after);
             oInbox.refresh ("all", after);
-
             oPhones.refresh ();
+            oPhones.refreshOutgoing ();
         } else if (ATTS_NW_ERROR == task->status) {
             Q_WARN("Login failed because of network error");
             uiSetUserPass (true);
@@ -240,14 +228,6 @@ IMainWindow::onLogoutDone()
     onUserLogoutDone();
     task->deleteLater ();
 }//IMainWindow::onLogoutDone
-
-void
-IMainWindow::onAccountsIdentified()
-{
-    AsyncTaskToken *task = (AsyncTaskToken *) QObject::sender ();
-
-    task->deleteLater ();
-}//IMainWindow::onAccountsIdentified
 
 void
 IMainWindow::onUiProxyChanged(const ProxyInfo &info)

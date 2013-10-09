@@ -24,23 +24,29 @@ Contact: yuvraaj@gmail.com
 
 #include <QObject>
 #include "global.h"
-#include "IPhoneAccount.h"
+
+class IPhoneAccount;
 
 class IPhoneAccountFactory : public QObject
 {
     Q_OBJECT
 
-public:
+protected:
     explicit IPhoneAccountFactory(QObject *parent = 0);
 
+public:
     virtual bool identifyAll(AsyncTaskToken *task) = 0;
+
+signals:
+    void oneAccount(AsyncTaskToken *task, IPhoneAccount *account);
 
 protected:
     //! ID -> Account
     QMap <QString, IPhoneAccount *> m_accounts;
+    AsyncTaskToken  *m_identifyTask;
 
-    friend IPhoneAccountFactory *
-    createPhoneAccountFactory(QObject *parent);
+// Friend function to create an object of this class.
+    friend IPhoneAccountFactory *createPhoneAccountFactory(QObject *parent);
 };
 
 IPhoneAccountFactory *

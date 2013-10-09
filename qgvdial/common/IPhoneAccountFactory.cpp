@@ -23,5 +23,6 @@ Contact: yuvraaj@gmail.com
 
 IPhoneAccountFactory::IPhoneAccountFactory(QObject *parent)
 : QObject(parent)
+, m_identifyTask(NULL)
 {
 }//IPhoneAccountFactory::IPhoneAccountFactory

@@ -28,7 +28,6 @@ Contact: yuvraaj@gmail.com
 #include "LibContacts.h"
 #include "LibInbox.h"
 #include "LibGvPhones.h"
-#include "IPhoneAccountFactory.h"
 
 /*==============================================================================
  *
@@ -121,7 +120,6 @@ private slots:
     void onTFARequest(AsyncTaskToken *task);
     void loginCompleted();
     void onLogoutDone();
-    void onAccountsIdentified();
 
 protected:
     virtual void log(QDateTime dt, int level, const QString &strLog) = 0;
@@ -162,8 +160,6 @@ protected:
     QString m_pass;
 
     AsyncTaskToken *m_loginTask;
-
-    IPhoneAccountFactory *m_acctFactory;
 
     friend class LibContacts;
     friend class LibInbox;

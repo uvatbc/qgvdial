@@ -23,16 +23,25 @@ Contact: yuvraaj@gmail.com
 #include "IMainWindow.h"
 #include "GVNumModel.h"
 
+#include "IPhoneAccount.h"
+#include "IPhoneAccountFactory.h"
+
 LibGvPhones::LibGvPhones(IMainWindow *parent)
 : QObject(parent)
 , m_numModel(new GVNumModel(this))
 , m_ignoreSelectedNumberChanges(false)
 , s_Refresh(0)
+, m_acctFactory(NULL)
 {
     IMainWindow *win = (IMainWindow *) this->parent ();
     connect(&win->gvApi, SIGNAL(registeredPhone(const GVRegisteredNumber &)),
             this, SLOT(onGotRegisteredPhone(const GVRegisteredNumber &)));
 }//LibGvPhones::LibGvPhones
+
+LibGvPhones::~LibGvPhones()
+{
+    clearAllAccounts ();
+}//LibGvPhones::~LibGvPhones
 
 bool
 LibGvPhones::refresh()
@@ -157,3 +166,80 @@ LibGvPhones::onUserSelectPhone(QString id)
     win->uiRefreshNumbers ();
     return (rv);
 }//LibGvPhones::onUserSelectPhone
+
+bool
+LibGvPhones::ensurePhoneAccountFactory()
+{
+    if (NULL == m_acctFactory) {
+        m_acctFactory = createPhoneAccountFactory (this);
+        if (NULL == m_acctFactory) {
+            Q_WARN("Failed to phone account factory");
+            return false;
+        }
+    }
+
+    return true;
+}//LibGvPhones::ensurePhoneAccountFactory
+
+void
+LibGvPhones::clearAllAccounts()
+{
+    foreach (IPhoneAccount *acc, m_accounts) {
+        acc->deleteLater ();
+    }
+    m_accounts.clear ();
+}//LibGvPhones::clearAllAccounts
+
+bool
+LibGvPhones::refreshOutgoing()
+{
+    if (!ensurePhoneAccountFactory ()) {
+        return false;
+    }
+
+    clearAllAccounts ();
+
+    //! Begin the work to identify all phone accounts
+    AsyncTaskToken *task = new AsyncTaskToken(this);
+    if (NULL == task) {
+        Q_WARN("Failed to allocate task token for account identification");
+        return false;
+    }
+    connect(task, SIGNAL(completed()), this, SLOT(onAllAccountsIdentified()));
+    if (!m_acctFactory->identifyAll (task)) {
+        Q_WARN("Failed to identify phone accounts");
+        delete task;
+        return false;
+    }
+
+    return true;
+}//LibGvPhones::refreshOutgoing
+
+void
+LibGvPhones::onOneAccount(AsyncTaskToken * /*task*/, IPhoneAccount *account)
+{
+    account->setParent (this);
+    m_accounts.push_back (account);
+}//LibGvPhones::onOneAccount
+
+void
+LibGvPhones::onAllAccountsIdentified()
+{
+    AsyncTaskToken *task = (AsyncTaskToken *) QObject::sender ();
+    task->deleteLater ();
+
+    if (NULL == m_numModel) {
+        Q_WARN("Number model is NULL");
+        return;
+    }
+
+    GVRegisteredNumber num;
+    foreach (IPhoneAccount *acc, m_accounts) {
+        Q_DEBUG(QString("id = %1 name = %2").arg (acc->id (), acc->name ()));
+        num.init ();
+        num.id = acc->id ();
+        num.name = acc->name ();
+        //TODO: Find out the number from the cache
+        m_numModel->m_dialOut += num;
+    }
+}//LibGvPhones::onAllAccountsIdentified

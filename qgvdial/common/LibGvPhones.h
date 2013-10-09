@@ -28,12 +28,18 @@ Contact: yuvraaj@gmail.com
 class IMainWindow;
 class GVNumModel;
 
+class IPhoneAccount;
+class IPhoneAccountFactory;
+
 class LibGvPhones : public QObject
 {
     Q_OBJECT
 public:
     explicit LibGvPhones(IMainWindow *parent);
+    ~LibGvPhones();
+
     bool refresh();
+    bool refreshOutgoing();
 
 public slots:
     bool onUserSelectPhone(int index);
@@ -43,12 +49,25 @@ private slots:
     void onGotRegisteredPhone (const GVRegisteredNumber &info);
     void onGotPhones();
 
+    void onOneAccount(AsyncTaskToken *task, IPhoneAccount *account);
+    void onAllAccountsIdentified();
+
+private:
+    bool ensurePhoneAccountFactory();
+    void clearAllAccounts();
+
 public:
     GVNumModel *m_numModel;
     bool        m_ignoreSelectedNumberChanges;
 
     //! Number of times this was refreshed successfully
     quint32     s_Refresh;
+
+private:
+    IPhoneAccountFactory *m_acctFactory;
+    QVector <IPhoneAccount *> m_accounts;
+
+    friend class IMainWindow;
 };
 
 #endif // LIBGVPHONES_H
