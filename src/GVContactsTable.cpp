@@ -223,6 +223,10 @@ GVContactsTable::gotOneContact (ContactInfo contactInfo)
     bool ok = false;
 
     do { // Begin cleanup block (not a loop)
+        if (contactInfo.bDeleted) {
+            break;
+        }
+
         if (contactInfo.hrefPhoto.isEmpty ()) {
             break;
         }

@@ -80,11 +80,11 @@ LibInbox::beginRefresh(AsyncTaskToken *task, QString type, QDateTime after,
     }
 
     if (after.isValid ()) {
-        Q_DEBUG(QString("Looking for %1 inbox entries until %2")
-                .arg (type).arg (after.toString ()));
+        Q_DEBUG(QString("Looking for %1 entries until %2. Page %3")
+                .arg(type).arg(after.toString())).arg(page);
     } else {
-        Q_DEBUG(QString("Looking for 30 pages of %1 inbox entries")
-                .arg (type));
+        Q_DEBUG(QString("Looking for page %1 of %2 entries")
+                .arg(page).arg(type));
     }
 
     return (rv);
@@ -98,7 +98,12 @@ LibInbox::onOneInboxEntry (AsyncTaskToken *task, const GVInboxEntry &hevent)
     if ((!after.isValid ()) || (hevent.startTime >= after)) {
         // Stuff this into the DB only if it is after "after"
         IMainWindow *win = (IMainWindow *) this->parent ();
-        win->db.insertInboxEntry (hevent);
+
+        if (hevent.bTrash) {
+            win->db.deleteInboxEntryById (hevent.id);
+        } else {
+            win->db.insertInboxEntry (hevent);
+        }
     }
 
     if (after.isValid () && (hevent.startTime < after)) {
@@ -123,13 +128,21 @@ LibInbox::onRefreshDone()
 
         int page = task->inParams["page"].toInt();
         bool overflow = task->inParams["overflow"].toBool();
-        if ((page > 30) || overflow) {
-            task->status = ATTS_SUCCESS;
-            break;
-        }
-
         QString type = task->inParams["type"].toString();
         QDateTime after = task->inParams["after"].toDateTime();
+
+        if (type == "trash") {
+            if (page > 2) {
+                task->status = ATTS_SUCCESS;
+                break;
+            }
+        } else {
+            if ((page > 30) || overflow) {
+                type = "trash";
+                page = 0;  // So that it becomes 1 on ++
+                after = QDateTime(); // Because we don't want a limit
+            }
+        }
 
         page++;
 

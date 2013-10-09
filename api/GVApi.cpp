@@ -1344,9 +1344,16 @@ GVApi::getInbox(AsyncTaskToken *token)
         return true;
     }
 
-    QString strLink = QString (GV_HTTPS "/b/0/inbox/recent/%1?page=p%2")
-                        .arg(token->inParams["type"].toString())
-                        .arg(token->inParams["page"].toString());
+    QString strLink;
+
+    quint32 page = token->inParams["page"].toUInt();
+    QString type = token->inParams["type"].toString();
+    if (page > 1) {
+        strLink = QString (GV_HTTPS "/b/0/inbox/recent/%1?page=p%2")
+                            .arg(type).arg(page);
+    } else {
+        strLink = QString (GV_HTTPS "/b/0/inbox/recent/%1").arg(type);
+    }
 
     bool rv =
     doGet(strLink, token, this,
