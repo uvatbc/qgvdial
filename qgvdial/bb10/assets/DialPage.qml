@@ -52,9 +52,17 @@ Page {
             }
             Button {
                 text: "\u232B"
-                onClicked: textNumber.text = textNumber.text.substr(0, textNumber.text.length-1);
                 maxWidth: 130
                 preferredHeight: 200
+                onClicked: textNumber.text = textNumber.text.substr(0, textNumber.text.length-1);
+                
+                gestureHandlers: [
+                    LongPressHandler {
+                        onLongPressed: {
+                            textNumber.text = "";
+                        }
+                    }
+                ]
             }
             TextField {
                 id: textNumber
