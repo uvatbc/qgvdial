@@ -51,6 +51,12 @@
       </item>
       <item>
        <widget class="QLabel" name="lblTime">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text">
          <string>Happened
 at this time</string>
@@ -58,6 +64,13 @@ at this time</string>
        </widget>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="lblNotes">
+     <property name="text">
+      <string/>
+     </property>
     </widget>
    </item>
   </layout>

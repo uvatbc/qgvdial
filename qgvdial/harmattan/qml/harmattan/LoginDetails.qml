@@ -58,7 +58,7 @@ Item {
             inputMethodHints: Qt.ImhPreferLowercase | Qt.ImhNoPredictiveText
 
             KeyNavigation.tab: textPassword
-            onAccepted: btnLogin.doClick();
+            onAccepted: btnLogin.clicked();
         }//QGVTextInput
 
         Label {
@@ -98,7 +98,7 @@ Item {
             placeholderText: "Password"
 
             KeyNavigation.tab: textUsername
-            onAccepted: btnLogin.doClick();
+            onAccepted: btnLogin.clicked();
         }//TextField
 
         Label {

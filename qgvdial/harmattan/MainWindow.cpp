@@ -33,7 +33,7 @@ Contact: yuvraaj@gmail.com
 
 MainWindow::MainWindow(QObject *parent)
 : IMainWindow(parent)
-, m_view(NULL)
+, m_view()
 , mainPageStack(NULL)
 , mainTabGroup(NULL)
 , loginExpand(NULL)

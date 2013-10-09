@@ -44,6 +44,7 @@ InboxEntryDialog::fill(const GVInboxEntry &event)
     ui->lblNumber->setText (event.strPhoneNumber);
     ui->lblTime->setText (InboxModel::dateToString (event.startTime, false));
     ui->lblName->setText (event.strDisplayNumber);
+    ui->lblNotes->setText (event.strNote);
 }//InboxEntryDialog::fillAndExec
 
 void
