@@ -45,15 +45,17 @@ Page {
                 ListItemComponent {
                     Container {
                         id:  listItem
-                        layout: DockLayout {}
+                        //layout: DockLayout {}
+                        layout: StackLayout { orientation: LayoutOrientation.LeftToRight }
+                        layoutProperties: StackLayoutProperties { spaceQuota: 1 }
                         
                         Container {
                             verticalAlignment: VerticalAlignment.Center
-                            horizontalAlignment: HorizontalAlignment.Left
                             
                             layout: StackLayout {
                                 orientation: LayoutOrientation.LeftToRight
                             }
+                            preferredWidth: Infinity
                             
                             ImageView {
                                 imageSource: {
@@ -88,13 +90,13 @@ Page {
                         }
                         
                         Container {
-                            horizontalAlignment: HorizontalAlignment.Right
                             verticalAlignment: VerticalAlignment.Center
 
                             Label {
                                 text: ListItemData.time
+                                multiline: true
                                 textStyle { base: tsdxsmall.style }
-                                //preferredWidth: 100
+                                preferredWidth: 250
                             }
                         }                        
                         
@@ -121,6 +123,7 @@ Page {
                                 id: tsdxsmall
                                 base: SystemDefaults.TextStyles.BodyText
                                 fontSize: FontSize.XXSmall
+                                textAlign: TextAlign.Right
                             }
                         ]//attachedObjects
                     }

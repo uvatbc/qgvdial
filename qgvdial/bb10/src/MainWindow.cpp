@@ -58,6 +58,8 @@ MainWindow::MainWindow(QCoreApplication *_app)
 , contactsPage(NULL)
 , contactsList(NULL)
 , inboxList(NULL)
+, textUsername(NULL)
+, textPassword(NULL)
 , tfaCtx(NULL)
 {
 }//MainWindow::MainWindow
@@ -141,21 +143,25 @@ MainWindow::onFakeInitDone()
     connect(inboxList, SIGNAL(setNumberToDial(QString)),
             this, SLOT(onInboxSetNumberToDial(QString)));
 
+    textUsername = (TextField *) getQMLObject("TextUsername");
+    textPassword = (TextField *) getQMLObject("TextPassword");
+
     onInitDone();
 }//MainWindow::onFakeInitDone
 
 void
 MainWindow::onLoginBtnClicked()
 {
-    TextField *textField;
-    QString user, pass;
+    if (loginButton->text() == "Login") {
+        QString user, pass;
 
-    textField = (TextField *) getQMLObject("TextUsername");
-    user = textField->text();
-    textField = (TextField *) getQMLObject("TextPassword");
-    pass = textField->text();
+        user = textUsername->text();
+        pass = textPassword->text();
 
-    beginLogin(user, pass);
+        beginLogin(user, pass);
+    } else {
+        onUserLogoutRequest ();
+    }
 }//MainWindow::onLoginBtnClicked
 
 void
@@ -237,6 +243,9 @@ MainWindow::uiLoginDone(int status, const QString &errStr)
 {
     if (ATTS_SUCCESS == status) {
         Q_DEBUG("Login successful");
+        loginButton->setText("Logout");
+        textUsername->setEnabled(false);
+        textPassword->setEnabled(false);
         return;
     }
 
@@ -259,6 +268,9 @@ void
 MainWindow::onUserLogoutDone()
 {
     Q_DEBUG("Logout complete");
+    loginButton->setText("Login");
+    textUsername->setEnabled(true);
+    textPassword->setEnabled(true);
 }//MainWindow::onUserLogoutDone
 
 void
@@ -354,7 +366,9 @@ MainWindow::uiSetNewContactDetailsModel()
 void
 MainWindow::uiShowContactDetails(const ContactInfo &cinfo)
 {
-    Q_DEBUG(QString("Show contact details for %1").arg(cinfo.strTitle));
+    QMetaObject::invokeMethod (contactsPage, "showContactDetails",
+                               Q_ARG(QVariant, cinfo.strPhotoPath),
+                               Q_ARG(QVariant, cinfo.strTitle));
 }//MainWindow::uiShowContactDetails
 
 void
@@ -362,7 +376,7 @@ MainWindow::onInboxSetNumberToDial(QString number)
 {
     QMetaObject::invokeMethod (dialPage, "setNumberInDisp",
                                Q_ARG(QVariant, number));
-                               
+
     int val = 0;
     QMetaObject::invokeMethod (mainTabbedPane, "showTab", Q_ARG(QVariant, val));
 }//MainWindow::onInboxSetNumberToDial

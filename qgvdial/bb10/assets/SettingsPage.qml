@@ -31,10 +31,10 @@ NavigationPane {
             
             signal sigShowProxy
             
-            function pushMe(index) {
-                if (index == 0) {
+            onTriggered: {
+                if (indexPath == 0) {
                     container.push(loginDetails);
-                } else if (index == 1) {
+                } else if (indexPath == 1) {
                     console.debug("Proxy settings please!");
                     settingsListView.sigShowProxy();
                 } 
@@ -69,12 +69,18 @@ NavigationPane {
             
             listItemComponents: [
                 ListItemComponent {
-                    Button {
+                    Label {
                         text: ListItem.data
                         horizontalAlignment: HorizontalAlignment.Center
-                        onClicked: {
-                            ListItem.view.pushMe(ListItem.indexPath);
-                        }
+                        textStyle { base: tsdxlarge.style }
+                        
+                        attachedObjects: [
+                            TextStyleDefinition {
+                                id: tsdxlarge
+                                base: SystemDefaults.TextStyles.BodyText
+                                fontSize: FontSize.XLarge
+                            }
+                        ]
                     }//Button
                 }//ListItemComponent
             ]//listItemComponents

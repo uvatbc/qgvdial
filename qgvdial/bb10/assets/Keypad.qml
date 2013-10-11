@@ -29,10 +29,17 @@ Container {
     signal text
 
     layout: StackLayout { orientation: LayoutOrientation.TopToBottom }
+    layoutProperties: StackLayoutProperties { spaceQuota: 1 }
+    
+    preferredHeight: Infinity
+    preferredWidth: Infinity
     
     Container {
         layout: StackLayout { orientation: LayoutOrientation.LeftToRight }
-        layoutProperties: StackLayoutProperties { spaceQuota: 1.0 }
+        layoutProperties: StackLayoutProperties { spaceQuota: 1 }
+        
+        preferredHeight: Infinity
+        preferredWidth: Infinity
 
         KeyButton {
             mainText: "1"
@@ -53,6 +60,9 @@ Container {
     Container {
         layout: StackLayout { orientation: LayoutOrientation.LeftToRight }
         layoutProperties: StackLayoutProperties { spaceQuota: 1.0 }
+        
+        preferredHeight: Infinity
+        preferredWidth: Infinity
 
         KeyButton {
             mainText: "4"
@@ -74,6 +84,9 @@ Container {
     Container {
         layout: StackLayout { orientation: LayoutOrientation.LeftToRight }
         layoutProperties: StackLayoutProperties { spaceQuota: 1.0 }
+        
+        preferredHeight: Infinity
+        preferredWidth: Infinity
 
         KeyButton {
             mainText: "7"
@@ -95,6 +108,9 @@ Container {
     Container {
         layout: StackLayout { orientation: LayoutOrientation.LeftToRight }
         layoutProperties: StackLayoutProperties { spaceQuota: 1.0 }
+        
+        preferredHeight: Infinity
+        preferredWidth: Infinity
 
         KeyButton {
             mainText: "*"
@@ -115,6 +131,9 @@ Container {
     Container {
         layout: StackLayout { orientation: LayoutOrientation.LeftToRight }
         layoutProperties: StackLayoutProperties { spaceQuota: 1.0 }
+        
+        preferredHeight: Infinity
+        preferredWidth: Infinity
 
         Button {
             text: "Call"

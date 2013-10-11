@@ -25,6 +25,16 @@ TabbedPane {
     id: container
     objectName: "MainTabbedPane"
     
+    onActiveTabChanged: {
+        if (activeTab == at(0)) {
+            console.debug("Portrait only");
+            OrientationSupport.supportedDisplayOrientation = SupportedDisplayOrientation.DisplayPortrait;
+        } else {
+            console.debug("All allowed");
+            OrientationSupport.supportedDisplayOrientation = SupportedDisplayOrientation.All;
+        }
+    }   
+     
     showTabsOnActionBar: true
     Tab {
         id: dialTab

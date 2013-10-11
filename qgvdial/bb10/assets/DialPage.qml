@@ -42,20 +42,34 @@ Page {
             }
         ] //attachedObjects
         
+        layout: StackLayout {
+            orientation: LayoutOrientation.TopToBottom
+        }
+        layoutProperties: StackLayoutProperties {
+            spaceQuota: 1
+        }
+        
         DropDown {
             objectName: "RegNumberDropDown"
+            preferredWidth: Infinity
         }
         
         Container {
             layout: StackLayout {
                 orientation: LayoutOrientation.RightToLeft
             }
+            layoutProperties: StackLayoutProperties {
+                spaceQuota: 1
+            }
+
             Button {
+                id: delBtn
                 text: "\u232B"
+                minWidth: 140
                 maxWidth: 130
-                preferredHeight: 200
-                onClicked: textNumber.text = textNumber.text.substr(0, textNumber.text.length-1);
+                verticalAlignment: VerticalAlignment.Center
                 
+                onClicked: textNumber.text = textNumber.text.substr(0, textNumber.text.length-1);
                 gestureHandlers: [
                     LongPressHandler {
                         onLongPressed: {
@@ -67,8 +81,11 @@ Page {
             TextField {
                 id: textNumber
                 textStyle { base: tsd.style }
-                preferredHeight: 200
-                minWidth: 630
+                //preferredHeight: 200
+                minHeight: delBtn.minHeight
+                preferredWidth: Infinity
+                verticalAlignment: VerticalAlignment.Center
+                
                 inputMode: TextFieldInputMode.PhoneNumber
                 onFocusedChanged: {
                     if (focused) {

@@ -68,7 +68,7 @@ Container {
             }
         }
     ]//gestureHandler
-
+    
     Label {
         text: container.mainText 
         horizontalAlignment: HorizontalAlignment.Center

@@ -1,5 +1,5 @@
 1
-48
+49
 main.qml
 LoginDetails.qml
 ProxyPage.qml
@@ -8,6 +8,7 @@ ext.txt
 Keypad.qml
 KeyButton.qml
 ContactsPage.qml
+ContactDetails.qml
 TFADialog.qml
 AppPwDialog.qml
 MessagePage.qml

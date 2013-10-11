@@ -114,6 +114,8 @@ private:
     Page        *contactsPage;
     ListView    *contactsList;
     ListView    *inboxList;
+    TextField   *textUsername;
+    TextField   *textPassword;
 
     //! Entirely transient two-factor authentication context
     void        *tfaCtx;

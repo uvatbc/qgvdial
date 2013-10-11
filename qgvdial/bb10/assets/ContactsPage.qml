@@ -22,80 +22,90 @@
 import bb.cascades 1.0
 import com.kdab.components 1.0
 
-Page {
+NavigationPane {
     id: container
     objectName: "ContactsPage"
     
+    function showContactDetails(imgSource, name) {
+        contactDetails.contactImageSource = imgSource;
+        contactDetails.contactNameText = name;
+        container.push(contactDetails);
+    }
     
     attachedObjects: [
         AbstractItemModel {
             id: contactsModel
 
             sourceModel: g_contactsModel
+        },
+        ContactDetails {
+            id: contactDetails
         }
     ]
 
-    Container {
-        TextField {
-            hintText: "Search"
-        }
-
-        ListView {
-            objectName: "ContactsList"
-            signal clicked(string id);
-
-            dataModel: contactsModel
-
-            listItemComponents: [
-                ListItemComponent {
-                    Container {
-                        id:  listItem
-
-                        layout: StackLayout {
-                            orientation: LayoutOrientation.LeftToRight
-                        }
-                        
-                        ImageView {
-                            imageSource: {
-                                if ((ListItemData.imagePath != null) && (ListItemData.imagePath.length != 0)) {
-                                    return ListItemData.imagePath;  
-                                } else {
-                                    return "asset:///icons/unknown_contact.png";
+    Page {
+        Container {
+            TextField {
+                hintText: "Search"
+            }
+            
+            ListView {
+                objectName: "ContactsList"
+                signal clicked(string id);
+                
+                dataModel: contactsModel
+                
+                listItemComponents: [
+                    ListItemComponent {
+                        Container {
+                            id:  listItem
+                            
+                            layout: StackLayout {
+                                orientation: LayoutOrientation.LeftToRight
+                            }
+                            
+                            ImageView {
+                                imageSource: {
+                                    if ((ListItemData.imagePath != null) && (ListItemData.imagePath.length != 0)) {
+                                        return ListItemData.imagePath;  
+                                    } else {
+                                        return "asset:///icons/unknown_contact.png";
+                                    }
                                 }
+                                
+                                scalingMethod: ScalingMethod.AspectFit
+                                horizontalAlignment: HorizontalAlignment.Center
+                                verticalAlignment: VerticalAlignment.Center
+                                
+                                preferredHeight: 80
+                                preferredWidth: 80
                             }
                             
-                            scalingMethod: ScalingMethod.AspectFit
-                            horizontalAlignment: HorizontalAlignment.Center
-                            verticalAlignment: VerticalAlignment.Center
+                            Label {
+                                text: ListItemData.name
+                                textStyle { base: tsdxlarge.style }
+                                verticalAlignment: VerticalAlignment.Center
+                            }
                             
-                            preferredHeight: 80
-                            preferredWidth: 80
+                            gestureHandlers: [
+                                TapHandler {
+                                    onTapped: {
+                                        listItem.ListItem.view.clicked(ListItemData.id);
+                                    }                                
+                                }
+                            ]
+                            
+                            attachedObjects: [
+                                TextStyleDefinition {
+                                    id: tsdxlarge
+                                    base: SystemDefaults.TextStyles.BodyText
+                                    fontSize: FontSize.XLarge
+                                }
+                            ]//attachedObjects
                         }
-                        
-                        Label {
-                            text: ListItemData.name
-                            textStyle { base: tsdxlarge.style }
-                            verticalAlignment: VerticalAlignment.Center
-                        }
-
-                        gestureHandlers: [
-                            TapHandler {
-                                onTapped: {
-                                    listItem.ListItem.view.clicked(ListItemData.id);
-                                }                                
-                            }
-                        ]
-                                                 
-                        attachedObjects: [
-                            TextStyleDefinition {
-                                id: tsdxlarge
-                                base: SystemDefaults.TextStyles.BodyText
-                                fontSize: FontSize.XLarge
-                            }
-                        ]//attachedObjects
                     }
-                }
-            ]//listItemComponents
-        }//ListView
-    }//Container
-}//Page
+                ]//listItemComponents
+            }//ListView
+        }//Container
+    }//Page
+}//NavigationPane
