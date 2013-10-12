@@ -22,6 +22,6 @@ Contact: yuvraaj@gmail.com
 #ifndef PLATFORMSPECIFIC_H
 #define PLATFORMSPECIFIC_H
 
-#define UNKNOWN_CONTACT_QRC_PATH "qrc:/unknown_contact.png"
+#define UNKNOWN_CONTACT_QRC_PATH "asset:///icons/unknown_contact.png"
 
 #endif // PLATFORMSPECIFIC_H

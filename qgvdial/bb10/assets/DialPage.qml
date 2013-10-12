@@ -45,9 +45,7 @@ Page {
         layout: StackLayout {
             orientation: LayoutOrientation.TopToBottom
         }
-        layoutProperties: StackLayoutProperties {
-            spaceQuota: 1
-        }
+        //layoutProperties: StackLayoutProperties { spaceQuota: 1 }
         
         DropDown {
             objectName: "RegNumberDropDown"
