@@ -51,8 +51,6 @@ public:
     void refresh (const QString &query);
     void refresh ();
 
-    void setUnknownContactPath(const QString &localPath);
-
 signals:
     void noContactPhoto(QString contactId, QString photoUrl) const;
 
@@ -64,8 +62,6 @@ private:
     CacheDb         db;
     QSqlTableModel *modelContacts;
     QString         m_strSearchQuery;
-
-    QString         m_unknownContactLocalPath;
 };
 
 #endif // CONTACTSMODEL_H
