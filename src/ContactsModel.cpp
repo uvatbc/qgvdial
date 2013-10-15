@@ -41,9 +41,17 @@ ContactsModel::data (const QModelIndex &index, int role) const
     QVariant retVar;
 
     do { // Begin cleanup block (not a loop)
+        QString id = QSqlQueryModel::data (index.sibling(index.row(), 0),
+                                           Qt::EditRole).toString ();
+
         if (CT_NameRole == role) {
             retVar =
             QSqlQueryModel::data (index.sibling(index.row(), 1), Qt::EditRole);
+
+            if (!retVar.isValid () || retVar.isNull () ||
+                (retVar.toString().length() == 0)) {
+                Q_WARN(QString("No name for id %1").arg (id));
+            }
             break;
         }
 
@@ -55,8 +63,7 @@ ContactsModel::data (const QModelIndex &index, int role) const
 
         CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
         ContactInfo info;
-        info.strId = QSqlQueryModel::data (index.sibling(index.row(), 0),
-                        Qt::EditRole).toString ();
+        info.strId = id;
         if (info.strId.isEmpty ()) {
             Q_WARN("This link is empty!");
             retVar = "";
@@ -71,7 +78,7 @@ ContactsModel::data (const QModelIndex &index, int role) const
             if (NULL != pCdm) {
                 retVar = qVariantFromValue<QObject *> (pCdm);
             } else {
-                qWarning ("Failed to allocate contact detail");
+                Q_WARN ("Failed to allocate contact detail");
             }
 
             break;

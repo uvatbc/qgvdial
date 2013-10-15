@@ -216,6 +216,7 @@ Rectangle {
                         //width: parent.width - contactImage.width
 
                         text: name
+
                         fontPointMultiplier: (10.0/8.0)
                     }//QGVLabel (contact name)
                 }// Row (image and contact name)

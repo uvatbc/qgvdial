@@ -223,6 +223,11 @@ GVContactsTable::gotOneContact (ContactInfo contactInfo)
     bool ok = false;
 
     do { // Begin cleanup block (not a loop)
+        if (contactInfo.arrPhones.count () == 0) {
+            // This contact has no numbers. Kill it
+            contactInfo.bDeleted = true;
+        }
+
         if (contactInfo.bDeleted) {
             break;
         }
