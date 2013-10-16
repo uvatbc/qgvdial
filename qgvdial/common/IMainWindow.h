@@ -106,6 +106,13 @@ public:
     explicit IMainWindow(QObject *parent = 0);
     virtual void init() = 0;
 
+public slots:
+    void onUserCall(QString number);
+    void onUserSendSMS (QStringList arrNumbers, QString strText);
+
+    QStringList getTextsByContact(const QString &strContact);
+    QStringList getTextsByDate(QDateTime dtStart, QDateTime dtEnd);
+
 protected slots:
     void onInitDone();
     void resumeTFAAuth(void *ctx, int pin, bool useAlt);
@@ -113,8 +120,6 @@ protected slots:
 
     void onUserLogoutRequest();
     void onUserProxyRevert();
-
-    void onUserCall(QString number);
 
 private slots:
     void onTFARequest(AsyncTaskToken *task);

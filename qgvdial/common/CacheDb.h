@@ -101,6 +101,9 @@ public:
     bool getSelectedPhone (QString &id);
     bool putSelectedPhone (const QString &id);
 
+    QStringList getTextsByContact(const QString &strContact);
+    QStringList getTextsByDate(QDateTime dtStart, QDateTime dtEnd);
+
 private:
     void ensureCache();
     bool blowAwayCache();

@@ -33,10 +33,8 @@ public:
 
     bool identifyAll(AsyncTaskToken *task);
 
-signals:
-
-public slots:
-
+private:
+    Tp::AccountManagerPtr   actMgr;
 };
 
 #endif // HARMATTANPHONEFACTORY_H

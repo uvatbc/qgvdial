@@ -1,5 +1,6 @@
 include(./common-code.pri)
 include(../features/dirs/linux/linux-dirs.pri)
+include(../features/dbus_api/dbus_api.pri)
 
 DEFINES += OS_DIABLO
 

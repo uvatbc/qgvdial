@@ -272,3 +272,56 @@ IMainWindow::onUserCall(QString number)
         gvApi.callOut (task);
     }
 }//IMainWindow::onUserCall
+
+void
+IMainWindow::onUserSendSMS (QStringList arrNumbers, QString strText)
+{
+    QStringList arrFailed;
+    QString msg;
+    AsyncTaskToken *task;
+
+    for (int i = 0; i < arrNumbers.size (); i++)
+    {
+        if (arrNumbers[i].isEmpty ()) {
+            Q_WARN("Cannot text empty number");
+            continue;
+        }
+
+        task = new AsyncTaskToken(this);
+        if (!task) {
+            Q_WARN("Allocation failure");
+            arrFailed += arrNumbers[i];
+            continue;
+        }
+
+        task->inParams["destination"] = arrNumbers[i];
+        task->inParams["text"] = strText;
+
+        if (!gvApi.sendSms (task)) {
+            task->deleteLater ();
+            msg = QString ("Failed to send an SMS to %1").arg (arrNumbers[i]);
+            Q_WARN(msg);
+            arrFailed += arrNumbers[i];
+            continue;
+        }
+    } // loop through all the numbers
+
+    if (0 != arrFailed.size ()) {
+        //TODO: Show messagebox ?
+        msg = QString("Could not send a text to %1")
+                .arg (arrFailed.join (", "));
+        Q_WARN (msg);
+    }
+}//IMainWindow::sendSMS
+
+QStringList
+IMainWindow::getTextsByContact(const QString &strContact)
+{
+    return (db.getTextsByContact(strContact));
+}//IMainWindow::getTextsByContact
+
+QStringList
+IMainWindow::getTextsByDate(QDateTime dtStart, QDateTime dtEnd)
+{
+    return (db.getTextsByDate(dtStart, dtEnd));
+}//IMainWindow::getTextsByDate

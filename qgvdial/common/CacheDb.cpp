@@ -1243,3 +1243,141 @@ CacheDb::putSelectedPhone (const QString &id)
     p.settings->setValue (GV_S_VAR_SELECTED_PHONE, id);
     return (true);
 }//CacheDb::putSelectedPhone
+
+QStringList
+CacheDb::getTextsByContact(const QString &strContact)
+{
+    CacheDbPrivate &p = CacheDbPrivate::ref();
+    QStringList arrNums;
+    QStringList rv;
+
+    // Search for the contact as if it were a number
+    ContactInfo info;
+    if (getContactFromNumber (strContact, info)) {
+        foreach (PhoneInfo phone, info.arrPhones) {
+            GVApi::simplify_number (phone.strNumber, false);
+            arrNums += phone.strNumber.replace("'", "''");
+        }
+    }
+
+    // Search for the contact as if it were a name
+    QSqlQuery query(p.db);
+    query.setForwardOnly (true);
+
+    QString scrubContact = strContact;
+    scrubContact.replace ("'", "''");
+    QString strQ = "SELECT " GV_C_ID " FROM " GV_CONTACTS_TABLE
+                 +  QString(" WHERE " GV_C_NAME " LIKE '%%%1%%' ")
+                            .arg (scrubContact)
+                 + "ORDER BY " GV_C_NAME;
+    query.exec (strQ);
+    while (query.next ()) {
+        info.init ();
+        info.strId = query.value(0).toString ();
+        if (getContactFromLink (info)) {
+            foreach (PhoneInfo phone, info.arrPhones) {
+                GVApi::simplify_number (phone.strNumber, false);
+                arrNums += phone.strNumber.replace("'", "''");
+            }
+        }
+    }
+
+    // We have all the ID's to look for
+    if (arrNums.isEmpty ()) {
+        Q_WARN(QString("Not a single ID matched the search string %1")
+               .arg (strContact));
+        return rv;
+    }
+
+    strQ = QString("SELECT "
+            GV_IN_ATTIME ","
+            GV_IN_DISPNUM ","
+            GV_IN_PHONE ","
+            GV_IN_SMSTEXT " "
+            "FROM " GV_INBOX_TABLE " "
+            "WHERE (" GV_IN_PHONE " LIKE '%%%1%%') "
+            "AND " GV_IN_TYPE " == %2 "
+            "ORDER BY " GV_IN_ATTIME " DESC")
+            .arg (arrNums.join ("%%' OR " GV_IN_PHONE " LIKE '%%"))
+            .arg (GVIE_TextMessage);
+
+    query.exec (strQ);
+    while (query.next ()) {
+        QString oneLine;
+        bool bok;
+        uint iDtTime = query.value (0).toInt (&bok);
+        if (!bok) {
+            break;
+        }
+
+        QString strNum = query.value(2).toString();
+        GVApi::simplify_number (strNum, false);
+        ContactInfo info;
+        getContactFromNumber (strNum, info);
+
+        // date,'dispnum','num','text'
+        oneLine = QDateTime::fromTime_t(iDtTime).toString (Qt::ISODate);
+        oneLine += ",'";
+        oneLine += info.strTitle.replace("'", "''");
+        oneLine += "','";
+        oneLine += query.value(2).toString().replace("'", "''");
+        oneLine += "','";
+        oneLine += query.value(3).toString().replace("'", "''");
+        oneLine += "'";
+
+        rv += oneLine;
+    }
+
+    return rv;
+}//CacheDb::getTextsByContact
+
+QStringList
+CacheDb::getTextsByDate(QDateTime dtStart, QDateTime dtEnd)
+{
+    CacheDbPrivate &p = CacheDbPrivate::ref();
+    QSqlQuery query(p.db);
+    query.setForwardOnly (true);
+
+    QString strQ = QString("SELECT "
+            GV_IN_ATTIME ","
+            GV_IN_PHONE ","
+            GV_IN_SMSTEXT " "
+            "FROM " GV_INBOX_TABLE " "
+            "WHERE " GV_IN_ATTIME " >= %1 AND " GV_IN_ATTIME " <= %2 "
+            "AND " GV_IN_TYPE " == %3 "
+            "ORDER BY " GV_IN_ATTIME " DESC")
+            .arg (dtStart.toTime_t ())
+            .arg (dtEnd.toTime_t ())
+            .arg (GVIE_TextMessage);
+
+    QStringList rv;
+
+    query.exec (strQ);
+    while (query.next ()) {
+        QString oneLine;
+        bool bok;
+        uint iDtTime = query.value (0).toInt (&bok);
+        if (!bok) {
+            break;
+        }
+
+        QString strNum = query.value(1).toString();
+        GVApi::simplify_number (strNum, false);
+        ContactInfo info;
+        getContactFromNumber (strNum, info);
+
+        // date,'name','num','text'
+        oneLine = QDateTime::fromTime_t(iDtTime).toString (Qt::ISODate);
+        oneLine += ",'";
+        oneLine += info.strTitle.replace("'", "''");
+        oneLine += "','";
+        oneLine += query.value(1).toString().replace("'", "''");
+        oneLine += "','";
+        oneLine += query.value(2).toString().replace("'", "''");
+        oneLine += "'";
+
+        rv += oneLine;
+    }
+
+    return rv;
+}//CacheDb::getTextsByDate
