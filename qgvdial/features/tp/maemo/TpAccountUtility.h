@@ -19,40 +19,38 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#ifndef PHONEFACTORY_H
-#define PHONEFACTORY_H
+#ifndef __TP_ACCOUNT_UTILITY_H__
+#define __TP_ACCOUNT_UTILITY_H__
 
-#include "global.h"
-#include "IPhoneAccountFactory.h"
+#include "PhoneIntegrationIface.h"
 #include "TpHeaders.h"
 
-class PhoneFactory : public IPhoneAccountFactory
+class TpPhoneIntegration : public IPhoneIntegration
 {
     Q_OBJECT
+
 public:
-    explicit PhoneFactory(QObject *parent = 0);
+    TpPhoneIntegration(QObject *parent = NULL);
 
-    bool identifyAll(AsyncTaskToken *task);
+    bool isEnabled();
 
-signals:
+public Q_SLOTS:
+    void phoneIntegrationChanged(bool enable = false);
 
-private slots:
-    void onAccountManagerReady (Tp::PendingOperation *op);
-    void onAccountReady (Tp::PendingOperation *op);
+private Q_SLOTS:
+    void onAcMgrReady(Tp::PendingOperation *operation);
+    void onAccountCreated(Tp::PendingOperation *operation);
+    void onAccountRemoved(Tp::PendingOperation *operation);
+    void onAccountOnline(Tp::PendingOperation *operation);
 
 private:
-    void completeIdentifyTask(int status);
-    void onAllAccountsReady ();
+    void enablePhoneIntegration();
+    void disablePhoneIntegration();
 
 private:
-    Tp::AccountManagerPtr   actMgr;
-
-    AsyncTaskToken *m_identifyTask;
-
-    QMutex  m_identifyLock;
-    int     m_tpAcCounter;
-
-    QList <IPhoneAccount *> m_accounts;
+    bool m_acMgrInitInProgress;
+    bool m_EnableAfteracMgrInit;
+    AccountManagerPtr acMgr;
 };
 
-#endif // PHONEFACTORY_H
+#endif //__TP_ACCOUNT_UTILITY_H__

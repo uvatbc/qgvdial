@@ -25,9 +25,10 @@ Contact: yuvraaj@gmail.com
 #define USE_DTMF_INTERFACE_1 0
 #define USE_RAW_CHANNEL_METHOD 0
 
-#include "CalloutInitiator.h"
+#include "TpHeaders.h"
+#include "IPhoneAccount.h"
 
-class TpCalloutInitiator : public CalloutInitiator
+class TpCalloutInitiator : public IPhoneAccount
 {
     Q_OBJECT
 
@@ -37,41 +38,17 @@ private:
 public:
     QString id ();
     QString name ();
-    QString selfNumber ();
-    bool isValid ();
 
 public slots:
-    void initiateCall (const QString &strDestination, void *ctx = NULL);
-    bool sendDTMF(const QString &strTones);
+    bool initiateCall(AsyncTaskToken *task);
 
 private slots:
-    void onConnectionChanged (const Tp::ConnectionPtr &connection);
-    void onConnectionChanged (Tp::ConnectionStatus, Tp::ConnectionStatusReason);
-    void onConnectionChanged (Tp::ConnectionStatus);
-
-    void onChannelReady (Tp::PendingOperation *op);
-    void onConnectionReady (Tp::PendingOperation *op);
-
-    void onDtmfChannelInvalidated(Tp::DBusProxy * proxy,
-                                  const QString & errorName,
-                                  const QString & errorMessage);
-    void onDtmfStoppedTones (bool cancelled);
-
-    void onDtmfNextTone();
-
-    void startMonitoringCall();
-    void stopMonitoringCall();
-    void readyToSendDTMF(const QDBusMessage &msg);
-    void allDTMFDone(const QDBusMessage &msg);
+    void onACReady(Tp::PendingOperation *op);
 
 private:
-    void sendMaemoDTMF(const QString &strTones);
 
 private:
     Tp::AccountPtr      account;
-    QString             m_uniqueId;
-    QString             strActCmName;
-    QString             strSelfNumber;
 
     //! DBUS System bus
     QDBusConnection     systemBus;
@@ -79,23 +56,10 @@ private:
     //! Is this the buggy spirit (skype) TP-CM?
     bool                bIsSpirit;
 
-    //! Channel pointer that can be used for DTMF calls. Must check for validity
-#if USE_RAW_CHANNEL_METHOD
-    Tp::ChannelPtr      channel;
-#else
-    Tp::StreamedMediaChannelPtr channel;
-#endif
+    QString m_id;
+    QString m_name;
 
-    QString remainingTones;
-    bool bMaemoAudioConnected;
-    bool toneOn;
-
-#if USE_DTMF_INTERFACE_1
-    //! Pointer to the DTMF interface
-    Tp::Client::ChannelInterfaceDTMFInterface *dtmfIface;
-#endif
-
-    friend class CallInitiatorFactory;
+    friend class PhoneFactory;
 };
 
 #endif // TPCALLOUTINITIATOR_H

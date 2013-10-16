@@ -34,6 +34,7 @@ Contact: yuvraaj@gmail.com
 #define ATTS_LOGIN_FAIL_SHOWURL 6
 #define ATTS_NW_ERROR           7
 #define ATTS_USER_CANCEL        8
+#define ATTS_IN_PROGRESS        9
 
 class AsyncTaskToken : public QObject
 {
