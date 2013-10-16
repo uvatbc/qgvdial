@@ -24,6 +24,7 @@ Contact: yuvraaj@gmail.com
 
 #include <QObject>
 #include "IPhoneAccountFactory.h"
+#include "TpHeaders.h"
 
 class HarmattanPhoneFactory : public IPhoneAccountFactory
 {
