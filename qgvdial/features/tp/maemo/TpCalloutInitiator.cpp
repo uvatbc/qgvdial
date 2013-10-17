@@ -41,6 +41,7 @@ TpCalloutInitiator::onACReady(Tp::PendingOperation *op)
         return;
     }
 
+#if 0
     Q_DEBUG(QString("cmName = %1, proto = %2, service = %3, disp = %4, "
                     "objectPath = %5")
             .arg(m_acc->cmName())
@@ -48,33 +49,50 @@ TpCalloutInitiator::onACReady(Tp::PendingOperation *op)
             .arg(m_acc->serviceName())
             .arg(m_acc->displayName())
             .arg(m_acc->objectPath()));
+#endif
 
     m_id = m_acc->objectPath();
 
+    m_name = m_acc->cmName();
+    int pos = m_id.lastIndexOf('/');
+    if (-1 != pos) {
+        m_name += " : " + m_id.mid(pos + 1);
+    }
+
+    Q_DEBUG(QString("id = %1, name = %2")
+            .arg(m_id, m_name));
+
     m_conn = m_acc->connection();
     if (m_conn.isNull()) {
-        Q_WARN("Connection is NULL");
         return;
     }
-    return;
 
-    connect(m_conn->becomeReady(Tp::Connection::FeatureSelfContact),
+    connect(m_conn->becomeReady(),
             SIGNAL(finished(Tp::PendingOperation*)),
             this, SLOT(onConnReady(Tp::PendingOperation*)));
 }//TpCalloutInitiator::onACReady
 
 void
+TpCalloutInitiator::onConnectionChanged(const Tp::ConnectionPtr &connection)
+{
+    m_conn = connection;
+
+    connect(m_conn->becomeReady(),
+            SIGNAL(finished(Tp::PendingOperation*)),
+            this, SLOT(onConnReady(Tp::PendingOperation*)));
+}//TpCalloutInitiator::onConnectionChanged
+
+void
+TpCalloutInitiator::onConnStatusChanged(Tp::ConnectionStatus status)
+{
+    Q_DEBUG(QString("Connection status changed to %1")
+            .arg(status));
+}//TpCalloutInitiator::onConnStatusChanged
+
+void
 TpCalloutInitiator::onConnReady(Tp::PendingOperation *op)
 {
     op->deleteLater ();
-
-    Tp::ContactPtr self = m_conn->selfContact();
-    if (self.isNull()) {
-        Q_WARN("Self contact is NULL");
-        return;
-    }
-    Q_DEBUG(QString("self contact id: %1")
-            .arg(self->id()));
 }//TpCalloutInitiator::onConnReady
 
 QString

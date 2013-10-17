@@ -82,7 +82,7 @@ Item {
                 onPaintedWidthChanged: {
                     if (paintedWidth + 10 > listView.maxWidth) {
                         listView.maxWidth = paintedWidth + 10;
-                        console.debug("Updated maxW = " + listView.maxWidth + " because of " + text);
+                        //console.debug("Updated maxW = " + listView.maxWidth + " because of " + text);
                     }
                 }
 

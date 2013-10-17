@@ -46,6 +46,9 @@ private slots:
     void onACReady(Tp::PendingOperation *op);
     void onConnReady(Tp::PendingOperation *op);
 
+    void onConnectionChanged(const Tp::ConnectionPtr &connection);
+    void onConnStatusChanged(Tp::ConnectionStatus status);
+
 private:
 
 private:

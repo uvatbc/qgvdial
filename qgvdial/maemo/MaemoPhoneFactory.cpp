@@ -40,6 +40,10 @@ MaemoPhoneFactory::MaemoPhoneFactory(QObject *parent)
 , m_tpAcCounter(0)
 #endif
 {
+#ifndef QT_SIMULATOR
+    qDBusRegisterMetaType<Tp::UIntList>();
+    qDBusRegisterMetaType<Tp::ContactAttributesMap>();
+#endif
 }//MaemoPhoneFactory::MaemoPhoneFactory
 
 bool
