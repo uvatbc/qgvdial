@@ -54,6 +54,7 @@ private:
 
 private:
     Tp::AccountManagerPtr   actMgr;
+    QList<Tp::AccountPtr>   allAccounts;
 
     QMutex  m_identifyLock;
     int     m_tpAcCounter;

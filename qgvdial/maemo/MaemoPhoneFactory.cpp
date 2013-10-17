@@ -21,7 +21,9 @@ Contact: yuvraaj@gmail.com
 
 #include "MaemoPhoneFactory.h"
 #include "IPhoneAccount.h"
+#ifndef QT_SIMULATOR
 #include "TpCalloutInitiator.h"
+#endif
 
 IPhoneAccountFactory *
 createPhoneAccountFactory(QObject *parent)
@@ -106,7 +108,7 @@ MaemoPhoneFactory::onAccountManagerReady (Tp::PendingOperation *op)
     bool rv;
 
     // Make each account get ready
-    QList<AccountPtr> allAccounts = actMgr->allAccounts ();
+    allAccounts = actMgr->allAccounts ();
     QMutexLocker locker (&m_identifyLock);
     m_tpAcCounter = 1;
     foreach (Tp::AccountPtr acc, allAccounts) {
@@ -146,8 +148,6 @@ MaemoPhoneFactory::onAccountReady (Tp::PendingOperation *op)
 void
 MaemoPhoneFactory::onAllAccountsReady ()
 {
-    QList<AccountPtr> allAccounts = actMgr->allAccounts ();
-
     QString msg;
     foreach (Tp::AccountPtr acc, allAccounts) {
         QString cmName = acc->cmName ();

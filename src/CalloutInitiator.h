@@ -57,7 +57,7 @@ public slots:
 protected:
     void *m_Context;
 
-    //! The phne number associated with a dialout initiator
+    //! The phone number associated with a dialout initiator
     QString m_associatedNumber;
 };
 typedef QList<CalloutInitiator *> CalloutInitiatorList;

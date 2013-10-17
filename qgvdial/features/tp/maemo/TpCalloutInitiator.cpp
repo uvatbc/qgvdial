@@ -41,11 +41,15 @@ TpCalloutInitiator::onACReady(Tp::PendingOperation *op)
         return;
     }
 
-    Q_DEBUG(QString("cmName = %1, proto = %2, service = %3, disp = %4")
+    Q_DEBUG(QString("cmName = %1, proto = %2, service = %3, disp = %4, "
+                    "objectPath = %5")
             .arg(m_acc->cmName())
             .arg(m_acc->protocolName())
             .arg(m_acc->serviceName())
-            .arg(m_acc->displayName()));
+            .arg(m_acc->displayName())
+            .arg(m_acc->objectPath()));
+
+    m_id = m_acc->objectPath();
 
     m_conn = m_acc->connection();
     if (m_conn.isNull()) {

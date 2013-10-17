@@ -97,7 +97,7 @@ TpCalloutInitiator::onConnectionChanged (const Tp::ConnectionPtr &connection)
                           this,
                           SLOT (onConnectionReady (Tp::PendingOperation *)));
         if (!rv) {
-            Q_WARN("CAnnot connect to connectionready signal");
+            Q_WARN("Cannot connect to connectionready signal");
             Q_ASSERT(rv);
         }
     } else {
