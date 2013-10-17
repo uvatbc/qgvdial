@@ -122,7 +122,7 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
         if (NULL == loginButton) {
             break;
         }
-        connect(loginButton, SIGNAL(sigClicked()),
+        connect(loginButton, SIGNAL(clicked()),
                 this, SLOT(onLoginButtonClicked()));
 
         textUsername = getQMLObject ("TextUsername");

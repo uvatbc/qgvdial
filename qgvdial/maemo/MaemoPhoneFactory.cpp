@@ -20,6 +20,8 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "MaemoPhoneFactory.h"
+#include "IPhoneAccount.h"
+#include "TpCalloutInitiator.h"
 
 IPhoneAccountFactory *
 createPhoneAccountFactory(QObject *parent)

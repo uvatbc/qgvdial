@@ -44,11 +44,13 @@ public slots:
 
 private slots:
     void onACReady(Tp::PendingOperation *op);
+    void onConnReady(Tp::PendingOperation *op);
 
 private:
 
 private:
-    Tp::AccountPtr      account;
+    Tp::AccountPtr      m_acc;
+    Tp::ConnectionPtr   m_conn;
 
     //! DBUS System bus
     QDBusConnection     systemBus;
@@ -59,7 +61,9 @@ private:
     QString m_id;
     QString m_name;
 
-    friend class PhoneFactory;
+// Both phone factories are allowed to create this class
+    friend class MaemoPhoneFactory;
+    friend class HarmattanPhoneFactory;
 };
 
 #endif // TPCALLOUTINITIATOR_H

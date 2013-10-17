@@ -23,11 +23,12 @@ Contact: yuvraaj@gmail.com
 
 TpCalloutInitiator::TpCalloutInitiator (Tp::AccountPtr act, QObject *parent)
 : IPhoneAccount(parent)
-, account (act)
+, m_acc (act)
 , systemBus(QDBusConnection::systemBus())
 , bIsSpirit (false)
 {
-    connect(account->becomeReady(), SIGNAL(finished(Tp::PendingOperation*)),
+    connect(m_acc->becomeReady(),
+            SIGNAL(finished(Tp::PendingOperation*)),
             this, SLOT(onACReady(Tp::PendingOperation*)));
 }//TpCalloutInitiator::TpCalloutInitiator
 
@@ -35,14 +36,42 @@ void
 TpCalloutInitiator::onACReady(Tp::PendingOperation *op)
 {
     op->deleteLater ();
-
-    Tp::ProfilePtr profile = account->profile ();
-    if (profile.isNull ()) {
+    if (op->isError()) {
+        Q_WARN("Account could not be made ready");
         return;
     }
 
-    m_id = m_name = profile->name ();
+    Q_DEBUG(QString("cmName = %1, proto = %2, service = %3, disp = %4")
+            .arg(m_acc->cmName())
+            .arg(m_acc->protocolName())
+            .arg(m_acc->serviceName())
+            .arg(m_acc->displayName()));
+
+    m_conn = m_acc->connection();
+    if (m_conn.isNull()) {
+        Q_WARN("Connection is NULL");
+        return;
+    }
+    return;
+
+    connect(m_conn->becomeReady(Tp::Connection::FeatureSelfContact),
+            SIGNAL(finished(Tp::PendingOperation*)),
+            this, SLOT(onConnReady(Tp::PendingOperation*)));
 }//TpCalloutInitiator::onACReady
+
+void
+TpCalloutInitiator::onConnReady(Tp::PendingOperation *op)
+{
+    op->deleteLater ();
+
+    Tp::ContactPtr self = m_conn->selfContact();
+    if (self.isNull()) {
+        Q_WARN("Self contact is NULL");
+        return;
+    }
+    Q_DEBUG(QString("self contact id: %1")
+            .arg(self->id()));
+}//TpCalloutInitiator::onConnReady
 
 QString
 TpCalloutInitiator::id ()

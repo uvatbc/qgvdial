@@ -106,7 +106,7 @@ Item {
             placeholderText: "Password"
 
             KeyNavigation.tab: textUsername
-            onAccepted: btnLogin.doClick();
+            onAccepted: btnLogin.clicked();
         }//QGVTextInput
 
         Text {
@@ -123,8 +123,6 @@ Item {
         id: btnLogin
         objectName: "LoginButton"
 
-        signal sigClicked
-
         anchors {
             horizontalCenter: parent.horizontalCenter
             top: rowPass.bottom
@@ -133,11 +131,9 @@ Item {
 
         text: "Login"
 
-        onSigClicked: {
+        onClicked: {
             //textUsername.closeSoftwareInputPanel();
             //textPassword.closeSoftwareInputPanel();
         }
-
-        onClicked: btnLogin.sigClicked();
     }//Button (login/logout)
 }//Item (container)
