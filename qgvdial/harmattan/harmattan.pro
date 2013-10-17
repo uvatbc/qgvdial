@@ -35,6 +35,7 @@ include(../../api/api.pri)
 include(../features/openssl/openssl.pri)
 include(../features/dirs/linux/linux-dirs.pri)
 include(../features/qtsingleapplication/qtsingleapplication.pri)
+include(../features/dbus_api/dbus_api.pri)
 include(../features/tp/maemo/tp.pri)
 
 RESOURCES += harmattan.qrc
