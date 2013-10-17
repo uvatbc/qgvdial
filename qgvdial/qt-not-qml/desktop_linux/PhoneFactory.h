@@ -34,8 +34,6 @@ public:
 
     bool identifyAll(AsyncTaskToken *task);
 
-signals:
-
 private slots:
     void onAccountManagerReady (Tp::PendingOperation *op);
     void onAccountReady (Tp::PendingOperation *op);

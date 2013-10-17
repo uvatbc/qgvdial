@@ -41,6 +41,7 @@ Contact: yuvraaj@gmail.com
 #include <TelepathyQt4/Connection>
 #include <TelepathyQt4/ChannelRequest>
 #include <TelepathyQt4/ChannelClassSpecList>
+#include <TelepathyQt4/Profile>
 
 #ifdef DBG_TP_VERBOSE
 #include <TelepathyQt4/Debug>

@@ -25,7 +25,9 @@ include(../../api/api.pri)
 include(../features/openssl/openssl.pri)
 include(../features/dirs/linux/linux-dirs.pri)
 include(../features/dbus_api/dbus_api.pri)
+!simulator {
 include(../features/tp/maemo/tp.pri)
+}
 
 RESOURCES += maemo.qrc
 
