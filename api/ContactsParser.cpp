@@ -94,7 +94,7 @@ ContactsParser::doJsonWork ()
     QString cmd = QString("var o = %1").arg (QString(byData));
     QString rStr, tmpl;
 
-    quint32 total;
+    quint32 total = 0;
 
     do {
         e.evaluate (cmd);
