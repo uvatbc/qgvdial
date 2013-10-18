@@ -20,7 +20,7 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "PhoneFactory.h"
-#include "TpCalloutInitiator.h"
+#include "IPhoneAccount.h"
 
 IPhoneAccountFactory *
 createPhoneAccountFactory(QObject *parent)
@@ -30,11 +30,11 @@ createPhoneAccountFactory(QObject *parent)
 
 PhoneFactory::PhoneFactory(QObject *parent)
 : IPhoneAccountFactory(parent)
-, actMgr (Tp::AccountManager::create ())
 , m_identifyTask(NULL)
-, m_identifyLock(QMutex::Recursive)
-, m_tpAcCounter(0)
+, m_tpFactory(this)
 {
+    connect (&m_tpFactory, SIGNAL(onePhone(IPhoneAccount*)),
+             this, SLOT(onOnePhone(IPhoneAccount*)));
 }//PhoneFactory::PhoneFactory
 
 bool
@@ -56,15 +56,22 @@ PhoneFactory::identifyAll(AsyncTaskToken *task)
     }
     m_accounts.clear ();
 
-    // Make the account manager ready again.
-    bool rv;
-    rv = connect (
-         actMgr->becomeReady(), SIGNAL(finished(Tp::PendingOperation*)),
-         this, SLOT(onAccountManagerReady(Tp::PendingOperation *)));
-    Q_ASSERT(rv);
-    if (!rv) {
+    AsyncTaskToken *subTask = new AsyncTaskToken(this);
+    if (NULL == subTask) {
         completeIdentifyTask (ATTS_FAILURE);
+        return true;
     }
+    subTask->callerCtx = m_identifyTask;
+
+    connect(subTask, SIGNAL(completed()), this, SLOT(onTpIdentified()));
+
+    bool rv = m_tpFactory.identifyAll (subTask);
+    if (!rv) {
+        delete subTask;
+        completeIdentifyTask (ATTS_FAILURE);
+        return true;
+    }
+
     return true;
 }//PhoneFactory::identifyAll
 
@@ -78,88 +85,19 @@ PhoneFactory::completeIdentifyTask(int status)
 }//PhoneFactory::completeIdentifyTask
 
 void
-PhoneFactory::onAccountManagerReady (Tp::PendingOperation *op)
+PhoneFactory::onOnePhone(IPhoneAccount *p)
 {
-    op->deleteLater ();
-
-    if (op->isError ()) {
-        Q_WARN ("Account manager could not become ready");
-        completeIdentifyTask (ATTS_FAILURE);
-        return;
-    }
-
-    bool rv;
-
-    // Make each account get ready
-    QList<AccountPtr> allAccounts = actMgr->allAccounts ();
-    QMutexLocker locker (&m_identifyLock);
-    m_tpAcCounter = 1;
-    foreach (Tp::AccountPtr acc, allAccounts) {
-        m_tpAcCounter++;
-        rv = connect (acc->becomeReady(),
-                      SIGNAL(finished(Tp::PendingOperation*)),
-                      this,
-                      SLOT(onAccountReady(Tp::PendingOperation*)));
-        Q_ASSERT(rv);
-        if (!rv) {
-            m_tpAcCounter--;
-        }
-    }
-    m_tpAcCounter--;
-    if (0 == m_tpAcCounter) {
-        onAllAccountsReady ();
-    }
-}//PhoneFactory::onAccountManagerReady
+    m_accounts += p;
+    emit oneAccount (m_identifyTask, p);
+}//PhoneFactory::onOnePhone
 
 void
-PhoneFactory::onAccountReady (Tp::PendingOperation *op)
+PhoneFactory::onTpIdentified()
 {
-    op->deleteLater ();
+    AsyncTaskToken *subTask = (AsyncTaskToken *) QObject::sender ();
+    subTask->deleteLater ();
 
-    if (op->isError ()) {
-        Q_WARN ("Account could not become ready");
-        return;
-    }
+    Q_ASSERT(subTask->callerCtx == m_identifyTask);
 
-    QMutexLocker locker (&m_identifyLock);
-    m_tpAcCounter--;
-    if (0 == m_tpAcCounter) {
-        onAllAccountsReady ();
-    }
-}//PhoneFactory::onAccountReady
-
-void
-PhoneFactory::onAllAccountsReady ()
-{
-    QList<AccountPtr> allAccounts = actMgr->allAccounts ();
-
-    QString msg;
-    foreach (Tp::AccountPtr acc, allAccounts) {
-        QString cmName = acc->cmName ();
-        msg = QString ("Account cmName = %1").arg (cmName);
-        if ((cmName != "sofiasip") &&
-            (cmName != "spirit") &&
-            (cmName != "ring"))
-        {
-            // Who cares about this one?
-            msg += " IGNORED!!";
-            Q_DEBUG (msg);
-            continue;
-        }
-
-        IPhoneAccount *pa = new TpCalloutInitiator (acc, this);
-        m_accounts += pa;
-
-        if (cmName == "ring") {
-            Q_DEBUG("Added ring as fallback");
-            //listFallback += initiator;
-        }
-
-        msg += " ADDED!";
-        Q_DEBUG (msg);
-
-        emit oneAccount (m_identifyTask, pa);
-    }
-
-    completeIdentifyTask (ATTS_SUCCESS);
-}//PhoneFactory::onAllAccountsReady
+    completeIdentifyTask (subTask->status);
+}//PhoneFactory::onTpIdentified

@@ -26,7 +26,7 @@ Contact: yuvraaj@gmail.com
 #include "IPhoneAccountFactory.h"
 
 #ifndef QT_SIMULATOR
-#include "TpHeaders.h"
+#include "TpPhoneFactory.h"
 #endif
 
 class MaemoPhoneFactory : public IPhoneAccountFactory
@@ -37,6 +37,10 @@ public:
 
     bool identifyAll(AsyncTaskToken *task);
 
+private slots:
+    void onOnePhone(IPhoneAccount *p);
+    void onTpIdentified();
+
 private:
     void completeIdentifyTask(int status);
 
@@ -45,19 +49,7 @@ private:
     QList <IPhoneAccount *> m_accounts;
 
 #ifndef QT_SIMULATOR
-private slots:
-    void onAccountManagerReady (Tp::PendingOperation *op);
-    void onAccountReady (Tp::PendingOperation *op);
-
-private:
-    void onAllAccountsReady ();
-
-private:
-    Tp::AccountManagerPtr   actMgr;
-    QList<Tp::AccountPtr>   allAccounts;
-
-    QMutex  m_identifyLock;
-    int     m_tpAcCounter;
+    TpPhoneFactory m_tpFactory;
 #endif
 };
 

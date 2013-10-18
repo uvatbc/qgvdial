@@ -47,7 +47,6 @@ private slots:
     void onConnReady(Tp::PendingOperation *op);
 
     void onConnectionChanged(const Tp::ConnectionPtr &connection);
-    void onConnStatusChanged(Tp::ConnectionStatus status);
 
 private:
 
@@ -64,9 +63,7 @@ private:
     QString m_id;
     QString m_name;
 
-// Both phone factories are allowed to create this class
-    friend class MaemoPhoneFactory;
-    friend class HarmattanPhoneFactory;
+    friend class TpPhoneFactory;
 };
 
 #endif // TPCALLOUTINITIATOR_H

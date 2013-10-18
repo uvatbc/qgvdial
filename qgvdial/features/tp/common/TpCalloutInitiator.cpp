@@ -41,6 +41,9 @@ TpCalloutInitiator::onACReady(Tp::PendingOperation *op)
         return;
     }
 
+    connect(m_acc.data(), SIGNAL(connectionChanged(const Tp::ConnectionPtr &)),
+            this, SLOT(onConnectionChanged(const Tp::ConnectionPtr &)));
+
 #if 0
     Q_DEBUG(QString("cmName = %1, proto = %2, service = %3, disp = %4, "
                     "objectPath = %5")
@@ -76,6 +79,10 @@ void
 TpCalloutInitiator::onConnectionChanged(const Tp::ConnectionPtr &connection)
 {
     m_conn = connection;
+    if (m_conn.isNull ()) {
+        Q_DEBUG(QString("%1: Connection dropped").arg (m_name));
+        return;
+    }
 
     connect(m_conn->becomeReady(),
             SIGNAL(finished(Tp::PendingOperation*)),
@@ -83,16 +90,10 @@ TpCalloutInitiator::onConnectionChanged(const Tp::ConnectionPtr &connection)
 }//TpCalloutInitiator::onConnectionChanged
 
 void
-TpCalloutInitiator::onConnStatusChanged(Tp::ConnectionStatus status)
-{
-    Q_DEBUG(QString("Connection status changed to %1")
-            .arg(status));
-}//TpCalloutInitiator::onConnStatusChanged
-
-void
 TpCalloutInitiator::onConnReady(Tp::PendingOperation *op)
 {
     op->deleteLater ();
+    Q_DEBUG(QString("%1: Connection ready").arg (m_name));
 }//TpCalloutInitiator::onConnReady
 
 QString

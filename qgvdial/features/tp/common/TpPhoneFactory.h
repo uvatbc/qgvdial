@@ -19,47 +19,40 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#ifndef TPCALLOUTINITIATOR_H
-#define TPCALLOUTINITIATOR_H
+#ifndef TPPHONEFACTORY_H
+#define TPPHONEFACTORY_H
 
-#define USE_DTMF_INTERFACE_1 0
-#define USE_RAW_CHANNEL_METHOD 0
-
+#include "global.h"
 #include "TpHeaders.h"
-#include "IPhoneAccount.h"
 
-class TpCalloutInitiator : public IPhoneAccount
+class IPhoneAccount;
+
+class TpPhoneFactory : public QObject
 {
     Q_OBJECT
-
-private:
-    TpCalloutInitiator (Tp::AccountPtr act, QObject *parent = 0);
-
 public:
-    QString id ();
-    QString name ();
+    explicit TpPhoneFactory(QObject *parent = 0);
+    bool identifyAll(AsyncTaskToken *task);
 
-public slots:
-    bool initiateCall(AsyncTaskToken *task);
+signals:
+    void onePhone(IPhoneAccount *p);
 
 private slots:
-    void onACReady(Tp::PendingOperation *op);
+    void onAccountManagerReady (Tp::PendingOperation *op);
+    void onAccountReady (Tp::PendingOperation *op);
 
 private:
+    void completeIdentifyTask(int status);
+    void onAllAccountsReady ();
 
 private:
-    Tp::AccountPtr      account;
+    AsyncTaskToken *m_identifyTask;
 
-    //! DBUS System bus
-    QDBusConnection     systemBus;
+    Tp::AccountManagerPtr   actMgr;
+    QList<Tp::AccountPtr>   allAccounts;
 
-    //! Is this the buggy spirit (skype) TP-CM?
-    bool                bIsSpirit;
-
-    QString m_id;
-    QString m_name;
-
-    friend class PhoneFactory;
+    QMutex  m_identifyLock;
+    int     m_tpAcCounter;
 };
 
-#endif // TPCALLOUTINITIATOR_H
+#endif // TPPHONEFACTORY_H

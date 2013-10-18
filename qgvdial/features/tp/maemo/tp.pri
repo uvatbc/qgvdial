@@ -1,17 +1,12 @@
 INCLUDEPATH += $$PWD
 
-QT *= dbus
-
 message(Maemo or Meego TP)
 INCLUDEPATH += $$QMAKESPEC/usr/include/telepathy-1.0/
 DEFINES += TP10
 
-LIBS += -ltelepathy-qt4
+include(../common/tp-common.pri)
 
 HEADERS  += $$PWD/TpHeaders.h
-
-HEADERS  += $$PWD/TpCalloutInitiator.h
-SOURCES  += $$PWD/TpCalloutInitiator.cpp
 
 #HEADERS  += $$PWD/TpObserver.h
 #SOURCES  += $$PWD/TpObserver.cpp

@@ -21,9 +21,6 @@ Contact: yuvraaj@gmail.com
 
 #include "MaemoPhoneFactory.h"
 #include "IPhoneAccount.h"
-#ifndef QT_SIMULATOR
-#include "TpCalloutInitiator.h"
-#endif
 
 IPhoneAccountFactory *
 createPhoneAccountFactory(QObject *parent)
@@ -35,14 +32,12 @@ MaemoPhoneFactory::MaemoPhoneFactory(QObject *parent)
 : IPhoneAccountFactory(parent)
 , m_identifyTask(NULL)
 #ifndef QT_SIMULATOR
-, actMgr (Tp::AccountManager::create ())
-, m_identifyLock(QMutex::Recursive)
-, m_tpAcCounter(0)
+, m_tpFactory(this)
 #endif
 {
 #ifndef QT_SIMULATOR
-    qDBusRegisterMetaType<Tp::UIntList>();
-    qDBusRegisterMetaType<Tp::ContactAttributesMap>();
+    connect (&m_tpFactory, SIGNAL(onePhone(IPhoneAccount*)),
+             this, SLOT(onOnePhone(IPhoneAccount*)));
 #endif
 }//MaemoPhoneFactory::MaemoPhoneFactory
 
@@ -73,15 +68,22 @@ MaemoPhoneFactory::identifyAll(AsyncTaskToken *task)
     }
     m_accounts.clear ();
 
-    // Make the account manager ready again.
-    bool rv;
-    rv = connect (
-         actMgr->becomeReady(), SIGNAL(finished(Tp::PendingOperation*)),
-         this, SLOT(onAccountManagerReady(Tp::PendingOperation *)));
-    Q_ASSERT(rv);
-    if (!rv) {
+    AsyncTaskToken *subTask = new AsyncTaskToken(this);
+    if (NULL == subTask) {
         completeIdentifyTask (ATTS_FAILURE);
+        return true;
     }
+    subTask->callerCtx = m_identifyTask;
+
+    connect(subTask, SIGNAL(completed()), this, SLOT(onTpIdentified()));
+
+    bool rv = m_tpFactory.identifyAll (subTask);
+    if (!rv) {
+        delete subTask;
+        completeIdentifyTask (ATTS_FAILURE);
+        return true;
+    }
+
     return true;
 
 #endif
@@ -96,91 +98,20 @@ MaemoPhoneFactory::completeIdentifyTask(int status)
     task->emitCompleted ();
 }//MaemoPhoneFactory::completeIdentifyTask
 
-#ifndef QT_SIMULATOR
+void
+MaemoPhoneFactory::onOnePhone(IPhoneAccount *p)
+{
+    m_accounts += p;
+    emit oneAccount (m_identifyTask, p);
+}//MaemoPhoneFactory::onOnePhone
 
 void
-MaemoPhoneFactory::onAccountManagerReady (Tp::PendingOperation *op)
+MaemoPhoneFactory::onTpIdentified()
 {
-    op->deleteLater ();
+    AsyncTaskToken *subTask = (AsyncTaskToken *) QObject::sender ();
+    subTask->deleteLater ();
 
-    if (op->isError ()) {
-        Q_WARN ("Account manager could not become ready");
-        completeIdentifyTask (ATTS_FAILURE);
-        return;
-    }
+    Q_ASSERT(subTask->callerCtx == m_identifyTask);
 
-    bool rv;
-
-    // Make each account get ready
-    allAccounts = actMgr->allAccounts ();
-    QMutexLocker locker (&m_identifyLock);
-    m_tpAcCounter = 1;
-    foreach (Tp::AccountPtr acc, allAccounts) {
-        m_tpAcCounter++;
-        rv = connect (acc->becomeReady(),
-                      SIGNAL(finished(Tp::PendingOperation*)),
-                      this,
-                      SLOT(onAccountReady(Tp::PendingOperation*)));
-        Q_ASSERT(rv);
-        if (!rv) {
-            m_tpAcCounter--;
-        }
-    }
-    m_tpAcCounter--;
-    if (0 == m_tpAcCounter) {
-        onAllAccountsReady ();
-    }
-}//MaemoPhoneFactory::onAccountManagerReady
-
-void
-MaemoPhoneFactory::onAccountReady (Tp::PendingOperation *op)
-{
-    op->deleteLater ();
-
-    if (op->isError ()) {
-        Q_WARN ("Account could not become ready");
-        return;
-    }
-
-    QMutexLocker locker (&m_identifyLock);
-    m_tpAcCounter--;
-    if (0 == m_tpAcCounter) {
-        onAllAccountsReady ();
-    }
-}//MaemoPhoneFactory::onAccountReady
-
-void
-MaemoPhoneFactory::onAllAccountsReady ()
-{
-    QString msg;
-    foreach (Tp::AccountPtr acc, allAccounts) {
-        QString cmName = acc->cmName ();
-        msg = QString ("Account cmName = %1").arg (cmName);
-        if ((cmName != "sofiasip") &&
-            (cmName != "spirit") &&
-            (cmName != "ring"))
-        {
-            // Who cares about this one?
-            msg += " IGNORED!!";
-            Q_DEBUG (msg);
-            continue;
-        }
-
-        IPhoneAccount *pa = new TpCalloutInitiator (acc, this);
-        m_accounts += pa;
-
-        if (cmName == "ring") {
-            Q_DEBUG("Added ring as fallback");
-            //listFallback += initiator;
-        }
-
-        msg += " ADDED!";
-        Q_DEBUG (msg);
-
-        emit oneAccount (m_identifyTask, pa);
-    }
-
-    completeIdentifyTask (ATTS_SUCCESS);
-}//MaemoPhoneFactory::onAllAccountsReady
-
-#endif
+    completeIdentifyTask (subTask->status);
+}//MaemoPhoneFactory::onTpIdentified

@@ -24,7 +24,7 @@ Contact: yuvraaj@gmail.com
 
 #include "global.h"
 #include "IPhoneAccountFactory.h"
-#include "TpHeaders.h"
+#include "TpPhoneFactory.h"
 
 class PhoneFactory : public IPhoneAccountFactory
 {
@@ -35,22 +35,17 @@ public:
     bool identifyAll(AsyncTaskToken *task);
 
 private slots:
-    void onAccountManagerReady (Tp::PendingOperation *op);
-    void onAccountReady (Tp::PendingOperation *op);
+    void onOnePhone(IPhoneAccount *p);
+    void onTpIdentified();
 
 private:
     void completeIdentifyTask(int status);
-    void onAllAccountsReady ();
 
 private:
-    Tp::AccountManagerPtr   actMgr;
-
     AsyncTaskToken *m_identifyTask;
-
-    QMutex  m_identifyLock;
-    int     m_tpAcCounter;
-
     QList <IPhoneAccount *> m_accounts;
+
+    TpPhoneFactory m_tpFactory;
 };
 
 #endif // PHONEFACTORY_H
