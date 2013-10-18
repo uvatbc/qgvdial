@@ -45,6 +45,8 @@ public:
         return _cipher (byIn, byOut, bEncrypt);
     }
 
+    void setMainWidget (QWidget *win);
+
 #if DESKTOP_OS
     SkypeClientFactory &skypeClientFactory();
 #endif

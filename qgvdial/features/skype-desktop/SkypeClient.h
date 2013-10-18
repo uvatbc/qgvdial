@@ -35,7 +35,7 @@ enum Skype_Work {
     SW_InitiateCall,    // Target contacts (1 or more)
     SW_GetContacts,     // No params
     SW_GetCallInfo,     // Call id
-    SW_SendDtmf,        // Send DTMF to the current call
+    SW_SendDtmf         // Send DTMF to the current call
 };
 
 struct Skype_CallInfo

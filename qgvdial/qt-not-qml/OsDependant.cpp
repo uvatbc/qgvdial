@@ -46,3 +46,11 @@ OsDependant::skypeClientFactory()
     return (*m_skypeClientFactory);
 }//OsDependant::skypeClientFactory
 #endif
+
+void
+OsDependant::setMainWidget (QWidget *win)
+{
+#if DESKTOP_OS
+    m_skypeClientFactory->setMainWidget (win);
+#endif
+}//OsDependant::setMainWidget

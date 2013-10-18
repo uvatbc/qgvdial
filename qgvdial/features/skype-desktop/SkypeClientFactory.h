@@ -23,7 +23,6 @@ Contact: yuvraaj@gmail.com
 #define SKYPECLIENTFACTORY_H
 
 #include "global.h"
-#include <QObject>
 
 class SkypeClient;
 typedef QMap<QString, SkypeClient *> SkypeClientMap;

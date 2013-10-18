@@ -32,6 +32,9 @@ Contact: yuvraaj@gmail.com
 
 #include "InboxEntryDialog.h"
 
+#include "Lib.h"
+#include "OsDependant.h"
+
 #ifdef Q_WS_WIN32
 #include "MainApp.h"
 #endif
@@ -99,6 +102,9 @@ MainWindow::init()
     d->setWindowFlags (flags);
     d->setFixedSize (d->size ());
 #endif
+
+    Lib &lib = Lib::ref ();
+    ((OsDependant *)lib.osd())->setMainWidget (d);
 
     d->setOrientation(MainWindowPrivate::ScreenOrientationAuto);
     d->showExpanded();
