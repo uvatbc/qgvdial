@@ -31,27 +31,15 @@ createPhoneAccountFactory(QObject *parent)
 HarmattanPhoneFactory::HarmattanPhoneFactory(QObject *parent)
 : IPhoneAccountFactory(parent)
 , m_identifyTask(NULL)
-#ifndef QT_SIMULATOR
 , m_tpFactory(this)
-#endif
 {
-#ifndef QT_SIMULATOR
     connect (&m_tpFactory, SIGNAL(onePhone(IPhoneAccount*)),
              this, SLOT(onOnePhone(IPhoneAccount*)));
-#endif
 }//HarmattanPhoneFactory::HarmattanPhoneFactory
 
 bool
 HarmattanPhoneFactory::identifyAll(AsyncTaskToken *task)
 {
-#ifdef QT_SIMULATOR
-
-    task->status = ATTS_SUCCESS;
-    task->emitCompleted ();
-    return (true);
-
-#else
-
     // If there is an identify in progress, deny another one
     if (NULL != m_identifyTask) {
         task->status = ATTS_IN_PROGRESS;
@@ -85,8 +73,6 @@ HarmattanPhoneFactory::identifyAll(AsyncTaskToken *task)
     }
 
     return true;
-
-#endif
 }//HarmattanPhoneFactory::identifyAll
 
 void

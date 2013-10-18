@@ -25,7 +25,10 @@ include(../../api/api.pri)
 include(../features/openssl/openssl.pri)
 include(../features/dirs/linux/linux-dirs.pri)
 include(../features/dbus_api/dbus_api.pri)
-!simulator {
+
+simulator {
+include(../features/tp/linux/tp.pri)
+} else {
 include(../features/tp/maemo/tp.pri)
 }
 

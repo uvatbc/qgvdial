@@ -25,9 +25,7 @@ Contact: yuvraaj@gmail.com
 #include "global.h"
 #include "IPhoneAccountFactory.h"
 
-#ifndef QT_SIMULATOR
 #include "TpPhoneFactory.h"
-#endif
 
 class MaemoPhoneFactory : public IPhoneAccountFactory
 {
@@ -48,9 +46,7 @@ private:
     AsyncTaskToken *m_identifyTask;
     QList <IPhoneAccount *> m_accounts;
 
-#ifndef QT_SIMULATOR
     TpPhoneFactory m_tpFactory;
-#endif
 };
 
 #endif // MAEMOPHONEFACTORY_H
