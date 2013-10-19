@@ -50,6 +50,13 @@ PageStackWindow {
         }
         pageStack.push(contactDetails);
     }
+    function pushCiSelector(ciId) {
+        ciPhoneSelector.ciId = ciId;
+        if (ciPhoneSelector.phonesModel == null) {
+            ciPhoneSelector.phonesModel = g_CiPhonesModel;
+        }
+        pageStack.push(ciPhoneSelector);
+    }
 
     initialPage: Page {
         tools: commonTools
@@ -175,5 +182,11 @@ PageStackWindow {
     InfoBanner {
         id: infoBanner
         objectName: "InfoBanner"
+    }
+
+    CiPhoneSelectionPage {
+        id: ciPhoneSelector
+        objectName: "CiPhoneSelectionPage"
+        onDone: appWindow.pageStack.pop();
     }
 }

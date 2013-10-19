@@ -69,6 +69,8 @@ protected:
     void uiSetNewContactDetailsModel();
     void uiShowContactDetails(const ContactInfo &cinfo);
 
+    void uiGetCIDetails(GVRegisteredNumber &num, GVNumModel *model);
+
 private:
     QmlApplicationViewer m_view;
 
@@ -86,6 +88,7 @@ private:
     QObject *proxySettingsPage;
     QObject *selectedNumberButton;
     QObject *regNumberSelector;
+    QObject *ciSelector;
 
     void    *loginCtx;
 

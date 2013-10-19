@@ -26,31 +26,39 @@ Page {
     id: container
     tools: commonTools
 
-    anchors.fill: parent
+    signal done(bool accepted)
+    signal setCiNumber(string id, string number)
 
-    property alias model: regNumList.model
-    signal selected(string id);
-    signal modify(string id);
+    onSetCiNumber: container.done(true);
 
-    function setMyModel() {
-        if (container.model == null) {
-            container.model = g_RegNumberModel;
-        }
-    }
+    property string ciId: "Replace this ID"
+    property alias phonesModel: numbersView.model
 
-    ListView {
-        id: regNumList
+    Column {
         anchors.fill: parent
+        spacing: 5
 
-        delegate: Label {
-            width: regNumList.width
-            text: name + "\n(" + number + ")"
-
-            MouseArea {
-                anchors.fill: parent
-                onClicked: container.selected(id);
-                onPressAndHold: container.modify(id);
-            }
+        Label {
+            id: lblTitle
+            font.pixelSize: 30
+            text: "Please select a number for the account with id " + container.ciId
         }
-    }
-}
+
+        ListView {
+            id: numbersView
+
+            width: parent.width
+            height: parent.height - lblTitle.height - parent.spacing
+
+            delegate: Label {
+                width: numbersView.width
+                text: name + "\n(" + number + ")"
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: container.setCiNumber(container.ciId, number);
+                }
+            }//delegate
+        }//ListView
+    }//Column
+}//TFA Dialog

@@ -26,11 +26,12 @@ Rectangle {
     color: "black"
 
     signal done(bool accepted)
-    signal setNumberToDial(string number)
+    signal setCiNumber(string id, string number)
 
-    property alias imageSource: contactImage.source
-    property alias name: contactName.text
-    property alias phonesModel: detailsView.model
+    onSetCiNumber: container.done(true);
+
+    property string ciId: "Replace this ID"
+    property alias phonesModel: numbersView.model
 
     visible: false
     opacity: visible ? 1 : 0
@@ -40,46 +41,25 @@ Rectangle {
         anchors.fill: parent
         spacing: 5
 
-        Row {
-            id: titleRow
-            width: parent.width
-            height: contactImage.height
-
-            Image {
-                id: contactImage
-                fillMode: Image.PreserveAspectFit
-                height: 100
-                width: 100
-            }
-            TextOneLine {
-                id: contactName
-                anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: 30
-            }
+        TextOneLine {
+            id: lblTitle
+            font.pixelSize: 30
+            text: "Please select a number for the account with id " + container.ciId
         }
 
         ListView {
-            id: detailsView
+            id: numbersView
 
             width: parent.width
-            height: parent.height - titleRow.height - parent.spacing
+            height: parent.height - lblTitle.height - parent.spacing
 
-            delegate: Item {
-                width: detailsView.width
-                height: lblNumber.height + 4
-
-                TextOneLine {
-                    id: lblNumber
-                    text: number
-                    width: parent.width
-                }
+            delegate: TextOneLine {
+                width: numbersView.width
+                text: name + "\n(" + number + ")"
 
                 MouseArea {
                     anchors.fill: parent
-                    onPressAndHold: {
-                        container.setNumberToDial(number);
-                        container.done(true);
-                    }
+                    onClicked: container.setCiNumber(container.ciId, number);
                 }
             }//delegate
         }//ListView

@@ -75,6 +75,16 @@ Rectangle {
         imgClose.state = "back";
     }
 
+    function showCiSelector(ciId) {
+        ciPhoneSelector.ciId = ciId;
+        if (ciPhoneSelector.phonesModel == null) {
+            ciPhoneSelector.phonesModel = g_CiPhonesModel;
+        }
+        regNumberSelector.visible = false;
+        ciPhoneSelector.visible = true;
+        imgClose.state = "back";
+    }
+
     function doBack() {
         if (imgClose.state != "back") {
             return;
@@ -85,6 +95,9 @@ Rectangle {
         }
         if (contactDetails.visible) {
             contactDetails.visible = false;
+        }
+        if (ciPhoneSelector.visible) {
+            ciPhoneSelector.visible = false;
         }
 
         imgClose.state = '';
@@ -248,5 +261,18 @@ Rectangle {
         width: parent.width
 
         onSelected: { container.doBack(); }
+    }
+
+    CiPhoneSelectionPage {
+        id: ciPhoneSelector
+        objectName: "CiPhoneSelectionPage"
+
+        anchors {
+            top: tabBar.bottom
+            bottom: parent.bottom
+        }
+        width: parent.width
+
+        onDone: { container.doBack(); }
     }
 }//Rectangle

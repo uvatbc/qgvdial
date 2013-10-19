@@ -48,6 +48,7 @@ MainWindow::MainWindow(QObject *parent)
 , proxySettingsPage(NULL)
 , selectedNumberButton(NULL)
 , regNumberSelector(NULL)
+, ciSelector(NULL)
 {
 }//MainWindow::MainWindow
 
@@ -193,6 +194,15 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
         }
         connect (regNumberSelector, SIGNAL(selected(QString)),
                  &oPhones, SLOT(onUserSelectPhone(QString)));
+        connect (regNumberSelector, SIGNAL(modify(QString)),
+                 &oPhones, SLOT(onUserUpdateCiNumber(QString)));
+
+        ciSelector = getQMLObject ("CiPhoneSelectionPage");
+        if (NULL == ciSelector) {
+            break;
+        }
+        connect(ciSelector, SIGNAL(setCiNumber(QString,QString)),
+                &oPhones, SLOT(linkCiToNumber(QString,QString)));
 
         onInitDone();
         return;
@@ -407,3 +417,13 @@ MainWindow::onInboxClicked(QString id)
                                Q_ARG (QVariant, QVariant(cinfo.strTitle)));
     */
 }//MainWindow::onInboxClicked
+
+void
+MainWindow::uiGetCIDetails(GVRegisteredNumber &num, GVNumModel *model)
+{
+    m_view.engine()->rootContext()
+                   ->setContextProperty("g_CiPhonesModel", model);
+
+    QMetaObject::invokeMethod (mainPageStack, "pushCiSelector",
+                               Q_ARG (QVariant, QVariant(num.id)));
+}//MainWindow::uiGetCIDetails

@@ -29,6 +29,7 @@ Item {
     Behavior on opacity { PropertyAnimation { duration: 500 } }
 
     signal selected(string id);
+    signal modify(string id);
 
     function setMyModel() {
         if (regNumList.model == null) {
@@ -52,6 +53,7 @@ Item {
             MouseArea {
                 anchors.fill: parent
                 onClicked: container.selected(id);
+                onPressAndHold: container.modify(id);
             }
         }//delegate (TextOneLine)
     }

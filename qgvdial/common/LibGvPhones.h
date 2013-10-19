@@ -41,14 +41,14 @@ public:
     bool refresh();
     bool refreshOutgoing();
 
-    bool linkCiToNumber(QString ciId, QString strNumber);
-
 public slots:
     bool onUserSelectPhone(int index);
     bool onUserSelectPhone(QString id);
 
     bool onUserUpdateCiNumber(int index);
     bool onUserUpdateCiNumber(QString id);
+
+    bool linkCiToNumber(QString ciId, QString strNumber);
 
 private slots:
     void onGotRegisteredPhone (const GVRegisteredNumber &info);

@@ -134,7 +134,13 @@ DummyMainWindow::uiSetNewContactDetailsModel()
 }//DummyMainWindow::uiSetNewContactDetailsModel
 
 void
-DummyMainWindow::uiShowContactDetails(const ContactInfo & /*cinfo*/)
+DummyMainWindow::uiShowContactDetails(const ContactInfo &)
 {
     Q_ASSERT(0 == "Not implemented");
 }//DummyMainWindow::uiShowContactDetails
+
+void
+DummyMainWindow::uiGetCIDetails(GVRegisteredNumber &, GVNumModel *)
+{
+    Q_ASSERT(0 == "Not implemented");
+}//DummyMainWindow::uiGetCIDetails

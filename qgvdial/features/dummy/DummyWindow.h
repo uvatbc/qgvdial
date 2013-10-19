@@ -54,6 +54,8 @@ protected:
 
     virtual void uiSetNewContactDetailsModel();
     virtual void uiShowContactDetails(const ContactInfo &cinfo);
+
+    virtual void uiGetCIDetails(GVRegisteredNumber &num, GVNumModel *model);
 };
 
 #endif // DUMMYMAINWINDOW_H

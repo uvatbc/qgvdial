@@ -167,6 +167,7 @@ LibGvPhones::onUserSelectPhone(QString id)
             m_ciModel->m_dialBack.clear();
             m_ciModel->m_dialOut.clear();
             m_ciModel->m_dialBack = m_numModel->m_dialBack;
+            m_ciModel->informViewsOfNewData ();
 
             // Tell the UI that this CI needs a number
             win->uiGetCIDetails(num, m_ciModel);
@@ -307,6 +308,7 @@ LibGvPhones::onUserUpdateCiNumber(QString id)
             m_ciModel->m_dialBack.clear();
             m_ciModel->m_dialOut.clear();
             m_ciModel->m_dialBack = m_numModel->m_dialBack;
+            m_ciModel->informViewsOfNewData ();
 
             // Tell the UI that this CI needs a number
             IMainWindow *win = (IMainWindow *) this->parent ();
