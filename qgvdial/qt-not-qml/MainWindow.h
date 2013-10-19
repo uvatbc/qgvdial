@@ -79,6 +79,8 @@ protected slots:
     void onInboxClicked(const QModelIndex &index);
     void onInboxDoubleClicked(const QModelIndex &index);
 
+    void onCbNumLongPress(int index);
+
 private:
     MainWindowPrivate *d;
 };

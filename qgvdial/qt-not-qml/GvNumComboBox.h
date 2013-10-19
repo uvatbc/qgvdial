@@ -19,31 +19,31 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#include "CINumberDialog.h"
-#include "ui_CINumberDialog.h"
-#include "GVNumModel.h"
+#ifndef GVNUMCOMBOBOX_H
+#define GVNUMCOMBOBOX_H
 
-CINumberDialog::CINumberDialog(QWidget *parent)
-: QDialog(parent)
-, ui(new Ui::CINumberDialog)
-{
-    ui->setupUi(this);
-}//CINumberDialog::CINumberDialog
+#include "global.h"
 
-CINumberDialog::~CINumberDialog()
+class GvNumComboBox : public QComboBox
 {
-    delete ui;
-}//CINumberDialog::~CINumberDialog
+    Q_OBJECT
+public:
+    explicit GvNumComboBox(QWidget *parent = 0);
 
-void
-CINumberDialog::fillUI(QString id, GVNumModel *model)
-{
-    ui->lblCiId->setText (id);
-    ui->listPhones->setModel (model);
-}//CINumberDialog::fillUI
+signals:
+    void longActivated(int index);
 
-QString
-CINumberDialog::getSelected()
-{
-    return (ui->listPhones->getSelectedNumber ());
-}//CINumberDialog::getSelected
+private slots:
+    void onLongPressTimer();
+    void onActivated(int index);
+
+protected:
+    void mousePressEvent(QMouseEvent *e);
+    void mouseReleaseEvent(QMouseEvent *e);
+
+private:
+    QTimer  m_longPressTimer;
+    bool    m_isLongPress;
+};
+
+#endif // GVNUMCOMBOBOX_H

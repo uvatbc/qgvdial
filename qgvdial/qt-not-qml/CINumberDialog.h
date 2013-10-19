@@ -39,7 +39,7 @@ public:
     ~CINumberDialog();
 
     void fillUI(QString id, GVNumModel *model);
-    int getSelected();
+    QString getSelected();
 
 private:
     Ui::CINumberDialog *ui;

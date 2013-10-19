@@ -133,9 +133,7 @@ LibGvPhones::onUserSelectPhone(int index)
         return (false);
     } while (0);
 
-    onUserSelectPhone (id);
-
-    return (true);
+    return onUserSelectPhone (id);
 }//LibGvPhones::onUserSelectPhone
 
 bool
@@ -256,3 +254,67 @@ LibGvPhones::onAllAccountsIdentified()
     m_numModel->informViewsOfNewData ();
     win->uiRefreshNumbers ();
 }//LibGvPhones::onAllAccountsIdentified
+
+bool
+LibGvPhones::linkCiToNumber(QString ciId, QString strNumber)
+{
+    IMainWindow *win = (IMainWindow *) this->parent ();
+    bool rv = false;
+
+    for (int i = 0; i < m_numModel->m_dialOut.count(); i++) {
+        if (m_numModel->m_dialOut[i].id == ciId) {
+            m_numModel->m_dialOut[i].number = strNumber;
+            win->db.setCINumber (ciId, strNumber);
+            m_numModel->informViewsOfNewData ();
+            rv = true;
+            break;
+        }
+    }
+
+    return rv;
+}//LibGvPhones::linkCiToNumber
+
+bool
+LibGvPhones::onUserUpdateCiNumber(int index)
+{
+    QString id;
+
+    do {
+        if (index < m_numModel->m_dialBack.count()) {
+            return false;
+        }
+        index -= m_numModel->m_dialBack.count();
+
+        if (index < m_numModel->m_dialOut.count()) {
+            id = m_numModel->m_dialOut[index].id;
+            break;
+        }
+
+        Q_WARN("Array index out of bounds");
+        return (false);
+    } while(0);
+
+    return onUserUpdateCiNumber(id);
+}//LibGvPhones::onUserUpdateCiNumber
+
+bool
+LibGvPhones::onUserUpdateCiNumber(QString id)
+{
+    bool rv = false;
+
+    foreach (GVRegisteredNumber num, m_numModel->m_dialOut) {
+        if (num.id == id) {
+            m_ciModel->m_dialBack.clear();
+            m_ciModel->m_dialOut.clear();
+            m_ciModel->m_dialBack = m_numModel->m_dialBack;
+
+            // Tell the UI that this CI needs a number
+            IMainWindow *win = (IMainWindow *) this->parent ();
+            win->uiGetCIDetails(num, m_ciModel);
+            rv = true;
+            break;
+        }
+    }
+
+    return rv;
+}//LibGvPhones::onUserUpdateCiNumber

@@ -35,7 +35,7 @@
          <widget class="QWidget" name="numDisp" native="true">
           <layout class="QVBoxLayout" name="verticalLayout_5">
            <item>
-            <widget class="QComboBox" name="cbNumbers">
+            <widget class="GvNumComboBox" name="cbNumbers">
              <property name="minimumSize">
               <size>
                <width>0</width>
@@ -474,6 +474,13 @@
   <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>GvNumComboBox</class>
+   <extends>QComboBox</extends>
+   <header>GvNumComboBox.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>

@@ -18,19 +18,21 @@ SOURCES  += MainWindow.cpp \
             ContactDialog.cpp \
             InboxEntryDialog.cpp \
             CINumberDialog.cpp \
-    CiListView.cpp
+            CiListView.cpp \
+    GvNumComboBox.cpp
 HEADERS  += MainWindow.h \
             MainWindow_p.h \
             OsDependant.h \
             ContactDialog.h \
             InboxEntryDialog.h \
             CINumberDialog.h \
-    CiListView.h
+            CiListView.h \
+    GvNumComboBox.h
 
 FORMS    += mainwindow.ui \
             ContactDialog.ui \
             InboxEntryDialog.ui \
-    CINumberDialog.ui
+            CINumberDialog.ui
 RESOURCES += qtnotqml.qrc
 
 include(../common/common.pri)

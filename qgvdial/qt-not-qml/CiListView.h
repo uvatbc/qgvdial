@@ -29,11 +29,7 @@ class CiListView : public QListView
     Q_OBJECT
 public:
     explicit CiListView(QWidget *parent = 0);
-
-signals:
-
-public slots:
-
+    QString getSelectedNumber();
 };
 
 #endif // CILISTVIEW_H

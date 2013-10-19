@@ -145,6 +145,8 @@ MainWindow::init()
 
     connect(d->ui->cbNumbers, SIGNAL(currentIndexChanged(int)),
             &oPhones, SLOT(onUserSelectPhone(int)));
+    connect(d->ui->cbNumbers, SIGNAL(longActivated(int)),
+            this, SLOT(onCbNumLongPress(int)));
 
     connect(d->ui->btnCall, SIGNAL(clicked()),
             this, SLOT(onUserCallBtnClicked()));
@@ -474,5 +476,20 @@ MainWindow::uiGetCIDetails(GVRegisteredNumber &num, GVNumModel *model)
 {
     CINumberDialog dlg;
     dlg.fillUI (num.id, model);
-    dlg.exec();
+    if (QDialog::Accepted != dlg.exec()) {
+        return;
+    }
+
+    QString number = dlg.getSelected();
+    if (number.isEmpty ()) {
+        return;
+    }
+
+    oPhones.linkCiToNumber (num.id, number);
 }//MainWindow::uiGetCIDetails
+
+void
+MainWindow::onCbNumLongPress(int index)
+{
+    oPhones.onUserUpdateCiNumber (index);
+}//MainWindow::onCbNumLongPress

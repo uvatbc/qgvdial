@@ -20,8 +20,22 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "CiListView.h"
+#include "GVNumModel.h"
 
 CiListView::CiListView(QWidget *parent)
 : QListView(parent)
 {
 }//CiListView::CiListView
+
+QString
+CiListView::getSelectedNumber()
+{
+    QModelIndexList iList = selectedIndexes ();
+    int index = iList.count ();
+    Q_ASSERT(index <= 1);
+    if (index == 0) {
+        return "";
+    }
+
+    return (iList[0].data(GVNumModel::NumberRole).toString());
+}//CiListView::getSelectedId

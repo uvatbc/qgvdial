@@ -256,6 +256,18 @@ IMainWindow::onUserCall(QString number)
         return;
     }
 
+    if (number.isEmpty ()) {
+        Q_WARN("Cannot dial empty number.");
+        return;
+    }
+
+    if ((!num.dialBack) && num.number.isEmpty ()) {
+        // Roundabout way to show the CI selection UI:
+        oPhones.onUserSelectPhone(num.id);
+        // Cannot be certain that this completed in time, so just leave.
+        return;
+    }
+
     AsyncTaskToken *task = new AsyncTaskToken(this);
     if (NULL == task) {
         Q_WARN("Failed to allocate task!");
