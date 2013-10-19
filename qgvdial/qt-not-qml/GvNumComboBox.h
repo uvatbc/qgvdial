@@ -31,19 +31,18 @@ public:
     explicit GvNumComboBox(QWidget *parent = 0);
 
 signals:
-    void longActivated(int index);
+    void doModify(int index);
 
 private slots:
-    void onLongPressTimer();
-    void onActivated(int index);
+    void onViewDoubleClicked(const QModelIndex &index);
 
-protected:
-    void mousePressEvent(QMouseEvent *e);
-    void mouseReleaseEvent(QMouseEvent *e);
+    void onViewEntryPressed(const QModelIndex &index);
+    void onViewTimerTimeout();
+    void onViewEntryClicked(int index);
 
 private:
     QTimer  m_longPressTimer;
-    bool    m_isLongPress;
+    int     m_longPressRow;
 };
 
 #endif // GVNUMCOMBOBOX_H

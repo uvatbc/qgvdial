@@ -23,47 +23,50 @@ Contact: yuvraaj@gmail.com
 
 GvNumComboBox::GvNumComboBox(QWidget *parent)
 : QComboBox(parent)
-, m_isLongPress(false)
+, m_longPressRow(-1)
 {
-    connect (&m_longPressTimer, SIGNAL(timeout()),
-             this, SLOT(onLongPressTimer()));
-    m_longPressTimer.setSingleShot (true);
-    m_longPressTimer.setInterval (1000);
+    connect(view(), SIGNAL(doubleClicked(QModelIndex)),
+            this, SLOT(onViewDoubleClicked(QModelIndex)));
 
-    connect(this, SIGNAL(activated(int)), this, SLOT(onActivated(int)));
+    m_longPressTimer.setInterval (1000);
+    m_longPressTimer.setSingleShot (true);
+    connect(&m_longPressTimer, SIGNAL(timeout()),
+            this, SLOT(onViewTimerTimeout()));
+
+    connect (view (), SIGNAL(pressed(QModelIndex)),
+             this, SLOT(onViewEntryPressed(QModelIndex)));
+    connect (this, SIGNAL(currentIndexChanged(int)),
+             this, SLOT(onViewEntryClicked(int)));
 }//GvNumComboBox::GvNumComboBox
 
 void
-GvNumComboBox::onLongPressTimer()
+GvNumComboBox::onViewDoubleClicked(const QModelIndex &index)
 {
-    m_isLongPress = true;
-    Q_DEBUG("LONG");
-}//GvNumComboBox::onLongPressTimer
+    emit doModify(index.row ());
+}//GvNumComboBox::onViewDoubleClicked
 
 void
-GvNumComboBox::mousePressEvent(QMouseEvent *e)
+GvNumComboBox::onViewEntryPressed(const QModelIndex &index)
 {
-    QComboBox::mousePressEvent(e);
-
-    m_isLongPress = false;
     m_longPressTimer.stop ();
+
+    m_longPressRow = index.row ();
     m_longPressTimer.start ();
-}//GvNumComboBox::mousePressEvent
+}//GvNumComboBox::onViewEntryPressed
 
 void
-GvNumComboBox::mouseReleaseEvent(QMouseEvent *e)
+GvNumComboBox::onViewTimerTimeout()
 {
-    m_longPressTimer.stop ();
-    QComboBox::mouseReleaseEvent (e);
-}//GvNumComboBox::mouseReleaseEvent
-
-void
-GvNumComboBox::onActivated(int index)
-{
-    if (m_isLongPress) {
-        m_isLongPress = false;
-        emit longActivated (index);
-    } else {
-        Q_DEBUG("Not long");
+    if (-1 != m_longPressRow) {
+        int val = m_longPressRow;
+        m_longPressRow = -1;
+        emit doModify(val);
     }
-}//GvNumComboBox::onActivated
+}//GvNumComboBox::onViewTimerTimeout
+
+void
+GvNumComboBox::onViewEntryClicked(int index)
+{
+    m_longPressRow = -1;
+    m_longPressTimer.stop ();
+}//GvNumComboBox::onViewEntryClicked

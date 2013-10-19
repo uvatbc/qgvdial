@@ -145,8 +145,8 @@ MainWindow::init()
 
     connect(d->ui->cbNumbers, SIGNAL(currentIndexChanged(int)),
             &oPhones, SLOT(onUserSelectPhone(int)));
-    connect(d->ui->cbNumbers, SIGNAL(longActivated(int)),
-            this, SLOT(onCbNumLongPress(int)));
+    connect(d->ui->cbNumbers, SIGNAL(doModify(int)),
+            this, SLOT(onCbNumDoModify(int)));
 
     connect(d->ui->btnCall, SIGNAL(clicked()),
             this, SLOT(onUserCallBtnClicked()));
@@ -489,7 +489,7 @@ MainWindow::uiGetCIDetails(GVRegisteredNumber &num, GVNumModel *model)
 }//MainWindow::uiGetCIDetails
 
 void
-MainWindow::onCbNumLongPress(int index)
+MainWindow::onCbNumDoModify(int index)
 {
     oPhones.onUserUpdateCiNumber (index);
-}//MainWindow::onCbNumLongPress
+}//MainWindow::onCbNumDoModify
