@@ -37,9 +37,6 @@ protected:
 public:
     virtual bool identifyAll(AsyncTaskToken *task) = 0;
 
-signals:
-    void oneAccount(AsyncTaskToken *task, IPhoneAccount *account);
-
 protected:
     //! ID -> Account
     QMap <QString, IPhoneAccount *> m_accounts;
@@ -47,6 +44,8 @@ protected:
 
 // Friend function to create an object of this class.
     friend IPhoneAccountFactory *createPhoneAccountFactory(QObject *parent);
+// Firend class to access the accounts map
+    friend class LibGvPhones;
 };
 
 IPhoneAccountFactory *

@@ -23,7 +23,6 @@ Contact: yuvraaj@gmail.com
 #define CONTACTDIALOG_H
 
 #include "global.h"
-#include <QtGui>
 
 namespace Ui {
 class ContactDialog;
@@ -32,7 +31,7 @@ class ContactDialog;
 class ContactDialog : public QDialog
 {
     Q_OBJECT
-    
+
 public:
     explicit ContactDialog(QWidget *parent = 0);
     ~ContactDialog();
@@ -44,7 +43,7 @@ signals:
 
 private slots:
     void onDoubleClicked(const QModelIndex &index);
-    
+
 private:
     Ui::ContactDialog *ui;
 

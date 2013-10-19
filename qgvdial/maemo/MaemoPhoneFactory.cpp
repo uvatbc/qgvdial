@@ -87,8 +87,7 @@ MaemoPhoneFactory::completeIdentifyTask(int status)
 void
 MaemoPhoneFactory::onOnePhone(IPhoneAccount *p)
 {
-    m_accounts += p;
-    emit oneAccount (m_identifyTask, p);
+    m_accounts[p->id ()] = p;
 }//MaemoPhoneFactory::onOnePhone
 
 void

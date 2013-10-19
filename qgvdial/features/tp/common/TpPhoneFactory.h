@@ -41,6 +41,8 @@ private slots:
     void onAccountManagerReady (Tp::PendingOperation *op);
     void onAccountReady (Tp::PendingOperation *op);
 
+    void onAccIdFound();
+
 private:
     void completeIdentifyTask(int status);
     void onAllAccountsReady ();

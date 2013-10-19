@@ -38,6 +38,7 @@ TpCalloutInitiator::onACReady(Tp::PendingOperation *op)
     op->deleteLater ();
     if (op->isError()) {
         Q_WARN("Account could not be made ready");
+        emit changed();
         return;
     }
 
@@ -55,7 +56,6 @@ TpCalloutInitiator::onACReady(Tp::PendingOperation *op)
 #endif
 
     m_id = m_acc->objectPath();
-
     m_name = m_acc->cmName();
     int pos = m_id.lastIndexOf('/');
     if (-1 != pos) {
@@ -64,6 +64,7 @@ TpCalloutInitiator::onACReady(Tp::PendingOperation *op)
 
     Q_DEBUG(QString("id = %1, name = %2")
             .arg(m_id, m_name));
+    emit changed();
 
     m_conn = m_acc->connection();
     if (m_conn.isNull()) {

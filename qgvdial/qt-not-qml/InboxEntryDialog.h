@@ -23,7 +23,6 @@ Contact: yuvraaj@gmail.com
 #define INBOXENTRYDIALOG_H
 
 #include "global.h"
-#include <QtGui>
 
 namespace Ui {
 class InboxEntryDialog;

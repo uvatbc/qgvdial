@@ -87,8 +87,8 @@ PhoneFactory::completeIdentifyTask(int status)
 void
 PhoneFactory::onOnePhone(IPhoneAccount *p)
 {
-    m_accounts += p;
-    emit oneAccount (m_identifyTask, p);
+    Q_ASSERT(! p->id().isEmpty());
+    m_accounts[p->id ()] = p;
 }//PhoneFactory::onOnePhone
 
 void

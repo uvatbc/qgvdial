@@ -19,32 +19,30 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#ifndef PHONEFACTORY_H
-#define PHONEFACTORY_H
+#include "CINumberDialog.h"
+#include "ui_CINumberDialog.h"
+#include "GVNumModel.h"
 
-#include "global.h"
-#include "IPhoneAccountFactory.h"
-#include "TpPhoneFactory.h"
-
-class PhoneFactory : public IPhoneAccountFactory
+CINumberDialog::CINumberDialog(QWidget *parent)
+: QDialog(parent)
+, ui(new Ui::CINumberDialog)
 {
-    Q_OBJECT
-public:
-    explicit PhoneFactory(QObject *parent = 0);
+    ui->setupUi(this);
+}//CINumberDialog::CINumberDialog
 
-    bool identifyAll(AsyncTaskToken *task);
+CINumberDialog::~CINumberDialog()
+{
+    delete ui;
+}//CINumberDialog::~CINumberDialog
 
-private slots:
-    void onOnePhone(IPhoneAccount *p);
-    void onTpIdentified();
+void
+CINumberDialog::fillUI(QString id, GVNumModel *model)
+{
+    ui->lblCiId->setText (id);
+    ui->listPhones->setModel (model);
+}//CINumberDialog::fillUI
 
-private:
-    void completeIdentifyTask(int status);
-
-private:
-    AsyncTaskToken *m_identifyTask;
-
-    TpPhoneFactory m_tpFactory;
-};
-
-#endif // PHONEFACTORY_H
+int
+CINumberDialog::getSelected()
+{
+}//CINumberDialog::getSelected

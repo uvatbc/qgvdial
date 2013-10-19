@@ -104,6 +104,9 @@ public:
     QStringList getTextsByContact(const QString &strContact);
     QStringList getTextsByDate(QDateTime dtStart, QDateTime dtEnd);
 
+    bool getCINumber(const QString &id, QString &num);
+    bool setCINumber(const QString &id, const QString &num);
+
 private:
     void ensureCache();
     bool blowAwayCache();

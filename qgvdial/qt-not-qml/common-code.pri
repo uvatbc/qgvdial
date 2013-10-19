@@ -16,16 +16,21 @@ SOURCES  += MainWindow.cpp \
             MainWindow_p.cpp \
             OsDependant.cpp \
             ContactDialog.cpp \
-            InboxEntryDialog.cpp
+            InboxEntryDialog.cpp \
+            CINumberDialog.cpp \
+    CiListView.cpp
 HEADERS  += MainWindow.h \
             MainWindow_p.h \
             OsDependant.h \
             ContactDialog.h \
-            InboxEntryDialog.h
+            InboxEntryDialog.h \
+            CINumberDialog.h \
+    CiListView.h
 
 FORMS    += mainwindow.ui \
             ContactDialog.ui \
-            InboxEntryDialog.ui
+            InboxEntryDialog.ui \
+    CINumberDialog.ui
 RESOURCES += qtnotqml.qrc
 
 include(../common/common.pri)

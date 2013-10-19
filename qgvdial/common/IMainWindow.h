@@ -153,6 +153,8 @@ protected:
     virtual void uiSetNewContactDetailsModel() = 0;
     virtual void uiShowContactDetails(const ContactInfo &cinfo) = 0;
 
+    virtual void uiGetCIDetails(GVRegisteredNumber &num, GVNumModel *model) = 0;
+
 protected:
     CacheDb db;
     GVApi   gvApi;

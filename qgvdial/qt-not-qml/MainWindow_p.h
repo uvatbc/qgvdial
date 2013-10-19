@@ -22,7 +22,6 @@ Contact: yuvraaj@gmail.com
 #ifndef MAINWINDOW_P_H
 #define MAINWINDOW_P_H
 
-#include <QtGui>
 #include "global.h"
 
 namespace Ui {

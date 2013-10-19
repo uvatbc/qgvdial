@@ -23,6 +23,10 @@ Contact: yuvraaj@gmail.com
 #include "MainWindow.h"
 #include "MainWindow_p.h"
 #include "ui_mainwindow.h"
+
+#include "Lib.h"
+#include "OsDependant.h"
+
 #include "ContactsModel.h"
 #include "InboxModel.h"
 #include "GVNumModel.h"
@@ -31,9 +35,7 @@ Contact: yuvraaj@gmail.com
 #include "ContactNumbersModel.h"
 
 #include "InboxEntryDialog.h"
-
-#include "Lib.h"
-#include "OsDependant.h"
+#include "CINumberDialog.h"
 
 #ifdef Q_WS_WIN32
 #include "MainApp.h"
@@ -466,3 +468,11 @@ MainWindow::onInboxDoubleClicked(const QModelIndex &index)
     QModelIndex numIndex = index.sibling (index.row (), 3);
     setNumberToDial (numIndex.data().toString());
 }//MainWindow::onInboxClicked
+
+void
+MainWindow::uiGetCIDetails(GVRegisteredNumber &num, GVNumModel *model)
+{
+    CINumberDialog dlg;
+    dlg.fillUI (num.id, model);
+    dlg.exec();
+}//MainWindow::uiGetCIDetails

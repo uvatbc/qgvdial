@@ -44,7 +44,6 @@ private:
 
 private:
     AsyncTaskToken *m_identifyTask;
-    QList <IPhoneAccount *> m_accounts;
 
     TpPhoneFactory m_tpFactory;
 };

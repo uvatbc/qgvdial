@@ -139,18 +139,6 @@ CacheDb::ensureCache ()
                         GV_L_DATA   " varchar)");
     }
 
-    // Ensure that the registered numbers table is present. If not, create it.
-    if (!arrTables.contains (GV_REG_NUMS_TABLE)) {
-        query.exec ("CREATE TABLE " GV_REG_NUMS_TABLE " "
-                    "(" GV_RN_NAME           " varchar, "
-                        GV_RN_NUM            " varchar, "
-                        GV_RN_TYPE           " tinyint, "
-                        GV_RN_FLAGS          " integer, "
-                        GV_RN_FWDCOUNTRY     " varchar, "
-                        GV_RN_DISPUNVERIFYDT " varchar"
-                    ")");
-    }
-
     // Ensure that the call initiators table is present. If not, create it.
     if (!arrTables.contains (GV_CI_TABLE)) {
         query.exec ("CREATE TABLE " GV_CI_TABLE " "
@@ -1339,13 +1327,14 @@ CacheDb::getTextsByDate(QDateTime dtStart, QDateTime dtEnd)
     query.setForwardOnly (true);
 
     QString strQ = QString("SELECT "
-            GV_IN_ATTIME ","
-            GV_IN_PHONE ","
-            GV_IN_SMSTEXT " "
-            "FROM " GV_INBOX_TABLE " "
-            "WHERE " GV_IN_ATTIME " >= %1 AND " GV_IN_ATTIME " <= %2 "
-            "AND " GV_IN_TYPE " == %3 "
-            "ORDER BY " GV_IN_ATTIME " DESC")
+                                GV_IN_ATTIME ","
+                                GV_IN_PHONE ","
+                                GV_IN_SMSTEXT " "
+                           "FROM " GV_INBOX_TABLE " "
+                           "WHERE " GV_IN_ATTIME " >= %1 "
+                             "AND " GV_IN_ATTIME " <= %2 "
+                             "AND " GV_IN_TYPE " == %3 "
+                           "ORDER BY " GV_IN_ATTIME " DESC")
             .arg (dtStart.toTime_t ())
             .arg (dtEnd.toTime_t ())
             .arg (GVIE_TextMessage);
@@ -1381,3 +1370,45 @@ CacheDb::getTextsByDate(QDateTime dtStart, QDateTime dtEnd)
 
     return rv;
 }//CacheDb::getTextsByDate
+
+bool
+CacheDb::getCINumber(const QString &id, QString &num)
+{
+    CacheDbPrivate &p = CacheDbPrivate::ref();
+    QSqlQuery query(p.db);
+    query.setForwardOnly (true);
+
+    QString scrubId = id;
+    scrubId.replace ("'", "''");
+
+    QString strQ = QString("SELECT " GV_CI_NUMBER " FROM " GV_CI_TABLE " "
+                           "WHERE " GV_CI_ID " == '%1'")
+                    .arg (scrubId);
+
+    query.exec (strQ);
+    if (!query.next ()) {
+        return false;
+    }
+    num = query.value (0).toString ();
+    return true;
+}//CacheDb::getCINumber
+
+bool
+CacheDb::setCINumber(const QString &id, const QString &num)
+{
+    CacheDbPrivate &p = CacheDbPrivate::ref();
+    QSqlQuery query(p.db);
+    query.setForwardOnly (true);
+
+    QString scrubId = id;
+    QString scrubNum = num;
+    scrubId.replace ("'", "''");
+    scrubNum.replace ("'", "''");
+
+    QString strQ = QString("INSERT INTO " GV_CI_TABLE " ("
+                                GV_CI_ID "," GV_CI_NUMBER ") "
+                           "VALUES ('%1', '%2')")
+                    .arg (scrubId, scrubNum);
+
+    return query.exec (strQ);
+}//CacheDb::setCINumber

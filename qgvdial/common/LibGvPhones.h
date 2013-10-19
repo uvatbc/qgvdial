@@ -49,7 +49,6 @@ private slots:
     void onGotRegisteredPhone (const GVRegisteredNumber &info);
     void onGotPhones();
 
-    void onOneAccount(AsyncTaskToken *task, IPhoneAccount *account);
     void onAllAccountsIdentified();
 
 private:
@@ -58,6 +57,7 @@ private:
 
 public:
     GVNumModel *m_numModel;
+    GVNumModel *m_ciModel;
     bool        m_ignoreSelectedNumberChanges;
 
     //! Number of times this was refreshed successfully
@@ -65,7 +65,6 @@ public:
 
 private:
     IPhoneAccountFactory *m_acctFactory;
-    QVector <IPhoneAccount *> m_accounts;
 
     friend class IMainWindow;
 };

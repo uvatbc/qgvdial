@@ -19,32 +19,21 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#ifndef PHONEFACTORY_H
-#define PHONEFACTORY_H
+#ifndef CILISTVIEW_H
+#define CILISTVIEW_H
 
 #include "global.h"
-#include "IPhoneAccountFactory.h"
-#include "TpPhoneFactory.h"
 
-class PhoneFactory : public IPhoneAccountFactory
+class CiListView : public QListView
 {
     Q_OBJECT
 public:
-    explicit PhoneFactory(QObject *parent = 0);
+    explicit CiListView(QWidget *parent = 0);
 
-    bool identifyAll(AsyncTaskToken *task);
+signals:
 
-private slots:
-    void onOnePhone(IPhoneAccount *p);
-    void onTpIdentified();
+public slots:
 
-private:
-    void completeIdentifyTask(int status);
-
-private:
-    AsyncTaskToken *m_identifyTask;
-
-    TpPhoneFactory m_tpFactory;
 };
 
-#endif // PHONEFACTORY_H
+#endif // CILISTVIEW_H

@@ -67,6 +67,8 @@ protected:
     void uiSetNewContactDetailsModel();
     void uiShowContactDetails(const ContactInfo &cinfo);
 
+    void uiGetCIDetails(GVRegisteredNumber &num, GVNumModel *model);
+
 protected slots:
     void messageReceived(const QString &msg);
 

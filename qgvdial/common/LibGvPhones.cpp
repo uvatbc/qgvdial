@@ -29,6 +29,7 @@ Contact: yuvraaj@gmail.com
 LibGvPhones::LibGvPhones(IMainWindow *parent)
 : QObject(parent)
 , m_numModel(new GVNumModel(this))
+, m_ciModel(new GVNumModel(this))
 , m_ignoreSelectedNumberChanges(false)
 , s_Refresh(0)
 , m_acctFactory(NULL)
@@ -40,7 +41,6 @@ LibGvPhones::LibGvPhones(IMainWindow *parent)
 
 LibGvPhones::~LibGvPhones()
 {
-    clearAllAccounts ();
 }//LibGvPhones::~LibGvPhones
 
 bool
@@ -68,7 +68,6 @@ void
 LibGvPhones::onGotPhones()
 {
     AsyncTaskToken *task = (AsyncTaskToken *) QObject::sender ();
-
     IMainWindow *win = (IMainWindow *) this->parent ();
 
     QString id;
@@ -113,19 +112,20 @@ LibGvPhones::onUserSelectPhone(int index)
         return false;
     }
 
+    QString id;
     do {
         if (index < 0) {
             return (false);
         }
 
         if (index < m_numModel->m_dialBack.count()) {
-            m_numModel->m_selectedId = m_numModel->m_dialBack[index].id;
+            id = m_numModel->m_dialBack[index].id;
             break;
         }
         index -= m_numModel->m_dialBack.count();
 
         if (index < m_numModel->m_dialOut.count()) {
-            m_numModel->m_selectedId = m_numModel->m_dialOut[index].id;
+            id = m_numModel->m_dialOut[index].id;
             break;
         }
 
@@ -133,9 +133,7 @@ LibGvPhones::onUserSelectPhone(int index)
         return (false);
     } while (0);
 
-    Q_DEBUG(QString("Selected phone ID: %1").arg(m_numModel->m_selectedId));
-    IMainWindow *win = (IMainWindow *) this->parent ();
-    win->db.putSelectedPhone (m_numModel->m_selectedId);
+    onUserSelectPhone (id);
 
     return (true);
 }//LibGvPhones::onUserSelectPhone
@@ -152,17 +150,34 @@ LibGvPhones::onUserSelectPhone(QString id)
     }
 
     bool rv;
-    int index;
     IMainWindow *win = (IMainWindow *) this->parent ();
 
     do {
-        if (!m_numModel->findById (id, rv, index)) {
-            rv = false;
+        GVRegisteredNumber num;
+        rv = m_numModel->findById (id, num);
+        if (!rv) {
             break;
         }
 
-        m_numModel->m_selectedId = id;
-        win->db.putSelectedPhone (id);
+        if ((!num.dialBack) && (num.number.isEmpty ())) {
+            QStringList ids, ph;
+            foreach (GVRegisteredNumber r, m_numModel->m_dialBack) {
+                ids += r.id;
+                ph += QString("%1\n(%2)").arg(r.name, r.number);
+            }
+
+            m_ciModel->m_dialBack.clear();
+            m_ciModel->m_dialOut.clear();
+            m_ciModel->m_dialBack = m_numModel->m_dialBack;
+
+            // Tell the UI that this CI needs a number
+            win->uiGetCIDetails(num, m_ciModel);
+        }
+
+        Q_DEBUG(QString("Selected phone ID: %1").arg(m_numModel->m_selectedId));
+        m_numModel->m_selectedId = num.id;
+        win->db.putSelectedPhone (num.id);
+
         rv = true;
     } while (0);
 
@@ -185,23 +200,12 @@ LibGvPhones::ensurePhoneAccountFactory()
     return true;
 }//LibGvPhones::ensurePhoneAccountFactory
 
-void
-LibGvPhones::clearAllAccounts()
-{
-    foreach (IPhoneAccount *acc, m_accounts) {
-        acc->deleteLater ();
-    }
-    m_accounts.clear ();
-}//LibGvPhones::clearAllAccounts
-
 bool
 LibGvPhones::refreshOutgoing()
 {
     if (!ensurePhoneAccountFactory ()) {
         return false;
     }
-
-    clearAllAccounts ();
 
     //! Begin the work to identify all phone accounts
     AsyncTaskToken *task = new AsyncTaskToken(this);
@@ -220,15 +224,9 @@ LibGvPhones::refreshOutgoing()
 }//LibGvPhones::refreshOutgoing
 
 void
-LibGvPhones::onOneAccount(AsyncTaskToken * /*task*/, IPhoneAccount *account)
-{
-    account->setParent (this);
-    m_accounts.push_back (account);
-}//LibGvPhones::onOneAccount
-
-void
 LibGvPhones::onAllAccountsIdentified()
 {
+    IMainWindow *win = (IMainWindow *) this->parent ();
     AsyncTaskToken *task = (AsyncTaskToken *) QObject::sender ();
     task->deleteLater ();
 
@@ -237,13 +235,24 @@ LibGvPhones::onAllAccountsIdentified()
         return;
     }
 
+    Q_DEBUG(QString("count = %1")
+            .arg (m_acctFactory->m_accounts.keys ().count ()));
+
     GVRegisteredNumber num;
-    foreach (IPhoneAccount *acc, m_accounts) {
+    foreach (QString id, m_acctFactory->m_accounts.keys ()) {
+        IPhoneAccount *acc = m_acctFactory->m_accounts[id];
+        Q_ASSERT(id == acc->id ());
+
         Q_DEBUG(QString("id = %1 name = %2").arg (acc->id (), acc->name ()));
         num.init ();
         num.id = acc->id ();
         num.name = acc->name ();
-        //TODO: Find out the number from the cache
+        num.dialBack = 0;
+        // Find out the number from the cache
+        win->db.getCINumber (num.id, num.number);
         m_numModel->m_dialOut += num;
     }
+
+    m_numModel->informViewsOfNewData ();
+    win->uiRefreshNumbers ();
 }//LibGvPhones::onAllAccountsIdentified

@@ -89,7 +89,7 @@ protected:
 // Registered numbers table changed to get more fields
 //#define GV_S_VALUE_DB_VER   "2013-04-15 16:49:28"
 // Brand new qgvdial
-#define GV_S_VALUE_DB_VER   "2013-08-28 08:53:58"
+#define GV_S_VALUE_DB_VER   "2013-10-18 12:11:26"
 ////////////////////////////////////////////////////////////////////////////////
 // Started using versioning for the settings
 //#define GV_SETTINGS_VER     "2011-05-13 16:33:50"
@@ -117,21 +117,6 @@ protected:
 #define GV_L_DATA           "data"
 
 #define GV_L_TYPE_NUMBER    "contact number"
-///////////////////////// GV registered numbers table //////////////////////////
-#define GV_REG_NUMS_TABLE       "gvregnumbers"
-#define GV_RN_NAME              "name"
-#define GV_RN_NUM               "number"
-#define GV_RN_TYPE              "type"
-#define GV_RN_FLAGS             "flags"
-#define GV_RN_FWDCOUNTRY        "forwardingCountry"
-#define GV_RN_DISPUNVERIFYDT    "displayUnverifyScheduledDateTime"
-
-#define GV_RN_F_ACTIVE              (1 << 0)
-#define GV_RN_F_VERIFIED            (1 << 1)
-#define GV_RN_F_INVERIFICATION      (1 << 2)
-#define GV_RN_F_REVERIFYNEEDED      (1 << 3)
-#define GV_RN_F_SMSENABLED          (1 << 4)
-#define GV_RN_F_TELEPHONYVERIFIED   (1 << 5)
 ///////////////////////////// Call initiator table /////////////////////////////
 #define GV_CI_TABLE             "call_initiator_table"
 #define GV_CI_ID                "ID"

@@ -122,6 +122,11 @@ void
 TpPhoneFactory::onAllAccountsReady ()
 {
     QString msg;
+
+    QMutexLocker locker (&m_identifyLock);
+    Q_ASSERT(m_tpAcCounter == 0);
+    m_tpAcCounter = 1;
+
     foreach (Tp::AccountPtr acc, allAccounts) {
         QString cmName = acc->cmName ();
         msg = QString ("Account cmName = %1").arg (cmName);
@@ -135,8 +140,11 @@ TpPhoneFactory::onAllAccountsReady ()
             continue;
         }
 
-        IPhoneAccount *pa = new TpCalloutInitiator (acc, this);
-        emit onePhone (pa);
+        IPhoneAccount *p = new TpCalloutInitiator (acc, this);
+        if (NULL != p) {
+            m_tpAcCounter++;
+            connect(p, SIGNAL(changed()), this, SLOT(onAccIdFound()));
+        }
 
         if (cmName == "ring") {
             Q_DEBUG("Added ring as fallback");
@@ -147,5 +155,28 @@ TpPhoneFactory::onAllAccountsReady ()
         Q_DEBUG (msg);
     }
 
-    completeIdentifyTask (ATTS_SUCCESS);
+    m_tpAcCounter--;
+    if (0 == m_tpAcCounter) {
+        completeIdentifyTask (ATTS_SUCCESS);
+    }
 }//TpPhoneFactory::onAllAccountsReady
+
+void
+TpPhoneFactory::onAccIdFound()
+{
+    IPhoneAccount *p = (IPhoneAccount *) QObject::sender ();
+    disconnect(p, SIGNAL(changed()), this, SLOT(onAccIdFound()));
+
+    if (p->id ().isEmpty ()) {
+        p->deleteLater ();
+    } else {
+        Q_ASSERT(!p->name().isEmpty());
+        emit onePhone (p);
+    }
+
+    QMutexLocker locker (&m_identifyLock);
+    m_tpAcCounter--;
+    if (0 == m_tpAcCounter) {
+        completeIdentifyTask (ATTS_SUCCESS);
+    }
+}//TpPhoneFactory::onAccIdFound
