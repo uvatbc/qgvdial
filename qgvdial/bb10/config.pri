@@ -4,10 +4,12 @@ BASEDIR =  $$quote($$_PRO_FILE_PWD_)
 device {
     CONFIG(debug, debug|release) {
         SOURCES +=  $$quote($$BASEDIR/src/BB10PhoneFactory.cpp) \
+                 $$quote($$BASEDIR/src/BBPhoneAccount.cpp) \
                  $$quote($$BASEDIR/src/MainWindow.cpp) \
                  $$quote($$BASEDIR/src/OsDependant.cpp)
 
         HEADERS +=  $$quote($$BASEDIR/src/BB10PhoneFactory.h) \
+                 $$quote($$BASEDIR/src/BBPhoneAccount.h) \
                  $$quote($$BASEDIR/src/MainWindow.h) \
                  $$quote($$BASEDIR/src/OsDependant.h) \
                  $$quote($$BASEDIR/src/platform_specific.h)
@@ -15,10 +17,12 @@ device {
 
     CONFIG(release, debug|release) {
         SOURCES +=  $$quote($$BASEDIR/src/BB10PhoneFactory.cpp) \
+                 $$quote($$BASEDIR/src/BBPhoneAccount.cpp) \
                  $$quote($$BASEDIR/src/MainWindow.cpp) \
                  $$quote($$BASEDIR/src/OsDependant.cpp)
 
         HEADERS +=  $$quote($$BASEDIR/src/BB10PhoneFactory.h) \
+                 $$quote($$BASEDIR/src/BBPhoneAccount.h) \
                  $$quote($$BASEDIR/src/MainWindow.h) \
                  $$quote($$BASEDIR/src/OsDependant.h) \
                  $$quote($$BASEDIR/src/platform_specific.h)
@@ -28,10 +32,12 @@ device {
 simulator {
     CONFIG(debug, debug|release) {
         SOURCES +=  $$quote($$BASEDIR/src/BB10PhoneFactory.cpp) \
+                 $$quote($$BASEDIR/src/BBPhoneAccount.cpp) \
                  $$quote($$BASEDIR/src/MainWindow.cpp) \
                  $$quote($$BASEDIR/src/OsDependant.cpp)
 
         HEADERS +=  $$quote($$BASEDIR/src/BB10PhoneFactory.h) \
+                 $$quote($$BASEDIR/src/BBPhoneAccount.h) \
                  $$quote($$BASEDIR/src/MainWindow.h) \
                  $$quote($$BASEDIR/src/OsDependant.h) \
                  $$quote($$BASEDIR/src/platform_specific.h)

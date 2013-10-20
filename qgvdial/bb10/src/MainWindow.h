@@ -62,6 +62,9 @@ public:
     MainWindow(QCoreApplication *app);
     virtual ~MainWindow() {}
 
+    void init();
+    void log(QDateTime dt, int level, const QString &strLog);
+
     void uiRequestLoginDetails();
     void uiRequestTFALoginDetails(void*);
     void uiSetUserPass(bool editable);
@@ -81,8 +84,7 @@ public:
     void uiSetNewContactDetailsModel();
     void uiShowContactDetails(const ContactInfo &cinfo);
 
-    void init();
-    void log(QDateTime dt, int level, const QString &strLog);
+    void uiGetCIDetails(GVRegisteredNumber &num, GVNumModel *model);
 
 protected:
     QObject *getQMLObject(const char *objectName);

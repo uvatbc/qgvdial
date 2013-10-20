@@ -20,6 +20,8 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "BB10PhoneFactory.h"
+#include "BBPhoneAccount.h"
+#include "LibGvPhones.h"
 
 IPhoneAccountFactory *
 createPhoneAccountFactory(QObject *parent)
@@ -35,7 +37,25 @@ BB10PhoneFactory::BB10PhoneFactory(QObject *parent)
 bool
 BB10PhoneFactory::identifyAll(AsyncTaskToken *task)
 {
-    task->status = ATTS_SUCCESS;
-    task->emitCompleted ();
+    foreach (QString key, m_accounts.keys()) {
+        m_accounts[key]->deleteLater();
+    }
+    m_accounts.clear();
+
+    BBPhoneAccount *acct = new BBPhoneAccount(this);
+    if (NULL == acct) {
+        task->status = ATTS_FAILURE;
+        task->emitCompleted ();
+    } else {
+        m_accounts[acct->id()] = acct;
+        task->status = ATTS_SUCCESS;
+        task->emitCompleted ();
+
+        QString num = acct->getNumber();
+        if (!num.isEmpty()) {
+            LibGvPhones *p = (LibGvPhones *) parent();
+            p->linkCiToNumber(acct->id(), num);
+        }
+    }
     return (true);
 }//BB10PhoneFactory::identifyAll

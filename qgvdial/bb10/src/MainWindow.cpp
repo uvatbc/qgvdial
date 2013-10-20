@@ -380,3 +380,8 @@ MainWindow::onInboxSetNumberToDial(QString number)
     int val = 0;
     QMetaObject::invokeMethod (mainTabbedPane, "showTab", Q_ARG(QVariant, val));
 }//MainWindow::onInboxSetNumberToDial
+
+void
+MainWindow::uiGetCIDetails(GVRegisteredNumber &num, GVNumModel *model)
+{
+}//MainWindow::uiGetCIDetails

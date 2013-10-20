@@ -44,7 +44,7 @@ protected:
 
 // Friend function to create an object of this class.
     friend IPhoneAccountFactory *createPhoneAccountFactory(QObject *parent);
-// Firend class to access the accounts map
+// Friend class to access the accounts map
     friend class LibGvPhones;
 };
 

@@ -25,6 +25,8 @@ Contact: yuvraaj@gmail.com
 #include <QObject>
 #include "IPhoneAccountFactory.h"
 
+class BBPhoneAccount;
+
 class BB10PhoneFactory : public IPhoneAccountFactory
 {
     Q_OBJECT
@@ -32,11 +34,6 @@ public:
     explicit BB10PhoneFactory(QObject *parent = 0);
 
     bool identifyAll(AsyncTaskToken *task);
-
-signals:
-
-public slots:
-
 };
 
 #endif // BB10PHONEFACTORY_H
