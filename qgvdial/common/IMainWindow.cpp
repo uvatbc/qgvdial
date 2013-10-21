@@ -298,14 +298,27 @@ IMainWindow::onGvCallTaskDone()
     AsyncTaskToken *task = (AsyncTaskToken *) QObject::sender();
     task->deleteLater();
 
+    QString id = task->outParams["id"].toString();
+    QString dest = task->inParams["destination"].toString();
+
     if (ATTS_SUCCESS != task->status) {
-        Q_WARN(QString("Failed to initiate call. status = %1")
-               .arg(task->status));
+        Q_WARN(QString("Failed to initiate call to %1 using id %2. status = %3")
+               .arg(dest, id).arg(task->status));
     }
 
     if (task->outParams.contains ("access_number")) {
         // This was a dial out.
         QString accessNumber = task->outParams["access_number"].toString();
+        if (!oPhones.dialOut (id, accessNumber)) {
+            Q_WARN(QString("Dialout failed for access number %1 to call %2")
+                   .arg(accessNumber, dest));
+        } else {
+            Q_DEBUG(QString("Dialed access number %1 to call %2")
+                    .arg(accessNumber, dest));
+        }
+    } else {
+        Q_DEBUG(QString("Callback initiated to id %1 to dest %2")
+                .arg(id, dest));
     }
 }//IMainWindow::onGvCallTaskDone
 
