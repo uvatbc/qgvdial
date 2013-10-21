@@ -273,17 +273,41 @@ IMainWindow::onUserCall(QString number)
         Q_WARN("Failed to allocate task!");
         return;
     }
+    connect(task, SIGNAL(completed()), this, SLOT(onGvCallTaskDone()));
 
     task->inParams["destination"] = number;
     task->inParams["source"] = num.number;
+    task->outParams["id"] = num.id;
 
+    bool rv;
     if (num.dialBack) {
         task->inParams["sourceType"] = QString(num.chType);
-        gvApi.callBack (task);
+        rv = gvApi.callBack (task);
     } else {
-        gvApi.callOut (task);
+        rv = gvApi.callOut (task);
+    }
+    
+    if (!rv) {
+        delete task;
     }
 }//IMainWindow::onUserCall
+
+void
+IMainWindow::onGvCallTaskDone()
+{
+    AsyncTaskToken *task = (AsyncTaskToken *) QObject::sender();
+    task->deleteLater();
+
+    if (ATTS_SUCCESS != task->status) {
+        Q_WARN(QString("Failed to initiate call. status = %1")
+               .arg(task->status));
+    }
+
+    if (task->outParams.contains ("access_number")) {
+        // This was a dial out.
+        QString accessNumber = task->outParams["access_number"].toString();
+    }
+}//IMainWindow::onGvCallTaskDone
 
 void
 IMainWindow::onUserSendSMS (QStringList arrNumbers, QString strText)
@@ -292,8 +316,7 @@ IMainWindow::onUserSendSMS (QStringList arrNumbers, QString strText)
     QString msg;
     AsyncTaskToken *task;
 
-    for (int i = 0; i < arrNumbers.size (); i++)
-    {
+    for (int i = 0; i < arrNumbers.size (); i++) {
         if (arrNumbers[i].isEmpty ()) {
             Q_WARN("Cannot text empty number");
             continue;
@@ -305,6 +328,7 @@ IMainWindow::onUserSendSMS (QStringList arrNumbers, QString strText)
             arrFailed += arrNumbers[i];
             continue;
         }
+        connect(task, SIGNAL(completed()), this, SLOT(onGvTextTaskDone()));
 
         task->inParams["destination"] = arrNumbers[i];
         task->inParams["text"] = strText;
@@ -325,6 +349,18 @@ IMainWindow::onUserSendSMS (QStringList arrNumbers, QString strText)
         Q_WARN (msg);
     }
 }//IMainWindow::sendSMS
+
+void
+IMainWindow::onGvTextTaskDone()
+{
+    AsyncTaskToken *task = (AsyncTaskToken *) QObject::sender();
+    task->deleteLater();
+
+    if (ATTS_SUCCESS != task->status) {
+        Q_WARN(QString("Failed to send text. status = %1")
+               .arg(task->status));
+    }
+}//IMainWindow::onGvTextTaskDone
 
 QStringList
 IMainWindow::getTextsByContact(const QString &strContact)

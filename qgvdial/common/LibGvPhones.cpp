@@ -320,3 +320,55 @@ LibGvPhones::onUserUpdateCiNumber(QString id)
 
     return rv;
 }//LibGvPhones::onUserUpdateCiNumber
+
+bool
+LibGvPhones::dialOut(const QString &id, const QString &num)
+{
+    GVRegisteredNumber rnum;
+    bool rv;
+
+    do {
+        rv = m_numModel->findById (id, rnum);
+        if (!rv) {
+            Q_WARN(QString("Invalid ID: %1: Not found").arg(id));
+            break;
+        }
+        rv = false;
+
+        if (rnum.dialBack) {
+            Q_WARN(QString("Invalid ID: %1: dial back").arg(id));
+            break;
+        }
+
+        if (!m_acctFactory->m_accounts.contains (id)) {
+            Q_WARN(QString("%1 exists in model but not in factory!").arg(id));
+            break;
+        }
+
+        AsyncTaskToken *task = (AsyncTaskToken *) new AsyncTaskToken(this);
+        if (NULL == task) {
+            Q_WARN("Failed to allocate task");
+            break;
+        }
+        connect (task, SIGNAL(completed()), this, SLOT(onDialoutCompleted()));
+        task->inParams["destination"] = num;
+
+        rv = m_acctFactory->m_accounts[id]->initiateCall (task);
+        if (!rv) {
+            Q_WARN("Failed to initiate call");
+            delete task;
+            break;
+        }
+
+        rv = true;
+    } while (0);
+
+    return (rv);
+}//LibGvPhones::dialOut
+
+void
+LibGvPhones::onDialoutCompleted()
+{
+    AsyncTaskToken *task = (AsyncTaskToken *) QObject::sender ();
+    task->deleteLater ();
+}//LibGvPhones::onDialoutCompleted

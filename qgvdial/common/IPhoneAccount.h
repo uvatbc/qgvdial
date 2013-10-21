@@ -38,6 +38,7 @@ public:
     //! A friendly name for this account
     virtual QString name() = 0;
 
+    //! Dial out. params: (QString) "destination"
     virtual bool initiateCall(AsyncTaskToken *task) = 0;
 
 signals:

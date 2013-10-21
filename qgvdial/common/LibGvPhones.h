@@ -50,11 +50,15 @@ public slots:
 
     bool linkCiToNumber(QString ciId, QString strNumber);
 
+    bool dialOut(const QString &id, const QString &num);
+
 private slots:
     void onGotRegisteredPhone (const GVRegisteredNumber &info);
     void onGotPhones();
 
     void onAllAccountsIdentified();
+
+    void onDialoutCompleted();
 
 private:
     bool ensurePhoneAccountFactory();

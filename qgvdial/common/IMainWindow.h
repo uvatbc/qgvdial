@@ -125,6 +125,9 @@ private slots:
     void onTFARequest(AsyncTaskToken *task);
     void loginCompleted();
     void onLogoutDone();
+    
+    void onGvCallTaskDone();
+    void onGvTextTaskDone();
 
 protected:
     virtual void log(QDateTime dt, int level, const QString &strLog) = 0;
