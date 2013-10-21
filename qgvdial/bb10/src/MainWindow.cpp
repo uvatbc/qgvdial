@@ -384,4 +384,5 @@ MainWindow::onInboxSetNumberToDial(QString number)
 void
 MainWindow::uiGetCIDetails(GVRegisteredNumber &num, GVNumModel *model)
 {
+    Q_WARN("Should NEVER be here");
 }//MainWindow::uiGetCIDetails

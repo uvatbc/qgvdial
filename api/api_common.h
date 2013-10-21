@@ -349,7 +349,7 @@ Q_DECLARE_METATYPE(ContactInfo)
 // Debugging
 ////////////////////////////////////////////////////////////////////////////////
 
-#if defined(Q_WS_X11)
+#if defined(Q_WS_X11) || defined(Q_OS_BLACKBERRY)
 #define __FULLFUNC__ __PRETTY_FUNCTION__
 #else
 #define __FULLFUNC__ __FUNCTION__
