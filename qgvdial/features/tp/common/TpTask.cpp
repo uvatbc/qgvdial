@@ -19,32 +19,27 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#include "AsyncTaskToken.h"
+#include "TpTask.h"
 
-AsyncTaskToken::AsyncTaskToken(QObject *parent)
-: QObject(parent)
+TpTask::TpTask(QObject *parent)
+: AsyncTaskToken(parent)
 {
-    reinit ();
-}//AsyncTaskToken::AsyncTaskToken
+}//TpTask::TpTask
 
-AsyncTaskToken::~AsyncTaskToken()
+bool
+TpTask::connectOp(Tp::PendingOperation *op)
 {
-}//AsyncTaskToken::~AsyncTaskToken
+    pendingOp = op;
+    return connect(op, SIGNAL(finished(Tp::PendingOperation*)),
+                   this, SLOT(onOpReady(Tp::PendingOperation*)));
+}//TpTask::connectOp
 
 void
-AsyncTaskToken::emitCompleted()
+TpTask::onOpReady(Tp::PendingOperation *op)
 {
-   emit completed();
-}//AsyncTaskToken::emitCompleted
+    Q_ASSERT(op == pendingOp);
 
-void
-AsyncTaskToken::reinit()
-{
-    inParams.clear ();
-    outParams.clear ();
-    status = ATTS_SUCCESS;
-    callerCtx = NULL;
-    apiCtx = NULL;
+    emit completed ();
 
-    this->disconnect (SIGNAL(completed()));
-}//AsyncTaskToken::reinit
+    op->deleteLater ();
+}//TpTask::onOpReady

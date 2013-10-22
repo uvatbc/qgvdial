@@ -20,6 +20,7 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "TpCalloutInitiator.h"
+#include "TpTask.h"
 
 TpCalloutInitiator::TpCalloutInitiator (Tp::AccountPtr act, QObject *parent)
 : IPhoneAccount(parent)
@@ -112,7 +113,55 @@ TpCalloutInitiator::name ()
 bool
 TpCalloutInitiator::initiateCall(AsyncTaskToken *task)
 {
+    if (NULL == task) {
+        Q_WARN("Invalid task: NULL");
+        return false;
+    }
+    if (!task->inParams.contains ("destination")) {
+        Q_WARN("No destination specified");
+        task->status = ATTS_INVALID_PARAMS;
+        task->emitCompleted ();
+        return true;
+    }
+    QString strDestination = task->inParams["destination"].toString();
+
+    TpTask *tpTask = new TpTask(this);
+    if (NULL == tpTask) {
+        Q_WARN("Failed to allocate TpTask");
+        task->status = ATTS_FAILURE;
+        task->emitCompleted ();
+        return true;
+    }
+    tpTask->parentTask = task;
+    connect(tpTask, SIGNAL(completed()), this, SLOT(onCallInitiated()));
+
+    Tp::PendingChannelRequest *pReq =
+        m_acc->ensureStreamedMediaAudioCall (strDestination);
+    if (NULL == pReq) {
+        Q_WARN("Failed to ensure streamed media channel");
+        delete tpTask;
+        task->status = ATTS_FAILURE;
+        task->emitCompleted ();
+        return true;
+    }
+    tpTask->connectOp(pReq);
+
     task->status = ATTS_FAILURE;
     task->emitCompleted ();
     return true;
 }//TpCalloutInitiator::initiateCall
+
+void
+TpCalloutInitiator::onCallInitiated()
+{
+    TpTask *task = (TpTask *) QObject::sender ();
+    task->deleteLater ();
+
+    if (task->pendingOp->isError ()) {
+        task->parentTask->status = ATTS_FAILURE;
+    } else {
+        task->parentTask->status = ATTS_SUCCESS;
+    }
+
+    task->parentTask->emitCompleted ();
+}//TpCalloutInitiator::onCallInitiated

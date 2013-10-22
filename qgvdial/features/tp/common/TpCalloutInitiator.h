@@ -48,6 +48,8 @@ private slots:
 
     void onConnectionChanged(const Tp::ConnectionPtr &connection);
 
+    void onCallInitiated();
+
 private:
 
 private:

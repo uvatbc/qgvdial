@@ -41,10 +41,12 @@ class AsyncTaskToken : public QObject
     Q_OBJECT
 public:
     explicit AsyncTaskToken(QObject *parent = 0);
-    void emitCompleted();
+    virtual ~AsyncTaskToken();
+
+    virtual void emitCompleted();
 
     //! Reinitialize the token for reuse.
-    void reinit();
+    virtual void reinit();
 
 signals:
     void completed();

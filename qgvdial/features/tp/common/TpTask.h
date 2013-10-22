@@ -19,32 +19,26 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
+#ifndef TPTASK_H
+#define TPTASK_H
+
 #include "AsyncTaskToken.h"
+#include "TpHeaders.h"
 
-AsyncTaskToken::AsyncTaskToken(QObject *parent)
-: QObject(parent)
+class TpTask : public AsyncTaskToken
 {
-    reinit ();
-}//AsyncTaskToken::AsyncTaskToken
+    Q_OBJECT
+public:
+    explicit TpTask(QObject *parent);
 
-AsyncTaskToken::~AsyncTaskToken()
-{
-}//AsyncTaskToken::~AsyncTaskToken
+    bool connectOp(Tp::PendingOperation *op);
 
-void
-AsyncTaskToken::emitCompleted()
-{
-   emit completed();
-}//AsyncTaskToken::emitCompleted
+private slots:
+    void onOpReady(Tp::PendingOperation *op);
 
-void
-AsyncTaskToken::reinit()
-{
-    inParams.clear ();
-    outParams.clear ();
-    status = ATTS_SUCCESS;
-    callerCtx = NULL;
-    apiCtx = NULL;
+public:
+    AsyncTaskToken *parentTask;
+    Tp::PendingOperation *pendingOp;
+};
 
-    this->disconnect (SIGNAL(completed()));
-}//AsyncTaskToken::reinit
+#endif // TPTASK_H
