@@ -49,6 +49,7 @@ Item {
         delegate: TextOneLine {
             width: container.width
             text: name + "\n(" + number + ")"
+            readOnly: true
 
             MouseArea {
                 anchors.fill: parent

@@ -89,6 +89,8 @@ Rectangle {
         if (imgClose.state != "back") {
             return;
         }
+        
+        var newState = '';
 
         if (regNumberSelector.visible) {
             regNumberSelector.visible = false;
@@ -98,9 +100,11 @@ Rectangle {
         }
         if (ciPhoneSelector.visible) {
             ciPhoneSelector.visible = false;
+            regNumberSelector.visible = true;
+            newState = "back";
         }
 
-        imgClose.state = '';
+        imgClose.state = newState;
     }
 
     Component {

@@ -41,6 +41,7 @@ Rectangle {
         TextOneLine {
             id: searchField
             placeholderText: "Search"
+            readOnly: true
             width: parent.width - searchButton.width - parent.spacing - 5
         }
 
@@ -105,6 +106,7 @@ Rectangle {
                 TextOneLine {
                     anchors.verticalCenter: parent.verticalCenter
                     text: name
+                    readOnly: true
                 }//Label (contact name)
             }//Row (image and contact name)
 

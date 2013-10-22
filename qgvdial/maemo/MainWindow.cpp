@@ -50,6 +50,7 @@ MainWindow::MainWindow(QObject *parent)
 , selectedNumberButton(NULL)
 , regNumberSelector(NULL)
 , ciSelector(NULL)
+, dialPage(NULL)
 {
 }//MainWindow::MainWindow
 
@@ -163,7 +164,7 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
         if (NULL == selectedNumberButton) {
             break;
         }
-        connect(selectedNumberButton, SIGNAL(clicked(QString)),
+        connect(selectedNumberButton, SIGNAL(clicked()),
                 this, SLOT(onUserClickedRegNumBtn()));
 
         regNumberSelector = getQMLObject ("RegNumberSelector");
@@ -181,6 +182,15 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
         }
         connect(ciSelector, SIGNAL(setCiNumber(QString,QString)),
                 &oPhones, SLOT(linkCiToNumber(QString,QString)));
+
+        dialPage = getQMLObject ("DialPage");
+        if (NULL == dialPage) {
+            break;
+        }
+        connect(dialPage, SIGNAL(sigCall(QString)),
+                this, SLOT(onUserCall(QString)));
+        //connect(dialPage, SIGNAL(sigText(QString)),
+        //        this, SLOT(onUserText(QString)));
 
         onInitDone();
         return;
@@ -356,7 +366,7 @@ MainWindow::uiRefreshNumbers()
     }
 
     QString btnText = QString("%1\n(%2)").arg(num.name, num.number);
-    selectedNumberButton->setProperty ("mainText", btnText);
+    selectedNumberButton->setProperty ("text", btnText);
 }//MainWindow::uiRefreshNumbers
 
 void

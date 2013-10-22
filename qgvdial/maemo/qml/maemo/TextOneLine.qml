@@ -30,6 +30,7 @@ Rectangle {
     property alias selectionStart: textInput.selectionStart
     property int echoMode: TextInput.Normal
     property string placeholderText
+    property alias readOnly: textInput.readOnly
 
     signal textChanged(string text)
     signal accepted

@@ -82,6 +82,7 @@ private:
     QObject *selectedNumberButton;
     QObject *regNumberSelector;
     QObject *ciSelector;
+    QObject *dialPage;
 };
 
 #endif // MAINWINDOW_H

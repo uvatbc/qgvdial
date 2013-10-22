@@ -27,6 +27,8 @@ Rectangle {
     property alias text: textEdit.text
     property alias font: textEdit.font
     property int textFormat: TextEdit.PlainText
+    property alias readOnly: textEdit.readOnly
+    property alias wrapMode: textEdit.wrapMode
 
     signal textChanged(string text)
 

@@ -23,17 +23,25 @@ import Qt 4.7
 
 Rectangle {
     id: container
+    objectName: "DialPage"
 
     signal sigHaptic
+    signal sigCall(string dest)
+    signal sigText(string dest)
+    
     property real toolbarHeight: 50
 
     function _keypadBtnClick(strText) {
+        /*
         var origStart = numberField.selectionStart;
         var result = numberField.text.substr(0, origStart);
         result += strText;
         result += numberField.text.substr(numberField.selectionEnd);
         numberField.text = result;
         numberField.cursorPosition = origStart + strText.length;
+        */
+        
+        numberField.text += strText;
     }
 
     function setNumberToDial(number) {
@@ -46,10 +54,10 @@ Rectangle {
         anchors.fill: parent
         spacing: 2
 
-        MyButton {
+        Button {
             objectName: "SelectedNumberButton"
             width: parent.width
-            mainPixelSize: 30
+            //mainPixelSize: 30
         }
 
         TextOneLine {
@@ -82,12 +90,14 @@ Rectangle {
                 height: 80
                 font.pixelSize: 35
                 width: container.width/2 - 20
+                onClicked: { container.sigText(numberField.text); }
             }
             Button {
                 text: "Call"
                 height: 80
                 font.pixelSize: 35
                 width: container.width/2 - 20
+                onClicked: { container.sigCall(numberField.text); }
             }
         }//Row
     }//Column

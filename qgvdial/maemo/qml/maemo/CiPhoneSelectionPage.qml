@@ -28,8 +28,6 @@ Rectangle {
     signal done(bool accepted)
     signal setCiNumber(string id, string number)
 
-    onSetCiNumber: container.done(true);
-
     property string ciId: "Replace this ID"
     property alias phonesModel: numbersView.model
 
@@ -41,10 +39,14 @@ Rectangle {
         anchors.fill: parent
         spacing: 5
 
-        TextOneLine {
+        TextMultiLine {
             id: lblTitle
             font.pixelSize: 30
             text: "Please select a number for the account with id " + container.ciId
+            readOnly: true
+            
+            width: parent.width
+            wrapMode: TextEdit.Wrap
         }
 
         ListView {
@@ -54,12 +56,16 @@ Rectangle {
             height: parent.height - lblTitle.height - parent.spacing
 
             delegate: TextOneLine {
-                width: numbersView.width
+                width: container.width
                 text: name + "\n(" + number + ")"
+                readOnly: true
 
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: container.setCiNumber(container.ciId, number);
+                    onClicked: {
+                        container.setCiNumber(container.ciId, number);
+                        container.done(true);
+                    }
                 }
             }//delegate
         }//ListView
