@@ -27,10 +27,6 @@ AsyncTaskToken::AsyncTaskToken(QObject *parent)
     reinit ();
 }//AsyncTaskToken::AsyncTaskToken
 
-AsyncTaskToken::~AsyncTaskToken()
-{
-}//AsyncTaskToken::~AsyncTaskToken
-
 void
 AsyncTaskToken::emitCompleted()
 {

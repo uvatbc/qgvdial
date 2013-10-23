@@ -59,49 +59,60 @@ NavigationPane {
                     ListItemComponent {
                         Container {
                             id:  listItem
-                            
+
                             layout: StackLayout {
-                                orientation: LayoutOrientation.LeftToRight
+                                orientation: LayoutOrientation.TopToBottom
                             }
-                            
-                            ImageView {
-                                imageSource: {
-                                    if ((ListItemData.imagePath != null) && (ListItemData.imagePath.length != 0)) {
-                                        return ListItemData.imagePath;  
-                                    } else {
-                                        return "asset:///icons/unknown_contact.png";
+
+                            Container {
+
+                                layout: StackLayout {
+                                    orientation: LayoutOrientation.LeftToRight
+                                }
+
+                                ImageView {
+                                    imageSource: {
+                                        if ((ListItemData.imagePath != null) && (ListItemData.imagePath.length != 0)) {
+                                            return ListItemData.imagePath;  
+                                        } else {
+                                            return "asset:///icons/unknown_contact.png";
+                                        }
                                     }
+                                    
+                                    scalingMethod: ScalingMethod.AspectFit
+                                    horizontalAlignment: HorizontalAlignment.Center
+                                    verticalAlignment: VerticalAlignment.Center
+                                    
+                                    preferredHeight: 80
+                                    preferredWidth: 80
                                 }
                                 
-                                scalingMethod: ScalingMethod.AspectFit
-                                horizontalAlignment: HorizontalAlignment.Center
-                                verticalAlignment: VerticalAlignment.Center
+                                Label {
+                                    text: ListItemData.name
+                                    textStyle { base: tsdxlarge.style }
+                                    verticalAlignment: VerticalAlignment.Center
+                                }
                                 
-                                preferredHeight: 80
-                                preferredWidth: 80
+                                gestureHandlers: [
+                                    TapHandler {
+                                        onTapped: {
+                                            listItem.ListItem.view.clicked(ListItemData.id);
+                                        }                                
+                                    }
+                                ]
+                                
+                                attachedObjects: [
+                                    TextStyleDefinition {
+                                        id: tsdxlarge
+                                        base: SystemDefaults.TextStyles.BodyText
+                                        fontSize: FontSize.XLarge
+                                    }
+                                ]//attachedObjects
                             }
                             
-                            Label {
-                                text: ListItemData.name
-                                textStyle { base: tsdxlarge.style }
-                                verticalAlignment: VerticalAlignment.Center
+                            Divider {
+                                horizontalAlignment: HorizontalAlignment.Fill
                             }
-                            
-                            gestureHandlers: [
-                                TapHandler {
-                                    onTapped: {
-                                        listItem.ListItem.view.clicked(ListItemData.id);
-                                    }                                
-                                }
-                            ]
-                            
-                            attachedObjects: [
-                                TextStyleDefinition {
-                                    id: tsdxlarge
-                                    base: SystemDefaults.TextStyles.BodyText
-                                    fontSize: FontSize.XLarge
-                                }
-                            ]//attachedObjects
                         }
                     }
                 ]//listItemComponents

@@ -382,7 +382,9 @@ MainWindow::onInboxSetNumberToDial(QString number)
 }//MainWindow::onInboxSetNumberToDial
 
 void
-MainWindow::uiGetCIDetails(GVRegisteredNumber &num, GVNumModel *model)
+MainWindow::uiGetCIDetails(GVRegisteredNumber & /*num*/,
+                           GVNumModel * /*model*/)
 {
     Q_WARN("Should NEVER be here");
+    Q_ASSERT(0 == "Should never get here");
 }//MainWindow::uiGetCIDetails

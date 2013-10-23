@@ -372,6 +372,9 @@ IMainWindow::onGvTextTaskDone()
     if (ATTS_SUCCESS != task->status) {
         Q_WARN(QString("Failed to send text. status = %1")
                .arg(task->status));
+    } else {
+        Q_DEBUG(QString("Successfully sent text to %1")
+                .arg(task->inParams["destination"].toString()));
     }
 }//IMainWindow::onGvTextTaskDone
 
