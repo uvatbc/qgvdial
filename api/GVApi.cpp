@@ -519,8 +519,9 @@ GVApi::onLogin1(bool success, const QByteArray &response, QNetworkReply *reply,
             break;
         }
         if (!nextAction.startsWith ("http")) {
-            Q_DEBUG(QString("nextAction %1").arg (nextAction));
-            nextAction = GOOGLE_ACCOUNTS "/" + nextAction;
+            QUrl nextUrl = reply->url().resolved (nextAction);
+            nextAction = nextUrl.toString ();
+            Q_DEBUG(nextAction);
         }
 
         Q_DEBUG(QString("Starting service login by posting login to %1")
@@ -698,6 +699,96 @@ GVApi::postLogin(QUrl url, AsyncTaskToken *token)
     return found;
 }//GVApi::postLogin
 
+bool
+GVApi::parseAlternateLogins(const QString &form, AsyncTaskToken *task)
+{
+/* To match:
+  <input type="radio" name="retry" id="SMS_..."   value="SMS_..." />
+  <input type="radio" name="retry" id="VOICE_..." value="VOICE_" />
+*/
+    QRegExp rx1("\\<input(.*)\\>");
+    rx1.setMinimal (true);
+    if (!form.contains (rx1)) {
+        Q_WARN("No input fields");
+        return false;
+    }
+
+    int pos = 0;
+    while ((pos = rx1.indexIn (form, pos)) != -1) {
+        QString fullMatch = rx1.cap(0);
+        QString oneInstance = rx1.cap(1);
+        QString name, value;
+        QVariantMap attrs;
+
+        if (!fullMatch.endsWith("/>")) {
+            fullMatch = fullMatch.mid(0, fullMatch.length()-1) + "/>";
+        }
+
+        QXmlInputSource inputSource;
+        QXmlSimpleReader simpleReader;
+        inputSource.setData (fullMatch);
+        HtmlFieldParser xmlHandler;
+        xmlHandler.setEmitLog (emitLog);
+
+        simpleReader.setContentHandler (&xmlHandler);
+        simpleReader.setErrorHandler (&xmlHandler);
+
+        if (!simpleReader.parse (&inputSource, false)) {
+            Q_WARN("Failed to parse input field.");
+            goto gonext;
+        }
+
+        if (!xmlHandler.elems.contains ("input") || 
+            !xmlHandler.attrMap.contains("input")) {
+                Q_WARN("Failed to parse input field.");
+                goto gonext;
+        }
+
+        attrs = xmlHandler.attrMap["input"];
+        if (!attrs.contains ("name") ||
+            !attrs.contains ("value") ||
+            !attrs.contains ("type")) {
+                Q_WARN(QString("Input field \"%1\" doesn't have name/type/value")
+                    .arg(oneInstance));
+                goto gonext;
+        }
+        if (attrs["type"].toString() != "radio") {
+#if DEBUG_ONLY
+            if (emitLog) {
+                Q_DEBUG(QString("Input field \"%1\" is not a radio")
+                    .arg(oneInstance));
+            }
+#endif
+            goto gonext;
+        }
+
+        name  = attrs["name"].toString ();
+        value = attrs["value"].toString ();
+
+        if (name != "retry") {
+            goto gonext;
+        }
+
+        if (value.startsWith("VOICE_")) {
+            task->inParams["tfaAlternate"] = value;
+        }
+        if (value.startsWith("SMS_")) {
+            task->inParams["tfaAltSMS"] = value;
+        }
+
+gonext:
+        pos += fullMatch.indexOf (oneInstance);
+    }
+
+    // This is the only MUST return field
+    if (!task->inParams.contains("tfaAlternate")) {
+        return false;
+    }
+
+    return true;
+
+}//GVApi::parseAlternateLogins
+
 void
 GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
                 void *ctx)
@@ -810,29 +901,9 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
             Q_DEBUG(nextAction);
         }
 
-        do {
-            pos = strResponse.indexOf ("alternative-delivery");
-            if (-1 == pos) {
-                Q_WARN("Failed to get alternate delivery");
-                break;
-            }
-            pos = strResponse.lastIndexOf ('<', pos);
-            if (-1 == pos) {
-                Q_WARN("Failed to get alternate delivery");
-                break;
-            }
-            cap = strResponse.mid(pos, strResponse.indexOf('>', pos) - pos);
-
-            QRegExp rxHref("href\\s*=\\s*\"(.*)\"");
-            rxHref.setMinimal (true);
-            pos = cap.indexOf (rxHref);
-            if (-1 == pos) {
-                Q_WARN("Failed to get alternate delivery href");
-                break;
-            }
-            cap = rxHref.cap (1);
-            token->inParams["tfaAlternate"] = cap;
-        } while(0);
+        if (!parseAlternateLogins (rxForm.cap(0), token)) {
+            Q_WARN("Failed to get alternate delivery");
+        }
 
         if (emitLog) {
             Q_DEBUG("Two factor AUTH required!");

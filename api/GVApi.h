@@ -155,6 +155,7 @@ private:
     bool postLogin(QUrl url, AsyncTaskToken *token);
     bool parseHiddenLoginFields(const QString &strResponse, QVariantMap &ret);
     bool getRnr(AsyncTaskToken *token);
+    bool parseAlternateLogins(const QString &form, AsyncTaskToken *task);
 
     // Send SMS
     bool doSendSms(QUrl url, AsyncTaskToken *token);
