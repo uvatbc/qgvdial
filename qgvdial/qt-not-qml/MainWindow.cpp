@@ -49,11 +49,11 @@ QCoreApplication *
 createApplication(int argc, char *argv[])
 {
     QtSingleApplication *app;
-#ifdef Q_WS_WIN32
-    app = new MainApp(argc, argv);
-#else
+//#ifdef Q_WS_WIN32
+//    app = new MainApp(argc, argv);
+//#else
     app = new QtSingleApplication(argc, argv);
-#endif
+//#endif
 
     if (NULL == app) {
         return app;

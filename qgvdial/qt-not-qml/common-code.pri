@@ -12,30 +12,32 @@ DEPLOYMENTFOLDERS = # file1 dir1
 # CONFIG += mobility
 # MOBILITY +=
 
-SOURCES  += MainWindow.cpp \
-            MainWindow_p.cpp \
-            OsDependant.cpp \
-            ContactDialog.cpp \
-            InboxEntryDialog.cpp \
-            CINumberDialog.cpp \
-            CiListView.cpp \
-    GvNumComboBox.cpp
-HEADERS  += MainWindow.h \
-            MainWindow_p.h \
-            OsDependant.h \
-            ContactDialog.h \
-            InboxEntryDialog.h \
-            CINumberDialog.h \
-            CiListView.h \
-    GvNumComboBox.h
+INCLUDEPATH += $$PWD
 
-FORMS    += mainwindow.ui \
-            ContactDialog.ui \
-            InboxEntryDialog.ui \
-            CINumberDialog.ui
-RESOURCES += qtnotqml.qrc
+SOURCES  += $$PWD/MainWindow.cpp \
+            $$PWD/MainWindow_p.cpp \
+            $$PWD/OsDependant.cpp \
+            $$PWD/ContactDialog.cpp \
+            $$PWD/InboxEntryDialog.cpp \
+            $$PWD/CINumberDialog.cpp \
+            $$PWD/CiListView.cpp \
+            $$PWD/GvNumComboBox.cpp
+HEADERS  += $$PWD/MainWindow.h \
+            $$PWD/MainWindow_p.h \
+            $$PWD/OsDependant.h \
+            $$PWD/ContactDialog.h \
+            $$PWD/InboxEntryDialog.h \
+            $$PWD/CINumberDialog.h \
+            $$PWD/CiListView.h \
+            $$PWD/GvNumComboBox.h
 
-include(../common/common.pri)
-include(../../api/api.pri)
-include(../features/openssl/openssl.pri)
-include(../features/qtsingleapplication/qtsingleapplication.pri)
+FORMS    += $$PWD/mainwindow.ui \
+            $$PWD/ContactDialog.ui \
+            $$PWD/InboxEntryDialog.ui \
+            $$PWD/CINumberDialog.ui
+RESOURCES += $$PWD/qtnotqml.qrc
+
+include($$PWD/../common/common.pri)
+include($$PWD/../../api/api.pri)
+include($$PWD/../features/openssl/openssl.pri)
+include($$PWD/../features/qtsingleapplication/qtsingleapplication.pri)

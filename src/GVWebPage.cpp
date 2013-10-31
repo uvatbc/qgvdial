@@ -20,7 +20,7 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "GVWebPage.h"
-#include "GvXMLParser.h"
+#include "HtmlFieldParser.h"
 #include "MyXmlErrorHandler.h"
 
 #define SYMBIAN_SIGNED 0
@@ -750,7 +750,7 @@ GVWebPage::onGotPhonesListXML (QNetworkReply *reply)
         QXmlInputSource inputSource;
         QXmlSimpleReader simpleReader;
         inputSource.setData (strReply);
-        GvXMLParser xmlHandler;
+        HtmlFieldParser xmlHandler;
         xmlHandler.setEmitLog (bEmitLog);
 
         simpleReader.setContentHandler (&xmlHandler);
@@ -758,9 +758,15 @@ GVWebPage::onGotPhonesListXML (QNetworkReply *reply)
 
         simpleReader.parse (&inputSource, false);
 
+        if (!xmlHandler.output.contains ("json") ||
+            !xmlHandler.output.contains ("html")) {
+            Q_WARN("Couldn't parse either the JSON or the HTML");
+            break;
+        }
+
         QString strTemp;
         QScriptEngine scriptEngine;
-        strTemp = "var obj = " + xmlHandler.strJson;
+        strTemp = "var obj = " + xmlHandler.output["json"].toString();
         scriptEngine.evaluate (strTemp);
         if (scriptEngine.hasUncaughtException ()) {
             strTemp = QString ("Could not assign json to obj : %1")
@@ -1018,7 +1024,7 @@ GVWebPage::onGotInboxXML (QNetworkReply *reply)
         QXmlInputSource inputSource;
         QXmlSimpleReader simpleReader;
         inputSource.setData (strReply);
-        GvXMLParser xmlHandler;
+        HtmlFieldParser xmlHandler;
         xmlHandler.setEmitLog (bEmitLog);
 
         simpleReader.setContentHandler (&xmlHandler);
@@ -1031,11 +1037,19 @@ GVWebPage::onGotInboxXML (QNetworkReply *reply)
         }
         if (bEmitLog) qDebug ("End parsing");
 
+        if (!xmlHandler.output.contains ("json") ||
+            !xmlHandler.output.contains ("html")) {
+            Q_WARN("Couldn't parse either the JSON or the HTML");
+            break;
+        }
+
         QDateTime dtUpdate = workCurrent.arrParams[3].toDateTime ();
         bool bGotOld = false;
         int nNew = 0;
         qint32 nUsableMsgs = 0;
-        if (!parseInboxJson (dtUpdate, xmlHandler.strJson, xmlHandler.strHtml,
+        if (!parseInboxJson (dtUpdate,
+                             xmlHandler.output["json"].toString(),
+                             xmlHandler.output["html"].toString(),
                              bGotOld, nNew, nUsableMsgs))
         {
             qWarning() << "Failed to parse GV Inbox JSON. Data =" << strReply;

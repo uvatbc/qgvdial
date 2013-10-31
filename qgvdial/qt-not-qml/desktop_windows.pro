@@ -1,18 +1,19 @@
-include(./common-code.pri)
-include(../features/skype-desktop/skype.pri)
+include($$PWD/common-code.pri)
 
 # Surprisingly enough, this works just perfectly in Windows
-include(../features/dirs/linux/linux-dirs.pri)
+include($$PWD/../features/dirs/linux/linux-dirs.pri)
 
-INCLUDEPATH += desktop_windows
-SOURCES  += desktop_windows/MainApp.cpp \
-            desktop_windows/PhoneFactory.cpp \
-            desktop_windows/ObserverFactory.cpp
-HEADERS  += desktop_windows/platform_specific.h \
-            desktop_windows/MainApp.h \
-            desktop_windows/PhoneFactory.h \
-            desktop_windows/ObserverFactory.h
+INCLUDEPATH += $$PWD/desktop_windows
+SOURCES  += $$PWD/desktop_windows/PhoneFactory.cpp
+HEADERS  += $$PWD/desktop_windows/platform_specific.h \
+            $$PWD/desktop_windows/PhoneFactory.h
+
+#SOURCES  += $$PWD/desktop_windows/MainApp.cpp \
+#            $$PWD/desktop_windows/ObserverFactory.cpp
+#HEADERS  += $$PWD/desktop_windows/MainApp.h \
+#            $$PWD/desktop_windows/ObserverFactory.h
+#include($$PWD/../features/skype-desktop/skype.pri)
 
 # Please do not modify the following two lines. Required for deployment.
-include(deployment.pri)
+include($$PWD/deployment.pri)
 qtcAddDeployment()

@@ -44,6 +44,8 @@
 ** 
 ****************************************************************************/
 
+#ifndef _QTSINGLEAPPLICATION_H_
+#define _QTSINGLEAPPLICATION_H_
 
 #include <QtGui/QApplication>
 
@@ -103,3 +105,5 @@ private:
     QtLocalPeer *peer;
     QWidget *actWin;
 };
+
+#endif//_QTSINGLEAPPLICATION_H_

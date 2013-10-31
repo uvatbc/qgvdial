@@ -20,7 +20,7 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "GVApi.h"
-#include "GvXMLParser.h"
+#include "HtmlFieldParser.h"
 #include "MyXmlErrorHandler.h"
 
 #define DEBUG_ONLY 0
@@ -559,10 +559,10 @@ GVApi::parseHiddenLoginFields(const QString &strResponse, QVariantMap &ret)
   <input type="hidden" name="continue" id="continue"
            value="https://www.google.com/voice/m" />
 */
-    QRegExp rx1("\\<input\\s*type\\s*=\\s*\"hidden\"(.*)\\>");
+    QRegExp rx1("\\<input(.*)\\>");
     rx1.setMinimal (true);
     if (!strResponse.contains (rx1)) {
-        Q_WARN("Invalid login page!");
+        Q_WARN("Invalid login page: No input fields");
         return false;
     }
 
@@ -572,32 +572,52 @@ GVApi::parseHiddenLoginFields(const QString &strResponse, QVariantMap &ret)
         QString fullMatch = rx1.cap(0);
         QString oneInstance = rx1.cap(1);
         QString name, value;
-        QRegExp rx2("\"(.*)\""), rx3("'(.*)'");
-        rx2.setMinimal (true);
-        rx3.setMinimal (true);
+        QVariantMap attrs;
 
-        int pos1 = oneInstance.indexOf ("value");
-        if (pos1 == -1) {
+        if (!fullMatch.endsWith("/>")) {
+            fullMatch = fullMatch.mid(0, fullMatch.length()-1) + "/>";
+        }
+
+        QXmlInputSource inputSource;
+        QXmlSimpleReader simpleReader;
+        inputSource.setData (fullMatch);
+        HtmlFieldParser xmlHandler;
+        xmlHandler.setEmitLog (emitLog);
+
+        simpleReader.setContentHandler (&xmlHandler);
+        simpleReader.setErrorHandler (&xmlHandler);
+
+        if (!simpleReader.parse (&inputSource, false)) {
+            Q_WARN("Failed to parse input field.");
             goto gonext;
         }
 
-        name  = oneInstance.left (pos1);
-        value = oneInstance.mid (pos1);
-
-        if (rx2.indexIn (name) == -1) {
+        if (!xmlHandler.elems.contains ("input") || 
+            !xmlHandler.attrMap.contains("input")) {
+            Q_WARN("Failed to parse input field.");
             goto gonext;
         }
-        name = rx2.cap (1);
 
-        if (rx2.indexIn (value) == -1) {
-            if (rx3.indexIn (value) == -1) {
-                goto gonext;
-            } else {
-                value = rx3.cap (1);
+        attrs = xmlHandler.attrMap["input"];
+        if (!attrs.contains ("name") ||
+            !attrs.contains ("value") ||
+            !attrs.contains ("type")) {
+            Q_WARN(QString("Input field \"%1\" doesn't have name/type/value")
+                    .arg(oneInstance));
+            goto gonext;
+        }
+        if (attrs["type"].toString() != "hidden") {
+#if DEBUG_ONLY
+            if (emitLog) {
+                Q_DEBUG(QString("Input field \"%1\" is not hidden")
+                    .arg(oneInstance));
             }
-        } else {
-            value = rx2.cap (1);
+#endif
+            goto gonext;
         }
+
+        name  = attrs["name"].toString ();
+        value = attrs["value"].toString ();
 
 #if DEBUG_ONLY
         if (ret.contains (name) &&
@@ -606,6 +626,7 @@ GVApi::parseHiddenLoginFields(const QString &strResponse, QVariantMap &ret)
                     .arg (name, ret[name].toString(), value));
         }
 #endif
+
         ret[name] = value;
 
 gonext:
@@ -1159,15 +1180,21 @@ GVApi::onGetPhones(bool success, const QByteArray &response, QNetworkReply *,
         QXmlInputSource inputSource;
         QXmlSimpleReader simpleReader;
         inputSource.setData (strReply);
-        GvXMLParser xmlHandler;
+        HtmlFieldParser xmlHandler;
         xmlHandler.setEmitLog (emitLog);
 
         simpleReader.setContentHandler (&xmlHandler);
         simpleReader.setErrorHandler (&xmlHandler);
         simpleReader.parse (&inputSource, false);
 
+        if (!xmlHandler.elems.contains ("json") ||
+            !xmlHandler.elems.contains ("html")) {
+            Q_WARN("Couldn't parse either the JSON or the HTML");
+            break;
+        }
+
         QString strTemp;
-        strTemp = "var o = " + xmlHandler.strJson;
+        strTemp = "var o = " + xmlHandler.elems["json"].toString();
         scriptEngine.evaluate (strTemp);
         if (scriptEngine.hasUncaughtException ()) {
             strTemp = QString ("Could not assign json to obj : %1")
@@ -1403,7 +1430,7 @@ GVApi::onGetInbox(bool success, const QByteArray &response, QNetworkReply *,
         QXmlInputSource inputSource;
         QXmlSimpleReader simpleReader;
         inputSource.setData (strReply);
-        GvXMLParser xmlHandler;
+        HtmlFieldParser xmlHandler;
         xmlHandler.setEmitLog (emitLog);
 
         simpleReader.setContentHandler (&xmlHandler);
@@ -1414,8 +1441,16 @@ GVApi::onGetInbox(bool success, const QByteArray &response, QNetworkReply *,
             break;
         }
 
+        if (!xmlHandler.elems.contains ("json") ||
+            !xmlHandler.elems.contains ("html")) {
+            Q_WARN("Couldn't parse either the JSON or the HTML");
+            break;
+        }
+
         qint32 msgCount = 0;
-        if (!parseInboxJson(token, xmlHandler.strJson, xmlHandler.strHtml,
+        if (!parseInboxJson(token,
+                            xmlHandler.elems["json"].toString(),
+                            xmlHandler.elems["html"].toString(),
                             msgCount)) {
             Q_WARN("Failed to parse GV Inbox JSON. Data =") << strReply;
             break;
@@ -2465,7 +2500,7 @@ GVApi::onCheckRecentInbox(bool success, const QByteArray &response,
         QXmlInputSource inputSource;
         QXmlSimpleReader simpleReader;
         inputSource.setData (strReply);
-        GvXMLParser xmlHandler;
+        HtmlFieldParser xmlHandler;
         xmlHandler.setEmitLog (emitLog);
 
         simpleReader.setContentHandler (&xmlHandler);
@@ -2476,13 +2511,20 @@ GVApi::onCheckRecentInbox(bool success, const QByteArray &response,
             break;
         }
 
-        QString strTemp;
-        strTemp = "var obj = " + xmlHandler.strJson;
+        if (!xmlHandler.elems.contains ("json") ||
+            !xmlHandler.elems.contains ("html")) {
+            Q_WARN("Couldn't parse either the JSON or the HTML");
+            break;
+        }
+
+        QString strTemp, strJson;
+        strJson = xmlHandler.elems["json"].toString();
+        strTemp = "var obj = " + strJson;
         scriptEngine.evaluate (strTemp);
         if (scriptEngine.hasUncaughtException ()) {
             Q_WARN("Failed to assign json to obj. error =")
                << scriptEngine.uncaughtException().toString ()
-               << "JSON =" << xmlHandler.strJson;
+               << "JSON =" << strJson;
             break;
         }
 
@@ -2495,7 +2537,7 @@ GVApi::onCheckRecentInbox(bool success, const QByteArray &response,
         if (scriptEngine.hasUncaughtException ()) {
             Q_WARN("Uncaught exception executing script :")
                 << scriptEngine.uncaughtException().toString()
-                << "JSON =" << xmlHandler.strJson;
+                << "JSON =" << strJson;
             break;
         }
 
@@ -2507,7 +2549,7 @@ GVApi::onCheckRecentInbox(bool success, const QByteArray &response,
             if (scriptEngine.hasUncaughtException ()) {
                 Q_WARN("Uncaught exception executing script :")
                     << scriptEngine.uncaughtException().toString()
-                    << "JSON =" << xmlHandler.strJson;
+                    << "JSON =" << strJson;
                 break;
             }
 
@@ -2528,7 +2570,7 @@ GVApi::onCheckRecentInbox(bool success, const QByteArray &response,
         if (scriptEngine.hasUncaughtException ()) {
             Q_WARN("Uncaught exception executing script :")
                 << scriptEngine.uncaughtException().toString()
-                << "JSON =" << xmlHandler.strJson;
+                << "JSON =" << strJson;
             break;
         }
 

@@ -19,38 +19,36 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#include "OsDependant.h"
+#ifndef HTMLFIELDPARSER_H
+#define HTMLFIELDPARSER_H
 
-#if DESKTOP_OS && SKYPE_ENABLED
-#include "SkypeClientFactory.h"
-#endif
+#include "api_common.h"
 
-IOsDependant *
-createOSD(QObject *parent /* = NULL*/)
+class HtmlFieldParser : public QXmlDefaultHandler
 {
-    return (new OsDependant(parent));
-}//createOSD
+public:
+    explicit HtmlFieldParser();
+    void setEmitLog (bool enable);
 
-OsDependant::OsDependant(QObject *parent /* = NULL*/)
-: IOsDependant(parent)
-#if DESKTOP_OS && SKYPE_ENABLED
-, m_skypeClientFactory(new SkypeClientFactory(this))
-#endif
-{
-}//OsDependant::OsDependant
+public:
+    QVariantMap                 elems;
+    QMap<QString, QVariantMap>  attrMap;
 
-#if DESKTOP_OS && SKYPE_ENABLED
-SkypeClientFactory &
-OsDependant::skypeClientFactory()
-{
-    return (*m_skypeClientFactory);
-}//OsDependant::skypeClientFactory
-#endif
+protected:
+    bool startElement (const QString        &namespaceURI,
+                       const QString        &localName   ,
+                       const QString        &qName       ,
+                       const QXmlAttributes &atts        );
 
-void
-OsDependant::setMainWidget (QWidget *win)
-{
-#if DESKTOP_OS && SKYPE_ENABLED
-    m_skypeClientFactory->setMainWidget (win);
-#endif
-}//OsDependant::setMainWidget
+    bool endElement (const QString &namespaceURI,
+                     const QString &localName   ,
+                     const QString &qName       );
+
+    bool characters (const QString &ch);
+
+private:
+    QString strChars;
+    bool m_emitLog;
+};
+
+#endif // HTMLFIELDPARSER_H

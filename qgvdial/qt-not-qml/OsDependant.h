@@ -27,7 +27,9 @@ Contact: yuvraaj@gmail.com
 #include "OSDCipher.h"
 #include "OSDDirs.h"
 
-#if DESKTOP_OS
+#define SKYPE_ENABLED 0
+
+#if DESKTOP_OS && SKYPE_ENABLED
 class SkypeClientFactory;
 #endif
 
@@ -47,12 +49,12 @@ public:
 
     void setMainWidget (QWidget *win);
 
-#if DESKTOP_OS
+#if DESKTOP_OS && SKYPE_ENABLED
     SkypeClientFactory &skypeClientFactory();
 #endif
 
 private:
-#if DESKTOP_OS
+#if DESKTOP_OS && SKYPE_ENABLED
     SkypeClientFactory *m_skypeClientFactory;
 #endif
 };

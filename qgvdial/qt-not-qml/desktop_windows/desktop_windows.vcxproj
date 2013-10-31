@@ -1,0 +1,166 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{92C83163-34E9-48F7-AEBE-1C4E801DA605}</ProjectGuid>
+    <Keyword>MakeFileProj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <NMakeBuildCommandLine>nmake -nologo</NMakeBuildCommandLine>
+    <NMakeOutput>debug\qgvdial.exe</NMakeOutput>
+    <NMakeCleanCommandLine>nmake -nologo clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>nmake -nologo clean all</NMakeReBuildCommandLine>
+    <NMakePreprocessorDefinitions>WIN32;_DEBUG;$(NMakePreprocessorDefinitions);Q_WS_WIN32</NMakePreprocessorDefinitions>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <NMakeBuildCommandLine>nmake -nologo</NMakeBuildCommandLine>
+    <NMakeOutput>debug\qgvdial.exe</NMakeOutput>
+    <NMakeCleanCommandLine>nmake -nologo clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>nmake -nologo clean all</NMakeReBuildCommandLine>
+    <NMakePreprocessorDefinitions>WIN32;NDEBUG;$(NMakePreprocessorDefinitions);Q_WS_WIN32</NMakePreprocessorDefinitions>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <None Include="..\..\..\api\api.pri" />
+    <None Include="..\..\common\common.pri" />
+    <None Include="..\..\features\dirs\linux\linux-dirs.pri" />
+    <None Include="..\..\features\openssl\openssl.pri" />
+    <None Include="..\..\features\qtsingleapplication\inc\QtLockedFile" />
+    <None Include="..\..\features\qtsingleapplication\inc\QtSingleApplication" />
+    <None Include="..\..\features\qtsingleapplication\qtsingleapplication.pri" />
+    <None Include="..\CINumberDialog.ui" />
+    <None Include="..\common-code.pri" />
+    <None Include="..\ContactDialog.ui" />
+    <None Include="..\desktop_windows.pro" />
+    <None Include="..\InboxEntryDialog.ui" />
+    <None Include="..\mainwindow.ui" />
+    <None Include="readme.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\api\api_common.h" />
+    <ClInclude Include="..\..\..\api\AsyncTaskToken.h" />
+    <ClInclude Include="..\..\..\api\ContactsParser.h" />
+    <ClInclude Include="..\..\..\api\ContactsXmlHandler.h" />
+    <ClInclude Include="..\..\..\api\CookieJar.h" />
+    <ClInclude Include="..\..\..\api\GContactsApi.h" />
+    <ClInclude Include="..\..\..\api\GVApi.h" />
+    <ClInclude Include="..\..\..\api\GvXMLParser.h" />
+    <ClInclude Include="..\..\..\api\HtmlFieldParser.h" />
+    <ClInclude Include="..\..\..\api\MyXmlErrorHandler.h" />
+    <ClInclude Include="..\..\..\api\NwReqTracker.h" />
+    <ClInclude Include="..\..\common\CacheDb.h" />
+    <ClInclude Include="..\..\common\CacheDb_p.h" />
+    <ClInclude Include="..\..\common\ContactNumbersModel.h" />
+    <ClInclude Include="..\..\common\ContactsModel.h" />
+    <ClInclude Include="..\..\common\global.h" />
+    <ClInclude Include="..\..\common\GVNumModel.h" />
+    <ClInclude Include="..\..\common\IMainWindow.h" />
+    <ClInclude Include="..\..\common\InboxModel.h" />
+    <ClInclude Include="..\..\common\IObserver.h" />
+    <ClInclude Include="..\..\common\IObserverFactory.h" />
+    <ClInclude Include="..\..\common\IOsDependent.h" />
+    <ClInclude Include="..\..\common\IPhoneAccount.h" />
+    <ClInclude Include="..\..\common\IPhoneAccountFactory.h" />
+    <ClInclude Include="..\..\common\Lib.h" />
+    <ClInclude Include="..\..\common\LibContacts.h" />
+    <ClInclude Include="..\..\common\LibGvPhones.h" />
+    <ClInclude Include="..\..\common\LibInbox.h" />
+    <ClInclude Include="..\..\features\dirs\linux\OSDDirs.h" />
+    <ClInclude Include="..\..\features\openssl\OSDCipher.h" />
+    <ClInclude Include="..\..\features\qtsingleapplication\inc\qtlocalpeer.h" />
+    <ClInclude Include="..\..\features\qtsingleapplication\inc\qtlockedfile.h" />
+    <ClInclude Include="..\..\features\qtsingleapplication\inc\qtsingleapplication.h" />
+    <ClInclude Include="..\..\features\qtsingleapplication\inc\qtsinglecoreapplication.h" />
+    <ClInclude Include="..\CiListView.h" />
+    <ClInclude Include="..\CINumberDialog.h" />
+    <ClInclude Include="..\ContactDialog.h" />
+    <ClInclude Include="..\GvNumComboBox.h" />
+    <ClInclude Include="..\InboxEntryDialog.h" />
+    <ClInclude Include="..\MainWindow.h" />
+    <ClInclude Include="..\MainWindow_p.h" />
+    <ClInclude Include="..\OsDependant.h" />
+    <ClInclude Include="..\ui_mainwindow.h" />
+    <ClInclude Include="MainApp.h" />
+    <ClInclude Include="ObserverFactory.h" />
+    <ClInclude Include="PhoneFactory.h" />
+    <ClInclude Include="platform_specific.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\api\AsyncTaskToken.cpp" />
+    <ClCompile Include="..\..\..\api\ContactsParser.cpp" />
+    <ClCompile Include="..\..\..\api\ContactsXmlHandler.cpp" />
+    <ClCompile Include="..\..\..\api\CookieJar.cpp" />
+    <ClCompile Include="..\..\..\api\GContactsApi.cpp" />
+    <ClCompile Include="..\..\..\api\GVApi.cpp" />
+    <ClCompile Include="..\..\..\api\GvXMLParser.cpp" />
+    <ClCompile Include="..\..\..\api\HtmlFieldParser.cpp" />
+    <ClCompile Include="..\..\..\api\MyXmlErrorHandler.cpp" />
+    <ClCompile Include="..\..\..\api\NwReqTracker.cpp" />
+    <ClCompile Include="..\..\common\CacheDb.cpp" />
+    <ClCompile Include="..\..\common\CacheDb_p.cpp" />
+    <ClCompile Include="..\..\common\ContactNumbersModel.cpp" />
+    <ClCompile Include="..\..\common\ContactsModel.cpp" />
+    <ClCompile Include="..\..\common\GVNumModel.cpp" />
+    <ClCompile Include="..\..\common\IMainWindow.cpp" />
+    <ClCompile Include="..\..\common\InboxModel.cpp" />
+    <ClCompile Include="..\..\common\IObserverFactory.cpp" />
+    <ClCompile Include="..\..\common\IPhoneAccount.cpp" />
+    <ClCompile Include="..\..\common\IPhoneAccountFactory.cpp" />
+    <ClCompile Include="..\..\common\Lib.cpp" />
+    <ClCompile Include="..\..\common\LibContacts.cpp" />
+    <ClCompile Include="..\..\common\LibGvPhones.cpp" />
+    <ClCompile Include="..\..\common\LibInbox.cpp" />
+    <ClCompile Include="..\..\common\main.cpp" />
+    <ClCompile Include="..\..\features\dirs\linux\OSDDirs.cpp" />
+    <ClCompile Include="..\..\features\openssl\OSDCipher.cpp" />
+    <ClCompile Include="..\..\features\qtsingleapplication\src\qtlocalpeer.cpp" />
+    <ClCompile Include="..\..\features\qtsingleapplication\src\qtlockedfile.cpp" />
+    <ClCompile Include="..\..\features\qtsingleapplication\src\qtlockedfile_unix.cpp" />
+    <ClCompile Include="..\..\features\qtsingleapplication\src\qtlockedfile_win.cpp" />
+    <ClCompile Include="..\..\features\qtsingleapplication\src\qtsingleapplication.cpp" />
+    <ClCompile Include="..\..\features\qtsingleapplication\src\qtsinglecoreapplication.cpp" />
+    <ClCompile Include="..\CiListView.cpp" />
+    <ClCompile Include="..\CINumberDialog.cpp" />
+    <ClCompile Include="..\ContactDialog.cpp" />
+    <ClCompile Include="..\GvNumComboBox.cpp" />
+    <ClCompile Include="..\InboxEntryDialog.cpp" />
+    <ClCompile Include="..\MainWindow.cpp" />
+    <ClCompile Include="..\MainWindow_p.cpp" />
+    <ClCompile Include="..\OsDependant.cpp" />
+    <ClCompile Include="MainApp.cpp" />
+    <ClCompile Include="ObserverFactory.cpp" />
+    <ClCompile Include="PhoneFactory.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

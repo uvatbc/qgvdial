@@ -1,0 +1,396 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="api">
+      <UniqueIdentifier>{fee3d133-0bf3-4a53-afd7-a15e74299b82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="api\sources">
+      <UniqueIdentifier>{1f35ae52-7431-4b04-8b44-ebc13a3156f9}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="api\headers">
+      <UniqueIdentifier>{4c04c30f-42af-4696-a15c-328d8355383e}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="common">
+      <UniqueIdentifier>{76bf784e-1bbe-4ce1-b48e-af4df54c22f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\sources">
+      <UniqueIdentifier>{1322684b-67d6-4830-8298-3dafe7564ce4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\headers">
+      <UniqueIdentifier>{03c09e4e-c32c-4b00-bdd3-de7c65bbc796}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common-code">
+      <UniqueIdentifier>{688052ed-7bc1-40e2-b9d3-7e07ec008feb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common-code\sources">
+      <UniqueIdentifier>{52ceb0fa-232b-414e-ac1f-5a32d0e85060}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common-code\headers">
+      <UniqueIdentifier>{10d2bf10-eda9-449d-af04-d0cf290d86f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common-code\forms">
+      <UniqueIdentifier>{30d54f9e-6196-49f4-baf6-495931b4a5ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="features">
+      <UniqueIdentifier>{8ca12c2b-4392-42f8-90d2-2d7bbf53f3ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="features\dirs">
+      <UniqueIdentifier>{5b1eb5bc-487e-4a52-bd03-198c723686a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="features\dirs\sources">
+      <UniqueIdentifier>{5d1a6fc8-b4f7-4dd1-9d7e-7b2477f604ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="features\dirs\headers">
+      <UniqueIdentifier>{323c2305-a3b3-4211-a8e8-b6359acd6cff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="features\openssl">
+      <UniqueIdentifier>{745025ce-0a9e-44bd-ac0e-3b2d6b73920b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="features\openssl\sources">
+      <UniqueIdentifier>{45d6690e-428f-4c15-9ab8-da003085636d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="features\openssl\headers">
+      <UniqueIdentifier>{158c8384-0a88-4b3e-830a-60fedc628985}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="features\qtsingleapplication">
+      <UniqueIdentifier>{94d8fe25-8cb2-4a86-a7ca-419ccc6db916}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="features\qtsingleapplication\sources">
+      <UniqueIdentifier>{ad896b1a-f0ce-4359-8254-770de3ce50e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="features\qtsingleapplication\headers">
+      <UniqueIdentifier>{74b61af9-eae2-4443-bb9c-14657fe6b1c8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="readme.txt" />
+    <None Include="..\..\..\api\api.pri">
+      <Filter>api</Filter>
+    </None>
+    <None Include="..\..\common\common.pri">
+      <Filter>common</Filter>
+    </None>
+    <None Include="..\common-code.pri">
+      <Filter>common-code</Filter>
+    </None>
+    <None Include="..\CINumberDialog.ui">
+      <Filter>common-code\forms</Filter>
+    </None>
+    <None Include="..\InboxEntryDialog.ui">
+      <Filter>common-code\forms</Filter>
+    </None>
+    <None Include="..\ContactDialog.ui">
+      <Filter>common-code\forms</Filter>
+    </None>
+    <None Include="..\mainwindow.ui">
+      <Filter>common-code\forms</Filter>
+    </None>
+    <None Include="..\..\features\dirs\linux\linux-dirs.pri">
+      <Filter>features\dirs</Filter>
+    </None>
+    <None Include="..\..\features\openssl\openssl.pri">
+      <Filter>features\openssl</Filter>
+    </None>
+    <None Include="..\..\features\qtsingleapplication\qtsingleapplication.pri">
+      <Filter>features\qtsingleapplication</Filter>
+    </None>
+    <None Include="..\..\features\qtsingleapplication\inc\QtLockedFile">
+      <Filter>features\qtsingleapplication\headers</Filter>
+    </None>
+    <None Include="..\..\features\qtsingleapplication\inc\QtSingleApplication">
+      <Filter>features\qtsingleapplication\headers</Filter>
+    </None>
+    <None Include="..\desktop_windows.pro" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MainApp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ObserverFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PhoneFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="platform_specific.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\api\api_common.h">
+      <Filter>api\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\api\AsyncTaskToken.h">
+      <Filter>api\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\api\ContactsParser.h">
+      <Filter>api\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\api\ContactsXmlHandler.h">
+      <Filter>api\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\api\CookieJar.h">
+      <Filter>api\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\api\GContactsApi.h">
+      <Filter>api\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\api\GVApi.h">
+      <Filter>api\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\api\GvXMLParser.h">
+      <Filter>api\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\api\MyXmlErrorHandler.h">
+      <Filter>api\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\api\NwReqTracker.h">
+      <Filter>api\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\CacheDb.h">
+      <Filter>common\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\CacheDb_p.h">
+      <Filter>common\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\ContactNumbersModel.h">
+      <Filter>common\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\ContactsModel.h">
+      <Filter>common\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\global.h">
+      <Filter>common\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\GVNumModel.h">
+      <Filter>common\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\IMainWindow.h">
+      <Filter>common\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\InboxModel.h">
+      <Filter>common\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\IObserver.h">
+      <Filter>common\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\IObserverFactory.h">
+      <Filter>common\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\IOsDependent.h">
+      <Filter>common\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\IPhoneAccount.h">
+      <Filter>common\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\IPhoneAccountFactory.h">
+      <Filter>common\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\Lib.h">
+      <Filter>common\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\LibContacts.h">
+      <Filter>common\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\LibGvPhones.h">
+      <Filter>common\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\LibInbox.h">
+      <Filter>common\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CiListView.h">
+      <Filter>common-code\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CINumberDialog.h">
+      <Filter>common-code\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ContactDialog.h">
+      <Filter>common-code\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\GvNumComboBox.h">
+      <Filter>common-code\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\InboxEntryDialog.h">
+      <Filter>common-code\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\MainWindow.h">
+      <Filter>common-code\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\MainWindow_p.h">
+      <Filter>common-code\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OsDependant.h">
+      <Filter>common-code\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ui_mainwindow.h">
+      <Filter>common-code\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\features\dirs\linux\OSDDirs.h">
+      <Filter>features\dirs\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\features\openssl\OSDCipher.h">
+      <Filter>features\openssl\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\features\qtsingleapplication\inc\qtlocalpeer.h">
+      <Filter>features\qtsingleapplication\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\features\qtsingleapplication\inc\qtlockedfile.h">
+      <Filter>features\qtsingleapplication\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\features\qtsingleapplication\inc\qtsingleapplication.h">
+      <Filter>features\qtsingleapplication\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\features\qtsingleapplication\inc\qtsinglecoreapplication.h">
+      <Filter>features\qtsingleapplication\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\api\HtmlFieldParser.h">
+      <Filter>api\headers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="MainApp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ObserverFactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PhoneFactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\api\AsyncTaskToken.cpp">
+      <Filter>api\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\api\NwReqTracker.cpp">
+      <Filter>api\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\api\ContactsParser.cpp">
+      <Filter>api\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\api\ContactsXmlHandler.cpp">
+      <Filter>api\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\api\CookieJar.cpp">
+      <Filter>api\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\api\GContactsApi.cpp">
+      <Filter>api\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\api\GVApi.cpp">
+      <Filter>api\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\api\GvXMLParser.cpp">
+      <Filter>api\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\api\MyXmlErrorHandler.cpp">
+      <Filter>api\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\CacheDb.cpp">
+      <Filter>common\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\CacheDb_p.cpp">
+      <Filter>common\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\ContactNumbersModel.cpp">
+      <Filter>common\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\ContactsModel.cpp">
+      <Filter>common\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\GVNumModel.cpp">
+      <Filter>common\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\IMainWindow.cpp">
+      <Filter>common\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\InboxModel.cpp">
+      <Filter>common\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\IObserverFactory.cpp">
+      <Filter>common\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\IPhoneAccount.cpp">
+      <Filter>common\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\IPhoneAccountFactory.cpp">
+      <Filter>common\headers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\Lib.cpp">
+      <Filter>common\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\main.cpp">
+      <Filter>common\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\LibContacts.cpp">
+      <Filter>common\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\LibGvPhones.cpp">
+      <Filter>common\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\LibInbox.cpp">
+      <Filter>common\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CiListView.cpp">
+      <Filter>common-code\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CINumberDialog.cpp">
+      <Filter>common-code\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ContactDialog.cpp">
+      <Filter>common-code\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\GvNumComboBox.cpp">
+      <Filter>common-code\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\InboxEntryDialog.cpp">
+      <Filter>common-code\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MainWindow.cpp">
+      <Filter>common-code\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MainWindow_p.cpp">
+      <Filter>common-code\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OsDependant.cpp">
+      <Filter>common-code\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\features\dirs\linux\OSDDirs.cpp">
+      <Filter>features\dirs\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\features\openssl\OSDCipher.cpp">
+      <Filter>features\openssl\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\features\qtsingleapplication\src\qtlocalpeer.cpp">
+      <Filter>features\qtsingleapplication\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\features\qtsingleapplication\src\qtlockedfile.cpp">
+      <Filter>features\qtsingleapplication\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\features\qtsingleapplication\src\qtlockedfile_unix.cpp">
+      <Filter>features\qtsingleapplication\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\features\qtsingleapplication\src\qtlockedfile_win.cpp">
+      <Filter>features\qtsingleapplication\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\features\qtsingleapplication\src\qtsingleapplication.cpp">
+      <Filter>features\qtsingleapplication\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\features\qtsingleapplication\src\qtsinglecoreapplication.cpp">
+      <Filter>features\qtsingleapplication\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\api\HtmlFieldParser.cpp">
+      <Filter>api\sources</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
