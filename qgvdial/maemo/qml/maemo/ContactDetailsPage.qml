@@ -55,6 +55,7 @@ Rectangle {
                 id: contactName
                 anchors.verticalCenter: parent.verticalCenter
                 font.pixelSize: 30
+                width: parent.width - contactImage.width - parent.spacing
             }
         }
 

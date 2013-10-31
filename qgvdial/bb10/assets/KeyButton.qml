@@ -82,4 +82,9 @@ Container {
         verticalAlignment: VerticalAlignment.Center
         textStyle { base: tsdxsmall.style }
     }
+    
+    Divider {
+        horizontalAlignment: HorizontalAlignment.Center
+        verticalAlignment: VerticalAlignment.Bottom
+    }
 }

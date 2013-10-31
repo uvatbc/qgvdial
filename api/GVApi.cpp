@@ -412,6 +412,15 @@ GVApi::cancel(AsyncTaskToken *token)
     tracker->abort ();
 }//GVApi::cancel
 
+/*
+ * GET http://google.com/voice
+ * Should result in a bunch of redirects (to FQDN, then to mobile https)
+ * eventually landing on
+ * https://accounts.google.com/ServiceLogin?service=grandcentral
+ *      &continue=https://www.google.com/voice/m?initialauth
+ *      &followup=https://www.google.com/voice/m?initialauth
+ * ... which is handled by onLogin1.
+ */
 bool
 GVApi::login(AsyncTaskToken *token)
 {
@@ -449,6 +458,10 @@ GVApi::login(AsyncTaskToken *token)
     return rv;
 }//GVApi::login
 
+/*
+ * Parse out the login form out of the Service Login page.
+ * "Fill up" the form and post it with postLogin.
+ */
 void
 GVApi::onLogin1(bool success, const QByteArray &response, QNetworkReply *reply,
                 void *ctx)
@@ -685,10 +698,6 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
     fTemp.close ();
 #endif
 
-    if (strResponse.contains ("FinishSignIn")) {
-        Q_DEBUG("Here!!");
-    }
-
     token->errorString.clear();
     do {
         if (!success) {
@@ -759,7 +768,7 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
             quint32 len = cap.length ();
             QRegExp rxAction("action=[\"|'](.*)[\"|']");
             rxAction.setMinimal (true);
-            if (cap.contains ("verify-form")) {
+            if (cap.contains ("gaia_secondfactorform")) {
                 if (cap.contains (rxAction)) {
                     nextAction = rxAction.cap (1);
                     break;
@@ -773,6 +782,11 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
             Q_WARN("Failed to get two factor auth form");
             success = false;
             break;
+        }
+        if (!nextAction.startsWith ("http")) {
+            QUrl nextUrl = replyUrl.resolved (nextAction);
+            nextAction = nextUrl.toString ();
+            Q_DEBUG(nextAction);
         }
 
         do {
