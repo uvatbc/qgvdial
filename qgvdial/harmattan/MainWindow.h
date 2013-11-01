@@ -93,6 +93,7 @@ private:
     QObject *selectedNumberButton;
     QObject *regNumberSelector;
     QObject *ciSelector;
+    QObject *statusBanner;
 
     void    *loginCtx;
 

@@ -70,6 +70,7 @@ MainWindow::MainWindow(QObject *parent)
 , selectedNumberButton(NULL)
 , regNumberSelector(NULL)
 , ciSelector(NULL)
+, statusBanner(NULL)
 {
 }//MainWindow::MainWindow
 
@@ -224,6 +225,11 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
         }
         connect(ciSelector, SIGNAL(setCiNumber(QString,QString)),
                 &oPhones, SLOT(linkCiToNumber(QString,QString)));
+
+        statusBanner = getQMLObject ("StatusBanner");
+        if (NULL == statusBanner) {
+            break;
+        }
 
         onInitDone();
         return;
@@ -452,17 +458,25 @@ MainWindow::uiGetCIDetails(GVRegisteredNumber &num, GVNumModel *model)
 void
 MainWindow::uiLongTaskBegins()
 {
-    Q_ASSERT(0 == "Not implemented");
+    QMetaObject::invokeMethod(statusBanner, "showMessage",
+                              Q_ARG(QVariant,
+                                    QVariant(m_taskInfo.suggestedStatus)),
+                              Q_ARG(QVariant,
+                                    QVariant(m_taskInfo.suggestedMillisconds)));
 }//MainWindow::uiLongTaskBegins
 
 void
 MainWindow::uiLongTaskContinues()
 {
-    Q_ASSERT(0 == "Not implemented");
+    QMetaObject::invokeMethod(statusBanner, "showMessage",
+                              Q_ARG(QVariant,
+                                    QVariant(m_taskInfo.suggestedStatus)),
+                              Q_ARG(QVariant,
+                                    QVariant(m_taskInfo.suggestedMillisconds)));
 }//MainWindow::uiLongTaskContinues
 
 void
 MainWindow::uiLongTaskEnds()
 {
-    Q_ASSERT(0 == "Not implemented");
+    QMetaObject::invokeMethod (statusBanner, "clearMessage");
 }//MainWindow::uiLongTaskEnds

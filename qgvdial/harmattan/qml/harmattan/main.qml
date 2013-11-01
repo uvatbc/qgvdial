@@ -189,4 +189,14 @@ PageStackWindow {
         objectName: "CiPhoneSelectionPage"
         onDone: appWindow.pageStack.pop();
     }
+
+    StatusBanner {
+        id: statusBanner
+        objectName: "StatusBanner"
+
+        anchors {
+            bottom: parent.bottom
+            bottomMargin: commonTools.height + 5
+        }
+    }
 }
