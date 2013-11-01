@@ -124,6 +124,6 @@ private:
 };
 
 QCoreApplication *
-createApplication(int argc, char **argv);
+createAppObject(int argc, char **argv);
 
 #endif /* MainWindow_HPP_ */

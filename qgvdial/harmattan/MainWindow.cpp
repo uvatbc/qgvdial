@@ -20,7 +20,9 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "MainWindow.h"
-#include "QtDeclarative"
+#include "qmlapplicationviewer.h"
+
+#include "QtSingleApplication"
 
 #include "ContactsModel.h"
 #include "InboxModel.h"
@@ -31,9 +33,28 @@ Contact: yuvraaj@gmail.com
 #error Must define the unknown contact QRC path
 #endif
 
+QApplication *
+createAppObject(int &argc, char **argv)
+{
+    QtSingleApplication *app;
+
+    app = new QtSingleApplication(argc, argv);
+    if (NULL == app) {
+        return app;
+    }
+
+    if (app->isRunning ()) {
+        app->sendMessage ("show");
+        delete app;
+        app = NULL;
+    }
+
+    return app;
+}//createAppObject
+
 MainWindow::MainWindow(QObject *parent)
 : IMainWindow(parent)
-, m_view()
+, m_view(new QmlApplicationViewer)
 , mainPageStack(NULL)
 , mainTabGroup(NULL)
 , loginExpand(NULL)
@@ -58,13 +79,13 @@ MainWindow::init()
     IMainWindow::init ();
 
     bool rv =
-    connect(&m_view, SIGNAL(statusChanged(QDeclarativeView::Status)),
+    connect(m_view, SIGNAL(statusChanged(QDeclarativeView::Status)),
             this, SLOT(declStatusChanged(QDeclarativeView::Status)));
     Q_ASSERT(rv); Q_UNUSED(rv);
 
-    m_view.setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
-    m_view.setMainQmlFile(QLatin1String("qml/harmattan/main.qml"));
-    m_view.showExpanded();
+    m_view->setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
+    m_view->setMainQmlFile(QLatin1String("qml/harmattan/main.qml"));
+    m_view->showExpanded();
 }//MainWindow::init
 
 QObject *
@@ -72,7 +93,7 @@ MainWindow::getQMLObject(const char *pageName)
 {
     QObject *pObj = NULL;
     do { // Begin cleanup block (not a loop)
-        QObject *pRoot = (QObject *) m_view.rootObject ();
+        QObject *pRoot = (QObject *) m_view->rootObject ();
         if (NULL == pRoot) {
             Q_WARN(QString("Couldn't get root object in QML for %1")
                     .arg(pageName));
@@ -349,26 +370,26 @@ MainWindow::uiRefreshContacts()
 {
     Q_ASSERT(NULL != oContacts.m_contactsModel);
 
-    m_view.engine()->rootContext()
-                   ->setContextProperty("g_ContactsModel",
-                                        oContacts.m_contactsModel);
+    m_view->engine()->rootContext()
+                    ->setContextProperty("g_ContactsModel",
+                                         oContacts.m_contactsModel);
     QMetaObject::invokeMethod (contactsList, "setMyModel");
 }//MainWindow::uiRefreshContacts
 
 void
 MainWindow::uiRefreshInbox()
 {
-    m_view.engine()->rootContext()
-                   ->setContextProperty("g_InboxModel",
-                                        oInbox.m_inboxModel);
+    m_view->engine()->rootContext()
+                    ->setContextProperty("g_InboxModel",
+                                         oInbox.m_inboxModel);
     QMetaObject::invokeMethod (inboxList, "setMyModel");
 }//MainWindow::uiRefreshInbox
 
 void
 MainWindow::uiSetNewRegNumbersModel()
 {
-    m_view.engine()->rootContext()->setContextProperty("g_RegNumberModel",
-                                                       oPhones.m_numModel);
+    m_view->engine()->rootContext()->setContextProperty("g_RegNumberModel",
+                                                        oPhones.m_numModel);
     QMetaObject::invokeMethod (regNumberSelector, "setMyModel");
 }//MainWindow::uiSetNewRegNumbersModel
 
@@ -394,9 +415,9 @@ MainWindow::uiRefreshNumbers()
 void
 MainWindow::uiSetNewContactDetailsModel()
 {
-    m_view.engine()->rootContext()
-                   ->setContextProperty("g_ContactPhonesModel",
-                                        oContacts.m_contactPhonesModel);
+    m_view->engine()->rootContext()
+                    ->setContextProperty("g_ContactPhonesModel",
+                                         oContacts.m_contactPhonesModel);
 }//MainWindow::uiSetNewContactDetailsModel
 
 void
@@ -421,8 +442,8 @@ MainWindow::onInboxClicked(QString id)
 void
 MainWindow::uiGetCIDetails(GVRegisteredNumber &num, GVNumModel *model)
 {
-    m_view.engine()->rootContext()
-                   ->setContextProperty("g_CiPhonesModel", model);
+    m_view->engine()->rootContext()
+                    ->setContextProperty("g_CiPhonesModel", model);
 
     QMetaObject::invokeMethod (mainPageStack, "pushCiSelector",
                                Q_ARG (QVariant, QVariant(num.id)));

@@ -26,8 +26,8 @@ Contact: yuvraaj@gmail.com
 #include <QApplication>
 
 #include "IMainWindow.h"
-#include "qmlapplicationviewer.h"
 
+class QmlApplicationViewer;
 class MainWindow : public IMainWindow
 {
     Q_OBJECT
@@ -73,7 +73,7 @@ protected:
     void uiLongTaskEnds();
 
 private:
-    QmlApplicationViewer m_view;
+    QmlApplicationViewer *m_view;
 
     QObject *tabbedUI;
     QObject *closeButton;
@@ -90,5 +90,8 @@ private:
     QObject *dialPage;
     QObject *statusBanner;
 };
+
+QApplication *
+createAppObject(int &argc, char **argv);
 
 #endif // MAINWINDOW_H

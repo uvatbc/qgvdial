@@ -28,7 +28,7 @@ Contact: yuvraaj@gmail.com
 using namespace bb::cascades;
 
 QCoreApplication *
-createApplication(int argc, char **argv)
+createAppObject(int argc, char **argv)
 {
 	Application *app = new Application(argc, argv);
 
@@ -41,7 +41,7 @@ createApplication(int argc, char **argv)
     }
 
 	return app;
-}
+}//createAppObject
 
 MainWindow::MainWindow(QCoreApplication *_app)
 : IMainWindow(_app)

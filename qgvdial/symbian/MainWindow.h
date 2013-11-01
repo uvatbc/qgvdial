@@ -26,10 +26,10 @@ Contact: yuvraaj@gmail.com
 #include <QApplication>
 
 #include "IMainWindow.h"
-#include "qmlapplicationviewer.h"
 
 #include "DummyWindow.h"
 
+class QmlApplicationViewer;
 class MainWindow : public DummyMainWindow
 {
     Q_OBJECT
@@ -39,7 +39,10 @@ public:
     void log(QDateTime dt, int level, const QString &strLog);
 
 private:
-    QmlApplicationViewer m_view;
+    QmlApplicationViewer *m_view;
 };
+
+QApplication *
+createAppObject(int &argc, char **argv);
 
 #endif // MAINWINDOW_H

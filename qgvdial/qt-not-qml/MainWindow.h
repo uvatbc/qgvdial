@@ -90,6 +90,6 @@ private:
 };
 
 QCoreApplication *
-createApplication(int argc, char *argv[]);
+createAppObject(int argc, char *argv[]);
 
 #endif // MAINWINDOW_H

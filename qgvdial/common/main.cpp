@@ -160,7 +160,7 @@ deinitLogging ()
 Q_DECL_EXPORT int
 main(int argc, char *argv[])
 {
-    QCoreApplication *app = createApplication(argc, argv);
+    QCoreApplication *app = createAppObject(argc, argv);
     if (NULL == app) {
         // For whatever reason (not necessarily a lack of memory), the fn has
         // told us that creating this app is NOT possible. GTFO NOW!

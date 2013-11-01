@@ -20,19 +20,26 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "MainWindow.h"
+#include "qmlapplicationviewer.h"
+
+QApplication *
+createAppObject(int &argc, char **argv)
+{
+    return createApplication (argc, argv);
+}//createAppObject
 
 MainWindow::MainWindow(QObject *parent)
 //: IMainWindow(parent)
 : DummyMainWindow(parent)
-, m_view(NULL)
+, m_view(new QmlApplicationViewer)
 {
 }//MainWindow::MainWindow
 
 void
 MainWindow::init()
 {
-    m_view.setMainQmlFile(QLatin1String("qml/symbian/main.qml"));
-    m_view.showExpanded();
+    m_view->setMainQmlFile(QLatin1String("qml/symbian/main.qml"));
+    m_view->showExpanded();
 }//MainWindow::init
 
 void

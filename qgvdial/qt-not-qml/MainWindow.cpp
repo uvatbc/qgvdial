@@ -46,7 +46,7 @@ Contact: yuvraaj@gmail.com
 #endif
 
 QCoreApplication *
-createApplication(int argc, char *argv[])
+createAppObject(int argc, char *argv[])
 {
     QtSingleApplication *app;
 //#ifdef Q_WS_WIN32
@@ -66,7 +66,7 @@ createApplication(int argc, char *argv[])
     }
 
     return app;
-}//createApplication
+}//createAppObject
 
 MainWindow::MainWindow(QObject *parent)
 : IMainWindow(parent)
@@ -515,7 +515,7 @@ MainWindow::uiLongTaskBegins()
 void
 MainWindow::uiLongTaskContinues()
 {
-    d->ui->statusBar->showMessage (m_taskInfo.suggestedStatus,,
+    d->ui->statusBar->showMessage (m_taskInfo.suggestedStatus,
                                    m_taskInfo.suggestedMillisconds);
 }//MainWindow::uiLongTaskContinues
 
