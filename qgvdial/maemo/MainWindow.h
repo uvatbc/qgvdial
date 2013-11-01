@@ -76,6 +76,7 @@ private:
     QmlApplicationViewer m_view;
 
     QObject *tabbedUI;
+    QObject *closeButton;
     QObject *loginExpand;
     QObject *loginButton;
     QObject *textUsername;
@@ -87,6 +88,7 @@ private:
     QObject *regNumberSelector;
     QObject *ciSelector;
     QObject *dialPage;
+    QObject *statusBanner;
 };
 
 #endif // MAINWINDOW_H

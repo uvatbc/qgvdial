@@ -23,6 +23,8 @@ Contact: yuvraaj@gmail.com
 
 TpTask::TpTask(QObject *parent)
 : AsyncTaskToken(parent)
+, parentTask(NULL)
+, pendingOp(NULL)
 {
 }//TpTask::TpTask
 

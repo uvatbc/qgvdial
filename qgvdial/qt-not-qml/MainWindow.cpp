@@ -45,11 +45,6 @@ Contact: yuvraaj@gmail.com
 #error Must define the unknown contact QRC path
 #endif
 
-#define SHOW_3SEC   ( 3 * 1000)
-#define SHOW_5SEC   ( 5 * 1000)
-#define SHOW_10SEC  (10 * 1000)
-#define SHOW_INF    0
-
 QCoreApplication *
 createApplication(int argc, char *argv[])
 {
@@ -506,7 +501,8 @@ MainWindow::uiLongTaskBegins()
 {
     switch (m_taskInfo.type) {
     case LT_Login:
-        d->ui->statusBar->showMessage ("Logging in ...", SHOW_INF);
+        d->ui->statusBar->showMessage (m_taskInfo.suggestedStatus,
+                                       m_taskInfo.suggestedMillisconds);
         break;
     case LT_Call:
         d->ui->statusBar->showMessage ("Setting up a call ...", SHOW_INF);
@@ -519,20 +515,8 @@ MainWindow::uiLongTaskBegins()
 void
 MainWindow::uiLongTaskContinues()
 {
-    switch (m_taskInfo.type) {
-    case LT_Login:
-        d->ui->statusBar->showMessage (QString("Logging in for the last %1 "
-                                               "seconds")
-                                       .arg(m_taskInfo.seconds), SHOW_3SEC);
-        break;
-    case LT_Call:
-        d->ui->statusBar->showMessage (QString("Attempting a call for the last "
-                                               "%1 seconds")
-                                       .arg(m_taskInfo.seconds), SHOW_3SEC);
-        break;
-    default:
-        break;
-    }
+    d->ui->statusBar->showMessage (m_taskInfo.suggestedStatus,,
+                                   m_taskInfo.suggestedMillisconds);
 }//MainWindow::uiLongTaskContinues
 
 void

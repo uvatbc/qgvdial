@@ -25,8 +25,6 @@ Rectangle {
     id: container
 
     signal longPress
-    signal sigHide
-    signal sigClose
     signal setNumberToDial(string number)
 
     // height of the tab bar
@@ -89,7 +87,7 @@ Rectangle {
         if (imgClose.state != "back") {
             return;
         }
-        
+
         var newState = '';
 
         if (regNumberSelector.visible) {
@@ -156,6 +154,9 @@ Rectangle {
             id: rectX
             objectName: "CloseButton"
 
+            signal sigHide
+            signal sigClose
+
             color: "black"
             anchors.right: tabBar.right
             width: tabBar.height
@@ -185,13 +186,13 @@ Rectangle {
                 anchors.fill: parent
                 onPressAndHold: {
                     if (imgClose.state != "back") {
-                        container.sigClose();
+                        rectX.sigClose();
                     }
                 }
 
                 onClicked: {
                     if (imgClose.state != "back") {
-                        container.sigHide();
+                        rectX.sigHide();
                     } else {
                         container.doBack();
                     }
@@ -278,5 +279,14 @@ Rectangle {
         width: parent.width
 
         onDone: { container.doBack(); }
+    }
+
+    StatusBanner {
+        id: statusBanner
+        objectName: "StatusBanner"
+
+        anchors {
+            top: tabBar.bottom
+        }
     }
 }//Rectangle

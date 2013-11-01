@@ -77,8 +77,6 @@ Rectangle {
         width: main.centralWidth - 1
         height: main.centralHeight - 1
 
-        onSigHide: main.sigHide();
-        onSigClose: main.sigQuit();
         onSetNumberToDial: {
             tabClicked(0);
             dialPage.setNumberToDial(number);

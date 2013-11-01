@@ -401,6 +401,8 @@ IMainWindow::startLongTask(LongTaskType newType)
 {
     m_taskInfo.type = newType;
     m_taskInfo.seconds = 0;
+    m_taskInfo.suggestedStatus = "Logging in ...";
+    m_taskInfo.suggestedMillisconds = SHOW_INF;
     m_taskTimer.stop ();
     m_taskTimer.start ();
     uiLongTaskBegins();
@@ -417,6 +419,21 @@ void
 IMainWindow::onTaskTimerTimeout()
 {
     ++m_taskInfo.seconds;
+    switch (m_taskInfo.type) {
+    case LT_Login:
+        m_taskInfo.suggestedStatus = QString("Logging in for the last %1 "
+                                             "seconds")
+                                        .arg(m_taskInfo.seconds);
+        break;
+    case LT_Call:
+        m_taskInfo.suggestedStatus = QString("Attempting a call for the last "
+                                               "%1 seconds")
+                                        .arg(m_taskInfo.seconds);
+        break;
+    default:
+        break;
+    }
+    m_taskInfo.suggestedMillisconds = SHOW_3SEC;
     uiLongTaskContinues ();
     m_taskTimer.start ();
 }//IMainWindow::onTaskTimerTimeout

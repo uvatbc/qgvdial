@@ -155,13 +155,17 @@ void
 TpCalloutInitiator::onCallInitiated()
 {
     TpTask *task = (TpTask *) QObject::sender ();
-    task->deleteLater ();
+
+    AsyncTaskToken *subTask = task->parentTask;
+    Q_ASSERT(subTask != NULL);
 
     if (task->pendingOp->isError ()) {
-        task->parentTask->status = ATTS_FAILURE;
+        subTask->status = ATTS_FAILURE;
     } else {
-        task->parentTask->status = ATTS_SUCCESS;
+        subTask->status = ATTS_SUCCESS;
     }
 
-    task->parentTask->emitCompleted ();
+    subTask->emitCompleted ();
+
+    task->deleteLater ();
 }//TpCalloutInitiator::onCallInitiated

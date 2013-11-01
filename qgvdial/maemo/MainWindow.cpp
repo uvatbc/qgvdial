@@ -19,9 +19,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#include <QtGui>
-#include "QtDeclarative"
-
 #include "MainWindow.h"
 #include "ContactsModel.h"
 #include "InboxModel.h"
@@ -40,6 +37,7 @@ MainWindow::MainWindow(QObject *parent)
 : IMainWindow(parent)
 , m_view(NULL)
 , tabbedUI(NULL)
+, closeButton(NULL)
 , loginExpand(NULL)
 , loginButton(NULL)
 , textUsername(NULL)
@@ -51,6 +49,7 @@ MainWindow::MainWindow(QObject *parent)
 , regNumberSelector(NULL)
 , ciSelector(NULL)
 , dialPage(NULL)
+, statusBanner(NULL)
 {
 }//MainWindow::MainWindow
 
@@ -67,6 +66,7 @@ MainWindow::init()
     m_view.setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
     m_view.setMainQmlFile(QLatin1String("qml/maemo/main.qml"));
     m_view.showExpanded();
+    m_view.showFullScreen ();
 }//MainWindow::init
 
 QObject *
@@ -114,6 +114,13 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
         if (NULL == tabbedUI) {
             break;
         }
+
+        closeButton = getQMLObject ("CloseButton");
+        if (NULL == closeButton) {
+            break;
+        }
+        connect(closeButton, SIGNAL(sigHide()), &m_view, SLOT(hide()));
+        connect(closeButton, SIGNAL(sigClose()), qApp, SLOT(quit()));
 
         loginExpand = getQMLObject ("ExpandLoginDetails");
         if (NULL == loginExpand) {
@@ -191,6 +198,11 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
                 this, SLOT(onUserCall(QString)));
         //connect(dialPage, SIGNAL(sigText(QString)),
         //        this, SLOT(onUserText(QString)));
+
+        statusBanner = getQMLObject ("StatusBanner");
+        if (NULL == statusBanner) {
+            break;
+        }
 
         onInitDone();
         return;
@@ -404,17 +416,25 @@ MainWindow::uiGetCIDetails(GVRegisteredNumber &num, GVNumModel *model)
 void
 MainWindow::uiLongTaskBegins()
 {
-    Q_ASSERT(0 == "Not implemented");
+    QMetaObject::invokeMethod(statusBanner, "showMessage",
+                              Q_ARG(QVariant,
+                                    QVariant(m_taskInfo.suggestedStatus)),
+                              Q_ARG(QVariant,
+                                    QVariant(m_taskInfo.suggestedMillisconds)));
 }//MainWindow::uiLongTaskBegins
 
 void
 MainWindow::uiLongTaskContinues()
 {
-    Q_ASSERT(0 == "Not implemented");
+    QMetaObject::invokeMethod(statusBanner, "showMessage",
+                              Q_ARG(QVariant,
+                                    QVariant(m_taskInfo.suggestedStatus)),
+                              Q_ARG(QVariant,
+                                    QVariant(m_taskInfo.suggestedMillisconds)));
 }//MainWindow::uiLongTaskContinues
 
 void
 MainWindow::uiLongTaskEnds()
 {
-    Q_ASSERT(0 == "Not implemented");
+    QMetaObject::invokeMethod (statusBanner, "clearMessage");
 }//MainWindow::uiLongTaskEnds

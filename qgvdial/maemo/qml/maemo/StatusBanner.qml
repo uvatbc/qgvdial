@@ -19,12 +19,44 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#ifndef PLATFORMSPECIFIC_H
-#define PLATFORMSPECIFIC_H
+import Qt 4.7
 
-#include <QtGui>
-#include "QtDeclarative"
+Rectangle {
+    id: container
 
-#define UNKNOWN_CONTACT_QRC_PATH "qrc:/unknown_contact.png"
+    function showMessage(msg, timeout) {
+        statusText.text = msg;
+        statusTimer.interval = timeout;
+        container.visible = true;
+        statusTimer.start();
+    }
 
-#endif // PLATFORMSPECIFIC_H
+    function clearMessage() {
+        statusTimer.stop();
+        container.visible = false;
+    }
+
+    visible: false
+    color: "yellow"
+    width: parent.width
+    height: 40
+
+    Timer {
+        id: statusTimer
+        onTriggered: {
+            container.visible = false;
+        }
+    }
+
+    Text {
+        id: statusText
+        anchors.centerIn: parent
+    }
+
+    MouseArea {
+        anchors.fill: parent
+        onClicked: {
+            container.clearMessage();
+        }
+    }
+}//Rectangle

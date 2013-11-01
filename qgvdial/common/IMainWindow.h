@@ -105,10 +105,18 @@ enum LongTaskType {
     LT_Call
 };
 
+#define SHOW_3SEC   ( 3 * 1000)
+#define SHOW_5SEC   ( 5 * 1000)
+#define SHOW_10SEC  (10 * 1000)
+#define SHOW_INF    0
+
 struct LongTaskInfo
 {
     LongTaskType type;
     int seconds;
+
+    QString suggestedStatus;
+    int suggestedMillisconds;
 };
 
 class IMainWindow : public QObject
