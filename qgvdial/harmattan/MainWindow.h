@@ -71,6 +71,10 @@ protected:
 
     void uiGetCIDetails(GVRegisteredNumber &num, GVNumModel *model);
 
+    void uiLongTaskBegins();
+    void uiLongTaskContinues();
+    void uiLongTaskEnds();
+
 private:
     QmlApplicationViewer m_view;
 

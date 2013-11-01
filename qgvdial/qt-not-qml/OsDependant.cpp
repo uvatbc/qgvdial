@@ -52,5 +52,7 @@ OsDependant::setMainWidget (QWidget *win)
 {
 #if DESKTOP_OS && SKYPE_ENABLED
     m_skypeClientFactory->setMainWidget (win);
+#else
+    Q_UNUSED(win);
 #endif
 }//OsDependant::setMainWidget

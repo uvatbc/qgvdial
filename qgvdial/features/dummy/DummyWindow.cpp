@@ -144,3 +144,21 @@ DummyMainWindow::uiGetCIDetails(GVRegisteredNumber &, GVNumModel *)
 {
     Q_ASSERT(0 == "Not implemented");
 }//DummyMainWindow::uiGetCIDetails
+
+void
+DummyMainWindow::uiLongTaskBegins()
+{
+    Q_ASSERT(0 == "Not implemented");
+}//DummyMainWindow::uiLongTaskBegins
+
+void
+DummyMainWindow::uiLongTaskContinues()
+{
+    Q_ASSERT(0 == "Not implemented");
+}//DummyMainWindow::uiLongTaskContinues
+
+void
+DummyMainWindow::uiLongTaskEnds()
+{
+    Q_ASSERT(0 == "Not implemented");
+}//DummyMainWindow::uiLongTaskEnds

@@ -65,7 +65,7 @@ GvNumComboBox::onViewTimerTimeout()
 }//GvNumComboBox::onViewTimerTimeout
 
 void
-GvNumComboBox::onViewEntryClicked(int index)
+GvNumComboBox::onViewEntryClicked(int /*index*/)
 {
     m_longPressRow = -1;
     m_longPressTimer.stop ();

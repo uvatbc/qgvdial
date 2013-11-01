@@ -56,6 +56,10 @@ protected:
     virtual void uiShowContactDetails(const ContactInfo &cinfo);
 
     virtual void uiGetCIDetails(GVRegisteredNumber &num, GVNumModel *model);
+
+    virtual void uiLongTaskBegins();
+    virtual void uiLongTaskContinues();
+    virtual void uiLongTaskEnds();
 };
 
 #endif // DUMMYMAINWINDOW_H

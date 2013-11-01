@@ -99,6 +99,18 @@ Contact: yuvraaj@gmail.com
  *==============================================================================
  */
 
+enum LongTaskType {
+    LT_Invalid = 0,
+    LT_Login,
+    LT_Call
+};
+
+struct LongTaskInfo
+{
+    LongTaskType type;
+    int seconds;
+};
+
 class IMainWindow : public QObject
 {
     Q_OBJECT
@@ -125,9 +137,11 @@ private slots:
     void onTFARequest(AsyncTaskToken *task);
     void loginCompleted();
     void onLogoutDone();
-    
+
     void onGvCallTaskDone();
     void onGvTextTaskDone();
+
+    void onTaskTimerTimeout();
 
 protected:
     virtual void log(QDateTime dt, int level, const QString &strLog) = 0;
@@ -158,6 +172,12 @@ protected:
 
     virtual void uiGetCIDetails(GVRegisteredNumber &num, GVNumModel *model) = 0;
 
+    void startLongTask(LongTaskType newType);
+    void endLongTask();
+    virtual void uiLongTaskBegins() = 0;
+    virtual void uiLongTaskContinues() = 0;
+    virtual void uiLongTaskEnds() = 0;
+
 protected:
     CacheDb db;
     GVApi   gvApi;
@@ -170,6 +190,9 @@ protected:
     QString m_pass;
 
     AsyncTaskToken *m_loginTask;
+
+    QTimer  m_taskTimer;
+    LongTaskInfo m_taskInfo;
 
     friend class LibContacts;
     friend class LibInbox;

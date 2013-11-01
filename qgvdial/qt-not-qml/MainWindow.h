@@ -69,6 +69,10 @@ protected:
 
     void uiGetCIDetails(GVRegisteredNumber &num, GVNumModel *model);
 
+    void uiLongTaskBegins();
+    void uiLongTaskContinues();
+    void uiLongTaskEnds();
+
 protected slots:
     void messageReceived(const QString &msg);
 

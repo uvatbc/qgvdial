@@ -400,3 +400,21 @@ MainWindow::uiGetCIDetails(GVRegisteredNumber &num, GVNumModel *model)
     QMetaObject::invokeMethod (tabbedUI, "showCiSelector",
                                Q_ARG (QVariant, QVariant(num.id)));
 }//MainWindow::uiGetCIDetails
+
+void
+MainWindow::uiLongTaskBegins()
+{
+    Q_ASSERT(0 == "Not implemented");
+}//MainWindow::uiLongTaskBegins
+
+void
+MainWindow::uiLongTaskContinues()
+{
+    Q_ASSERT(0 == "Not implemented");
+}//MainWindow::uiLongTaskContinues
+
+void
+MainWindow::uiLongTaskEnds()
+{
+    Q_ASSERT(0 == "Not implemented");
+}//MainWindow::uiLongTaskEnds

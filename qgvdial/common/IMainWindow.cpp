@@ -35,6 +35,10 @@ IMainWindow::IMainWindow(QObject *parent)
     qRegisterMetaType<ContactInfo>("ContactInfo");
     connect(&gvApi, SIGNAL(twoStepAuthentication(AsyncTaskToken*)),
             this, SLOT(onTFARequest(AsyncTaskToken*)));
+
+    m_taskTimer.setSingleShot (true);
+    m_taskTimer.setInterval (1 * 1000); // 1 second
+    connect (&m_taskTimer, SIGNAL(timeout()), this, SLOT(onTaskTimerTimeout()));
 }//IMainWindow::IMainWindow
 
 void
@@ -112,6 +116,7 @@ IMainWindow::beginLogin(const QString &user, const QString &pass)
         m_loginTask->inParams["pass"] = pass;
 
         Q_DEBUG(QString("Login using user %1").arg(user));
+        startLongTask (LT_Login);
 
         if (!gvApi.login (m_loginTask)) {
             Q_WARN("Failed to log in");
@@ -199,6 +204,7 @@ IMainWindow::loginCompleted()
         }
     } while (0);
 
+    endLongTask ();
     uiLoginDone (task->status, task->errorString);
     task->deleteLater ();
 }//IMainWindow::loginCompleted
@@ -286,7 +292,7 @@ IMainWindow::onUserCall(QString number)
     } else {
         rv = gvApi.callOut (task);
     }
-    
+
     if (!rv) {
         delete task;
     }
@@ -389,3 +395,28 @@ IMainWindow::getTextsByDate(QDateTime dtStart, QDateTime dtEnd)
 {
     return (db.getTextsByDate(dtStart, dtEnd));
 }//IMainWindow::getTextsByDate
+
+void
+IMainWindow::startLongTask(LongTaskType newType)
+{
+    m_taskInfo.type = newType;
+    m_taskInfo.seconds = 0;
+    m_taskTimer.stop ();
+    m_taskTimer.start ();
+    uiLongTaskBegins();
+}//IMainWindow::startLongTask
+
+void
+IMainWindow::endLongTask()
+{
+    m_taskTimer.stop ();
+    uiLongTaskEnds ();
+}//IMainWindow::endLongTask
+
+void
+IMainWindow::onTaskTimerTimeout()
+{
+    ++m_taskInfo.seconds;
+    uiLongTaskContinues ();
+    m_taskTimer.start ();
+}//IMainWindow::onTaskTimerTimeout

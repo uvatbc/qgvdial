@@ -45,6 +45,11 @@ Contact: yuvraaj@gmail.com
 #error Must define the unknown contact QRC path
 #endif
 
+#define SHOW_3SEC   ( 3 * 1000)
+#define SHOW_5SEC   ( 5 * 1000)
+#define SHOW_10SEC  (10 * 1000)
+#define SHOW_INF    0
+
 QCoreApplication *
 createApplication(int argc, char *argv[])
 {
@@ -186,7 +191,8 @@ MainWindow::uiUpdateProxySettings(const ProxyInfo &info)
 void
 MainWindow::uiRequestLoginDetails()
 {
-    d->ui->statusBar->showMessage ("Please enter a user and password");
+    d->ui->statusBar->showMessage ("Please enter a user and password",
+                                   SHOW_INF);
     d->ui->tabWidget->setCurrentIndex (3);
     d->ui->toolBox->setCurrentIndex (0);
 }//MainWindow::uiRequestLoginDetails
@@ -265,10 +271,11 @@ MainWindow::uiLoginDone(int status, const QString &errStr)
 {
     do {
         if (ATTS_NW_ERROR == status) {
-            d->ui->statusBar->showMessage ("Network error. Try again later.");
+            d->ui->statusBar->showMessage ("Network error. Try again later.",
+                                           SHOW_10SEC);
             break;
         } else if (ATTS_USER_CANCEL == status) {
-            d->ui->statusBar->showMessage ("User canceled login.");
+            d->ui->statusBar->showMessage ("User canceled login.", SHOW_5SEC);
             break;
         } else if (ATTS_SUCCESS != status) {
             QMessageBox msg;
@@ -279,7 +286,7 @@ MainWindow::uiLoginDone(int status, const QString &errStr)
             break;
         }
 
-        d->ui->statusBar->showMessage ("Login successful");
+        d->ui->statusBar->showMessage ("Login successful", SHOW_5SEC);
     } while (0);
 }//MainWindow::uiLoginDone
 
@@ -493,3 +500,43 @@ MainWindow::onCbNumDoModify(int index)
 {
     oPhones.onUserUpdateCiNumber (index);
 }//MainWindow::onCbNumDoModify
+
+void
+MainWindow::uiLongTaskBegins()
+{
+    switch (m_taskInfo.type) {
+    case LT_Login:
+        d->ui->statusBar->showMessage ("Logging in ...", SHOW_INF);
+        break;
+    case LT_Call:
+        d->ui->statusBar->showMessage ("Setting up a call ...", SHOW_INF);
+        break;
+    default:
+        break;
+    }
+}//MainWindow::uiLongTaskBegins
+
+void
+MainWindow::uiLongTaskContinues()
+{
+    switch (m_taskInfo.type) {
+    case LT_Login:
+        d->ui->statusBar->showMessage (QString("Logging in for the last %1 "
+                                               "seconds")
+                                       .arg(m_taskInfo.seconds), SHOW_3SEC);
+        break;
+    case LT_Call:
+        d->ui->statusBar->showMessage (QString("Attempting a call for the last "
+                                               "%1 seconds")
+                                       .arg(m_taskInfo.seconds), SHOW_3SEC);
+        break;
+    default:
+        break;
+    }
+}//MainWindow::uiLongTaskContinues
+
+void
+MainWindow::uiLongTaskEnds()
+{
+    d->ui->statusBar->clearMessage ();
+}//MainWindow::uiLongTaskEnds
