@@ -56,6 +56,7 @@ signals:
 
 private:
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    QVariant getPic(const QModelIndex &index, bool isQML) const;
 
 private:
     bool            mandatoryLocalPic;

@@ -38,6 +38,8 @@ MainWindow::MainWindow(QObject *parent)
 void
 MainWindow::init()
 {
+    IMainWindow::init();
+
     m_view->setMainQmlFile(QLatin1String("qml/symbian/main.qml"));
     m_view->showExpanded();
 }//MainWindow::init

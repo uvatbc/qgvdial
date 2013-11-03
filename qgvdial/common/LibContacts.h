@@ -37,16 +37,19 @@ class LibContacts : public QObject
 public:
     explicit LibContacts(IMainWindow *parent);
 
+    void setMandatoryLocalPicsFlag(bool value);
+    bool getMandatoryLocalPicsFlag();
+
     bool login(const QString &user, const QString &pass);
     bool refresh(QDateTime after = QDateTime());
 
-    ContactsModel *createModel(bool mandatoryLocalPic = true);
-    void refreshModel();
+    ContactsModel *createModel();
 
     bool getContactInfoAndModel(ContactInfo &cinfo);
 
 public slots:
     bool getContactInfoAndModel(QString id);
+    void refreshModel();
 
 signals:
     void someTimeAfterGettingTheLastPhoto();
@@ -67,6 +70,7 @@ protected:
 public:
     ContactsModel       *m_contactsModel;
     ContactNumbersModel *m_contactPhonesModel;
+    bool                 m_mandatoryLocalPics;
 };
 
 #endif // LIBCONTACTS_H

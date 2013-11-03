@@ -39,7 +39,6 @@ public:
 
 public slots:
     void onLoginClicked();
-    void someTimeAfterGettingTheLastPhoto();
 
     void onUserProxyEnableChanged(bool newValue);
     void onUserUseSystemProxyChanged(bool newValue);

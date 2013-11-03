@@ -25,12 +25,13 @@ Contact: yuvraaj@gmail.com
 #include "ContactsModel.h"
 #include "ContactNumbersModel.h"
 
-#define GOT_PHOTO_TIMEOUT (5000)  // 5 seconds
+#define GOT_PHOTO_TIMEOUT (5 * 1000)  // 5 seconds
 
 LibContacts::LibContacts(IMainWindow *parent)
 : QObject(parent)
 , m_contactsModel(NULL)
 , m_contactPhonesModel(NULL)
+, m_mandatoryLocalPics(true) // True because QML is not GV authenticated
 {
     Q_ASSERT(NULL != parent);
 
@@ -142,6 +143,13 @@ LibContacts::onContactsFetched()
         ContactsModel *oldModel = m_contactsModel;
         m_contactsModel = this->createModel ();
         if (NULL != m_contactsModel) {
+            if (m_mandatoryLocalPics) {
+                connect(m_contactsModel, SIGNAL(noContactPhoto(QString,QString)),
+                        this, SLOT(onNoContactPhoto(QString,QString)));
+                connect(this, SIGNAL(someTimeAfterGettingTheLastPhoto()),
+                        this, SLOT(refreshModel()));
+            }
+
             win->uiRefreshContacts ();
             oldModel->deleteLater ();
         } else {
@@ -153,10 +161,10 @@ LibContacts::onContactsFetched()
 }//LibContacts::onContactsFetched
 
 ContactsModel *
-LibContacts::createModel(bool mandatoryLocalPic /* = true*/)
+LibContacts::createModel()
 {
     IMainWindow *win = (IMainWindow *) this->parent ();
-    ContactsModel *model = new ContactsModel(mandatoryLocalPic, this);
+    ContactsModel *model = new ContactsModel(m_mandatoryLocalPics, this);
     win->db.refreshContactsModel (model);
     return (model);
 }//LibContacts::createModel
@@ -183,6 +191,8 @@ LibContacts::onNoContactPhoto(QString contactId, QString photoUrl)
         Q_WARN("Unable to get photo");
         delete task;
     }
+
+    m_gotPhotoTimer.stop ();
 }//LibContacts::onNoContactPhoto
 
 void
@@ -230,6 +240,7 @@ LibContacts::onGotPhoto()
     } while(0);
     task->deleteLater ();
 
+    m_gotPhotoTimer.stop ();
     m_gotPhotoTimer.start ();
 }//LibContacts::onGotPhoto
 

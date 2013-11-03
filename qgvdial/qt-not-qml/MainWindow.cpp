@@ -290,11 +290,6 @@ MainWindow::uiRefreshContacts()
 {
     Q_ASSERT(NULL != oContacts.m_contactsModel);
 
-    connect(oContacts.m_contactsModel, SIGNAL(noContactPhoto(QString,QString)),
-            &oContacts, SLOT(onNoContactPhoto(QString,QString)));
-    connect(&oContacts, SIGNAL(someTimeAfterGettingTheLastPhoto()),
-            this, SLOT(someTimeAfterGettingTheLastPhoto()));
-
     d->ui->contactsView->setModel (oContacts.m_contactsModel);
 
     d->ui->contactsView->hideColumn (0);    // id
@@ -336,12 +331,6 @@ MainWindow::uiRefreshNumbers()
         oPhones.m_ignoreSelectedNumberChanges = false;
     }
 }//MainWindow::uiRefreshNumbers
-
-void
-MainWindow::someTimeAfterGettingTheLastPhoto()
-{
-    oContacts.refreshModel ();
-}//MainWindow::someTimeAfterGettingTheLastPhoto
 
 void
 MainWindow::messageReceived(const QString &msg)

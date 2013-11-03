@@ -37,10 +37,72 @@ ContactsModel::ContactsModel(bool bLocalPic, QObject *parent)
 }//ContactsModel::ContactsModel
 
 QVariant
-ContactsModel::data(const QModelIndex &index, int role) const
+ContactsModel::getPic(const QModelIndex &index, bool isQML) const
 {
     QVariant retVar;
     QString photoUrl, localPath;
+
+    photoUrl = QSqlQueryModel::data(index.sibling(index.row(), 2),
+                                    Qt::EditRole).toString();
+    localPath = QSqlQueryModel::data(index.sibling(index.row(), 3),
+                                     Qt::EditRole).toString();
+
+    do {
+        if (photoUrl.isEmpty()) {
+            if (isQML) {
+                // Return blank
+                //retVar = UNKNOWN_CONTACT_QRC_PATH;
+            } else {
+#if !defined(Q_OS_BLACKBERRY)
+                // No contact photo at all, but there is a default...
+                QPixmap pixmap(UNKNOWN_CONTACT_QRC_PATH);
+                retVar = pixmap.scaled(PIXMAP_SCALED_W, PIXMAP_SCALED_H,
+                                       Qt::KeepAspectRatio);
+#endif
+            }
+
+            break;
+        }
+
+        if (!mandatoryLocalPic) {
+            if (isQML) {
+                retVar = photoUrl;
+                break;
+            }
+            // If it isn't QML, the pic has to be made local
+        }
+
+        if (localPath.isEmpty() ||
+            !QFileInfo(localPath).exists()) {
+            // Local path is empty and image path is not empty.
+            QString contactId =
+                    QSqlQueryModel::data(index.sibling(index.row(), 0),
+                                         Qt::EditRole).toString();
+            emit noContactPhoto(contactId, photoUrl);
+
+            // And return blank
+            break;
+        }
+
+        if (isQML) {
+            // Local path is mandatory, and I *do* have it:
+            retVar = localPath;
+        } else {
+#if !defined(Q_OS_BLACKBERRY)
+            QPixmap pixmap(localPath);
+            retVar = pixmap.scaled(PIXMAP_SCALED_W, PIXMAP_SCALED_H,
+                                   Qt::KeepAspectRatio);
+#endif
+        }
+    } while (0);
+
+    return retVar;
+}//ContactsModel::getPic
+
+QVariant
+ContactsModel::data(const QModelIndex &index, int role) const
+{
+    QVariant retVar;
 
     do {
         if (CT_IDRole == role) {
@@ -55,38 +117,8 @@ ContactsModel::data(const QModelIndex &index, int role) const
             break;
         }
 
-        photoUrl = QSqlQueryModel::data(index.sibling(index.row(), 2),
-                                        Qt::EditRole).toString();
-        localPath = QSqlQueryModel::data(index.sibling(index.row(), 3),
-                                         Qt::EditRole).toString();
-
         if (CT_ImagePathRole == role) {
-            if (photoUrl.isEmpty()) {
-                retVar = UNKNOWN_CONTACT_QRC_PATH;
-                break;
-            }
-
-            if (mandatoryLocalPic) {
-                if (localPath.isEmpty()) {
-                    // Local path is empty and image path is not empty.
-                    QString contactId =
-                            QSqlQueryModel::data(index.sibling(index.row(), 0),
-                                                 Qt::EditRole).toString();
-                    emit noContactPhoto(contactId, photoUrl);
-
-                    // even if it is empty:
-                    retVar = UNKNOWN_CONTACT_QRC_PATH;
-                } else {
-                    // Local path is mandatory, and I *do* have it:
-                    retVar = localPath;
-                }
-                break;
-            }
-
-            Q_ASSERT(!mandatoryLocalPic);
-            Q_ASSERT(!photoUrl.isEmpty());
-
-            retVar = photoUrl;
+            retVar = getPic (index, true);
             break;
         }
 
@@ -96,41 +128,22 @@ ContactsModel::data(const QModelIndex &index, int role) const
             break;
         }
 
-#if !defined(Q_OS_BLACKBERRY)
         // For the decoration role, return a pixmap. Pixmap require local paths
         if (Qt::DecorationRole == role) {
-            if (!photoUrl.isEmpty()) {
-                if (localPath.isEmpty()) {
-                    // Local path is empty and image path is not empty.
-                    QString contactId =
-                            QSqlQueryModel::data(index.sibling(index.row(), 0),
-                                                 Qt::EditRole).toString();
-                    emit noContactPhoto(contactId, photoUrl);
-                } else {
-                    QPixmap pixmap(localPath);
-                    retVar = pixmap.scaled(PIXMAP_SCALED_W, PIXMAP_SCALED_H,
-                                           Qt::KeepAspectRatio);
-                }
-            } else {
-                // No contact photo at all, but there is a default...
-                QPixmap pixmap(UNKNOWN_CONTACT_QRC_PATH);
-                retVar = pixmap.scaled(PIXMAP_SCALED_W, PIXMAP_SCALED_H,
-                                       Qt::KeepAspectRatio);
-            }
+            retVar = getPic (index, false);
         } else if (Qt::DecorationPropertyRole == role) {
             QSize size(PIXMAP_SCALED_W, PIXMAP_SCALED_H);
             retVar = size;
         } else {
             retVar = QSqlQueryModel::data(index, role);
         }
-#endif
 
         // At this point I either have valid data in retVar or it is empty.
         // There's no need to get data from the base model.
     } while (0);
 
     return (retVar);
-} //ContactsModel::data
+}//ContactsModel::data
 
 int
 ContactsModel::rowCount(const QModelIndex & /*parent*/) const
