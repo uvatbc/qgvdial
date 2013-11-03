@@ -20,7 +20,7 @@ Contact: yuvraaj@gmail.com
 */
 
 import Qt 4.7
- 
+
 Rectangle {
     id: container
 
@@ -29,29 +29,32 @@ Rectangle {
     property int textFormat: TextEdit.PlainText
     property alias readOnly: textEdit.readOnly
     property alias wrapMode: textEdit.wrapMode
+    property alias verticalAlignment: textEdit.verticalAlignment
+    property alias horizontalAlignment: textEdit.horizontalAlignment
+    property bool enableBorder: true
 
     signal textChanged(string text)
 
     height: textEdit.height + textEdit.font.pointSize
- 
+
     border {
-        color: "gray"
-        width: 2
+        color: enableBorder ? "gray" : undefined
+        width: enableBorder ? 2 : undefined
     }
     radius: textEdit.font.pointSize
     smooth: true
     color: "black"
- 
+
     TextEdit {
         id: textEdit
- 
+
         anchors.centerIn: parent
         width: parent.width - (2 * font.pointSize)
- 
+
         font.pointSize: 17
         color: "white"
         textFormat: container.textFormat
- 
+
         onTextChanged: container.textChanged(text)
     }//TextEdit
 

@@ -33,6 +33,8 @@ class MainWindow : public IMainWindow
     Q_OBJECT
 public:
     explicit MainWindow(QObject *parent = 0);
+    ~MainWindow();
+
     void init();
     void log(QDateTime dt, int level, const QString &strLog);
 
@@ -44,6 +46,8 @@ protected slots:
                            int port, bool authRequired, QString user,
                            QString pass);
     void onUserClickedRegNumBtn();
+
+    void onInboxClicked(QString id);
 
 protected:
     QObject *getQMLObject(const char *pageName);

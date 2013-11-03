@@ -20,7 +20,7 @@ Contact: yuvraaj@gmail.com
 */
 
 import Qt 4.7
- 
+
 Rectangle {
     id: container
 
@@ -31,16 +31,18 @@ Rectangle {
     property int echoMode: TextInput.Normal
     property string placeholderText
     property alias readOnly: textInput.readOnly
+    property alias horizontalAlignment: textInput.horizontalAlignment
+    property bool enableBorder: true
 
     signal textChanged(string text)
     signal accepted
 
     width: parent.width
     height: textInput.height * 1.8
- 
+
     border {
-        color: "gray"
-        width: 2
+        color: enableBorder ? "gray" : undefined
+        width: enableBorder ? 2 : undefined
     }
     radius: height/4
     smooth: true
@@ -48,15 +50,15 @@ Rectangle {
 
     TextInput {
         id: textInput
- 
+
         width: parent.width - (2 * font.pointSize)
         anchors.centerIn: parent
- 
+
         font.pointSize: 17
- 
+
         color: "white"
         echoMode: container.echoMode
- 
+
         onTextChanged: container.textChanged(text)
         onAccepted: container.accepted();
     }//TextInput

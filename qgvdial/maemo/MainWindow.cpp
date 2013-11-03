@@ -92,6 +92,11 @@ MainWindow::init()
     m_view->showFullScreen ();
 }//MainWindow::init
 
+MainWindow::~MainWindow()
+{
+    Q_DEBUG("Over and out");
+}//MainWindow::~MainWindow
+
 QObject *
 MainWindow::getQMLObject(const char *pageName)
 {
@@ -178,6 +183,8 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
         if (NULL == inboxList) {
             break;
         }
+        connect(inboxList, SIGNAL(clicked(QString)),
+                this, SLOT(onInboxClicked(QString)));
 
         proxySettingsPage = getQMLObject ("ProxySettingsPage");
         if (NULL == proxySettingsPage) {
@@ -425,6 +432,17 @@ MainWindow::uiShowContactDetails(const ContactInfo &cinfo)
                                Q_ARG (QVariant, QVariant(cinfo.strPhotoPath)),
                                Q_ARG (QVariant, QVariant(cinfo.strTitle)));
 }//MainWindow::uiShowContactDetails
+
+void
+MainWindow::onInboxClicked(QString id)
+{
+//TODO: Something like
+    /*
+    QMetaObject::invokeMethod (mainPageStack, "showContactDetails",
+                               Q_ARG (QVariant, QVariant(cinfo.strPhotoPath)),
+                               Q_ARG (QVariant, QVariant(cinfo.strTitle)));
+    */
+}//MainWindow::onInboxClicked
 
 void
 MainWindow::uiGetCIDetails(GVRegisteredNumber &num, GVNumModel *model)

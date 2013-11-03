@@ -107,6 +107,8 @@ Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                     text: name
                     readOnly: true
+                    enableBorder: false
+                    color: "transparent"
                 }//Label (contact name)
             }//Row (image and contact name)
 
