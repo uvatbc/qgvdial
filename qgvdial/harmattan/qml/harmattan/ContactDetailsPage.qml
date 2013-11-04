@@ -58,17 +58,34 @@ Page {
         ListView {
             id: detailsView
 
-            width: parent.width
+            width: parent.width - 40
             height: parent.height - titleRow.height - parent.spacing
 
-            delegate: Item {
-                width: detailsView.width
-                height: lblNumber.height + 4
+            anchors {
+                left: parent.left
+                leftMargin: 20
+                right: parent.right
+                rightMargin: 20
+            }
 
-                Label {
-                    id: lblNumber
-                    text: number
+            delegate: Item {
+                height: lblNumber.height + 4
+                width: parent.width
+
+                Row {
                     width: parent.width
+
+                    Label {
+                        id: lblType
+                        text: type
+                    }
+
+                    Label {
+                        id: lblNumber
+                        text: number
+                        width: parent.width - lblType.width - parent.spacing
+                        horizontalAlignment: Text.AlignRight
+                    }
                 }
 
                 MouseArea {

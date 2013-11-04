@@ -94,37 +94,35 @@ Page {
 
             property real margins: 1
 
-            Item {
+            Image {
                 id: imageItem
+
                 anchors {
                     left: parent.left
                     leftMargin: listDelegate.margins
                     verticalCenter: parent.verticalCenter
                 }
 
-                width: 60
+                width: 35
+                height: width
+                fillMode: Image.PreserveAspectFit
+                smooth: true
 
-                Image {
-                    id: imgReceived
-                    height: imageItem.width
-                    fillMode: Image.PreserveAspectFit
-                    source: {
-                        switch (type) {
-                        case "Received":
-                            return "qrc:/in_Received.png";
-                        case "Placed":
-                            return "qrc:/in_Placed.png";
-                        case "Missed":
-                            return "qrc:/in_Missed.png";
-                        case "Voicemail":
-                            return "qrc:/in_Voicemail.png";
-                        case "SMS":
-                            return "qrc:/in_Sms.png";
-                        }
+                source: {
+                    switch (type) {
+                    case "Received":
+                        return "qrc:/in_Received.png";
+                    case "Placed":
+                        return "qrc:/in_Placed.png";
+                    case "Missed":
+                        return "qrc:/in_Missed.png";
+                    case "Voicemail":
+                        return "qrc:/in_Voicemail.png";
+                    case "SMS":
+                        return "qrc:/in_Sms.png";
                     }
-                    smooth: true
-                }//Image (incoming / outgoing / text / voicemail)
-            }//Item (the inbox entry image)
+                }
+            }//Image (incoming / outgoing / text / voicemail)
 
             Label {
                 id: entryName
@@ -132,6 +130,7 @@ Page {
                     left: imageItem.right
                     right: entryTime.left
                     verticalCenter: parent.verticalCenter
+                    leftMargin: 10
                 }
 
                 clip: true
@@ -146,6 +145,7 @@ Page {
                 anchors {
                     right: parent.right
                     rightMargin: listDelegate.margins
+                    verticalCenter: parent.verticalCenter
                 }
 
                 text: time

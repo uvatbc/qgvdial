@@ -61,7 +61,8 @@ Page {
                        expandPinSettings.height + expandLogView.height +
                        expandPhoneIntegration.height + expandAbout.height
         */
-        contentHeight: expandLoginDetails.height
+        contentHeight: (expandLoginDetails.height + 1 +
+                        expandProxySettings.height + 1)
         contentWidth: width
         clip: true
 
@@ -96,6 +97,7 @@ Page {
             anchors {
                 top: expandLoginDetails.bottom
                 left: parent.left
+                topMargin: 1
             }
             width: parent.width
 

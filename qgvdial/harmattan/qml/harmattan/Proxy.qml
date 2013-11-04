@@ -58,19 +58,32 @@ Item {
             top: parent.top
             left: parent.left
         }
-        spacing: 2
+        spacing: 5
         width: parent.width
 
         CheckBox {
             id: proxySupport
-            width: parent.width
+            width: parent.width - 20
+            anchors {
+                left: parent.left
+                right: parent.right
+                leftMargin: 10
+                rightMargin: 10
+            }
 
             text: "Enable proxy support"
         }// CheckBox (proxySupport)
 
         CheckBox {
             id: proxySystem
-            width: parent.width
+            width: parent.width - 20
+            anchors {
+                left: parent.left
+                right: parent.right
+                leftMargin: 10
+                rightMargin: 10
+            }
+
             opacity: (bEnableProxy? 1 : 0)
 
             text: "Use system proxy settings"
@@ -80,7 +93,14 @@ Item {
             id: rowUserProxyHost
 
             height: lblHost.height > textUserProxyHost.height ? lblHost.height : textUserProxyHost.height
-            width: parent.width
+            width: parent.width - 20
+            anchors {
+                left: parent.left
+                right: parent.right
+                leftMargin: 10
+                rightMargin: 10
+            }
+
             spacing: 2
 
             opacity: (bEnableProxy && !bSystemProxy ? 1 : 0)
@@ -105,7 +125,14 @@ Item {
             id: rowUserProxyPort
 
             height: lblPort.height > textUserProxyPort.height ? lblPort.height : textUserProxyPort.height
-            width: parent.width
+            width: parent.width - 20
+            anchors {
+                left: parent.left
+                right: parent.right
+                leftMargin: 10
+                rightMargin: 10
+            }
+
             spacing: 2
 
             opacity: (bEnableProxy && !bSystemProxy ? 1 : 0)
@@ -129,7 +156,14 @@ Item {
 
         CheckBox {
             id: proxyUserPassRequired
-            width: parent.width
+            width: parent.width - 20
+            anchors {
+                left: parent.left
+                right: parent.right
+                leftMargin: 10
+                rightMargin: 10
+            }
+
             opacity: (bEnableProxy && !bSystemProxy ? 1 : 0)
 
             text: "Requires user and pass"
@@ -139,7 +173,14 @@ Item {
             id: rowProxyUsername
 
             height: lblProxyUser.height > textUserProxyUser.height ? lblProxyUser.height : textUserProxyUser.height
-            width: parent.width
+            width: parent.width - 20
+            anchors {
+                left: parent.left
+                right: parent.right
+                leftMargin: 10
+                rightMargin: 10
+            }
+
             spacing: 2
 
             opacity: (bEnableProxy && !bSystemProxy && bProxyUserPass ? 1 : 0)
@@ -164,16 +205,23 @@ Item {
             id: rowProxyPassword
 
             height: lblProxyPass.height > textUserProxyPass.height ? lblProxyPass.height : textUserProxyPass.height
-            width: parent.width
+            width: parent.width - 20
+            anchors {
+                left: parent.left
+                right: parent.right
+                leftMargin: 10
+                rightMargin: 10
+            }
+
             spacing: 2
 
             opacity: (bEnableProxy && !bSystemProxy && bProxyUserPass ? 1 : 0)
 
             Label {
                 id: lblProxyPass
-                text: "Password"
+                text: "Password:"
                 anchors.verticalCenter: parent.verticalCenter
-            }//Label ("Proxy password:")
+            }//Label ("Password:")
 
             TextField {
                 id: textUserProxyPass
@@ -188,6 +236,7 @@ Item {
 
         ButtonRow {
             exclusive: false
+            anchors.horizontalCenter: parent.horizontalCenter
 
             Button {
                 text: "Revert"

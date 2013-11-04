@@ -49,6 +49,12 @@ ContactNumbersModel::rowCount (const QModelIndex & /*parent*/) const
     return (m_numbers.count ());
 }//ContactNumbersModel::rowCount
 
+int
+ContactNumbersModel::columnCount(const QModelIndex & /*parent*/) const
+{
+    return (2);
+}//ContactNumbersModel::columnCount
+
 QVariant
 ContactNumbersModel::data (const QModelIndex &index, int role) const
 {
@@ -73,12 +79,18 @@ ContactNumbersModel::data (const QModelIndex &index, int role) const
         }
 
         int col = index.column ();
-        if (col > 0) {
-            break;
-        }
-
         if (Qt::DisplayRole == role) {
-            var = data.strNumber;
+            switch (col) {
+            case 0:
+                var = PhoneInfo::typeToString (data.Type);
+                break;
+            case 1:
+                var = data.strNumber;
+                break;
+            default:
+                break;
+            }
+
             break;
         }
     } while (0);

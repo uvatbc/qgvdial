@@ -28,18 +28,20 @@ Item {
     property alias username: textUsername.text
     property alias password: textPassword.text
 
-    height: (rowUser.height + rowPass.height + btnLogin.height + 6)
+    height: (rowUser.height + rowPass.height + btnLogin.height + 8)
 
     Row {
         id: rowUser
 
+        height: textUsername.height
+        width: parent.width - 20
         anchors {
             left: parent.left
-            top: parent.top
+            right: parent.right
+            leftMargin: 10
+            rightMargin: 10
         }
 
-        width: parent.width
-        height: textUsername.height
         spacing: 2
 
         Label {
@@ -72,14 +74,17 @@ Item {
     Row {
         id: rowPass
 
+        height: textPassword.height
+        width: parent.width - 20
         anchors {
             left: parent.left
+            right: parent.right
+            leftMargin: 10
+            rightMargin: 10
             top: rowUser.bottom
             topMargin: 2
         }
 
-        width: parent.width
-        height: textPassword.height
         spacing: 2
 
         Label {
