@@ -31,11 +31,12 @@ Page {
 
     property alias imageSource: contactImage.source
     property alias name: contactName.text
-    property alias phonesModel: detailsView.model
+    property alias number: contactNumber.text
+    property alias phType: numberType.text
 
     Column {
         anchors.fill: parent
-        spacing: 5
+        spacing: 20
 
         Row {
             id: titleRow
@@ -51,52 +52,42 @@ Page {
             Label {
                 id: contactName
                 anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: 30
+                font.pixelSize: 40
                 width: parent.width - contactImage.width - parent.spacing
             }
         }
 
-        ListView {
-            id: detailsView
+        Row {
+            width: parent.width
+            spacing: 10
 
-            width: parent.width - 40
-            height: parent.height - titleRow.height - parent.spacing
-
-            anchors {
-                left: parent.left
-                leftMargin: 20
-                right: parent.right
-                rightMargin: 20
-            }
-
-            delegate: Item {
-                height: lblNumber.height + 4
-                width: parent.width
-
-                Row {
-                    width: parent.width
-
-                    Label {
-                        id: lblType
-                        text: type
-                    }
-
-                    Label {
-                        id: lblNumber
-                        text: number
-                        width: parent.width - lblType.width - parent.spacing
-                        horizontalAlignment: Text.AlignRight
-                    }
-                }
+            Label {
+                id: numberType
+                font.pixelSize: 30
 
                 MouseArea {
                     anchors.fill: parent
                     onPressAndHold: {
-                        container.setNumberToDial(number);
+                        container.setNumberToDial(container.number);
                         container.done(true);
                     }
                 }
-            }//delegate
-        }//ListView
+            }
+
+            Label {
+                id: contactNumber
+                width: parent.width - numberType.width - parent.spacing
+                font.pixelSize: 30
+                horizontalAlignment: Text.AlignRight
+
+                MouseArea {
+                    anchors.fill: parent
+                    onPressAndHold: {
+                        container.setNumberToDial(container.number);
+                        container.done(true);
+                    }
+                }
+            }
+        }
     }//Column
-}//TFA Dialog
+}//Page

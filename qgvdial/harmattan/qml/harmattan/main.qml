@@ -50,6 +50,13 @@ PageStackWindow {
         }
         pageStack.push(contactDetails);
     }
+    function showInboxDetails(imgSource, name, number, phType) {
+        inboxDetails.imageSource = imgSource;
+        inboxDetails.name = name;
+        inboxDetails.number = number;
+        inboxDetails.phType = phType;
+        pageStack.push(inboxDetails);
+    }
     function pushCiSelector(ciId) {
         ciPhoneSelector.ciId = ciId;
         if (ciPhoneSelector.phonesModel == null) {
@@ -167,6 +174,15 @@ PageStackWindow {
 
     ContactDetailsPage {
         id: contactDetails
+        onDone: appWindow.pageStack.pop();
+        onSetNumberToDial: {
+            dialTab.setNumberInDisp(number);
+            tabgroup.setTab(0);
+        }
+    }
+
+    InboxDetailsPage {
+        id: inboxDetails
         onDone: appWindow.pageStack.pop();
         onSetNumberToDial: {
             dialTab.setNumberInDisp(number);

@@ -862,20 +862,10 @@ CacheDb::getInboxCount (GVI_Entry_Type Type) const
 bool
 CacheDb::existsInboxEntry (const GVInboxEntry &hEvent)
 {
-    CacheDbPrivate &p = CacheDbPrivate::ref ();
-    QSqlQuery query(p.db);
-    query.setForwardOnly (true);
+    GVInboxEntry e;
+    e.id = hEvent.id;
 
-    QString scrubId = hEvent.id;
-    scrubId.replace ("'", "''");
-    query.exec (QString ("SELECT " GV_IN_ID " FROM " GV_INBOX_TABLE " "
-                         "WHERE " GV_IN_ID "='%1'")
-                .arg (scrubId));
-    if (query.next ()) {
-        return true;
-    }
-
-    return false;
+    return getInboxEntryById (e);
 }//CacheDb::existsInboxEntry
 
 bool
@@ -1016,9 +1006,13 @@ CacheDb::getInboxEntryById (GVInboxEntry &hEvent)
     quint32 flags;
     QString scrubId = hEvent.id;
     scrubId.replace ("'", "''");
-    query.exec (QString ("SELECT " GV_IN_TYPE","GV_IN_ATTIME","GV_IN_DISPNUM","
-                                   GV_IN_PHONE","GV_IN_FLAGS","GV_IN_SMSTEXT","
-                                   GV_IN_NOTE" "
+    query.exec (QString ("SELECT " GV_IN_TYPE
+                               "," GV_IN_ATTIME
+                               "," GV_IN_DISPNUM
+                               "," GV_IN_PHONE
+                               "," GV_IN_FLAGS
+                               "," GV_IN_SMSTEXT
+                               "," GV_IN_NOTE " "
                          "FROM " GV_INBOX_TABLE " "
                          "WHERE " GV_IN_ID "='%1'")
                 .arg (scrubId));
