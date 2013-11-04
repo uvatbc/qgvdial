@@ -165,3 +165,36 @@ LibInbox::onRefreshDone()
         task->deleteLater ();
     }
 }//LibInbox::onRefreshDone
+
+bool
+LibInbox::getEventInfo(GVInboxEntry &event, ContactInfo &cinfo, QString &type)
+{
+    IMainWindow *win = (IMainWindow *) this->parent ();
+    if (!win->db.getInboxEntryById (event)) {
+        return (false);
+    }
+
+    if (!win->db.getContactFromNumber (event.strPhoneNumber, cinfo)) {
+        cinfo.strPhotoPath = UNKNOWN_CONTACT_QRC_PATH;
+    } else {
+        if (cinfo.strPhotoPath.isEmpty() ||
+            !QFileInfo(cinfo.strPhotoPath).exists ()) {
+            cinfo.strPhotoPath = UNKNOWN_CONTACT_QRC_PATH;
+        }
+
+        if (event.strDisplayNumber == "Unknown") {
+            event.strDisplayNumber = cinfo.strTitle;
+        }
+
+        foreach (PhoneInfo pi, cinfo.arrPhones) {
+            if (pi.strNumber == event.strPhoneNumber) {
+                type = PhoneInfo::typeToString (pi.Type);
+                break;
+            }
+        }
+    }
+
+    GVApi::beautify_number (event.strPhoneNumber);
+
+    return (true);
+}//LibInbox::getEventInfo

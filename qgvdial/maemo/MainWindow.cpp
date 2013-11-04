@@ -436,12 +436,21 @@ MainWindow::uiShowContactDetails(const ContactInfo &cinfo)
 void
 MainWindow::onInboxClicked(QString id)
 {
-//TODO: Something like
-    /*
-    QMetaObject::invokeMethod (mainPageStack, "showContactDetails",
-                               Q_ARG (QVariant, QVariant(cinfo.strPhotoPath)),
-                               Q_ARG (QVariant, QVariant(cinfo.strTitle)));
-    */
+    GVInboxEntry event;
+    QString type;
+    ContactInfo cinfo;
+
+    event.id = id;
+    if (!oInbox.getEventInfo (event, cinfo, type)) {
+        //TODO: Show error message
+        return;
+    }
+
+    QMetaObject::invokeMethod(tabbedUI, "showInboxDetails",
+                              Q_ARG(QVariant,QVariant(cinfo.strPhotoPath)),
+                              Q_ARG(QVariant,QVariant(event.strDisplayNumber)),
+                              Q_ARG(QVariant,QVariant(event.strPhoneNumber)),
+                              Q_ARG(QVariant,QVariant(type)));
 }//MainWindow::onInboxClicked
 
 void

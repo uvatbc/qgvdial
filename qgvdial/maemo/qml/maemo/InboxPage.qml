@@ -166,4 +166,4 @@ Rectangle {
             }
         }// delegate Rectangle
     }//ListView
-}
+}//Rectangle

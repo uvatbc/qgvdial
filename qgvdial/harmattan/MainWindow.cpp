@@ -438,36 +438,14 @@ void
 MainWindow::onInboxClicked(QString id)
 {
     GVInboxEntry event;
-    event.id = id;
+    QString type;
+    ContactInfo cinfo;
 
-    if (!db.getInboxEntryById (event)) {
+    event.id = id;
+    if (!oInbox.getEventInfo (event, cinfo, type)) {
         //TODO: Show error message
         return;
     }
-
-    QString type;
-    ContactInfo cinfo;
-    if (!db.getContactFromNumber (event.strPhoneNumber, cinfo)) {
-        cinfo.strPhotoPath = UNKNOWN_CONTACT_QRC_PATH;
-    } else {
-        if (cinfo.strPhotoPath.isEmpty() ||
-            !QFileInfo(cinfo.strPhotoPath).exists ()) {
-            cinfo.strPhotoPath = UNKNOWN_CONTACT_QRC_PATH;
-        }
-
-        if (event.strDisplayNumber == "Unknown") {
-            event.strDisplayNumber = cinfo.strTitle;
-        }
-
-        foreach (PhoneInfo pi, cinfo.arrPhones) {
-            if (pi.strNumber == event.strPhoneNumber) {
-                type = PhoneInfo::typeToString (pi.Type);
-                break;
-            }
-        }
-    }
-
-    GVApi::beautify_number (event.strPhoneNumber);
 
     QMetaObject::invokeMethod(mainPageStack, "showInboxDetails",
                               Q_ARG(QVariant,QVariant(cinfo.strPhotoPath)),

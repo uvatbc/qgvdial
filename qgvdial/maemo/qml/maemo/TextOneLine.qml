@@ -41,8 +41,8 @@ Rectangle {
     height: textInput.height * 1.8
 
     border {
-        color: enableBorder ? "gray" : undefined
-        width: enableBorder ? 2 : undefined
+        color: enableBorder ? "gray" : "transparent"
+        width: 2
     }
     radius: height/4
     smooth: true

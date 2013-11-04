@@ -29,7 +29,8 @@ Rectangle {
 
     property alias imageSource: contactImage.source
     property alias name: contactName.text
-    property alias phonesModel: detailsView.model
+    property alias number: contactNumber.text
+    property alias phType: numberType.text
 
     color: "black"
     visible: false
@@ -38,7 +39,7 @@ Rectangle {
 
     Column {
         anchors.fill: parent
-        spacing: 5
+        spacing: 20
 
         Row {
             id: titleRow
@@ -54,58 +55,56 @@ Rectangle {
             TextOneLine {
                 id: contactName
                 anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: 30
+                font.pixelSize: 40
                 width: parent.width - contactImage.width - parent.spacing
+                clip: true
+                readOnly: true
                 enableBorder: false
                 color: "transparent"
             }
         }
 
-        ListView {
-            id: detailsView
-
+        Item {
             width: parent.width
-            height: parent.height - titleRow.height - parent.spacing
+            height: numberType.height
 
-            delegate: Item {
-                width: detailsView.width
-                height: lblNumber.height + 4
+            TextOneLine {
+                id: numberType
+                font.pixelSize: 30
+                readOnly: true
+                enableBorder: false
+                color: "transparent"
+                width: 150
+                horizontalAlignment: Text.AlignLeft
 
-                TextOneLine {
-                    id: lblType
-                    text: type
-                    enableBorder: false
-                    color: "transparent"
-                    width: 100
-
-                    anchors {
-                        left: parent.left
-                        verticalCenter: parent.verticalCenter
-                    }
+                anchors {
+                    left: parent.left
+                    verticalCenter: parent.verticalCenter
                 }
+            }
 
-                TextOneLine {
-                    id: lblNumber
-                    text: number
-                    width: parent.width - lblType.width - 5
-                    enableBorder: false
-                    color: "transparent"
-                    horizontalAlignment: Text.AlignRight
+            TextOneLine {
+                id: contactNumber
+                width: parent.width - numberType.width - 2
+                font.pixelSize: 30
+                horizontalAlignment: Text.AlignRight
+                readOnly: true
+                enableBorder: false
+                color: "transparent"
 
-                    anchors {
-                        right: parent.right
-                        verticalCenter: parent.verticalCenter
-                    }
+                anchors {
+                    right: parent.right
+                    verticalCenter: parent.verticalCenter
                 }
+            }
 
-                MouseArea {
-                    anchors.fill: parent
-                    onPressAndHold: {
-                        container.setNumberToDial(number);
-                        container.done(true);
-                    }
+            MouseArea {
+                anchors.fill: parent
+                onPressAndHold: {
+                    container.setNumberToDial(container.number);
+                    container.done(true);
                 }
-            }//delegate
-        }//ListView
+            }
+        }
     }//Column
-}//TFA Dialog
+}//Item

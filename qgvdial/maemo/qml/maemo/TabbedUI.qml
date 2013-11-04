@@ -73,6 +73,15 @@ Rectangle {
         imgClose.state = "back";
     }
 
+    function showInboxDetails(imgSource, name, number, phType) {
+        inboxDetails.imageSource = imgSource;
+        inboxDetails.name = name;
+        inboxDetails.number = number;
+        inboxDetails.phType = phType;
+        inboxDetails.visible = true;
+        imgClose.state = "back";
+    }
+
     function showCiSelector(ciId) {
         ciPhoneSelector.ciId = ciId;
         if (ciPhoneSelector.phonesModel == null) {
@@ -95,6 +104,9 @@ Rectangle {
         }
         if (contactDetails.visible) {
             contactDetails.visible = false;
+        }
+        if (inboxDetails.visible) {
+            inboxDetails.visible = false;
         }
         if (ciPhoneSelector.visible) {
             ciPhoneSelector.visible = false;
@@ -254,6 +266,19 @@ Rectangle {
         onSetNumberToDial: { container.setNumberToDial(number); }
         onDone: { container.doBack(); }
     }//ContactDetailsPage
+
+    InboxDetailsPage {
+        id: inboxDetails
+
+        anchors {
+            top: tabBar.bottom
+            bottom: parent.bottom
+        }
+        width: parent.width
+
+        onSetNumberToDial: { container.setNumberToDial(number); }
+        onDone: { container.doBack(); }
+    }
 
     RegNumberSelector {
         id: regNumberSelector

@@ -38,8 +38,8 @@ Rectangle {
     height: textEdit.height + textEdit.font.pointSize
 
     border {
-        color: enableBorder ? "gray" : undefined
-        width: enableBorder ? 2 : undefined
+        color: enableBorder ? "gray" : "transparent"
+        width: 2
     }
     radius: textEdit.font.pointSize
     smooth: true

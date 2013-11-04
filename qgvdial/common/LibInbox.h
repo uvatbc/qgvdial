@@ -38,6 +38,8 @@ public:
 
     InboxModel *createModel();
 
+    bool getEventInfo(GVInboxEntry &event, ContactInfo &cinfo, QString &type);
+
 private slots:
     void onRefreshDone();
     void onOneInboxEntry (AsyncTaskToken *task, const GVInboxEntry &hevent);
