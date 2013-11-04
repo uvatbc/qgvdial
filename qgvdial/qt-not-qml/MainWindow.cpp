@@ -440,19 +440,23 @@ MainWindow::onInboxClicked(const QModelIndex &index)
 {
     QModelIndex idIndex = index.sibling (index.row (), 0);
     GVInboxEntry event;
+    ContactInfo cinfo;
+    QString type;
+
     event.id = idIndex.data().toString();
-    if (db.getInboxEntryById (event)) {
-        InboxEntryDialog dlg;
-        dlg.fill (event);
-
-        ContactInfo cinfo;
-        if (db.getContactFromNumber (event.strPhoneNumber, cinfo)) {
-            dlg.fill (cinfo);
-        }
-
-        //TODO: Show inbox details
-        dlg.exec ();
+    if (!oInbox.getEventInfo (event, cinfo, type)) {
+        //TODO: Some error
+        return;
     }
+
+    db.markAsRead (event.id);
+
+    InboxEntryDialog dlg;
+    dlg.fill (event);
+    dlg.fill (cinfo);
+
+    // Show inbox details
+    dlg.exec ();
 }//MainWindow::onInboxClicked
 
 void

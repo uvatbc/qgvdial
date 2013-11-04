@@ -18,7 +18,7 @@
 <context>
     <name>LibContacts</name>
     <message>
-        <location filename="../common/LibContacts.cpp" line="205"/>
+        <location filename="../common/LibContacts.cpp" line="215"/>
         <source>qgv_XXXXXX.tmp.</source>
         <translation type="unfinished"></translation>
     </message>

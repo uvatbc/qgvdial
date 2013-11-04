@@ -447,6 +447,8 @@ MainWindow::onInboxClicked(QString id)
         return;
     }
 
+    db.markAsRead (event.id);
+
     QMetaObject::invokeMethod(mainPageStack, "showInboxDetails",
                               Q_ARG(QVariant,QVariant(cinfo.strPhotoPath)),
                               Q_ARG(QVariant,QVariant(event.strDisplayNumber)),

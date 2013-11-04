@@ -71,12 +71,14 @@ TabbedPane {
         
         container.activeTab = container.at(index);
     }
+    
+    attachedObjects: [
+        StatusBanner {
+            objectName: "StatusBanner"
+        }
+    ]
 
     onCreationCompleted: {
-        // this slot is called when declarative scene is created
-        // write post creation initialization here
-        console.log("TabbedPane - onCreationCompleted()")
-
         // enable layout to adapt to the device rotation
         // don't forget to enable screen rotation in bar-bescriptor.xml (Application->Orientation->Auto-orient)
         OrientationSupport.supportedDisplayOrientation = SupportedDisplayOrientation.All;

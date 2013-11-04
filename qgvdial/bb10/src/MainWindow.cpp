@@ -388,3 +388,23 @@ MainWindow::uiGetCIDetails(GVRegisteredNumber & /*num*/,
     Q_WARN("Should NEVER be here");
     Q_ASSERT(0 == "Should never get here");
 }//MainWindow::uiGetCIDetails
+
+void
+MainWindow::uiLongTaskBegins()
+{
+    //Q_ASSERT(0 == "Not implemented");
+    Q_DEBUG(m_taskInfo.suggestedStatus);
+}//MainWindow::uiLongTaskBegins
+
+void
+MainWindow::uiLongTaskContinues()
+{
+    //Q_ASSERT(0 == "Not implemented");
+    Q_DEBUG(m_taskInfo.suggestedStatus);
+}//MainWindow::uiLongTaskContinues
+
+void
+MainWindow::uiLongTaskEnds()
+{
+    Q_DEBUG("Status cleared");
+}//MainWindow::uiLongTaskEnds

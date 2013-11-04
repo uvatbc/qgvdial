@@ -52,7 +52,7 @@ class ContactsModel;
 /*!
  * @brief Application pane object
  *
- *Use this object to create and init app UI, to create context objects, to register the new meta types etc.
+ * Use this object to create and init app UI, to create context objects, to register the new meta types etc.
  */
 class MainWindow : public IMainWindow
 {
@@ -85,6 +85,10 @@ public:
     void uiShowContactDetails(const ContactInfo &cinfo);
 
     void uiGetCIDetails(GVRegisteredNumber &num, GVNumModel *model);
+
+    void uiLongTaskBegins();
+    void uiLongTaskContinues();
+    void uiLongTaskEnds();
 
 protected:
     QObject *getQMLObject(const char *objectName);
