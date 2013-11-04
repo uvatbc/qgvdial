@@ -593,7 +593,7 @@ GVApi::parseHiddenLoginFields(const QString &strResponse, QVariantMap &ret)
             goto gonext;
         }
 
-        if (!xmlHandler.elems.contains ("input") || 
+        if (!xmlHandler.elems.contains ("input") ||
             !xmlHandler.attrMap.contains("input")) {
             Q_WARN("Failed to parse input field.");
             goto gonext;
@@ -738,7 +738,7 @@ GVApi::parseAlternateLogins(const QString &form, AsyncTaskToken *task)
             goto gonext;
         }
 
-        if (!xmlHandler.elems.contains ("input") || 
+        if (!xmlHandler.elems.contains ("input") ||
             !xmlHandler.attrMap.contains("input")) {
                 Q_WARN("Failed to parse input field.");
                 goto gonext;
