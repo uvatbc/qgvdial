@@ -1551,7 +1551,7 @@ GVApi::parseInboxJson(AsyncTaskToken *token, const QString &strJson,
 {
     bool rv = false;
 
-    QString strFixedHtml = strHtml;
+    QString strFixedHtml = "<html>" + strHtml + "</html>";
     strFixedHtml.replace ("&", "&amp;");
 
     QTemporaryFile fHtml, fSms;
@@ -1565,6 +1565,20 @@ GVApi::parseInboxJson(AsyncTaskToken *token, const QString &strJson,
     }
     fHtml.write(strFixedHtml.toUtf8());
     fHtml.seek(0);
+
+#if 0
+    QFile fTemp1("inbox-html.html");
+    fTemp1.open (QFile::ReadWrite);
+    fTemp1.write (strFixedHtml.toUtf8());
+    fTemp1.close ();
+#endif
+
+#if 0
+    QFile fTemp2("inbox-json.json");
+    fTemp2.open (QFile::ReadWrite);
+    fTemp2.write (strJson.toUtf8());
+    fTemp2.close ();
+#endif
 
     do {
         QString strTemp;
