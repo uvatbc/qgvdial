@@ -66,6 +66,7 @@ MainWindow::MainWindow(QObject *parent)
 , appPwDlg(NULL)
 , contactsList(NULL)
 , inboxList(NULL)
+, inboxSelector(NULL)
 , proxySettingsPage(NULL)
 , selectedNumberButton(NULL)
 , regNumberSelector(NULL)
@@ -187,6 +188,13 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
         }
         connect(inboxList, SIGNAL(clicked(QString)),
                 this, SLOT(onInboxClicked(QString)));
+
+        inboxSelector = getQMLObject ("InboxSelector");
+        if (NULL == inboxSelector) {
+            break;
+        }
+        connect(inboxSelector, SIGNAL(selectionChanged(QString)),
+                this, SLOT(onInboxSelectionChanged(QString)));
 
         appPwDlg = getQMLObject ("AppPwDialog");
         if (NULL == appPwDlg) {
@@ -394,7 +402,8 @@ MainWindow::uiRefreshInbox()
 void
 MainWindow::uiSetSelelctedInbox(const QString &selection)
 {
-    Q_ASSERT(0 == "Not implemented");
+    QMetaObject::invokeMethod (inboxSelector, "setSelection",
+                               Q_ARG(QVariant, QVariant(selection)));
 }//MainWindow::uiSetSelelctedInbox
 
 void
@@ -461,6 +470,12 @@ MainWindow::onInboxClicked(QString id)
                               Q_ARG(QVariant,QVariant(event.strPhoneNumber)),
                               Q_ARG(QVariant,QVariant(type)));
 }//MainWindow::onInboxClicked
+
+void
+MainWindow::onInboxSelectionChanged(QString sel)
+{
+    oInbox.onUserSelect (sel);
+}//MainWindow::onInboxSelectionChanged
 
 void
 MainWindow::uiGetCIDetails(GVRegisteredNumber &num, GVNumModel *model)

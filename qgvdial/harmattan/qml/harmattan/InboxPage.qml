@@ -40,18 +40,35 @@ Page {
 
         width: parent.width - 10
 
-        text: inboxSelection.model.get(inboxSelection.selectedIndex).name
-        onClicked: inboxSelection.open();
+        text: inboxSelector.model.get(inboxSelector.selectedIndex).name
+        onClicked: inboxSelector.open();
     }
 
     SelectionDialog {
-        id: inboxSelection
+        id: inboxSelector
+        objectName: "InboxSelector"
+
+        signal selectionChanged(string sel)
+        function setSelection(sel) {
+            var i;
+            for (i = 0; inboxSelector.model.count; i = i + 1) {
+                if (inboxSelector.model.get(i).name.toUpperCase() == sel.toUpperCase()) {
+                    selectedIndex = i;
+                    break;
+                }
+            }
+        }
+
         anchors {
             top: parent.top
         }
         width: parent.width
 
         selectedIndex: 0
+        onSelectedIndexChanged: {
+            var sel = model.get(selectedIndex).name;
+            inboxSelector.selectionChanged(sel);
+        }
 
         model: ListModel {
             ListElement { name: "All" }

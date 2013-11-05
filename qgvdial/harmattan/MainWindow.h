@@ -47,6 +47,7 @@ protected slots:
                            QString pass);
 
     void onInboxClicked(QString id);
+    void onInboxSelectionChanged(QString sel);
 
 protected:
     QObject *getQMLObject(const char *pageName);
@@ -91,6 +92,7 @@ private:
     QObject *appPwDlg;
     QObject *contactsList;
     QObject *inboxList;
+    QObject *inboxSelector;
     QObject *proxySettingsPage;
     QObject *selectedNumberButton;
     QObject *regNumberSelector;
