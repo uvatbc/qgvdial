@@ -1740,7 +1740,8 @@ GVApi::parseInboxJson(AsyncTaskToken *token, const QString &strJson,
 
                 QString strSmsRow;
                 if (!resultSms.isEmpty ()) {
-                    result = "<div><div class=\"gc-message-sms-row\">" + resultSms
+                    result = "<div><div class=\"gc-message-sms-row\">"
+                           + resultSms
                            + "</div></div>";
                 }
 

@@ -286,7 +286,7 @@ Rectangle {
 
         onSetNumberToDial: { container.setNumberToDial(number); }
         onDone: { container.doBack(); }
-    }
+    }//InboxDetailsPage
 
     SelectionDialog {
         id: inboxSelector
@@ -312,7 +312,7 @@ Rectangle {
         width: parent.width
 
         onSelected: { container.doBack(); }
-    }
+    }//RegNumberSelector
 
     CiPhoneSelectionPage {
         id: ciPhoneSelector

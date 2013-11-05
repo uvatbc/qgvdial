@@ -85,9 +85,12 @@ protected slots:
     void onInboxDoubleClicked(const QModelIndex &index);
 
     void onCbNumDoModify(int index);
+    void onCbInboxChanged(const QString &text);
 
 private:
     MainWindowPrivate *d;
+
+    bool m_ignoreCbInboxChange;
 };
 
 QCoreApplication *

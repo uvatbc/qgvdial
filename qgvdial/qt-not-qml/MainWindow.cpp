@@ -71,6 +71,7 @@ createAppObject(int argc, char *argv[])
 MainWindow::MainWindow(QObject *parent)
 : IMainWindow(parent)
 , d(new MainWindowPrivate)
+, m_ignoreCbInboxChange(false)
 {
 }//MainWindow::MainWindow
 
@@ -158,6 +159,15 @@ MainWindow::init()
             this, SLOT(onInboxClicked(const QModelIndex&)));
     connect(d->ui->inboxView, SIGNAL(doubleClicked(const QModelIndex&)),
             this, SLOT(onInboxDoubleClicked(const QModelIndex&)));
+
+    d->ui->cbInboxSelector->addItem("All");
+    d->ui->cbInboxSelector->addItem("Placed");
+    d->ui->cbInboxSelector->addItem("Missed");
+    d->ui->cbInboxSelector->addItem("Received");
+    d->ui->cbInboxSelector->addItem("Voicemail");
+    d->ui->cbInboxSelector->addItem("SMS");
+    connect(d->ui->cbInboxSelector, SIGNAL(currentIndexChanged(const QString&)),
+            this, SLOT(onCbInboxChanged(const QString&)));
 
     QTimer::singleShot (1, this, SLOT(onInitDone()));
 }//MainWindow::init
@@ -310,8 +320,23 @@ MainWindow::uiRefreshInbox()
 void
 MainWindow::uiSetSelelctedInbox(const QString &selection)
 {
-    Q_ASSERT(0 == "Not implemented");
+    int pos = d->ui->cbInboxSelector->findText(selection, Qt::MatchFixedString);
+    if (-1 != pos) {
+        m_ignoreCbInboxChange = true;
+        d->ui->cbInboxSelector->setCurrentIndex(pos);
+        m_ignoreCbInboxChange = false;
+    } else {
+        Q_WARN(QString("Did not find \"%1\" in the ComboBox").arg(selection));
+    }
 }//MainWindow::uiSetSelelctedInbox
+
+void
+MainWindow::onCbInboxChanged(const QString &text)
+{
+    if (!m_ignoreCbInboxChange) {
+        oInbox.onUserSelect (text);
+    }
+}//MainWindow::onCbInboxChanged
 
 void
 MainWindow::uiSetNewRegNumbersModel()

@@ -21,7 +21,7 @@
        <enum>QTabWidget::East</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="dialTab">
        <attribute name="title">
@@ -255,7 +255,10 @@
        <attribute name="title">
         <string>Inbox</string>
        </attribute>
-       <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <layout class="QVBoxLayout" name="verticalLayout_6">
+        <item>
+         <widget class="QComboBox" name="cbInboxSelector"/>
+        </item>
         <item>
          <widget class="QTreeView" name="inboxView">
           <property name="rootIsDecorated">
@@ -283,8 +286,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>436</width>
-             <height>148</height>
+             <width>93</width>
+             <height>93</height>
             </rect>
            </property>
            <attribute name="label">
@@ -322,8 +325,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>420</width>
-             <height>240</height>
+             <width>220</width>
+             <height>211</height>
             </rect>
            </property>
            <attribute name="label">
@@ -436,8 +439,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>112</width>
-             <height>112</height>
+             <width>89</width>
+             <height>89</height>
             </rect>
            </property>
            <attribute name="label">
@@ -467,7 +470,7 @@
      <x>0</x>
      <y>0</y>
      <width>497</width>
-     <height>25</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

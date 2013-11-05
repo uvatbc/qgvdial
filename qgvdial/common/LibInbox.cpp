@@ -122,8 +122,6 @@ LibInbox::onRefreshDone()
     AsyncTaskToken *task = (AsyncTaskToken *) QObject::sender ();
     QString selection = task->inParams["initialType"].toString();
 
-    Q_DEBUG(QString("selection = %1").arg(selection));
-
     win->db.setQuickAndDirty (false);
 
     do {
@@ -133,7 +131,10 @@ LibInbox::onRefreshDone()
         }
 
         int page = task->inParams["page"].toInt();
-        bool overflow = task->inParams["overflow"].toBool();
+        bool overflow = false;
+        if (task->inParams.contains("overflow")) {
+            overflow = task->inParams["overflow"].toBool();
+        }
         QString type = task->inParams["type"].toString();
         QDateTime after = task->inParams["after"].toDateTime();
 
@@ -153,6 +154,7 @@ LibInbox::onRefreshDone()
         page++;
 
         if (beginRefresh (task, type, after, page, false)) {
+            task->inParams["initialType"] = selection;
             task = NULL;
         }
     } while (0);
