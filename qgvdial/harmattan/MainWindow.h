@@ -63,6 +63,8 @@ protected:
     void uiRefreshContacts();
     void uiRefreshInbox();
 
+    void uiSetSelelctedInbox(const QString &selection);
+
     void uiSetNewRegNumbersModel();
     void uiRefreshNumbers();
 

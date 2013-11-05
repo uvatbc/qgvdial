@@ -822,7 +822,7 @@ CacheDb::refreshInboxModel (InboxModel *modelInbox,
                          "," GV_IN_PHONE
                          "," GV_IN_ATTIME
                          "," GV_IN_FLAGS
-                   " FROM "   GV_INBOX_TABLE;
+                   " FROM "  GV_INBOX_TABLE;
     if (GVIE_Unknown != Type) {
         strQ += QString (" WHERE " GV_IN_TYPE "=%1 ").arg (Type);
     }

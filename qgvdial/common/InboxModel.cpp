@@ -274,7 +274,8 @@ InboxModel::refresh (const QString &strSelected)
     if (strSelected != strSelectType) {
         eSelected = string_to_type (strSelected);
     }
-    if (GVIE_Unknown != eSelected) {
+    if ((GVIE_Unknown != eSelected) ||
+        (0 == strSelected.compare ("all", Qt::CaseInsensitive))) {
         strSelectType = strSelected;
         m_eSelectType = eSelected;
     } else {

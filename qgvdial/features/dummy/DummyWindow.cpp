@@ -115,6 +115,12 @@ DummyMainWindow::uiRefreshInbox()
 }//DummyMainWindow::uiRefreshInbox
 
 void
+DummyMainWindow::uiSetSelelctedInbox(const QString & /*selection*/)
+{
+    Q_ASSERT(0 == "Not implemented");
+}//DummyMainWindow::uiSetSelelctedInbox
+
+void
 DummyMainWindow::uiSetNewRegNumbersModel()
 {
     Q_ASSERT(0 == "Not implemented");

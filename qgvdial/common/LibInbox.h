@@ -39,7 +39,7 @@ public:
     bool getEventInfo(GVInboxEntry &event, ContactInfo &cinfo, QString &type);
 
 public slots:
-    bool onUserSelect(QString type = QString("all"));
+    bool onUserSelect(QString selection = QString("all"));
 
 private:
     InboxModel *createModel(QString type);
@@ -49,7 +49,7 @@ private slots:
     void onOneInboxEntry (AsyncTaskToken *task, const GVInboxEntry &hevent);
 
     bool beginRefresh(AsyncTaskToken *task, QString type, QDateTime after,
-                      int page);
+                      int page, bool isExternal = true);
 
 public:
     InboxModel    *m_inboxModel;

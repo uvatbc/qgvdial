@@ -58,10 +58,13 @@ LibInbox::refresh(const char *type, QDateTime after)
 
 bool
 LibInbox::beginRefresh(AsyncTaskToken *task, QString type, QDateTime after,
-                       int page)
+                       int page, bool isExternal)
 {
     task->reinit ();
 
+    if (isExternal) {
+        task->inParams["initialType"] = type;
+    }
     task->inParams["type"] = type;
     task->inParams["page"] = page;
     task->inParams["after"] = after;
@@ -117,6 +120,9 @@ LibInbox::onRefreshDone()
 {
     IMainWindow *win = (IMainWindow *) this->parent ();
     AsyncTaskToken *task = (AsyncTaskToken *) QObject::sender ();
+    QString selection = task->inParams["initialType"].toString();
+
+    Q_DEBUG(QString("selection = %1").arg(selection));
 
     win->db.setQuickAndDirty (false);
 
@@ -146,7 +152,7 @@ LibInbox::onRefreshDone()
 
         page++;
 
-        if (beginRefresh (task, type, after, page)) {
+        if (beginRefresh (task, type, after, page, false)) {
             task = NULL;
         }
     } while (0);
@@ -154,10 +160,10 @@ LibInbox::onRefreshDone()
     if (task) {
         if (ATTS_SUCCESS == task->status) {
             InboxModel *oldModel = m_inboxModel;
-            QString type = task->inParams["type"].toString();
-            m_inboxModel = this->createModel (type);
+            m_inboxModel = this->createModel (selection);
             if (NULL != m_inboxModel) {
                 win->uiRefreshInbox ();
+                win->uiSetSelelctedInbox (selection);
                 oldModel->deleteLater ();
             } else {
                 m_inboxModel = oldModel;
@@ -201,12 +207,15 @@ LibInbox::getEventInfo(GVInboxEntry &event, ContactInfo &cinfo, QString &type)
 }//LibInbox::getEventInfo
 
 bool
-LibInbox::onUserSelect(QString type)
+LibInbox::onUserSelect(QString selection)
 {
-    if (!m_inboxModel->refresh (type)) {
-        Q_WARN(QString("Invalid selection \"%1\"").arg ((type)));
+    if (!m_inboxModel->refresh (selection)) {
+        Q_WARN(QString("Invalid selection \"%1\"").arg ((selection)));
         return false;
     }
+
+    IMainWindow *win = (IMainWindow *) this->parent ();
+    win->uiSetSelelctedInbox (selection);
 
     return (true);
 }//LibInbox::onUserSelect

@@ -395,6 +395,13 @@ MainWindow::uiRefreshInbox()
 }//MainWindow::uiRefreshInbox()
 
 void
+MainWindow::uiSetSelelctedInbox(const QString &selection)
+{
+    QMetaObject::invokeMethod (inboxList, "setSelected",
+                               Q_ARG (QVariant, QVariant(selection)));
+}//MainWindow::uiSetSelelctedInbox
+
+void
 MainWindow::uiSetNewRegNumbersModel()
 {
     m_view->engine()->rootContext()->setContextProperty("g_RegNumberModel",
@@ -484,9 +491,6 @@ MainWindow::onInboxSelected(bool accepted)
         Q_WARN("Inbox selection not accepted");
         return;
     }
-
-    QMetaObject::invokeMethod (inboxList, "setSelected",
-                               Q_ARG (QVariant, QVariant(selected)));
 }//MainWindow::onInboxSelected
 
 void

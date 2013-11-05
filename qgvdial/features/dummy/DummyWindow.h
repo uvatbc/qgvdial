@@ -49,6 +49,8 @@ protected:
     virtual void uiRefreshContacts();
     virtual void uiRefreshInbox();
 
+    virtual void uiSetSelelctedInbox(const QString &selection);
+
     virtual void uiSetNewRegNumbersModel();
     virtual void uiRefreshNumbers();
 

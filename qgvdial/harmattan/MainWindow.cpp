@@ -392,6 +392,12 @@ MainWindow::uiRefreshInbox()
 }//MainWindow::uiRefreshInbox
 
 void
+MainWindow::uiSetSelelctedInbox(const QString &selection)
+{
+    Q_ASSERT(0 == "Not implemented");
+}//MainWindow::uiSetSelelctedInbox
+
+void
 MainWindow::uiSetNewRegNumbersModel()
 {
     m_view->engine()->rootContext()->setContextProperty("g_RegNumberModel",

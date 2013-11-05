@@ -169,6 +169,8 @@ protected:
     virtual void uiRefreshContacts() = 0;
     virtual void uiRefreshInbox() = 0;
 
+    virtual void uiSetSelelctedInbox(const QString &selection) = 0;
+
     virtual void uiSetNewRegNumbersModel() = 0;
     virtual void uiRefreshNumbers() = 0;
 
