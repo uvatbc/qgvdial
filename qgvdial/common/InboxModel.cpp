@@ -22,6 +22,9 @@ Contact: yuvraaj@gmail.com
 #include "InboxModel.h"
 #include "GVApi.h"
 
+#define PIXMAP_SCALED_W 25
+#define PIXMAP_SCALED_H 25
+
 InboxModel::InboxModel (QObject * parent)
 : QSqlQueryModel (parent)
 , strSelectType ("all")
@@ -75,6 +78,13 @@ InboxModel::data (const QModelIndex &index, int role) const
         case Qt::EditRole:
             column = index.column ();
             break;
+        case Qt::DecorationRole:
+        case Qt::DecorationPropertyRole:
+            column = index.column ();
+            if (2 != column) {
+                column = -1;
+            }
+            break;
         }
 
         // Pick up the data from the base class
@@ -82,7 +92,7 @@ InboxModel::data (const QModelIndex &index, int role) const
                                     Qt::EditRole);
 
         if (0 == column) {          // GV_IN_ID
-            // Nothing
+            // No modifications
         } else if (1 == column) {   // GV_IN_TYPE
             char chType = var.toChar().toAscii ();
             QString strDisp = type_to_string ((GVI_Entry_Type) chType);
@@ -95,6 +105,50 @@ InboxModel::data (const QModelIndex &index, int role) const
 
             var = strDisp;
         } else if (2 == column) {   // GV_IN_DISPNUM
+            if (Qt::DecorationRole == role) {
+                QVariant v;
+                v = QSqlQueryModel::data (index.sibling(index.row (), 1), //Type
+                                          Qt::EditRole);
+                GVI_Entry_Type type = (GVI_Entry_Type) v.toChar().toAscii();
+                QString path;
+                switch (type) {
+                case GVIE_Placed:
+                    path = ":/in_Placed.png";
+                    break;
+                case GVIE_Received:
+                    path = ":/in_Received.png";
+                    break;
+                case GVIE_Missed:
+                    path = ":/in_Missed.png";
+                    break;
+                case GVIE_Voicemail:
+                    path = ":/in_Voicemail.png";
+                    break;
+                case GVIE_TextMessage:
+                    path = ":/in_Sms.png";
+                    break;
+                default:
+                    break;
+                }
+
+                var.clear ();
+
+                if (path.isEmpty ()) {
+                    break;
+                }
+
+    #if !defined(Q_OS_BLACKBERRY)
+                QPixmap pixmap(path);
+                var = pixmap.scaled(PIXMAP_SCALED_W, PIXMAP_SCALED_H,
+                                       Qt::KeepAspectRatio);
+    #endif
+                break;
+            } else if (Qt::DecorationPropertyRole == role) {
+                QSize size(PIXMAP_SCALED_W, PIXMAP_SCALED_H);
+                var = size;
+                break;
+            }
+
             QString strNum = var.toString ();
             var.clear ();
             if (0 == strNum.length()) {
