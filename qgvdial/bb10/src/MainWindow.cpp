@@ -286,6 +286,12 @@ MainWindow::uiRefreshInbox()
 }//MainWindow::uiRefreshInbox
 
 void
+MainWindow::uiSetSelelctedInbox(const QString &selection)
+{
+    Q_DEBUG(selection);
+}//MainWindow::uiSetSelelctedInbox
+
+void
 MainWindow::uiSetNewRegNumbersModel()
 {
     // Absolutely nothing to do here...
