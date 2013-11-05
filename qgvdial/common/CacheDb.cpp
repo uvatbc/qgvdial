@@ -811,7 +811,7 @@ CacheDb::clearInbox ()
 
 void
 CacheDb::refreshInboxModel (InboxModel *modelInbox,
-                                  const QString &strType)
+                            const QString &strType)
 {
     //  0,    1,    2,      3,    4,     5
     // id, type, name, number, time, flags

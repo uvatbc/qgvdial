@@ -36,9 +36,13 @@ public:
 
     bool refresh(const char *type = "all", QDateTime after = QDateTime());
 
-    InboxModel *createModel();
-
     bool getEventInfo(GVInboxEntry &event, ContactInfo &cinfo, QString &type);
+
+public slots:
+    bool onUserSelect(QString type = QString("all"));
+
+private:
+    InboxModel *createModel(QString type);
 
 private slots:
     void onRefreshDone();

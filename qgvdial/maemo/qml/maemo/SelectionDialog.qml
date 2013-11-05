@@ -21,29 +21,18 @@ Contact: yuvraaj@gmail.com
 
 import Qt 4.7
 
-Item {
+Rectangle {
     id: container
 
-    property int selectedIndex: 0
-    property alias model: listView.model
+    property string selected: "All"
 
-    function isOpen() {
-        return container.visible;
-    }
-    function open() {
-        container.visible = true;
-    }
-    function close() {
-        container.visible = false;
-    }
+    property real delWidth: 5
+    property real delHeight: 40
+
+    signal done(bool accepted)
 
     visible: false
-
-    Fader {
-        anchors.fill: parent
-        state: "faded"
-        fadingOpacity: 0.8
-    }//Opacify the underlying page
+    color: "black"
 
     ListView {
         id: listView
@@ -51,25 +40,29 @@ Item {
         anchors {
             top: parent.top
             topMargin: 10
-
+            bottom: parent.bottom
             horizontalCenter: parent.horizontalCenter
         }
 
-        width: maxWidth
-        height: model.count == 0 ? 50 : (maxHeight + 3) * model.count;
-
         clip: true
         spacing: 2
+        width: container.delWidth + 10
 
-        property real maxWidth: 5
-        property real maxHeight: 5
+        model: ListModel {
+            ListElement { name: "All" }
+            ListElement { name: "Placed" }
+            ListElement { name: "Missed" }
+            ListElement { name: "Received" }
+            ListElement { name: "Voicemail" }
+            ListElement { name: "SMS" }
+        }
 
         delegate: Rectangle {
-            width: listView.maxWidth
-            height: listView.maxHeight
+            width: container.delWidth + 2
+            height: container.delHeight + 2
 
             color: "transparent"
-            border.color: index === container.selectedIndex ? "orange" : "black"
+            border.color: name.toUpperCase() === container.selected.toUpperCase() ? "orange" : "transparent"
 
             Text {
                 id: textDelegate
@@ -80,15 +73,16 @@ Item {
                 color: "white"
 
                 onPaintedWidthChanged: {
-                    if (paintedWidth + 10 > listView.maxWidth) {
-                        listView.maxWidth = paintedWidth + 10;
-                        //console.debug("Updated maxW = " + listView.maxWidth + " because of " + text);
+                    if (paintedWidth + 10 > container.delWidth) {
+                        container.delWidth = paintedWidth + 10;
+                        //console.debug("Updated delW = " + container.delWidth + " because of " + text);
                     }
                 }
 
                 onPaintedHeightChanged: {
-                    if (paintedHeight + 10 > listView.maxHeight) {
-                        listView.maxHeight = paintedHeight + 10;
+                    if (paintedHeight + 10 > container.delHeight) {
+                        container.delHeight = paintedHeight + 10;
+                        //console.debug("Updated delH = " + container.delHeight + " because of " + text);
                     }
                 }
             }//TextOneLine
@@ -99,9 +93,8 @@ Item {
                 anchors.fill: parent
 
                 onClicked: {
-                    console.debug("Clicked");
-                    container.selectedIndex = index;
-                    container.close();
+                    container.selected = name;
+                    container.done(true);
                 }
             }//MouseArea
         }//Rectangle

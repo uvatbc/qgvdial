@@ -25,7 +25,7 @@ Contact: yuvraaj@gmail.com
 InboxModel::InboxModel (QObject * parent)
 : QSqlQueryModel (parent)
 , strSelectType ("all")
-, eSelectType (GVIE_Unknown)
+, m_eSelectType (GVIE_Unknown)
 {
     QHash<int, QByteArray> roles;
     roles[IN_IdRole]    = "id";
@@ -41,7 +41,7 @@ InboxModel::InboxModel (QObject * parent)
 int
 InboxModel::rowCount (const QModelIndex & /*parent = QModelIndex()*/) const
 {
-    return (db.getInboxCount (eSelectType));
+    return (db.getInboxCount (m_eSelectType));
 }//InboxModel::rowCount
 
 QVariant
@@ -270,16 +270,23 @@ InboxModel::searchById(const QString &id, quint32 &foundRow)
 bool
 InboxModel::refresh (const QString &strSelected)
 {
+    GVI_Entry_Type eSelected;
     if (strSelected != strSelectType) {
+        eSelected = string_to_type (strSelected);
+    }
+    if (GVIE_Unknown != eSelected) {
         strSelectType = strSelected;
-        eSelectType = string_to_type (strSelected);
+        m_eSelectType = eSelected;
+    } else {
+        return (false);
     }
 
+    this->beginResetModel ();
     db.refreshInboxModel (this, strSelected);
-
     while (this->canFetchMore ()) {
         this->fetchMore ();
     }
+    this->endResetModel ();
 
     return (true);
 }//InboxModel::refresh

@@ -92,6 +92,9 @@ Rectangle {
 
             width: parent.width - imgArrow.width - parent.spacing
             anchors.verticalCenter: parent.verticalCenter
+
+            font.pixelSize: 30
+            smooth: true
         }//QGVLabel (text)
     }//Row (arrow and text)
 

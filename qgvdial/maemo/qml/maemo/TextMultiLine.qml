@@ -53,6 +53,7 @@ Rectangle {
 
         font.pointSize: 17
         color: "white"
+        smooth: true
         textFormat: container.textFormat
 
         onTextChanged: container.textChanged(text)

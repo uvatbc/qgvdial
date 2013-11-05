@@ -135,6 +135,9 @@ Page {
 
                 clip: true
                 text: name
+
+                font.pixelSize: 25
+                smooth: true
             }//Label (name)
 
             Label {
@@ -149,6 +152,9 @@ Page {
                 }
 
                 text: time
+
+                font.pixelSize: 20
+                smooth: true
             }//Label (entry time)
 
             MouseArea {

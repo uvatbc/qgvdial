@@ -51,7 +51,8 @@ Page {
             Label {
                 id: contactName
                 anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: 30
+                font.pixelSize: 40
+                smooth: true
                 width: parent.width - contactImage.width - parent.spacing
             }
         }
@@ -86,6 +87,8 @@ Page {
                         text: number
                         width: parent.width - lblType.width - parent.spacing
                         horizontalAlignment: Text.AlignRight
+                        font.pixelSize: 25
+                        smooth: true
                     }
                 }
 

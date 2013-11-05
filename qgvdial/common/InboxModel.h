@@ -65,7 +65,7 @@ private:
 
     CacheDb db;
     QString strSelectType;
-    GVI_Entry_Type eSelectType;
+    GVI_Entry_Type m_eSelectType;
 };
 
 #define INBOX_ENTRY_READ_MASK  (1 << 0)

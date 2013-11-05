@@ -37,41 +37,24 @@ Rectangle {
         }
 
         width: parent.width - 10
-
-        text: inboxSelection.model.get(inboxSelection.selectedIndex).name
-        onClicked: inboxSelection.isOpen() ? inboxSelection.close() : inboxSelection.open();
+        onClicked: { inboxList.showInboxSelector(); }
     }
-
-    SelectionDialog {
-        id: inboxSelection
-        anchors {
-            top: inboxSelectorBtn.bottom
-            bottom: parent.bottom
-        }
-        width: parent.width
-
-        selectedIndex: 1
-
-        model: ListModel {
-            ListElement { name: "All" }
-            ListElement { name: "Placed" }
-            ListElement { name: "Missed" }
-            ListElement { name: "Received" }
-            ListElement { name: "Voicemail" }
-            ListElement { name: "SMS" }
-        }
-    }//SelectionDialog
 
     ListView {
         id: inboxList
         objectName: "InboxList"
 
         signal clicked(string id)
+        signal showInboxSelector
 
         function setMyModel() {
             if (inboxList.model == null) {
                 inboxList.model = g_InboxModel;
             }
+        }
+
+        function setSelected(selected) {
+            inboxSelectorBtn.text = selected;
         }
 
         anchors {
@@ -149,6 +132,7 @@ Rectangle {
                 anchors {
                     right: parent.right
                     rightMargin: listDelegate.margins
+                    verticalCenter: parent.verticalCenter
                 }
                 width: 100
 
@@ -156,6 +140,7 @@ Rectangle {
                 readOnly: true
                 enableBorder: false
                 color: "transparent"
+                font.pointSize: 15
             }//Label (entry time)
 
             MouseArea {

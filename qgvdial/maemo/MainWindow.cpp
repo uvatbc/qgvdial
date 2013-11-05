@@ -67,6 +67,7 @@ MainWindow::MainWindow(QObject *parent)
 , textPassword(NULL)
 , contactsList(NULL)
 , inboxList(NULL)
+, inboxSelector(NULL)
 , proxySettingsPage(NULL)
 , selectedNumberButton(NULL)
 , regNumberSelector(NULL)
@@ -185,6 +186,15 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
         }
         connect(inboxList, SIGNAL(clicked(QString)),
                 this, SLOT(onInboxClicked(QString)));
+        connect(inboxList, SIGNAL(showInboxSelector()),
+                this, SLOT(onInboxSelBtnClicked()));
+
+        inboxSelector = getQMLObject ("InboxSelector");
+        if (NULL == inboxList) {
+            break;
+        }
+        connect(inboxSelector, SIGNAL(done(bool)),
+                this, SLOT(onInboxSelected(bool)));
 
         proxySettingsPage = getQMLObject ("ProxySettingsPage");
         if (NULL == proxySettingsPage) {
@@ -454,6 +464,30 @@ MainWindow::onInboxClicked(QString id)
                               Q_ARG(QVariant,QVariant(event.strPhoneNumber)),
                               Q_ARG(QVariant,QVariant(type)));
 }//MainWindow::onInboxClicked
+
+void
+MainWindow::onInboxSelBtnClicked()
+{
+    QMetaObject::invokeMethod (tabbedUI, "showInboxSelector");
+}//MainWindow::onInboxSelBtnClicked
+
+void
+MainWindow::onInboxSelected(bool accepted)
+{
+    if (!accepted) {
+        Q_DEBUG("Inbox selection not accepted");
+        return;
+    }
+
+    QString selected = inboxSelector->property("selected").toString();
+    if (!oInbox.onUserSelect (selected)) {
+        Q_WARN("Inbox selection not accepted");
+        return;
+    }
+
+    QMetaObject::invokeMethod (inboxList, "setSelected",
+                               Q_ARG (QVariant, QVariant(selected)));
+}//MainWindow::onInboxSelected
 
 void
 MainWindow::uiGetCIDetails(GVRegisteredNumber &num, GVNumModel *model)

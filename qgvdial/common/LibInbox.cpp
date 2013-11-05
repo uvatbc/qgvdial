@@ -34,12 +34,12 @@ LibInbox::LibInbox(IMainWindow *parent)
 }//LibInbox::LibInbox
 
 InboxModel *
-LibInbox::createModel()
+LibInbox::createModel(QString type)
 {
     IMainWindow *win = (IMainWindow *) this->parent ();
     InboxModel *modelInbox = new InboxModel(this);
 
-    win->db.refreshInboxModel (modelInbox, "all");
+    win->db.refreshInboxModel (modelInbox, type);
 
     return (modelInbox);
 }//LibInbox::createModel
@@ -154,7 +154,8 @@ LibInbox::onRefreshDone()
     if (task) {
         if (ATTS_SUCCESS == task->status) {
             InboxModel *oldModel = m_inboxModel;
-            m_inboxModel = this->createModel ();
+            QString type = task->inParams["type"].toString();
+            m_inboxModel = this->createModel (type);
             if (NULL != m_inboxModel) {
                 win->uiRefreshInbox ();
                 oldModel->deleteLater ();
@@ -198,3 +199,14 @@ LibInbox::getEventInfo(GVInboxEntry &event, ContactInfo &cinfo, QString &type)
 
     return (true);
 }//LibInbox::getEventInfo
+
+bool
+LibInbox::onUserSelect(QString type)
+{
+    if (!m_inboxModel->refresh (type)) {
+        Q_WARN(QString("Invalid selection \"%1\"").arg ((type)));
+        return false;
+    }
+
+    return (true);
+}//LibInbox::onUserSelect

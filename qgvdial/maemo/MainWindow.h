@@ -48,6 +48,8 @@ protected slots:
     void onUserClickedRegNumBtn();
 
     void onInboxClicked(QString id);
+    void onInboxSelBtnClicked();
+    void onInboxSelected(bool accepted);
 
 protected:
     QObject *getQMLObject(const char *pageName);
@@ -87,6 +89,7 @@ private:
     QObject *textPassword;
     QObject *contactsList;
     QObject *inboxList;
+    QObject *inboxSelector;
     QObject *proxySettingsPage;
     QObject *selectedNumberButton;
     QObject *regNumberSelector;

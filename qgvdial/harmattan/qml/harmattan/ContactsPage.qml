@@ -104,6 +104,9 @@ Page {
                 Label {
                     anchors.verticalCenter: parent.verticalCenter
                     text: name
+
+                    font.pixelSize: 25
+                    smooth: true
                 }//Label (contact name)
             }//Row (image and contact name)
 
@@ -125,4 +128,4 @@ Page {
             ]
         }// delegate Rectangle
     }// ListView (contacts list)
-}
+}//Page
