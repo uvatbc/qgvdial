@@ -20,7 +20,7 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "MainWindow.h"
-#include "qmlapplicationviewer.h"
+#include "QmlView.h"
 
 #include "QtSingleApplication"
 
@@ -47,6 +47,8 @@ createAppObject(int &argc, char **argv)
         app->sendMessage ("show");
         delete app;
         app = NULL;
+    } else {
+        app->setQuitOnLastWindowClosed (false);
     }
 
     return app;
@@ -54,7 +56,7 @@ createAppObject(int &argc, char **argv)
 
 MainWindow::MainWindow(QObject *parent)
 : IMainWindow(parent)
-, m_view(new QmlApplicationViewer)
+, m_view(new QmlView)
 , mainPageStack(NULL)
 , mainTabGroup(NULL)
 , loginExpand(NULL)
@@ -75,6 +77,14 @@ MainWindow::MainWindow(QObject *parent)
 {
 }//MainWindow::MainWindow
 
+MainWindow::~MainWindow()
+{
+    if (NULL != m_view) {
+        delete m_view;
+        m_view = NULL;
+    }
+}//MainWindow::~MainWindow
+
 void
 MainWindow::init()
 {
@@ -88,6 +98,15 @@ MainWindow::init()
     m_view->setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
     m_view->setMainQmlFile(QLatin1String("qml/harmattan/main.qml"));
     m_view->showExpanded();
+
+    rv = connect(qApp, SIGNAL(messageReceived(QString)),
+                 this, SLOT(messageReceived(QString)));
+    if (!rv) {
+        Q_WARN("Failed to connect to message received signal");
+        qApp->quit ();
+        exit(-1);
+        return;
+    }
 }//MainWindow::init
 
 QObject *
@@ -244,6 +263,18 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
     } while(0);
     exit(-1);
 }//MainWindow::declStatusChanged
+
+void
+MainWindow::messageReceived(const QString &msg)
+{
+    if (msg == "show") {
+        Q_DEBUG ("Second instance asked us to show");
+        m_view->show ();
+    } else if (msg == "quit") {
+        Q_DEBUG ("Second instance asked us to quit");
+        qApp->quit ();
+    }
+}//MainWindow::messageReceived
 
 void
 MainWindow::uiUpdateProxySettings(const ProxyInfo &info)

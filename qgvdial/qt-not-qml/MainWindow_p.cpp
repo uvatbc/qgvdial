@@ -107,9 +107,3 @@ MainWindowPrivate::setAllowClose(bool allow)
 {
     m_allowClose = allow;
 }//MainWindowPrivate::setAllowClose
-
-void
-MainWindowPrivate::on_action_Quit_triggered()
-{
-    qApp->quit ();
-}//MainWindowPrivate::on_action_Quit_triggered

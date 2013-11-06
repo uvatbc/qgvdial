@@ -27,17 +27,21 @@ Contact: yuvraaj@gmail.com
 
 #include "IMainWindow.h"
 
-class QmlApplicationViewer;
+class QmlView;
 class MainWindow : public IMainWindow
 {
     Q_OBJECT
 public:
     explicit MainWindow(QObject *parent = 0);
+    virtual ~MainWindow();
+
     void init();
     void log(QDateTime dt, int level, const QString &strLog);
 
 protected slots:
     void declStatusChanged(QDeclarativeView::Status status);
+    void messageReceived(const QString &msg);
+
     void onLoginButtonClicked();
     void onTfaPinDlg(bool accepted);
     void onAppPwDlg(bool accepted);
@@ -79,7 +83,7 @@ protected:
     void uiLongTaskEnds();
 
 private:
-    QmlApplicationViewer *m_view;
+    QmlView *m_view;
 
     QObject *mainPageStack;
     QObject *mainTabGroup;

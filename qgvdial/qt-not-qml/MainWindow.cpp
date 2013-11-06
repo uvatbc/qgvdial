@@ -189,6 +189,7 @@ MainWindow::init()
 
     d->setWindowIcon (m_appIcon);
     d->setAllowClose (false);
+    connect(d->ui->action_Quit, SIGNAL(triggered()), qApp, SLOT(quit()));
 
     QTimer::singleShot (1, this, SLOT(onInitDone()));
 }//MainWindow::init

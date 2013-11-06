@@ -19,44 +19,20 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#ifndef MAINWINDOW_P_H
-#define MAINWINDOW_P_H
+#ifndef QMLVIEW_H
+#define QMLVIEW_H
 
 #include "global.h"
+#include "qmlapplicationviewer.h"
 
-namespace Ui {
-    class MainWindow;
-}
-
-class MainWindowPrivate : public QMainWindow
+class QmlView : public QmlApplicationViewer
 {
     Q_OBJECT
-
 public:
-    enum ScreenOrientation {
-        ScreenOrientationLockPortrait,
-        ScreenOrientationLockLandscape,
-        ScreenOrientationAuto
-    };
-
-    explicit MainWindowPrivate(QWidget *parent = NULL);
-    virtual ~MainWindowPrivate();
-
-    // Note that this will only have an effect on Symbian and Fremantle.
-    void setOrientation(ScreenOrientation orientation);
-    void showExpanded();
-
-    void setAllowClose(bool allow);
+    explicit QmlView(void);
 
 protected:
     void closeEvent(QCloseEvent *event);
-
-private:
-    Ui::MainWindow *ui;
-    bool m_allowClose;
-
-    friend class MainWindow;
 };
 
-
-#endif // MAINWINDOW_P_H
+#endif // QMLVIEW_H
