@@ -39,14 +39,14 @@ public:
     void fill(const GVInboxEntry &event);
     void fill(const ContactInfo &cinfo);
 
-public:
-    bool m_hasBeenDoubleClicked;
-
 private slots:
     void onDoubleClicked();
 
 private:
     Ui::InboxEntryDialog *ui;
+
+public:
+    bool m_hasBeenDoubleClicked;
 };
 
 #endif // INBOXENTRYDIALOG_H

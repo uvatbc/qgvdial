@@ -25,6 +25,7 @@ Contact: yuvraaj@gmail.com
 MainWindowPrivate::MainWindowPrivate(QWidget *parent)
 : QMainWindow(parent)
 , ui(new Ui::MainWindow)
+, m_allowClose(true)
 {
     ui->setupUi(this);
 }//MainWindowPrivateLLMainWindowPrivate
@@ -89,3 +90,26 @@ MainWindowPrivate::showExpanded()
     show();
 #endif
 }//MainWindowPrivate::showExpanded
+
+void
+MainWindowPrivate::closeEvent(QCloseEvent *event)
+{
+    if (m_allowClose) {
+        QMainWindow::closeEvent (event);
+    } else {
+        event->ignore ();
+        this->hide ();
+    }
+}//MainWindowPrivate::closeEvent
+
+void
+MainWindowPrivate::setAllowClose(bool allow)
+{
+    m_allowClose = allow;
+}//MainWindowPrivate::setAllowClose
+
+void
+MainWindowPrivate::on_action_Quit_triggered()
+{
+    qApp->quit ();
+}//MainWindowPrivate::on_action_Quit_triggered

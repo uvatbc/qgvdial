@@ -63,6 +63,8 @@ createAppObject(int argc, char *argv[])
         app->sendMessage ("show");
         delete app;
         app = NULL;
+    } else {
+        app->setQuitOnLastWindowClosed (false);
     }
 
     return app;
@@ -71,6 +73,8 @@ createAppObject(int argc, char *argv[])
 MainWindow::MainWindow(QObject *parent)
 : IMainWindow(parent)
 , d(new MainWindowPrivate)
+, m_appIcon(":/qgv.png")
+, m_systrayIcon(NULL)
 , m_ignoreCbInboxChange(false)
 {
 }//MainWindow::MainWindow
@@ -166,6 +170,25 @@ MainWindow::init()
     d->ui->cbInboxSelector->addItem("SMS");
     connect(d->ui->cbInboxSelector, SIGNAL(currentIndexChanged(const QString&)),
             this, SLOT(onCbInboxChanged(const QString&)));
+
+    if (QSystemTrayIcon::isSystemTrayAvailable ()) {
+        m_systrayIcon = new QSystemTrayIcon(d);
+        if (NULL == m_systrayIcon) {
+            Q_CRIT("Failed to create system tray icon");
+            qApp->quit ();
+            return;
+        }
+
+        m_systrayIcon->setIcon (m_appIcon);
+        connect(m_systrayIcon,
+                SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
+                this,
+                SLOT(onSystrayactivated(QSystemTrayIcon::ActivationReason)));
+        m_systrayIcon->show ();
+    }
+
+    d->setWindowIcon (m_appIcon);
+    d->setAllowClose (false);
 
     QTimer::singleShot (1, this, SLOT(onInitDone()));
 }//MainWindow::init
@@ -546,3 +569,20 @@ MainWindow::uiLongTaskEnds()
 {
     d->ui->statusBar->clearMessage ();
 }//MainWindow::uiLongTaskEnds
+
+void
+MainWindow::onSystrayactivated(QSystemTrayIcon::ActivationReason reason)
+{
+    switch (reason) {
+    case QSystemTrayIcon::Trigger:
+        if (d->isVisible ()) {
+            d->hide ();
+        } else {
+            d->show ();
+        }
+        break;
+
+    default:
+        break;
+    }
+}//MainWindow::onSystrayactivated

@@ -26,6 +26,8 @@ Contact: yuvraaj@gmail.com
 #include "IMainWindow.h"
 
 class MainWindowPrivate;
+class QSystemTrayIcon;
+
 class MainWindow : public IMainWindow
 {
     Q_OBJECT
@@ -86,8 +88,13 @@ protected slots:
     void onCbNumDoModify(int index);
     void onCbInboxChanged(const QString &text);
 
+    void onSystrayactivated(QSystemTrayIcon::ActivationReason reason);
+
 private:
     MainWindowPrivate *d;
+
+    QIcon            m_appIcon;
+    QSystemTrayIcon *m_systrayIcon;
 
     bool m_ignoreCbInboxChange;
 };

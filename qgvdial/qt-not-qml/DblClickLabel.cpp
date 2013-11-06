@@ -27,7 +27,7 @@ DblClickLabel::DblClickLabel(QWidget *parent)
 }//DblClickLabel::DblClickLabel
 
 void
-DblClickLabel::mouseDoubleClickEvent(QMouseEvent *event)
+DblClickLabel::mouseDoubleClickEvent(QMouseEvent * /*event*/)
 {
     emit doubleClicked ();
 }//DblClickLabel::mouseDoubleClickEvent

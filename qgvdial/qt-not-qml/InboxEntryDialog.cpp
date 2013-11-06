@@ -63,7 +63,8 @@ InboxEntryDialog::fill(const ContactInfo &cinfo)
 
     QPixmap pixmap(localPath);
     ui->lblImage->setPixmap (pixmap.scaled(PIXMAP_SCALED_W, PIXMAP_SCALED_H,
-                                           Qt::KeepAspectRatio));
+                                           Qt::KeepAspectRatio,
+                                           Qt::SmoothTransformation));
 }//InboxEntryDialog::fillAndExec
 
 void

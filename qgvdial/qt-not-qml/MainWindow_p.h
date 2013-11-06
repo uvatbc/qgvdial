@@ -44,11 +44,19 @@ public:
 
     // Note that this will only have an effect on Symbian and Fremantle.
     void setOrientation(ScreenOrientation orientation);
-
     void showExpanded();
+
+    void setAllowClose(bool allow);
+
+protected:
+    void closeEvent(QCloseEvent *event);
+
+private slots:
+    void on_action_Quit_triggered();
 
 private:
     Ui::MainWindow *ui;
+    bool m_allowClose;
 
     friend class MainWindow;
 };

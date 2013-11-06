@@ -22,7 +22,8 @@ SOURCES  += $$PWD/MainWindow.cpp \
             $$PWD/CINumberDialog.cpp \
             $$PWD/CiListView.cpp \
             $$PWD/GvNumComboBox.cpp \
-    DblClickLabel.cpp
+            $$PWD/DblClickLabel.cpp \
+            $$PWD/DummySystemTray.cpp
 HEADERS  += $$PWD/MainWindow.h \
             $$PWD/MainWindow_p.h \
             $$PWD/OsDependant.h \
@@ -31,7 +32,8 @@ HEADERS  += $$PWD/MainWindow.h \
             $$PWD/CINumberDialog.h \
             $$PWD/CiListView.h \
             $$PWD/GvNumComboBox.h \
-    DblClickLabel.h
+            $$PWD/DblClickLabel.h \
+            $$PWD/DummySystemTray.h
 
 FORMS    += $$PWD/mainwindow.ui \
             $$PWD/ContactDialog.ui \

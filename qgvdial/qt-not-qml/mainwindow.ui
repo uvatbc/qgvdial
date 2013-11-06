@@ -286,8 +286,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>93</width>
-             <height>93</height>
+             <width>436</width>
+             <height>148</height>
             </rect>
            </property>
            <attribute name="label">
@@ -325,8 +325,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>220</width>
-             <height>211</height>
+             <width>246</width>
+             <height>240</height>
             </rect>
            </property>
            <attribute name="label">
@@ -439,8 +439,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>89</width>
-             <height>89</height>
+             <width>112</width>
+             <height>112</height>
             </rect>
            </property>
            <attribute name="label">
@@ -470,11 +470,26 @@
      <x>0</x>
      <y>0</y>
      <width>497</width>
-     <height>21</height>
+     <height>25</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menu_File">
+    <property name="title">
+     <string>&amp;File</string>
+    </property>
+    <addaction name="action_Quit"/>
+   </widget>
+   <addaction name="menu_File"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
+  <action name="action_Quit">
+   <property name="text">
+    <string>&amp;Quit</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+Q</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
