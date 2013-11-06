@@ -155,8 +155,6 @@ MainWindow::init()
     connect(d->ui->contactsView, SIGNAL(doubleClicked(const QModelIndex&)),
             this, SLOT(onContactDoubleClicked(const QModelIndex&)));
 
-    connect(d->ui->inboxView, SIGNAL(clicked(const QModelIndex&)),
-            this, SLOT(onInboxClicked(const QModelIndex&)));
     connect(d->ui->inboxView, SIGNAL(doubleClicked(const QModelIndex&)),
             this, SLOT(onInboxDoubleClicked(const QModelIndex&)));
 
@@ -467,7 +465,7 @@ MainWindow::setNumberToDial(QString num)
 }//MainWindow::setNumberToDial
 
 void
-MainWindow::onInboxClicked(const QModelIndex &index)
+MainWindow::onInboxDoubleClicked(const QModelIndex &index)
 {
     QModelIndex idIndex = index.sibling (index.row (), 0);
     GVInboxEntry event;
@@ -487,15 +485,15 @@ MainWindow::onInboxClicked(const QModelIndex &index)
     dlg.fill (cinfo);
 
     // Show inbox details
-    dlg.exec ();
-}//MainWindow::onInboxClicked
+    if (QDialog::Accepted != dlg.exec ()) {
+        return;
+    }
 
-void
-MainWindow::onInboxDoubleClicked(const QModelIndex &index)
-{
-    QModelIndex numIndex = index.sibling (index.row (), 3);
-    setNumberToDial (numIndex.data().toString());
-}//MainWindow::onInboxClicked
+    if (dlg.m_hasBeenDoubleClicked) {
+        QModelIndex numIndex = index.sibling (index.row (), 3);
+        setNumberToDial (numIndex.data().toString());
+    }
+}//MainWindow::onInboxDoubleClicked
 
 void
 MainWindow::uiGetCIDetails(GVRegisteredNumber &num, GVNumModel *model)

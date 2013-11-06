@@ -21,7 +21,8 @@ SOURCES  += $$PWD/MainWindow.cpp \
             $$PWD/InboxEntryDialog.cpp \
             $$PWD/CINumberDialog.cpp \
             $$PWD/CiListView.cpp \
-            $$PWD/GvNumComboBox.cpp
+            $$PWD/GvNumComboBox.cpp \
+    DblClickLabel.cpp
 HEADERS  += $$PWD/MainWindow.h \
             $$PWD/MainWindow_p.h \
             $$PWD/OsDependant.h \
@@ -29,7 +30,8 @@ HEADERS  += $$PWD/MainWindow.h \
             $$PWD/InboxEntryDialog.h \
             $$PWD/CINumberDialog.h \
             $$PWD/CiListView.h \
-            $$PWD/GvNumComboBox.h
+            $$PWD/GvNumComboBox.h \
+    DblClickLabel.h
 
 FORMS    += $$PWD/mainwindow.ui \
             $$PWD/ContactDialog.ui \

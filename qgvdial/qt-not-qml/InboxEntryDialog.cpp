@@ -29,8 +29,12 @@ Contact: yuvraaj@gmail.com
 InboxEntryDialog::InboxEntryDialog(QWidget *parent)
 : QDialog(parent)
 , ui(new Ui::InboxEntryDialog)
+, m_hasBeenDoubleClicked(false)
 {
     ui->setupUi(this);
+
+    connect(ui->lblNumber, SIGNAL(doubleClicked()),
+            this, SLOT(onDoubleClicked()));
 }//InboxEntryDialog::InboxEntryDialog
 
 InboxEntryDialog::~InboxEntryDialog()
@@ -61,3 +65,11 @@ InboxEntryDialog::fill(const ContactInfo &cinfo)
     ui->lblImage->setPixmap (pixmap.scaled(PIXMAP_SCALED_W, PIXMAP_SCALED_H,
                                            Qt::KeepAspectRatio));
 }//InboxEntryDialog::fillAndExec
+
+void
+InboxEntryDialog::onDoubleClicked()
+{
+    m_hasBeenDoubleClicked = true;
+
+    this->accept ();
+}//InboxEntryDialog::onDoubleClicked

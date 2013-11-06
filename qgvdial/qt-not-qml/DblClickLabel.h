@@ -19,34 +19,23 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#ifndef INBOXENTRYDIALOG_H
-#define INBOXENTRYDIALOG_H
+#ifndef DBLCLICKLABEL_H
+#define DBLCLICKLABEL_H
 
 #include "global.h"
 
-namespace Ui {
-class InboxEntryDialog;
-}
-
-class InboxEntryDialog : public QDialog
+class DblClickLabel : public QLabel
 {
     Q_OBJECT
 
 public:
-    explicit InboxEntryDialog(QWidget *parent = 0);
-    ~InboxEntryDialog();
+    explicit DblClickLabel(QWidget *parent = 0);
 
-    void fill(const GVInboxEntry &event);
-    void fill(const ContactInfo &cinfo);
+signals:
+    void doubleClicked();
 
-public:
-    bool m_hasBeenDoubleClicked;
-
-private slots:
-    void onDoubleClicked();
-
-private:
-    Ui::InboxEntryDialog *ui;
+protected:
+    void mouseDoubleClickEvent(QMouseEvent *event);
 };
 
-#endif // INBOXENTRYDIALOG_H
+#endif // DBLCLICKLABEL_H

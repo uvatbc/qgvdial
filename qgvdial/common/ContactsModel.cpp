@@ -57,7 +57,8 @@ ContactsModel::getPic(const QModelIndex &index, bool isQML) const
                 // No contact photo at all, but there is a default...
                 QPixmap pixmap(UNKNOWN_CONTACT_QRC_PATH);
                 retVar = pixmap.scaled(PIXMAP_SCALED_W, PIXMAP_SCALED_H,
-                                       Qt::KeepAspectRatio);
+                                       Qt::KeepAspectRatio,
+                                       Qt::SmoothTransformation);
 #endif
             }
 
@@ -91,7 +92,8 @@ ContactsModel::getPic(const QModelIndex &index, bool isQML) const
 #if !defined(Q_OS_BLACKBERRY)
             QPixmap pixmap(localPath);
             retVar = pixmap.scaled(PIXMAP_SCALED_W, PIXMAP_SCALED_H,
-                                   Qt::KeepAspectRatio);
+                                   Qt::KeepAspectRatio,
+                                   Qt::SmoothTransformation);
 #endif
         }
     } while (0);

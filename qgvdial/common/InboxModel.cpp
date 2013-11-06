@@ -140,7 +140,8 @@ InboxModel::data (const QModelIndex &index, int role) const
     #if !defined(Q_OS_BLACKBERRY)
                 QPixmap pixmap(path);
                 var = pixmap.scaled(PIXMAP_SCALED_W, PIXMAP_SCALED_H,
-                                       Qt::KeepAspectRatio);
+                                    Qt::KeepAspectRatio,
+                                    Qt::SmoothTransformation);
     #endif
                 break;
             } else if (Qt::DecorationPropertyRole == role) {

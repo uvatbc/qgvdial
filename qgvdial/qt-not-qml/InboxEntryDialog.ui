@@ -43,14 +43,14 @@
     <widget class="QWidget" name="widget_2" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
-       <widget class="QLabel" name="lblNumber">
+       <widget class="DblClickLabel" name="lblNumber">
         <property name="text">
          <string>Number</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="lblTime">
+       <widget class="DblClickLabel" name="lblTime">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
           <horstretch>0</horstretch>
@@ -75,6 +75,13 @@ at this time</string>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>DblClickLabel</class>
+   <extends>QLabel</extends>
+   <header>DblClickLabel.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
