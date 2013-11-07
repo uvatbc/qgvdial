@@ -65,7 +65,6 @@ NavigationPane {
                             }
 
                             Container {
-
                                 layout: StackLayout {
                                     orientation: LayoutOrientation.LeftToRight
                                 }

@@ -22,6 +22,7 @@ Contact: yuvraaj@gmail.com
 #include "MainWindow.h"
 #include "AbstractItemModel.hpp"
 #include "ContactsModel.h"
+#include "ContactNumbersModel.h"
 #include "InboxModel.h"
 #include "GVNumModel.h"
 
@@ -367,6 +368,8 @@ void
 MainWindow::uiSetNewContactDetailsModel()
 {
     Q_DEBUG("Got new contact details model");
+    qml->setContextProperty("g_ContactPhonesModel",
+                            oContacts.m_contactPhonesModel);
 }//MainWindow::uiSetNewContactDetailsModel
 
 void

@@ -90,7 +90,7 @@ Page {
                         font.pixelSize: 25
                         smooth: true
                     }
-                }
+                }//Row: type (work/home/mobile) and number
 
                 MouseArea {
                     anchors.fill: parent
