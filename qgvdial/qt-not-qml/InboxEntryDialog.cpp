@@ -29,12 +29,20 @@ Contact: yuvraaj@gmail.com
 InboxEntryDialog::InboxEntryDialog(QWidget *parent)
 : QDialog(parent)
 , ui(new Ui::InboxEntryDialog)
-, m_hasBeenDoubleClicked(false)
+, m_numberDoubleClicked(false)
+, m_contactDoubleClicked(false)
 {
     ui->setupUi(this);
 
     connect(ui->lblNumber, SIGNAL(doubleClicked()),
-            this, SLOT(onDoubleClicked()));
+            this, SLOT(onNumberDoubleClicked()));
+    connect(ui->lblTime, SIGNAL(doubleClicked()),
+            this, SLOT(onNumberDoubleClicked()));
+
+    connect(ui->lblImage, SIGNAL(doubleClicked()),
+            this, SLOT(onContactDoubleClicked()));
+    connect(ui->lblName, SIGNAL(doubleClicked()),
+            this, SLOT(onContactDoubleClicked()));
 }//InboxEntryDialog::InboxEntryDialog
 
 InboxEntryDialog::~InboxEntryDialog()
@@ -49,7 +57,7 @@ InboxEntryDialog::fill(const GVInboxEntry &event)
     ui->lblTime->setText (InboxModel::dateToString (event.startTime, false));
     ui->lblName->setText (event.strDisplayNumber);
     ui->lblNotes->setText (event.strNote);
-}//InboxEntryDialog::fillAndExec
+}//InboxEntryDialog::fill
 
 void
 InboxEntryDialog::fill(const ContactInfo &cinfo)
@@ -65,12 +73,18 @@ InboxEntryDialog::fill(const ContactInfo &cinfo)
     ui->lblImage->setPixmap (pixmap.scaled(PIXMAP_SCALED_W, PIXMAP_SCALED_H,
                                            Qt::KeepAspectRatio,
                                            Qt::SmoothTransformation));
-}//InboxEntryDialog::fillAndExec
+}//InboxEntryDialog::fill
 
 void
-InboxEntryDialog::onDoubleClicked()
+InboxEntryDialog::onNumberDoubleClicked()
 {
-    m_hasBeenDoubleClicked = true;
-
+    m_numberDoubleClicked = true;
     this->accept ();
-}//InboxEntryDialog::onDoubleClicked
+}//InboxEntryDialog::onNumberDoubleClicked
+
+void
+InboxEntryDialog::onContactDoubleClicked()
+{
+    m_contactDoubleClicked = true;
+    this->accept ();
+}//InboxEntryDialog::onContactDoubleClicked

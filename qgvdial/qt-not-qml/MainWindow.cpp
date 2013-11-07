@@ -513,9 +513,16 @@ MainWindow::onInboxDoubleClicked(const QModelIndex &index)
         return;
     }
 
-    if (dlg.m_hasBeenDoubleClicked) {
+    if (dlg.m_numberDoubleClicked) {
         QModelIndex numIndex = index.sibling (index.row (), 3);
         setNumberToDial (numIndex.data().toString());
+    }
+
+    if (dlg.m_contactDoubleClicked) {
+        ContactDialog dlg1;
+        connect(&dlg1, SIGNAL(selected(QString)),
+                this, SLOT(setNumberToDial(QString)));
+        dlg1.fillAndExec (cinfo);
     }
 }//MainWindow::onInboxDoubleClicked
 

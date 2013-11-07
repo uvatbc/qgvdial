@@ -40,13 +40,15 @@ public:
     void fill(const ContactInfo &cinfo);
 
 private slots:
-    void onDoubleClicked();
+    void onNumberDoubleClicked();
+    void onContactDoubleClicked();
 
 private:
     Ui::InboxEntryDialog *ui;
 
 public:
-    bool m_hasBeenDoubleClicked;
+    bool m_numberDoubleClicked;
+    bool m_contactDoubleClicked;
 };
 
 #endif // INBOXENTRYDIALOG_H
