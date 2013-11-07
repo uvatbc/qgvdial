@@ -26,6 +26,7 @@ Rectangle {
 
     signal longPress
     signal setNumberToDial(string number)
+    signal sigOpenContact(string cId)
 
     // height of the tab bar
     property int tabsHeight : 50
@@ -73,11 +74,12 @@ Rectangle {
         imgClose.state = "back";
     }
 
-    function showInboxDetails(imgSource, name, number, phType) {
+    function showInboxDetails(imgSource, name, number, phType, cId) {
         inboxDetails.imageSource = imgSource;
         inboxDetails.name = name;
         inboxDetails.number = number;
         inboxDetails.phType = phType;
+        inboxDetails.cId = cId;
         inboxDetails.visible = true;
         imgClose.state = "back";
     }
@@ -277,6 +279,7 @@ Rectangle {
 
     InboxDetailsPage {
         id: inboxDetails
+        objectName: "InboxDetails"
 
         anchors {
             top: tabBar.bottom
@@ -286,6 +289,7 @@ Rectangle {
 
         onSetNumberToDial: { container.setNumberToDial(number); }
         onDone: { container.doBack(); }
+        onSigOpenContact: container.sigOpenContact(cId);
     }//InboxDetailsPage
 
     SelectionDialog {

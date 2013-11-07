@@ -28,68 +28,84 @@ Page {
 
     signal done(bool accepted)
     signal setNumberToDial(string number)
+    signal sigShowContact(string cId)
 
     property alias imageSource: contactImage.source
     property alias name: contactName.text
     property alias number: contactNumber.text
     property alias phType: numberType.text
+    property string cId
 
     Column {
         anchors.fill: parent
         spacing: 20
 
-        Row {
-            id: titleRow
+        Item {
             width: parent.width
-            height: contactImage.height
+            height: 100
 
-            Image {
-                id: contactImage
-                fillMode: Image.PreserveAspectFit
-                height: 100
-                width: 100
-            }
-            Label {
-                id: contactName
-                anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: 40
-                smooth: true
-                width: parent.width - contactImage.width - parent.spacing
-            }
-        }
+            Row {
+                anchors.fill: parent
 
-        Row {
-            width: parent.width
-            spacing: 10
+                Image {
+                    id: contactImage
+                    fillMode: Image.PreserveAspectFit
+                    height: parent.height
+                    width: height
+                }
+                Label {
+                    id: contactName
+                    anchors.verticalCenter: parent.verticalCenter
+                    font.pixelSize: 40
+                    smooth: true
+                    width: parent.width - contactImage.width - parent.spacing
+                }
+            }//Row: Contact image and name
 
-            Label {
-                id: numberType
-                font.pixelSize: 30
-
-                MouseArea {
-                    anchors.fill: parent
-                    onPressAndHold: {
-                        container.setNumberToDial(container.number);
-                        container.done(true);
+            MouseArea {
+                anchors.fill: parent
+                onPressAndHold: {
+                    if (container.cId.length != 0) {
+                        container.sigShowContact(container.cId);
                     }
                 }
             }
+        }//Item
 
-            Label {
-                id: contactNumber
-                width: parent.width - numberType.width - parent.spacing
-                font.pixelSize: 25
-                smooth: true
-                horizontalAlignment: Text.AlignRight
+        Item {
+            width: parent.width
+            height: 40
 
-                MouseArea {
-                    anchors.fill: parent
-                    onPressAndHold: {
-                        container.setNumberToDial(container.number);
-                        container.done(true);
-                    }
+            Row {
+                anchors.fill: parent
+                spacing: 10
+
+                Label {
+                    id: numberType
+
+                    anchors.verticalCenter: parent.verticalCenter
+                    font.pixelSize: 30
+
+                }
+
+                Label {
+                    id: contactNumber
+
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: parent.width - numberType.width - parent.spacing
+                    font.pixelSize: 25
+                    smooth: true
+                    horizontalAlignment: Text.AlignRight
+                }
+            }//Row: type (mobile/work/home) and actual number
+
+            MouseArea {
+                anchors.fill: parent
+                onPressAndHold: {
+                    container.setNumberToDial(container.number);
+                    container.done(true);
                 }
             }
-        }
+        }//Item
     }//Column
 }//Page

@@ -26,12 +26,13 @@ Rectangle {
 
     signal done(bool accepted)
     signal setNumberToDial(string number)
-    signal sigOpenContact
+    signal sigOpenContact(string cId)
 
     property alias imageSource: contactImage.source
     property alias name: contactName.text
     property alias number: contactNumber.text
     property alias phType: numberType.text
+    property string cId
 
     color: "black"
     visible: false
@@ -69,7 +70,12 @@ Rectangle {
 
             MouseArea {
                 anchors.fill: parent
-                onPressAndHold: console.debug("Open sesame");
+                onPressAndHold: {
+                    container.done(true);
+                    if (container.cId.length != 0) {
+                        container.sigOpenContact(container.cId);
+                    }
+                }
             }
         }
 

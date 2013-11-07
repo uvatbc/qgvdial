@@ -27,6 +27,8 @@ PageStackWindow {
     id: appWindow
     objectName: "MainPageStack"
 
+    signal sigShowContact(string cId)
+
     Component.onCompleted: {
         // Use the dark theme.
         theme.inverted = true;
@@ -50,11 +52,12 @@ PageStackWindow {
         }
         pageStack.push(contactDetails);
     }
-    function showInboxDetails(imgSource, name, number, phType) {
+    function showInboxDetails(imgSource, name, number, phType, cId) {
         inboxDetails.imageSource = imgSource;
         inboxDetails.name = name;
         inboxDetails.number = number;
         inboxDetails.phType = phType;
+        inboxDetails.cId = cId;
         pageStack.push(inboxDetails);
     }
     function pushCiSelector(ciId) {
@@ -188,6 +191,8 @@ PageStackWindow {
             dialTab.setNumberInDisp(number);
             tabgroup.setTab(0);
         }
+
+        onSigShowContact: appWindow.sigShowContact(cId);
     }
 
     MessageBox {
