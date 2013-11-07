@@ -62,7 +62,9 @@ InboxEntryDialog::fill(const GVInboxEntry &event)
 void
 InboxEntryDialog::fill(const ContactInfo &cinfo)
 {
-    ui->lblName->setText (cinfo.strTitle);
+    if (!cinfo.strTitle.isEmpty ()) {
+        ui->lblName->setText (cinfo.strTitle);
+    }
 
     QString localPath = UNKNOWN_CONTACT_QRC_PATH;
     if (!cinfo.strPhotoPath.isEmpty ()) {

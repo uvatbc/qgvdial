@@ -183,6 +183,7 @@ LibInbox::getEventInfo(GVInboxEntry &event, ContactInfo &cinfo, QString &type)
         return (false);
     }
 
+    type = "Unknown";
     if (!win->db.getContactFromNumber (event.strPhoneNumber, cinfo)) {
         cinfo.strPhotoPath = UNKNOWN_CONTACT_QRC_PATH;
     } else {

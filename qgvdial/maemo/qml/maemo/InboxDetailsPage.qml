@@ -26,6 +26,7 @@ Rectangle {
 
     signal done(bool accepted)
     signal setNumberToDial(string number)
+    signal sigOpenContact
 
     property alias imageSource: contactImage.source
     property alias name: contactName.text
@@ -41,26 +42,34 @@ Rectangle {
         anchors.fill: parent
         spacing: 20
 
-        Row {
-            id: titleRow
+        Item {
             width: parent.width
-            height: contactImage.height
+            height: 100
 
-            Image {
-                id: contactImage
-                fillMode: Image.PreserveAspectFit
-                height: 100
-                width: 100
+            Row {
+                anchors.fill: parent
+
+                Image {
+                    id: contactImage
+                    fillMode: Image.PreserveAspectFit
+                    height: parent.height
+                    width: height
+                }
+                TextOneLine {
+                    id: contactName
+                    anchors.verticalCenter: parent.verticalCenter
+                    font.pixelSize: 40
+                    width: parent.width - contactImage.width - parent.spacing
+                    clip: true
+                    readOnly: true
+                    enableBorder: false
+                    color: "transparent"
+                }
             }
-            TextOneLine {
-                id: contactName
-                anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: 40
-                width: parent.width - contactImage.width - parent.spacing
-                clip: true
-                readOnly: true
-                enableBorder: false
-                color: "transparent"
+
+            MouseArea {
+                anchors.fill: parent
+                onPressAndHold: console.debug("Open sesame");
             }
         }
 
@@ -74,7 +83,7 @@ Rectangle {
                 readOnly: true
                 enableBorder: false
                 color: "transparent"
-                width: 150
+                width: 170
                 horizontalAlignment: Text.AlignLeft
 
                 anchors {

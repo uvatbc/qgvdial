@@ -502,7 +502,9 @@ MainWindow::onInboxDoubleClicked(const QModelIndex &index)
         return;
     }
 
-    db.markAsRead (event.id);
+    if (!event.bRead) {
+        db.markAsRead (event.id);
+    }
 
     InboxEntryDialog dlg;
     dlg.fill (event);
@@ -513,16 +515,20 @@ MainWindow::onInboxDoubleClicked(const QModelIndex &index)
         return;
     }
 
+    if (dlg.m_contactDoubleClicked) {
+        if (!cinfo.strId.isEmpty ()) {
+            ContactDialog dlg1;
+            connect(&dlg1, SIGNAL(selected(QString)),
+                    this, SLOT(setNumberToDial(QString)));
+            dlg1.fillAndExec (cinfo);
+        } else {
+            dlg.m_numberDoubleClicked = true;
+        }
+    }
+
     if (dlg.m_numberDoubleClicked) {
         QModelIndex numIndex = index.sibling (index.row (), 3);
         setNumberToDial (numIndex.data().toString());
-    }
-
-    if (dlg.m_contactDoubleClicked) {
-        ContactDialog dlg1;
-        connect(&dlg1, SIGNAL(selected(QString)),
-                this, SLOT(setNumberToDial(QString)));
-        dlg1.fillAndExec (cinfo);
     }
 }//MainWindow::onInboxDoubleClicked
 
