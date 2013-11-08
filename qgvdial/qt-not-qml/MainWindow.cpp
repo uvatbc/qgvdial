@@ -179,17 +179,22 @@ MainWindow::init()
             return;
         }
 
-        m_systrayIcon->setIcon (m_appIcon);
         connect(m_systrayIcon,
                 SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
                 this,
                 SLOT(onSystrayactivated(QSystemTrayIcon::ActivationReason)));
+
+        m_systrayIcon->setIcon (m_appIcon);
+        m_systrayIcon->setContextMenu (d->ui->menu_File);
         m_systrayIcon->show ();
     }
 
     d->setWindowIcon (m_appIcon);
     d->setAllowClose (false);
     connect(d->ui->action_Quit, SIGNAL(triggered()), qApp, SLOT(quit()));
+
+    connect(d->ui->actionRefresh, SIGNAL(triggered()),
+            this, SLOT(onUserRefreshTrigerred()));
 
     QTimer::singleShot (1, this, SLOT(onInitDone()));
 }//MainWindow::init
@@ -336,7 +341,20 @@ MainWindow::uiRefreshInbox()
 
     d->ui->inboxView->hideColumn (0);
     d->ui->inboxView->hideColumn (1);
+    d->ui->inboxView->resizeColumnToContents(2);
+    d->ui->inboxView->resizeColumnToContents(3);
+    d->ui->inboxView->resizeColumnToContents(4);
     d->ui->inboxView->hideColumn (5);
+
+    int width = d->ui->inboxView->width() - d->ui->inboxView->columnWidth (4);
+    width >>= 1;
+    width--;
+    if (d->ui->inboxView->columnWidth(2) < (width - 2)) {
+        d->ui->inboxView->setColumnWidth (2, width - 2);
+    }
+    if (d->ui->inboxView->columnWidth(3) < (width - 2)) {
+        d->ui->inboxView->setColumnWidth (3, width - 2);
+    }
 }//MainWindow::uiRefreshInbox
 
 void
@@ -600,3 +618,16 @@ MainWindow::onSystrayactivated(QSystemTrayIcon::ActivationReason reason)
         break;
     }
 }//MainWindow::onSystrayactivated
+
+void
+MainWindow::onUserRefreshTrigerred()
+{
+    QDateTime latest;
+    if (db.getLatestContact (latest)) {
+        oContacts.refresh (latest);
+    }
+
+    if (db.getLatestInboxEntry (latest)) {
+        oInbox.refresh ("all", latest);
+    }
+}//MainWindow::onUserRefreshTrigerred

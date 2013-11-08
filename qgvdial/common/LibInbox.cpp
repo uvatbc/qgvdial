@@ -98,7 +98,7 @@ LibInbox::onOneInboxEntry (AsyncTaskToken *task, const GVInboxEntry &hevent)
 {
     QDateTime after = task->inParams["after"].toDateTime();
 
-    if ((!after.isValid ()) || (hevent.startTime >= after)) {
+    if ((!after.isValid()) || (hevent.startTime >= after)) {
         // Stuff this into the DB only if it is after "after"
         IMainWindow *win = (IMainWindow *) this->parent ();
 
@@ -109,7 +109,7 @@ LibInbox::onOneInboxEntry (AsyncTaskToken *task, const GVInboxEntry &hevent)
         }
     }
 
-    if (after.isValid () && (hevent.startTime < after)) {
+    if (after.isValid() && (hevent.startTime < after)) {
         bool overflow = true;
         task->inParams["overflow"] = overflow;
     }

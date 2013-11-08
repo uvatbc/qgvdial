@@ -21,7 +21,7 @@
        <enum>QTabWidget::East</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="dialTab">
        <attribute name="title">
@@ -267,6 +267,9 @@
           <property name="headerHidden">
            <bool>true</bool>
           </property>
+          <property name="expandsOnDoubleClick">
+           <bool>false</bool>
+          </property>
          </widget>
         </item>
        </layout>
@@ -286,8 +289,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>96</width>
-             <height>101</height>
+             <width>436</width>
+             <height>167</height>
             </rect>
            </property>
            <attribute name="label">
@@ -477,9 +480,9 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
+    <addaction name="actionRefresh"/>
     <addaction name="actionHide"/>
     <addaction name="action_Quit"/>
-    <addaction name="actionRefresh"/>
    </widget>
    <addaction name="menu_File"/>
   </widget>

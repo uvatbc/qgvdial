@@ -90,6 +90,8 @@ protected slots:
 
     void onSystrayactivated(QSystemTrayIcon::ActivationReason reason);
 
+    void onUserRefreshTrigerred();
+
 private:
     MainWindowPrivate *d;
 
