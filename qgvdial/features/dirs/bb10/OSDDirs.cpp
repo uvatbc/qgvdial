@@ -24,7 +24,7 @@ Contact: yuvraaj@gmail.com
 QString
 OsdDirs::_getTempDir()
 {
-	return QDir::homePath();
+	return QDir::temp().absolutePath();
 }//OsdDirs::_getTempDir
 
 QString
