@@ -6,12 +6,6 @@ TARGET=qgvdial
 # dir1.source = mydir
 DEPLOYMENTFOLDERS = # file1 dir1
 
-# If your application uses the Qt Mobility libraries, uncomment
-# the following lines and add the respective components to the
-# MOBILITY variable.
-# CONFIG += mobility
-# MOBILITY +=
-
 INCLUDEPATH += $$PWD
 
 SOURCES  += $$PWD/MainWindow.cpp \
@@ -39,9 +33,13 @@ FORMS    += $$PWD/mainwindow.ui \
             $$PWD/ContactDialog.ui \
             $$PWD/InboxEntryDialog.ui \
             $$PWD/CINumberDialog.ui
+
 RESOURCES += $$PWD/qtnotqml.qrc
 
 include($$PWD/../common/common.pri)
 include($$PWD/../../api/api.pri)
 include($$PWD/../features/openssl/openssl.pri)
-include($$PWD/../features/qtsingleapplication/qtsingleapplication.pri)
+
+!blackberry {
+    include($$PWD/../features/qtsingleapplication/qtsingleapplication.pri)
+}

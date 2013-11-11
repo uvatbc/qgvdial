@@ -19,7 +19,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
+#ifndef Q_OS_BLACKBERRY
 #include "QtSingleApplication"
+#endif
+
 #include "MainWindow.h"
 #include "MainWindow_p.h"
 #include "ui_mainwindow.h"
@@ -45,6 +48,7 @@ Contact: yuvraaj@gmail.com
 #error Must define the unknown contact QRC path
 #endif
 
+#ifndef Q_OS_BLACKBERRY
 QCoreApplication *
 createAppObject(int argc, char *argv[])
 {
@@ -69,6 +73,19 @@ createAppObject(int argc, char *argv[])
 
     return app;
 }//createAppObject
+#else
+QCoreApplication *
+createAppObject(int argc, char *argv[])
+{
+    QApplication *app = new QApplication(argc, argv);
+    if (NULL == app) {
+        return app;
+    }
+
+    app->setQuitOnLastWindowClosed (false);
+    return app;
+}//createAppObject
+#endif
 
 MainWindow::MainWindow(QObject *parent)
 : IMainWindow(parent)
@@ -91,6 +108,7 @@ MainWindow::init()
 {
     IMainWindow::init ();
 
+#ifndef Q_OS_BLACKBERRY
     bool rv = connect(qApp, SIGNAL(messageReceived(QString)),
                       this, SLOT(messageReceived(QString)));
     if (!rv) {
@@ -101,6 +119,7 @@ MainWindow::init()
     }
 
     ((QtSingleApplication *)qApp)->setActivationWindow (this->d);
+#endif
 
 #if DESKTOP_OS
     // Desktop only ?
