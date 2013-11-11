@@ -27,7 +27,7 @@ NavigationPane {
     objectName: "ContactsPage"
     
     function showContactDetails(imgSource, name) {
-        contactDetails.contactImageSource = imgSource;
+        contactDetails.contactImageSource = "file://" + imgSource;
         contactDetails.contactNameText = name;
         container.push(contactDetails);
     }
@@ -72,7 +72,7 @@ NavigationPane {
                                 ImageView {
                                     imageSource: {
                                         if ((ListItemData.imagePath != null) && (ListItemData.imagePath.length != 0)) {
-                                            return ListItemData.imagePath;  
+                                            return "file://" + ListItemData.imagePath;  
                                         } else {
                                             return "asset:///icons/unknown_contact.png";
                                         }

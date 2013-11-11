@@ -325,7 +325,7 @@ InboxModel::searchById(const QString &id, quint32 &foundRow)
 bool
 InboxModel::refresh (const QString &strSelected)
 {
-    GVI_Entry_Type eSelected;
+    GVI_Entry_Type eSelected = GVIE_Unknown;
     if (strSelected != strSelectType) {
         eSelected = string_to_type (strSelected);
     }

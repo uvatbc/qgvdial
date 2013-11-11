@@ -43,7 +43,7 @@ LibContacts::LibContacts(IMainWindow *parent)
     m_gotPhotoTimer.setSingleShot (true);
     m_gotPhotoTimer.setInterval (GOT_PHOTO_TIMEOUT);
     connect (&m_gotPhotoTimer, SIGNAL(timeout()),
-             this, SIGNAL(someTimeAfterGettingTheLastPhoto()));
+             this, SLOT(refreshModel()));
 }//LibContacts::LibContacts
 
 bool
@@ -146,8 +146,6 @@ LibContacts::onContactsFetched()
             if (m_mandatoryLocalPics) {
                 connect(m_contactsModel, SIGNAL(noContactPhoto(QString,QString)),
                         this, SLOT(onNoContactPhoto(QString,QString)));
-                connect(this, SIGNAL(someTimeAfterGettingTheLastPhoto()),
-                        this, SLOT(refreshModel()));
             }
 
             win->uiRefreshContacts ();

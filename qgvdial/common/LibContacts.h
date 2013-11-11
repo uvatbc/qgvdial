@@ -51,9 +51,6 @@ public slots:
     bool getContactInfoAndModel(QString id);
     void refreshModel();
 
-signals:
-    void someTimeAfterGettingTheLastPhoto();
-
 protected slots:
     void loginCompleted();
     void onPresentCaptcha(AsyncTaskToken *task, const QString &captchaUrl);
