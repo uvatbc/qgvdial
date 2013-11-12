@@ -112,7 +112,7 @@ PageStackWindow {
     ToolBarLayout {
         id: commonTools
         
-        height: 250
+        //height: 250
         visible: true
 
         ToolButton {

@@ -25,6 +25,7 @@ import com.nokia.symbian 1.1
 Page {
     id: container
     tools: commonTools
+    anchors.fill: parent
 
     objectName: "SettingsPage"
 
