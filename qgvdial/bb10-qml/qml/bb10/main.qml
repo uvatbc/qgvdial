@@ -107,44 +107,43 @@ PageStackWindow {
                 toolbarHeight: commonTools.height
             }
         }//TabGroup
-
-        ToolBarLayout {
-            id: commonTools
-            
-            anchors.bottom: parent.bottom
-            height: 250
-            visible: true
-
-            ToolButton {
-                iconSource: "toolbar-back";
-                onClicked: pageStack.pop();
-            }
-
-            ButtonRow {
-                TabButton {
-                    iconSource: "qrc:/dialpad.svg"
-                    tab: dialTab
-                }
-                TabButton {
-                    iconSource: "qrc:/people.svg"
-                    tab: contactsTab
-                }
-                TabButton {
-                    iconSource: "qrc:/history.svg"
-                    tab: inboxTab
-                }
-                TabButton {
-                    iconSource: "qrc:/settings.svg"
-                    tab: settingsTab
-                }
-            }
-            ToolButton {
-                iconSource: "toolbar-view-menu"
-                anchors.right: (parent === undefined) ? undefined : parent.right
-                onClicked: (myMenu.status === DialogStatus.Closed) ? myMenu.open() : myMenu.close()
-            }
-        }//ToolBarLayout
     }
+
+    ToolBarLayout {
+        id: commonTools
+        
+        height: 250
+        visible: true
+
+        ToolButton {
+            iconSource: "toolbar-back";
+            onClicked: pageStack.pop();
+        }
+
+        ButtonRow {
+            TabButton {
+                iconSource: "qrc:/dialpad.svg"
+                tab: dialTab
+            }
+            TabButton {
+                iconSource: "qrc:/people.svg"
+                tab: contactsTab
+            }
+            TabButton {
+                iconSource: "qrc:/history.svg"
+                tab: inboxTab
+            }
+            TabButton {
+                iconSource: "qrc:/settings.svg"
+                tab: settingsTab
+            }
+        }
+        ToolButton {
+            iconSource: "toolbar-view-menu"
+            anchors.right: (parent === undefined) ? undefined : parent.right
+            onClicked: (myMenu.status === DialogStatus.Closed) ? myMenu.open() : myMenu.close()
+        }
+    }//ToolBarLayout
 
     Menu {
         id: myMenu
