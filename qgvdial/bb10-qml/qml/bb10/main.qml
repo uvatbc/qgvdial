@@ -29,10 +29,7 @@ PageStackWindow {
 
     signal sigShowContact(string cId)
 
-    Component.onCompleted: {
-        // Use the dark theme.
-        theme.inverted = true;
-    }
+    showStatusBar: false
 
     function pushTfaDlg() {
         pageStack.push(tfaPinDlg);
@@ -94,11 +91,11 @@ PageStackWindow {
             }
             ContactsPage {
                 id: contactsTab
-                toolbarHeight: appWindow.platformToolBarHeight
+                toolbarHeight: commonTools.height
             }
             InboxPage {
                 id: inboxTab
-                toolbarHeight: appWindow.platformToolBarHeight
+                toolbarHeight: commonTools.height
 
                 onSetNumberToDial: {
                     dialTab.setNumberInDisp(number);
@@ -107,16 +104,19 @@ PageStackWindow {
             }
             SettingsPage {
                 id: settingsTab
-                toolbarHeight: appWindow.platformToolBarHeight
+                toolbarHeight: commonTools.height
             }
         }//TabGroup
 
         ToolBarLayout {
             id: commonTools
+            
+            anchors.bottom: parent.bottom
+            height: 250
             visible: true
 
-            ToolIcon {
-                iconId: "toolbar-back";
+            ToolButton {
+                iconSource: "toolbar-back";
                 onClicked: pageStack.pop();
             }
 
@@ -138,8 +138,8 @@ PageStackWindow {
                     tab: settingsTab
                 }
             }
-            ToolIcon {
-                platformIconId: "toolbar-view-menu"
+            ToolButton {
+                iconSource: "toolbar-view-menu"
                 anchors.right: (parent === undefined) ? undefined : parent.right
                 onClicked: (myMenu.status === DialogStatus.Closed) ? myMenu.open() : myMenu.close()
             }

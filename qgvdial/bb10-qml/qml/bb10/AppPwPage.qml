@@ -42,8 +42,6 @@ Page {
             id: textAppPw
             placeholderText: "App specific password"
             anchors.horizontalCenter: parent.horizontalCenter
-
-            onAccepted: container.done(true);
         }
 
         ButtonRow {

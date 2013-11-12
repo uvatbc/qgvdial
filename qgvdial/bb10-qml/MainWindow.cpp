@@ -83,20 +83,17 @@ MainWindow::init()
     bool rv =
     connect(m_view, SIGNAL(statusChanged(QDeclarativeView::Status)),
             this, SLOT(declStatusChanged(QDeclarativeView::Status)));
-    Q_ASSERT(rv); Q_UNUSED(rv);
-
-    m_view->setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
-    m_view->setMainQmlFile(QLatin1String("qml/bb10/main.qml"));
-    m_view->showExpanded();
-
-    rv = connect(qApp, SIGNAL(messageReceived(QString)),
-                 this, SLOT(messageReceived(QString)));
+    Q_ASSERT(rv);
     if (!rv) {
         Q_WARN("Failed to connect to message received signal");
         qApp->quit ();
         exit(-1);
         return;
     }
+
+    m_view->setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
+    m_view->setMainQmlFile(QLatin1String("app/native/qml/bb10/main.qml"));
+    m_view->showExpanded();
 }//MainWindow::init
 
 QObject *

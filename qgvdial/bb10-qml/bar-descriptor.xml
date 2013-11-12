@@ -34,6 +34,8 @@
        <image>qgvdial.png</image>
     </icon>
 
+    <asset path="qml/">qml</asset>
     <asset path="imports/">imports</asset>
     <env var="QML_IMPORT_PATH" value="app/native/imports" />
+    <env var="QBB_USE_OPENGL" value="1"/>
 </qnx>

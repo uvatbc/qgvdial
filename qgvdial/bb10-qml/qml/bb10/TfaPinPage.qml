@@ -41,8 +41,6 @@ Page {
             id: textTfaPin
             placeholderText: "PIN"
             anchors.horizontalCenter: parent.horizontalCenter
-
-            onAccepted: container.done(true);
         }
 
         ButtonRow {

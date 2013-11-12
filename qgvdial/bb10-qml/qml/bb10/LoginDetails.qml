@@ -58,17 +58,14 @@ Item {
 
             placeholderText: "example@gmail.com"
             inputMethodHints: Qt.ImhPreferLowercase | Qt.ImhNoPredictiveText
-
-            KeyNavigation.tab: textPassword
-            onAccepted: btnLogin.clicked();
-        }//QGVTextInput
+        }//TextField
 
         Label {
             id: lblUsername
             anchors.verticalCenter: parent.verticalCenter
             opacity: (1 - textUsername.opacity)
             text: container.username
-        }//QGVLabel (username)
+        }//Label (username)
     }//Row (username)
 
     Row {
@@ -101,9 +98,6 @@ Item {
             echoMode: TextInput.Password
 
             placeholderText: "Password"
-
-            KeyNavigation.tab: textUsername
-            onAccepted: btnLogin.clicked();
         }//TextField
 
         Label {
