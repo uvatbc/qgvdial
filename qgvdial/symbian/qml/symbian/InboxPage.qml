@@ -28,7 +28,6 @@ Page {
     anchors.fill: parent
 
     property bool isSearchResults: false
-    property real toolbarHeight: 50
 
     signal setNumberToDial(string number)
 

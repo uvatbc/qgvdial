@@ -38,8 +38,6 @@ Page {
 
     signal sigSendLogs
 
-    property real toolbarHeight: 50
-
     Timer {
         id: yAdjustTimer
 
@@ -71,7 +69,7 @@ Page {
             top: parent.top
         }
         width: parent.width
-        height: parent.height - container.toolbarHeight
+        height: parent.height
 
         ExpandView {
             id: expandLoginDetails

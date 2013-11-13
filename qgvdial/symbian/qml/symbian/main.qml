@@ -23,14 +23,11 @@ import QtQuick 1.1
 import com.nokia.symbian 1.1
 import com.nokia.extras 1.1
 
-PageStackWindow {
+ApplicationWindow {
     id: appWindow
     objectName: "MainPageStack"
 
     signal sigShowContact(string cId)
-
-    showStatusBar: true
-    showToolBar: true
 
     function pushTfaDlg() {
         pageStack.push(tfaPinDlg);
@@ -66,85 +63,10 @@ PageStackWindow {
         pageStack.push(ciPhoneSelector);
     }
 
-    initialPage: Page {
-        tools: commonTools
+    initialPage: mainPage
+    fullScreen: true
 
-        TabGroup {
-            id: tabgroup
-            objectName: "MainTabGroup"
-            currentTab: dialTab
-
-            function setTab(index) {
-                if (0 === index) {
-                    currentTab = dialTab;
-                } else if (1 === index) {
-                    currentTab = contactsTab;
-                } else if (2 === index) {
-                    currentTab = inboxTab;
-                } else if (3 === index) {
-                    currentTab = settingsTab;
-                }
-            }
-
-            DialPage {
-                id: dialTab
-                onRegNumBtnClicked: appWindow.pageStack.push(regNumberSelector);
-            }
-            ContactsPage {
-                id: contactsTab
-                toolbarHeight: commonTools.height
-            }
-            InboxPage {
-                id: inboxTab
-                toolbarHeight: commonTools.height
-
-                onSetNumberToDial: {
-                    dialTab.setNumberInDisp(number);
-                    tabgroup.setTab(0);
-                }
-            }
-            SettingsPage {
-                id: settingsTab
-                toolbarHeight: commonTools.height
-            }
-        }//TabGroup
-    }
-
-    ToolBarLayout {
-        id: commonTools
-
-        anchors.bottom: parent.bottom
-        visible: true
-
-        ToolButton {
-            iconSource: "toolbar-back";
-            onClicked: pageStack.pop();
-        }
-
-        ButtonRow {
-            TabButton {
-                iconSource: "qrc:/dialpad.svg"
-                tab: dialTab
-            }
-            TabButton {
-                iconSource: "qrc:/people.svg"
-                tab: contactsTab
-            }
-            TabButton {
-                iconSource: "qrc:/history.svg"
-                tab: inboxTab
-            }
-            TabButton {
-                iconSource: "qrc:/settings.svg"
-                tab: settingsTab
-            }
-        }
-        ToolButton {
-            iconSource: "toolbar-view-menu"
-            anchors.right: (parent === undefined) ? undefined : parent.right
-            onClicked: (myMenu.status === DialogStatus.Closed) ? myMenu.open() : myMenu.close()
-        }
-    }//ToolBarLayout
+    property real pageHeights: height - commonTools.height
 
     Menu {
         id: myMenu
@@ -177,6 +99,8 @@ PageStackWindow {
 
     ContactDetailsPage {
         id: contactDetails
+        tools: commonTools
+        height: pageHeights
         onDone: appWindow.pageStack.pop();
         onSetNumberToDial: {
             dialTab.setNumberInDisp(number);
@@ -218,6 +142,106 @@ PageStackWindow {
         anchors {
             bottom: parent.bottom
             bottomMargin: commonTools.height + 5
+        }
+    }
+
+    Page {
+        id: mainPage
+        tools: commonTools
+
+        anchors.fill: parent
+
+        TabGroup {
+            id: tabgroup
+            objectName: "MainTabGroup"
+            currentTab: dialTab
+
+            anchors {
+                top: parent.top
+                left: parent.left
+                right: parent.right
+                bottom: commonTools.top
+            }
+
+            function setTab(index) {
+                if (0 === index) {
+                    currentTab = dialTab;
+                } else if (1 === index) {
+                    currentTab = contactsTab;
+                } else if (2 === index) {
+                    currentTab = inboxTab;
+                } else if (3 === index) {
+                    currentTab = settingsTab;
+                }
+            }
+
+            DialPage {
+                id: dialTab
+                tools: commonTools
+                onRegNumBtnClicked: appWindow.pageStack.push(regNumberSelector);
+            }
+            ContactsPage {
+                id: contactsTab
+                tools: commonTools
+            }
+            InboxPage {
+                id: inboxTab
+                tools: commonTools
+
+                onSetNumberToDial: {
+                    dialTab.setNumberInDisp(number);
+                    tabgroup.setTab(0);
+                }
+            }
+            SettingsPage {
+                id: settingsTab
+                tools: commonTools
+            }
+        }//TabGroup
+
+        ToolBar {
+            id: commonTools
+
+            anchors.bottom: parent.bottom
+            //width: parent.width
+            visible: true
+
+            tools: ToolBarLayout {
+                ToolButton {
+                    iconSource: "toolbar-back";
+                    onClicked: {
+                        if (pageStack.depth > 1) {
+                            pageStack.pop();
+                        } else {
+                            console.debug("Quit!");
+                        }
+                    }
+                }
+
+                ButtonRow {
+                    TabButton {
+                        iconSource: "qrc:/dialpad.svg"
+                        tab: dialTab
+                    }
+                    TabButton {
+                        iconSource: "qrc:/people.svg"
+                        tab: contactsTab
+                    }
+                    TabButton {
+                        iconSource: "qrc:/history.svg"
+                        tab: inboxTab
+                    }
+                    TabButton {
+                        iconSource: "qrc:/settings.svg"
+                        tab: settingsTab
+                    }
+                }
+                ToolButton {
+                    iconSource: "toolbar-view-menu"
+                    anchors.right: (parent === undefined) ? undefined : parent.right
+                    onClicked: (myMenu.status === DialogStatus.Closed) ? myMenu.open() : myMenu.close()
+                }
+            }//ToolBarLayout
         }
     }
 }

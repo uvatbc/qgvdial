@@ -80,6 +80,8 @@ MainWindow::init()
 {
     IMainWindow::init ();
 
+    qApp->setAttribute (Qt::AA_S60DontConstructApplicationPanes);
+
     bool rv =
     connect(m_view, SIGNAL(statusChanged(QDeclarativeView::Status)),
             this, SLOT(declStatusChanged(QDeclarativeView::Status)));
@@ -91,7 +93,7 @@ MainWindow::init()
         return;
     }
 
-    m_view->setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
+    m_view->setOrientation(QmlApplicationViewer::ScreenOrientationLockPortrait);
     m_view->setMainQmlFile(QLatin1String("qml/symbian/main.qml"));
     m_view->showExpanded();
 }//MainWindow::init
