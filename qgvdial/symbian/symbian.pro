@@ -31,12 +31,11 @@ MOBILITY +=
 # Add dependency to Symbian components
 CONFIG += qt-components
 
-SOURCES  += MainWindow.cpp \
-            OsDependant.cpp \
+INCLUDEPATH += $$PWD
+SOURCES  += OsDependant.cpp \
             QmlView.cpp \
             SymbianPhoneFactory.cpp
 HEADERS  += platform_specific.h \
-            MainWindow.h \
             OsDependant.h \
             QmlView.h \
             SymbianPhoneFactory.h
@@ -45,6 +44,7 @@ include(../common/common.pri)
 include(../../api/api.pri)
 include(../features/openssl/openssl.pri)
 include(../features/dirs/linux/linux-dirs.pri)
+include(../features/qml/mainwindow/qml-mainwindow.pri)
 
 RESOURCES += symbian.qrc
 

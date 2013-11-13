@@ -24,6 +24,8 @@ Contact: yuvraaj@gmail.com
 
 #include <QtDeclarative>
 
-#define UNKNOWN_CONTACT_QRC_PATH "qrc:/unknown_contact.png"
+#define UNKNOWN_CONTACT_QRC_PATH    "qrc:/unknown_contact.png"
+#define MAIN_QML_PATH               "app/native/qml/bb10/main.qml"
+#define USE_SINGLE_APPLICATION      0
 
 #endif // PLATFORMSPECIFIC_H

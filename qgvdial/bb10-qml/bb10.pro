@@ -24,13 +24,11 @@ QML_IMPORT_PATH = ./imports
 
 LIBS += -lbbsystem
 
-SOURCES  += MainWindow.cpp \
-            OsDependant.cpp \
+SOURCES  += OsDependant.cpp \
             BB10PhoneFactory.cpp \
             BBPhoneAccount.cpp \
             QmlView.cpp
 HEADERS  += platform_specific.h \
-            MainWindow.h \
             OsDependant.h \
             BB10PhoneFactory.h \
             BBPhoneAccount.h \
@@ -40,6 +38,7 @@ include(../common/common.pri)
 include(../../api/api.pri)
 include(../features/openssl/openssl.pri)
 include(../features/dirs/bb10/bb10-dirs.pri)
+include(../features/qml/mainwindow/qml-mainwindow.pri)
 
 RESOURCES += bb10.qrc
 

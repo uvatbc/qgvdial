@@ -22,12 +22,11 @@ CONFIG += qdeclarative-boostable
 # Add dependency to Symbian components
 # CONFIG += qt-components
 
-SOURCES  += MainWindow.cpp \
-            OsDependant.cpp \
+INCLUDEPATH += $$PWD
+SOURCES  += OsDependant.cpp \
             HarmattanPhoneFactory.cpp \
             QmlView.cpp
 HEADERS  += platform_specific.h \
-            MainWindow.h \
             OsDependant.h \
             HarmattanPhoneFactory.h \
             QmlView.h
@@ -38,6 +37,7 @@ include(../features/openssl/openssl.pri)
 include(../features/dirs/linux/linux-dirs.pri)
 include(../features/qtsingleapplication/qtsingleapplication.pri)
 include(../features/dbus_api/dbus_api.pri)
+include(../features/qml/mainwindow/qml-mainwindow.pri)
 
 simulator {
 include(../features/tp/linux/tp.pri)

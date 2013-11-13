@@ -23,6 +23,9 @@ Contact: yuvraaj@gmail.com
 #define PLATFORMSPECIFIC_H
 
 #include <QtDeclarative>
-#define UNKNOWN_CONTACT_QRC_PATH "qrc:/unknown_contact.png"
+
+#define UNKNOWN_CONTACT_QRC_PATH    "qrc:/unknown_contact.png"
+#define MAIN_QML_PATH               "qml/symbian/main.qml"
+#define USE_SINGLE_APPLICATION      0
 
 #endif // PLATFORMSPECIFIC_H

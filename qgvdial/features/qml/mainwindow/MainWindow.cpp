@@ -22,24 +22,49 @@ Contact: yuvraaj@gmail.com
 #include "MainWindow.h"
 #include "QmlView.h"
 
+#ifndef UNKNOWN_CONTACT_QRC_PATH
+#error Must define the unknown contact QRC path
+#endif
+
+#ifndef USE_SINGLE_APPLICATION
+#error Must define USE_SINGLE_APPLICATION macro in your platform_specifics.h
+#endif
+
+#if USE_SINGLE_APPLICATION
+#include "QtSingleApplication"
+#endif
+
 #include "ContactsModel.h"
 #include "InboxModel.h"
 #include "GVNumModel.h"
 #include "ContactNumbersModel.h"
 
-#ifndef UNKNOWN_CONTACT_QRC_PATH
-#error Must define the unknown contact QRC path
-#endif
-
 QApplication *
 createAppObject(int &argc, char **argv)
 {
+#if USE_SINGLE_APPLICATION
+    QtSingleApplication *app;
+
+    app = new QtSingleApplication(argc, argv);
+    if (NULL == app) {
+        return app;
+    }
+
+    if (app->isRunning ()) {
+        app->sendMessage ("show");
+        delete app;
+        app = NULL;
+    } else {
+        app->setQuitOnLastWindowClosed (false);
+    }
+#else
     QApplication *app = createApplication(argc, argv);
     if (NULL == app) {
         return app;
     }
 
     app->setQuitOnLastWindowClosed (false);
+#endif
 
     return app;
 }//createAppObject
@@ -92,8 +117,19 @@ MainWindow::init()
     }
 
     m_view->setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
-    m_view->setMainQmlFile(QLatin1String("app/native/qml/bb10/main.qml"));
+    m_view->setMainQmlFile(QLatin1String(MAIN_QML_PATH));
     m_view->showExpanded();
+
+#if USE_SINGLE_APPLICATION
+    rv = connect(qApp, SIGNAL(messageReceived(QString)),
+                 this, SLOT(messageReceived(QString)));
+    if (!rv) {
+        Q_WARN("Failed to connect to message received signal");
+        qApp->quit ();
+        exit(-1);
+        return;
+    }
+#endif
 }//MainWindow::init
 
 QObject *
