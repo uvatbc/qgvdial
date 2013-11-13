@@ -23,5 +23,38 @@ import QtQuick 1.1
 import com.nokia.symbian 1.1
 
 Page {
-    tools: commonTools
-}
+    id: container
+
+    property alias textPin: textTfaPin.text
+    signal done(bool accepted)
+
+    Column {
+        anchors.centerIn: parent
+        spacing: 5
+
+        Label {
+            text: "Enter the two-factor authentication PIN"
+            anchors.horizontalCenter: parent.horizontalCenter
+        }
+
+        TextField {
+            id: textTfaPin
+            placeholderText: "PIN"
+            anchors.horizontalCenter: parent.horizontalCenter
+        }
+
+        ButtonRow {
+            exclusive: false
+            spacing: 5
+
+            Button {
+                text: "Cancel"
+                onClicked: container.done(false);
+            }
+            Button {
+                text: "Submit"
+                onClicked: container.done(true);
+            }//Button
+        }//ButtonRow
+    }//Column
+}//TFA Dialog

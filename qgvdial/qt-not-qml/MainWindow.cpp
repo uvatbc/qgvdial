@@ -279,7 +279,8 @@ MainWindow::onUserLogoutDone()
 void
 MainWindow::uiRequestTFALoginDetails(void *ctx)
 {
-    QString strPin = QInputDialog::getText(d, tr("Enter PIN"),
+    QString strPin = QInputDialog::getText(d,
+                                           tr("Enter PIN"),
                                            tr("Two factor authentication"));
 
     int pin = strPin.toInt ();
@@ -309,9 +310,12 @@ MainWindow::uiRequestApplicationPassword()
 {
     bool ok;
     QString strAppPw =
-    QInputDialog::getText (d, "Application specific password",
-                           "Enter password for contacts", QLineEdit::Password,
-                           "", &ok);
+    QInputDialog::getText (d,
+                           "Application specific password",
+                           "Enter password for contacts",
+                           QLineEdit::Password,
+                           "",
+                           &ok);
     if (ok) {
         onUiGotApplicationPassword(strAppPw);
     }

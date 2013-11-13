@@ -19,9 +19,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-import QtQuick 1.1
-import com.nokia.symbian 1.1
+#ifndef PLATFORMSPECIFIC_H
+#define PLATFORMSPECIFIC_H
 
-Page {
-    tools: commonTools
-}
+#define UNKNOWN_CONTACT_QRC_PATH ":/unknown_contact.png"
+
+#endif // PLATFORMSPECIFIC_H

@@ -19,9 +19,16 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-import QtQuick 1.1
-import com.nokia.symbian 1.1
+#include "QmlView.h"
 
-Page {
-    tools: commonTools
-}
+QmlView::QmlView(void)
+: QmlApplicationViewer(NULL)
+{
+}//QmlView::QmlView
+
+void
+QmlView::closeEvent(QCloseEvent *event)
+{
+    // Ignore all close events
+    event->ignore ();
+}//QmlView::closeEvent

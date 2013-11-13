@@ -22,6 +22,48 @@ Contact: yuvraaj@gmail.com
 import QtQuick 1.1
 import com.nokia.symbian 1.1
 
-Page {
-    tools: commonTools
-}
+Rectangle {
+    id: container
+
+    function showMessage(msg, timeout) {
+        statusTimer.stop();
+
+        statusText.text = msg;
+        container.visible = true;
+
+        if (timeout !== 0) {
+            statusTimer.interval = timeout;
+            statusTimer.start();
+        }
+    }
+
+    function clearMessage() {
+        statusTimer.stop();
+        container.visible = false;
+    }
+
+    visible: false
+    color: "yellow"
+    width: parent.width
+    height: 40
+
+    Timer {
+        id: statusTimer
+        onTriggered: {
+            container.visible = false;
+        }
+    }
+
+    Label {
+        id: statusText
+        anchors.centerIn: parent
+        color: "black"
+    }
+
+    MouseArea {
+        anchors.fill: parent
+        onClicked: {
+            container.clearMessage();
+        }
+    }
+}//Rectangle

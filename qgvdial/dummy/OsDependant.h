@@ -19,9 +19,25 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-import QtQuick 1.1
-import com.nokia.symbian 1.1
+#ifndef OSDEPENDANT_H
+#define OSDEPENDANT_H
 
-Page {
-    tools: commonTools
-}
+#include "global.h"
+#include "IOsDependent.h"
+#include "OSDCipher.h"
+#include "OSDDirs.h"
+
+class OsDependant : public IOsDependant, public OsdCipher, public OsdDirs
+{
+public:
+    OsDependant(QObject *parent = NULL);
+
+    inline QString getTempDir() { return _getTempDir (); }
+    inline QString getDbDir() { return _getDbDir (); }
+    inline QString getLogsDir() { return _getLogsDir (); }
+
+    inline bool cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt) {
+        return _cipher (byIn, byOut, bEncrypt);
+    }
+};
+#endif // OSDEPENDANT_H

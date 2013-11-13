@@ -19,9 +19,23 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-import QtQuick 1.1
-import com.nokia.symbian 1.1
+#include "SymbianPhoneFactory.h"
 
-Page {
-    tools: commonTools
-}
+IPhoneAccountFactory *
+createPhoneAccountFactory(QObject *parent)
+{
+    return (new SymbianPhoneFactory(parent));
+}//createPhoneAccountFactory
+
+SymbianPhoneFactory::SymbianPhoneFactory(QObject *parent)
+: IPhoneAccountFactory(parent)
+{
+}//SymbianPhoneFactory::SymbianPhoneFactory
+
+bool
+SymbianPhoneFactory::identifyAll(AsyncTaskToken *task)
+{
+    task->status = ATTS_SUCCESS;
+    task->emitCompleted ();
+    return (true);
+}//SymbianPhoneFactory::identifyAll

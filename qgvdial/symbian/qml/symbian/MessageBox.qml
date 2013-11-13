@@ -23,5 +23,24 @@ import QtQuick 1.1
 import com.nokia.symbian 1.1
 
 Page {
-    tools: commonTools
-}
+    id: container
+
+    property string message
+    signal done
+
+    Column {
+        anchors.centerIn: parent
+        spacing: 5
+
+        Label {
+            text: container.message
+            anchors.horizontalCenter: parent.horizontalCenter
+        }
+
+        Button {
+            text: "OK"
+            anchors.horizontalCenter: parent.horizontalCenter
+            onClicked: container.done();
+        }
+    }//Column
+}//Message Box

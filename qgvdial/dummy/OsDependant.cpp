@@ -19,9 +19,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-import QtQuick 1.1
-import com.nokia.symbian 1.1
+#include "OsDependant.h"
 
-Page {
-    tools: commonTools
-}
+IOsDependant *
+createOSD(QObject *parent /* = NULL*/)
+{
+    return (new OsDependant(parent));
+}//createOSD
+
+OsDependant::OsDependant(QObject *parent /* = NULL*/)
+: IOsDependant(parent)
+{
+}//OsDependant::OsDependant

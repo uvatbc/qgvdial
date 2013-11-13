@@ -23,5 +23,40 @@ import QtQuick 1.1
 import com.nokia.symbian 1.1
 
 Page {
-    tools: commonTools
-}
+    id: container
+
+    property alias appPw: textAppPw.text
+    signal done(bool accepted)
+
+    Column {
+        anchors.centerIn: parent
+        spacing: 5
+
+        Label {
+            id: label
+            text: "Enter the application specific password\nfor Google Contacts"
+            anchors.horizontalCenter: parent.horizontalCenter
+        }
+
+        TextField {
+            id: textAppPw
+            placeholderText: "App specific password"
+            anchors.horizontalCenter: parent.horizontalCenter
+        }
+
+        ButtonRow {
+            exclusive: false
+            spacing: 5
+
+            Button {
+                text: "Cancel"
+                onClicked: container.done(false);
+            }
+            Button {
+                text: "Submit"
+                onClicked: container.done(true);
+            }//Button
+        }//ButtonRow
+    }//Column
+
+}//TFA Dialog

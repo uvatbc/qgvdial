@@ -22,6 +22,7 @@ Contact: yuvraaj@gmail.com
 #ifndef PLATFORMSPECIFIC_H
 #define PLATFORMSPECIFIC_H
 
+#include <QtDeclarative>
 #define UNKNOWN_CONTACT_QRC_PATH ":/unknown_contact.png"
 
 #endif // PLATFORMSPECIFIC_H

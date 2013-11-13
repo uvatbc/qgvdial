@@ -19,9 +19,30 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-import QtQuick 1.1
-import com.nokia.symbian 1.1
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
 
-Page {
-    tools: commonTools
-}
+#include <QObject>
+#include <QApplication>
+
+#include "IMainWindow.h"
+
+#include "DummyWindow.h"
+
+class QmlApplicationViewer;
+class MainWindow : public DummyMainWindow
+{
+    Q_OBJECT
+public:
+    explicit MainWindow(QObject *parent = 0);
+    void init();
+    void log(QDateTime dt, int level, const QString &strLog);
+
+private:
+    QmlApplicationViewer *m_view;
+};
+
+QApplication *
+createAppObject(int &argc, char **argv);
+
+#endif // MAINWINDOW_H

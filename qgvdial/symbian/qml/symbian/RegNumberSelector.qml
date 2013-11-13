@@ -23,5 +23,34 @@ import QtQuick 1.1
 import com.nokia.symbian 1.1
 
 Page {
+    id: container
     tools: commonTools
+
+    anchors.fill: parent
+
+    property alias model: regNumList.model
+    signal selected(string id);
+    signal modify(string id);
+
+    function setMyModel() {
+        if (container.model == null) {
+            container.model = g_RegNumberModel;
+        }
+    }
+
+    ListView {
+        id: regNumList
+        anchors.fill: parent
+
+        delegate: Label {
+            width: regNumList.width
+            text: name + "\n(" + number + ")"
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: container.selected(id);
+                onPressAndHold: container.modify(id);
+            }
+        }
+    }
 }

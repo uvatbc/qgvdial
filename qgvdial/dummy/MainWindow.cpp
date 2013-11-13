@@ -19,9 +19,32 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-import QtQuick 1.1
-import com.nokia.symbian 1.1
+#include "MainWindow.h"
+#include "qmlapplicationviewer.h"
 
-Page {
-    tools: commonTools
-}
+QApplication *
+createAppObject(int &argc, char **argv)
+{
+    return createApplication (argc, argv);
+}//createAppObject
+
+MainWindow::MainWindow(QObject *parent)
+//: IMainWindow(parent)
+: DummyMainWindow(parent)
+, m_view(new QmlApplicationViewer)
+{
+}//MainWindow::MainWindow
+
+void
+MainWindow::init()
+{
+    IMainWindow::init();
+
+    m_view->setMainQmlFile(QLatin1String("qml/symbian/main.qml"));
+    m_view->showExpanded();
+}//MainWindow::init
+
+void
+MainWindow::log(QDateTime /*dt*/, int /*level*/, const QString & /*strLog*/)
+{
+}//MainWindow::log

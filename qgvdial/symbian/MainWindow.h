@@ -27,19 +27,84 @@ Contact: yuvraaj@gmail.com
 
 #include "IMainWindow.h"
 
-#include "DummyWindow.h"
-
-class QmlApplicationViewer;
-class MainWindow : public DummyMainWindow
+class QmlView;
+class MainWindow : public IMainWindow
 {
     Q_OBJECT
 public:
     explicit MainWindow(QObject *parent = 0);
+    virtual ~MainWindow();
+
     void init();
     void log(QDateTime dt, int level, const QString &strLog);
 
+protected slots:
+    void declStatusChanged(QDeclarativeView::Status status);
+    void messageReceived(const QString &msg);
+
+    void onLoginButtonClicked();
+    void onTfaPinDlg(bool accepted);
+    void onAppPwDlg(bool accepted);
+
+    void onSigProxyChanges(bool enable, bool useSystemProxy, QString server,
+                           int port, bool authRequired, QString user,
+                           QString pass);
+
+    void onInboxClicked(QString id);
+    void onInboxSelectionChanged(QString sel);
+
+protected:
+    QObject *getQMLObject(const char *pageName);
+
+    void uiUpdateProxySettings(const ProxyInfo &info);
+    void uiRequestLoginDetails();
+    void uiRequestTFALoginDetails(void *ctx);
+    void uiSetUserPass(bool editable);
+    void uiRequestApplicationPassword();
+
+    void uiLoginDone(int status, const QString &errStr);
+    void onUserLogoutDone();
+
+    void uiRefreshContacts();
+    void uiRefreshInbox();
+
+    void uiSetSelelctedInbox(const QString &selection);
+
+    void uiSetNewRegNumbersModel();
+    void uiRefreshNumbers();
+
+    void uiSetNewContactDetailsModel();
+    void uiShowContactDetails(const ContactInfo &cinfo);
+
+    void uiGetCIDetails(GVRegisteredNumber &num, GVNumModel *model);
+
+    void uiLongTaskBegins();
+    void uiLongTaskContinues();
+    void uiLongTaskEnds();
+
 private:
-    QmlApplicationViewer *m_view;
+    QmlView *m_view;
+
+    QObject *mainPageStack;
+    QObject *mainTabGroup;
+    QObject *loginExpand;
+    QObject *loginButton;
+    QObject *tfaPinDlg;
+    QObject *textUsername;
+    QObject *textPassword;
+    QObject *infoBanner;
+    QObject *appPwDlg;
+    QObject *contactsList;
+    QObject *inboxList;
+    QObject *inboxSelector;
+    QObject *proxySettingsPage;
+    QObject *selectedNumberButton;
+    QObject *regNumberSelector;
+    QObject *ciSelector;
+    QObject *statusBanner;
+
+    void    *loginCtx;
+
 };
 
 QApplication *

@@ -1,12 +1,7 @@
-TARGET = qgvdial
-
 # Add more folders to ship with the application, here
 folder_01.source = qml/symbian
 folder_01.target = qml
 DEPLOYMENTFOLDERS = folder_01
-
-MOC_DIR = moc
-OBJECTS_DIR = obj
 
 # Additional import path used to resolve QML modules in Creator's code model
 QML_IMPORT_PATH =
@@ -33,18 +28,17 @@ CONFIG += qt-components
 
 SOURCES  += MainWindow.cpp \
             OsDependant.cpp \
-            QmlView.cpp \
             SymbianPhoneFactory.cpp
 HEADERS  += platform_specific.h \
             MainWindow.h \
             OsDependant.h \
-            QmlView.h \
             SymbianPhoneFactory.h
 
 include(../common/common.pri)
 include(../../api/api.pri)
 include(../features/openssl/openssl.pri)
 include(../features/dirs/linux/linux-dirs.pri)
+include(../features/dummy/dummy.pri)
 
 RESOURCES += symbian.qrc
 
