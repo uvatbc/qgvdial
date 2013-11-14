@@ -22,6 +22,11 @@ Contact: yuvraaj@gmail.com
 #include "MainWindow.h"
 #include "QmlView.h"
 
+#ifdef Q_OS_BLACKBEERRY
+#include <QGLWidget>
+#include <QGLFormat>
+#endif
+
 #ifndef UNKNOWN_CONTACT_QRC_PATH
 #error Must define the unknown contact QRC path
 #endif
@@ -93,6 +98,22 @@ MainWindow::MainWindow(QObject *parent)
 , statusBanner(NULL)
 , dialPage(NULL)
 {
+#ifdef Q_OS_BLACKBEERRY
+    // GL viewport increases performance on blackberry
+    QGLFormat format = QGLFormat::defaultFormat();
+    format.setSampleBuffers(false);
+    QGLWidget *glWidget = new QGLWidget(format);
+    glWidget->setAutoFillBackground(false);
+    
+    m_view->setViewport(glWidget);
+
+    // More gfx performance
+    m_view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+    m_view->setAttribute(Qt::WA_OpaquePaintEvent);
+    m_view->setAttribute(Qt::WA_NoSystemBackground);
+    m_view->viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
+    m_view->viewport()->setAttribute(Qt::WA_NoSystemBackground);
+#endif
 }//MainWindow::MainWindow
 
 MainWindow::~MainWindow()
