@@ -39,7 +39,7 @@ Page {
     Button {
         id: btnSelectedNumber
         objectName: "SelectedNumberButton"
-        height: 70
+        height: 100
         width: parent.width
         anchors {
             top: parent.top
@@ -63,7 +63,7 @@ Page {
         placeholderText: "Enter number here"
 
         width: parent.width - 4
-        font.pointSize: 40
+        font.pointSize: 50
         
         readOnly: true
 
@@ -133,12 +133,14 @@ Page {
             text: "Text"
             height: 100
             font.pixelSize: 35
+            enabled: (numberField.text.length != 0)
             onClicked: container.sigText(numberField.text);
         }
         Button {
             text: "Call"
             height: 100
             font.pixelSize: 35
+            enabled: (numberField.text.length != 0)
             onClicked: container.sigCall(numberField.text);
         }
     }//Buttonrow

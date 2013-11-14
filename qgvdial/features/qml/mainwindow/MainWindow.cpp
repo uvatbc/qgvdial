@@ -522,7 +522,7 @@ MainWindow::uiRefreshNumbers()
         return;
     }
 
-    QString btnText = QString("%1\n(%2)").arg(num.name, num.number);
+    QString btnText = QString("%1 (%2)").arg(num.name, num.number);
     selectedNumberButton->setProperty ("text", btnText);
 }//MainWindow::uiRefreshNumbers
 

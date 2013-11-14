@@ -69,10 +69,18 @@ PageStackWindow {
     }
 
     initialPage: mainPage
+    
     Component.onCompleted: {
-        // This seems to correct the position of the toolbar
+        // Cheating: This seems to correct the position of the toolbar
         pageStack.push(contactDetails);
-        pageStack.pop();
+        pushPopTimer.start();
+    }
+    Timer {
+        id: pushPopTimer
+        interval: 100
+        onTriggered: {
+            pageStack.pop();
+        }
     }
 
     Menu {
