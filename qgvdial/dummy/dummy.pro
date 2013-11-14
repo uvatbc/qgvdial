@@ -27,11 +27,9 @@ MOBILITY +=
 CONFIG += qt-components
 
 SOURCES  += MainWindow.cpp \
-            OsDependant.cpp \
             SymbianPhoneFactory.cpp
 HEADERS  += platform_specific.h \
             MainWindow.h \
-            OsDependant.h \
             SymbianPhoneFactory.h
 
 include(../common/common.pri)
@@ -39,6 +37,7 @@ include(../../api/api.pri)
 include(../features/openssl/openssl.pri)
 include(../features/dirs/linux/linux-dirs.pri)
 include(../features/dummy/dummy.pri)
+include(../features/cookie-cutter/osdependent/cc-osdependent.pri)
 
 RESOURCES += symbian.qrc
 

@@ -23,11 +23,9 @@ CONFIG += qdeclarative-boostable
 # CONFIG += qt-components
 
 INCLUDEPATH += $$PWD
-SOURCES  += OsDependant.cpp \
-            HarmattanPhoneFactory.cpp \
+SOURCES  += HarmattanPhoneFactory.cpp \
             QmlView.cpp
 HEADERS  += platform_specific.h \
-            OsDependant.h \
             HarmattanPhoneFactory.h \
             QmlView.h
 
@@ -38,6 +36,7 @@ include(../features/dirs/linux/linux-dirs.pri)
 include(../features/qtsingleapplication/qtsingleapplication.pri)
 include(../features/dbus_api/dbus_api.pri)
 include(../features/qml/mainwindow/qml-mainwindow.pri)
+include(../features/cookie-cutter/osdependent/cc-osdependent.pri)
 
 simulator {
 include(../features/tp/linux/tp.pri)

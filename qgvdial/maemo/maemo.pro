@@ -16,11 +16,9 @@ CONFIG += mobility
 MOBILITY +=
 
 SOURCES  += MainWindow.cpp \
-            OsDependant.cpp \
             MaemoPhoneFactory.cpp
 HEADERS  += platform_specific.h \
             MainWindow.h \
-            OsDependant.h \
             MaemoPhoneFactory.h
 
 include(../common/common.pri)
@@ -29,6 +27,7 @@ include(../features/openssl/openssl.pri)
 include(../features/dirs/linux/linux-dirs.pri)
 include(../features/dbus_api/dbus_api.pri)
 include(../features/qtsingleapplication/qtsingleapplication.pri)
+include(../features/cookie-cutter/osdependent/cc-osdependent.pri)
 
 simulator {
 include(../features/tp/linux/tp.pri)
