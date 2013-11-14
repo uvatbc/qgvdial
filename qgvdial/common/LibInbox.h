@@ -34,12 +34,12 @@ class LibInbox : public QObject
 public:
     explicit LibInbox(IMainWindow *parent);
 
-    bool refresh(const char *type = "all", QDateTime after = QDateTime());
-
     bool getEventInfo(GVInboxEntry &event, ContactInfo &cinfo, QString &type);
 
 public slots:
     bool onUserSelect(QString selection = QString("all"));
+    bool refresh(const char *type = "all", QDateTime after = QDateTime());
+    bool refreshLatest(const char *type = "all");
 
 private:
     InboxModel *createModel(QString type);

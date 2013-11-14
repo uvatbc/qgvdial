@@ -183,6 +183,10 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
         }
         connect(mainPageStack, SIGNAL(sigShowContact(QString)),
                 &oContacts, SLOT(getContactInfoAndModel(QString)));
+        connect(mainPageStack, SIGNAL(sigRefreshContacts()),
+                &oContacts, SLOT(refreshLatest()));
+        connect(mainPageStack, SIGNAL(sigRefreshInbox()),
+                &oInbox, SLOT(refreshLatest()));
 
         mainTabGroup = getQMLObject ("MainTabGroup");
         if (NULL == mainTabGroup) {

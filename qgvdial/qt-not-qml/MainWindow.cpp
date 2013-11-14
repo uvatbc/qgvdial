@@ -213,7 +213,9 @@ MainWindow::init()
     connect(d->ui->action_Quit, SIGNAL(triggered()), qApp, SLOT(quit()));
 
     connect(d->ui->actionRefresh, SIGNAL(triggered()),
-            this, SLOT(onUserRefreshTrigerred()));
+            &oContacts, SLOT(refreshLatest()));
+    connect(d->ui->actionRefresh, SIGNAL(triggered()),
+            &oInbox, SLOT(refreshLatest()));
 
     QTimer::singleShot (1, this, SLOT(onInitDone()));
 }//MainWindow::init
@@ -641,16 +643,3 @@ MainWindow::onSystrayactivated(QSystemTrayIcon::ActivationReason reason)
         break;
     }
 }//MainWindow::onSystrayactivated
-
-void
-MainWindow::onUserRefreshTrigerred()
-{
-    QDateTime latest;
-    if (db.getLatestContact (latest)) {
-        oContacts.refresh (latest);
-    }
-
-    if (db.getLatestInboxEntry (latest)) {
-        oInbox.refresh ("all", latest);
-    }
-}//MainWindow::onUserRefreshTrigerred

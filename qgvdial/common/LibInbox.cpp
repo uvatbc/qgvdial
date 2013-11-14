@@ -57,6 +57,20 @@ LibInbox::refresh(const char *type, QDateTime after)
 }//LibInbox::refresh
 
 bool
+LibInbox::refreshLatest(const char *type /* = "all" */)
+{
+    bool rv = false;
+    QDateTime latest;
+    IMainWindow *win = (IMainWindow *) this->parent ();
+
+    if (win->db.getLatestInboxEntry (latest)) {
+        rv = this->refresh (type, latest);
+    }
+
+    return (rv);
+}//LibInbox::refreshLatest
+
+bool
 LibInbox::beginRefresh(AsyncTaskToken *task, QString type, QDateTime after,
                        int page, bool isExternal)
 {
@@ -166,7 +180,9 @@ LibInbox::onRefreshDone()
             if (NULL != m_inboxModel) {
                 win->uiRefreshInbox ();
                 win->uiSetSelelctedInbox (selection);
-                oldModel->deleteLater ();
+                if (NULL != oldModel) {
+                    oldModel->deleteLater ();
+                }
             } else {
                 m_inboxModel = oldModel;
             }

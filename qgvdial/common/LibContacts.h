@@ -41,7 +41,6 @@ public:
     bool getMandatoryLocalPicsFlag();
 
     bool login(const QString &user, const QString &pass);
-    bool refresh(QDateTime after = QDateTime());
 
     ContactsModel *createModel();
 
@@ -50,6 +49,8 @@ public:
 public slots:
     bool getContactInfoAndModel(QString id);
     void refreshModel();
+    bool refresh(QDateTime after = QDateTime());
+    bool refreshLatest();
 
 protected slots:
     void loginCompleted();

@@ -119,6 +119,20 @@ LibContacts::refresh(QDateTime after /* = QDateTime()*/)
     return (bval);
 }//LibContacts::refresh
 
+bool
+LibContacts::refreshLatest()
+{
+    bool rv = false;
+    QDateTime latest;
+    IMainWindow *win = (IMainWindow *) this->parent ();
+    if (win->db.getLatestContact (latest)) {
+        this->refresh (latest);
+        rv = true;
+    }
+
+    return (rv);
+}//LibContacts::refreshLatest
+
 void
 LibContacts::onOneContact(ContactInfo cinfo)
 {
@@ -149,7 +163,9 @@ LibContacts::onContactsFetched()
             }
 
             win->uiRefreshContacts ();
-            oldModel->deleteLater ();
+            if (NULL != oldModel) {
+                oldModel->deleteLater ();
+            }
         } else {
             m_contactsModel = oldModel;
         }

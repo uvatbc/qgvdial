@@ -29,6 +29,8 @@ PageStackWindow {
     showStatusBar: false
 
     signal sigShowContact(string cId)
+    signal sigRefreshContacts
+    signal sigRefreshInbox
 
     function pushTfaDlg() {
         pageStack.push(tfaPinDlg);
@@ -77,6 +79,19 @@ PageStackWindow {
         MenuLayout {
             MenuItem {
                 text: qsTr("Refresh")
+                onClicked: {
+                    if (tabgroup.currentTab === dialTab) {
+                        console.debug("Refresh the dialPage");
+                    } else if (tabgroup.currentTab === contactsTab) {
+                        console.debug("Refresh the contactsTab");
+                        appWindow.sigRefreshContacts();
+                    } else if (tabgroup.currentTab === inboxTab) {
+                        console.debug("Refresh the inboxTab");
+                        appWindow.sigRefreshInbox();
+                    } else if (tabgroup.currentTab === settingsTab) {
+                        console.debug("Refresh the settingsTab");
+                    }
+                }
             }
         }
     }//Menu
