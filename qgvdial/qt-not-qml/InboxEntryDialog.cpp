@@ -56,7 +56,19 @@ InboxEntryDialog::fill(const GVInboxEntry &event)
     ui->lblNumber->setText (event.strPhoneNumber);
     ui->lblTime->setText (InboxModel::dateToString (event.startTime, false));
     ui->lblName->setText (event.strDisplayNumber);
-    ui->lblNotes->setText (event.strNote);
+
+    if (0 == event.strNote.length ()) {
+        ui->lblNotes->hide();
+    } else {
+        ui->lblNotes->setText (event.strNote);
+    }
+
+    if (0 == event.strText.length ()) {
+        ui->wConversation->hide ();
+    } else {
+        ui->lblConv->setText (event.strText);
+        ui->lblConv->setTextFormat (Qt::RichText);
+    }
 }//InboxEntryDialog::fill
 
 void

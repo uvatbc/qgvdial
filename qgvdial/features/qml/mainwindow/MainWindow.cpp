@@ -104,7 +104,7 @@ MainWindow::MainWindow(QObject *parent)
     format.setSampleBuffers(false);
     QGLWidget *glWidget = new QGLWidget(format);
     glWidget->setAutoFillBackground(false);
-    
+
     m_view->setViewport(glWidget);
 
     // More gfx performance
@@ -563,6 +563,8 @@ MainWindow::onInboxClicked(QString id)
                               Q_ARG(QVariant,QVariant(cinfo.strPhotoPath)),
                               Q_ARG(QVariant,QVariant(event.strDisplayNumber)),
                               Q_ARG(QVariant,QVariant(event.strPhoneNumber)),
+                              Q_ARG(QVariant,QVariant(event.strNote)),
+                              Q_ARG(QVariant,QVariant(event.strText)),
                               Q_ARG(QVariant,QVariant(type)),
                               Q_ARG(QVariant,QVariant(cinfo.strId)));
 }//MainWindow::onInboxClicked

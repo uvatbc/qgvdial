@@ -31,9 +31,11 @@ Page {
     signal sigShowContact(string cId)
 
     property alias imageSource: contactImage.source
-    property alias name: contactName.text
-    property alias number: contactNumber.text
-    property alias phType: numberType.text
+    property alias name:        contactName.text
+    property alias number:      contactNumber.text
+    property alias phType:      numberType.text
+    property alias note:        lblNote.text
+    property alias smsText:     lblSmsText.text
     property string cId
 
     Column {
@@ -70,11 +72,16 @@ Page {
                     }
                 }
             }
-        }//Item
+        }//Item: Contact image and name
 
         Item {
             width: parent.width
             height: 40
+
+            Rectangle {
+                anchors.fill: parent
+                color: "gray"
+            }
 
             Row {
                 anchors.fill: parent
@@ -84,8 +91,7 @@ Page {
                     id: numberType
 
                     anchors.verticalCenter: parent.verticalCenter
-                    font.pixelSize: 30
-
+                    font.pixelSize: 25
                 }
 
                 Label {
@@ -106,6 +112,18 @@ Page {
                     container.done(true);
                 }
             }
-        }//Item
+        }//Item: type (mobile/work/home) and actual number
+
+        Label {
+            id: lblNote
+            width: parent.width
+            visible: text.length == 0 ? false : true
+        }//Label: notes
+
+        Label {
+            id: lblSmsText
+            width: parent.width
+            visible: text.length == 0 ? false : true
+        }//Label: SMS text
     }//Column
 }//Page
