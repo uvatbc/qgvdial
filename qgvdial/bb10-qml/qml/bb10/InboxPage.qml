@@ -87,9 +87,7 @@ Page {
         signal clicked(string id)
 
         function setMyModel() {
-            if (inboxList.model == null) {
-                inboxList.model = g_InboxModel;
-            }
+            inboxList.model = g_InboxModel;
         }
 
         anchors {

@@ -60,9 +60,7 @@ Rectangle {
         signal contactClicked(string id)
 
         function setMyModel() {
-            if (contactsList.model == null) {
-                contactsList.model = g_ContactsModel;
-            }
+            contactsList.model = g_ContactsModel;
         }
 
         anchors {

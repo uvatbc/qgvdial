@@ -45,7 +45,7 @@ LibInbox::createModel(QString type)
 }//LibInbox::createModel
 
 bool
-LibInbox::refresh(const char *type, QDateTime after)
+LibInbox::refresh(QString type, QDateTime after)
 {
     AsyncTaskToken *task = new AsyncTaskToken(this);
     if (NULL == task) {
@@ -57,7 +57,7 @@ LibInbox::refresh(const char *type, QDateTime after)
 }//LibInbox::refresh
 
 bool
-LibInbox::refreshLatest(const char *type /* = "all" */)
+LibInbox::refreshLatest(QString type)
 {
     bool rv = false;
     QDateTime latest;
@@ -68,6 +68,12 @@ LibInbox::refreshLatest(const char *type /* = "all" */)
     }
 
     return (rv);
+}//LibInbox::refreshLatest
+
+bool
+LibInbox::refreshLatest()
+{
+    return refreshLatest ("all");
 }//LibInbox::refreshLatest
 
 bool

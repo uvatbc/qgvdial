@@ -48,9 +48,7 @@ Rectangle {
         signal showInboxSelector
 
         function setMyModel() {
-            if (inboxList.model == null) {
-                inboxList.model = g_InboxModel;
-            }
+            inboxList.model = g_InboxModel;
         }
 
         function setSelected(selected) {

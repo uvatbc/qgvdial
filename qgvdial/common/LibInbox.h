@@ -31,6 +31,7 @@ class IMainWindow;
 class LibInbox : public QObject
 {
     Q_OBJECT
+
 public:
     explicit LibInbox(IMainWindow *parent);
 
@@ -38,8 +39,9 @@ public:
 
 public slots:
     bool onUserSelect(QString selection = QString("all"));
-    bool refresh(const char *type = "all", QDateTime after = QDateTime());
-    bool refreshLatest(const char *type = "all");
+    bool refresh(QString type = QString("all"), QDateTime after = QDateTime());
+    bool refreshLatest(QString type);
+    bool refreshLatest();
 
 private:
     InboxModel *createModel(QString type);
