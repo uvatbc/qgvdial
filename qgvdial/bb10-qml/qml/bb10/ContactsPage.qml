@@ -24,11 +24,9 @@ import com.nokia.symbian 1.1
 
 Page {
     id: container
-    tools: commonTools
     anchors.fill: parent
 
     property bool isSearchResults: false
-    property real toolbarHeight: 50
 
     Row {
         id: searchRow
@@ -95,7 +93,7 @@ Page {
                     id: contactImage
                     anchors.verticalCenter: parent.verticalCenter
 
-                    height: 60
+                    height: 100
                     width: height
 
                     source: imagePath ? imagePath : "qrc:/unknown_contact.png"
@@ -106,7 +104,7 @@ Page {
                     anchors.verticalCenter: parent.verticalCenter
                     text: name
 
-                    font.pixelSize: 25
+                    font.pixelSize: 45
                     smooth: true
                 }//Label (contact name)
             }//Row (image and contact name)

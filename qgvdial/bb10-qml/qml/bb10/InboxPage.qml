@@ -28,7 +28,6 @@ Page {
     anchors.fill: parent
 
     property bool isSearchResults: false
-    property real toolbarHeight: 50
 
     signal setNumberToDial(string number)
 
@@ -121,7 +120,7 @@ Page {
                     verticalCenter: parent.verticalCenter
                 }
 
-                width: 35
+                width: 70
                 height: width
                 fillMode: Image.PreserveAspectFit
                 smooth: true
@@ -154,7 +153,7 @@ Page {
                 clip: true
                 text: name
 
-                font.pixelSize: 25
+                font.pixelSize: 45
                 smooth: true
             }//Label (name)
 
@@ -171,7 +170,7 @@ Page {
 
                 text: time
 
-                font.pixelSize: 20
+                font.pixelSize: 25
                 smooth: true
             }//Label (entry time)
 

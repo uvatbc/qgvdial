@@ -17,5 +17,7 @@
         <file alias="in_Received.png">../../icons/in_Received.png</file>
         <file alias="in_Sms.png">../../icons/in_Sms.png</file>
         <file alias="in_Voicemail.png">../../icons/in_Voicemail.png</file>
+
+        <file alias="u232B.gif">../../icons/u232B.gif</file>
     </qresource>
 </RCC>

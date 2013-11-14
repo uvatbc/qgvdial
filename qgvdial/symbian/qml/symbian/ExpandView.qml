@@ -69,8 +69,8 @@ Rectangle {
             id: imgArrow
             source: "qrc:/play.svg"
 
-            height: 30
-            width: 30
+            height: parent.height - 4
+            width: height
 
             smooth: true
             anchors.verticalCenter: parent.verticalCenter

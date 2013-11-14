@@ -24,7 +24,6 @@ import com.nokia.symbian 1.1
 
 Page {
     id: container
-    tools: commonTools
 
     signal done(bool accepted)
     signal setNumberToDial(string number)
@@ -45,13 +44,13 @@ Page {
             Image {
                 id: contactImage
                 fillMode: Image.PreserveAspectFit
-                height: 100
-                width: 100
+                height: 200
+                width: 200
             }
             Label {
                 id: contactName
                 anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: 40
+                font.pixelSize: 70
                 smooth: true
                 width: parent.width - contactImage.width - parent.spacing
             }
@@ -80,6 +79,7 @@ Page {
                     Label {
                         id: lblType
                         text: type
+                        font.pixelSize: 45
                     }
 
                     Label {
@@ -87,8 +87,7 @@ Page {
                         text: number
                         width: parent.width - lblType.width - parent.spacing
                         horizontalAlignment: Text.AlignRight
-                        font.pixelSize: 25
-                        smooth: true
+                        font.pixelSize: 45
                     }
                 }//Row: type (work/home/mobile) and number
 

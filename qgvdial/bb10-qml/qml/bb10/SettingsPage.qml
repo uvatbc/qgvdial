@@ -38,8 +38,6 @@ Page {
 
     signal sigSendLogs
 
-    property real toolbarHeight: 50
-
     Timer {
         id: yAdjustTimer
 
@@ -53,6 +51,11 @@ Page {
         //onTriggered: container.contentY = setY;
     }//Timer for delayed setting of contentY so that when you click on an
     // ExpandView, it gets into focus. Expecially important for the logs
+    
+    Rectangle {
+        anchors.fill: parent
+        color: "black"
+    }
 
     Flickable {
         // Cannot use childrenRect.height because it causes a binding loop
@@ -67,11 +70,12 @@ Page {
         contentWidth: width
         clip: true
 
-        anchors {
-            top: parent.top
-        }
-        width: parent.width
-        height: parent.height - container.toolbarHeight
+        anchors.fill: parent
+        //anchors {
+        //    top: parent.top
+        //}
+        //width: parent.width
+        //height: parent.height
 
         ExpandView {
             id: expandLoginDetails

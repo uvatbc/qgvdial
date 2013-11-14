@@ -62,15 +62,15 @@ Rectangle {
             leftMargin: 3
         }
         width: parent.width
-        height: 34
+        height: 80
         spacing: 2
 
         Image {
             id: imgArrow
             source: "qrc:/play.svg"
 
-            height: 30
-            width: 30
+            height: parent.height - 4
+            width: height
 
             smooth: true
             anchors.verticalCenter: parent.verticalCenter
@@ -93,7 +93,7 @@ Rectangle {
             width: parent.width - imgArrow.width - parent.spacing
             anchors.verticalCenter: parent.verticalCenter
 
-            font.pixelSize: 30
+            font.pixelSize: 65
             smooth: true
         }//QGVLabel (text)
     }//Row (arrow and text)

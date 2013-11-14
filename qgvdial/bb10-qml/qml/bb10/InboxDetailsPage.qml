@@ -42,7 +42,7 @@ Page {
 
         Item {
             width: parent.width
-            height: 100
+            height: 200
 
             Row {
                 anchors.fill: parent
@@ -56,7 +56,7 @@ Page {
                 Label {
                     id: contactName
                     anchors.verticalCenter: parent.verticalCenter
-                    font.pixelSize: 40
+                    font.pixelSize: 70
                     smooth: true
                     width: parent.width - contactImage.width - parent.spacing
                 }
@@ -84,8 +84,7 @@ Page {
                     id: numberType
 
                     anchors.verticalCenter: parent.verticalCenter
-                    font.pixelSize: 30
-
+                    font.pixelSize: 45
                 }
 
                 Label {
@@ -93,8 +92,7 @@ Page {
 
                     anchors.verticalCenter: parent.verticalCenter
                     width: parent.width - numberType.width - parent.spacing
-                    font.pixelSize: 25
-                    smooth: true
+                    font.pixelSize: 45
                     horizontalAlignment: Text.AlignRight
                 }
             }//Row: type (mobile/work/home) and actual number

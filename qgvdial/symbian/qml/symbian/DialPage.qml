@@ -29,6 +29,9 @@ Page {
     signal sigHaptic
     signal regNumBtnClicked
 
+    signal sigCall(string num)
+    signal sigText(string num)
+
     function setNumberInDisp(number) {
         numberField.text = number;
     }
@@ -60,8 +63,34 @@ Page {
         placeholderText: "Enter number here"
 
         width: parent.width - 4
-        height: 180
         font.pointSize: 14
+
+        Image {
+            anchors {
+                verticalCenter: parent.verticalCenter
+                right: parent.right
+                rightMargin: 4
+            }
+            source: "qrc:/u232B.gif"
+            smooth: true
+            visible: numberField.text.length != 0 ? true : false
+
+            height: 30
+            width: height
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    if (numberField.selectedText.length == 0) {
+                        numberField.text = numberField.text.slice(0, numberField.text.length - 1);
+                    } else {
+                        numberField.cut();
+                    }
+                }
+
+                onPressAndHold: { numberField.text = ""; }
+            }
+        }
     }
 
     Keypad {
@@ -102,11 +131,13 @@ Page {
             text: "Text"
             height: 50
             font.pixelSize: 35
+            onClicked: container.sigText(numberField.text);
         }
         Button {
             text: "Call"
             height: 50
             font.pixelSize: 35
+            onClicked: container.sigCall(numberField.text);
         }
     }//Buttonrow
 }

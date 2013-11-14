@@ -23,7 +23,7 @@ import QtQuick 1.1
 import com.nokia.symbian 1.1
 import com.nokia.extras 1.1
 
-ApplicationWindow {
+PageStackWindow {
     id: appWindow
     objectName: "MainPageStack"
 
@@ -64,9 +64,6 @@ ApplicationWindow {
     }
 
     initialPage: mainPage
-    fullScreen: true
-
-    property real pageHeights: height - commonTools.height
 
     Menu {
         id: myMenu
@@ -100,7 +97,6 @@ ApplicationWindow {
     ContactDetailsPage {
         id: contactDetails
         tools: commonTools
-        height: pageHeights
         onDone: appWindow.pageStack.pop();
         onSetNumberToDial: {
             dialTab.setNumberInDisp(number);
@@ -149,19 +145,18 @@ ApplicationWindow {
         id: mainPage
         tools: commonTools
 
-        anchors.fill: parent
+        anchors {
+            top: parent.top
+            left: parent.left
+            right: parent.right
+        }
 
         TabGroup {
             id: tabgroup
             objectName: "MainTabGroup"
             currentTab: dialTab
 
-            anchors {
-                top: parent.top
-                left: parent.left
-                right: parent.right
-                bottom: commonTools.top
-            }
+            anchors.fill: parent
 
             function setTab(index) {
                 if (0 === index) {
@@ -177,6 +172,7 @@ ApplicationWindow {
 
             DialPage {
                 id: dialTab
+                objectName: "DialPage"
                 tools: commonTools
                 onRegNumBtnClicked: appWindow.pageStack.push(regNumberSelector);
             }
@@ -198,50 +194,49 @@ ApplicationWindow {
                 tools: commonTools
             }
         }//TabGroup
+    }
 
-        ToolBar {
-            id: commonTools
+    ToolBar {
+        id: commonTools
 
-            anchors.bottom: parent.bottom
-            //width: parent.width
-            visible: true
+        anchors.bottom: parent.bottom
+        visible: true
 
-            tools: ToolBarLayout {
-                ToolButton {
-                    iconSource: "toolbar-back";
-                    onClicked: {
-                        if (pageStack.depth > 1) {
-                            pageStack.pop();
-                        } else {
-                            console.debug("Quit!");
-                        }
+        tools: ToolBarLayout {
+            ToolButton {
+                iconSource: "toolbar-back";
+                onClicked: {
+                    if (pageStack.depth > 1) {
+                        pageStack.pop();
+                    } else {
+                        console.debug("Quit!");
                     }
                 }
+            }
 
-                ButtonRow {
-                    TabButton {
-                        iconSource: "qrc:/dialpad.svg"
-                        tab: dialTab
-                    }
-                    TabButton {
-                        iconSource: "qrc:/people.svg"
-                        tab: contactsTab
-                    }
-                    TabButton {
-                        iconSource: "qrc:/history.svg"
-                        tab: inboxTab
-                    }
-                    TabButton {
-                        iconSource: "qrc:/settings.svg"
-                        tab: settingsTab
-                    }
+            ButtonRow {
+                TabButton {
+                    iconSource: "qrc:/dialpad.svg"
+                    tab: dialTab
                 }
-                ToolButton {
-                    iconSource: "toolbar-view-menu"
-                    anchors.right: (parent === undefined) ? undefined : parent.right
-                    onClicked: (myMenu.status === DialogStatus.Closed) ? myMenu.open() : myMenu.close()
+                TabButton {
+                    iconSource: "qrc:/people.svg"
+                    tab: contactsTab
                 }
-            }//ToolBarLayout
-        }
+                TabButton {
+                    iconSource: "qrc:/history.svg"
+                    tab: inboxTab
+                }
+                TabButton {
+                    iconSource: "qrc:/settings.svg"
+                    tab: settingsTab
+                }
+            }
+            ToolButton {
+                iconSource: "toolbar-view-menu"
+                anchors.right: (parent === undefined) ? undefined : parent.right
+                onClicked: (myMenu.status === DialogStatus.Closed) ? myMenu.open() : myMenu.close()
+            }
+        }//ToolBarLayout
     }
 }
