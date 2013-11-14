@@ -102,6 +102,7 @@ private:
     QObject *regNumberSelector;
     QObject *ciSelector;
     QObject *statusBanner;
+    QObject *dialPage;
 
     void    *loginCtx;
 

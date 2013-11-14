@@ -47,6 +47,7 @@ createAppObject(int &argc, char **argv)
 
     app = new QtSingleApplication(argc, argv);
     if (NULL == app) {
+        Q_WARN("Failed to create QtSingleApplication object");
         return app;
     }
 
@@ -60,6 +61,7 @@ createAppObject(int &argc, char **argv)
 #else
     QApplication *app = createApplication(argc, argv);
     if (NULL == app) {
+        Q_WARN("Failed to create QApplication object");
         return app;
     }
 
@@ -89,6 +91,7 @@ MainWindow::MainWindow(QObject *parent)
 , regNumberSelector(NULL)
 , ciSelector(NULL)
 , statusBanner(NULL)
+, dialPage(NULL)
 {
 }//MainWindow::MainWindow
 
@@ -110,7 +113,7 @@ MainWindow::init()
             this, SLOT(declStatusChanged(QDeclarativeView::Status)));
     Q_ASSERT(rv);
     if (!rv) {
-        Q_WARN("Failed to connect to message received signal");
+        Q_WARN("Failed to connect to declStatusChanged signal");
         qApp->quit ();
         exit(-1);
         return;
@@ -282,6 +285,15 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
         if (NULL == statusBanner) {
             break;
         }
+
+        dialPage = getQMLObject ("DialPage");
+        if (NULL == dialPage) {
+            break;
+        }
+        connect(dialPage, SIGNAL(sigCall(QString)),
+                this, SLOT(onUserCall(QString)));
+        //connect(dialPage, SIGNAL(sigText(QString)),
+        //        this, SLOT(onUserText(QString)));
 
         onInitDone();
         return;

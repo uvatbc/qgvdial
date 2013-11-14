@@ -29,6 +29,9 @@ Page {
     signal sigHaptic
     signal regNumBtnClicked
 
+    signal sigCall(string num)
+    signal sigText(string num)
+
     function setNumberInDisp(number) {
         numberField.text = number;
     }
@@ -86,11 +89,13 @@ Page {
                 text: "Text"
                 height: 100
                 font.pixelSize: 35
+                onClicked: container.sigText(numberField.text);
             }
             Button {
                 text: "Call"
                 height: 100
                 font.pixelSize: 35
+                onClicked: container.sigCall(numberField.text);
             }
         }//Buttonrow
     }//Column

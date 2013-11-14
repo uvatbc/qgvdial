@@ -79,9 +79,11 @@ IMainWindow::onInitDone()
         }
 
         if (db.usernameIsCached () && db.getUserPass (user,pass)) {
+            Q_DEBUG("Init done, starting login");
             // Begin login
             beginLogin (user, pass);
         } else {
+            Q_DEBUG("Init done, asking for login info");
             // Ask the user for login credentials
             uiRequestLoginDetails();
         }

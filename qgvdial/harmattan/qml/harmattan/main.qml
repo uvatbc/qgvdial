@@ -90,6 +90,7 @@ PageStackWindow {
 
             DialPage {
                 id: dialTab
+                objectName: "DialPage"
                 onRegNumBtnClicked: appWindow.pageStack.push(regNumberSelector);
             }
             ContactsPage {
