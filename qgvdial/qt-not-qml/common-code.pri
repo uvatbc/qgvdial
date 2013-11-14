@@ -10,6 +10,7 @@ INCLUDEPATH += $$PWD
 
 SOURCES  += $$PWD/MainWindow.cpp \
             $$PWD/MainWindow_p.cpp \
+            $$PWD/OsDependant.cpp \
             $$PWD/ContactDialog.cpp \
             $$PWD/InboxEntryDialog.cpp \
             $$PWD/CINumberDialog.cpp \
@@ -19,6 +20,7 @@ SOURCES  += $$PWD/MainWindow.cpp \
             $$PWD/DummySystemTray.cpp
 HEADERS  += $$PWD/MainWindow.h \
             $$PWD/MainWindow_p.h \
+            $$PWD/OsDependant.h \
             $$PWD/ContactDialog.h \
             $$PWD/InboxEntryDialog.h \
             $$PWD/CINumberDialog.h \
@@ -37,7 +39,6 @@ RESOURCES += $$PWD/qtnotqml.qrc
 include($$PWD/../common/common.pri)
 include($$PWD/../../api/api.pri)
 include($$PWD/../features/openssl/openssl.pri)
-include($$PWD/../features/cookie-cutter/osdependent/cc-osdependent.pri)
 
 !blackberry {
     include($$PWD/../features/qtsingleapplication/qtsingleapplication.pri)
