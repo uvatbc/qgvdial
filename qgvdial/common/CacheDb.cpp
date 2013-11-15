@@ -520,14 +520,16 @@ CacheDb::refreshContactsModel (ContactsModel *modelContacts,
 {
     //  0,    1,       2,         3
     // id, name, piclink, localpath
-    QString strQ = "SELECT c."GV_C_ID",c."GV_C_NAME",c."GV_C_PICLINK
-                   ",t."GV_TT_PATH " FROM "
-                   GV_CONTACTS_TABLE" c LEFT JOIN "GV_TEMP_TABLE" t "
+    QString strQ = "SELECT c."GV_C_ID       ","
+                          "c."GV_C_NAME     ","
+                          "c."GV_C_PICLINK  ","
+                          "t."GV_TT_PATH    " "
+                   "FROM "GV_CONTACTS_TABLE" c LEFT JOIN "GV_TEMP_TABLE" t "
                    "WHERE c."GV_C_PICLINK"=t."GV_TT_LINK;
     if (!query.isEmpty ()) {
         QString scrubQuery = query;
         scrubQuery.replace ("'", "''");
-        strQ += QString(" WHERE c."GV_C_NAME" LIKE '%%%1%%'").arg (scrubQuery);
+        strQ += QString(" AND c."GV_C_NAME" LIKE '%%%1%%'").arg (scrubQuery);
     }
     strQ += " ORDER BY c." GV_C_NAME ";";
 

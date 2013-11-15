@@ -39,6 +39,7 @@ public:
     explicit GVNumModel(QObject *parent = 0);
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data (const QModelIndex &index, int role = Qt::DisplayRole) const;
 
     bool findById(const QString &id, bool &m_dialBack, int &index);

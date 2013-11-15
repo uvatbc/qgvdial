@@ -38,6 +38,12 @@ GVNumModel::rowCount (const QModelIndex & /*parent*/) const
     return (m_dialBack.count () + m_dialOut.count ());
 }//GVNumModel::rowCount
 
+int
+GVNumModel::columnCount(const QModelIndex & /*parent*/) const
+{
+    return 4;
+}//GVNumModel::columnCount
+
 QVariant
 GVNumModel::data (const QModelIndex &index, int role) const
 {
@@ -77,7 +83,7 @@ GVNumModel::data (const QModelIndex &index, int role) const
         }
 
         // This code path is only for QComboBox.
-        // QComboBox only asks for the 0th column.
+        // QComboBox only needs the 0th column.
         if (col != 0) {
             break;
         }

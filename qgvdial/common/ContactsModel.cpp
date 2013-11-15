@@ -147,12 +147,6 @@ ContactsModel::data(const QModelIndex &index, int role) const
     return (retVar);
 }//ContactsModel::data
 
-int
-ContactsModel::rowCount(const QModelIndex & /*parent*/) const
-{
-    return (db.getContactsCount(m_strSearchQuery));
-} //ContactsModel::rowCount
-
 bool
 ContactsModel::insertContact(const ContactInfo &contactInfo)
 {

@@ -41,12 +41,6 @@ InboxModel::InboxModel (QObject * parent)
     setRoleNames(roles);
 }//InboxModel::InboxModel
 
-int
-InboxModel::rowCount (const QModelIndex & /*parent = QModelIndex()*/) const
-{
-    return (db.getInboxCount (m_eSelectType));
-}//InboxModel::rowCount
-
 QVariant
 InboxModel::data (const QModelIndex &index, int role) const
 {
