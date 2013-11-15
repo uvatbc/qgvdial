@@ -26,4 +26,8 @@ Contact: yuvraaj@gmail.com
 
 #define UNKNOWN_CONTACT_QRC_PATH ":/unknown_contact.png"
 
+#define setRoleNames(_a) do { ; } while (0)
+#define beginResetModel() do { ; } while (0)
+#define endResetModel() reset()
+
 #endif // PLATFORMSPECIFIC_H

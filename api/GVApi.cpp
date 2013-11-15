@@ -45,7 +45,7 @@ GVApi::getSystemProxies (QNetworkProxy &http, QNetworkProxy &https)
 
     httpDone = httpsDone = false;
 
-#if !DIABLO_OS
+#if !DIABLO_OS && !defined(OS_DIABLO)
     QNetworkProxyFactory::setUseSystemConfiguration (true);
 #endif
 
@@ -2648,7 +2648,7 @@ GVApi::onCheckRecentInbox(bool success, const QByteArray &response,
             serverLatest = QDateTime::fromTime_t (iVal);
         } else {
             //Q_DEBUG("Empty list");
-            serverLatest = QDateTime::fromMSecsSinceEpoch (0);
+            serverLatest = QDateTime();
         }
 
         quint32 totalSize;

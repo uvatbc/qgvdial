@@ -337,12 +337,12 @@ InboxModel::refresh (const QString &strSelected)
         return (false);
     }
 
-    this->beginResetModel ();
+    beginResetModel ();
     db.refreshInboxModel (this, strSelected);
     while (this->canFetchMore ()) {
         this->fetchMore ();
     }
-    this->endResetModel ();
+    endResetModel ();
 
     return (true);
 }//InboxModel::refresh
