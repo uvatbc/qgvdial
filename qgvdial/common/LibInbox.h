@@ -36,6 +36,7 @@ public:
     explicit LibInbox(IMainWindow *parent);
 
     bool getEventInfo(GVInboxEntry &event, ContactInfo &cinfo, QString &type);
+    bool markEntryAsRead(GVInboxEntry &event);
 
 public slots:
     bool onUserSelect(QString selection = QString("all"));
@@ -53,8 +54,14 @@ private slots:
     bool beginRefresh(AsyncTaskToken *task, QString type, QDateTime after,
                       int page, bool isExternal = true);
 
+    void onInboxEntryMarkedAsRead();
+    void onModelRefreshTimeout();
+
 public:
-    InboxModel    *m_inboxModel;
+    InboxModel *m_inboxModel;
+
+protected:
+    QTimer      m_modelRefreshTimer;
 };
 
 #endif // LIBINBOX_H

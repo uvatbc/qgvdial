@@ -973,7 +973,7 @@ CacheDb::markAsRead (const QString &msgId)
         }
 
         if (flags & INBOX_ENTRY_READ_MASK) {
-            qDebug("Entry was already read. no need to re-mark.");
+            Q_DEBUG("Entry was already read. no need to re-mark.");
             rv = false;
             break;
         }

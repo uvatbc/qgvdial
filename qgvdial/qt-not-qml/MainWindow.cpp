@@ -546,7 +546,7 @@ MainWindow::onInboxDoubleClicked(const QModelIndex &index)
     }
 
     if (!event.bRead) {
-        db.markAsRead (event.id);
+        oInbox.markEntryAsRead (event);
     }
 
     InboxEntryDialog dlg;

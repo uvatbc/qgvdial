@@ -23,6 +23,8 @@ Contact: yuvraaj@gmail.com
 #include "IMainWindow.h"
 #include "InboxModel.h"
 
+#define REFRESH_TIMEOUT (5 * 1000)  // 5 seconds
+
 LibInbox::LibInbox(IMainWindow *parent)
 : QObject(parent)
 , m_inboxModel(NULL)
@@ -31,6 +33,11 @@ LibInbox::LibInbox(IMainWindow *parent)
              SIGNAL(oneInboxEntry(AsyncTaskToken*,GVInboxEntry)),
              this,
              SLOT(onOneInboxEntry(AsyncTaskToken*,GVInboxEntry)));
+
+    m_modelRefreshTimer.setSingleShot (true);
+    m_modelRefreshTimer.setInterval (REFRESH_TIMEOUT);
+    connect (&m_modelRefreshTimer, SIGNAL(timeout()),
+             this, SLOT(onModelRefreshTimeout()));
 }//LibInbox::LibInbox
 
 InboxModel *
@@ -244,3 +251,48 @@ LibInbox::onUserSelect(QString selection)
 
     return (true);
 }//LibInbox::onUserSelect
+
+bool
+LibInbox::markEntryAsRead(GVInboxEntry &event)
+{
+    AsyncTaskToken *task = new AsyncTaskToken(this);
+    if (NULL == task) {
+        Q_WARN("Failed to allocate AsyncTaskToken");
+        return false;
+    }
+    connect(task, SIGNAL(completed()), this, SLOT(onInboxEntryMarkedAsRead()));
+
+    task->inParams["id"] = event.id;
+    IMainWindow *win = (IMainWindow *) this->parent ();
+    if (!win->gvApi.markInboxEntryAsRead (task)) {
+        delete task;
+        return false;
+    }
+
+    return true;
+}//LibInbox::markEntryAsRead
+
+void
+LibInbox::onInboxEntryMarkedAsRead()
+{
+    AsyncTaskToken *task = (AsyncTaskToken *) QObject::sender ();
+    QString id = task->inParams["id"].toString();
+
+    if (ATTS_SUCCESS == task->status) {
+        IMainWindow *win = (IMainWindow *) this->parent ();
+        win->db.markAsRead (id);
+    } else {
+        Q_WARN("Failed to mark inbox entry as read");
+    }
+
+    task->deleteLater ();
+
+    m_modelRefreshTimer.stop ();
+    m_modelRefreshTimer.start ();
+}//LibInbox::onInboxEntryMarkedAsRead
+
+void
+LibInbox::onModelRefreshTimeout()
+{
+    m_inboxModel->refresh ();
+}//LibInbox::onModelRefreshTimeout

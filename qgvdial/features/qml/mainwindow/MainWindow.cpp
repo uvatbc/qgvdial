@@ -556,7 +556,7 @@ MainWindow::onInboxClicked(QString id)
     }
 
     if (!event.bRead) {
-        db.markAsRead (event.id);
+        oInbox.markEntryAsRead (event);
     }
 
     QMetaObject::invokeMethod(mainPageStack, "showInboxDetails",
