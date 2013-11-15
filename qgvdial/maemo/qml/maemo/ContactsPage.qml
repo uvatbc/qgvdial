@@ -33,6 +33,7 @@ Rectangle {
     function setMyModel(searchTerm) {
         contactsList.model = g_ContactsModel;
         container.prevSearchTerm = searchTerm;
+        _updateSearchBtnIcon();
     }
 
     function _updateSearchBtnIcon() {
@@ -103,6 +104,7 @@ Rectangle {
                 if (searchButton.iconForSearch) {
                     container.searchContact(searchField.text);
                 } else {
+                    searchField.text = "";
                     container.searchContact("");
                 }
             }

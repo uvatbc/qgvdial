@@ -44,13 +44,12 @@ public:
 
     bool getContactInfoAndModel(ContactInfo &cinfo);
 
-    bool searchContacts(const QString &query = QString());
-
 public slots:
     bool getContactInfoAndModel(QString id);
     void refreshModel();
     bool refresh(QDateTime after = QDateTime());
     bool refreshLatest();
+    bool searchContacts(const QString &query = QString());
 
 protected:
     ContactsModel *createModel(const QString &query = QString());

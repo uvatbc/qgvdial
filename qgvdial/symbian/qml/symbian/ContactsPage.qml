@@ -34,6 +34,7 @@ Page {
     function setMyModel(searchTerm) {
         contactsList.model = g_ContactsModel;
         container.prevSearchTerm = searchTerm;
+        _updateSearchBtnIcon();
     }
 
     function _updateSearchBtnIcon() {
@@ -100,6 +101,7 @@ Page {
                 if (searchButton.iconForSearch) {
                     container.searchContact(searchField.text);
                 } else {
+                    searchField.text = "";
                     container.searchContact("");
                 }
             }

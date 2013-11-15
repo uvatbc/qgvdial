@@ -181,6 +181,8 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
         }
         connect(contactsPage, SIGNAL(contactClicked(QString)),
                 &oContacts, SLOT(getContactInfoAndModel(QString)));
+        connect(contactsPage, SIGNAL(searchContact(QString)),
+                &oContacts, SLOT(searchContacts(QString)));
 
         inboxList = getQMLObject ("InboxList");
         if (NULL == inboxList) {

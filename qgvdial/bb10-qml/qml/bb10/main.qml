@@ -210,7 +210,7 @@ PageStackWindow {
             }
             ContactsPage {
                 id: contactsTab
-                objectName: "ContactsList"
+                objectName: "ContactsPage"
                 tools: commonTools
             }
             InboxPage {
