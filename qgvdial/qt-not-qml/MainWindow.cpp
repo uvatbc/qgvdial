@@ -201,7 +201,7 @@ MainWindow::init()
         connect(m_systrayIcon,
                 SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
                 this,
-                SLOT(onSystrayactivated(QSystemTrayIcon::ActivationReason)));
+                SLOT(onSystrayActivated(QSystemTrayIcon::ActivationReason)));
 
         m_systrayIcon->setIcon (m_appIcon);
         m_systrayIcon->setContextMenu (d->ui->menu_File);
@@ -217,6 +217,14 @@ MainWindow::init()
     connect(d->ui->actionRefresh, SIGNAL(triggered()),
             &oInbox, SLOT(refreshLatest()));
 
+    connect(d->ui->tabWidget, SIGNAL(currentChanged(int)),
+            this, SLOT(onTabWidgetCurrentChanged(int)));
+
+    connect(d->ui->actionFind, SIGNAL(triggered()),
+            this, SLOT(onUserContactSearchTriggered()));
+
+    d->ui->actionFind->setEnabled (false);
+    d->ui->tabWidget->setCurrentIndex (0);
     QTimer::singleShot (1, this, SLOT(onInitDone()));
 }//MainWindow::init
 
@@ -358,6 +366,18 @@ MainWindow::uiRefreshContacts()
     d->ui->contactsView->hideColumn (2);    // pic link
     d->ui->contactsView->hideColumn (3);    // local path
 }//MainWindow::uiRefreshContacts
+
+void
+MainWindow::uiRefreshSearchedContacts()
+{
+    Q_ASSERT(NULL != oContacts.m_searchedContactsModel);
+
+    d->ui->contactsView->setModel (oContacts.m_searchedContactsModel);
+
+    d->ui->contactsView->hideColumn (0);    // id
+    d->ui->contactsView->hideColumn (2);    // pic link
+    d->ui->contactsView->hideColumn (3);    // local path
+}//MainWindow::uiRefreshSearchedContacts
 
 void
 MainWindow::uiRefreshInbox()
@@ -628,7 +648,7 @@ MainWindow::uiLongTaskEnds()
 }//MainWindow::uiLongTaskEnds
 
 void
-MainWindow::onSystrayactivated(QSystemTrayIcon::ActivationReason reason)
+MainWindow::onSystrayActivated(QSystemTrayIcon::ActivationReason reason)
 {
     switch (reason) {
     case QSystemTrayIcon::Trigger:
@@ -642,4 +662,42 @@ MainWindow::onSystrayactivated(QSystemTrayIcon::ActivationReason reason)
     default:
         break;
     }
-}//MainWindow::onSystrayactivated
+}//MainWindow::onSystrayActivated
+
+void
+MainWindow::onTabWidgetCurrentChanged(int index)
+{
+    QString text = "Find";
+
+    d->ui->actionFind->setEnabled (1 == index);
+    if ((1 == index) && (NULL != oContacts.m_searchedContactsModel)) {
+        text = "Clear";
+    }
+    d->ui->actionFind->setText(text);
+}//MainWindow::onTabWidgetCurrentChanged
+
+void
+MainWindow::onUserContactSearchTriggered()
+{
+    if (d->ui->actionFind->text () == "Clear") {
+        oContacts.searchContacts ();
+        d->ui->actionFind->setText("Find");
+        return;
+    }
+
+    bool ok;
+    QString searchTerm = QInputDialog::getText (d,
+                                                "Search for contact",
+                                                "Enter search term",
+                                                QLineEdit::Normal,
+                                                QString(),
+                                                &ok);
+
+    if (!ok || searchTerm.isEmpty ()) {
+        return;
+    }
+
+    if (oContacts.searchContacts (searchTerm)) {
+        d->ui->actionFind->setText("Clear");
+    }
+}//MainWindow::onUserContactSearchTriggered

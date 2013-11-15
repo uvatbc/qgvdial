@@ -30,6 +30,7 @@ Contact: yuvraaj@gmail.com
 LibContacts::LibContacts(IMainWindow *parent)
 : QObject(parent)
 , m_contactsModel(NULL)
+, m_searchedContactsModel(NULL)
 , m_contactPhonesModel(NULL)
 , m_mandatoryLocalPics(true) // True because QML is not GV authenticated
 {
@@ -175,11 +176,11 @@ LibContacts::onContactsFetched()
 }//LibContacts::onContactsFetched
 
 ContactsModel *
-LibContacts::createModel()
+LibContacts::createModel(const QString &query)
 {
     IMainWindow *win = (IMainWindow *) this->parent ();
     ContactsModel *model = new ContactsModel(m_mandatoryLocalPics, this);
-    win->db.refreshContactsModel (model);
+    win->db.refreshContactsModel (model, query);
     return (model);
 }//LibContacts::createModel
 
@@ -309,3 +310,53 @@ LibContacts::getContactInfoAndModel(QString id)
 
     return (true);
 }//LibContacts::getContactInfoAndModel
+
+bool
+LibContacts::searchContacts(const QString &query)
+{
+    IMainWindow *win = (IMainWindow *) this->parent ();
+    ContactsModel *oldModel = m_searchedContactsModel;
+
+    if (query.isEmpty ()) {
+        if (NULL == m_contactsModel) {
+            m_contactsModel = this->createModel ();
+            if (NULL == m_contactsModel) {
+                Q_WARN("Unable to allocate contacts model");
+                return false;
+            }
+
+            if (m_mandatoryLocalPics) {
+                connect(m_contactsModel,SIGNAL(noContactPhoto(QString,QString)),
+                        this, SLOT(onNoContactPhoto(QString,QString)));
+            }
+        }
+
+        win->uiRefreshContacts ();
+
+        if (NULL != oldModel) {
+            oldModel->deleteLater ();
+            m_searchedContactsModel = NULL;
+        }
+        return true;
+    }
+
+    m_searchedContactsModel = this->createModel (query);
+    if (NULL == m_searchedContactsModel) {
+        m_searchedContactsModel = oldModel;
+        Q_WARN("Unable to allocate contacts model");
+        return false;
+    }
+
+    if (m_mandatoryLocalPics) {
+        connect(m_contactsModel, SIGNAL(noContactPhoto(QString,QString)),
+                this, SLOT(onNoContactPhoto(QString,QString)));
+    }
+
+    win->uiRefreshSearchedContacts();
+
+    if (NULL != oldModel) {
+        oldModel->deleteLater ();
+    }
+
+    return true;
+}//LibContacts::searchContacts

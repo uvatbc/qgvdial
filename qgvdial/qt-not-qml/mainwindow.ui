@@ -21,7 +21,7 @@
        <enum>QTabWidget::East</enum>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="dialTab">
        <attribute name="title">
@@ -282,15 +282,15 @@
         <item>
          <widget class="QToolBox" name="toolBox">
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="loginDetails">
            <property name="geometry">
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>436</width>
-             <height>167</height>
+             <width>437</width>
+             <height>171</height>
             </rect>
            </property>
            <attribute name="label">
@@ -328,8 +328,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>420</width>
-             <height>240</height>
+             <width>253</width>
+             <height>245</height>
             </rect>
            </property>
            <attribute name="label">
@@ -442,8 +442,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>112</width>
-             <height>112</height>
+             <width>96</width>
+             <height>93</height>
             </rect>
            </property>
            <attribute name="label">
@@ -473,13 +473,14 @@
      <x>0</x>
      <y>0</y>
      <width>497</width>
-     <height>25</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
     <property name="title">
      <string>&amp;File</string>
     </property>
+    <addaction name="actionFind"/>
     <addaction name="actionRefresh"/>
     <addaction name="actionHide"/>
     <addaction name="action_Quit"/>
@@ -509,6 +510,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+R</string>
+   </property>
+  </action>
+  <action name="actionFind">
+   <property name="text">
+    <string>Find</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
    </property>
   </action>
  </widget>

@@ -60,6 +60,7 @@ protected:
     void onUserLogoutDone();
 
     void uiRefreshContacts();
+    void uiRefreshSearchedContacts();
     void uiRefreshInbox();
 
     void uiSetSelelctedInbox(const QString &selection);
@@ -88,7 +89,10 @@ protected slots:
     void onCbNumDoModify(int index);
     void onCbInboxChanged(const QString &text);
 
-    void onSystrayactivated(QSystemTrayIcon::ActivationReason reason);
+    void onSystrayActivated(QSystemTrayIcon::ActivationReason reason);
+
+    void onTabWidgetCurrentChanged(int index);
+    void onUserContactSearchTriggered();
 
 private:
     MainWindowPrivate *d;

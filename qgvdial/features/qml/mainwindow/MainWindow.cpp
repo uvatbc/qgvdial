@@ -47,6 +47,16 @@ Contact: yuvraaj@gmail.com
 QApplication *
 createAppObject(int &argc, char **argv)
 {
+#ifdef Q_OS_BLACKBERRY
+#define DRAG_DIST 16
+    int startDragDistance = QApplication::startDragDistance ();
+    if (DRAG_DIST != startDragDistance) {
+        Q_DEBUG(QString("Original startDragDistance = %1")
+                .arg (startDragDistance));
+        QApplication::setStartDragDistance (DRAG_DIST);
+    }
+#endif
+
 #if USE_SINGLE_APPLICATION
     QtSingleApplication *app;
 
