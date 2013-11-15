@@ -59,8 +59,7 @@ protected:
     void uiLoginDone(int status, const QString &errStr);
     void onUserLogoutDone();
 
-    void uiRefreshContacts();
-    void uiRefreshSearchedContacts();
+    void uiRefreshContacts(ContactsModel *model);
     void uiRefreshInbox();
 
     void uiSetSelelctedInbox(const QString &selection);

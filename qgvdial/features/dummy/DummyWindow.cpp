@@ -103,7 +103,7 @@ DummyMainWindow::uiRequestApplicationPassword()
 }//DummyMainWindow::uiRequestApplicationPassword()
 
 void
-DummyMainWindow::uiRefreshContacts()
+DummyMainWindow::uiRefreshContacts(ContactsModel *)
 {
     Q_ASSERT(0 == "Not implemented");
 }//DummyMainWindow::uiRefreshContacts

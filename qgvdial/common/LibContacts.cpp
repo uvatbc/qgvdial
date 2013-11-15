@@ -163,7 +163,7 @@ LibContacts::onContactsFetched()
                         this, SLOT(onNoContactPhoto(QString,QString)));
             }
 
-            win->uiRefreshContacts ();
+            win->uiRefreshContacts (m_contactsModel);
             if (NULL != oldModel) {
                 oldModel->deleteLater ();
             }
@@ -331,7 +331,7 @@ LibContacts::searchContacts(const QString &query)
             }
         }
 
-        win->uiRefreshContacts ();
+        win->uiRefreshContacts (m_contactsModel);
 
         if (NULL != oldModel) {
             oldModel->deleteLater ();
@@ -352,7 +352,7 @@ LibContacts::searchContacts(const QString &query)
                 this, SLOT(onNoContactPhoto(QString,QString)));
     }
 
-    win->uiRefreshSearchedContacts();
+    win->uiRefreshContacts(m_searchedContactsModel);
 
     if (NULL != oldModel) {
         oldModel->deleteLater ();

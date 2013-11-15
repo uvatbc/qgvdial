@@ -377,13 +377,12 @@ MainWindow::uiLoginDone(int status, const QString &errStr)
 }//MainWindow::uiLoginDone
 
 void
-MainWindow::uiRefreshContacts()
+MainWindow::uiRefreshContacts(ContactsModel *model)
 {
-    Q_ASSERT(NULL != oContacts.m_contactsModel);
+    Q_ASSERT(NULL != model);
 
     m_view->engine()->rootContext()
-                    ->setContextProperty("g_ContactsModel",
-                                         oContacts.m_contactsModel);
+                    ->setContextProperty("g_ContactsModel", model);
     QMetaObject::invokeMethod (contactsList, "setMyModel");
 }//MainWindow::uiRefreshContacts
 

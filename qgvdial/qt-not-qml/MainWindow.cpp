@@ -356,28 +356,16 @@ MainWindow::uiLoginDone(int status, const QString &errStr)
 }//MainWindow::uiLoginDone
 
 void
-MainWindow::uiRefreshContacts()
+MainWindow::uiRefreshContacts(ContactsModel *model)
 {
-    Q_ASSERT(NULL != oContacts.m_contactsModel);
+    Q_ASSERT(NULL != model);
 
-    d->ui->contactsView->setModel (oContacts.m_contactsModel);
+    d->ui->contactsView->setModel (model);
 
     d->ui->contactsView->hideColumn (0);    // id
     d->ui->contactsView->hideColumn (2);    // pic link
     d->ui->contactsView->hideColumn (3);    // local path
 }//MainWindow::uiRefreshContacts
-
-void
-MainWindow::uiRefreshSearchedContacts()
-{
-    Q_ASSERT(NULL != oContacts.m_searchedContactsModel);
-
-    d->ui->contactsView->setModel (oContacts.m_searchedContactsModel);
-
-    d->ui->contactsView->hideColumn (0);    // id
-    d->ui->contactsView->hideColumn (2);    // pic link
-    d->ui->contactsView->hideColumn (3);    // local path
-}//MainWindow::uiRefreshSearchedContacts
 
 void
 MainWindow::uiRefreshInbox()
