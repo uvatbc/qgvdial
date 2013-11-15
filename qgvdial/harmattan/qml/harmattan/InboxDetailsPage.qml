@@ -78,11 +78,6 @@ Page {
             width: parent.width
             height: 40
 
-            Rectangle {
-                anchors.fill: parent
-                color: "gray"
-            }
-
             Row {
                 anchors.fill: parent
                 spacing: 10
