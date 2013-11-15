@@ -27,8 +27,6 @@ Page {
     tools: commonTools
     anchors.fill: parent
 
-    property bool isSearchResults: false
-
     signal setNumberToDial(string number)
 
     Button {

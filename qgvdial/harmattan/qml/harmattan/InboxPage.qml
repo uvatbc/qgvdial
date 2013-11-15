@@ -26,7 +26,6 @@ Page {
     id: container
     tools: commonTools
 
-    property bool isSearchResults: false
     property real toolbarHeight: 50
 
     signal setNumberToDial(string number)

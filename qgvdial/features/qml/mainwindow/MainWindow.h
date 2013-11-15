@@ -65,7 +65,7 @@ protected:
     void uiLoginDone(int status, const QString &errStr);
     void onUserLogoutDone();
 
-    void uiRefreshContacts(ContactsModel *model);
+    void uiRefreshContacts(ContactsModel *model, QString query);
     void uiRefreshInbox();
 
     void uiSetSelelctedInbox(const QString &selection);
@@ -94,7 +94,7 @@ private:
     QObject *textPassword;
     QObject *infoBanner;
     QObject *appPwDlg;
-    QObject *contactsList;
+    QObject *contactsPage;
     QObject *inboxList;
     QObject *inboxSelector;
     QObject *proxySettingsPage;

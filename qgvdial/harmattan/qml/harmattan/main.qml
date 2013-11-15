@@ -99,6 +99,7 @@ PageStackWindow {
             }
             ContactsPage {
                 id: contactsTab
+                objectName: "ContactsPage"
                 toolbarHeight: appWindow.platformToolBarHeight
             }
             InboxPage {

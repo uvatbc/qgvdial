@@ -24,8 +24,6 @@ import Qt 4.7
 Rectangle {
     id: container
 
-    property bool isSearchResults: false
-
     color: "black"
 
     Button {

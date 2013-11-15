@@ -98,7 +98,7 @@ MainWindow::MainWindow(QObject *parent)
 , textPassword(NULL)
 , infoBanner(NULL)
 , appPwDlg(NULL)
-, contactsList(NULL)
+, contactsPage(NULL)
 , inboxList(NULL)
 , inboxSelector(NULL)
 , proxySettingsPage(NULL)
@@ -257,11 +257,11 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
             break;
         }
 
-        contactsList = getQMLObject ("ContactsList");
-        if (NULL == contactsList) {
+        contactsPage = getQMLObject ("ContactsPage");
+        if (NULL == contactsPage) {
             break;
         }
-        connect(contactsList, SIGNAL(contactClicked(QString)),
+        connect(contactsPage, SIGNAL(contactClicked(QString)),
                 &oContacts, SLOT(getContactInfoAndModel(QString)));
 
         inboxList = getQMLObject ("InboxList");
@@ -483,13 +483,14 @@ MainWindow::uiLoginDone(int status, const QString &errStr)
 }//MainWindow::uiLoginDone
 
 void
-MainWindow::uiRefreshContacts(ContactsModel *model)
+MainWindow::uiRefreshContacts(ContactsModel *model, QString query)
 {
     Q_ASSERT(NULL != model);
 
     m_view->engine()->rootContext()
                     ->setContextProperty("g_ContactsModel", model);
-    QMetaObject::invokeMethod (contactsList, "setMyModel");
+    QMetaObject::invokeMethod (contactsPage, "setMyModel",
+                               Q_ARG(QVariant, QVariant(query)));
 }//MainWindow::uiRefreshContacts
 
 void

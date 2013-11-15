@@ -166,7 +166,7 @@ protected:
 
     virtual void onUserLogoutDone() = 0;
 
-    virtual void uiRefreshContacts(ContactsModel *model) = 0;
+    virtual void uiRefreshContacts(ContactsModel *model, QString query) = 0;
     virtual void uiRefreshInbox() = 0;
 
     virtual void uiSetSelelctedInbox(const QString &selection) = 0;

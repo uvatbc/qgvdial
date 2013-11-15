@@ -26,8 +26,38 @@ Page {
     id: container
     tools: commonTools
 
-    property bool isSearchResults: false
     property real toolbarHeight: 50
+    property string prevSearchTerm
+
+    signal contactClicked(string id)
+    signal searchContact(string searchTerm)
+
+    function setMyModel(searchTerm) {
+        contactsList.model = g_ContactsModel;
+        container.prevSearchTerm = searchTerm;
+    }
+
+    function _updateSearchBtnIcon() {
+        if (container.prevSearchTerm.length == 0) {
+            searchButton.iconForSearch = true;
+            if (searchField.text.length == 0) {
+                searchButton.enabled = false;
+            } else {
+                searchButton.enabled = true;
+            }
+        } else {
+            searchButton.enabled = true;
+            if (searchField.text.length == 0) {
+                searchButton.iconForSearch = false;
+            } else {
+                if (container.prevSearchTerm == searchField.text) {
+                    searchButton.iconForSearch = false;
+                } else {
+                    searchButton.iconForSearch = true;
+                }
+            }
+        }
+    }
 
     Row {
         id: searchRow
@@ -41,25 +71,45 @@ Page {
             id: searchField
             placeholderText: "Search"
             width: parent.width - searchButton.width - parent.spacing - 5
+            onTextChanged: container._updateSearchBtnIcon();
         }
 
         Button {
             id: searchButton
-            iconSource: container.isSearchResults ? "qrc:/close.png" : "qrc:/search.png"
             width: 70
             anchors.verticalCenter: parent.verticalCenter
+
+            property bool iconForSearch: true
+
+            Component.onCompleted: { searchButton.state = "Search" }
+            onIconForSearchChanged: {
+                searchButton.state = iconForSearch ? "Search" : "Close"
+            }
+
+            states: [
+                State {
+                    name: "Search"
+                    PropertyChanges { target: searchButton; iconSource: "qrc:/search.png"}
+                },
+                State {
+                    name: "Close"
+                    PropertyChanges { target: searchButton; iconSource: "qrc:/close.png"}
+                }
+            ]
+
+            onClicked: {
+                if (searchButton.iconForSearch) {
+                    container.searchContact(searchField.text);
+                } else {
+                    container.searchContact("");
+                }
+            }
         }
     }//Search row: text and button
 
     ListView {
         id: contactsList
-        objectName: "ContactsList"
 
-        signal contactClicked(string id)
-
-        function setMyModel() {
-            contactsList.model = g_ContactsModel;
-        }
 
         anchors {
             top: searchRow.bottom
@@ -110,7 +160,7 @@ Page {
 
             MouseArea {
                 anchors.fill: parent
-                onClicked: contactsList.contactClicked(id);
+                onClicked: container.contactClicked(id);
                 onPressed: { listDelegate.state = "pressed"; }
                 onReleased: { listDelegate.state = ''; }
             }

@@ -195,6 +195,7 @@ PageStackWindow {
             }
             ContactsPage {
                 id: contactsTab
+                objectName: "ContactsPage"
                 tools: commonTools
             }
             InboxPage {
