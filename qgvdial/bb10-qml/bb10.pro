@@ -25,12 +25,10 @@ QML_IMPORT_PATH = ./imports
 LIBS += -lbbsystem
 
 SOURCES  += BB10PhoneFactory.cpp \
-            BBPhoneAccount.cpp \
-            QmlView.cpp
+            BBPhoneAccount.cpp
 HEADERS  += platform_specific.h \
             BB10PhoneFactory.h \
-            BBPhoneAccount.h \
-            QmlView.h
+            BBPhoneAccount.h
 
 include(../common/common.pri)
 include(../../api/api.pri)

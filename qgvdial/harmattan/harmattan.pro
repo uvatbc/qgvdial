@@ -23,11 +23,9 @@ CONFIG += qdeclarative-boostable
 # CONFIG += qt-components
 
 INCLUDEPATH += $$PWD
-SOURCES  += HarmattanPhoneFactory.cpp \
-            QmlView.cpp
+SOURCES  += HarmattanPhoneFactory.cpp
 HEADERS  += platform_specific.h \
-            HarmattanPhoneFactory.h \
-            QmlView.h
+            HarmattanPhoneFactory.h
 
 include(../common/common.pri)
 include(../../api/api.pri)

@@ -32,10 +32,8 @@ MOBILITY +=
 CONFIG += qt-components
 
 INCLUDEPATH += $$PWD
-SOURCES  += QmlView.cpp \
-            SymbianPhoneFactory.cpp
+SOURCES  += SymbianPhoneFactory.cpp
 HEADERS  += platform_specific.h \
-            QmlView.h \
             SymbianPhoneFactory.h
 
 include(../common/common.pri)
