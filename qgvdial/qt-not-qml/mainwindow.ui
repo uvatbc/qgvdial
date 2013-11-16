@@ -220,6 +220,9 @@
           <layout class="QHBoxLayout" name="horizontalLayout">
            <item>
             <widget class="QPushButton" name="btnText">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="text">
               <string>Text</string>
              </property>
@@ -227,6 +230,9 @@
            </item>
            <item>
             <widget class="QPushButton" name="btnCall">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="text">
               <string>Call</string>
              </property>

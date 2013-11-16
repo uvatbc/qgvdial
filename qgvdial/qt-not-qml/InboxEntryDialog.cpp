@@ -31,6 +31,8 @@ InboxEntryDialog::InboxEntryDialog(QWidget *parent)
 , ui(new Ui::InboxEntryDialog)
 , m_numberDoubleClicked(false)
 , m_contactDoubleClicked(false)
+, m_replyRequested(false)
+, m_deleteRequested(false)
 {
     ui->setupUi(this);
 
@@ -43,6 +45,11 @@ InboxEntryDialog::InboxEntryDialog(QWidget *parent)
             this, SLOT(onContactDoubleClicked()));
     connect(ui->lblName, SIGNAL(doubleClicked()),
             this, SLOT(onContactDoubleClicked()));
+
+    connect(ui->btnDelete, SIGNAL(clicked()),
+            this, SLOT(onDeleteClicked()));
+    connect(ui->btnReply, SIGNAL(clicked()),
+            this, SLOT(onReplyClicked()));
 }//InboxEntryDialog::InboxEntryDialog
 
 InboxEntryDialog::~InboxEntryDialog()
@@ -64,10 +71,10 @@ InboxEntryDialog::fill(const GVInboxEntry &event)
     }
 
     if (0 == event.strText.length ()) {
-        ui->wConversation->hide ();
+        ui->txtConv->hide ();
+        ui->btnReply->hide ();
     } else {
-        ui->lblConv->setText (event.strText);
-        ui->lblConv->setTextFormat (Qt::RichText);
+        ui->txtConv->setText (event.strText);
     }
 }//InboxEntryDialog::fill
 
@@ -102,3 +109,17 @@ InboxEntryDialog::onContactDoubleClicked()
     m_contactDoubleClicked = true;
     this->accept ();
 }//InboxEntryDialog::onContactDoubleClicked
+
+void
+InboxEntryDialog::onDeleteClicked()
+{
+    m_deleteRequested = true;
+    this->accept ();
+}//InboxEntryDialog::onDeleteClicked
+
+void
+InboxEntryDialog::onReplyClicked()
+{
+    m_replyRequested = true;
+    this->accept ();
+}//InboxEntryDialog::onReplyClicked

@@ -76,10 +76,14 @@ protected:
     void uiLongTaskContinues();
     void uiLongTaskEnds();
 
+    void uiFailedToSendMessage(const QString &dest, const QString &text);
+
 protected slots:
     void messageReceived(const QString &msg);
 
     void onUserCallBtnClicked();
+    void onUserTextBtnClicked();
+
     void onContactDoubleClicked(const QModelIndex &index);
     void setNumberToDial(QString num);
 
@@ -92,6 +96,8 @@ protected slots:
 
     void onTabWidgetCurrentChanged(int index);
     void onUserContactSearchTriggered();
+
+    void onDispNumTextChanged();
 
 private:
     MainWindowPrivate *d;

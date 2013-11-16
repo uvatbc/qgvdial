@@ -19,42 +19,35 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#ifndef INBOXENTRYDIALOG_H
-#define INBOXENTRYDIALOG_H
+#ifndef SMSDIALOG_H
+#define SMSDIALOG_H
 
 #include "global.h"
 
 namespace Ui {
-class InboxEntryDialog;
+class SmsDialog;
 }
 
-class InboxEntryDialog : public QDialog
+class SmsDialog : public QDialog
 {
     Q_OBJECT
-
+    
 public:
-    explicit InboxEntryDialog(QWidget *parent = 0);
-    ~InboxEntryDialog();
+    explicit SmsDialog(QWidget *parent = 0);
+    virtual ~SmsDialog();
 
-    void fill(const GVInboxEntry &event);
+    void fill(const QString &num);
     void fill(const ContactInfo &cinfo);
+    void fill(const GVInboxEntry &event);
+
+    QString getText();
+    void setText(const QString &text);
 
 private slots:
-    void onNumberDoubleClicked();
-    void onContactDoubleClicked();
-
-    void onDeleteClicked();
-    void onReplyClicked();
-
+    void onSmsTextChanged();
+    
 private:
-    Ui::InboxEntryDialog *ui;
-
-public:
-    bool m_numberDoubleClicked;
-    bool m_contactDoubleClicked;
-
-    bool m_replyRequested;
-    bool m_deleteRequested;
+    Ui::SmsDialog *ui;
 };
 
-#endif // INBOXENTRYDIALOG_H
+#endif // SMSDIALOG_H

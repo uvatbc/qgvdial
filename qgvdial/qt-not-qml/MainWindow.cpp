@@ -40,6 +40,8 @@ Contact: yuvraaj@gmail.com
 #include "InboxEntryDialog.h"
 #include "CINumberDialog.h"
 
+#include "SmsDialog.h"
+
 #ifdef Q_WS_WIN32
 #include "MainApp.h"
 #endif
@@ -174,6 +176,8 @@ MainWindow::init()
 
     connect(d->ui->btnCall, SIGNAL(clicked()),
             this, SLOT(onUserCallBtnClicked()));
+    connect(d->ui->btnText, SIGNAL(clicked()),
+            this, SLOT(onUserTextBtnClicked()));
 
     connect(d->ui->contactsView, SIGNAL(doubleClicked(const QModelIndex&)),
             this, SLOT(onContactDoubleClicked(const QModelIndex&)));
@@ -223,8 +227,15 @@ MainWindow::init()
     connect(d->ui->actionFind, SIGNAL(triggered()),
             this, SLOT(onUserContactSearchTriggered()));
 
+    connect(d->ui->dispNum, SIGNAL(textChanged()),
+            this, SLOT(onDispNumTextChanged()));
+
+    // Set up starting page and initial actions: These can change everytime I
+    // touch the ui file. So force them into a state that is good to show to the end user.
     d->ui->actionFind->setEnabled (false);
     d->ui->tabWidget->setCurrentIndex (0);
+
+    // Fake an event in the event loop
     QTimer::singleShot (1, this, SLOT(onInitDone()));
 }//MainWindow::init
 
@@ -510,6 +521,59 @@ MainWindow::onUserCallBtnClicked()
 }//MainWindow::onUserCallBtnClicked
 
 void
+MainWindow::onUserTextBtnClicked()
+{
+    QString dest = d->ui->dispNum->toPlainText();
+    if (0 == dest.length()) {
+        Q_WARN("Attempting to send a text to a blank number");
+        return;
+    }
+
+    SmsDialog dlg;
+    dlg.fill (dest);
+
+    ContactInfo cinfo;
+    if (db.getContactFromNumber (dest, cinfo)) {
+        dlg.fill (cinfo);
+    }
+
+    // Show the text window and get the text to send
+    if (QDialog::Accepted != dlg.exec ()) {
+        Q_DEBUG("User canceled SMS text dialog");
+        return;
+    }
+
+    QStringList arrNumbers;
+    arrNumbers += dest;
+    onUserSendSMS (arrNumbers, dlg.getText ());
+}//MainWindow::onUserTextBtnClicked
+
+void
+MainWindow::uiFailedToSendMessage(const QString &dest, const QString &text)
+{
+    d->ui->statusBar->showMessage ("Failed to send text message!", 30*1000);
+
+    SmsDialog dlg;
+    dlg.fill (dest);
+    dlg.setText (text);
+
+    ContactInfo cinfo;
+    if (db.getContactFromNumber (dest, cinfo)) {
+        dlg.fill (cinfo);
+    }
+
+    // Show the text window and get the text to send
+    if (QDialog::Accepted != dlg.exec ()) {
+        Q_DEBUG("User canceled SMS text dialog");
+        return;
+    }
+
+    QStringList arrNumbers;
+    arrNumbers += dest;
+    onUserSendSMS (arrNumbers, dlg.getText ());
+}//MainWindow::uiFailedToSendMessage
+
+void
 MainWindow::onContactDoubleClicked(const QModelIndex &index)
 {
     QModelIndex idIndex = index.sibling (index.row (), 0);
@@ -554,7 +618,7 @@ MainWindow::onInboxDoubleClicked(const QModelIndex &index)
     }
 
     if (!event.bRead) {
-        oInbox.markEntryAsRead (event);
+        oInbox.markEntryAsRead (event.id);
     }
 
     InboxEntryDialog dlg;
@@ -580,6 +644,24 @@ MainWindow::onInboxDoubleClicked(const QModelIndex &index)
     if (dlg.m_numberDoubleClicked) {
         QModelIndex numIndex = index.sibling (index.row (), 3);
         setNumberToDial (numIndex.data().toString());
+    }
+
+    if (dlg.m_deleteRequested) {
+        oInbox.deleteEntry (event.id);
+    }
+
+    if (dlg.m_replyRequested) {
+        // Start reply dialog
+        SmsDialog dlg1;
+        dlg1.fill (event.strPhoneNumber);
+        dlg1.fill (cinfo);
+        dlg1.fill (event);
+
+        if (QDialog::Accepted == dlg1.exec ()) {
+            QStringList nums;
+            nums += event.strPhoneNumber;
+            onUserSendSMS (nums, dlg1.getText ());
+        }
     }
 }//MainWindow::onInboxDoubleClicked
 
@@ -689,3 +771,16 @@ MainWindow::onUserContactSearchTriggered()
         d->ui->actionFind->setText("Clear");
     }
 }//MainWindow::onUserContactSearchTriggered
+
+void
+MainWindow::onDispNumTextChanged()
+{
+    if (0 != d->ui->dispNum->toPlainText().length()) {
+        d->ui->btnText->setEnabled (true);
+        d->ui->btnCall->setEnabled (true);
+    } else {
+        d->ui->btnText->setEnabled (false);
+        d->ui->btnCall->setEnabled (false);
+    }
+}//MainWindow::onDispNumTextChanged
+

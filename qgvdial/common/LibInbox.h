@@ -36,7 +36,9 @@ public:
     explicit LibInbox(IMainWindow *parent);
 
     bool getEventInfo(GVInboxEntry &event, ContactInfo &cinfo, QString &type);
-    bool markEntryAsRead(GVInboxEntry &event);
+
+    bool markEntryAsRead(const QString &id);
+    bool deleteEntry(const QString &id);
 
 public slots:
     bool onUserSelect(QString selection = QString("all"));
@@ -55,6 +57,8 @@ private slots:
                       int page, bool isExternal = true);
 
     void onInboxEntryMarkedAsRead();
+    void onInboxEntryDeleted();
+
     void onModelRefreshTimeout();
 
 public:

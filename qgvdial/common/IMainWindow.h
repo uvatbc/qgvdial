@@ -188,6 +188,9 @@ protected:
     virtual void uiLongTaskContinues() = 0;
     virtual void uiLongTaskEnds() = 0;
 
+    virtual void uiFailedToSendMessage(const QString &destination,
+                                       const QString &text) = 0;
+
 protected:
     CacheDb db;
     GVApi   gvApi;

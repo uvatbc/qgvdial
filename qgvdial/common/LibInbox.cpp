@@ -253,7 +253,7 @@ LibInbox::onUserSelect(QString selection)
 }//LibInbox::onUserSelect
 
 bool
-LibInbox::markEntryAsRead(GVInboxEntry &event)
+LibInbox::markEntryAsRead(const QString &id)
 {
     AsyncTaskToken *task = new AsyncTaskToken(this);
     if (NULL == task) {
@@ -262,7 +262,7 @@ LibInbox::markEntryAsRead(GVInboxEntry &event)
     }
     connect(task, SIGNAL(completed()), this, SLOT(onInboxEntryMarkedAsRead()));
 
-    task->inParams["id"] = event.id;
+    task->inParams["id"] = id;
     IMainWindow *win = (IMainWindow *) this->parent ();
     if (!win->gvApi.markInboxEntryAsRead (task)) {
         delete task;
@@ -281,15 +281,54 @@ LibInbox::onInboxEntryMarkedAsRead()
     if (ATTS_SUCCESS == task->status) {
         IMainWindow *win = (IMainWindow *) this->parent ();
         win->db.markAsRead (id);
+
+        m_modelRefreshTimer.stop ();
+        m_modelRefreshTimer.start ();
     } else {
         Q_WARN("Failed to mark inbox entry as read");
     }
 
     task->deleteLater ();
-
-    m_modelRefreshTimer.stop ();
-    m_modelRefreshTimer.start ();
 }//LibInbox::onInboxEntryMarkedAsRead
+
+bool
+LibInbox::deleteEntry(const QString &id)
+{
+    AsyncTaskToken *task = new AsyncTaskToken(this);
+    if (NULL == task) {
+        Q_WARN("Failed to allocate AsyncTaskToken");
+        return false;
+    }
+    connect(task, SIGNAL(completed()), this, SLOT(onInboxEntryDeleted()));
+
+    task->inParams["id"] = id;
+    IMainWindow *win = (IMainWindow *) this->parent ();
+    if (!win->gvApi.deleteInboxEntry (task)) {
+        delete task;
+        return false;
+    }
+
+    return true;
+}//LibInbox::deleteEntry
+
+void
+LibInbox::onInboxEntryDeleted()
+{
+    AsyncTaskToken *task = (AsyncTaskToken *) QObject::sender ();
+    QString id = task->inParams["id"].toString();
+
+    if (ATTS_SUCCESS == task->status) {
+        IMainWindow *win = (IMainWindow *) this->parent ();
+        win->db.deleteInboxEntryById (id);
+
+        m_modelRefreshTimer.stop ();
+        m_modelRefreshTimer.start ();
+    } else {
+        Q_WARN("Failed to delete inbox entry");
+    }
+
+    task->deleteLater ();
+}//LibInbox::onInboxEntryDeleted
 
 void
 LibInbox::onModelRefreshTimeout()

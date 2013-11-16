@@ -23,7 +23,8 @@ SOURCES  += $$PWD/MainWindow.cpp \
             $$PWD/GvNumComboBox.cpp \
             $$PWD/DblClickLabel.cpp \
             $$PWD/DummySystemTray.cpp \
-            $$PWD/MyLineEdit.cpp
+            $$PWD/MyLineEdit.cpp \
+            $$PWD/SmsDialog.cpp
 HEADERS  += $$PWD/MainWindow.h \
             $$PWD/MainWindow_p.h \
             $$PWD/OsDependant.h \
@@ -34,12 +35,14 @@ HEADERS  += $$PWD/MainWindow.h \
             $$PWD/GvNumComboBox.h \
             $$PWD/DblClickLabel.h \
             $$PWD/DummySystemTray.h \
-            $$PWD/MyLineEdit.h
+            $$PWD/MyLineEdit.h \
+            $$PWD/SmsDialog.h
 
 FORMS    += $$PWD/mainwindow.ui \
             $$PWD/ContactDialog.ui \
             $$PWD/InboxEntryDialog.ui \
-            $$PWD/CINumberDialog.ui
+            $$PWD/CINumberDialog.ui \
+            $$PWD/SmsDialog.ui
 
 RESOURCES += $$PWD/qtnotqml.qrc
 

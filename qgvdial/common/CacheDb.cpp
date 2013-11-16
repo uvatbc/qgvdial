@@ -785,8 +785,7 @@ CacheDb::getContactFromNumber (const QString &strNumber,
                     .arg (scrubNumber);
     query.exec (strQ);
 
-    if (query.next ())
-    {
+    if (query.next ()) {
         info.strId = query.value(0).toString ();
         rv = getContactFromLink (info);
     }
