@@ -74,12 +74,14 @@ Rectangle {
         imgClose.state = "back";
     }
 
-    function showInboxDetails(imgSource, name, number, phType, cId) {
+    function showInboxDetails(imgSource, name, number, note, smsText, phType, cId) {
         inboxDetails.imageSource = imgSource;
-        inboxDetails.name = name;
-        inboxDetails.number = number;
-        inboxDetails.phType = phType;
-        inboxDetails.cId = cId;
+        inboxDetails.name        = name;
+        inboxDetails.number      = number;
+        inboxDetails.note        = note;
+        inboxDetails.smsText     = smsText;
+        inboxDetails.phType      = phType;
+        inboxDetails.cId         = cId;
         inboxDetails.visible = true;
         imgClose.state = "back";
     }

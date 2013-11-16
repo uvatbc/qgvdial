@@ -29,9 +29,11 @@ Rectangle {
     signal sigOpenContact(string cId)
 
     property alias imageSource: contactImage.source
-    property alias name: contactName.text
-    property alias number: contactNumber.text
-    property alias phType: numberType.text
+    property alias name:        contactName.text
+    property alias number:      contactNumber.text
+    property alias phType:      numberType.text
+    property alias note:        txtNotes.text
+    property alias smsText:     txtSms.text
     property string cId
 
     color: "black"
@@ -96,7 +98,7 @@ Rectangle {
                     left: parent.left
                     verticalCenter: parent.verticalCenter
                 }
-            }
+            }//type: mobile/work/home
 
             TextOneLine {
                 id: contactNumber
@@ -111,7 +113,7 @@ Rectangle {
                     right: parent.right
                     verticalCenter: parent.verticalCenter
                 }
-            }
+            }//number
 
             MouseArea {
                 anchors.fill: parent
@@ -119,6 +121,32 @@ Rectangle {
                     container.setNumberToDial(container.number);
                     container.done(true);
                 }
+            }
+        }//type and number
+
+        TextMultiLine {
+            id: txtNotes
+            width: parent.width
+            enableBorder: false
+            readOnly: true
+            wrapMode: Text.WordWrap
+            textFormat: Text.RichText
+
+            onTextChanged: {
+                visible = (text.length != 0);
+            }
+        }
+
+        TextMultiLine {
+            id: txtSms
+            width: parent.width
+            enableBorder: false
+            readOnly: true
+            wrapMode: Text.WordWrap
+            textFormat: Text.RichText
+
+            onTextChanged: {
+                visible = (text.length != 0);
             }
         }
     }//Column

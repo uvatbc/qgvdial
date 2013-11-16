@@ -119,6 +119,7 @@ Page {
             id: lblSmsText
             width: parent.width
             visible: text.length == 0 ? false : true
+            wrapMode: Text.WordWrap
         }//Label: SMS text
     }//Column
 }//Page
