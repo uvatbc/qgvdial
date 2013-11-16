@@ -72,11 +72,12 @@ Page {
             placeholderText: "Search"
             width: parent.width - searchButton.width - parent.spacing - 5
             onTextChanged: container._updateSearchBtnIcon();
+            anchors.verticalCenter: parent.verticalCenter
         }
 
         Button {
             id: searchButton
-            width: 70
+            width: 100
             anchors.verticalCenter: parent.verticalCenter
 
             property bool iconForSearch: true
@@ -105,6 +106,7 @@ Page {
                     container.searchContact("");
                 }
                 searchField.closeSoftwareInputPanel();
+                contactsList.forceActiveFocus();
             }
         }
     }//Search row: text and button

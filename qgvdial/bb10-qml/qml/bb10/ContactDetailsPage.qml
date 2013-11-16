@@ -70,7 +70,7 @@ Page {
             }
 
             delegate: Item {
-                height: lblNumber.height + 4
+                height: lblNumber.height + 10
                 width: parent.width
 
                 Row {
@@ -79,7 +79,7 @@ Page {
                     Label {
                         id: lblType
                         text: type
-                        font.pixelSize: 45
+                        font.pixelSize: 50
                     }
 
                     Label {
@@ -87,7 +87,7 @@ Page {
                         text: number
                         width: parent.width - lblType.width - parent.spacing
                         horizontalAlignment: Text.AlignRight
-                        font.pixelSize: 45
+                        font.pixelSize: 50
                     }
                 }//Row: type (work/home/mobile) and number
 

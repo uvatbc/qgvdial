@@ -76,7 +76,7 @@ Page {
 
         Item {
             width: parent.width
-            height: 40
+            height: 60
 
             Row {
                 anchors.fill: parent
@@ -86,7 +86,7 @@ Page {
                     id: numberType
 
                     anchors.verticalCenter: parent.verticalCenter
-                    font.pixelSize: 45
+                    font.pixelSize: 50
                 }
 
                 Label {
@@ -94,7 +94,7 @@ Page {
 
                     anchors.verticalCenter: parent.verticalCenter
                     width: parent.width - numberType.width - parent.spacing
-                    font.pixelSize: 45
+                    font.pixelSize: 50
                     horizontalAlignment: Text.AlignRight
                 }
             }//Row: type (mobile/work/home) and actual number
@@ -112,12 +112,15 @@ Page {
             id: lblNote
             width: parent.width
             visible: text.length == 0 ? false : true
+            font.pixelSize: 45
+            wrapMode: Text.WordWrap
         }//Label: notes
 
         Label {
             id: lblSmsText
             width: parent.width
             visible: text.length == 0 ? false : true
+            font.pixelSize: 45
             wrapMode: Text.WordWrap
         }//Label: SMS text
     }//Column
