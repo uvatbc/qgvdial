@@ -1,5 +1,10 @@
 TARGET=qgvdial
 
+greaterThan(QT_MAJOR_VERSION, 4) {
+message(Qt version $$QT_MAJOR_VERSION)
+QT *= widgets core gui
+}
+
 # Add files and directories to ship with the application
 # by adapting the examples below.
 # file1.source = myfile
@@ -18,7 +23,7 @@ SOURCES  += $$PWD/MainWindow.cpp \
             $$PWD/GvNumComboBox.cpp \
             $$PWD/DblClickLabel.cpp \
             $$PWD/DummySystemTray.cpp \
-    MyLineEdit.cpp
+            $$PWD/MyLineEdit.cpp
 HEADERS  += $$PWD/MainWindow.h \
             $$PWD/MainWindow_p.h \
             $$PWD/OsDependant.h \
@@ -29,7 +34,7 @@ HEADERS  += $$PWD/MainWindow.h \
             $$PWD/GvNumComboBox.h \
             $$PWD/DblClickLabel.h \
             $$PWD/DummySystemTray.h \
-    MyLineEdit.h
+            $$PWD/MyLineEdit.h
 
 FORMS    += $$PWD/mainwindow.ui \
             $$PWD/ContactDialog.ui \
