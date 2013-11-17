@@ -109,6 +109,7 @@ Rectangle {
         smsPage.conversation = conversation;
         smsPage.smsText      = text;
         smsPage.visible = true;
+        inboxDetails.visible = false;
         imgClose.state = "back";
     }
 
@@ -134,6 +135,11 @@ Rectangle {
         if (ciPhoneSelector.visible) {
             ciPhoneSelector.visible = false;
             regNumberSelector.visible = true;
+            newState = "back";
+        }
+        if (smsPage.visible) {
+            smsPage.visible = false;
+            inboxDetails.visible = true;
             newState = "back";
         }
 
@@ -347,8 +353,15 @@ Rectangle {
     SmsPage {
         id: smsPage
         objectName: "SmsPage"
+
+        anchors {
+            top: tabBar.bottom
+            bottom: parent.bottom
+        }
+        width: parent.width
+
         onDone: { container.doBack(); }
-    }
+    }//SmsPage
 
     StatusBanner {
         id: statusBanner

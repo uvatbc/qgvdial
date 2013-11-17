@@ -74,6 +74,8 @@ MainWindow::MainWindow(QObject *parent)
 , ciSelector(NULL)
 , dialPage(NULL)
 , statusBanner(NULL)
+, inboxDetails(NULL)
+, smsPage(NULL)
 {
 }//MainWindow::MainWindow
 
@@ -247,6 +249,22 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
         if (NULL == statusBanner) {
             break;
         }
+
+        inboxDetails = getQMLObject ("InboxDetails");
+        if (NULL == inboxDetails) {
+            break;
+        }
+        connect(inboxDetails, SIGNAL(deleteEntry(QString)),
+                &oInbox, SLOT(deleteEntry(QString)));
+        connect(inboxDetails, SIGNAL(replySms(QString)),
+                this, SLOT(onUserReplyToInboxEntry(QString)));
+
+        smsPage = getQMLObject ("SmsPage");
+        if (NULL == smsPage) {
+            break;
+        }
+        connect(smsPage, SIGNAL(done(bool)),
+                this, SLOT(onUserSmsTextDone(bool)));
 
         onInitDone();
         return;
@@ -542,5 +560,50 @@ MainWindow::uiLongTaskEnds()
 void
 MainWindow::uiFailedToSendMessage(const QString &dest, const QString &text)
 {
-    Q_ASSERT(0 == "Not implemented");
+    ContactInfo cinfo;
+    if (!oContacts.getContactInfoFromNumber(dest, cinfo)) {
+        cinfo.strTitle = dest;
+    }
+
+    QMetaObject::invokeMethod (tabbedUI, "showSmsPage",
+                               Q_ARG (QVariant, QVariant(cinfo.strPhotoPath)),
+                               Q_ARG (QVariant, QVariant(cinfo.strTitle)),
+                               Q_ARG (QVariant, QVariant(dest)),
+                               Q_ARG (QVariant, QVariant(QString())),
+                               Q_ARG (QVariant, QVariant(text)));
 }//MainWindow::uiFailedToSendMessage
+
+void
+MainWindow::onUserSmsTextDone(bool ok)
+{
+    if (!ok) {
+        return;
+    }
+
+    QString dest, text;
+    dest = smsPage->property("dest").toString();
+    text = smsPage->property("smsText").toString();
+
+    onUserSendSMS (QStringList(dest), text);
+}//MainWindow::onUserSmsTextDone
+
+void
+MainWindow::onUserReplyToInboxEntry(QString id)
+{
+    GVInboxEntry event;
+    event.id = id;
+
+    ContactInfo cinfo;
+    QString type;
+    if (!oInbox.getEventInfo (event, cinfo, type)) {
+        Q_WARN(QString("Could not find inbox id").arg(id));
+        return;
+    }
+
+    QMetaObject::invokeMethod (tabbedUI, "showSmsPage",
+                               Q_ARG (QVariant, QVariant(cinfo.strPhotoPath)),
+                               Q_ARG (QVariant, QVariant(cinfo.strTitle)),
+                               Q_ARG (QVariant, QVariant(event.strPhoneNumber)),
+                               Q_ARG (QVariant, QVariant(event.strText)),
+                               Q_ARG (QVariant, QVariant(QString())));
+}//MainWindow::onUserReplyToInboxEntry

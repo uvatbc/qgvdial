@@ -29,6 +29,7 @@ Rectangle {
     property string prevSearchTerm
 
     signal contactClicked(string id)
+    signal searchContact(string searchTerm)
 
     function setMyModel(searchTerm) {
         contactsList.model = g_ContactsModel;

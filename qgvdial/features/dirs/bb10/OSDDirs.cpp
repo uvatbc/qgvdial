@@ -24,7 +24,7 @@ Contact: yuvraaj@gmail.com
 QString
 OsdDirs::_getTempDir()
 {
-	return QDir::tempPath();
+	return QDir::temp().absolutePath();
 }//OsdDirs::_getTempDir
 
 QString
@@ -36,7 +36,11 @@ OsdDirs::_getDbDir()
 QString
 OsdDirs::_getLogsDir()
 {
-//    QString base = QDir::currentPath();
-//    return base + "/shared/documents";
-	return QDir::tempPath();
+/*
+    QString base = QDir::currentPath();
+    return base + "/shared/documents";
+*/
+
+    QString base = QDir::currentPath();
+    return base + "/logs";
 }//OsdDirs::_getLogsDir

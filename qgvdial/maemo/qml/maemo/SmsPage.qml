@@ -24,7 +24,6 @@ import Qt 4.7
 Rectangle {
     id: container
 
-    visible: false
     signal done(bool accepted)
 
     property alias imageSource: contactImage.source
@@ -32,6 +31,10 @@ Rectangle {
     property string dest
     property alias conversation: lblConversation.text
     property alias smsText: txtSmsText.text
+
+    color: "black"
+    visible: false
+    opacity: visible ? 1 : 0
 
     Column {
         anchors.fill: parent
@@ -72,24 +75,28 @@ Rectangle {
             width: parent.width
             readOnly: true
             enableBorder: false
+            textFormat: Text.RichText
         }
 
         TextMultiLine {
             id: txtSmsText
             width: parent.width
-            enableBorder: false
+            enableBorder: true
         }
 
         Row {
-            spacing: 5
-            width: parent.width
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: parent.width * 8/10
+            spacing: 10
 
             Button {
                 text: "Cancel"
+                width: ((parent.width - parent.spacing) / 2)
                 onClicked: container.done(false);
             }
             Button {
                 text: "Send"
+                width: ((parent.width - parent.spacing) / 2)
                 onClicked: container.done(true);
             }//Button
         }//ButtonRow

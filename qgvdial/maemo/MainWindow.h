@@ -51,6 +51,9 @@ protected slots:
     void onInboxSelBtnClicked();
     void onInboxSelected(bool accepted);
 
+    void onUserSmsTextDone(bool ok);
+    void onUserReplyToInboxEntry(QString id);
+
 protected:
     QObject *getQMLObject(const char *pageName);
 
@@ -100,6 +103,8 @@ private:
     QObject *ciSelector;
     QObject *dialPage;
     QObject *statusBanner;
+    QObject *inboxDetails;
+    QObject *smsPage;
 };
 
 QApplication *
