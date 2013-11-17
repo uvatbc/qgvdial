@@ -48,6 +48,7 @@ Page {
             bottom: btnRow.top
         }
         spacing: 20
+        width: parent.width
 
         Item {
             width: parent.width
