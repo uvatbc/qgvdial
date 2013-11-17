@@ -537,3 +537,9 @@ MainWindow::uiLongTaskEnds()
 {
     QMetaObject::invokeMethod (statusBanner, "clearMessage");
 }//MainWindow::uiLongTaskEnds
+
+void
+MainWindow::uiFailedToSendMessage(const QString &dest, const QString &text)
+{
+    Q_ASSERT(0 == "Not implemented");
+}//MainWindow::uiFailedToSendMessage

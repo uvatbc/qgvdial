@@ -62,6 +62,9 @@ protected:
     virtual void uiLongTaskBegins();
     virtual void uiLongTaskContinues();
     virtual void uiLongTaskEnds();
+
+    virtual void uiFailedToSendMessage(const QString &destination,
+                                       const QString &text);
 };
 
 #endif // DUMMYMAINWINDOW_H

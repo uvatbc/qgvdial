@@ -82,6 +82,8 @@ protected:
     void uiLongTaskContinues();
     void uiLongTaskEnds();
 
+    void uiFailedToSendMessage(const QString &dest, const QString &text);
+
 private:
     QmlView *m_view;
 

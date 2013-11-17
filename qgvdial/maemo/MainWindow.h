@@ -80,6 +80,8 @@ protected:
     void uiLongTaskContinues();
     void uiLongTaskEnds();
 
+    void uiFailedToSendMessage(const QString &dest, const QString &text);
+
 private:
     QmlApplicationViewer *m_view;
 

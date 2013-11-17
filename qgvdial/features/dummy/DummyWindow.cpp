@@ -168,3 +168,10 @@ DummyMainWindow::uiLongTaskEnds()
 {
     Q_ASSERT(0 == "Not implemented");
 }//DummyMainWindow::uiLongTaskEnds
+
+void
+DummyMainWindow::uiFailedToSendMessage(const QString &destination,
+                                       const QString &text)
+{
+    Q_ASSERT(0 == "Not implemented");
+}//DummyMainWindow::uiFailedToSendMessage
