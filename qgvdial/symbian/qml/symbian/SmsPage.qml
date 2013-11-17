@@ -20,18 +20,19 @@ Contact: yuvraaj@gmail.com
 */
 
 import QtQuick 1.1
-import com.nokia.meego 1.1
+import com.nokia.symbian 1.1
 
 Page {
     id: container
     tools: commonTools
 
     signal done(bool accepted)
-    signal setNumberToDial(string number)
 
     property alias imageSource: contactImage.source
     property alias name: contactName.text
-    property alias phonesModel: detailsView.model
+    property string dest
+    property alias conversation: lblConversation.text
+    property alias smsText: txtSmsText.text
 
     Column {
         anchors.fill: parent
@@ -57,49 +58,40 @@ Page {
             }
         }//row: contact image and name
 
-        ListView {
-            id: detailsView
+        Label {
+            text: "Conversation so far:"
+            width: parent.width
+            visible: (lblConversation.text.length != 0)
+        }
 
-            width: parent.width - 40
-            height: parent.height - titleRow.height - parent.spacing
+        Label {
+            id: lblConversation
+            width: parent.width
+        }
 
-            anchors {
-                left: parent.left
-                leftMargin: 20
-                right: parent.right
-                rightMargin: 20
+        TextArea {
+            id: txtSmsText
+            width: parent.width
+        }
+
+        ButtonRow {
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: parent.width * 8 / 10
+            exclusive: false
+            spacing: 5
+
+            Button {
+                text: "Cancel"
+                width: ((container.width - parent.spacing) / 2) * 8 / 10
+
+                onClicked: container.done(false);
             }
+            Button {
+                text: "Send"
+                width: ((container.width - parent.spacing) / 2) * 8 / 10
 
-            delegate: Item {
-                height: lblNumber.height + 4
-                width: parent.width
-
-                Row {
-                    width: parent.width
-
-                    Label {
-                        id: lblType
-                        text: type
-                    }
-
-                    Label {
-                        id: lblNumber
-                        text: number
-                        width: parent.width - lblType.width - parent.spacing
-                        horizontalAlignment: Text.AlignRight
-                        font.pixelSize: 25
-                        smooth: true
-                    }
-                }//Row: type (work/home/mobile) and number
-
-                MouseArea {
-                    anchors.fill: parent
-                    onPressAndHold: {
-                        container.setNumberToDial(number);
-                        container.done(true);
-                    }
-                }
-            }//delegate
-        }//ListView
+                onClicked: container.done(true);
+            }//Button
+        }//ButtonRow
     }//Column
-}//TFA Dialog
+}//Sms Page

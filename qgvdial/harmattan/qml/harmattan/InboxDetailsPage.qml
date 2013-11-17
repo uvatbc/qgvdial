@@ -29,6 +29,8 @@ Page {
     signal done(bool accepted)
     signal setNumberToDial(string number)
     signal sigShowContact(string cId)
+    signal deleteEntry(string iId)
+    signal replySms(string iId)
 
     property alias imageSource: contactImage.source
     property alias name:        contactName.text
@@ -37,9 +39,16 @@ Page {
     property alias note:        lblNote.text
     property alias smsText:     lblSmsText.text
     property string cId
+    property string iId
 
     Column {
-        anchors.fill: parent
+        anchors {
+            top: parent.top
+            left: parent.left
+            bottom: btnRow.top
+        }
+        width: parent.width
+
         spacing: 20
 
         Item {
@@ -122,4 +131,26 @@ Page {
             wrapMode: Text.WordWrap
         }//Label: SMS text
     }//Column
+
+    ButtonRow {
+        id: btnRow
+        anchors.bottom: parent.bottom
+        width: parent.width
+        exclusive: false
+
+        Button {
+            text: "Reply"
+            visible: (smsText.length != 0)
+            onClicked: {
+                container.replySms(container.iId);
+            }
+        }
+        Button {
+            text: "Delete"
+            onClicked: {
+                container.deleteEntry(container.iId);
+                container.done(true);
+            }
+        }
+    }//ButtonRow
 }//Page

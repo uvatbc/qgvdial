@@ -37,14 +37,14 @@ public:
 
     bool getEventInfo(GVInboxEntry &event, ContactInfo &cinfo, QString &type);
 
-    bool markEntryAsRead(const QString &id);
-    bool deleteEntry(const QString &id);
-
 public slots:
     bool onUserSelect(QString selection = QString("all"));
     bool refresh(QString type = QString("all"), QDateTime after = QDateTime());
     bool refreshLatest(QString type);
     bool refreshLatest();
+
+    bool markEntryAsRead(const QString &id);
+    bool deleteEntry(const QString &id);
 
 private:
     InboxModel *createModel(QString type);

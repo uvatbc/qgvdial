@@ -50,7 +50,7 @@ PageStackWindow {
         }
         pageStack.push(contactDetails);
     }
-    function showInboxDetails(imgSource, name, number, note, smsText, phType, cId) {
+    function showInboxDetails(imgSource, name, number, note, smsText, phType, cId, iId) {
         inboxDetails.imageSource = imgSource;
         inboxDetails.name        = name;
         inboxDetails.number      = number;
@@ -58,6 +58,7 @@ PageStackWindow {
         inboxDetails.smsText     = smsText;
         inboxDetails.phType      = phType;
         inboxDetails.cId         = cId;
+        inboxDetails.iId         = iId;
         pageStack.push(inboxDetails);
     }
     function pushCiSelector(ciId) {
@@ -66,6 +67,14 @@ PageStackWindow {
             ciPhoneSelector.phonesModel = g_CiPhonesModel;
         }
         pageStack.push(ciPhoneSelector);
+    }
+    function showSmsPage(imgSource, name, dest, conversation, text) {
+        smsPage.imageSource  = imgSource;
+        smsPage.name         = name;
+        smsPage.dest         = dest;
+        smsPage.conversation = conversation;
+        smsPage.smsText      = text;
+        pageStack.push(smsPage);
     }
 
     initialPage: mainPage
@@ -138,6 +147,8 @@ PageStackWindow {
 
     InboxDetailsPage {
         id: inboxDetails
+        objectName: "InboxDetails"
+
         onDone: appWindow.pageStack.pop();
         onSetNumberToDial: {
             dialTab.setNumberInDisp(number);
@@ -160,6 +171,12 @@ PageStackWindow {
     CiPhoneSelectionPage {
         id: ciPhoneSelector
         objectName: "CiPhoneSelectionPage"
+        onDone: appWindow.pageStack.pop();
+    }
+
+    SmsPage {
+        id: smsPage
+        objectName: "SmsPage"
         onDone: appWindow.pageStack.pop();
     }
 

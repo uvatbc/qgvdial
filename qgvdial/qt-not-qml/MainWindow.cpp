@@ -533,7 +533,7 @@ MainWindow::onUserTextBtnClicked()
     dlg.fill (dest);
 
     ContactInfo cinfo;
-    if (db.getContactFromNumber (dest, cinfo)) {
+    if (oContacts.getContactInfoFromNumber (dest, cinfo)) {
         dlg.fill (cinfo);
     }
 
@@ -558,7 +558,7 @@ MainWindow::uiFailedToSendMessage(const QString &dest, const QString &text)
     dlg.setText (text);
 
     ContactInfo cinfo;
-    if (db.getContactFromNumber (dest, cinfo)) {
+    if (oContacts.getContactInfoFromNumber (dest, cinfo)) {
         dlg.fill (cinfo);
     }
 

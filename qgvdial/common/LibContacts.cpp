@@ -267,12 +267,13 @@ LibContacts::refreshModel()
 }//LibContacts::refreshModel
 
 bool
-LibContacts::getContactInfoAndModel(ContactInfo &cinfo)
+LibContacts::getContactInfoFromLink(ContactInfo &cinfo)
 {
     IMainWindow *win = (IMainWindow *) this->parent ();
 
     if (!win->db.getContactFromLink (cinfo)) {
         Q_WARN(QString("Couldn't find contact with ID %1").arg (cinfo.strId));
+        cinfo.strPhotoPath = UNKNOWN_CONTACT_QRC_PATH;
         return (false);
     }
 
@@ -281,7 +282,26 @@ LibContacts::getContactInfoAndModel(ContactInfo &cinfo)
     }
 
     return true;
-}//LibContacts::getContactInfoAndModel
+}//LibContacts::getContactInfoFromLink
+
+bool
+LibContacts::getContactInfoFromNumber(QString num, ContactInfo &cinfo)
+{
+    IMainWindow *win = (IMainWindow *) this->parent ();
+
+    num.remove(' ').remove('+');
+    if (!win->db.getContactFromNumber (num, cinfo)) {
+        Q_WARN(QString("Couldn't find contact with number %1").arg (num));
+        cinfo.strPhotoPath = UNKNOWN_CONTACT_QRC_PATH;
+        return (false);
+    }
+
+    if (cinfo.strPhotoPath.isEmpty ()) {
+        cinfo.strPhotoPath = UNKNOWN_CONTACT_QRC_PATH;
+    }
+
+    return true;
+}//LibContacts::getContactInfoFromNumber
 
 bool
 LibContacts::getContactInfoAndModel(QString id)
@@ -290,7 +310,7 @@ LibContacts::getContactInfoAndModel(QString id)
 
     ContactInfo cinfo;
     cinfo.strId = id;
-    if (!getContactInfoAndModel (cinfo)) {
+    if (!getContactInfoFromLink (cinfo)) {
         Q_WARN(QString("Couldn't find contact with ID %1").arg (id));
         return (false);
     }

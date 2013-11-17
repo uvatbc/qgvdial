@@ -74,7 +74,7 @@ Rectangle {
         imgClose.state = "back";
     }
 
-    function showInboxDetails(imgSource, name, number, note, smsText, phType, cId) {
+    function showInboxDetails(imgSource, name, number, note, smsText, phType, cId, iId) {
         inboxDetails.imageSource = imgSource;
         inboxDetails.name        = name;
         inboxDetails.number      = number;
@@ -82,6 +82,7 @@ Rectangle {
         inboxDetails.smsText     = smsText;
         inboxDetails.phType      = phType;
         inboxDetails.cId         = cId;
+        inboxDetails.iId         = iId;
         inboxDetails.visible = true;
         imgClose.state = "back";
     }
@@ -98,6 +99,16 @@ Rectangle {
         }
         regNumberSelector.visible = false;
         ciPhoneSelector.visible = true;
+        imgClose.state = "back";
+    }
+
+    function showSmsPage(imgSource, name, dest, conversation, text) {
+        smsPage.imageSource  = imgSource;
+        smsPage.name         = name;
+        smsPage.dest         = dest;
+        smsPage.conversation = conversation;
+        smsPage.smsText      = text;
+        smsPage.visible = true;
         imgClose.state = "back";
     }
 
@@ -330,6 +341,12 @@ Rectangle {
         }
         width: parent.width
 
+        onDone: { container.doBack(); }
+    }
+
+    SmsPage {
+        id: smsPage
+        objectName: "SmsPage"
         onDone: { container.doBack(); }
     }
 

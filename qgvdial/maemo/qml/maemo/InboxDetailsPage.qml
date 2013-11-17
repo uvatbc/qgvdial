@@ -27,6 +27,8 @@ Rectangle {
     signal done(bool accepted)
     signal setNumberToDial(string number)
     signal sigOpenContact(string cId)
+    signal deleteEntry(string iId)
+    signal replySms(string iId)
 
     property alias imageSource: contactImage.source
     property alias name:        contactName.text
@@ -35,6 +37,7 @@ Rectangle {
     property alias note:        txtNotes.text
     property alias smsText:     txtSms.text
     property string cId
+    property string iId
 
     color: "black"
     visible: false
@@ -42,7 +45,11 @@ Rectangle {
     Behavior on opacity { PropertyAnimation { duration: 250 } }
 
     Column {
-        anchors.fill: parent
+        anchors {
+            top: parent.top
+            left: parent.left
+            bottom: btnRow.top
+        }
         spacing: 20
 
         Item {
@@ -135,7 +142,7 @@ Rectangle {
             onTextChanged: {
                 visible = (text.length != 0);
             }
-        }
+        }//notes
 
         TextMultiLine {
             id: txtSms
@@ -148,6 +155,34 @@ Rectangle {
             onTextChanged: {
                 visible = (text.length != 0);
             }
-        }
+        }//SMS text
     }//Column
+
+    Row {
+        id: btnRow
+        anchors {
+            bottom: parent.bottom
+            horizontalCenter: parent.horizontalCenter
+        }
+        width: parent.width * 8 / 10
+
+        Button {
+            text: "Reply"
+            visible: (smsText.length != 0)
+            width: ((container.width - parent.spacing) / 2) * 8 / 10
+
+            onClicked: {
+                container.replySms(container.iId);
+            }
+        }
+        Button {
+            text: "Delete"
+            width: ((container.width - parent.spacing) / 2) * 8 / 10
+
+            onClicked: {
+                container.deleteEntry(container.iId);
+                container.done(true);
+            }
+        }
+    }//ButtonRow
 }//Item

@@ -19,19 +19,19 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-import QtQuick 1.1
-import com.nokia.meego 1.1
+import Qt 4.7
 
-Page {
+Rectangle {
     id: container
-    tools: commonTools
 
+    visible: false
     signal done(bool accepted)
-    signal setNumberToDial(string number)
 
     property alias imageSource: contactImage.source
     property alias name: contactName.text
-    property alias phonesModel: detailsView.model
+    property string dest
+    property alias conversation: lblConversation.text
+    property alias smsText: txtSmsText.text
 
     Column {
         anchors.fill: parent
@@ -48,58 +48,50 @@ Page {
                 height: 100
                 width: 100
             }
-            Label {
+            TextOneLine {
                 id: contactName
                 anchors.verticalCenter: parent.verticalCenter
                 font.pixelSize: 40
                 smooth: true
+                readOnly: true
+                enableBorder: false
                 width: parent.width - contactImage.width - parent.spacing
             }
         }//row: contact image and name
 
-        ListView {
-            id: detailsView
+        TextOneLine {
+            text: "Conversation so far:"
+            width: parent.width
+            visible: (lblConversation.text.length != 0)
+            readOnly: true
+            enableBorder: false
+        }
 
-            width: parent.width - 40
-            height: parent.height - titleRow.height - parent.spacing
+        TextMultiLine {
+            id: lblConversation
+            width: parent.width
+            readOnly: true
+            enableBorder: false
+        }
 
-            anchors {
-                left: parent.left
-                leftMargin: 20
-                right: parent.right
-                rightMargin: 20
+        TextMultiLine {
+            id: txtSmsText
+            width: parent.width
+            enableBorder: false
+        }
+
+        Row {
+            spacing: 5
+            width: parent.width
+
+            Button {
+                text: "Cancel"
+                onClicked: container.done(false);
             }
-
-            delegate: Item {
-                height: lblNumber.height + 4
-                width: parent.width
-
-                Row {
-                    width: parent.width
-
-                    Label {
-                        id: lblType
-                        text: type
-                    }
-
-                    Label {
-                        id: lblNumber
-                        text: number
-                        width: parent.width - lblType.width - parent.spacing
-                        horizontalAlignment: Text.AlignRight
-                        font.pixelSize: 25
-                        smooth: true
-                    }
-                }//Row: type (work/home/mobile) and number
-
-                MouseArea {
-                    anchors.fill: parent
-                    onPressAndHold: {
-                        container.setNumberToDial(number);
-                        container.done(true);
-                    }
-                }
-            }//delegate
-        }//ListView
+            Button {
+                text: "Send"
+                onClicked: container.done(true);
+            }//Button
+        }//ButtonRow
     }//Column
-}//TFA Dialog
+}//Sms Page

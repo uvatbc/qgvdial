@@ -42,7 +42,8 @@ public:
 
     bool login(const QString &user, const QString &pass);
 
-    bool getContactInfoAndModel(ContactInfo &cinfo);
+    bool getContactInfoFromLink(ContactInfo &cinfo);
+    bool getContactInfoFromNumber(QString num, ContactInfo &cinfo);
 
 public slots:
     bool getContactInfoAndModel(QString id);

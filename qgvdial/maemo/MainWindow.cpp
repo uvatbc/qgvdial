@@ -478,7 +478,8 @@ MainWindow::onInboxClicked(QString id)
                               Q_ARG(QVariant,QVariant(event.strNote)),
                               Q_ARG(QVariant,QVariant(event.strText)),
                               Q_ARG(QVariant,QVariant(type)),
-                              Q_ARG(QVariant,QVariant(cinfo.strId)));
+                              Q_ARG(QVariant,QVariant(cinfo.strId)),
+                              Q_ARG(QVariant,QVariant(event.id)));
 }//MainWindow::onInboxClicked
 
 void
