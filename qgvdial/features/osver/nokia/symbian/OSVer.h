@@ -19,37 +19,14 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#ifndef LIB_H
-#define LIB_H
+#ifndef OSVER_H
+#define OSVER_H
 
 #include "global.h"
-#include "IOsDependent.h"
 
-class Lib : public QObject
-{
-    Q_OBJECT
-private:
-    explicit Lib(QObject *parent = 0);
-
+class OsVer {
 public:
-    static Lib &ref();
-    static void deref();
-
-    inline QString getTempDir()   { return m_osd->getTempDir(); }
-    inline QString getDbDir()     { return m_osd->getDbDir(); }
-    inline QString getLogsDir()   { return m_osd->getLogsDir(); }
-    inline QString getOsDetails() { return m_osd->getOsDetails(); }
-
-    inline bool cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt) {
-        return m_osd->cipher(byIn, byOut, bEncrypt);
-    }
-
-    // BE VERY CAREFUL USING THIS FUNCTION
-    inline IOsDependant *osd() { return m_osd; }
-
-
-protected:
-    IOsDependant *m_osd;
+    QString _getOsDetails();
 };
 
-#endif // LIB_H
+#endif//OSVER_H

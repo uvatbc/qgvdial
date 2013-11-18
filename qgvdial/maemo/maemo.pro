@@ -28,6 +28,7 @@ include(../features/dirs/linux/linux-dirs.pri)
 include(../features/dbus_api/dbus_api.pri)
 include(../features/qtsingleapplication/qtsingleapplication.pri)
 include(../features/cookie-cutter/osdependent/cc-osdependent.pri)
+include(../features/osver/nokia/maemo/osv-maemo.pri)
 
 simulator {
 include(../features/tp/linux/tp.pri)

@@ -28,6 +28,7 @@ Contact: yuvraaj@gmail.com
 #include "LibContacts.h"
 #include "LibInbox.h"
 #include "LibGvPhones.h"
+#include "LogUploader.h"
 
 /*==============================================================================
  *
@@ -198,6 +199,7 @@ protected:
     LibContacts oContacts;
     LibInbox    oInbox;
     LibGvPhones oPhones;
+    LogUploader oLogUploader;
 
     QString m_user;
     QString m_pass;
@@ -210,6 +212,7 @@ protected:
     friend class LibContacts;
     friend class LibInbox;
     friend class LibGvPhones;
+    friend class LogUploader;
 };
 
 #endif // IMAINWINDOW_H

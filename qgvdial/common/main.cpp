@@ -33,7 +33,7 @@ int   logLevel = 5;   //! Log level
 int   logCounter = 0; //! Number of log entries since the last log flush
 #define LOG_FLUSH_LEVEL 0
 
-QStringList arrLogFiles;
+QStringList g_arrLogFiles;
 
 const char *ignoreMsgs[] = {
     "MPanRecognizerTouch",
@@ -134,14 +134,14 @@ initLogRotate()
     strLogfile += "qgvdial.log";
 
     for (int i = 4; i >= 0; i--) {
-        arrLogFiles.append (QString("%1.%2").arg(strLogfile).arg(i));
+        g_arrLogFiles.append (QString("%1.%2").arg(strLogfile).arg(i));
     }
-    arrLogFiles.append (strLogfile);
+    g_arrLogFiles.append (strLogfile);
 
-    QFile::remove (arrLogFiles[0]);
-    for (int i = 1; i < arrLogFiles.count (); i++) {
-        if (QFile::exists (arrLogFiles[i])) {
-            QFile::rename (arrLogFiles[i], arrLogFiles[i-1]);
+    QFile::remove (g_arrLogFiles[0]);
+    for (int i = 1; i < g_arrLogFiles.count (); i++) {
+        if (QFile::exists (g_arrLogFiles[i])) {
+            QFile::rename (g_arrLogFiles[i], g_arrLogFiles[i-1]);
         }
     }
 

@@ -35,6 +35,7 @@ include(../features/qtsingleapplication/qtsingleapplication.pri)
 include(../features/dbus_api/dbus_api.pri)
 include(../features/qml/mainwindow/qml-mainwindow.pri)
 include(../features/cookie-cutter/osdependent/cc-osdependent.pri)
+include(../features/osver/nokia/harmattan/osv-harmattan.pri)
 
 simulator {
 include(../features/tp/linux/tp.pri)

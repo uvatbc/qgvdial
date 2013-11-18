@@ -15,7 +15,8 @@ SOURCES  += $$PWD/main.cpp \
             $$PWD/IPhoneAccount.cpp \
             $$PWD/IPhoneAccountFactory.cpp \
             $$PWD/IObserverFactory.cpp \
-            $$PWD/GVNumModel.cpp
+            $$PWD/GVNumModel.cpp \
+            $$PWD/LogUploader.cpp
 
 HEADERS  += $$PWD/global.h \
             $$PWD/IOsDependent.h \
@@ -33,4 +34,5 @@ HEADERS  += $$PWD/global.h \
             $$PWD/IPhoneAccountFactory.h \
             $$PWD/IObserverFactory.h \
             $$PWD/IObserver.h \
-            $$PWD/GVNumModel.h
+            $$PWD/GVNumModel.h \
+            $$PWD/LogUploader.h

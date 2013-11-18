@@ -35,6 +35,7 @@ public:
     virtual QString getTempDir() = 0;
     virtual QString getDbDir() = 0;
     virtual QString getLogsDir() = 0;
+    virtual QString getOsDetails() = 0;
 
     virtual bool cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt) = 0;
 };

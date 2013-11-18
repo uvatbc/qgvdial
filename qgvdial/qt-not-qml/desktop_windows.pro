@@ -1,4 +1,5 @@
 include($$PWD/common-code.pri)
+include(../features/osver/desktop/windows/osv-windows.pri)
 
 # Surprisingly enough, this works just perfectly in Windows
 include($$PWD/../features/dirs/linux/linux-dirs.pri)

@@ -1,0 +1,4 @@
+INCLUDEPATH += $$PWD
+
+SOURCES  += $$PWD/OSVer.cpp
+HEADERS  += $$PWD/OSVer.h

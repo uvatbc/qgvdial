@@ -26,6 +26,7 @@ Contact: yuvraaj@gmail.com
 #include "IOsDependent.h"
 #include "OSDCipher.h"
 #include "OSDDirs.h"
+#include "OSVer.h"
 
 #define SKYPE_ENABLED 0
 
@@ -33,7 +34,10 @@ Contact: yuvraaj@gmail.com
 class SkypeClientFactory;
 #endif
 
-class OsDependant : public IOsDependant, public OsdCipher, public OsdDirs
+class OsDependant : public IOsDependant,
+                    public OsdCipher,
+                    public OsdDirs,
+                    public OsVer
 {
 public:
     OsDependant(QObject *parent = NULL);
@@ -41,6 +45,7 @@ public:
     inline QString getTempDir() { return _getTempDir (); }
     inline QString getDbDir() { return _getDbDir (); }
     inline QString getLogsDir() { return _getLogsDir (); }
+    inline QString getOsDetails() { return _getOsDetails(); }
 
     inline bool
     cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt) {
