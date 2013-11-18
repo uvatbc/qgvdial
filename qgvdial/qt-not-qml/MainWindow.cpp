@@ -230,6 +230,9 @@ MainWindow::init()
     connect(d->ui->dispNum, SIGNAL(textChanged()),
             this, SLOT(onDispNumTextChanged()));
 
+    connect(d->ui->btnSendLogs, SIGNAL(clicked()),
+            &oLogUploader, SLOT(sendLogs()));
+
     // Set up starting page and initial actions: These can change everytime I
     // touch the ui file. So force them into a state that is good to show to the end user.
     d->ui->actionFind->setEnabled (false);

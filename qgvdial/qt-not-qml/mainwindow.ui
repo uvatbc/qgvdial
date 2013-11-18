@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>QGVDial</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -295,8 +295,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>437</width>
-             <height>171</height>
+             <width>436</width>
+             <height>167</height>
             </rect>
            </property>
            <attribute name="label">
@@ -334,8 +334,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>253</width>
-             <height>245</height>
+             <width>421</width>
+             <height>251</height>
             </rect>
            </property>
            <attribute name="label">
@@ -443,23 +443,30 @@
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="aboutDetails">
+          <widget class="QWidget" name="etCeteraDetails">
            <property name="geometry">
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>96</width>
-             <height>93</height>
+             <width>436</width>
+             <height>167</height>
             </rect>
            </property>
            <attribute name="label">
-            <string>About</string>
+            <string>Et Cetera</string>
            </attribute>
            <layout class="QVBoxLayout" name="verticalLayout_4">
             <item>
-             <widget class="QPlainTextEdit" name="plainTextEdit">
-              <property name="readOnly">
-               <bool>true</bool>
+             <widget class="QPushButton" name="btnAbout">
+              <property name="text">
+               <string>About</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btnSendLogs">
+              <property name="text">
+               <string>Send Logs</string>
               </property>
              </widget>
             </item>
@@ -479,7 +486,7 @@
      <x>0</x>
      <y>0</y>
      <width>497</width>
-     <height>22</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
