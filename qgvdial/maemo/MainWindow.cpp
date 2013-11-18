@@ -76,6 +76,7 @@ MainWindow::MainWindow(QObject *parent)
 , statusBanner(NULL)
 , inboxDetails(NULL)
 , smsPage(NULL)
+, etCetera(NULL)
 {
 }//MainWindow::MainWindow
 
@@ -265,6 +266,13 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
         }
         connect(smsPage, SIGNAL(done(bool)),
                 this, SLOT(onUserSmsTextDone(bool)));
+
+        etCetera = getQMLObject ("EtCetera");
+        if (NULL == etCetera) {
+            break;
+        }
+        connect(etCetera, SIGNAL(sendLogs()),
+                &oLogUploader, SLOT(sendLogs()));
 
         onInitDone();
         return;

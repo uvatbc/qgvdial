@@ -112,6 +112,7 @@ private:
     QObject *dialPage;
     QObject *smsPage;
     QObject *inboxDetails;
+    QObject *etCetera;
 
     void    *loginCtx;
 

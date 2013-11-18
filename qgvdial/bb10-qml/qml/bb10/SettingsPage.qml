@@ -59,23 +59,13 @@ Page {
 
     Flickable {
         // Cannot use childrenRect.height because it causes a binding loop
-        /*
-        contentHeight: expandLoginDetails.height + expandProxySettings.height +
-                       expandDialSettings.height + expandRefreshSettings.height +
-                       expandPinSettings.height + expandLogView.height +
-                       expandPhoneIntegration.height + expandAbout.height
-        */
         contentHeight: (expandLoginDetails.height + 1 +
-                        expandProxySettings.height + 1)
+                        expandProxySettings.height + 1 +
+                        expandEtCetera.height)
         contentWidth: width
         clip: true
 
         anchors.fill: parent
-        //anchors {
-        //    top: parent.top
-        //}
-        //width: parent.width
-        //height: parent.height
 
         ExpandView {
             id: expandLoginDetails
@@ -116,161 +106,24 @@ Page {
             }
         }//ExpandView (proxy)
 
-/*
         ExpandView {
-            id: expandDialSettings
-            anchors {
-                top: expandLoginDetails.bottom
-                left: parent.left
-            }
-
-            width: parent.width
-            contentHeight: dialSettings.height;
-
-            onClicked: if (isExpanded) yAdjustTimer.setY = y;
-
-            mainTitle: "Dial settings"
-
-            DialSettings {
-                id: dialSettings
-                y: parent.startY
-
-                width: parent.width - 1
-                opacity: parent.containedOpacity
-            }
-        }//ExpandView (dial settings)
-
-        ExpandView {
-            id: expandRefreshSettings
+            id: expandEtCetera
             anchors {
                 top: expandProxySettings.bottom
                 left: parent.left
+                topMargin: 1
             }
-
             width: parent.width
-            contentHeight: refreshSettings.height;
 
-            onClicked: if (isExpanded) yAdjustTimer.setY = y;
+            mainTitle: "Et Cetera"
+            content: etCetera
+            yTimer: yAdjustTimer
 
-            mainTitle: "Auto refresh"
-
-            RefreshSettings {
-                id: refreshSettings
-                objectName: "RefreshSettingsPage"
-
-                y: parent.startY
-                width: parent.width - 1
-                opacity: parent.containedOpacity
-
-                onSigDone: parent.isExpanded = false;
-            }//RefreshSettings
-        }//ExpandView (refresh)
-
-        ExpandView {
-            id: expandPinSettings
-            anchors {
-                top: expandRefreshSettings.bottom
-                left: parent.left
-            }
-
-            width: parent.width
-            contentHeight: pinSettings.height;
-
-            onClicked: if (isExpanded) yAdjustTimer.setY = y;
-
-            mainTitle: "Pin"
-
-            PinSetting {
-                id: pinSettings
-                y: parent.startY
-
-                width: parent.width - 1
-                opacity: parent.containedOpacity
-
-                onSigDone: {
-                    if (!bSave) {
-                        container.sigPinRefresh();
-                    }
-                    parent.isExpanded = false;
-                }
-                onSigPinSettingChanges: container.sigPinSettingChanges(bEnable, pin)
-            }//Pin settings
-        }//ExpandView (pin settings)
-
-        ExpandView {
-            id: expandLogView
-            anchors {
-                top: expandPinSettings.bottom
-                left: parent.left
-            }
-
-            width: parent.width
-            contentHeight: logView.height;
-
-            onClicked: if (isExpanded) yAdjustTimer.setY = y;
-
-            mainTitle: "Logs"
-
-            LogView {
-                id: logView
-
-                width: parent.width - 1
-                height: container.height - parent.textHeight
-                y: parent.startY
-
-                opacity: parent.containedOpacity
-                onSigBack: parent.isExpanded = false;
-                onSigSendLogs: container.sigSendLogs();
-            }
-        }//ExpandView (log view)
-
-        ExpandView {
-            id: expandPhoneIntegration
-            anchors {
-                top: expandLogView.bottom
-                left: parent.left
-            }
-
-            width: parent.width
-            contentHeight: phoneIntegrationView.height;
-
-            onClicked: if (isExpanded) yAdjustTimer.setY = y;
-
-            mainTitle: "Phone integration"
-
-            PhoneIntegrationView {
-                id: phoneIntegrationView
-
+            EtCetera {
+                id: etCetera
+                objectName: "EtCetera"
                 width: parent.width
-                opacity: parent.containedOpacity
-                y: parent.startY
             }
-        }//ExpandView (phone integration)
-
-        ExpandView {
-            id: expandAbout
-            anchors {
-                top: expandPhoneIntegration.bottom
-                left: parent.left
-            }
-
-            width: parent.width
-            contentHeight: aboutWin.height;
-
-            onClicked: if (isExpanded) yAdjustTimer.setY = y;
-
-            mainTitle: "About"
-
-            About {
-                id: aboutWin
-
-                width: parent.width - 1
-                y: parent.startY
-                opacity: parent.containedOpacity
-
-                onSigLinkActivated: container.sigLinkActivated(strLink)
-            }//About
-        }//ExpandView (About)
-        */
+        }//ExpandView (Et Cetera)
     }//Flickable
 }//Page (SettingsPage)

@@ -105,6 +105,7 @@ private:
     QObject *statusBanner;
     QObject *inboxDetails;
     QObject *smsPage;
+    QObject *etCetera;
 };
 
 QApplication *

@@ -55,14 +55,9 @@ Page {
 
     Flickable {
         // Cannot use childrenRect.height because it causes a binding loop
-        /*
-        contentHeight: expandLoginDetails.height + expandProxySettings.height +
-                       expandDialSettings.height + expandRefreshSettings.height +
-                       expandPinSettings.height + expandLogView.height +
-                       expandPhoneIntegration.height + expandAbout.height
-        */
         contentHeight: (expandLoginDetails.height + 1 +
-                        expandProxySettings.height + 1)
+                        expandProxySettings.height + 1 +
+                        expandEtCetera.height)
         contentWidth: width
         clip: true
 
@@ -111,30 +106,27 @@ Page {
             }
         }//ExpandView (proxy)
 
-/*
         ExpandView {
-            id: expandDialSettings
+            id: expandEtCetera
             anchors {
-                top: expandLoginDetails.bottom
+                top: expandProxySettings.bottom
                 left: parent.left
+                topMargin: 1
             }
-
             width: parent.width
-            contentHeight: dialSettings.height;
 
-            onClicked: if (isExpanded) yAdjustTimer.setY = y;
+            mainTitle: "Et Cetera"
+            content: etCetera
+            yTimer: yAdjustTimer
 
-            mainTitle: "Dial settings"
-
-            DialSettings {
-                id: dialSettings
-                y: parent.startY
-
-                width: parent.width - 1
-                opacity: parent.containedOpacity
+            EtCetera {
+                id: etCetera
+                objectName: "EtCetera"
+                width: parent.width
             }
-        }//ExpandView (dial settings)
+        }//ExpandView (Et Cetera)
 
+/*
         ExpandView {
             id: expandRefreshSettings
             anchors {
@@ -241,31 +233,6 @@ Page {
                 y: parent.startY
             }
         }//ExpandView (phone integration)
-
-        ExpandView {
-            id: expandAbout
-            anchors {
-                top: expandPhoneIntegration.bottom
-                left: parent.left
-            }
-
-            width: parent.width
-            contentHeight: aboutWin.height;
-
-            onClicked: if (isExpanded) yAdjustTimer.setY = y;
-
-            mainTitle: "About"
-
-            About {
-                id: aboutWin
-
-                width: parent.width - 1
-                y: parent.startY
-                opacity: parent.containedOpacity
-
-                onSigLinkActivated: container.sigLinkActivated(strLink)
-            }//About
-        }//ExpandView (About)
         */
     }//Flickable
 }//Page (SettingsPage)

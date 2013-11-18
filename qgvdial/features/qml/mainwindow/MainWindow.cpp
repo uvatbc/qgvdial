@@ -109,6 +109,7 @@ MainWindow::MainWindow(QObject *parent)
 , dialPage(NULL)
 , smsPage(NULL)
 , inboxDetails(NULL)
+, etCetera(NULL)
 {
 #ifdef Q_OS_BLACKBEERRY
     // GL viewport increases performance on blackberry
@@ -349,6 +350,12 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
                 &oInbox, SLOT(deleteEntry(QString)));
         connect(inboxDetails, SIGNAL(replySms(QString)),
                 this, SLOT(onUserReplyToInboxEntry(QString)));
+
+        etCetera = getQMLObject ("EtCetera");
+        if (NULL == etCetera) {
+            break;
+        }
+        connect(etCetera, SIGNAL(sendLogs()), &oLogUploader, SLOT(sendLogs()));
 
         onInitDone();
         return;
