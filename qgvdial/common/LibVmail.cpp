@@ -41,6 +41,11 @@ LibVmail::LibVmail(IMainWindow *parent)
 {
 }//LibVmail::LibVmail
 
+LibVmail::~LibVmail()
+{
+    deinitPlayer ();
+}//LibVmail::~LibVmail
+
 bool
 LibVmail::getVmailForId(const QString &id, QString &localPath)
 {
@@ -176,6 +181,15 @@ LibVmail::createVmailPlayer()
     m_player->setNotifyInterval (NOTIFY_INTERVAL);
 #endif
 }//LibVmail::createVmailPlayer
+
+void
+LibVmail::deinitPlayer()
+{
+    if (m_player) {
+        delete m_player;
+        m_player = NULL;
+    }
+}//LibVmail::deinitPlayer
 
 void
 LibVmail::onDurationChanged(qint64 duration)

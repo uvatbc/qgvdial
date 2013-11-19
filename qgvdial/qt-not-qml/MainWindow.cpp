@@ -371,7 +371,7 @@ MainWindow::uiLoginDone(int status, const QString &errStr)
 }//MainWindow::uiLoginDone
 
 void
-MainWindow::uiRefreshContacts(ContactsModel *model, QString query)
+MainWindow::uiRefreshContacts(ContactsModel *model, QString /*query*/)
 {
     Q_ASSERT(NULL != model);
 

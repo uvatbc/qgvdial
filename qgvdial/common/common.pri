@@ -1,6 +1,13 @@
 INCLUDEPATH += $$PWD
 PRECOMPILED_HEADER = $$PWD/global.h
 
+CONFIG *= mobility
+!blackberry {
+QT *= phonon
+} else {
+MOBILITY *= multimedia
+}
+
 SOURCES  += $$PWD/main.cpp \
             $$PWD/IMainWindow.cpp \
             $$PWD/CacheDb.cpp \

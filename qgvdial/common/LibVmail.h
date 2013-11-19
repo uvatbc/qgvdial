@@ -47,6 +47,7 @@ class LibVmail : public QObject
     Q_OBJECT
 public:
     explicit LibVmail(IMainWindow *parent);
+    ~LibVmail();
 
     bool getVmailForId(const QString &id, QString &localPath);
     bool fetchVmail(const QString &id);
@@ -59,6 +60,8 @@ public slots:
     void play();
     void pause();
     void stop();
+
+    void deinitPlayer();
 
 signals:
     void vmailFetched(const QString &id, const QString &localPath, bool ok);
@@ -78,7 +81,7 @@ private slots:
 #if PHONON_ENABLED
     //! Invoked when the vmail player changes state
     void onPhononPlayerStateChanged(Phonon::State newState,
-        Phonon::State oldState);
+                                    Phonon::State oldState);
 #else
     void onMMKitPlayerStateChanged(QMediaPlayer::State state);
 #endif
@@ -88,9 +91,8 @@ private:
 
 private:
     bool bBeginPlayAfterLoad;
-    LVPlayerState m_state;
-
     quint64 m_duration;
+    LVPlayerState m_state;
 
 #if PHONON_ENABLED
     //! The Phonon vmail player

@@ -72,6 +72,7 @@ VmailDialog::VmailDialog(MainWindow *parent)
 VmailDialog::~VmailDialog()
 {
     win->oVmail.stop ();
+    win->oVmail.deinitPlayer ();
     delete ui;
 }//VmailDialog::~VmailDialog
 
@@ -153,10 +154,10 @@ VmailDialog::onReplyClicked()
 }//VmailDialog::onReplyClicked
 
 void
-VmailDialog::onVmailFetched(const QString &id, const QString &path, bool ok)
+VmailDialog::onVmailFetched(const QString &, const QString &path, bool ok)
 {
-    disconnect (&win->oVmail, SIGNAL(vmailFetched(QString,QString,bool)),
-                this, SLOT(onVmailFetched(QString,QString,bool)));
+    disconnect(&win->oVmail, SIGNAL(vmailFetched(QString,QString,bool)),
+               this, SLOT(onVmailFetched(QString,QString,bool)));
 
     const char *msg;
     if (!ok) {
