@@ -64,10 +64,16 @@ signals:
     void vmailFetched(const QString &id, const QString &localPath, bool ok);
     void playerStateUpdate(LVPlayerState newState);
 
+    void durationChanged(quint64 duration);
+    void currentPositionChanged(quint64 position, quint64 duration);
+
 private slots:
     void onVmailDownloaded ();
     void ensureVmailPlaying();
     void onVmailPlayerFinished();
+
+    void onDurationChanged(qint64 duration);
+    void onCurrentPositionChanged(qint64 position);
 
 #if PHONON_ENABLED
     //! Invoked when the vmail player changes state
@@ -83,6 +89,8 @@ private:
 private:
     bool bBeginPlayAfterLoad;
     LVPlayerState m_state;
+
+    quint64 m_duration;
 
 #if PHONON_ENABLED
     //! The Phonon vmail player

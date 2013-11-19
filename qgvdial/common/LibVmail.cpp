@@ -30,9 +30,12 @@ Contact: yuvraaj@gmail.com
 #include <QtMultimediaKit/QMediaPlaylist>
 #endif
 
+#define NOTIFY_INTERVAL 100
+
 LibVmail::LibVmail(IMainWindow *parent)
 : QObject(parent)
 , bBeginPlayAfterLoad(false)
+, m_duration(0)
 , m_state(LVPS_Invalid)
 , m_player (NULL)
 {
@@ -143,6 +146,16 @@ LibVmail::createVmailPlayer()
                   this, SLOT(onVmailPlayerFinished()));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
+    rv = connect (m_player, SIGNAL(totalTimeChanged(qint64)),
+                  this, SLOT(onDurationChanged(qint64)));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+    rv = connect (m_player, SIGNAL(tick(qint64)),
+                  this, SLOT(onCurrentPositionChanged(qint64)));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+
+    m_player->setTickInterval (NOTIFY_INTERVAL);
 #else
     m_player = new QMediaPlayer(this);
 
@@ -151,15 +164,37 @@ LibVmail::createVmailPlayer()
         this, SLOT(onMMKitPlayerStateChanged(QMediaPlayer::State)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
+    rv = connect (m_player, SIGNAL(durationChanged(qint64)),
+                  this, SLOT(onDurationChanged(qint64)));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+    rv = connect (m_player, SIGNAL(positionChanged(qint64)),
+                  this, SLOT(onCurrentPositionChanged(qint64)));
+    Q_ASSERT(rv);
+    if (!rv) { exit(1); }
+
+    m_player->setNotifyInterval (NOTIFY_INTERVAL);
 #endif
 }//LibVmail::createVmailPlayer
+
+void
+LibVmail::onDurationChanged(qint64 duration)
+{
+    m_duration = duration;
+    emit durationChanged (m_duration);
+}//LibVmail::onDurationChanged
+
+void
+LibVmail::onCurrentPositionChanged(qint64 position)
+{
+    emit currentPositionChanged (position, m_duration);
+}//LibVmail::onCurrentPositionChanged
 
 void
 LibVmail::onVmailPlayerFinished()
 {
     // Required to make phonon on Maemo work as expected.
     Q_DEBUG("Force stop vmail on finished");
-
     m_player->stop ();   // Present in Phonon and MMKit
 }//LibVmail::onVmailPlayerFinished
 

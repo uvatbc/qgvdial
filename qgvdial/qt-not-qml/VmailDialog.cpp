@@ -37,6 +37,8 @@ VmailDialog::VmailDialog(MainWindow *parent)
 , m_deleteRequested(false)
 {
     ui->setupUi(this);
+    ui->progressBar->setValue (0);
+    ui->progressBar->setFormat ("%v sec");
 
     connect(ui->lblNumber, SIGNAL(doubleClicked()),
             this, SLOT(onNumberDoubleClicked()));
@@ -60,6 +62,9 @@ VmailDialog::VmailDialog(MainWindow *parent)
             this, SLOT(onPlayPauseClicked()));
     connect(ui->btnStop, SIGNAL(clicked()),
             this, SLOT(onStopClicked()));
+
+    connect (&win->oVmail, SIGNAL(currentPositionChanged(quint64,quint64)),
+             this, SLOT(onPlayerPositionChanged(quint64,quint64)));
 }//VmailDialog::VmailDialog
 
 VmailDialog::~VmailDialog()
@@ -181,8 +186,9 @@ VmailDialog::onPlayPauseClicked()
         ui->btnPlayPause->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
         win->oVmail.pause ();
         break;
-    case LVPS_Paused:
     case LVPS_Stopped:
+        ui->progressBar->show();
+    case LVPS_Paused:
         ui->btnPlayPause->setIcon(style()->standardIcon(QStyle::SP_MediaPause));
         win->oVmail.play ();
         break;
@@ -200,8 +206,20 @@ VmailDialog::onStopClicked()
     case LVPS_Paused:
         ui->btnPlayPause->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
         win->oVmail.stop ();
+        ui->progressBar->hide();
         break;
     default:
         break;
     }
 }//VmailDialog::onPlayPauseClicked
+
+void
+VmailDialog::onPlayerPositionChanged(quint64 current, quint64 max)
+{
+    // Convert to seconds
+    current /= 1000;
+    max /= 1000;
+
+    ui->progressBar->setRange (0, max);
+    ui->progressBar->setValue (current);
+}//VmailDialog::onPlayerPositionChanged

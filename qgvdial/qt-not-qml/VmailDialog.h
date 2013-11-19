@@ -49,6 +49,7 @@ private slots:
     void onVmailFetched(const QString &id, const QString &localPath, bool ok);
     void onPlayPauseClicked();
     void onStopClicked();
+    void onPlayerPositionChanged(quint64 current, quint64 max);
 
 private:
     MainWindow *win;
