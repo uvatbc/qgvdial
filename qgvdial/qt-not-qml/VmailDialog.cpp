@@ -65,6 +65,8 @@ VmailDialog::VmailDialog(MainWindow *parent)
 
     connect (&win->oVmail, SIGNAL(currentPositionChanged(quint64,quint64)),
              this, SLOT(onPlayerPositionChanged(quint64,quint64)));
+    connect (&win->oVmail, SIGNAL(playerStateUpdate(LVPlayerState)),
+             this, SLOT(onPlayerStateUpdate(LVPlayerState)));
 }//VmailDialog::VmailDialog
 
 VmailDialog::~VmailDialog()
@@ -206,8 +208,9 @@ VmailDialog::onStopClicked()
     case LVPS_Paused:
         ui->btnPlayPause->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
         win->oVmail.stop ();
-        ui->progressBar->hide();
         break;
+    case LVPS_Stopped:
+        ui->btnPlayPause->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
     default:
         break;
     }
@@ -223,3 +226,19 @@ VmailDialog::onPlayerPositionChanged(quint64 current, quint64 max)
     ui->progressBar->setRange (0, max);
     ui->progressBar->setValue (current);
 }//VmailDialog::onPlayerPositionChanged
+
+void
+VmailDialog::onPlayerStateUpdate(LVPlayerState newState)
+{
+    switch (newState) {
+    case LVPS_Playing:
+        ui->btnPlayPause->setIcon(style()->standardIcon(QStyle::SP_MediaPause));
+        break;
+    case LVPS_Paused:
+    case LVPS_Stopped:
+        ui->btnPlayPause->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+        break;
+    default:
+        break;
+    }
+}//VmailDialog::onPlayerStateUpdate

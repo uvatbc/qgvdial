@@ -23,6 +23,7 @@ Contact: yuvraaj@gmail.com
 #define VMAILDIALOG_H
 
 #include "global.h"
+#include "LibVmail.h"
 
 namespace Ui {
 class VmailDialog;
@@ -50,6 +51,8 @@ private slots:
     void onPlayPauseClicked();
     void onStopClicked();
     void onPlayerPositionChanged(quint64 current, quint64 max);
+
+    void onPlayerStateUpdate(LVPlayerState newState);
 
 private:
     MainWindow *win;

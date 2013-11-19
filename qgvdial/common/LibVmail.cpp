@@ -297,6 +297,8 @@ LibVmail::loadVmail(const QString &path)
     m_player->setMedia(url);
 #endif
 
+    m_player->stop ();
+
     return (true);
 }//LibVmail::loadVmail
 
@@ -314,7 +316,7 @@ LibVmail::play()
         QTimer::singleShot(1000, this, SLOT(ensureVmailPlaying()));
         return;
     }
-    
+
     m_player->play ();
 }//LibVmail::play
 
