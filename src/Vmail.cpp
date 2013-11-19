@@ -60,13 +60,13 @@ qgvVmail::playVmail (const QString &strFile)
         Q_DEBUG(QString("Play vmail file: %1").arg(strFile));
 
         createVmailPlayer ();
-        bBeginPlayAfterLoad = true;
 #if PHONON_ENABLED
         vmailPlayer->setCurrentSource (Phonon::MediaSource(url));
 //        vmailPlayer->setVolume (50);
 #else
         vmailPlayer->setMedia(url);
 #endif
+        bBeginPlayAfterLoad = true;
         QTimer::singleShot(1000, this, SLOT(ensureVmailPlaying()));
     } while (0); // End cleanup block (not a loop)
 }//qgvVmail::playVmail
@@ -99,11 +99,11 @@ qgvVmail::createVmailPlayer()
     Phonon::createPath(vmailPlayer, audioOutput);
 
     rv = connect (
-        vmailPlayer, SIGNAL(stateChanged (Phonon::State, Phonon::State)),
-        this, SLOT(onPhononPlayerStateChanged(Phonon::State, Phonon::State)));
+        vmailPlayer, SIGNAL(stateChanged(Phonon::State,Phonon::State)),
+        this, SLOT(onPhononPlayerStateChanged(Phonon::State,Phonon::State)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
-    rv = connect (vmailPlayer, SIGNAL(finished ()),
+    rv = connect (vmailPlayer, SIGNAL(finished()),
                   this, SLOT(onVmailPlayerFinished()));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }

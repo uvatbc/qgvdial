@@ -55,10 +55,16 @@ VmailDialog::VmailDialog(MainWindow *parent)
 
     ui->btnPlayPause->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
     ui->btnStop->setIcon(style()->standardIcon(QStyle::SP_MediaStop));
+
+    connect(ui->btnPlayPause, SIGNAL(clicked()),
+            this, SLOT(onPlayPauseClicked()));
+    connect(ui->btnStop, SIGNAL(clicked()),
+            this, SLOT(onStopClicked()));
 }//VmailDialog::VmailDialog
 
 VmailDialog::~VmailDialog()
 {
+    win->oVmail.stop ();
     delete ui;
 }//VmailDialog::~VmailDialog
 
@@ -86,9 +92,8 @@ VmailDialog::fill(const GVInboxEntry &event)
                  this, SLOT(onVmailFetched(QString,QString,bool)));
         rv = win->oVmail.fetchVmail (event.id);
     } else {
-        ui->lblFetching->hide ();
-
         rv = true;
+        onVmailFetched (event.id, m_localPath, rv);
     }
 
     return (rv);
@@ -146,12 +151,57 @@ VmailDialog::onVmailFetched(const QString &id, const QString &path, bool ok)
     disconnect (&win->oVmail, SIGNAL(vmailFetched(QString,QString,bool)),
                 this, SLOT(onVmailFetched(QString,QString,bool)));
 
+    const char *msg;
     if (!ok) {
-        ui->lblFetching->setText ("Failed to download voice mail!");
+        msg = "Failed to download voice mail!";
+        Q_WARN(msg);
+        ui->lblFetching->setText (msg);
         return;
     }
 
+    if (!win->oVmail.loadVmail(path)) {
+        msg = "Failed to load voice mail";
+        Q_WARN(msg);
+        ui->lblFetching->setText (msg);
+        return;
+    }
+
+    m_localPath = path;
     ui->lblFetching->hide ();
     ui->wPlayerButtons->show ();
     ui->progressBar->show ();
 }//VmailDialog::onVmailFetched
+
+void
+VmailDialog::onPlayPauseClicked()
+{
+    LVPlayerState state = win->oVmail.getPlayerState ();
+    switch (state) {
+    case LVPS_Playing:
+        ui->btnPlayPause->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+        win->oVmail.pause ();
+        break;
+    case LVPS_Paused:
+    case LVPS_Stopped:
+        ui->btnPlayPause->setIcon(style()->standardIcon(QStyle::SP_MediaPause));
+        win->oVmail.play ();
+        break;
+    default:
+        break;
+    }
+}//VmailDialog::onPlayPauseClicked
+
+void
+VmailDialog::onStopClicked()
+{
+    LVPlayerState state = win->oVmail.getPlayerState ();
+    switch (state) {
+    case LVPS_Playing:
+    case LVPS_Paused:
+        ui->btnPlayPause->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+        win->oVmail.stop ();
+        break;
+    default:
+        break;
+    }
+}//VmailDialog::onPlayPauseClicked
