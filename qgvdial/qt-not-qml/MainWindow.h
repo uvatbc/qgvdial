@@ -106,6 +106,8 @@ private:
     QSystemTrayIcon *m_systrayIcon;
 
     bool m_ignoreCbInboxChange;
+
+    friend class VmailDialog;
 };
 
 QCoreApplication *

@@ -31,6 +31,7 @@ IMainWindow::IMainWindow(QObject *parent)
 , oInbox(this)
 , oPhones(this)
 , oLogUploader(this)
+, oVmail(this)
 , m_loginTask(NULL)
 {
     qRegisterMetaType<ContactInfo>("ContactInfo");

@@ -37,8 +37,9 @@ Contact: yuvraaj@gmail.com
 #include "ContactDialog.h"
 #include "ContactNumbersModel.h"
 
-#include "InboxEntryDialog.h"
 #include "CINumberDialog.h"
+#include "InboxEntryDialog.h"
+#include "VmailDialog.h"
 
 #include "SmsDialog.h"
 
@@ -614,6 +615,11 @@ MainWindow::onInboxDoubleClicked(const QModelIndex &index)
     ContactInfo cinfo;
     QString type;
 
+    bool contactDoubleClicked, numberDoubleClicked, deleteRequested;
+    bool replyRequested;
+
+    contactDoubleClicked = numberDoubleClicked = replyRequested = false;
+
     event.id = idIndex.data().toString();
     if (!oInbox.getEventInfo (event, cinfo, type)) {
         //TODO: Some error
@@ -624,46 +630,70 @@ MainWindow::onInboxDoubleClicked(const QModelIndex &index)
         oInbox.markEntryAsRead (event.id);
     }
 
-    InboxEntryDialog dlg;
-    dlg.fill (event);
-    dlg.fill (cinfo);
+    if (GVIE_Voicemail == event.Type) {
+        VmailDialog dlg(this);
 
-    // Show inbox details
-    if (QDialog::Accepted != dlg.exec ()) {
-        return;
+        if (!dlg.fill (event)) {
+            Q_WARN("Failed to fill in VMail details");
+            return;
+        }
+        dlg.fill (cinfo);
+
+        if (QDialog::Accepted != dlg.exec ()) {
+            return;
+        }
+
+        contactDoubleClicked = dlg.m_contactDoubleClicked;
+        numberDoubleClicked  = dlg.m_numberDoubleClicked;
+        replyRequested       = dlg.m_replyRequested;
+        deleteRequested      = dlg.m_deleteRequested;
+    } else {
+        InboxEntryDialog dlg;
+        dlg.fill (event);
+        dlg.fill (cinfo);
+
+        // Show inbox details
+        if (QDialog::Accepted != dlg.exec ()) {
+            return;
+        }
+
+        contactDoubleClicked = dlg.m_contactDoubleClicked;
+        numberDoubleClicked  = dlg.m_numberDoubleClicked;
+        replyRequested       = dlg.m_replyRequested;
+        deleteRequested      = dlg.m_deleteRequested;
     }
 
-    if (dlg.m_contactDoubleClicked) {
+    if (contactDoubleClicked) {
         if (!cinfo.strId.isEmpty ()) {
-            ContactDialog dlg1;
-            connect(&dlg1, SIGNAL(selected(QString)),
+            ContactDialog dlg;
+            connect(&dlg, SIGNAL(selected(QString)),
                     this, SLOT(setNumberToDial(QString)));
-            dlg1.fillAndExec (cinfo);
+            dlg.fillAndExec (cinfo);
         } else {
-            dlg.m_numberDoubleClicked = true;
+            numberDoubleClicked = true;
         }
     }
 
-    if (dlg.m_numberDoubleClicked) {
+    if (numberDoubleClicked) {
         QModelIndex numIndex = index.sibling (index.row (), 3);
         setNumberToDial (numIndex.data().toString());
     }
 
-    if (dlg.m_deleteRequested) {
+    if (deleteRequested) {
         oInbox.deleteEntry (event.id);
     }
 
-    if (dlg.m_replyRequested) {
+    if (replyRequested) {
         // Start reply dialog
-        SmsDialog dlg1;
-        dlg1.fill (event.strPhoneNumber);
-        dlg1.fill (cinfo);
-        dlg1.fill (event);
+        SmsDialog dlg;
+        dlg.fill (event.strPhoneNumber);
+        dlg.fill (cinfo);
+        dlg.fill (event);
 
-        if (QDialog::Accepted == dlg1.exec ()) {
+        if (QDialog::Accepted == dlg.exec ()) {
             QStringList nums;
             nums += event.strPhoneNumber;
-            onUserSendSMS (nums, dlg1.getText ());
+            onUserSendSMS (nums, dlg.getText ());
         }
     }
 }//MainWindow::onInboxDoubleClicked

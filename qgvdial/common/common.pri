@@ -16,7 +16,8 @@ SOURCES  += $$PWD/main.cpp \
             $$PWD/IPhoneAccountFactory.cpp \
             $$PWD/IObserverFactory.cpp \
             $$PWD/GVNumModel.cpp \
-            $$PWD/LogUploader.cpp
+            $$PWD/LogUploader.cpp \
+            $$PWD/LibVmail.cpp
 
 HEADERS  += $$PWD/global.h \
             $$PWD/IOsDependent.h \
@@ -35,4 +36,5 @@ HEADERS  += $$PWD/global.h \
             $$PWD/IObserverFactory.h \
             $$PWD/IObserver.h \
             $$PWD/GVNumModel.h \
-            $$PWD/LogUploader.h
+            $$PWD/LogUploader.h \
+            $$PWD/LibVmail.h

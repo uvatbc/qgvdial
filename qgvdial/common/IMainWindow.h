@@ -29,6 +29,7 @@ Contact: yuvraaj@gmail.com
 #include "LibInbox.h"
 #include "LibGvPhones.h"
 #include "LogUploader.h"
+#include "LibVmail.h"
 
 /*==============================================================================
  *
@@ -200,6 +201,7 @@ protected:
     LibInbox    oInbox;
     LibGvPhones oPhones;
     LogUploader oLogUploader;
+    LibVmail    oVmail;
 
     QString m_user;
     QString m_pass;
@@ -213,6 +215,7 @@ protected:
     friend class LibInbox;
     friend class LibGvPhones;
     friend class LogUploader;
+    friend class LibVmail;
 };
 
 #endif // IMAINWINDOW_H

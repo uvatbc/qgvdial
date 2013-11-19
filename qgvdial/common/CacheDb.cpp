@@ -72,6 +72,8 @@ CacheDb::init(const QString &dbDir)
     }
 
     ensureCache ();
+
+    //TODO: Clean out the temp table of dead entries
     return (true);
 }//CacheDb::init
 

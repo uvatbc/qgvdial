@@ -19,24 +19,25 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#ifndef INBOXENTRYDIALOG_H
-#define INBOXENTRYDIALOG_H
+#ifndef VMAILDIALOG_H
+#define VMAILDIALOG_H
 
 #include "global.h"
 
 namespace Ui {
-class InboxEntryDialog;
+class VmailDialog;
 }
 
-class InboxEntryDialog : public QDialog
+class MainWindow;
+class VmailDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit InboxEntryDialog(QWidget *parent = 0);
-    ~InboxEntryDialog();
+    explicit VmailDialog(MainWindow *parent);
+    ~VmailDialog();
 
-    void fill(const GVInboxEntry &event);
+    bool fill(const GVInboxEntry &event);
     void fill(const ContactInfo &cinfo);
 
 private slots:
@@ -45,8 +46,13 @@ private slots:
     void onDeleteClicked();
     void onReplyClicked();
 
+    void onVmailFetched(const QString &id, const QString &localPath, bool ok);
+
 private:
-    Ui::InboxEntryDialog *ui;
+    MainWindow *win;
+    Ui::VmailDialog *ui;
+
+    QString m_localPath;
 
 public:
     bool m_numberDoubleClicked;
@@ -55,4 +61,4 @@ public:
     bool m_deleteRequested;
 };
 
-#endif // INBOXENTRYDIALOG_H
+#endif // VMAILDIALOG_H

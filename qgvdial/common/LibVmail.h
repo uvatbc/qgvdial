@@ -19,40 +19,26 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#ifndef INBOXENTRYDIALOG_H
-#define INBOXENTRYDIALOG_H
+#ifndef LIBVMAIL_H
+#define LIBVMAIL_H
 
 #include "global.h"
 
-namespace Ui {
-class InboxEntryDialog;
-}
-
-class InboxEntryDialog : public QDialog
+class IMainWindow;
+class LibVmail : public QObject
 {
     Q_OBJECT
-
 public:
-    explicit InboxEntryDialog(QWidget *parent = 0);
-    ~InboxEntryDialog();
+    explicit LibVmail(IMainWindow *parent);
 
-    void fill(const GVInboxEntry &event);
-    void fill(const ContactInfo &cinfo);
+    bool getVmailForId(const QString &id, QString &localPath);
+    bool fetchVmail(const QString &id);
+
+signals:
+    void vmailFetched(const QString &id, const QString &localPath, bool ok);
 
 private slots:
-    void onNumberDoubleClicked();
-    void onContactDoubleClicked();
-    void onDeleteClicked();
-    void onReplyClicked();
-
-private:
-    Ui::InboxEntryDialog *ui;
-
-public:
-    bool m_numberDoubleClicked;
-    bool m_contactDoubleClicked;
-    bool m_replyRequested;
-    bool m_deleteRequested;
+    void onVmailDownloaded ();
 };
 
-#endif // INBOXENTRYDIALOG_H
+#endif // LIBVMAIL_H

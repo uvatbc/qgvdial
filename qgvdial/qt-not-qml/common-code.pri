@@ -24,7 +24,8 @@ SOURCES  += $$PWD/MainWindow.cpp \
             $$PWD/DblClickLabel.cpp \
             $$PWD/DummySystemTray.cpp \
             $$PWD/MyLineEdit.cpp \
-            $$PWD/SmsDialog.cpp
+            $$PWD/SmsDialog.cpp \
+            $$PWD/VmailDialog.cpp
 HEADERS  += $$PWD/MainWindow.h \
             $$PWD/MainWindow_p.h \
             $$PWD/OsDependant.h \
@@ -36,13 +37,15 @@ HEADERS  += $$PWD/MainWindow.h \
             $$PWD/DblClickLabel.h \
             $$PWD/DummySystemTray.h \
             $$PWD/MyLineEdit.h \
-            $$PWD/SmsDialog.h
+            $$PWD/SmsDialog.h \
+            $$PWD/VmailDialog.h
 
 FORMS    += $$PWD/mainwindow.ui \
             $$PWD/ContactDialog.ui \
             $$PWD/InboxEntryDialog.ui \
             $$PWD/CINumberDialog.ui \
-            $$PWD/SmsDialog.ui
+            $$PWD/SmsDialog.ui \
+    VmailDialog.ui
 
 RESOURCES += $$PWD/qtnotqml.qrc
 

@@ -19,16 +19,18 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#include "InboxEntryDialog.h"
-#include "ui_InboxEntryDialog.h"
+#include "VmailDialog.h"
+#include "ui_VmailDialog.h"
+#include "MainWindow.h"
 #include "InboxModel.h"
 
 #define PIXMAP_SCALED_W 85
 #define PIXMAP_SCALED_H 85
 
-InboxEntryDialog::InboxEntryDialog(QWidget *parent)
-: QDialog(parent)
-, ui(new Ui::InboxEntryDialog)
+VmailDialog::VmailDialog(MainWindow *parent)
+: QDialog(NULL)
+, win(parent)
+, ui(new Ui::VmailDialog)
 , m_numberDoubleClicked(false)
 , m_contactDoubleClicked(false)
 , m_replyRequested(false)
@@ -50,17 +52,20 @@ InboxEntryDialog::InboxEntryDialog(QWidget *parent)
             this, SLOT(onDeleteClicked()));
     connect(ui->btnReply, SIGNAL(clicked()),
             this, SLOT(onReplyClicked()));
-}//InboxEntryDialog::InboxEntryDialog
 
-InboxEntryDialog::~InboxEntryDialog()
+    ui->btnPlayPause->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+    ui->btnStop->setIcon(style()->standardIcon(QStyle::SP_MediaStop));
+}//VmailDialog::VmailDialog
+
+VmailDialog::~VmailDialog()
 {
     delete ui;
-}//InboxEntryDialog::~InboxEntryDialog
+}//VmailDialog::~VmailDialog
 
-void
-InboxEntryDialog::fill(const GVInboxEntry &event)
+bool
+VmailDialog::fill(const GVInboxEntry &event)
 {
-    Q_ASSERT(GVIE_Voicemail != event.Type);
+    Q_ASSERT(GVIE_Voicemail == event.Type);
 
     ui->lblNumber->setText (event.strPhoneNumber);
     ui->lblTime->setText (InboxModel::dateToString (event.startTime, false));
@@ -72,16 +77,25 @@ InboxEntryDialog::fill(const GVInboxEntry &event)
         ui->lblNotes->setText (event.strNote);
     }
 
-    if (0 == event.strText.length ()) {
-        ui->txtConv->hide ();
-        ui->btnReply->hide ();
+    bool rv;
+    if (!win->oVmail.getVmailForId (event.id, m_localPath)) {
+        ui->wPlayerButtons->hide ();
+        ui->progressBar->hide ();
+
+        connect (&win->oVmail, SIGNAL(vmailFetched(QString,QString,bool)),
+                 this, SLOT(onVmailFetched(QString,QString,bool)));
+        rv = win->oVmail.fetchVmail (event.id);
     } else {
-        ui->txtConv->setText (event.strText);
+        ui->lblFetching->hide ();
+
+        rv = true;
     }
-}//InboxEntryDialog::fill
+
+    return (rv);
+}//VmailDialog::fill
 
 void
-InboxEntryDialog::fill(const ContactInfo &cinfo)
+VmailDialog::fill(const ContactInfo &cinfo)
 {
     if (!cinfo.strTitle.isEmpty ()) {
         ui->lblName->setText (cinfo.strTitle);
@@ -96,32 +110,48 @@ InboxEntryDialog::fill(const ContactInfo &cinfo)
     ui->lblImage->setPixmap (pixmap.scaled(PIXMAP_SCALED_W, PIXMAP_SCALED_H,
                                            Qt::KeepAspectRatio,
                                            Qt::SmoothTransformation));
-}//InboxEntryDialog::fill
+}//VmailDialog::fill
 
 void
-InboxEntryDialog::onNumberDoubleClicked()
+VmailDialog::onNumberDoubleClicked()
 {
     m_numberDoubleClicked = true;
     this->accept ();
-}//InboxEntryDialog::onNumberDoubleClicked
+}//VmailDialog::onNumberDoubleClicked
 
 void
-InboxEntryDialog::onContactDoubleClicked()
+VmailDialog::onContactDoubleClicked()
 {
     m_contactDoubleClicked = true;
     this->accept ();
-}//InboxEntryDialog::onContactDoubleClicked
+}//VmailDialog::onContactDoubleClicked
 
 void
-InboxEntryDialog::onDeleteClicked()
+VmailDialog::onDeleteClicked()
 {
     m_deleteRequested = true;
     this->accept ();
-}//InboxEntryDialog::onDeleteClicked
+}//VmailDialog::onDeleteClicked
 
 void
-InboxEntryDialog::onReplyClicked()
+VmailDialog::onReplyClicked()
 {
     m_replyRequested = true;
     this->accept ();
-}//InboxEntryDialog::onReplyClicked
+}//VmailDialog::onReplyClicked
+
+void
+VmailDialog::onVmailFetched(const QString &id, const QString &path, bool ok)
+{
+    disconnect (&win->oVmail, SIGNAL(vmailFetched(QString,QString,bool)),
+                this, SLOT(onVmailFetched(QString,QString,bool)));
+
+    if (!ok) {
+        ui->lblFetching->setText ("Failed to download voice mail!");
+        return;
+    }
+
+    ui->lblFetching->hide ();
+    ui->wPlayerButtons->show ();
+    ui->progressBar->show ();
+}//VmailDialog::onVmailFetched
