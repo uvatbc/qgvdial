@@ -74,8 +74,38 @@ CacheDb::init(const QString &dbDir)
     ensureCache ();
 
     //TODO: Clean out the temp table of dead entries
+    cleanup_dangling_temp_ids ();
     return (true);
 }//CacheDb::init
+
+void
+CacheDb::cleanup_dangling_temp_ids()
+{
+    CacheDbPrivate &p = CacheDbPrivate::ref ();
+    QStringList arrPaths;
+    QSqlQuery query(p.db);
+    query.setForwardOnly (true);
+
+    query.exec ("SELECT " GV_TT_PATH " FROM " GV_TEMP_TABLE);
+    while (query.next ()) {
+        QString path = query.value(0).toString ();
+        if (path.isEmpty ()) {
+            continue;
+        }
+        if (!QFileInfo(path).exists ()) {
+            arrPaths.append (query.value(0).toString ());
+        }
+    }
+
+    // One entry for all empty paths
+    arrPaths += "";
+    for (int i = 0; i < arrPaths.length() ; i++) {
+        QString strPath = arrPaths[i];
+        strPath.replace ("'", "''");
+        query.exec(QString("DELETE FROM " GV_TEMP_TABLE " WHERE "
+                    GV_TT_PATH "='%1'").arg(strPath));
+    }
+}//CacheDb::cleanup_temp_files
 
 void
 CacheDb::deinit()

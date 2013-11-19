@@ -108,6 +108,9 @@ public:
     bool setCINumber(const QString &id, const QString &num);
 
 private:
+    void cleanup_dangling_temp_ids();
+
+private:
     void ensureCache();
     bool blowAwayCache();
 };
