@@ -4,6 +4,7 @@ include(../features/dbus_api/dbus_api.pri)
 include(../features/osver/nokia/diablo/osv-diablo.pri)
 
 DEFINES += OS_DIABLO
+QT *= phonon
 
 INCLUDEPATH += diablo
 SOURCES  += diablo/DiabloPhoneFactory.cpp

@@ -3,6 +3,8 @@ include(../features/dirs/bb10/bb10-dirs.pri)
 
 INCLUDEPATH += bb10
 LIBS += -lbbsystem
+CONFIG *= mobility
+MOBILITY *= multimedia
 
 MOC_DIR = moc
 OBJECTS_DIR = obj

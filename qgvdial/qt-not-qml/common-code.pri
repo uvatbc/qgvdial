@@ -45,7 +45,7 @@ FORMS    += $$PWD/mainwindow.ui \
             $$PWD/InboxEntryDialog.ui \
             $$PWD/CINumberDialog.ui \
             $$PWD/SmsDialog.ui \
-    VmailDialog.ui
+            $$PWD/VmailDialog.ui
 
 RESOURCES += $$PWD/qtnotqml.qrc
 

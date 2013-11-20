@@ -54,6 +54,7 @@
     <None Include="..\..\common\common.pri" />
     <None Include="..\..\features\dirs\linux\linux-dirs.pri" />
     <None Include="..\..\features\openssl\openssl.pri" />
+    <None Include="..\..\features\osver\desktop\windows\osv-windows.pri" />
     <None Include="..\..\features\qtsingleapplication\inc\QtLockedFile" />
     <None Include="..\..\features\qtsingleapplication\inc\QtSingleApplication" />
     <None Include="..\..\features\qtsingleapplication\qtsingleapplication.pri" />
@@ -63,6 +64,8 @@
     <None Include="..\desktop_windows.pro" />
     <None Include="..\InboxEntryDialog.ui" />
     <None Include="..\mainwindow.ui" />
+    <None Include="..\SmsDialog.ui" />
+    <None Include="..\VmailDialog.ui" />
     <None Include="readme.txt" />
   </ItemGroup>
   <ItemGroup>
@@ -94,8 +97,11 @@
     <ClInclude Include="..\..\common\LibContacts.h" />
     <ClInclude Include="..\..\common\LibGvPhones.h" />
     <ClInclude Include="..\..\common\LibInbox.h" />
+    <ClInclude Include="..\..\common\LibVmail.h" />
+    <ClInclude Include="..\..\common\LogUploader.h" />
     <ClInclude Include="..\..\features\dirs\linux\OSDDirs.h" />
     <ClInclude Include="..\..\features\openssl\OSDCipher.h" />
+    <ClInclude Include="..\..\features\osver\desktop\windows\OSVer.h" />
     <ClInclude Include="..\..\features\qtsingleapplication\inc\qtlocalpeer.h" />
     <ClInclude Include="..\..\features\qtsingleapplication\inc\qtlockedfile.h" />
     <ClInclude Include="..\..\features\qtsingleapplication\inc\qtsingleapplication.h" />
@@ -103,12 +109,17 @@
     <ClInclude Include="..\CiListView.h" />
     <ClInclude Include="..\CINumberDialog.h" />
     <ClInclude Include="..\ContactDialog.h" />
+    <ClInclude Include="..\DblClickLabel.h" />
+    <ClInclude Include="..\DummySystemTray.h" />
     <ClInclude Include="..\GvNumComboBox.h" />
     <ClInclude Include="..\InboxEntryDialog.h" />
     <ClInclude Include="..\MainWindow.h" />
     <ClInclude Include="..\MainWindow_p.h" />
+    <ClInclude Include="..\MyLineEdit.h" />
     <ClInclude Include="..\OsDependant.h" />
+    <ClInclude Include="..\SmsDialog.h" />
     <ClInclude Include="..\ui_mainwindow.h" />
+    <ClInclude Include="..\VmailDialog.h" />
     <ClInclude Include="MainApp.h" />
     <ClInclude Include="ObserverFactory.h" />
     <ClInclude Include="PhoneFactory.h" />
@@ -139,9 +150,12 @@
     <ClCompile Include="..\..\common\LibContacts.cpp" />
     <ClCompile Include="..\..\common\LibGvPhones.cpp" />
     <ClCompile Include="..\..\common\LibInbox.cpp" />
+    <ClCompile Include="..\..\common\LibVmail.cpp" />
+    <ClCompile Include="..\..\common\LogUploader.cpp" />
     <ClCompile Include="..\..\common\main.cpp" />
     <ClCompile Include="..\..\features\dirs\linux\OSDDirs.cpp" />
     <ClCompile Include="..\..\features\openssl\OSDCipher.cpp" />
+    <ClCompile Include="..\..\features\osver\desktop\windows\OSVer.cpp" />
     <ClCompile Include="..\..\features\qtsingleapplication\src\qtlocalpeer.cpp" />
     <ClCompile Include="..\..\features\qtsingleapplication\src\qtlockedfile.cpp" />
     <ClCompile Include="..\..\features\qtsingleapplication\src\qtlockedfile_unix.cpp" />
@@ -151,11 +165,16 @@
     <ClCompile Include="..\CiListView.cpp" />
     <ClCompile Include="..\CINumberDialog.cpp" />
     <ClCompile Include="..\ContactDialog.cpp" />
+    <ClCompile Include="..\DblClickLabel.cpp" />
+    <ClCompile Include="..\DummySystemTray.cpp" />
     <ClCompile Include="..\GvNumComboBox.cpp" />
     <ClCompile Include="..\InboxEntryDialog.cpp" />
     <ClCompile Include="..\MainWindow.cpp" />
     <ClCompile Include="..\MainWindow_p.cpp" />
+    <ClCompile Include="..\MyLineEdit.cpp" />
     <ClCompile Include="..\OsDependant.cpp" />
+    <ClCompile Include="..\SmsDialog.cpp" />
+    <ClCompile Include="..\VmailDialog.cpp" />
     <ClCompile Include="MainApp.cpp" />
     <ClCompile Include="ObserverFactory.cpp" />
     <ClCompile Include="PhoneFactory.cpp" />

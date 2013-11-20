@@ -75,6 +75,15 @@
     <Filter Include="features\qtsingleapplication\headers">
       <UniqueIdentifier>{74b61af9-eae2-4443-bb9c-14657fe6b1c8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="features\osv-windows">
+      <UniqueIdentifier>{ce6e6150-77d0-4f7b-b345-0ccb5217ba6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="features\osv-windows\headers">
+      <UniqueIdentifier>{8c557c3a-659e-4fcc-9e6d-398928b58d72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="features\osv-windows\sources">
+      <UniqueIdentifier>{a3810f9d-b02b-4172-92fc-c0dd1f64f34d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="readme.txt" />
@@ -115,6 +124,15 @@
       <Filter>features\qtsingleapplication\headers</Filter>
     </None>
     <None Include="..\desktop_windows.pro" />
+    <None Include="..\SmsDialog.ui">
+      <Filter>common-code\forms</Filter>
+    </None>
+    <None Include="..\VmailDialog.ui">
+      <Filter>common-code\forms</Filter>
+    </None>
+    <None Include="..\..\features\osver\desktop\windows\osv-windows.pri">
+      <Filter>features\osv-windows</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainApp.h">
@@ -258,6 +276,30 @@
     <ClInclude Include="..\..\..\api\HtmlFieldParser.h">
       <Filter>api\headers</Filter>
     </ClInclude>
+    <ClInclude Include="..\DblClickLabel.h">
+      <Filter>common-code\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DummySystemTray.h">
+      <Filter>common-code\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\MyLineEdit.h">
+      <Filter>common-code\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\SmsDialog.h">
+      <Filter>common-code\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VmailDialog.h">
+      <Filter>common-code\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\LibVmail.h">
+      <Filter>common\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\LogUploader.h">
+      <Filter>common\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\features\osver\desktop\windows\OSVer.h">
+      <Filter>features\osv-windows\headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MainApp.cpp">
@@ -391,6 +433,30 @@
     </ClCompile>
     <ClCompile Include="..\..\..\api\HtmlFieldParser.cpp">
       <Filter>api\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DblClickLabel.cpp">
+      <Filter>common-code\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DummySystemTray.cpp">
+      <Filter>common-code\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyLineEdit.cpp">
+      <Filter>common-code\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SmsDialog.cpp">
+      <Filter>common-code\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VmailDialog.cpp">
+      <Filter>common-code\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\LibVmail.cpp">
+      <Filter>common\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\LogUploader.cpp">
+      <Filter>common\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\features\osver\desktop\windows\OSVer.cpp">
+      <Filter>features\osv-windows\sources</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

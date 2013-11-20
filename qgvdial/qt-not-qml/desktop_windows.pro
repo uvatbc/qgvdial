@@ -15,6 +15,13 @@ HEADERS  += $$PWD/desktop_windows/platform_specific.h \
 #            $$PWD/desktop_windows/ObserverFactory.h
 #include($$PWD/../features/skype-desktop/skype.pri)
 
+greaterThan(QT_MAJOR_VERSION, 4) {
+CONFIG *= mobility
+MOBILITY *= multimedia
+} else {
+QT *= phonon
+}
+
 # Please do not modify the following two lines. Required for deployment.
 include($$PWD/deployment.pri)
 qtcAddDeployment()

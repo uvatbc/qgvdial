@@ -11,10 +11,8 @@ OBJECTS_DIR = obj
 # Additional import path used to resolve QML modules in Creators code model
 QML_IMPORT_PATH = ./imports
 
-# If your application uses the Qt Mobility libraries, uncomment the following
-# lines and add the respective components to the MOBILITY variable.
-#CONFIG += mobility
-#MOBILITY +=
+CONFIG *= mobility
+MOBILITY *= multimedia
 
 # Speed up launching on MeeGo/Harmattan when using applauncherd daemon
 #CONFIG += qdeclarative-boostable

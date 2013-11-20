@@ -22,12 +22,16 @@ Contact: yuvraaj@gmail.com
 #ifndef PLATFORMSPECIFIC_H
 #define PLATFORMSPECIFIC_H
 
+#define UNKNOWN_CONTACT_QRC_PATH ":/unknown_contact.png"
+
 #include <QtGui>
+
 #if QT_VERSION >= 0x050000
 #include <QtWidgets>
+#define PHONON_ENABLED 0
+#else
+#define PHONON_ENABLED 1
 #endif
 
-#define UNKNOWN_CONTACT_QRC_PATH ":/unknown_contact.png"
-#define PHONON_ENABLED 1
 
 #endif // PLATFORMSPECIFIC_H

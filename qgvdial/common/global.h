@@ -108,18 +108,8 @@ void qgv_LogFlush();
 #define HAS_SINGLE_APP 1
 #endif
 
-#if defined(Q_OS_BLACKBERRY)
-#define PHONON_ENABLED 0
-#else
-#define PHONON_ENABLED 1
-#endif
-
 //#include "PhoneIntegrationIface.h"
 //#include "TpHeaders.h"
-
-// To test MMKit:
-//#undef PHONON_ENABLED
-//#define PHONON_ENABLED 0
 
 #include "platform_specific.h"
 
