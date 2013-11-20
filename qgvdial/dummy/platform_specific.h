@@ -23,5 +23,6 @@ Contact: yuvraaj@gmail.com
 #define PLATFORMSPECIFIC_H
 
 #define UNKNOWN_CONTACT_QRC_PATH ":/unknown_contact.png"
+#define PHONON_ENABLED 1
 
 #endif // PLATFORMSPECIFIC_H

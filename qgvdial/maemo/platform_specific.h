@@ -25,6 +25,8 @@ Contact: yuvraaj@gmail.com
 #include <QtGui>
 #include "QtDeclarative"
 
-#define UNKNOWN_CONTACT_QRC_PATH "qrc:/unknown_contact.png"
+#define UNKNOWN_CONTACT_QRC_PATH    "qrc:/unknown_contact.png"
+#define USE_SINGLE_APPLICATION      1
+#define PHONON_ENABLED              1
 
 #endif // PLATFORMSPECIFIC_H

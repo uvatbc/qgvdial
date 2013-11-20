@@ -23,6 +23,8 @@ symbian:TARGET.CAPABILITY += NetworkServices
 CONFIG += mobility
 MOBILITY +=
 
+QT *= phonon
+
 # Add dependency to Symbian components
 CONFIG += qt-components
 

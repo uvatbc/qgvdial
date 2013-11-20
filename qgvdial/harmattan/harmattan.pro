@@ -16,6 +16,8 @@ QML_IMPORT_PATH =
 CONFIG += mobility
 MOBILITY +=
 
+QT *= phonon
+
 # Speed up launching on MeeGo/Harmattan when using applauncherd daemon
 CONFIG += qdeclarative-boostable
 

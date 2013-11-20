@@ -15,6 +15,8 @@ QT *= maemo5
 CONFIG += mobility
 MOBILITY +=
 
+QT *= phonon
+
 SOURCES  += MainWindow.cpp \
             MaemoPhoneFactory.cpp
 HEADERS  += platform_specific.h \

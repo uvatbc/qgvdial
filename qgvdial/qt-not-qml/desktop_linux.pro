@@ -10,6 +10,8 @@ SOURCES  += desktop_linux/PhoneFactory.cpp
 HEADERS  += desktop_linux/platform_specific.h \
             desktop_linux/PhoneFactory.h
 
+QT *= phonon
+
 # Please do not modify the following two lines. Required for deployment.
 include(deployment.pri)
 qtcAddDeployment()
