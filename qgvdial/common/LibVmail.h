@@ -70,7 +70,6 @@ public slots:
 signals:
     void vmailFetched(const QString &id, const QString &localPath, bool ok);
     void playerStateUpdate(LVPlayerState newState);
-
     void durationChanged(quint64 duration);
     void currentPositionChanged(quint64 position, quint64 duration);
 

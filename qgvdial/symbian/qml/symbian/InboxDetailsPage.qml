@@ -32,14 +32,26 @@ Page {
     signal deleteEntry(string iId)
     signal replySms(string iId)
 
+    signal play
+    signal pause
+    signal stop
+
+    // These fields are filled up by the JS function showInboxDetails
     property alias imageSource: contactImage.source
     property alias name:        contactName.text
     property alias number:      contactNumber.text
     property alias phType:      numberType.text
     property alias note:        lblNote.text
     property alias smsText:     lblSmsText.text
+    property bool isVmail
     property string cId
     property string iId
+
+    // These fields are updated while playing the voicemail
+    property bool showPlayBtn: true
+    property bool fetchingEmail: true
+    property real vmailDuration
+    property real vmailPosition
 
     Column {
         anchors {
@@ -129,6 +141,57 @@ Page {
             visible: text.length == 0 ? false : true
             wrapMode: Text.WordWrap
         }//Label: SMS text
+
+        ProgressBar {
+            id: vmailProgress
+            minimumValue: 0
+            maximumValue: vmailDuration
+            value: vmailPosition
+            width: parent.width * 7/10
+            visible: (container.isVmail && !container.fetchingEmail)
+            anchors.horizontalCenter: parent.horizontalCenter
+        }
+
+        Row {
+            spacing: 25
+            visible: vmailProgress.visible
+            anchors.horizontalCenter: parent.horizontalCenter
+
+            Image {
+                source: container.showPlayBtn ? "qrc:/button_black_play.png" : "qrc:/button_black_pause.png"
+                height: 70
+                width: height
+                smooth: true
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        if (container.showPlayBtn) {
+                            container.play();
+                        } else {
+                            container.pause();
+                        }
+                    }
+                }
+            }
+            Image {
+                source: "qrc:/button_black_stop.png"
+                height: 70
+                width: height
+                smooth: true
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: { container.stop(); }
+                }
+            }
+        }
+
+        Label {
+            text: "Fetching email"
+            visible: (container.isVmail && container.fetchingEmail)
+            anchors.horizontalCenter: parent.horizontalCenter
+        }
     }//Column
 
     ButtonRow {

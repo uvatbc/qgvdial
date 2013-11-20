@@ -54,16 +54,19 @@ PageStackWindow {
         }
         pageStack.push(contactDetails);
     }
-    function showInboxDetails(imgSource, name, number, note, smsText, phType, cId, iId) {
+    function showInboxDetails(imgSource, name, number, note, smsText, phType,
+                              isVmail, cId, iId) {
         inboxDetails.imageSource = imgSource;
         inboxDetails.name        = name;
         inboxDetails.number      = number;
         inboxDetails.note        = note;
         inboxDetails.smsText     = smsText;
         inboxDetails.phType      = phType;
+        inboxDetails.isVmail     = isVmail;
         inboxDetails.cId         = cId;
         inboxDetails.iId         = iId;
         pageStack.push(inboxDetails);
+        appWindow._inboxDetailsShown = true;
     }
     function pushCiSelector(ciId) {
         ciPhoneSelector.ciId = ciId;
@@ -80,6 +83,8 @@ PageStackWindow {
         smsPage.smsText      = text;
         pageStack.push(smsPage);
     }
+
+    property bool _inboxDetailsShown: false
 
     initialPage: Page {
         tools: commonTools
@@ -132,7 +137,13 @@ PageStackWindow {
 
             ToolIcon {
                 iconId: "toolbar-back";
-                onClicked: pageStack.pop();
+                onClicked: {
+                    pageStack.pop();
+                    if (appWindow._inboxDetailsShown) {
+                        appWindow._inboxDetailsShown = false;
+                        inboxDetails.done(false);
+                    }
+                }
             }
 
             ButtonRow {

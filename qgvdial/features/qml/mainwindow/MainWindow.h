@@ -58,6 +58,14 @@ protected slots:
 
     void onUserReplyToInboxEntry(QString id);
 
+    void onInboxDetailsDone(bool accepted);
+    void onVmailFetched(const QString &id, const QString &localPath, bool ok);
+    void onVmailPlayerStateUpdate(LVPlayerState newState);
+    void onVmailDurationChanged(quint64 duration);
+    void onVmailCurrentPositionChanged(quint64 position, quint64 duration);
+
+    void showStatusMessage(QString msg, quint64 timeout);
+
 protected:
     QObject *getQMLObject(const char *pageName);
 
@@ -116,6 +124,7 @@ private:
 
     void    *loginCtx;
 
+    bool     m_inboxDetailsShown;
 };
 
 QApplication *

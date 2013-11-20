@@ -19,7 +19,10 @@
         <file alias="in_Voicemail.png">../../icons/in_Voicemail.png</file>
 
         <file alias="tick.png">../../icons/tick.png</file>
-
         <file alias="left_arrow.png">../../icons/left_arrow.png</file>
+
+        <file alias="button_black_play.png">../../icons/button_black_play.png</file>
+        <file alias="button_black_pause.png">../../icons/button_black_pause.png</file>
+        <file alias="button_black_stop.png">../../icons/button_black_stop.png</file>
     </qresource>
 </RCC>

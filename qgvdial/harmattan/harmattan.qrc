@@ -17,5 +17,9 @@
         <file alias="in_Received.png">../../icons/in_Received.png</file>
         <file alias="in_Sms.png">../../icons/in_Sms.png</file>
         <file alias="in_Voicemail.png">../../icons/in_Voicemail.png</file>
+
+        <file alias="button_black_play.png">../../icons/button_black_play.png</file>
+        <file alias="button_black_pause.png">../../icons/button_black_pause.png</file>
+        <file alias="button_black_stop.png">../../icons/button_black_stop.png</file>
     </qresource>
 </RCC>
