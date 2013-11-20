@@ -23,8 +23,13 @@ Contact: yuvraaj@gmail.com
 #include "IMainWindow.h"
 
 #if PHONON_ENABLED
+#ifdef OS_DIABLO
+#include <Phonon/AudioOutput>
+#include <Phonon/AudioOutputDevice>
+#else
 #include <phonon/AudioOutput>
 #include <phonon/AudioOutputDevice>
+#endif
 #else
 #include <QtMultimediaKit/QMediaContent>
 #include <QtMultimediaKit/QMediaPlaylist>

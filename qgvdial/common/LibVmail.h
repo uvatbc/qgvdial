@@ -29,7 +29,11 @@ Contact: yuvraaj@gmail.com
 #endif
 
 #if PHONON_ENABLED
+#ifdef OS_DIABLO
+#include <Phonon/MediaObject>
+#else
 #include <phonon/MediaObject>
+#endif
 #else
 #include <QtMultimediaKit/QMediaPlayer>
 #endif
