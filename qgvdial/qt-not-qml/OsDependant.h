@@ -46,6 +46,7 @@ public:
     inline QString getDbDir() { return _getDbDir (); }
     inline QString getLogsDir() { return _getLogsDir (); }
     inline QString getOsDetails() { return _getOsDetails(); }
+    inline QString getVmailDir() { return _getVmailDir(); }
 
     inline bool
     cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt) {

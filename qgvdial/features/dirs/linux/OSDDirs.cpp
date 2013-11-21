@@ -64,3 +64,45 @@ OsdDirs::_getLogsDir()
 {
     return _getAppDirectory();
 }//OsdDirs::_getLogsDir
+
+QString
+OsdDirs::_getVmailDir()
+{
+    QString tmpl = QDir::homePath() + QDir::separator () + "%1";
+    QString rv;
+
+    do {
+        // Desktop Linux: ~/Documents/voicemail
+        rv = tmpl.arg ("Documents");
+        if (QFileInfo(rv).exists ()) {
+            QDir dir(rv);
+
+            rv += QDir::separator() + QString("voicemail");
+            if (!QFileInfo(rv).exists ()) {
+                dir.mkdir ("voicemail");
+            }
+
+            break;
+        }
+
+        // Maemo, Harmattan: ~/MyDocs/voicemail
+        rv = tmpl.arg ("MyDocs");
+        if (QFileInfo(rv).exists ()) {
+            QDir dir(rv);
+
+            rv += QDir::separator() + QString("voicemail");
+            if (!QFileInfo(rv).exists ()) {
+                dir.mkdir ("voicemail");
+            }
+
+            break;
+        }
+
+        rv = tmpl.arg ("voicemail");
+        if (!QFileInfo(rv).exists ()) {
+            QDir::home().mkdir ("voicemail");
+        }
+    } while(0);
+
+    return (rv);
+}//OsdDirs::_getVmailDir

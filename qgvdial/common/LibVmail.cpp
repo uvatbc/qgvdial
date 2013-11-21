@@ -21,6 +21,7 @@ Contact: yuvraaj@gmail.com
 
 #include "LibVmail.h"
 #include "IMainWindow.h"
+#include "Lib.h"
 
 #if PHONON_ENABLED
 #ifdef OS_DIABLO
@@ -66,7 +67,8 @@ LibVmail::fetchVmail(const QString &id)
     bool rv = false;
 
     do { // Begin cleanup block (not a loop)
-        QString strTemplate = QDir::tempPath ()
+        Lib &lib = Lib::ref ();
+        QString strTemplate = lib.getVmailDir ()
                             + QDir::separator ()
                             + "qgv_XXXXXX.vmail.mp3";
         QTemporaryFile tempFile (strTemplate);

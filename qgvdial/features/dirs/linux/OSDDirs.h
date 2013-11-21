@@ -30,6 +30,7 @@ public:
     QString _getTempDir();
     QString _getDbDir();
     QString _getLogsDir();
+    QString _getVmailDir();
 };
 
 #endif//OSDDIRS_H

@@ -167,6 +167,9 @@ main(int argc, char *argv[])
         return (-1);
     }
 
+    // Phonon needs this. Doesn't hurt even if we don't use Phonon.
+    app->setApplicationName ("qgvdial");
+
     initLogging ();
     initLogRotate ();
 

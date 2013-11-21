@@ -39,6 +39,7 @@ public:
     inline QString getDbDir()     { return m_osd->getDbDir(); }
     inline QString getLogsDir()   { return m_osd->getLogsDir(); }
     inline QString getOsDetails() { return m_osd->getOsDetails(); }
+    inline QString getVmailDir()  { return m_osd->getVmailDir(); }
 
     inline bool cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt) {
         return m_osd->cipher(byIn, byOut, bEncrypt);
