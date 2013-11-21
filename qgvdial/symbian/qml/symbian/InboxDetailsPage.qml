@@ -59,6 +59,8 @@ Page {
             left: parent.left
             bottom: btnRow.top
         }
+        width: parent.width
+
         spacing: 20
 
         Item {
@@ -106,7 +108,6 @@ Page {
 
                     anchors.verticalCenter: parent.verticalCenter
                     font.pixelSize: 30
-
                 }
 
                 Label {
