@@ -26,7 +26,12 @@ symbian:TARGET.CAPABILITY += NetworkServices
 # If your application uses the Qt Mobility libraries, uncomment the following
 # lines and add the respective components to the MOBILITY variable.
 CONFIG *= mobility
+
+simulator {
+QT *= phonon
+} else {
 MOBILITY *= multimedia
+}
 
 # Add dependency to Symbian components
 CONFIG += qt-components
