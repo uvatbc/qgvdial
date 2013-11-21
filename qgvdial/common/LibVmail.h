@@ -29,13 +29,15 @@ Contact: yuvraaj@gmail.com
 #endif
 
 #if PHONON_ENABLED
-#ifdef OS_DIABLO
-#include <Phonon/MediaObject>
+   #ifdef OS_DIABLO
+      #include <Phonon/MediaObject>
+   #else
+      #include <phonon/MediaObject>
+   #endif
+#elif QT_VERSION < 0x050000
+   #include <QtMultimediaKit/QMediaPlayer>
 #else
-#include <phonon/MediaObject>
-#endif
-#else
-#include <QtMultimediaKit/QMediaPlayer>
+   #include <QtMultimedia/QtMultimedia>
 #endif
 
 enum LVPlayerState {
