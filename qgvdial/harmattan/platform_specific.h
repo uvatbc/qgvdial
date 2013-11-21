@@ -29,4 +29,6 @@ Contact: yuvraaj@gmail.com
 #define USE_SINGLE_APPLICATION      1
 #define PHONON_ENABLED              1
 
+#define HARMATTAN                   1
+
 #endif // PLATFORMSPECIFIC_H
