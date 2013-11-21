@@ -53,148 +53,158 @@ Page {
     property real vmailDuration
     property real vmailPosition
 
-    Column {
+    Flickable {
         anchors {
             top: parent.top
             left: parent.left
             bottom: btnRow.top
         }
-        spacing: 20
         width: parent.width
 
-        Item {
+        contentWidth: width
+        contentHeight: mainColumn.height
+
+        Column {
+            id: mainColumn
+
+            spacing: 20
             width: parent.width
-            height: 200
 
-            Row {
-                anchors.fill: parent
+            Item {
+                width: parent.width
+                height: 200
 
-                Image {
-                    id: contactImage
-                    fillMode: Image.PreserveAspectFit
-                    height: parent.height
-                    width: height
-                }
-                Label {
-                    id: contactName
-                    anchors.verticalCenter: parent.verticalCenter
-                    font.pixelSize: 70
-                    smooth: true
-                    width: parent.width - contactImage.width - parent.spacing
-                }
-            }//Row: Contact image and name
+                Row {
+                    anchors.fill: parent
 
-            MouseArea {
-                anchors.fill: parent
-                onPressAndHold: {
-                    if (container.cId.length != 0) {
-                        container.sigShowContact(container.cId);
+                    Image {
+                        id: contactImage
+                        fillMode: Image.PreserveAspectFit
+                        height: parent.height
+                        width: height
                     }
-                }
-            }
-        }//Item: Contact image and name
-
-        Item {
-            width: parent.width
-            height: 60
-
-            Row {
-                anchors.fill: parent
-                spacing: 10
-
-                Label {
-                    id: numberType
-
-                    anchors.verticalCenter: parent.verticalCenter
-                    font.pixelSize: 50
-                }
-
-                Label {
-                    id: contactNumber
-
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: parent.width - numberType.width - parent.spacing
-                    font.pixelSize: 50
-                    horizontalAlignment: Text.AlignRight
-                }
-            }//Row: type (mobile/work/home) and actual number
-
-            MouseArea {
-                anchors.fill: parent
-                onPressAndHold: {
-                    container.setNumberToDial(container.number);
-                    container.done(true);
-                }
-            }
-        }//Item: type (mobile/work/home) and actual number
-
-        Label {
-            id: lblNote
-            width: parent.width
-            visible: text.length == 0 ? false : true
-            font.pixelSize: 45
-            wrapMode: Text.WordWrap
-        }//Label: notes
-
-        Label {
-            id: lblSmsText
-            width: parent.width
-            visible: text.length == 0 ? false : true
-            font.pixelSize: 45
-            wrapMode: Text.WordWrap
-        }//Label: SMS text
-
-        ProgressBar {
-            id: vmailProgress
-            minimumValue: 0
-            maximumValue: vmailDuration
-            value: vmailPosition
-            width: parent.width * 7/10
-            visible: (container.isVmail && !container.fetchingEmail)
-            anchors.horizontalCenter: parent.horizontalCenter
-        }
-
-        Row {
-            spacing: 25
-            visible: vmailProgress.visible
-            anchors.horizontalCenter: parent.horizontalCenter
-
-            Image {
-                source: container.showPlayBtn ? "qrc:/button_black_play.png" : "qrc:/button_black_pause.png"
-                height: 70
-                width: height
-                smooth: true
+                    Label {
+                        id: contactName
+                        anchors.verticalCenter: parent.verticalCenter
+                        font.pixelSize: 70
+                        smooth: true
+                        width: parent.width - contactImage.width - parent.spacing
+                    }
+                }//Row: Contact image and name
 
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: {
-                        if (container.showPlayBtn) {
-                            container.play();
-                        } else {
-                            container.pause();
+                    onPressAndHold: {
+                        if (container.cId.length != 0) {
+                            container.sigShowContact(container.cId);
                         }
                     }
                 }
-            }
-            Image {
-                source: "qrc:/button_black_stop.png"
-                height: 70
-                width: height
-                smooth: true
+            }//Item: Contact image and name
+
+            Item {
+                width: parent.width
+                height: 60
+
+                Row {
+                    anchors.fill: parent
+                    spacing: 10
+
+                    Label {
+                        id: numberType
+
+                        anchors.verticalCenter: parent.verticalCenter
+                        font.pixelSize: 50
+                    }
+
+                    Label {
+                        id: contactNumber
+
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: parent.width - numberType.width - parent.spacing
+                        font.pixelSize: 50
+                        horizontalAlignment: Text.AlignRight
+                    }
+                }//Row: type (mobile/work/home) and actual number
 
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: { container.stop(); }
+                    onPressAndHold: {
+                        container.setNumberToDial(container.number);
+                        container.done(true);
+                    }
+                }
+            }//Item: type (mobile/work/home) and actual number
+
+            Label {
+                id: lblNote
+                width: parent.width
+                visible: text.length == 0 ? false : true
+                font.pixelSize: 45
+                wrapMode: Text.WordWrap
+            }//Label: notes
+
+            Label {
+                id: lblSmsText
+                width: parent.width
+                visible: text.length == 0 ? false : true
+                font.pixelSize: 45
+                wrapMode: Text.WordWrap
+            }//Label: SMS text
+
+            ProgressBar {
+                id: vmailProgress
+                minimumValue: 0
+                maximumValue: vmailDuration
+                value: vmailPosition
+                width: parent.width * 7/10
+                visible: (container.isVmail && !container.fetchingEmail)
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+
+            Row {
+                spacing: 25
+                visible: vmailProgress.visible
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                Image {
+                    source: container.showPlayBtn ? "qrc:/button_black_play.png" : "qrc:/button_black_pause.png"
+                    height: 70
+                    width: height
+                    smooth: true
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            if (container.showPlayBtn) {
+                                container.play();
+                            } else {
+                                container.pause();
+                            }
+                        }
+                    }
+                }
+                Image {
+                    source: "qrc:/button_black_stop.png"
+                    height: 70
+                    width: height
+                    smooth: true
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: { container.stop(); }
+                    }
                 }
             }
-        }
 
-        Label {
-            text: "Fetching email"
-            visible: (container.isVmail && container.fetchingEmail)
-            anchors.horizontalCenter: parent.horizontalCenter
-        }
-    }//Column
+            Label {
+                text: "Fetching email"
+                visible: (container.isVmail && container.fetchingEmail)
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+        }//Column
+    }//Flickable
+
 
     ButtonRow {
         id: btnRow

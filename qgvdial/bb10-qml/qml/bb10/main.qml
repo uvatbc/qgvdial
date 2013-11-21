@@ -61,6 +61,10 @@ PageStackWindow {
         inboxDetails.isVmail     = isVmail;
         inboxDetails.cId         = cId;
         inboxDetails.iId         = iId;
+        // Other init
+        inboxDetails.showPlayBtn = true;
+        inboxDetails.fetchingEmail = true;
+        inboxDetails.vmailPosition = 0;
         pageStack.push(inboxDetails);
         appWindow._inboxDetailsShown = true;
     }
