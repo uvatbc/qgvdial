@@ -129,6 +129,10 @@ MainWindow::MainWindow(QObject *parent)
     m_view->viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
     m_view->viewport()->setAttribute(Qt::WA_NoSystemBackground);
 #endif
+
+#if USE_SINGLE_APPLICATION
+    ((QtSingleApplication*)qApp)->setActivationWindow(m_view);
+#endif
 }//MainWindow::MainWindow
 
 MainWindow::~MainWindow()
@@ -765,7 +769,7 @@ MainWindow::onInboxDetailsDone(bool /*accepted*/)
 }//MainWindow::onInboxDetailsDone
 
 void
-MainWindow::onVmailFetched(const QString &id, const QString &localPath, bool ok)
+MainWindow::onVmailFetched(const QString & /*id*/, const QString &localPath, bool ok)
 {
     if (!m_inboxDetailsShown) {
         return;
