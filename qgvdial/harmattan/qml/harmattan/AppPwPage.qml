@@ -42,6 +42,7 @@ Page {
             id: textAppPw
             placeholderText: "App specific password"
             anchors.horizontalCenter: parent.horizontalCenter
+            echoMode: TextInput.Password
 
             onAccepted: container.done(true);
         }

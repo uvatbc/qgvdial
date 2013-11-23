@@ -29,6 +29,12 @@ QmlView::QmlView(void)
 void
 QmlView::closeEvent(QCloseEvent *event)
 {
+#if !USE_SINGLE_APPLICATION
     // Ignore all close events
+    Q_DEBUG("Close event ignored");
     event->ignore ();
+#else
+    Q_DEBUG("Close event passed to base class");
+    QmlApplicationViewer::closeEvent(event);
+#endif
 }//QmlView::closeEvent

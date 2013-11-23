@@ -27,7 +27,7 @@ Contact: yuvraaj@gmail.com
 
 #include "IMainWindow.h"
 
-class QmlView;
+class QmlApplicationViewer;
 class MainWindow : public IMainWindow
 {
     Q_OBJECT
@@ -98,7 +98,7 @@ protected:
     void uiFailedToSendMessage(const QString &dest, const QString &text);
 
 private:
-    QmlView *m_view;
+    QmlApplicationViewer *m_view;
 
     QObject *mainPageStack;
     QObject *mainTabGroup;

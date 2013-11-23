@@ -20,7 +20,7 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "MainWindow.h"
-#include "QmlView.h"
+#include "qmlapplicationviewer.h"
 
 #ifdef Q_OS_BLACKBEERRY
 #include <QGLWidget>
@@ -67,11 +67,13 @@ createAppObject(int &argc, char **argv)
     }
 
     if (app->isRunning ()) {
+        Q_DEBUG("I am the second instance.");
         app->sendMessage ("show");
         delete app;
         app = NULL;
+        return app;
     } else {
-        app->setQuitOnLastWindowClosed (false);
+        Q_DEBUG("I am the first instance");
     }
 #else
     QApplication *app = createApplication(argc, argv);
@@ -79,16 +81,16 @@ createAppObject(int &argc, char **argv)
         Q_WARN("Failed to create QApplication object");
         return app;
     }
+#endif
 
     app->setQuitOnLastWindowClosed (false);
-#endif
 
     return app;
 }//createAppObject
 
 MainWindow::MainWindow(QObject *parent)
 : IMainWindow(parent)
-, m_view(new QmlView)
+, m_view(new QmlApplicationViewer)
 , mainPageStack(NULL)
 , mainTabGroup(NULL)
 , loginExpand(NULL)
