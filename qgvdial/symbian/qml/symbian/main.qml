@@ -65,9 +65,7 @@ PageStackWindow {
     }
     function pushCiSelector(ciId) {
         ciPhoneSelector.ciId = ciId;
-        if (ciPhoneSelector.phonesModel == null) {
-            ciPhoneSelector.phonesModel = g_CiPhonesModel;
-        }
+        ciPhoneSelector.phonesModel = g_CiPhonesModel;
         pageStack.push(ciPhoneSelector);
     }
     function showSmsPage(imgSource, name, dest, conversation, text) {

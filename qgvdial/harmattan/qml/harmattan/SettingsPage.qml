@@ -35,7 +35,8 @@ Page {
     signal sigPinSettingChanges(bool bEnable, string pin)
     signal sigPinRefresh
 
-    signal sigSendLogs
+    signal sendLogs
+    signal reallyQuit
 
     property real toolbarHeight: 50
 
@@ -207,7 +208,7 @@ Page {
 
                 opacity: parent.containedOpacity
                 onSigBack: parent.isExpanded = false;
-                onSigSendLogs: container.sigSendLogs();
+                onSigSendLogs: container.sendLogs();
             }
         }//ExpandView (log view)
 

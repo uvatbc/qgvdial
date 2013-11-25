@@ -40,6 +40,7 @@ Page {
         TextField {
             id: textTfaPin
             placeholderText: "PIN"
+            inputMethodHints: Qt.ImhDialableCharactersOnly
             anchors.horizontalCenter: parent.horizontalCenter
 
             onAccepted: container.done(true);

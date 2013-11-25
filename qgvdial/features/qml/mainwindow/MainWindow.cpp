@@ -367,6 +367,7 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
             break;
         }
         connect(etCetera, SIGNAL(sendLogs()), &oLogUploader, SLOT(sendLogs()));
+        connect(etCetera, SIGNAL(reallyQuit()), qApp, SLOT(quit()));
 
         // Vmail:
         connect(&oVmail, SIGNAL(vmailFetched(QString,QString,bool)),

@@ -27,6 +27,7 @@ Item {
     height: mainColumn.height
 
     signal sendLogs
+    signal reallyQuit
 
     Column {
         id: mainColumn
@@ -34,7 +35,6 @@ Item {
         spacing: 10
 
         Button {
-            id: btnAbout
             anchors.horizontalCenter: parent.horizontalCenter
             text: "About"
             onClicked: {
@@ -43,10 +43,15 @@ Item {
         }//Button (login/logout)
 
         Button {
-            id: btnSendLogs
             anchors.horizontalCenter: parent.horizontalCenter
             text: "Send logs"
             onClicked: { container.sendLogs(); }
         }//Button (login/logout)
+
+        Button {
+            anchors.horizontalCenter: parent.horizontalCenter
+            text: "Really quit"
+            onPressAndHold: { container.reallyQuit(); }
+        }//Button (really quit)
     }//Column of everything
 }//Page (container)

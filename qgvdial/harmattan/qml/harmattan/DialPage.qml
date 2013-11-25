@@ -57,7 +57,7 @@ Page {
 
             width: parent.width
             height: 290
-            font.pointSize: 14
+            font.pointSize: 30
         }
 
         Keypad {

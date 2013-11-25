@@ -62,7 +62,7 @@ Rectangle {
             leftMargin: 3
         }
         width: parent.width
-        height: 34
+        height: 50
         spacing: 2
 
         Image {
@@ -93,9 +93,9 @@ Rectangle {
             width: parent.width - imgArrow.width - parent.spacing
             anchors.verticalCenter: parent.verticalCenter
 
-            font.pixelSize: 30
+            font.pixelSize: 45
             smooth: true
-        }//QGVLabel (text)
+        }//Label (text)
     }//Row (arrow and text)
 
     Rectangle {
