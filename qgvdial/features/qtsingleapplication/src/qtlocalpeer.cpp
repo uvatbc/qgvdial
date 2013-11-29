@@ -94,7 +94,7 @@ QtLocalPeer::QtLocalPeer(QObject* parent, const QString &appId)
         pProcessIdToSessionId(GetCurrentProcessId(), &sessionId);
         socketName += QLatin1Char('-') + QString::number(sessionId, 16);
     }
-#elif defined(HARMATTAN)
+#elif defined(HARMATTAN) || defined(Q_WS_MAEMO_5)
     socketName += QLatin1Char('-') + QString::number(::getuid(), 16);
 #else
     socketName += QLatin1Char('-') + QString::number(QtLP_Private::getuid(), 16);
