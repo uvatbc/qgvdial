@@ -196,7 +196,7 @@ Page {
             }
 
             Label {
-                text: "Fetching email"
+                text: "Fetching voicemail"
                 visible: (container.isVmail && container.fetchingEmail)
                 anchors.horizontalCenter: parent.horizontalCenter
             }

@@ -56,15 +56,28 @@ TpCalloutInitiator::onACReady(Tp::PendingOperation *op)
             .arg(m_acc->objectPath()));
 #endif
 
+    // The ID is the unique Object Path
     m_id = m_acc->objectPath();
+
+    // Create a friendly name:
+    bool thisPhone = false;
     m_name = m_acc->cmName();
-    int pos = m_id.lastIndexOf('/');
-    if (-1 != pos) {
-        m_name += " : " + m_id.mid(pos + 1);
+    if (m_name == "ring") {
+        m_name = "This phone";
+        thisPhone = true;
+    } else if (m_name == "spirit") {
+        m_name = "Skype";
     }
 
-    Q_DEBUG(QString("id = %1, name = %2")
-            .arg(m_id, m_name));
+    // For everything except the "ring", follow the "cmName: id_part" template
+    if (!thisPhone) {
+        int pos = m_id.lastIndexOf('/');
+        if (-1 != pos) {
+            m_name += ": " + m_id.mid(pos + 1);
+        }
+    }
+
+    Q_DEBUG(QString("id = %1, name = %2").arg(m_id, m_name));
     emit changed();
 
     m_conn = m_acc->connection();

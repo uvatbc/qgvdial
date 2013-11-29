@@ -43,7 +43,7 @@ Page {
             inputMethodHints: Qt.ImhDialableCharactersOnly
             anchors.horizontalCenter: parent.horizontalCenter
 
-            onAccepted: container.done(true);
+            onAccepted: { container.done(true); }
         }
 
         ButtonRow {
@@ -52,11 +52,11 @@ Page {
 
             Button {
                 text: "Cancel"
-                onClicked: container.done(false);
+                onClicked: { container.done(false); }
             }
             Button {
                 text: "Submit"
-                onClicked: container.done(true);
+                onClicked: { container.done(true); }
             }//Button
         }//ButtonRow
     }//Column

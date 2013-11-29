@@ -80,11 +80,11 @@ Page {
 
             Button {
                 text: "Cancel"
-                onClicked: container.done(false);
+                onClicked: { container.done(false); }
             }
             Button {
                 text: "Send"
-                onClicked: container.done(true);
+                onClicked: { container.done(true); }
             }//Button
         }//ButtonRow
     }//Column

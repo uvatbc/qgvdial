@@ -29,8 +29,6 @@ Page {
     signal done(bool accepted)
     signal setCiNumber(string id, string number)
 
-    onSetCiNumber: container.done(true);
-
     property string ciId: "Replace this ID"
     property alias phonesModel: numbersView.model
 
@@ -56,7 +54,10 @@ Page {
 
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: container.setCiNumber(container.ciId, number);
+                    onClicked: {
+                        container.setCiNumber(container.ciId, number);
+                        container.done(true);
+                    }
                 }
             }//delegate
         }//ListView
