@@ -137,7 +137,7 @@ LibContacts::refreshLatest()
 bool
 LibContacts::refreshFull()
 {
-    refresh();
+    return refresh();
 }//LibContacts::refreshFull
 
 void
@@ -145,6 +145,11 @@ LibContacts::onOneContact(ContactInfo cinfo)
 {
     IMainWindow *win = (IMainWindow *) this->parent ();
     if (cinfo.bDeleted || (0 == cinfo.arrPhones.count ())) {
+#if 1
+        if (cinfo.strTitle.contains ("saroj", Qt::CaseInsensitive)) {
+            Q_DEBUG("Deleting Saroj");
+        }
+#endif
         win->db.deleteContact (cinfo.strId);
     } else {
         win->db.insertContact (cinfo);

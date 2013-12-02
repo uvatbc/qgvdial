@@ -44,9 +44,6 @@ public:
 
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
-    bool insertContact (const ContactInfo &contactInfo);
-    bool deleteContact (const ContactInfo &contactInfo);
-
     void clearAll ();
     void refresh (const QString &query);
     void refresh ();

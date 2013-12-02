@@ -563,7 +563,7 @@ CacheDb::refreshContactsModel (ContactsModel *modelContacts,
         scrubQuery.replace ("'", "''");
         strQ += QString(" AND c."GV_C_NAME" LIKE '%%%1%%'").arg (scrubQuery);
     }
-    strQ += " ORDER BY c." GV_C_NAME ";";
+    strQ += " ORDER BY c."GV_C_NAME ";";
 
     CacheDbPrivate &p = CacheDbPrivate::ref ();
     modelContacts->setQuery (strQ, p.db);

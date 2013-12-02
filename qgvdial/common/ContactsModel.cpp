@@ -116,6 +116,13 @@ ContactsModel::data(const QModelIndex &index, int role) const
         if (CT_NameRole == role) {
             retVar = QSqlQueryModel::data(index.sibling(index.row(), 1),
                                           Qt::EditRole);
+
+#if 1
+            if (retVar.toString().contains("saroj", Qt::CaseInsensitive)) {
+                Q_DEBUG("Got Saroj");
+            }
+#endif
+
             break;
         }
 
@@ -146,40 +153,6 @@ ContactsModel::data(const QModelIndex &index, int role) const
 
     return (retVar);
 }//ContactsModel::data
-
-bool
-ContactsModel::insertContact(const ContactInfo &contactInfo)
-{
-    bool bExists = db.existsContact(contactInfo.strId);
-    int oldcount = this->rowCount();
-
-    if (!bExists) {
-        beginInsertRows(QModelIndex(), oldcount, oldcount);
-    }
-
-    db.insertContact(contactInfo);
-
-    if (!bExists) {
-        endInsertRows();
-    }
-
-    return (true);
-}//ContactsModel::insertContact
-
-bool
-ContactsModel::deleteContact(const ContactInfo &contactInfo)
-{
-    int oldcount = this->rowCount();
-    bool bExists = db.existsContact(contactInfo.strId);
-
-    if (bExists) {
-        beginRemoveRows(QModelIndex(), oldcount, oldcount);
-        db.deleteContact(contactInfo.strId);
-        endRemoveRows();
-    }
-
-    return (true);
-} //ContactsModel::deleteContact
 
 void
 ContactsModel::clearAll()
