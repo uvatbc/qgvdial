@@ -45,6 +45,7 @@ Page {
         delegate: Label {
             width: regNumList.width
             text: name + "\n(" + number + ")"
+            font.pixelSize: 30
 
             MouseArea {
                 anchors.fill: parent

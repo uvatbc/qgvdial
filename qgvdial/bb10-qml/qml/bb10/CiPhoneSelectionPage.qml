@@ -39,7 +39,9 @@ Page {
         Label {
             id: lblTitle
             font.pixelSize: 30
-            text: "Please select a number for the account with id " + container.ciId
+            wrapMode: Text.WrapAnywhere
+            width: parent.width
+            text: "Please select a number for:\n" + container.ciId
         }
 
         ListView {
