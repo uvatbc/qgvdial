@@ -35,6 +35,7 @@ Page {
         Label {
             id: label
             text: "Enter the application specific password\nfor Google Contacts"
+            font.pixelSize: 40
             anchors.horizontalCenter: parent.horizontalCenter
         }
 
@@ -42,6 +43,11 @@ Page {
             id: textAppPw
             placeholderText: "App specific password"
             anchors.horizontalCenter: parent.horizontalCenter
+            width: 400
+            validator: IntValidator {
+                bottom: 0
+                top: 999999
+            }
         }
 
         ButtonRow {

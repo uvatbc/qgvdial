@@ -34,6 +34,7 @@ Page {
 
         Label {
             text: "Enter the two-factor authentication PIN"
+            font.pixelSize: 40
             anchors.horizontalCenter: parent.horizontalCenter
         }
 
@@ -41,6 +42,11 @@ Page {
             id: textTfaPin
             placeholderText: "PIN"
             anchors.horizontalCenter: parent.horizontalCenter
+            width: 400
+            validator: IntValidator {
+                bottom: 0
+                top: 999999
+            }
         }
 
         ButtonRow {

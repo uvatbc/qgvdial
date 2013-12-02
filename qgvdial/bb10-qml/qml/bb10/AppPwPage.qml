@@ -33,8 +33,8 @@ Page {
         spacing: 5
 
         Label {
-            id: label
             text: "Enter the application specific password\nfor Google Contacts"
+            font.pixelSize: 40
             anchors.horizontalCenter: parent.horizontalCenter
         }
 
@@ -42,18 +42,22 @@ Page {
             id: textAppPw
             placeholderText: "App specific password"
             anchors.horizontalCenter: parent.horizontalCenter
+            width: 400
         }
 
         ButtonRow {
+            anchors.horizontalCenter: parent.horizontalCenter
             exclusive: false
             spacing: 5
 
             Button {
                 text: "Cancel"
+                width: 200
                 onClicked: container.done(false);
             }
             Button {
                 text: "Submit"
+                width: 200
                 onClicked: container.done(true);
             }//Button
         }//ButtonRow

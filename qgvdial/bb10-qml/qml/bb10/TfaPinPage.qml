@@ -34,6 +34,7 @@ Page {
 
         Label {
             text: "Enter the two-factor authentication PIN"
+            font.pixelSize: 40
             anchors.horizontalCenter: parent.horizontalCenter
         }
 
@@ -41,18 +42,26 @@ Page {
             id: textTfaPin
             placeholderText: "PIN"
             anchors.horizontalCenter: parent.horizontalCenter
+            width: 400
+            validator: IntValidator {
+                bottom: 0
+                top: 999999
+            }
         }
 
         ButtonRow {
+            anchors.horizontalCenter: parent.horizontalCenter
             exclusive: false
             spacing: 5
 
             Button {
                 text: "Cancel"
+                width: 200
                 onClicked: container.done(false);
             }
             Button {
                 text: "Submit"
+                width: 200
                 onClicked: container.done(true);
             }//Button
         }//ButtonRow

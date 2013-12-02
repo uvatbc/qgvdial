@@ -44,6 +44,10 @@ Page {
             anchors.horizontalCenter: parent.horizontalCenter
 
             onAccepted: { container.done(true); }
+            validator: IntValidator {
+                bottom: 0
+                top: 999999
+            }
         }
 
         ButtonRow {
