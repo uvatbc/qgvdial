@@ -224,6 +224,8 @@ GContactsApi::getContacts(AsyncTaskToken *task)
         return false;
     }
 
+    QString msg = "Contacts update.";
+
     QDateTime updatedMin;
     if (task->inParams.contains ("updatedMin")) {
         updatedMin = task->inParams["updatedMin"].toDateTime ();
@@ -237,10 +239,14 @@ GContactsApi::getContacts(AsyncTaskToken *task)
     if (updatedMin.isValid ()) {
         temp = updatedMin.toUTC().toString (Qt::ISODate);
         url.addQueryItem ("updated-min", temp);
+        msg += QString(" Minimum = %1.").arg(temp);
+    } else {
+        msg += " Full update.";
     }
 
     if (task->inParams["showDeleted"].toBool()) {
         url.addQueryItem ("showdeleted", "true");
+        msg += " Show deleted.";
     }
 
 #if USE_JSON_FEED
@@ -251,6 +257,10 @@ GContactsApi::getContacts(AsyncTaskToken *task)
     doGet(url, task, this,
           SLOT(onGotContactsFeed(bool,const QByteArray&,QNetworkReply*,void*)));
     Q_ASSERT(rv);
+
+    if (rv) { // And emitlog?
+        Q_DEBUG(msg);
+    }
 
     return (rv);
 }//GContactsApi::getContacts

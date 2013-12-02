@@ -51,6 +51,7 @@ Page {
             delegate: Label {
                 width: numbersView.width
                 text: name + "\n(" + number + ")"
+                font.pixelSize: 25
 
                 MouseArea {
                     anchors.fill: parent

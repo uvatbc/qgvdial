@@ -159,8 +159,8 @@ MainWindow::init()
         return;
     }
 
-    m_view->setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
     m_view->setMainQmlFile(QLatin1String(MAIN_QML_PATH));
+    m_view->setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
     m_view->showExpanded();
 
 #if USE_SINGLE_APPLICATION
@@ -227,6 +227,10 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
                 &oContacts, SLOT(refreshLatest()));
         connect(mainPageStack, SIGNAL(sigRefreshInbox()),
                 &oInbox, SLOT(refreshLatest()));
+        connect(mainPageStack, SIGNAL(sigRefreshContactsFull()),
+                &oContacts, SLOT(refreshFull()));
+        connect(mainPageStack, SIGNAL(sigRefreshInboxFull()),
+                &oInbox, SLOT(refreshFull()));
 
         mainTabGroup = getQMLObject ("MainTabGroup");
         if (NULL == mainTabGroup) {

@@ -127,12 +127,18 @@ LibContacts::refreshLatest()
     QDateTime latest;
     IMainWindow *win = (IMainWindow *) this->parent ();
     if (win->db.getLatestContact (latest)) {
-        this->refresh (latest);
+        refresh (latest);
         rv = true;
     }
 
     return (rv);
 }//LibContacts::refreshLatest
+
+bool
+LibContacts::refreshFull()
+{
+    refresh();
+}//LibContacts::refreshFull
 
 void
 LibContacts::onOneContact(ContactInfo cinfo)
@@ -155,11 +161,13 @@ LibContacts::onContactsFetched()
     if (ATTS_SUCCESS != task->status) {
         Q_WARN("Failed to update contacts");
     } else {
+        Q_DEBUG("Contacts updated.");
+
         ContactsModel *oldModel = m_contactsModel;
         m_contactsModel = this->createModel ();
         if (NULL != m_contactsModel) {
             if (m_mandatoryLocalPics) {
-                connect(m_contactsModel, SIGNAL(noContactPhoto(QString,QString)),
+                connect(m_contactsModel,SIGNAL(noContactPhoto(QString,QString)),
                         this, SLOT(onNoContactPhoto(QString,QString)));
             }
 

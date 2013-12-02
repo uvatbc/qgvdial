@@ -126,7 +126,6 @@ Page {
 
             color: "#202020"
             border.color: "darkslategray"
-            radius: 5
 
             width:  (contactsList.width - border.width)
             height: contactImage.height + 4
@@ -164,19 +163,7 @@ Page {
             MouseArea {
                 anchors.fill: parent
                 onClicked: container.contactClicked(id);
-                onPressed: { listDelegate.state = "pressed"; }
-                onReleased: { listDelegate.state = ''; }
             }
-
-            states: [
-                State {
-                    name: "pressed"
-                    PropertyChanges {
-                        target: listDelegate.border
-                        color: "orange"
-                    }
-                }
-            ]
         }// delegate Rectangle
     }// ListView (contacts list)
 }//Page

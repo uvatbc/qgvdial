@@ -84,6 +84,12 @@ LibInbox::refreshLatest()
 }//LibInbox::refreshLatest
 
 bool
+LibInbox::refreshFull()
+{
+    return refresh();
+}//LibInbox::refreshFull
+
+bool
 LibInbox::beginRefresh(AsyncTaskToken *task, QString type, QDateTime after,
                        int page, bool isExternal)
 {

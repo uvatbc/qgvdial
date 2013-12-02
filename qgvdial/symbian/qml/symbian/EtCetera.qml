@@ -51,7 +51,7 @@ Item {
         Button {
             anchors.horizontalCenter: parent.horizontalCenter
             text: "Really quit"
-            onPressAndHold: { container.reallyQuit(); }
+            onClicked: { container.reallyQuit(); }
         }//Button (really quit)
     }//Column of everything
 }//Page (container)

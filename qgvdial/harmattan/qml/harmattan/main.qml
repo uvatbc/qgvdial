@@ -28,8 +28,12 @@ PageStackWindow {
     objectName: "MainPageStack"
 
     signal sigShowContact(string cId)
+
     signal sigRefreshContacts
     signal sigRefreshInbox
+
+    signal sigRefreshContactsFull
+    signal sigRefreshInboxFull
 
     Component.onCompleted: {
         // Use the dark theme.
@@ -174,9 +178,14 @@ PageStackWindow {
         id: myMenu
         visualParent: appWindow
         MenuLayout {
-            MenuItem {
+            MyMenuItem {
                 text: qsTr("Refresh")
                 onClicked: {
+                    if (pageStack.depth > 1) {
+                        console.debug("Refresh a pushed page?? Nope.");
+                        return;
+                    }
+
                     if (tabgroup.currentTab === dialTab) {
                         console.debug("Refresh the dialPage");
                     } else if (tabgroup.currentTab === contactsTab) {
@@ -187,6 +196,20 @@ PageStackWindow {
                         appWindow.sigRefreshInbox();
                     } else if (tabgroup.currentTab === settingsTab) {
                         console.debug("Refresh the settingsTab");
+                    }
+                }
+
+                onPressHold: {
+                    if (pageStack.depth > 1) {
+                        return;
+                    }
+
+                    if (tabgroup.currentTab === contactsTab) {
+                        console.debug("Full refresh contacts");
+                        appWindow.sigRefreshContactsFull();
+                    } else if (tabgroup.currentTab === inboxTab) {
+                        console.debug("Full refresh inbox");
+                        appWindow.sigRefreshInboxFull();
                     }
                 }
             }

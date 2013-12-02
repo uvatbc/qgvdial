@@ -42,6 +42,7 @@ public slots:
     bool refresh(QString type = QString("all"), QDateTime after = QDateTime());
     bool refreshLatest(QString type);
     bool refreshLatest();
+    bool refreshFull();
 
     bool markEntryAsRead(const QString &id);
     bool deleteEntry(const QString &id);

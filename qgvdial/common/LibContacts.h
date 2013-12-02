@@ -50,6 +50,7 @@ public slots:
     void refreshModel();
     bool refresh(QDateTime after = QDateTime());
     bool refreshLatest();
+    bool refreshFull();
     bool searchContacts(const QString &query = QString());
 
 protected:
