@@ -159,9 +159,7 @@ TpCalloutInitiator::initiateCall(AsyncTaskToken *task)
     }
     tpTask->connectOp(pReq);
 
-    task->status = ATTS_FAILURE;
-    task->emitCompleted ();
-    return true;
+    return (true);
 }//TpCalloutInitiator::initiateCall
 
 void
