@@ -105,6 +105,12 @@ CacheDb::cleanup_dangling_temp_ids()
         query.exec(QString("DELETE FROM " GV_TEMP_TABLE " WHERE "
                     GV_TT_PATH "='%1'").arg(strPath));
     }
+
+    quint32 del = clearTempFileByFile (UNKNOWN_CONTACT_QRC_PATH);
+    if (0 != del) {
+        Q_DEBUG(QString("Deleted %1 links all pointing to the unknown qrc path")
+                .arg (del));
+    }
 }//CacheDb::cleanup_temp_files
 
 void
@@ -470,7 +476,7 @@ CacheDb::putTempFile(const QString &strLink, const QString &strPath)
     scrubLink.replace ("'", "''");
     scrubPath.replace ("'", "''");
 
-    clearTempFile (strLink, true);
+    clearTempFileByLink (strLink, true);
 
     QString strCTime = QDateTime::currentDateTime().toString (Qt::ISODate);
     query.exec (QString("INSERT INTO " GV_TEMP_TABLE " "
@@ -505,7 +511,7 @@ CacheDb::getTempFile(const QString &strLink, QString &strPath) const
 }//CacheDb::getTempFile
 
 bool
-CacheDb::clearTempFile(const QString &strLink, bool deleteFile)
+CacheDb::clearTempFileByLink(const QString &strLink, bool deleteFile)
 {
     CacheDbPrivate &p = CacheDbPrivate::ref ();
     QSqlQuery query(p.db);
@@ -534,7 +540,39 @@ CacheDb::clearTempFile(const QString &strLink, bool deleteFile)
     }
 
     return (deletions != 0);
-}//CacheDb::clearTempFile
+}//CacheDb::clearTempFileByLink
+
+quint32
+CacheDb::clearTempFileByFile(const QString &strFile)
+{
+    CacheDbPrivate &p = CacheDbPrivate::ref ();
+    QSqlQuery query(p.db);
+    query.setForwardOnly (true);
+
+    QString scrubPath = strFile;
+    scrubPath.replace ("'", "''");
+
+    query.exec (QString("SELECT COUNT(*) FROM " GV_TEMP_TABLE
+                        " WHERE " GV_TT_PATH "='%1';").arg(scrubPath));
+
+    quint32 deletions;
+    do {
+        deletions = 0;
+        if (!query.next ()) {
+            break;
+        }
+
+        deletions = query.value (0).toInt ();
+        if (0 == deletions) {
+            break;
+        }
+
+        query.exec (QString("DELETE FROM " GV_TEMP_TABLE
+                            " WHERE " GV_TT_PATH "='%1';").arg(scrubPath));
+    } while (0);
+
+    return deletions;
+}//CacheDb::clearTempFileByFile
 
 void
 CacheDb::clearContacts ()
@@ -550,22 +588,47 @@ void
 CacheDb::refreshContactsModel (ContactsModel *modelContacts,
                                const QString &query)
 {
+    QString scrubQuery = query;
+    scrubQuery.replace ("'", "''");
+
     //  0,    1,       2,         3
     // id, name, piclink, localpath
     QString strQ = "SELECT c."GV_C_ID       ","
                           "c."GV_C_NAME     ","
                           "c."GV_C_PICLINK  ","
-                          "t."GV_TT_PATH    " "
-                   "FROM "GV_CONTACTS_TABLE" c LEFT JOIN "GV_TEMP_TABLE" t "
-                   "WHERE c."GV_C_PICLINK"=t."GV_TT_LINK;
+                          "t."GV_TT_PATH    " ";
+    QString strQ1 = "SELECT COUNT(*) ";
+
+    QString strRem = "FROM "GV_CONTACTS_TABLE" c LEFT JOIN "GV_TEMP_TABLE" t "
+                     "ON c."GV_C_PICLINK"=t."GV_TT_LINK;
     if (!query.isEmpty ()) {
-        QString scrubQuery = query;
-        scrubQuery.replace ("'", "''");
-        strQ += QString(" AND c."GV_C_NAME" LIKE '%%%1%%'").arg (scrubQuery);
+        strRem += QString(" WHERE c."GV_C_NAME" LIKE '%%%1%%'").arg (scrubQuery);
     }
-    strQ += " ORDER BY c."GV_C_NAME ";";
+    strQ += strRem + " ORDER BY c."GV_C_NAME ";";
+    strQ1 += strRem + ";";
+
+    QString strQ2 = "SELECT COUNT(*) FROM "GV_CONTACTS_TABLE;
+    if (!query.isEmpty ()) {
+        strQ2 += QString(" WHERE "GV_C_NAME" LIKE '%%%1%%'").arg (scrubQuery);
+    }
+    strQ2 += ";";
 
     CacheDbPrivate &p = CacheDbPrivate::ref ();
+    quint32 c1 = 0, c2 = 0;
+    QSqlQuery q(p.db);
+    q.setForwardOnly (true);
+    q.exec (strQ1);
+    if (q.next ()) {
+        c1 = q.value (0).toUInt ();
+    }
+    q.exec (strQ2);
+    if (q.next ()) {
+        c2 = q.value (0).toUInt ();
+    }
+    if (c1 != c2) {
+        Q_WARN(QString("c1=%1, c2=%2").arg(c1).arg(c2));
+    }
+
     modelContacts->setQuery (strQ, p.db);
 }//CacheDb::refreshContactsModel
 

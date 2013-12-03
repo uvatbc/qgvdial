@@ -81,8 +81,8 @@ ContactsModel::getPic(const QModelIndex &index, bool isQML) const
                                          Qt::EditRole).toString();
             emit noContactPhoto(contactId, photoUrl);
 
-            // And return blank
-            break;
+            //... and use the unknown pic path
+            localPath = UNKNOWN_CONTACT_QRC_PATH;
         }
 
         if (isQML) {
@@ -106,6 +106,14 @@ ContactsModel::data(const QModelIndex &index, int role) const
 {
     QVariant retVar;
 
+#if 1
+    QString name = QSqlQueryModel::data(index.sibling(index.row(), 1),
+                                        Qt::EditRole).toString ();
+    if (name.contains("saroj", Qt::CaseInsensitive)) {
+        name.clear ();
+    }
+#endif
+
     do {
         if (CT_IDRole == role) {
             retVar = QSqlQueryModel::data(index.sibling(index.row(), 0),
@@ -116,13 +124,6 @@ ContactsModel::data(const QModelIndex &index, int role) const
         if (CT_NameRole == role) {
             retVar = QSqlQueryModel::data(index.sibling(index.row(), 1),
                                           Qt::EditRole);
-
-#if 1
-            if (retVar.toString().contains("saroj", Qt::CaseInsensitive)) {
-                Q_DEBUG("Got Saroj");
-            }
-#endif
-
             break;
         }
 

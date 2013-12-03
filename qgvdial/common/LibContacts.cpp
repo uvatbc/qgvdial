@@ -25,7 +25,7 @@ Contact: yuvraaj@gmail.com
 #include "ContactsModel.h"
 #include "ContactNumbersModel.h"
 
-#define GOT_PHOTO_TIMEOUT (5 * 1000)  // 5 seconds
+#define GOT_PHOTO_TIMEOUT (3 * 1000)  // 3 seconds
 
 LibContacts::LibContacts(IMainWindow *parent)
 : QObject(parent)
@@ -108,13 +108,22 @@ LibContacts::refresh(QDateTime after /* = QDateTime()*/)
     connect (task, SIGNAL(completed()),
              this, SLOT(onContactsFetched()));
 
+    IMainWindow *win = (IMainWindow *) this->parent ();
     bool bval = true;
     task->inParams["showDeleted"] = bval;
     task->inParams["updatedMin"] = after;
 
     if ((bval = api.getContacts(task))) {
-        IMainWindow *win = (IMainWindow *) this->parent ();
         win->db.setQuickAndDirty (true);
+    }
+
+    if (!after.isValid ()) {
+        // This is a full refresh, so clear out the stale links
+        quint32 del = win->db.clearTempFileByFile (UNKNOWN_CONTACT_QRC_PATH);
+        if (0 != del) {
+            Q_DEBUG(QString("Deleted %1 links all pointing to the unknown qrc "
+                            "path") .arg (del));
+        }
     }
 
     return (bval);
@@ -145,11 +154,6 @@ LibContacts::onOneContact(ContactInfo cinfo)
 {
     IMainWindow *win = (IMainWindow *) this->parent ();
     if (cinfo.bDeleted || (0 == cinfo.arrPhones.count ())) {
-#if 1
-        if (cinfo.strTitle.contains ("saroj", Qt::CaseInsensitive)) {
-            Q_DEBUG("Deleting Saroj");
-        }
-#endif
         win->db.deleteContact (cinfo.strId);
     } else {
         win->db.insertContact (cinfo);
@@ -258,6 +262,7 @@ LibContacts::onGotPhoto()
         QTemporaryFile tempFile (tempPath);
         if (!tempFile.open ()) {
             Q_WARN("Failed to get a temp file name for the photo");
+            win->db.putTempFile (href, UNKNOWN_CONTACT_QRC_PATH);
             break;
         }
 
@@ -265,18 +270,27 @@ LibContacts::onGotPhoto()
         tempFile.write (task->outParams["data"].toByteArray());
 
         win->db.putTempFile (href, tempFile.fileName ());
-    } while(0);
-    task->deleteLater ();
 
-    m_gotPhotoTimer.stop ();
-    m_gotPhotoTimer.start ();
+        // Restart the timer only if we have successfully saved the data.
+        m_gotPhotoTimer.stop ();
+        m_gotPhotoTimer.start ();
+    } while(0);
+
+    task->deleteLater ();
 }//LibContacts::onGotPhoto
 
 void
 LibContacts::refreshModel()
 {
     IMainWindow *win = (IMainWindow *) this->parent ();
-    win->db.refreshContactsModel (m_contactsModel);
+
+    if (NULL != m_contactsModel) {
+        win->db.refreshContactsModel (m_contactsModel);
+    }
+    if (NULL != m_searchedContactsModel) {
+        Q_ASSERT(!m_searchQuery.isEmpty ());
+        win->db.refreshContactsModel (m_searchedContactsModel, m_searchQuery);
+    }
 }//LibContacts::refreshModel
 
 bool
@@ -369,6 +383,7 @@ LibContacts::searchContacts(const QString &query)
         if (NULL != oldModel) {
             oldModel->deleteLater ();
             m_searchedContactsModel = NULL;
+            m_searchQuery.clear ();
         }
         return true;
     }
@@ -379,6 +394,9 @@ LibContacts::searchContacts(const QString &query)
         Q_WARN("Unable to allocate contacts model");
         return false;
     }
+    m_searchQuery = query;
+    connect(m_searchedContactsModel, SIGNAL(noContactPhoto(QString,QString)),
+            this, SLOT(onNoContactPhoto(QString,QString)));
 
     if (m_mandatoryLocalPics) {
         connect(m_contactsModel, SIGNAL(noContactPhoto(QString,QString)),

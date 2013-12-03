@@ -71,6 +71,8 @@ protected:
 
 public:
     ContactsModel       *m_contactsModel;
+
+    QString              m_searchQuery;
     ContactsModel       *m_searchedContactsModel;
 
     ContactNumbersModel *m_contactPhonesModel;
