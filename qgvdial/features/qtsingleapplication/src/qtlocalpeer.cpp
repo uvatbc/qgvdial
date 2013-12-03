@@ -58,6 +58,10 @@ namespace QtLP_Private {
 #include "qtlockedfile_win.cpp"
 #else
 #include "qtlockedfile_unix.cpp"
+
+#define GCC_VERSION (__GNUC__ * 10000 \
+                               + __GNUC_MINOR__ * 100 \
+                               + __GNUC_PATCHLEVEL__)
 #endif
 }
 
@@ -84,6 +88,10 @@ QtLocalPeer::QtLocalPeer(QObject* parent, const QString &appId)
     socketName = QLatin1String("qtsingleapp-") + prefix
                  + QLatin1Char('-') + QString::number(idNum, 16);
 
+#ifndef GCC_VERSION
+#error woo
+#endif
+
 #if defined(Q_OS_WIN)
     if (!pProcessIdToSessionId) {
         QLibrary lib("kernel32");
@@ -94,7 +102,7 @@ QtLocalPeer::QtLocalPeer(QObject* parent, const QString &appId)
         pProcessIdToSessionId(GetCurrentProcessId(), &sessionId);
         socketName += QLatin1Char('-') + QString::number(sessionId, 16);
     }
-#elif (GCC_VERSION < 40401) && !defined(Q_WS_SIMULATOR)
+#elif (GCC_VERSION <= 40401) && !defined(Q_WS_SIMULATOR)
     socketName += QLatin1Char('-') + QString::number(::getuid(), 16);
 #else
     socketName += QLatin1Char('-') + QString::number(QtLP_Private::getuid(), 16);
