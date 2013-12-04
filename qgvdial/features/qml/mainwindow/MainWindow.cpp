@@ -371,6 +371,8 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
             break;
         }
         connect(etCetera, SIGNAL(sendLogs()), &oLogUploader, SLOT(sendLogs()));
+        connect(etCetera, SIGNAL(sigAbout()),
+                this, SLOT(onUserAboutBtnClicked()));
         connect(etCetera, SIGNAL(reallyQuit()), qApp, SLOT(quit()));
 
         // Vmail:

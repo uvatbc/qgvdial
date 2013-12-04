@@ -231,6 +231,8 @@ MainWindow::init()
     connect(d->ui->dispNum, SIGNAL(textChanged()),
             this, SLOT(onDispNumTextChanged()));
 
+    connect(d->ui->btnAbout, SIGNAL(clicked()),
+            this, SLOT(onUserAboutBtnClicked()));
     connect(d->ui->btnSendLogs, SIGNAL(clicked()),
             &oLogUploader, SLOT(sendLogs()));
 

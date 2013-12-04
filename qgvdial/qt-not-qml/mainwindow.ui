@@ -21,7 +21,7 @@
        <enum>QTabWidget::East</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="dialTab">
        <attribute name="title">
@@ -288,7 +288,7 @@
         <item>
          <widget class="QToolBox" name="toolBox">
           <property name="currentIndex">
-           <number>0</number>
+           <number>2</number>
           </property>
           <widget class="QWidget" name="loginDetails">
            <property name="geometry">
@@ -334,8 +334,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>421</width>
-             <height>251</height>
+             <width>246</width>
+             <height>240</height>
             </rect>
            </property>
            <attribute name="label">
@@ -486,7 +486,7 @@
      <x>0</x>
      <y>0</y>
      <width>497</width>
-     <height>23</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">

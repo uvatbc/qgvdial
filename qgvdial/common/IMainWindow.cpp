@@ -22,6 +22,7 @@ Contact: yuvraaj@gmail.com
 #include "IMainWindow.h"
 #include "Lib.h"
 #include "GVNumModel.h"
+#include <QDesktopServices>
 
 IMainWindow::IMainWindow(QObject *parent)
 : QObject(parent)
@@ -445,3 +446,10 @@ IMainWindow::onTaskTimerTimeout()
     uiLongTaskContinues ();
     m_taskTimer.start ();
 }//IMainWindow::onTaskTimerTimeout
+
+void
+IMainWindow::onUserAboutBtnClicked()
+{
+    QUrl url("http://www.yuvraaj.net/qgvdial/about.html");
+    QDesktopServices::openUrl (url);
+}//IMainWindow::onUserAboutBtnClicked

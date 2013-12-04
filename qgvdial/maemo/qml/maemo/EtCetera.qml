@@ -26,6 +26,8 @@ Item {
     height: mainColumn.height
 
     signal sendLogs
+    signal sigAbout
+    signal reallyQuit
 
     Column {
         id: mainColumn
@@ -36,9 +38,7 @@ Item {
             id: btnAbout
             anchors.horizontalCenter: parent.horizontalCenter
             text: "About"
-            onClicked: {
-                Qt.openUrlExternally("http://www.yuvraaj.net/qgvdial/about");
-            }
+            onClicked: { container.sigAbout(); }
         }//Button (login/logout)
 
         Button {
@@ -47,5 +47,11 @@ Item {
             text: "Send logs"
             onClicked: { container.sendLogs(); }
         }//Button (login/logout)
+
+        Button {
+            anchors.horizontalCenter: parent.horizontalCenter
+            text: "Really quit"
+            onClicked: { container.reallyQuit(); }
+        }//Button (really quit)
     }//Column of everything
 }//Page (container)

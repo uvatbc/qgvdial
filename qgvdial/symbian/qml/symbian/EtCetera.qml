@@ -27,6 +27,7 @@ Item {
     height: mainColumn.height
 
     signal sendLogs
+    signal sigAbout
     signal reallyQuit
 
     Column {
@@ -37,9 +38,7 @@ Item {
         Button {
             anchors.horizontalCenter: parent.horizontalCenter
             text: "About"
-            onClicked: {
-                Qt.openUrlExternally("http://www.yuvraaj.net/qgvdial/about");
-            }
+            onClicked: { container.sigAbout(); }
         }//Button (login/logout)
 
         Button {

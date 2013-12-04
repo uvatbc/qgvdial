@@ -143,6 +143,8 @@ protected slots:
     void onUserLogoutRequest();
     void onUserProxyRevert();
 
+    void onUserAboutBtnClicked();
+
 private slots:
     void onTFARequest(AsyncTaskToken *task);
     void loginCompleted();
