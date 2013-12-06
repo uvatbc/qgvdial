@@ -31,10 +31,9 @@ system("rm -rf qgvdial-* qgvtp-* qgvdial_* qgvtp_*");
 
 $cmd = "ssh uv\@userver \"cd ~/harmattan/export/qgvdial ; svn export $repo qgvdial-$qver\"";
 system($cmd);
-system("cp $basedir/icons/qgv.png $basedir/src/qgvdial.png");
 
 # Append the version to the pro file
-open(PRO_FILE, ">>$basedir/src/src.pro") || die "Cannot open pro file";
+open(PRO_FILE, ">>$basedir/qgvdial/harmattan/harmattan.pro") || die "Cannot open pro file";
 print PRO_FILE "VERSION=__QGVDIAL_VERSION__\n";
 close PRO_FILE;
 
@@ -43,28 +42,20 @@ $cmd = "perl $basedir/build-files/version.pl __QGVDIAL_VERSION__ $qver $basedir"
 print "$cmd\n";
 system($cmd);
 
-# Copy the correct pro file
-system("cp $basedir/build-files/qgvdial/harmattan/pro.qgvdial $basedir/qgvdial.pro");
-
-# For the moment, forcibly include mqlib
-$cmd = "cd $basedir/src && touch mqlib-build";
+# Do everything upto the preparation of the debian directory. Code is still not compiled.
+$cmd = "cd $basedir/qgvdial ; mv harmattan qgvdial-$qver";
 print "$cmd\n";
 system($cmd);
 
-# Do everything upto the preparation of the debian directory. Code is still not compiled.
+$basedir = "$basedir/qgvdial/qgvdial-$qver";
 $cmd = "cd $basedir && echo y | dh_make -n --createorig --single -e yuvraaj\@gmail.com -c lgpl2";
 print "$cmd\n";
 system($cmd);
 
 # Put all the debianization files into the debian folder
-system("cd $basedir/build-files/qgvdial/harmattan ; mv compat postinst prerm control qgvdial.aegis rules $basedir/debian/");
-
-# Fix the changelog and put it into the correct location
-system("head -1 $basedir/debian/changelog >dest.txt && cat $basedir/build-files/qgvdial/changelog >>dest.txt && tail -2 $basedir/debian/changelog | sed 's/unknown/Yuvraaj Kelkar/g' >>dest.txt && mv dest.txt $basedir/debian/changelog");
-
-# Built it all!
-$cmd = "cd $basedir && dpkg-buildpackage -rfakeroot -nc -uc -us";
-system($cmd);
-
-exit(0);
+system("cd $basedir && cd ./qtc_packaging/debian_harmattan/ ; cp changelog compat control copyright qgvdial.aegis README rules ../../debian/");
+# Speed up the make
+system("cd $basedir ; pushd ../features/dbus_api/gen/ ; ./create_ifaces.sh  ; popd ; qmake ; make -j4");
+system("cd $basedir ; dpkg-buildpackage -rfakeroot -nc -b -us -uc");
+system("cd $basedir ; cp ../qgvdial*deb ../../..");
 
