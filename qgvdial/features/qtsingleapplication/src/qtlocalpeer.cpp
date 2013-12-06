@@ -88,10 +88,6 @@ QtLocalPeer::QtLocalPeer(QObject* parent, const QString &appId)
     socketName = QLatin1String("qtsingleapp-") + prefix
                  + QLatin1Char('-') + QString::number(idNum, 16);
 
-#ifndef GCC_VERSION
-#error woo
-#endif
-
 #if defined(Q_OS_WIN)
     if (!pProcessIdToSessionId) {
         QLibrary lib("kernel32");
