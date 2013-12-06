@@ -15,3 +15,6 @@ override_dh_auto_configure:
 	pushd ../features/dbus_api/gen/ ; ./create_ifaces.sh ; popd
 	qmake
 
+override_dh_auto_build:
+	dh_auto_build -- -j4
+
