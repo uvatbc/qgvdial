@@ -26,8 +26,8 @@ Contact: yuvraaj@gmail.com
 
 #define LOGS_SERVER "http://www.yuvraaj.net"
 
-#define TRACKER_SERVER "http://localhost:8000"
-//#define TRACKER_SERVER "https://www.qgvdial.yuvraaj.net"
+//#define TRACKER_SERVER "http://localhost:8000"
+#define TRACKER_SERVER "https://qgvdial.yuvraaj.net"
 
 extern QStringList g_arrLogFiles;
 
@@ -83,9 +83,9 @@ LogUploader::onGetLogLocation(bool success, const QByteArray &response,
             break;
         }
 
-        AsyncTaskToken *token = new AsyncTaskToken(this);
-        if (!token) {
-            Q_WARN("Failed to create async token");
+        AsyncTaskToken *task = new AsyncTaskToken(this);
+        if (!task) {
+            Q_WARN("Failed to create async task");
             break;
         }
 
@@ -94,7 +94,7 @@ LogUploader::onGetLogLocation(bool success, const QByteArray &response,
 
         //- Collect all the parameters I want to send to myself -//
         QDateTime dtNow = QDateTime::currentDateTime().toUTC();
-        token->inParams["date"] = dtNow;
+        task->inParams["date"] = dtNow;
 
         QDomDocument doc("qgvdial Logs");
         QDomElement root = doc.createElement("Logs");
@@ -147,7 +147,7 @@ LogUploader::onGetLogLocation(bool success, const QByteArray &response,
             break;
         }
 
-        NwReqTracker *tracker = new NwReqTracker(reply, *m_nwMgr, token,
+        NwReqTracker *tracker = new NwReqTracker(reply, *m_nwMgr, task,
                                                  NW_REPLY_TIMEOUT, true, this);
         connect(tracker, SIGNAL(sigDone(bool,QByteArray,QNetworkReply*,void*)),
                 this, SLOT(onLogPosted(bool,QByteArray,QNetworkReply*,void*)));
@@ -200,6 +200,12 @@ LogUploader::onLogPosted(bool success, const QByteArray &response,
 void
 LogUploader::reportLogin(QString email)
 {
+    AsyncTaskToken *task = new AsyncTaskToken(this);
+    if (!task) {
+        Q_WARN("Failed to create async task");
+        return;
+    }
+
     Lib &lib = Lib::ref ();
     QUrl url(TRACKER_SERVER "/tracker/recordLogin");
     QNetworkRequest req(url);
@@ -213,6 +219,23 @@ LogUploader::reportLogin(QString email)
                     .arg(email).arg(lib.getOsDetails ())
                     .arg("__QGVDIAL_VERSION__");
 
-    // I don't care if it was ever received.
-    m_nwMgr->post (req, json.toAscii ());
+    QNetworkReply *reply = m_nwMgr->post (req, json.toAscii ());
+
+    NwReqTracker *tracker = new NwReqTracker(reply, *m_nwMgr, task,
+                                             NW_REPLY_TIMEOUT, true, this);
+    connect(tracker, SIGNAL(sigDone(bool,QByteArray,QNetworkReply*,void*)),
+            this, SLOT(onReportedLogin(bool,QByteArray,QNetworkReply*,void*)));
 }//LogUploader::reportLogin
+
+void
+LogUploader::onReportedLogin(bool success, const QByteArray &response,
+                             QNetworkReply * /*reply*/, void *ctx)
+{
+    AsyncTaskToken *task = (AsyncTaskToken *) ctx;
+    task->deleteLater ();
+
+    if (!success) {
+        QString strR = response;
+        Q_DEBUG(strR);
+    }
+}//LogUploader::onReportedLogin

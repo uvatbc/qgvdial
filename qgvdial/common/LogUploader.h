@@ -43,6 +43,9 @@ private slots:
     void onLogPosted(bool success, const QByteArray &response,
                      QNetworkReply *reply, void *ctx);
 
+    void onReportedLogin(bool success, const QByteArray &response,
+                         QNetworkReply *reply, void *ctx);
+
 protected:
     QNetworkAccessManager *m_nwMgr;
 };
