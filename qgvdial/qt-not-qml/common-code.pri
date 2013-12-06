@@ -11,6 +11,9 @@ QT *= widgets core gui
 # dir1.source = mydir
 DEPLOYMENTFOLDERS = # file1 dir1
 
+MOC_DIR = moc
+OBJECTS_DIR = obj
+
 INCLUDEPATH += $$PWD
 
 SOURCES  += $$PWD/MainWindow.cpp \

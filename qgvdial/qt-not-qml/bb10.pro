@@ -6,9 +6,6 @@ LIBS += -lbbsystem
 CONFIG *= mobility
 MOBILITY *= multimedia
 
-MOC_DIR = moc
-OBJECTS_DIR = obj
-
 SOURCES  += bb10/BB10PhoneFactory.cpp \
             bb10/BBPhoneAccount.cpp
 
