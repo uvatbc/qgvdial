@@ -24,6 +24,11 @@ Contact: yuvraaj@gmail.com
 #include "Lib.h"
 #include <QDesktopServices>
 
+#define LOGS_SERVER "http://www.yuvraaj.net"
+
+#define TRACKER_SERVER "http://localhost:8000"
+//#define TRACKER_SERVER "https://www.qgvdial.yuvraaj.net"
+
 extern QStringList g_arrLogFiles;
 
 LogUploader::LogUploader(IMainWindow *parent)
@@ -190,4 +195,24 @@ LogUploader::onLogPosted(bool success, const QByteArray &response,
     if (task) {
         delete task;
     }
-}//MainWindow::onLogPosted
+}//LogUploader::onLogPosted
+
+void
+LogUploader::reportLogin(QString email)
+{
+    Lib &lib = Lib::ref ();
+    QUrl url(TRACKER_SERVER "/tracker/recordLogin");
+    QNetworkRequest req(url);
+    req.setHeader (QNetworkRequest::ContentTypeHeader, POST_TEXT);
+
+    QString json = QString("{"
+                                "\"email\":\"%1\", "
+                                "\"device\": \"%2\", "
+                                "\"version\": \"%3\""
+                           "}")
+                    .arg(email).arg(lib.getOsDetails ())
+                    .arg("__QGVDIAL_VERSION__");
+
+    // I don't care if it was ever received.
+    m_nwMgr->post (req, json.toAscii ());
+}//LogUploader::reportLogin

@@ -27,7 +27,8 @@ Contact: yuvraaj@gmail.com
 #include "api_common.h"
 
 #define APPLICATION_NAME "qgvdial"
-#define LOGS_SERVER "http://www.yuvraaj.net"
+#define ABOUT_URL "http://www.yuvraaj.net/qgvdial/about.html"
+
 #define COUNT_OF(x) ((sizeof(x)/sizeof(0[x])) / ((size_t)(!(sizeof(x) % sizeof(0[x])))))
 
 struct ProxyInfo {

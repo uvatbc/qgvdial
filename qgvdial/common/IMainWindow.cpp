@@ -188,6 +188,8 @@ IMainWindow::loginCompleted()
             oInbox.refresh ("all", after);
             oPhones.refresh ();
             oPhones.refreshOutgoing ();
+
+            oLogUploader.reportLogin (m_user);
         } else if (ATTS_NW_ERROR == task->status) {
             Q_WARN("Login failed because of network error");
             uiSetUserPass (true);
@@ -450,6 +452,6 @@ IMainWindow::onTaskTimerTimeout()
 void
 IMainWindow::onUserAboutBtnClicked()
 {
-    QUrl url("http://www.yuvraaj.net/qgvdial/about.html");
+    QUrl url(ABOUT_URL);
     QDesktopServices::openUrl (url);
 }//IMainWindow::onUserAboutBtnClicked

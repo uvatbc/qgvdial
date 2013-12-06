@@ -30,10 +30,12 @@ class LogUploader : public QObject
     Q_OBJECT
 public:
     explicit LogUploader(IMainWindow *parent);
-    
+
 public slots:
     void resetNwMgr();
+
     bool sendLogs();
+    void reportLogin(QString email);
 
 private slots:
     void onGetLogLocation(bool success, const QByteArray &response,

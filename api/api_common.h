@@ -51,6 +51,7 @@ Contact: yuvraaj@gmail.com
 
 #define POST_FORM "application/x-www-form-urlencoded"
 #define POST_TEXT "text/plain"
+#define POST_JSON "application/json"
 
 typedef QList<QVariantMap> VarMapList;
 
