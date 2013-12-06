@@ -34,12 +34,10 @@ public:
 public slots:
     void resetNwMgr();
 
-    bool sendLogs();
-    void reportLogin(QString email);
+    void sendLogs();
+    void reportLogin();
 
 private slots:
-    void onGetLogLocation(bool success, const QByteArray &response,
-                          QNetworkReply *reply, void *ctx);
     void onLogPosted(bool success, const QByteArray &response,
                      QNetworkReply *reply, void *ctx);
 

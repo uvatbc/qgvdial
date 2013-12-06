@@ -24,10 +24,8 @@ Contact: yuvraaj@gmail.com
 #include "Lib.h"
 #include <QDesktopServices>
 
-#define LOGS_SERVER "http://www.yuvraaj.net"
-
-//#define TRACKER_SERVER "http://localhost:8000"
-#define TRACKER_SERVER "https://qgvdial.yuvraaj.net"
+//#define LOGS_SERVER "http://localhost:8000"
+#define LOGS_SERVER "https://qgvdial.yuvraaj.net"
 
 extern QStringList g_arrLogFiles;
 
@@ -49,40 +47,17 @@ LogUploader::resetNwMgr()
     m_nwMgr = new QNetworkAccessManager(this);
 }//LogUploader::resetNwMgr
 
-bool
-LogUploader::sendLogs()
-{
-    QUrl url(LOGS_SERVER "/qgvdial/getLogLocation.py");
-    QNetworkRequest req(url);
-    QNetworkReply *reply = m_nwMgr->get (req);
-    if (!reply) {
-        return (false);
-    }
-
-    NwReqTracker *tracker = new NwReqTracker(reply, *m_nwMgr, NULL,
-                                             NW_REPLY_TIMEOUT, true, this);
-    connect(tracker, SIGNAL(sigDone(bool,QByteArray,QNetworkReply*,void*)),
-            this, SLOT(onGetLogLocation(bool,QByteArray,QNetworkReply*,void*)));
-    return (true);
-}//LogUploader::sendLogs
-
-/** Callback invoked with the location to upload the logs to.
+/** Function to send logs to the log collector
  *
  * This function will collect all the logs from the target and package them into
- * an XML document that is then sent off to the location that the qgvdial logs
- * sink has asked me to send to.
+ * an XML document that is then sent off to the log location.
  */
 void
-LogUploader::onGetLogLocation(bool success, const QByteArray &response,
-                              QNetworkReply *reply, void * /*ctx*/)
+LogUploader::sendLogs()
 {
-    do { // Begin cleanup block (not a loop)
-        if (!success) {
-            QString strR = reply->readAll ();
-            Q_WARN(QString("Failed to get location to post logs").arg(strR));
-            break;
-        }
+    IMainWindow *win = (IMainWindow *) parent ();
 
+    do { // Begin cleanup block (not a loop)
         AsyncTaskToken *task = new AsyncTaskToken(this);
         if (!task) {
             Q_WARN("Failed to create async task");
@@ -137,68 +112,49 @@ LogUploader::onGetLogLocation(bool success, const QByteArray &response,
         }
 
         // Post the logs to my server
-        QString postLocation = response;
-        QUrl url(postLocation);
+        QUrl url(LOGS_SERVER "/tracker/postLogs");
+        url.addQueryItem ("email", win->m_user.toAscii());
+        url.addQueryItem ("version", "__QGVDIAL_VERSION__");
         QNetworkRequest req(url);
         req.setHeader (QNetworkRequest::ContentTypeHeader, POST_TEXT);
 
-        reply = m_nwMgr->post (req, doc.toString().toAscii ());
+        QNetworkReply *reply = m_nwMgr->post (req, doc.toString().toAscii ());
         if (!reply) {
+            delete task;
             break;
         }
 
         NwReqTracker *tracker = new NwReqTracker(reply, *m_nwMgr, task,
                                                  NW_REPLY_TIMEOUT, true, this);
+        if (NULL == tracker) {
+            Q_WARN("Failed to allocate tracker!");
+            delete task;
+            break;
+        }
         connect(tracker, SIGNAL(sigDone(bool,QByteArray,QNetworkReply*,void*)),
                 this, SLOT(onLogPosted(bool,QByteArray,QNetworkReply*,void*)));
     } while (0); // End cleanup block (not a loop)
-}//LogUploader::onGetLogLocation
+}//LogUploader::sendLogs
 
 /** Invoked when the XML document containing the logs has finished uploading
  *
  * This function initiates the sending of an email to me.
  */
 void
-LogUploader::onLogPosted(bool success, const QByteArray &response,
+LogUploader::onLogPosted(bool success, const QByteArray & /*response*/,
                          QNetworkReply *reply, void *ctx)
 {
     AsyncTaskToken *task = (AsyncTaskToken *) ctx;
-    do { // Begin cleanup block (not a loop)
-        if (!success) {
-            QString strR = reply->readAll ();
-            Q_WARN("Failed to post the logs") << strR;
-            break;
-        }
+    task->deleteLater ();
 
-        // The logs have been posted. Now send an email to me about it.
-        QString strReply = response;
-
-        QUrl url("mailto:yuvraaj@gmail.com");
-        url.addQueryItem ("subject", "Logs");
-
-        Lib &lib = Lib::ref();
-        QDateTime dt = task->inParams["date"].toDateTime();
-        QString body = QString("Logs captured at %1 \n")
-                                .arg (dt.toUTC ().toString (Qt::ISODate));
-        body += "qgvdial version = __QGVDIAL_VERSION__ \n";
-        body += QString("OS: %1 \n").arg(lib.getOsDetails());
-        body += QString("Logs are in %1 \n").arg(strReply);
-        url.addQueryItem ("body", body);
-
-        Q_DEBUG(url.toString ());
-
-        if (!QDesktopServices::openUrl (url)) {
-            Q_WARN("Failed to send email about logs");
-        }
-    } while (0); // End cleanup block (not a loop)
-
-    if (task) {
-        delete task;
+    if (!success) {
+        QString strR = reply->readAll ();
+        Q_WARN("Failed to post the logs") << strR;
     }
 }//LogUploader::onLogPosted
 
 void
-LogUploader::reportLogin(QString email)
+LogUploader::reportLogin()
 {
     AsyncTaskToken *task = new AsyncTaskToken(this);
     if (!task) {
@@ -207,16 +163,18 @@ LogUploader::reportLogin(QString email)
     }
 
     Lib &lib = Lib::ref ();
-    QUrl url(TRACKER_SERVER "/tracker/recordLogin");
+    QUrl url(LOGS_SERVER "/tracker/recordLogin");
     QNetworkRequest req(url);
     req.setHeader (QNetworkRequest::ContentTypeHeader, POST_TEXT);
 
+    IMainWindow *win = (IMainWindow *) parent ();
     QString json = QString("{"
                                 "\"email\":\"%1\", "
                                 "\"device\": \"%2\", "
                                 "\"version\": \"%3\""
                            "}")
-                    .arg(email).arg(lib.getOsDetails ())
+                    .arg(win->m_user)
+                    .arg(lib.getOsDetails ())
                     .arg("__QGVDIAL_VERSION__");
 
     QNetworkReply *reply = m_nwMgr->post (req, json.toAscii ());

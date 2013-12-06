@@ -189,7 +189,7 @@ IMainWindow::loginCompleted()
             oPhones.refresh ();
             oPhones.refreshOutgoing ();
 
-            oLogUploader.reportLogin (m_user);
+            oLogUploader.reportLogin ();
         } else if (ATTS_NW_ERROR == task->status) {
             Q_WARN("Login failed because of network error");
             uiSetUserPass (true);
