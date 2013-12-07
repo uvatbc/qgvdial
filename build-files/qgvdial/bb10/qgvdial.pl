@@ -37,8 +37,12 @@ $cmd = "perl $basedir/build-files/version.pl __QGVDIAL_VERSION__ $qver $basedir"
 print "$cmd\n";
 system($cmd);
 
-# Do everything upto the preparation of the debian directory. Code is still not compiled.
-$cmd = "cd $basedir/qgvdial/bb10-qml ; qmake ; make -j4 ; ./run-package.sh";
+# Prepare the bar-descriptor
+$cmd = "cd $basedir/qgvdial/bb10-qml ; mv bar-descriptor-deploy.xml bar-descriptor.xml";
+print "$cmd\n";
+system($cmd);
+
+$cmd = "cd $basedir/qgvdial/bb10-qml ; qmake ; make -j4 ; ./run-package.sh ; cp qgvdial.bar ../..";
 print "$cmd\n";
 system($cmd);
 

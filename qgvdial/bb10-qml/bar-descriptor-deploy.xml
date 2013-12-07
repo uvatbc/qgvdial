@@ -2,7 +2,7 @@
 <qnx xmlns="http://www.qnx.com/schemas/application/1.0">
     <id>com.example.qgvdial</id>
     <name>qgvdial</name>
-    <versionNumber>1.0.0</versionNumber>
+    <versionNumber>__QGVDIAL_VERSION__</versionNumber>
     <description>Google Voice client for BB10</description>
     <initialWindow>
         <autoOrients>true</autoOrients>
