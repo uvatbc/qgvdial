@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8' standalone='no'?>
 <qnx xmlns="http://www.qnx.com/schemas/application/1.0">
-    <id>com.example.qgvdial</id>
+    <id>net.yuvraaj.qgvdial</id>
     <name>qgvdial</name>
     <versionNumber>__QGVDIAL_VERSION__</versionNumber>
     <description>Google Voice client for BB10</description>
