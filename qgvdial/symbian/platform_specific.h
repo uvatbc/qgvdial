@@ -28,10 +28,7 @@ Contact: yuvraaj@gmail.com
 #define MAIN_QML_PATH               "qml/symbian/main.qml"
 #define USE_SINGLE_APPLICATION      0
 
-#ifdef Q_WS_SIMULATOR
+// Symbian has Phonon and ... just use it :/
 #define PHONON_ENABLED              1
-#else
-#define PHONON_ENABLED              0
-#endif
 
 #endif // PLATFORMSPECIFIC_H
