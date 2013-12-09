@@ -23,6 +23,7 @@ Contact: yuvraaj@gmail.com
 #define LOGUPLOADER_H
 
 #include "global.h"
+#include <QObject>  // S^1 :/
 
 class IMainWindow;
 class LogUploader : public QObject

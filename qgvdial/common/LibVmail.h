@@ -24,6 +24,10 @@ Contact: yuvraaj@gmail.com
 
 #include "global.h"
 
+// S^1 seems to enjoy torturing me: Failed to compile without this. WTF?
+// It is included at the end of global.h!!
+#include "platform_specific.h"
+
 #ifndef PHONON_ENABLED
 #error Must define PHONON_ENABLED
 #endif

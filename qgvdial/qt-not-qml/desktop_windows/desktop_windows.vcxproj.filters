@@ -133,6 +133,12 @@
     <None Include="..\..\features\osver\desktop\windows\osv-windows.pri">
       <Filter>features\osv-windows</Filter>
     </None>
+    <None Include="..\..\..\build-files\qgvdial\windows\qt.conf" />
+    <None Include="..\..\..\build-files\qgvdial\windows\qgvdial.pl" />
+    <None Include="..\..\..\build-files\qgvdial\windows\run.bat">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\..\build-files\qgvdial\windows\qgvdial.wxs" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainApp.h">

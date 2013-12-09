@@ -22,9 +22,6 @@ Contact: yuvraaj@gmail.com
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QObject>
-#include <QApplication>
-
 #include "IMainWindow.h"
 
 class QmlApplicationViewer;

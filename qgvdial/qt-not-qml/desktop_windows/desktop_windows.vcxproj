@@ -51,6 +51,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="..\..\..\api\api.pri" />
+    <None Include="..\..\..\build-files\qgvdial\windows\qgvdial.pl" />
+    <None Include="..\..\..\build-files\qgvdial\windows\qgvdial.wxs" />
+    <None Include="..\..\..\build-files\qgvdial\windows\qt.conf" />
+    <None Include="..\..\..\build-files\qgvdial\windows\run.bat" />
     <None Include="..\..\common\common.pri" />
     <None Include="..\..\features\dirs\linux\linux-dirs.pri" />
     <None Include="..\..\features\openssl\openssl.pri" />

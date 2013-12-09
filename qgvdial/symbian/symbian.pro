@@ -11,8 +11,8 @@ OBJECTS_DIR = obj
 # Additional import path used to resolve QML modules in Creator's code model
 QML_IMPORT_PATH =
 
-CONFIG *= mobility
-MOBILITY *= feedback
+#CONFIG *= mobility
+#MOBILITY *= feedback
 
 QT *= phonon
 
@@ -45,6 +45,13 @@ include(../features/cookie-cutter/osdependent/cc-osdependent.pri)
 include(../features/osver/nokia/symbian/osv-symbian.pri)
 
 RESOURCES += symbian.qrc
+
+exists(isS1) {
+# This hack is required for S^1
+QT_CONFIG -= opengl
+LIBS -= -lGLESv2
+LIBS -= -llibGLESv2
+}
 
 #####################################################
 # Deployment information

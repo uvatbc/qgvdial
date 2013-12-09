@@ -23,6 +23,7 @@ Contact: yuvraaj@gmail.com
 #define CACHEDB_H
 
 #include "global.h"
+#include <QObject>  // S^1 :/
 
 class ContactsModel;
 class InboxModel;

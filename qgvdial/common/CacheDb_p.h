@@ -23,6 +23,7 @@ Contact: yuvraaj@gmail.com
 #define CACHEDB_P_H
 
 #include "global.h"
+#include <QObject>  // S^1 :/
 
 class CacheDbPrivate : public QObject
 {

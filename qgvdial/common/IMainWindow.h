@@ -23,6 +23,7 @@ Contact: yuvraaj@gmail.com
 #define IMAINWINDOW_H
 
 #include <QObject>
+#include "global.h"
 #include "CacheDb.h"
 #include "GVApi.h"
 #include "LibContacts.h"
