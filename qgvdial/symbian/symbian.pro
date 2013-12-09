@@ -25,9 +25,13 @@ LIBS += -letel3rdparty -llibcrypto
 DEFINES += ENABLE_FUZZY_TIMER
 
 INCLUDEPATH += $$PWD
-SOURCES  += SymbianPhoneFactory.cpp
+SOURCES  += SymbianPhoneFactory.cpp \
+            SymbianPhoneAccount.cpp \
+            SymbianCallInitiatorPrivate.cpp
 HEADERS  += platform_specific.h \
-            SymbianPhoneFactory.h
+            SymbianPhoneFactory.h \
+            SymbianPhoneAccount.h \
+            SymbianCallInitiatorPrivate.h
 
 include(../common/common.pri)
 include(../../api/api.pri)

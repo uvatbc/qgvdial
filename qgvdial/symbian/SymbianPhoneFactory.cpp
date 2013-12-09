@@ -20,6 +20,7 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "SymbianPhoneFactory.h"
+#include "SymbianPhoneAccount.h"
 
 IPhoneAccountFactory *
 createPhoneAccountFactory(QObject *parent)
@@ -35,7 +36,25 @@ SymbianPhoneFactory::SymbianPhoneFactory(QObject *parent)
 bool
 SymbianPhoneFactory::identifyAll(AsyncTaskToken *task)
 {
-    task->status = ATTS_SUCCESS;
-    task->emitCompleted ();
+    foreach (QString key, m_accounts.keys()) {
+        m_accounts[key]->deleteLater();
+    }
+    m_accounts.clear();
+
+    SymbianPhoneAccount *acct = new SymbianPhoneAccount(this);
+    if (NULL == acct) {
+        task->status = ATTS_FAILURE;
+        task->emitCompleted ();
+    } else {
+        m_accounts[acct->id()] = acct;
+        task->status = ATTS_SUCCESS;
+        task->emitCompleted ();
+
+        //QString num = acct->getNumber();
+        //if (!num.isEmpty()) {
+        //    LibGvPhones *p = (LibGvPhones *) parent();
+        //    p->linkCiToNumber(acct->id(), num);
+        //}
+    }
     return (true);
 }//SymbianPhoneFactory::identifyAll
