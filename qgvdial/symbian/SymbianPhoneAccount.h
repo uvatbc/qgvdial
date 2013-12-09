@@ -26,7 +26,6 @@ Contact: yuvraaj@gmail.com
 #include "IPhoneAccount.h"
 #include <Etel3rdParty.h>
 
-class SymbianCallInitiatorPrivate;
 class SymbianPhoneAccount : public IPhoneAccount
 {
     Q_OBJECT
@@ -41,7 +40,6 @@ public:
 
 private:
     CTelephony                  *iTelephony;
-    SymbianCallInitiatorPrivate *dialer;
 
     friend class SymbianCallInitiatorPrivate;
 };

@@ -19,19 +19,22 @@ QT *= phonon
 # Add dependency to Symbian components
 CONFIG += qt-components
 
-# The Symbian telephony stack library and the equivalent of openssl
-LIBS += -letel3rdparty -llibcrypto
-
 DEFINES += ENABLE_FUZZY_TIMER
 
 INCLUDEPATH += $$PWD
-SOURCES  += SymbianPhoneFactory.cpp \
-            SymbianPhoneAccount.cpp \
-            SymbianCallInitiatorPrivate.cpp
+SOURCES  += SymbianPhoneFactory.cpp
 HEADERS  += platform_specific.h \
-            SymbianPhoneFactory.h \
-            SymbianPhoneAccount.h \
+            SymbianPhoneFactory.h
+
+!simulator {
+SOURCES  += SymbianPhoneAccount.cpp \
+            SymbianCallInitiatorPrivate.cpp
+HEADERS  += SymbianPhoneAccount.h \
             SymbianCallInitiatorPrivate.h
+
+# The Symbian telephony stack library
+LIBS += -letel3rdparty
+}
 
 include(../common/common.pri)
 include(../../api/api.pri)

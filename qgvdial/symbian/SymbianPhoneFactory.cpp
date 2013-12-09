@@ -20,7 +20,11 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "SymbianPhoneFactory.h"
+#include "IPhoneAccount.h"
+
+#if !defined(Q_WS_SIMULATOR)
 #include "SymbianPhoneAccount.h"
+#endif
 
 IPhoneAccountFactory *
 createPhoneAccountFactory(QObject *parent)
@@ -41,6 +45,7 @@ SymbianPhoneFactory::identifyAll(AsyncTaskToken *task)
     }
     m_accounts.clear();
 
+#if !defined(Q_WS_SIMULATOR)
     SymbianPhoneAccount *acct = new SymbianPhoneAccount(this);
     if (NULL == acct) {
         task->status = ATTS_FAILURE;
@@ -56,5 +61,9 @@ SymbianPhoneFactory::identifyAll(AsyncTaskToken *task)
         //    p->linkCiToNumber(acct->id(), num);
         //}
     }
+#else
+    task->status = ATTS_SUCCESS;
+    task->emitCompleted ();
+#endif
     return (true);
 }//SymbianPhoneFactory::identifyAll
