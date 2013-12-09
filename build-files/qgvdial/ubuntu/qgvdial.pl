@@ -30,11 +30,11 @@ $basedir = "$basedir/qgvdial-$qver";
 system("rm -rf qgvdial-* qgvtp-* qgvdial_* qgvtp_*");
 
 $cmd = "svn export $repo $basedir";
+print "$cmd\n";
 system($cmd);
-system("cp $basedir/icons/qgv.png $basedir/src/qgvdial.png");
 
 # Append the version to the pro file
-open(PRO_FILE, ">>$basedir/src/src.pro") || die "Cannot open pro file";
+open(PRO_FILE, ">>$basedir/qgvdial/qt-not-qml/desktop_linux.pro") || die "Cannot open pro file";
 print PRO_FILE "VERSION=__QGVDIAL_VERSION__\n";
 close PRO_FILE;
 
@@ -43,22 +43,19 @@ $cmd = "perl $basedir/build-files/version.pl __QGVDIAL_VERSION__ $qver $basedir"
 print "$cmd\n";
 system($cmd);
 
-# Copy the correct pro file
-system("cp $basedir/build-files/qgvdial/pro.qgvdial $basedir/qgvdial.pro");
-
 # Do everything upto the preparation of the debian directory. Code is still not compiled.
-$cmd = "cd $basedir && echo y | dh_make --createorig --single -e yuvraaj\@gmail.com -c lgpl";
+$cmd = "cd $basedir/qgvdial/qt-not-qml && echo y | dh_make --createorig --single -e yuvraaj\@gmail.com -c lgpl";
 print "$cmd\n";
 system($cmd);
 
 # Put all the debianization files into the debian folder
-system("cd $basedir/build-files/qgvdial/ubuntu ; mv postinst prerm control rules $basedir/debian/");
+system("cd $basedir/build-files/qgvdial/ubuntu ; mv postinst prerm control rules $basedir/qgvdial/qt-not-qml/debian/");
 
 # Fix the changelog and put it into the correct location
-system("head -1 $basedir/debian/changelog >dest.txt && cat $basedir/build-files/qgvdial/changelog >>dest.txt && tail -2 $basedir/debian/changelog | sed 's/unknown/Yuvraaj Kelkar/g' >>dest.txt && mv dest.txt $basedir/debian/changelog");
+system("head -1 $basedir/qgvdial/qt-not-qml/debian/changelog >dest.txt && cat $basedir/build-files/qgvdial/changelog >>dest.txt && tail -2 $basedir/qgvdial/qt-not-qml/debian/changelog | sed 's/unknown/Yuvraaj Kelkar/g' >>dest.txt && mv dest.txt $basedir/qgvdial/qt-not-qml/debian/changelog");
 
 # Built it all!
-$cmd = "cd $basedir && dpkg-buildpackage -rfakeroot -nc -uc -us";
+$cmd = "cd $basedir/qgvdial/qt-not-qml && dpkg-buildpackage -rfakeroot -nc -uc -us";
 system($cmd);
 
 exit(0);
