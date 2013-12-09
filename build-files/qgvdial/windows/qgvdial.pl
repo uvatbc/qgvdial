@@ -27,13 +27,12 @@ $svnver = $1;
 # Create the version suffix
 $qver = "$qver.$svnver";
 
-system("powershell Remove-Item -Recurse -Force qgvdial*");
+system("powershell Remove-Item -Recurse -Force qgvdial-*");
 system("svn export $repo qgvdial-$qver");
-system("copy qgvdial-$qver\\icons\\qgv.png qgvdial-$qver\\src\\qgvdial.png");
 system("move qgvdial-$qver\\build-files\\qt.conf.win qgvdial-$qver\\build-files\\qt.conf");
 
 # Append the version to the pro file
-open(PRO_FILE, ">>qgvdial-$qver/src/src.pro") || die "Cannot open pro file";
+open(PRO_FILE, ">>qgvdial-$qver/qgvdial/qt-not-qml/desktop_windows.pro") || die "Cannot open pro file";
 print PRO_FILE "VERSION=__QGVDIAL_VERSION__\n";
 close PRO_FILE;
 
@@ -47,11 +46,11 @@ $cmd = "cd qgvdial-$qver & perl build-files/version.pl __QTDIR__ $cmd";
 system($cmd);
 
 # Compile it!
-$cmd = "cd qgvdial-$qver & qmake & make release";
+$cmd = "cd qgvdial-$qver/qgvdial/qt-not-qml/desktop_windows & qmake ../desktop_windows.pro & nmake -nologo release";
 system($cmd);
 
 # this is required for the old installer
-$cmd = "copy qgvdial-$qver\\src\\release\\qgvdial.exe J:\\releases\\qgvdial\\win-install\\qgvdial\\bin";
+$cmd = "copy qgvdial-$qver\\qgvdial\\qt-not-qml\\desktop_windows\\release\\qgvdial.exe J:\\releases\\qgvdial\\win-install\\qgvdial\\bin";
 system($cmd);
 
 # New setup: Create MSI.

@@ -40,12 +40,12 @@ public:
     QString name ();
     
     bool initiateCall(AsyncTaskToken *task);
-    
+
     QString getNumber();
 
 private:
     bb::system::phone::Phone m_phone;
-    
+
     friend class BB10PhoneFactory;
 };
 
