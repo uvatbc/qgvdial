@@ -48,7 +48,7 @@ print("$cmd\n");
 system($cmd);
 
 # Append the version to the pro file
-open(PRO_FILE, ">>qgvdial-$qver/src/src.pro") || die "Cannot open pro file";
+open(PRO_FILE, ">>qgvdial-$qver/qgvdial/symbian/symbian.pro") || die "Cannot open pro file";
 print PRO_FILE "VERSION=__QGVDIAL_VERSION__\n";
 close PRO_FILE;
 
@@ -58,7 +58,7 @@ print("$cmd\n");
 system($cmd);
 
 # Mosquitto is merged straight into the build
-$cmd = "cd qgvdial-$qver/src & prep_s3.bat";
+$cmd = "cd qgvdial-$qver/qgvdial/symbian & prep_s3.bat";
 print "$cmd\n";
 system($cmd);
 
@@ -68,10 +68,10 @@ print "$cmd\n";
 system($cmd);
 
 # This is the way to enter a directory and setup the remainder variables
-my $enterdir = "cd qgvdial-$qver/src & set BUILDDIR=%CD% & set SOURCEDIR=%CD%";
+my $enterdir = "cd qgvdial-$qver/qgvdial/symbian & set BUILDDIR=%CD% & set SOURCEDIR=%CD%";
 
 # qmake, make release-gcce, make installer_sis
-$cmd = "$enterdir & qmake.exe src.pro -r -spec symbian-sbsv2 CONFIG+=release -after OBJECTS_DIR=obj MOC_DIR=moc UI_DIR=ui RCC_DIR=rcc QMLJSDEBUGGER_PATH=%QTSDK_SLASH%/../QtCreator/share/qtcreator/qml/qmljsdebugger & $s_make release-gcce -w & $s_make installer_sis -w QT_SIS_CERTIFICATE=%QGV_CERT% QT_SIS_KEY=%QGV_KEY%";
+$cmd = "$enterdir & qmake.exe symbian.pro -r -spec symbian-sbsv2 CONFIG+=release -after OBJECTS_DIR=obj MOC_DIR=moc UI_DIR=ui RCC_DIR=rcc & $s_make release-gcce -w & $s_make installer_sis -w QT_SIS_CERTIFICATE=%QGV_CERT% QT_SIS_KEY=%QGV_KEY%";
 print("$cmd\n");
 system($cmd);
 
