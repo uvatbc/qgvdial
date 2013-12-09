@@ -31,7 +31,7 @@
         <!-- Specify the files that need to go to the install location -->
         <DirectoryRef Id="appbins">
             <Component Id="qgvdial.exe" Guid="003F7582-3B03-4FED-8B3B-A21E6AB07D34">
-                <File Id="qgvdial.exe" Source="..\..\..\src\release\qgvdial.exe" KeyPath="yes" Checksum="yes"/>
+                <File Id="qgvdial.exe" Source="..\..\..\qgvdial\qt-not-qml\desktop_windows\release\qgvdial.exe" KeyPath="yes" Checksum="yes"/>
             </Component>
             <Component Id="libeay32.dll" Guid="85006557-DB29-43E1-B60D-D42457E2293F">
                 <File Id="libeay32.dll" Source="C:\Users\Uv\work\cc\qt-everywhere-opensource-src-4.8.1-dll-x86\bin\libeay32.dll" KeyPath="yes" Checksum="yes"/>
@@ -56,9 +56,6 @@
             </Component>
             <Component Id="QtCore4.dll" Guid="E35D7C13-FE4E-4BFD-A112-8E040D03469D">
                 <File Id="QtCore4.dll" Source="__QTDIR__\lib\QtCore4.dll" KeyPath="yes" Checksum="yes"/>
-            </Component>
-            <Component Id="QtDeclarative4.dll" Guid="45799C6D-8E1A-45A0-9A88-918399DC624C">
-                <File Id="QtDeclarative4.dll" Source="__QTDIR__\lib\QtDeclarative4.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
             <Component Id="QtGui4.dll" Guid="774C1356-53CF-4F65-94BF-A6B4C4755E41">
                 <File Id="QtGui4.dll" Source="__QTDIR__\lib\QtGui4.dll" KeyPath="yes" Checksum="yes"/>
@@ -150,7 +147,6 @@
             <ComponentRef Id="run.bat" />
             <ComponentRef Id="phonon4.dll" />
             <ComponentRef Id="QtCore4.dll" />
-            <ComponentRef Id="QtDeclarative4.dll" />
             <ComponentRef Id="QtGui4.dll" />
             <ComponentRef Id="QtNetwork4.dll" />
             <ComponentRef Id="QtOpenGL4.dll" />
