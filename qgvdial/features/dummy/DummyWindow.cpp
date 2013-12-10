@@ -170,8 +170,32 @@ DummyMainWindow::uiLongTaskEnds()
 }//DummyMainWindow::uiLongTaskEnds
 
 void
-DummyMainWindow::uiFailedToSendMessage(const QString &destination,
-                                       const QString &text)
+DummyMainWindow::uiFailedToSendMessage(const QString & /*destination*/,
+                                       const QString & /*text*/)
 {
     Q_ASSERT(0 == "Not implemented");
 }//DummyMainWindow::uiFailedToSendMessage
+
+void
+DummyMainWindow::uiEnableContactUpdateFrequency(bool /*enable*/)
+{
+    Q_ASSERT(0 == "Not implemented");
+}//DummyMainWindow::uiEnableContactUpdateFrequency
+
+void
+DummyMainWindow::uiSetContactUpdateFrequency(quint32 /*mins*/)
+{
+    Q_ASSERT(0 == "Not implemented");
+}//DummyMainWindow::uiSetContactUpdateFrequency
+
+void
+DummyMainWindow::uiEnableInboxUpdateFrequency(bool /*enable*/)
+{
+    Q_ASSERT(0 == "Not implemented");
+}//DummyMainWindow::uiEnableInboxUpdateFrequency
+
+void
+DummyMainWindow::uiSetInboxUpdateFrequency(quint32 /*mins*/)
+{
+    Q_ASSERT(0 == "Not implemented");
+}//DummyMainWindow::uiSetInboxUpdateFrequency

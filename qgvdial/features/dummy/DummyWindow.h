@@ -65,6 +65,11 @@ protected:
 
     virtual void uiFailedToSendMessage(const QString &destination,
                                        const QString &text);
+
+    virtual void uiEnableContactUpdateFrequency(bool enable);
+    virtual void uiSetContactUpdateFrequency(quint32 mins);
+    virtual void uiEnableInboxUpdateFrequency(bool enable);
+    virtual void uiSetInboxUpdateFrequency(quint32 mins);
 };
 
 #endif // DUMMYMAINWINDOW_H

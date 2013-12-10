@@ -22,7 +22,6 @@ Contact: yuvraaj@gmail.com
 #include "LogUploader.h"
 #include "IMainWindow.h"
 #include "Lib.h"
-#include <QDesktopServices>
 
 //#define LOGS_SERVER "http://localhost:8000"
 #define LOGS_SERVER "https://qgvdial.yuvraaj.net"

@@ -106,9 +106,28 @@ Page {
         }//ExpandView (proxy)
 
         ExpandView {
-            id: expandEtCetera
+            id: expandUpdateSettings
             anchors {
                 top: expandProxySettings.bottom
+                left: parent.left
+                topMargin: 1
+            }
+            width: parent.width
+
+            mainTitle: "Updates"
+            content: updateSettings
+            yTimer: yAdjustTimer
+
+            Updates {
+                id: updateSettings
+                width: parent.width
+            }
+        }//ExpandView (updates)
+
+        ExpandView {
+            id: expandEtCetera
+            anchors {
+                top: expandUpdateSettings.bottom
                 left: parent.left
                 topMargin: 1
             }

@@ -63,8 +63,13 @@ protected slots:
 
     void showStatusMessage(QString msg, quint64 timeout);
 
+    void onOptContactsUpdateClicked();
+    void onOptInboxUpdateClicked();
+
 protected:
     QObject *getQMLObject(const char *pageName);
+    bool connectToChangeNotify(QObject *item, const QString &propName,
+                               QObject *receiver, const char *slotName);
 
     void uiUpdateProxySettings(const ProxyInfo &info);
     void uiRequestLoginDetails();
@@ -94,6 +99,11 @@ protected:
 
     void uiFailedToSendMessage(const QString &dest, const QString &text);
 
+    void uiEnableContactUpdateFrequency(bool enable);
+    void uiSetContactUpdateFrequency(quint32 mins);
+    void uiEnableInboxUpdateFrequency(bool enable);
+    void uiSetInboxUpdateFrequency(quint32 mins);
+
 private:
     QmlApplicationViewer *m_view;
 
@@ -118,6 +128,10 @@ private:
     QObject *smsPage;
     QObject *inboxDetails;
     QObject *etCetera;
+    QObject *optContactsUpdate;
+    QObject *optInboxUpdate;
+    QObject *edContactsUpdateFreq;
+    QObject *edInboxUpdateFreq;
 
     void    *loginCtx;
 

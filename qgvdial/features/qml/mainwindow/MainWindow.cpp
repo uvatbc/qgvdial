@@ -112,6 +112,10 @@ MainWindow::MainWindow(QObject *parent)
 , smsPage(NULL)
 , inboxDetails(NULL)
 , etCetera(NULL)
+, optContactsUpdate(NULL)
+, optInboxUpdate(NULL)
+, edContactsUpdateFreq(NULL)
+, edInboxUpdateFreq(NULL)
 {
 #ifdef Q_OS_BLACKBEERRY
     // GL viewport increases performance on blackberry
@@ -201,6 +205,50 @@ MainWindow::getQMLObject(const char *pageName)
 
     return (pObj);
 }//MainWindow::getQMLObject
+
+bool
+MainWindow::connectToChangeNotify(QObject *item, const QString &propName,
+                                  QObject *receiver, const char *slotName)
+{
+    bool rv = false;
+    do {
+        const QMetaObject *metaObject = item->metaObject ();
+        if (NULL == metaObject) {
+            Q_WARN("NULL metaObject");
+            break;
+        }
+
+        QMetaProperty metaProp;
+        for (int i = 0; i < metaObject->propertyCount (); i++) {
+            metaProp = metaObject->property (i);
+            if (metaProp.name () == propName) {
+                rv = true;
+                break;
+            }
+        }
+
+        if (!rv) {
+            Q_WARN(QString("Couldn't find property named %1").arg(propName));
+            break;
+        }
+        rv = false;
+
+        if (!metaProp.hasNotifySignal ()) {
+            Q_WARN(QString("Property %1 does not have a notify signal")
+                   .arg(propName));
+            break;
+        }
+
+        QString signalName = QString("2%1")
+                                .arg(metaProp.notifySignal().signature());
+
+        Q_DEBUG(QString("Connect %1 to %2").arg(signalName).arg(slotName));
+
+        rv = connect(item, signalName.toAscii().constData(), receiver, slotName);
+    } while(0);
+
+    return (rv);
+}//MainWindow::connectToChangeNotify
 
 void
 MainWindow::log(QDateTime /*dt*/, int /*level*/, const QString & /*strLog*/)
@@ -384,6 +432,30 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
                 this, SLOT(onVmailDurationChanged(quint64)));
         connect(&oVmail, SIGNAL(currentPositionChanged(quint64,quint64)),
                 this, SLOT(onVmailCurrentPositionChanged(quint64,quint64)));
+
+        optContactsUpdate = getQMLObject ("OptContactsUpdate");
+        if (NULL == optContactsUpdate) {
+            break;
+        }
+        connect(optContactsUpdate, SIGNAL(clicked()),
+                this, SLOT(onOptContactsUpdateClicked()));
+
+        edContactsUpdateFreq = getQMLObject ("EdContactsUpdateFreq");
+        if (NULL == edContactsUpdateFreq) {
+            break;
+        }
+
+        optInboxUpdate = getQMLObject ("OptInboxUpdate");
+        if (NULL == optInboxUpdate) {
+            break;
+        }
+        connect(optInboxUpdate, SIGNAL(clicked()),
+                this, SLOT(onOptInboxUpdateClicked()));
+
+        edInboxUpdateFreq = getQMLObject ("EdInboxUpdateFreq");
+        if (NULL == edInboxUpdateFreq) {
+            break;
+        }
 
         onInitDone();
         return;
@@ -843,3 +915,37 @@ MainWindow::onVmailCurrentPositionChanged(quint64 position, quint64 duration)
     inboxDetails->setProperty ("vmailPosition", position);
     inboxDetails->setProperty ("vmailDuration", duration);
 }//MainWindow::onVmailCurrentPositionChanged
+
+void
+MainWindow::uiEnableContactUpdateFrequency(bool enable)
+{
+    Q_ASSERT(0 == "Not implemented");
+}//MainWindow::uiEnableContactUpdateFrequency
+
+void
+MainWindow::uiSetContactUpdateFrequency(quint32 mins)
+{
+    Q_ASSERT(0 == "Not implemented");
+}//MainWindow::uiSetContactUpdateFrequency
+
+void
+MainWindow::uiEnableInboxUpdateFrequency(bool enable)
+{
+    Q_ASSERT(0 == "Not implemented");
+}//MainWindow::uiEnableInboxUpdateFrequency
+
+void
+MainWindow::uiSetInboxUpdateFrequency(quint32 mins)
+{
+    Q_ASSERT(0 == "Not implemented");
+}//MainWindow::uiSetInboxUpdateFrequency
+
+void
+MainWindow::onOptContactsUpdateClicked()
+{
+}//MainWindow::onOptContactsUpdateClicked
+
+void
+MainWindow::onOptInboxUpdateClicked()
+{
+}//MainWindow::onOptInboxUpdateClicked
