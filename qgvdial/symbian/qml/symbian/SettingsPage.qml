@@ -50,7 +50,12 @@ Page {
         interval: 300; repeat: false; running: false
         //onTriggered: container.contentY = setY;
     }//Timer for delayed setting of contentY so that when you click on an
-    // ExpandView, it gets into focus. Expecially important for the logs
+    // ExpandView, it gets into focus. Especially important for the logs
+    
+    Rectangle {
+        anchors.fill: parent
+        color: "black"
+    }
 
     Flickable {
         // Cannot use childrenRect.height because it causes a binding loop
@@ -114,7 +119,7 @@ Page {
             }
             width: parent.width
 
-            mainTitle: "Updates"
+            mainTitle: "Auto refresh"
             content: updateSettings
             yTimer: yAdjustTimer
 

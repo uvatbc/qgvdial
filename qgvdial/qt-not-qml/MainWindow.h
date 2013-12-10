@@ -104,8 +104,8 @@ protected slots:
 
     void onDispNumTextChanged();
 
-    void onOptContactsFreq(bool updateDb = true);
-    void onOptInboxFreq(bool updateDb = true);
+    void onOptContactsFreqClicked(bool updateDb = true);
+    void onOptInboxFreqClicked(bool updateDb = true);
     void onSbContactsFreqChanged(int val);
     void onSbInboxFreqChanged(int val);
 

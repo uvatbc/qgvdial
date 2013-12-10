@@ -50,7 +50,7 @@ Page {
         interval: 300; repeat: false; running: false
         //onTriggered: container.contentY = setY;
     }//Timer for delayed setting of contentY so that when you click on an
-    // ExpandView, it gets into focus. Expecially important for the logs
+    // ExpandView, it gets into focus. Especially important for the logs
     
     Rectangle {
         anchors.fill: parent
@@ -107,9 +107,28 @@ Page {
         }//ExpandView (proxy)
 
         ExpandView {
-            id: expandEtCetera
+            id: expandUpdateSettings
             anchors {
                 top: expandProxySettings.bottom
+                left: parent.left
+                topMargin: 1
+            }
+            width: parent.width
+
+            mainTitle: "Auto refresh"
+            content: updateSettings
+            yTimer: yAdjustTimer
+
+            Updates {
+                id: updateSettings
+                width: parent.width
+            }
+        }//ExpandView (updates)
+
+        ExpandView {
+            id: expandEtCetera
+            anchors {
+                top: expandUpdateSettings.bottom
                 left: parent.left
                 topMargin: 1
             }

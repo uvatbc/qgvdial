@@ -108,9 +108,28 @@ Page {
         }//ExpandView (proxy)
 
         ExpandView {
-            id: expandEtCetera
+            id: expandUpdateSettings
             anchors {
                 top: expandProxySettings.bottom
+                left: parent.left
+                topMargin: 1
+            }
+            width: parent.width
+
+            mainTitle: "Auto refresh"
+            content: updateSettings
+            yTimer: yAdjustTimer
+
+            Updates {
+                id: updateSettings
+                width: parent.width
+            }
+        }//ExpandView (updates)
+
+        ExpandView {
+            id: expandEtCetera
+            anchors {
+                top: expandUpdateSettings.bottom
                 left: parent.left
                 topMargin: 1
             }
@@ -128,32 +147,6 @@ Page {
         }//ExpandView (Et Cetera)
 
 /*
-        ExpandView {
-            id: expandRefreshSettings
-            anchors {
-                top: expandProxySettings.bottom
-                left: parent.left
-            }
-
-            width: parent.width
-            contentHeight: refreshSettings.height;
-
-            onClicked: if (isExpanded) yAdjustTimer.setY = y;
-
-            mainTitle: "Auto refresh"
-
-            RefreshSettings {
-                id: refreshSettings
-                objectName: "RefreshSettingsPage"
-
-                y: parent.startY
-                width: parent.width - 1
-                opacity: parent.containedOpacity
-
-                onSigDone: parent.isExpanded = false;
-            }//RefreshSettings
-        }//ExpandView (refresh)
-
         ExpandView {
             id: expandPinSettings
             anchors {

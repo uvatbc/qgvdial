@@ -453,7 +453,7 @@
             </rect>
            </property>
            <attribute name="label">
-            <string>Update options</string>
+            <string>Auto refresh options</string>
            </attribute>
            <layout class="QFormLayout" name="formLayout_2">
             <property name="fieldGrowthPolicy">

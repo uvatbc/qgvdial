@@ -63,8 +63,11 @@ protected slots:
 
     void showStatusMessage(QString msg, quint64 timeout);
 
-    void onOptContactsUpdateClicked();
-    void onOptInboxUpdateClicked();
+    void onOptContactsUpdateClicked(bool updateDb = true);
+    void onOptInboxUpdateClicked(bool updateDb = true);
+
+    void onEdContactsUpdateTextChanged();
+    void onEdInboxUpdateTextChanged();
 
 protected:
     QObject *getQMLObject(const char *pageName);

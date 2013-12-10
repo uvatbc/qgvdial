@@ -440,11 +440,6 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
         connect(optContactsUpdate, SIGNAL(clicked()),
                 this, SLOT(onOptContactsUpdateClicked()));
 
-        edContactsUpdateFreq = getQMLObject ("EdContactsUpdateFreq");
-        if (NULL == edContactsUpdateFreq) {
-            break;
-        }
-
         optInboxUpdate = getQMLObject ("OptInboxUpdate");
         if (NULL == optInboxUpdate) {
             break;
@@ -452,10 +447,19 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
         connect(optInboxUpdate, SIGNAL(clicked()),
                 this, SLOT(onOptInboxUpdateClicked()));
 
+        edContactsUpdateFreq = getQMLObject ("EdContactsUpdateFreq");
+        if (NULL == edContactsUpdateFreq) {
+            break;
+        }
+        connectToChangeNotify(edContactsUpdateFreq, "text",
+                              this, SLOT(onEdContactsUpdateTextChanged()));
+
         edInboxUpdateFreq = getQMLObject ("EdInboxUpdateFreq");
         if (NULL == edInboxUpdateFreq) {
             break;
         }
+        connectToChangeNotify(edInboxUpdateFreq, "text",
+                              this, SLOT(onEdInboxUpdateTextChanged()));
 
         onInitDone();
         return;
@@ -917,35 +921,67 @@ MainWindow::onVmailCurrentPositionChanged(quint64 position, quint64 duration)
 }//MainWindow::onVmailCurrentPositionChanged
 
 void
+MainWindow::onOptContactsUpdateClicked(bool updateDb /*= true*/)
+{
+    bool enable = optContactsUpdate->property("checked").toBool ();
+    if (updateDb) {
+        oContacts.enableUpdateFrequency (enable);
+    }
+}//MainWindow::onOptContactsUpdateClicked
+
+void
+MainWindow::onOptInboxUpdateClicked(bool updateDb /*= true*/)
+{
+    bool enable = optInboxUpdate->property("checked").toBool ();
+    if (updateDb) {
+        oInbox.enableUpdateFrequency (enable);
+    }
+}//MainWindow::onOptInboxUpdateClicked
+
+void
+MainWindow::onEdContactsUpdateTextChanged()
+{
+    quint32 mins = edContactsUpdateFreq->property ("text").toInt ();
+    if (0 == mins) {
+        Q_WARN("Ignoring zero minute contact update frequency");
+        return;
+    }
+
+    oContacts.setUpdateFrequency (mins);
+}//MainWindow::onEdContactsUpdateTextChanged
+
+void
+MainWindow::onEdInboxUpdateTextChanged()
+{
+    quint32 mins = edInboxUpdateFreq->property ("text").toInt ();
+    if (0 == mins) {
+        Q_WARN("Ignoring zero minute inbox update frequency");
+        return;
+    }
+
+    oInbox.setUpdateFrequency (mins);
+}//MainWindow::onEdInboxUpdateTextChanged
+
+void
 MainWindow::uiEnableContactUpdateFrequency(bool enable)
 {
-    Q_ASSERT(0 == "Not implemented");
+    optContactsUpdate->setProperty ("checked", enable);
 }//MainWindow::uiEnableContactUpdateFrequency
 
 void
 MainWindow::uiSetContactUpdateFrequency(quint32 mins)
 {
-    Q_ASSERT(0 == "Not implemented");
+    edContactsUpdateFreq->setProperty ("text", QString::number (mins));
 }//MainWindow::uiSetContactUpdateFrequency
 
 void
 MainWindow::uiEnableInboxUpdateFrequency(bool enable)
 {
-    Q_ASSERT(0 == "Not implemented");
+    optInboxUpdate->setProperty ("checked", enable);
 }//MainWindow::uiEnableInboxUpdateFrequency
 
 void
 MainWindow::uiSetInboxUpdateFrequency(quint32 mins)
 {
-    Q_ASSERT(0 == "Not implemented");
+    edInboxUpdateFreq->setProperty ("text", QString::number (mins));
 }//MainWindow::uiSetInboxUpdateFrequency
-
-void
-MainWindow::onOptContactsUpdateClicked()
-{
-}//MainWindow::onOptContactsUpdateClicked
-
-void
-MainWindow::onOptInboxUpdateClicked()
-{
-}//MainWindow::onOptInboxUpdateClicked

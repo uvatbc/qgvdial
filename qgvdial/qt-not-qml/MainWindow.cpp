@@ -237,9 +237,9 @@ MainWindow::init()
             &oLogUploader, SLOT(sendLogs()));
 
     connect(d->ui->optContacts, SIGNAL(clicked()),
-            this, SLOT(onOptContactsFreq()));
+            this, SLOT(onOptContactsFreqClicked()));
     connect(d->ui->optInbox, SIGNAL(clicked()),
-            this, SLOT(onOptInboxFreq()));
+            this, SLOT(onOptInboxFreqClicked()));
     connect(d->ui->sbContactsFreq, SIGNAL(valueChanged(int)),
             this, SLOT(onSbContactsFreqChanged(int)));
     connect(d->ui->sbInboxFreq, SIGNAL(valueChanged(int)),
@@ -835,7 +835,7 @@ MainWindow::onDispNumTextChanged()
 }//MainWindow::onDispNumTextChanged
 
 void
-MainWindow::onOptContactsFreq(bool updateDb /*= true*/)
+MainWindow::onOptContactsFreqClicked(bool updateDb /*= true*/)
 {
     bool enable = d->ui->optContacts->isChecked ();
     d->ui->sbContactsFreq->setEnabled (enable);
@@ -843,10 +843,10 @@ MainWindow::onOptContactsFreq(bool updateDb /*= true*/)
     if (updateDb) {
         oContacts.enableUpdateFrequency (enable);
     }
-}//MainWindow::onOptContactsFreq
+}//MainWindow::onOptContactsFreqClicked
 
 void
-MainWindow::onOptInboxFreq(bool updateDb /*= true*/)
+MainWindow::onOptInboxFreqClicked(bool updateDb /*= true*/)
 {
     bool enable = d->ui->optInbox->isChecked ();
     d->ui->sbInboxFreq->setEnabled (enable);
@@ -854,7 +854,7 @@ MainWindow::onOptInboxFreq(bool updateDb /*= true*/)
     if (updateDb) {
         oInbox.enableUpdateFrequency (enable);
     }
-}//MainWindow::onOptInboxFreq
+}//MainWindow::onOptInboxFreqClicked
 
 void
 MainWindow::onSbContactsFreqChanged(int val)
@@ -872,7 +872,7 @@ void
 MainWindow::uiEnableContactUpdateFrequency(bool enable)
 {
     d->ui->optContacts->setChecked (enable);
-    onOptContactsFreq (false);
+    onOptContactsFreqClicked (false);
 }//MainWindow::uiEnableContactUpdateFrequency
 
 void
@@ -885,7 +885,7 @@ void
 MainWindow::uiEnableInboxUpdateFrequency(bool enable)
 {
     d->ui->optInbox->setChecked (enable);
-    onOptInboxFreq (false);
+    onOptInboxFreqClicked (false);
 }//MainWindow::uiEnableInboxUpdateFrequency
 
 void
