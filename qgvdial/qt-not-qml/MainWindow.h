@@ -78,6 +78,11 @@ protected:
 
     void uiFailedToSendMessage(const QString &dest, const QString &text);
 
+    void uiEnableContactUpdateFrequency(bool enable);
+    void uiSetContactUpdateFrequency(quint32 mins);
+    void uiEnableInboxUpdateFrequency(bool enable);
+    void uiSetInboxUpdateFrequency(quint32 mins);
+
 protected slots:
     void messageReceived(const QString &msg);
 
@@ -98,6 +103,11 @@ protected slots:
     void onUserContactSearchTriggered();
 
     void onDispNumTextChanged();
+
+    void onOptContactsFreq(bool updateDb = true);
+    void onOptInboxFreq(bool updateDb = true);
+    void onSbContactsFreqChanged(int val);
+    void onSbInboxFreqChanged(int val);
 
 private:
     MainWindowPrivate *d;

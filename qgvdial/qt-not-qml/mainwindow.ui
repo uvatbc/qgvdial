@@ -295,8 +295,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>436</width>
-             <height>167</height>
+             <width>96</width>
+             <height>101</height>
             </rect>
            </property>
            <attribute name="label">
@@ -334,12 +334,12 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>246</width>
+             <width>252</width>
              <height>240</height>
             </rect>
            </property>
            <attribute name="label">
-            <string>Proxy details</string>
+            <string>Proxy options</string>
            </attribute>
            <layout class="QGridLayout" name="gridLayout_2">
             <item row="0" column="1">
@@ -443,13 +443,71 @@
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="etCeteraDetails">
+          <widget class="QWidget" name="updatesPage">
            <property name="geometry">
             <rect>
              <x>0</x>
              <y>0</y>
              <width>436</width>
-             <height>167</height>
+             <height>138</height>
+            </rect>
+           </property>
+           <attribute name="label">
+            <string>Update options</string>
+           </attribute>
+           <layout class="QFormLayout" name="formLayout_2">
+            <property name="fieldGrowthPolicy">
+             <enum>QFormLayout::ExpandingFieldsGrow</enum>
+            </property>
+            <item row="0" column="0">
+             <widget class="QCheckBox" name="optContacts">
+              <property name="text">
+               <string>Update Contacts</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QSpinBox" name="sbContactsFreq">
+              <property name="suffix">
+               <string> minutes</string>
+              </property>
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>1440</number>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QCheckBox" name="optInbox">
+              <property name="text">
+               <string>Update Inbox</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QSpinBox" name="sbInboxFreq">
+              <property name="suffix">
+               <string> minutes</string>
+              </property>
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>1440</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="etCeteraDetails">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>96</width>
+             <height>77</height>
             </rect>
            </property>
            <attribute name="label">

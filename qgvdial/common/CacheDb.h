@@ -109,6 +109,14 @@ public:
     bool getCINumber(const QString &id, QString &num);
     bool setCINumber(const QString &id, const QString &num);
 
+    quint32 getContactsUpdateFreq();
+    void    setContactsUpdateFreq(quint32 minutes);
+    void  clearContactsUpdateFreq();
+
+    quint32 getInboxUpdateFreq();
+    void    setInboxUpdateFreq(quint32 minutes);
+    void  clearInboxUpdateFreq();
+
 private:
     void cleanup_dangling_temp_ids();
 

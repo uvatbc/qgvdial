@@ -29,6 +29,7 @@ Contact: yuvraaj@gmail.com
 
 LibContacts::LibContacts(IMainWindow *parent)
 : QObject(parent)
+, m_enableTimerUpdate(false)
 , m_contactsModel(NULL)
 , m_searchedContactsModel(NULL)
 , m_contactPhonesModel(NULL)
@@ -45,6 +46,10 @@ LibContacts::LibContacts(IMainWindow *parent)
     m_gotPhotoTimer.setInterval (GOT_PHOTO_TIMEOUT);
     connect (&m_gotPhotoTimer, SIGNAL(timeout()),
              this, SLOT(refreshModel()));
+
+    m_updateTimer.setSingleShot (true);
+    connect(&m_updateTimer, SIGNAL(timeout()),
+            this, SLOT(refreshLatest()));
 }//LibContacts::LibContacts
 
 bool
@@ -190,6 +195,12 @@ LibContacts::onContactsFetched()
    }
 
     task->deleteLater ();
+
+    if (m_enableTimerUpdate && (m_updateTimer.interval () >= 60)) {
+        m_updateTimer.stop ();
+        m_updateTimer.start ();
+        Q_DEBUG("Restarting update timer");
+    }
 }//LibContacts::onContactsFetched
 
 ContactsModel *
@@ -411,3 +422,47 @@ LibContacts::searchContacts(const QString &query)
 
     return true;
 }//LibContacts::searchContacts
+
+void
+LibContacts::enableUpdateFrequency(bool enable)
+{
+    IMainWindow *win = (IMainWindow *) this->parent ();
+
+    m_enableTimerUpdate = enable;
+
+    m_updateTimer.stop ();
+    if (enable) {
+        quint32 mins = m_updateTimer.interval () / (1000 * 60);
+        if (mins > 0) {
+            Q_DEBUG(QString("Enable update at %1 minute intervals").arg(mins));
+            m_updateTimer.start ();
+            win->db.setContactsUpdateFreq (mins);
+        } else {
+            Q_DEBUG("Enable update, but no interval set");
+        }
+    } else {
+        Q_DEBUG("Update disabled");
+        win->db.clearContactsUpdateFreq ();
+    }
+}//LibContacts::enableUpdateFrequency
+
+void
+LibContacts::setUpdateFrequency(quint32 mins)
+{
+    if (mins == 0) {
+        Q_WARN("Cannot set update frequency to zero minutes");
+        return;
+    }
+
+    IMainWindow *win = (IMainWindow *) this->parent ();
+    m_updateTimer.stop ();
+    m_updateTimer.setInterval (mins * 60 * 1000);
+
+    if (m_enableTimerUpdate) {
+        win->db.setContactsUpdateFreq (mins);
+        m_updateTimer.start ();
+    }
+
+    Q_DEBUG(QString("Update at %1 minute intervals set%2")
+            .arg(mins).arg(m_enableTimerUpdate?"":" but not started"));
+}//LibContacts::setUpdateFrequency

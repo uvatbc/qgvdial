@@ -47,6 +47,9 @@ public slots:
     bool markEntryAsRead(const QString &id);
     bool deleteEntry(const QString &id);
 
+    void enableUpdateFrequency(bool enable);
+    void setUpdateFrequency(quint32 mins);
+
 private:
     InboxModel *createModel(QString type);
 
@@ -67,6 +70,8 @@ public:
 
 protected:
     QTimer      m_modelRefreshTimer;
+    QTimer      m_updateTimer;
+    bool        m_enableTimerUpdate;
 };
 
 #endif // LIBINBOX_H

@@ -1502,3 +1502,39 @@ CacheDb::setCINumber(const QString &id, const QString &num)
 
     return query.exec (strQ);
 }//CacheDb::setCINumber
+
+quint32
+CacheDb::getContactsUpdateFreq()
+{
+    return CacheDbPrivate::ref().settings->value(GV_S_VAR_CFREQ).toUInt();
+}//CacheDb::getContactsUpdateFreq
+
+void
+CacheDb::setContactsUpdateFreq(quint32 minutes)
+{
+    CacheDbPrivate::ref().settings->setValue(GV_S_VAR_CFREQ, minutes);
+}//CacheDb::setContactsUpdateFreq
+
+void
+CacheDb::clearContactsUpdateFreq()
+{
+    CacheDbPrivate::ref().settings->remove (GV_S_VAR_CFREQ);
+}//CacheDb::clearContactsUpdateFreq
+
+quint32
+CacheDb::getInboxUpdateFreq()
+{
+    return CacheDbPrivate::ref().settings->value(GV_S_VAR_IFREQ).toUInt();
+}//CacheDb::getInboxUpdateFreq
+
+void
+CacheDb::setInboxUpdateFreq(quint32 minutes)
+{
+    CacheDbPrivate::ref().settings->setValue(GV_S_VAR_IFREQ, minutes);
+}//CacheDb::setInboxUpdateFreq
+
+void
+CacheDb::clearInboxUpdateFreq()
+{
+    CacheDbPrivate::ref().settings->remove (GV_S_VAR_IFREQ);
+}//CacheDb::clearInboxUpdateFreq

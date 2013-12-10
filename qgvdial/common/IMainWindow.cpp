@@ -103,6 +103,9 @@ IMainWindow::beginLogin(const QString &user, const QString &pass)
             break;
         }
 
+        uiEnableContactUpdateFrequency (false);
+        uiEnableInboxUpdateFrequency (false);
+
         // Begin logon
         m_loginTask = new AsyncTaskToken(this);
         if (NULL == m_loginTask) {
@@ -190,6 +193,22 @@ IMainWindow::loginCompleted()
             oPhones.refreshOutgoing ();
 
             oLogUploader.reportLogin ();
+
+            quint32 mins = db.getContactsUpdateFreq();
+            if (0 != mins) {
+                uiEnableContactUpdateFrequency (true);
+                uiSetContactUpdateFrequency (mins);
+                oContacts.enableUpdateFrequency (true);
+                oContacts.setUpdateFrequency (mins);
+            }
+
+            mins = db.getInboxUpdateFreq ();
+            if (0 != mins) {
+                uiEnableInboxUpdateFrequency (true);
+                uiSetInboxUpdateFrequency (mins);
+                oInbox.enableUpdateFrequency (true);
+                oInbox.setUpdateFrequency (mins);
+            }
         } else if (ATTS_NW_ERROR == task->status) {
             Q_WARN("Login failed because of network error");
             uiSetUserPass (true);

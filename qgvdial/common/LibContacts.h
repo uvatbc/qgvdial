@@ -53,6 +53,9 @@ public slots:
     bool refreshFull();
     bool searchContacts(const QString &query = QString());
 
+    void enableUpdateFrequency(bool enable);
+    void setUpdateFrequency(quint32 mins);
+
 protected:
     ContactsModel *createModel(const QString &query = QString());
 
@@ -68,6 +71,9 @@ protected slots:
 protected:
     GContactsApi api;
     QTimer      m_gotPhotoTimer;
+
+    QTimer      m_updateTimer;
+    bool        m_enableTimerUpdate;
 
 public:
     ContactsModel       *m_contactsModel;

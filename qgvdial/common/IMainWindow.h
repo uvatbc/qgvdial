@@ -196,6 +196,11 @@ protected:
     virtual void uiFailedToSendMessage(const QString &destination,
                                        const QString &text) = 0;
 
+    virtual void uiEnableContactUpdateFrequency(bool enable) = 0;
+    virtual void uiSetContactUpdateFrequency(quint32 mins) = 0;
+    virtual void uiEnableInboxUpdateFrequency(bool enable) = 0;
+    virtual void uiSetInboxUpdateFrequency(quint32 mins) = 0;
+
 protected:
     CacheDb db;
     GVApi   gvApi;

@@ -54,6 +54,9 @@ protected:
 #define GV_S_VAR_TFA            "two_factor"
 #define GV_S_VAR_CPASS          "c_password"
 
+#define GV_S_VAR_CFREQ          "contacts_frequency"
+#define GV_S_VAR_IFREQ          "inbox_frequency"
+
 #define GV_S_VAR_DB_VER         "db_ver"
 #define GV_S_VAR_VER            "settings_ver"
 ////////////////////////////////////////////////////////////////////////////////

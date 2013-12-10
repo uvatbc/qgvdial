@@ -236,6 +236,21 @@ MainWindow::init()
     connect(d->ui->btnSendLogs, SIGNAL(clicked()),
             &oLogUploader, SLOT(sendLogs()));
 
+    connect(d->ui->optContacts, SIGNAL(clicked()),
+            this, SLOT(onOptContactsFreq()));
+    connect(d->ui->optInbox, SIGNAL(clicked()),
+            this, SLOT(onOptInboxFreq()));
+    connect(d->ui->sbContactsFreq, SIGNAL(valueChanged(int)),
+            this, SLOT(onSbContactsFreqChanged(int)));
+    connect(d->ui->sbInboxFreq, SIGNAL(valueChanged(int)),
+            this, SLOT(onSbInboxFreqChanged(int)));
+
+    // Do this so that the update frequency UI elements are fixed up
+    d->ui->optContacts->setChecked (false);
+    d->ui->sbContactsFreq->setEnabled (false);
+    d->ui->optInbox->setChecked (false);
+    d->ui->sbInboxFreq->setEnabled (false);
+
     // Set up starting page and initial actions: These can change everytime I
     // touch the ui file. So force them into a state that is good to show to the end user.
     d->ui->actionFind->setEnabled (false);
@@ -819,3 +834,62 @@ MainWindow::onDispNumTextChanged()
     }
 }//MainWindow::onDispNumTextChanged
 
+void
+MainWindow::onOptContactsFreq(bool updateDb /*= true*/)
+{
+    bool enable = d->ui->optContacts->isChecked ();
+    d->ui->sbContactsFreq->setEnabled (enable);
+
+    if (updateDb) {
+        oContacts.enableUpdateFrequency (enable);
+    }
+}//MainWindow::onOptContactsFreq
+
+void
+MainWindow::onOptInboxFreq(bool updateDb /*= true*/)
+{
+    bool enable = d->ui->optInbox->isChecked ();
+    d->ui->sbInboxFreq->setEnabled (enable);
+
+    if (updateDb) {
+        oInbox.enableUpdateFrequency (enable);
+    }
+}//MainWindow::onOptInboxFreq
+
+void
+MainWindow::onSbContactsFreqChanged(int val)
+{
+    oContacts.setUpdateFrequency (val);
+}//MainWindow::onSbContactsFreqChanged
+
+void
+MainWindow::onSbInboxFreqChanged(int val)
+{
+    oInbox.setUpdateFrequency (val);
+}//MainWindow::onSbInboxFreqChanged
+
+void
+MainWindow::uiEnableContactUpdateFrequency(bool enable)
+{
+    d->ui->optContacts->setChecked (enable);
+    onOptContactsFreq (false);
+}//MainWindow::uiEnableContactUpdateFrequency
+
+void
+MainWindow::uiSetContactUpdateFrequency(quint32 mins)
+{
+    d->ui->sbContactsFreq->setValue (mins);
+}//MainWindow::uiSetContactUpdateFrequency
+
+void
+MainWindow::uiEnableInboxUpdateFrequency(bool enable)
+{
+    d->ui->optInbox->setChecked (enable);
+    onOptInboxFreq (false);
+}//MainWindow::uiEnableInboxUpdateFrequency
+
+void
+MainWindow::uiSetInboxUpdateFrequency(quint32 mins)
+{
+    d->ui->sbInboxFreq->setValue (mins);
+}//MainWindow::uiSetInboxUpdateFrequency
