@@ -85,6 +85,11 @@ protected:
 
     void uiFailedToSendMessage(const QString &dest, const QString &text);
 
+    void uiEnableContactUpdateFrequency(bool enable);
+    void uiSetContactUpdateFrequency(quint32 mins);
+    void uiEnableInboxUpdateFrequency(bool enable);
+    void uiSetInboxUpdateFrequency(quint32 mins);
+
 private:
     QmlApplicationViewer *m_view;
 

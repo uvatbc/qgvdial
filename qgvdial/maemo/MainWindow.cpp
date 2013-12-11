@@ -615,3 +615,24 @@ MainWindow::onUserReplyToInboxEntry(QString id)
                                Q_ARG (QVariant, QVariant(event.strText)),
                                Q_ARG (QVariant, QVariant(QString())));
 }//MainWindow::onUserReplyToInboxEntry
+
+void
+MainWindow::uiEnableContactUpdateFrequency(bool enable)
+{
+}//MainWindow::uiEnableContactUpdateFrequency
+
+void
+MainWindow::uiSetContactUpdateFrequency(quint32 mins)
+{
+}//MainWindow::uiSetContactUpdateFrequency
+
+void
+MainWindow::uiEnableInboxUpdateFrequency(bool enable)
+{
+}//MainWindow::uiEnableInboxUpdateFrequency
+
+void
+MainWindow::uiSetInboxUpdateFrequency(quint32 mins)
+{
+}//MainWindow::uiSetInboxUpdateFrequency
+
