@@ -175,8 +175,6 @@ Rectangle {
 
                 text: container.smsText
                 visible: (container.smsText.length != 0)
-
-                onHeightChanged: console.debug("h = " + height)
             }//SMS text
 
             ProgressBar {
@@ -222,13 +220,13 @@ Rectangle {
                         onClicked: { container.stop(); }
                     }
                 }
-            }
+            }//Row of Images (Play/Pause and Stop)
 
             Text {
                 text: "Fetching email"
                 visible: (container.isVmail && container.fetchingEmail)
                 anchors.horizontalCenter: parent.horizontalCenter
-            }
+            }//text: "Fetching email"
         }//Column
     }//Flickable
 
@@ -258,5 +256,5 @@ Rectangle {
                 container.done(true);
             }
         }
-    }//ButtonRow
+    }//ButtonRow (Reply and Delete)
 }//Item

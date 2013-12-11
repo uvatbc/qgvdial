@@ -38,6 +38,7 @@ public:
 protected slots:
     void declStatusChanged(QDeclarativeView::Status status);
     void messageReceived(const QString &msg);
+    void showStatusMessage(QString msg, quint64 timeout);
 
     void onLoginButtonClicked();
     void onTfaPinDlg(bool accepted);
@@ -60,8 +61,6 @@ protected slots:
     void onVmailPlayerStateUpdate(LVPlayerState newState);
     void onVmailDurationChanged(quint64 duration);
     void onVmailCurrentPositionChanged(quint64 position, quint64 duration);
-
-    void showStatusMessage(QString msg, quint64 timeout);
 
     void onOptContactsUpdateClicked(bool updateDb = true);
     void onOptInboxUpdateClicked(bool updateDb = true);

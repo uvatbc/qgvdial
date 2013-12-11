@@ -81,6 +81,7 @@ MainWindow::MainWindow(QObject *parent)
 , optInboxUpdate(NULL)
 , edContactsUpdateFreq(NULL)
 , edInboxUpdateFreq(NULL)
+, m_inboxDetailsShown(false)
 {
 }//MainWindow::MainWindow
 
@@ -307,6 +308,11 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
                 &oInbox, SLOT(deleteEntry(QString)));
         connect(inboxDetails, SIGNAL(replySms(QString)),
                 this, SLOT(onUserReplyToInboxEntry(QString)));
+        connect(inboxDetails, SIGNAL(play()), &oVmail, SLOT(play()));
+        connect(inboxDetails, SIGNAL(pause()), &oVmail, SLOT(pause()));
+        connect(inboxDetails, SIGNAL(stop()), &oVmail, SLOT(stop()));
+        connect(inboxDetails, SIGNAL(done(bool)),
+                this, SLOT(onInboxDetailsDone(bool)));
 
         smsPage = getQMLObject ("SmsPage");
         if (NULL == smsPage) {
@@ -320,6 +326,16 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
             break;
         }
         connect(etCetera, SIGNAL(sendLogs()), &oLogUploader, SLOT(sendLogs()));
+
+        // Vmail:
+        connect(&oVmail, SIGNAL(vmailFetched(QString,QString,bool)),
+                this, SLOT(onVmailFetched(QString,QString,bool)));
+        connect(&oVmail, SIGNAL(playerStateUpdate(LVPlayerState)),
+                this, SLOT(onVmailPlayerStateUpdate(LVPlayerState)));
+        connect(&oVmail, SIGNAL(durationChanged(quint64)),
+                this, SLOT(onVmailDurationChanged(quint64)));
+        connect(&oVmail, SIGNAL(currentPositionChanged(quint64,quint64)),
+                this, SLOT(onVmailCurrentPositionChanged(quint64,quint64)));
 
         optContactsUpdate = getQMLObject ("OptContactsUpdate");
         if (NULL == optContactsUpdate) {
@@ -354,6 +370,14 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
     } while(0);
     exit(-1);
 }//MainWindow::declStatusChanged
+
+void
+MainWindow::showStatusMessage(QString msg, quint64 timeout)
+{
+    QMetaObject::invokeMethod(statusBanner, "showMessage",
+                              Q_ARG(QVariant, QVariant(msg)),
+                              Q_ARG(QVariant, QVariant(timeout)));
+}//MainWindow::showStatusMessage
 
 void
 MainWindow::uiUpdateProxySettings(const ProxyInfo &info)
@@ -584,6 +608,24 @@ MainWindow::onInboxClicked(QString id)
                               Q_ARG(QVariant,QVariant(isVmail)),
                               Q_ARG(QVariant,QVariant(cinfo.strId)),
                               Q_ARG(QVariant,QVariant(event.id)));
+    m_inboxDetailsShown = true;
+
+    if (!isVmail) {
+        return;
+    }
+
+    QString localPath;
+    if (oVmail.getVmailForId (event.id, localPath)) {
+        onVmailFetched (event.id, localPath, true);
+    } else {
+        if (!oVmail.fetchVmail (event.id)) {
+            Q_WARN("Failed to fetch voice mail");
+            showStatusMessage ("Unable to fetch voicemail", SHOW_3SEC);
+        }
+
+        Q_ASSERT(isVmail); // Reuse this "true" value
+        inboxDetails->setProperty ("fetchingEmail", isVmail);
+    }
 }//MainWindow::onInboxClicked
 
 void
@@ -620,21 +662,15 @@ MainWindow::uiGetCIDetails(GVRegisteredNumber &num, GVNumModel *model)
 void
 MainWindow::uiLongTaskBegins()
 {
-    QMetaObject::invokeMethod(statusBanner, "showMessage",
-                              Q_ARG(QVariant,
-                                    QVariant(m_taskInfo.suggestedStatus)),
-                              Q_ARG(QVariant,
-                                    QVariant(m_taskInfo.suggestedMillisconds)));
+    showStatusMessage (m_taskInfo.suggestedStatus,
+                       m_taskInfo.suggestedMillisconds);
 }//MainWindow::uiLongTaskBegins
 
 void
 MainWindow::uiLongTaskContinues()
 {
-    QMetaObject::invokeMethod(statusBanner, "showMessage",
-                              Q_ARG(QVariant,
-                                    QVariant(m_taskInfo.suggestedStatus)),
-                              Q_ARG(QVariant,
-                                    QVariant(m_taskInfo.suggestedMillisconds)));
+    showStatusMessage (m_taskInfo.suggestedStatus,
+                       m_taskInfo.suggestedMillisconds);
 }//MainWindow::uiLongTaskContinues
 
 void
@@ -693,6 +729,83 @@ MainWindow::onUserReplyToInboxEntry(QString id)
                                Q_ARG (QVariant, QVariant(event.strText)),
                                Q_ARG (QVariant, QVariant(QString())));
 }//MainWindow::onUserReplyToInboxEntry
+
+void
+MainWindow::onInboxDetailsDone(bool /*accepted*/)
+{
+    m_inboxDetailsShown = false;
+    oVmail.stop ();
+    oVmail.deinitPlayer ();
+}//MainWindow::onInboxDetailsDone
+
+void
+MainWindow::onVmailFetched(const QString & /*id*/, const QString &localPath, bool ok)
+{
+    if (!m_inboxDetailsShown) {
+        return;
+    }
+
+    if (!ok) {
+        showStatusMessage ("Unable to fetch voicemail", SHOW_3SEC);
+        return;
+    }
+
+    if (!oVmail.loadVmail (localPath)) {
+        showStatusMessage ("Unable to load voicemail", SHOW_3SEC);
+        return;
+    }
+
+    ok = false;
+    inboxDetails->setProperty ("fetchingEmail", ok);
+}//MainWindow::onVmailFetched
+
+void
+MainWindow::onVmailPlayerStateUpdate(LVPlayerState newState)
+{
+    if (!m_inboxDetailsShown) {
+        return;
+    }
+
+    bool temp;
+
+    switch (newState) {
+    case LVPS_Playing:
+        temp = false;
+        inboxDetails->setProperty ("showPlayBtn", temp);
+        break;
+    case LVPS_Paused:
+        temp = true;
+        inboxDetails->setProperty ("showPlayBtn", temp);
+        break;
+    case LVPS_Stopped:
+        temp = true;
+        inboxDetails->setProperty ("showPlayBtn", temp);
+        break;
+    default:
+        break;
+    }
+}//MainWindow::onVmailPlayerStateUpdate
+
+void
+MainWindow::onVmailDurationChanged(quint64 duration)
+{
+    if (!m_inboxDetailsShown) {
+        return;
+    }
+
+    inboxDetails->setProperty ("vmailDuration", duration);
+}//MainWindow::onVmailDurationChanged
+
+void
+MainWindow::onVmailCurrentPositionChanged(quint64 position, quint64 duration)
+{
+    if (!m_inboxDetailsShown) {
+        return;
+    }
+
+    inboxDetails->setProperty ("vmailPosition", position);
+    inboxDetails->setProperty ("vmailDuration", duration);
+}//MainWindow::onVmailCurrentPositionChanged
 
 void
 MainWindow::onOptContactsUpdateClicked(bool updateDb /*= true*/)

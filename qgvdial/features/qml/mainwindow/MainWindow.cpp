@@ -480,6 +480,14 @@ MainWindow::messageReceived(const QString &msg)
 }//MainWindow::messageReceived
 
 void
+MainWindow::showStatusMessage(QString msg, quint64 timeout)
+{
+    QMetaObject::invokeMethod(statusBanner, "showMessage",
+                              Q_ARG(QVariant, QVariant(msg)),
+                              Q_ARG(QVariant, QVariant(timeout)));
+}//MainWindow::showStatusMessage
+
+void
 MainWindow::uiUpdateProxySettings(const ProxyInfo &info)
 {
     QMetaObject::invokeMethod (proxySettingsPage, "setValues",
@@ -754,14 +762,6 @@ MainWindow::uiLongTaskBegins()
     showStatusMessage (m_taskInfo.suggestedStatus,
                        m_taskInfo.suggestedMillisconds);
 }//MainWindow::uiLongTaskBegins
-
-void
-MainWindow::showStatusMessage(QString msg, quint64 timeout)
-{
-    QMetaObject::invokeMethod(statusBanner, "showMessage",
-                              Q_ARG(QVariant, QVariant(msg)),
-                              Q_ARG(QVariant, QVariant(timeout)));
-}//MainWindow::showStatusMessage
 
 void
 MainWindow::uiLongTaskContinues()

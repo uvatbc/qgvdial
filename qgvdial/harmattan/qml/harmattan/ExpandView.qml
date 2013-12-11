@@ -46,7 +46,7 @@ Rectangle {
 
     onClicked: {
         if (yTimer === undefined) {
-            console.debug("No timer in parent");
+            console.log("No timer in parent");
             return;
         }
 

@@ -110,8 +110,8 @@ Rectangle {
         smsPage.dest         = dest;
         smsPage.conversation = conversation;
         smsPage.smsText      = text;
+        doBack();
         smsPage.visible = true;
-        inboxDetails.visible = false;
         imgClose.state = "back";
     }
 
@@ -130,6 +130,7 @@ Rectangle {
         }
         if (inboxDetails.visible) {
             inboxDetails.visible = false;
+            inboxDetails.done(false);
         }
         if (inboxSelector.visible) {
             inboxSelector.visible = false;

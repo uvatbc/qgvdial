@@ -41,6 +41,7 @@ public:
 protected slots:
     void declStatusChanged(QDeclarativeView::Status status);
     void onLoginButtonClicked();
+    void showStatusMessage(QString msg, quint64 timeout);
 
     void onSigProxyChanges(bool enable, bool useSystemProxy, QString server,
                            int port, bool authRequired, QString user,
@@ -53,6 +54,12 @@ protected slots:
 
     void onUserSmsTextDone(bool ok);
     void onUserReplyToInboxEntry(QString id);
+
+    void onInboxDetailsDone(bool accepted);
+    void onVmailFetched(const QString &id, const QString &localPath, bool ok);
+    void onVmailPlayerStateUpdate(LVPlayerState newState);
+    void onVmailDurationChanged(quint64 duration);
+    void onVmailCurrentPositionChanged(quint64 position, quint64 duration);
 
     void onOptContactsUpdateClicked(bool updateDb = true);
     void onOptInboxUpdateClicked(bool updateDb = true);
@@ -123,6 +130,8 @@ private:
     QObject *optInboxUpdate;
     QObject *edContactsUpdateFreq;
     QObject *edInboxUpdateFreq;
+
+    bool     m_inboxDetailsShown;
 };
 
 QApplication *
