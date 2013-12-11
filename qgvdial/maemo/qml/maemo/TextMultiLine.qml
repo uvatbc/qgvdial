@@ -35,7 +35,7 @@ Rectangle {
 
     signal textChanged(string text)
 
-    height: textEdit.height + textEdit.font.pointSize
+    height: textEdit.paintedHeight + 20
 
     border {
         color: enableBorder ? "gray" : "transparent"

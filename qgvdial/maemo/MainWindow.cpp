@@ -77,6 +77,10 @@ MainWindow::MainWindow(QObject *parent)
 , inboxDetails(NULL)
 , smsPage(NULL)
 , etCetera(NULL)
+, optContactsUpdate(NULL)
+, optInboxUpdate(NULL)
+, edContactsUpdateFreq(NULL)
+, edInboxUpdateFreq(NULL)
 {
 }//MainWindow::MainWindow
 
@@ -127,6 +131,50 @@ MainWindow::getQMLObject(const char *pageName)
 
     return (pObj);
 }//MainWindow::getQMLObject
+
+bool
+MainWindow::connectToChangeNotify(QObject *item, const QString &propName,
+                                  QObject *receiver, const char *slotName)
+{
+    bool rv = false;
+    do {
+        const QMetaObject *metaObject = item->metaObject ();
+        if (NULL == metaObject) {
+            Q_WARN("NULL metaObject");
+            break;
+        }
+
+        QMetaProperty metaProp;
+        for (int i = 0; i < metaObject->propertyCount (); i++) {
+            metaProp = metaObject->property (i);
+            if (metaProp.name () == propName) {
+                rv = true;
+                break;
+            }
+        }
+
+        if (!rv) {
+            Q_WARN(QString("Couldn't find property named %1").arg(propName));
+            break;
+        }
+        rv = false;
+
+        if (!metaProp.hasNotifySignal ()) {
+            Q_WARN(QString("Property %1 does not have a notify signal")
+                   .arg(propName));
+            break;
+        }
+
+        QString signalName = QString("2%1")
+                                .arg(metaProp.notifySignal().signature());
+
+        Q_DEBUG(QString("Connect %1 to %2").arg(signalName).arg(slotName));
+
+        rv = connect(item, signalName.toAscii().constData(), receiver, slotName);
+    } while(0);
+
+    return (rv);
+}//MainWindow::connectToChangeNotify
 
 void
 MainWindow::log(QDateTime /*dt*/, int /*level*/, const QString & /*strLog*/)
@@ -271,8 +319,35 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
         if (NULL == etCetera) {
             break;
         }
-        connect(etCetera, SIGNAL(sendLogs()),
-                &oLogUploader, SLOT(sendLogs()));
+        connect(etCetera, SIGNAL(sendLogs()), &oLogUploader, SLOT(sendLogs()));
+
+        optContactsUpdate = getQMLObject ("OptContactsUpdate");
+        if (NULL == optContactsUpdate) {
+            break;
+        }
+        connect(optContactsUpdate, SIGNAL(clicked()),
+                this, SLOT(onOptContactsUpdateClicked()));
+
+        optInboxUpdate = getQMLObject ("OptInboxUpdate");
+        if (NULL == optInboxUpdate) {
+            break;
+        }
+        connect(optInboxUpdate, SIGNAL(clicked()),
+                this, SLOT(onOptInboxUpdateClicked()));
+
+        edContactsUpdateFreq = getQMLObject ("EdContactsUpdateFreq");
+        if (NULL == edContactsUpdateFreq) {
+            break;
+        }
+        connectToChangeNotify(edContactsUpdateFreq, "text",
+                              this, SLOT(onEdContactsUpdateTextChanged()));
+
+        edInboxUpdateFreq = getQMLObject ("EdInboxUpdateFreq");
+        if (NULL == edInboxUpdateFreq) {
+            break;
+        }
+        connectToChangeNotify(edInboxUpdateFreq, "text",
+                              this, SLOT(onEdInboxUpdateTextChanged()));
 
         onInitDone();
         return;
@@ -497,6 +572,8 @@ MainWindow::onInboxClicked(QString id)
         oInbox.markEntryAsRead (event.id);
     }
 
+    bool isVmail = (event.Type == GVIE_Voicemail);
+
     QMetaObject::invokeMethod(tabbedUI, "showInboxDetails",
                               Q_ARG(QVariant,QVariant(cinfo.strPhotoPath)),
                               Q_ARG(QVariant,QVariant(event.strDisplayNumber)),
@@ -504,6 +581,7 @@ MainWindow::onInboxClicked(QString id)
                               Q_ARG(QVariant,QVariant(event.strNote)),
                               Q_ARG(QVariant,QVariant(event.strText)),
                               Q_ARG(QVariant,QVariant(type)),
+                              Q_ARG(QVariant,QVariant(isVmail)),
                               Q_ARG(QVariant,QVariant(cinfo.strId)),
                               Q_ARG(QVariant,QVariant(event.id)));
 }//MainWindow::onInboxClicked
@@ -617,22 +695,67 @@ MainWindow::onUserReplyToInboxEntry(QString id)
 }//MainWindow::onUserReplyToInboxEntry
 
 void
+MainWindow::onOptContactsUpdateClicked(bool updateDb /*= true*/)
+{
+    bool enable = optContactsUpdate->property("checked").toBool ();
+    if (updateDb) {
+        oContacts.enableUpdateFrequency (enable);
+    }
+}//MainWindow::onOptContactsUpdateClicked
+
+void
+MainWindow::onOptInboxUpdateClicked(bool updateDb /*= true*/)
+{
+    bool enable = optInboxUpdate->property("checked").toBool ();
+    if (updateDb) {
+        oInbox.enableUpdateFrequency (enable);
+    }
+}//MainWindow::onOptInboxUpdateClicked
+
+void
+MainWindow::onEdContactsUpdateTextChanged()
+{
+    quint32 mins = edContactsUpdateFreq->property ("text").toInt ();
+    if (0 == mins) {
+        Q_WARN("Ignoring zero minute contact update frequency");
+        return;
+    }
+
+    oContacts.setUpdateFrequency (mins);
+}//MainWindow::onEdContactsUpdateTextChanged
+
+void
+MainWindow::onEdInboxUpdateTextChanged()
+{
+    quint32 mins = edInboxUpdateFreq->property ("text").toInt ();
+    if (0 == mins) {
+        Q_WARN("Ignoring zero minute inbox update frequency");
+        return;
+    }
+
+    oInbox.setUpdateFrequency (mins);
+}//MainWindow::onEdInboxUpdateTextChanged
+
+void
 MainWindow::uiEnableContactUpdateFrequency(bool enable)
 {
+    optContactsUpdate->setProperty ("checked", enable);
 }//MainWindow::uiEnableContactUpdateFrequency
 
 void
 MainWindow::uiSetContactUpdateFrequency(quint32 mins)
 {
+    edContactsUpdateFreq->setProperty ("text", QString::number (mins));
 }//MainWindow::uiSetContactUpdateFrequency
 
 void
 MainWindow::uiEnableInboxUpdateFrequency(bool enable)
 {
+    optInboxUpdate->setProperty ("checked", enable);
 }//MainWindow::uiEnableInboxUpdateFrequency
 
 void
 MainWindow::uiSetInboxUpdateFrequency(quint32 mins)
 {
+    edInboxUpdateFreq->setProperty ("text", QString::number (mins));
 }//MainWindow::uiSetInboxUpdateFrequency
-

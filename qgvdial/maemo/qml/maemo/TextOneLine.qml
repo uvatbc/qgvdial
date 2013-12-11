@@ -33,6 +33,7 @@ Rectangle {
     property alias readOnly: textInput.readOnly
     property alias horizontalAlignment: textInput.horizontalAlignment
     property bool enableBorder: true
+    property alias validator: textInput.validator
 
     signal textChanged(string text)
     signal accepted

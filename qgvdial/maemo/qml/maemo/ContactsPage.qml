@@ -165,19 +165,7 @@ Rectangle {
             MouseArea {
                 anchors.fill: parent
                 onClicked: container.contactClicked(id);
-                onPressed: { listDelegate.state = "pressed"; }
-                onReleased: { listDelegate.state = ''; }
             }
-
-            states: [
-                State {
-                    name: "pressed"
-                    PropertyChanges {
-                        target: listDelegate.border
-                        color: "orange"
-                    }
-                }
-            ]
         }// delegate Rectangle
     }// ListView (contacts list)
 }

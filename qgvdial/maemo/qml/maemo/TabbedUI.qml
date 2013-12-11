@@ -74,13 +74,15 @@ Rectangle {
         imgClose.state = "back";
     }
 
-    function showInboxDetails(imgSource, name, number, note, smsText, phType, cId, iId) {
+    function showInboxDetails(imgSource, name, number, note, smsText, phType,
+                              isVmail, cId, iId) {
         inboxDetails.imageSource = imgSource;
         inboxDetails.name        = name;
         inboxDetails.number      = number;
         inboxDetails.note        = note;
         inboxDetails.smsText     = smsText;
         inboxDetails.phType      = phType;
+        inboxDetails.isVmail     = isVmail;
         inboxDetails.cId         = cId;
         inboxDetails.iId         = iId;
         inboxDetails.visible = true;

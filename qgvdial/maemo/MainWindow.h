@@ -54,8 +54,16 @@ protected slots:
     void onUserSmsTextDone(bool ok);
     void onUserReplyToInboxEntry(QString id);
 
+    void onOptContactsUpdateClicked(bool updateDb = true);
+    void onOptInboxUpdateClicked(bool updateDb = true);
+
+    void onEdContactsUpdateTextChanged();
+    void onEdInboxUpdateTextChanged();
+
 protected:
     QObject *getQMLObject(const char *pageName);
+    bool connectToChangeNotify(QObject *item, const QString &propName,
+                               QObject *receiver, const char *slotName);
 
     void uiUpdateProxySettings(const ProxyInfo &info);
     void uiRequestLoginDetails();
@@ -111,6 +119,10 @@ private:
     QObject *inboxDetails;
     QObject *smsPage;
     QObject *etCetera;
+    QObject *optContactsUpdate;
+    QObject *optInboxUpdate;
+    QObject *edContactsUpdateFreq;
+    QObject *edInboxUpdateFreq;
 };
 
 QApplication *

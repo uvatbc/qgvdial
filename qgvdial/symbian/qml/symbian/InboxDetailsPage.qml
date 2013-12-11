@@ -230,5 +230,5 @@ Page {
                 container.done(true);
             }
         }
-    }//ButtonRow
+    }//ButtonRow (Reply, Delete)
 }//Page

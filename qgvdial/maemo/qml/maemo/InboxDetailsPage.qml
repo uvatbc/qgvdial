@@ -30,133 +30,207 @@ Rectangle {
     signal deleteEntry(string iId)
     signal replySms(string iId)
 
+    signal play
+    signal pause
+    signal stop
+
+    // These fields are filled up by the JS function showInboxDetails
     property alias imageSource: contactImage.source
     property alias name:        contactName.text
     property alias number:      contactNumber.text
     property alias phType:      numberType.text
-    property alias note:        txtNotes.text
-    property alias smsText:     txtSms.text
+    property string note
+    property string smsText
+    property bool isVmail
     property string cId
     property string iId
+
+    // These fields are updated while playing the voicemail
+    property bool showPlayBtn: true
+    property bool fetchingEmail: true
+    property real vmailDuration
+    property real vmailPosition
 
     color: "black"
     visible: false
     opacity: visible ? 1 : 0
     Behavior on opacity { PropertyAnimation { duration: 250 } }
 
-    Column {
+    Flickable {
         anchors {
             top: parent.top
             left: parent.left
             bottom: btnRow.top
         }
-        spacing: 20
+        width: parent.width
 
-        Item {
+        contentWidth: width
+        contentHeight: mainColumn.height
+        clip: true
+
+        Column {
+            id: mainColumn
+
+            spacing: 10
             width: parent.width
-            height: 100
 
-            Row {
-                anchors.fill: parent
+            Item {
+                width: parent.width
+                height: 100
 
-                Image {
-                    id: contactImage
-                    fillMode: Image.PreserveAspectFit
-                    height: parent.height
-                    width: height
+                Row {
+                    anchors.fill: parent
+
+                    Image {
+                        id: contactImage
+                        fillMode: Image.PreserveAspectFit
+                        height: parent.height
+                        width: height
+                    }
+                    TextOneLine {
+                        id: contactName
+                        anchors.verticalCenter: parent.verticalCenter
+                        font.pixelSize: 40
+                        width: parent.width - contactImage.width - parent.spacing
+                        clip: true
+                        readOnly: true
+                        enableBorder: false
+                        color: "transparent"
+                    }
                 }
+
+                MouseArea {
+                    anchors.fill: parent
+                    onPressAndHold: {
+                        container.done(true);
+                        if (container.cId.length != 0) {
+                            container.sigOpenContact(container.cId);
+                        }
+                    }
+                }
+            }//contact image and title
+
+            Item {
+                width: parent.width
+                height: numberType.height
+
                 TextOneLine {
-                    id: contactName
-                    anchors.verticalCenter: parent.verticalCenter
-                    font.pixelSize: 40
-                    width: parent.width - contactImage.width - parent.spacing
-                    clip: true
+                    id: numberType
+                    font.pixelSize: 30
                     readOnly: true
                     enableBorder: false
                     color: "transparent"
+                    width: 170
+                    horizontalAlignment: Text.AlignLeft
+
+                    anchors {
+                        left: parent.left
+                        verticalCenter: parent.verticalCenter
+                    }
+                }//type: mobile/work/home
+
+                TextOneLine {
+                    id: contactNumber
+                    width: parent.width - numberType.width - 2
+                    font.pixelSize: 30
+                    horizontalAlignment: Text.AlignRight
+                    readOnly: true
+                    enableBorder: false
+                    color: "transparent"
+
+                    anchors {
+                        right: parent.right
+                        verticalCenter: parent.verticalCenter
+                    }
+                }//number
+
+                MouseArea {
+                    anchors.fill: parent
+                    onPressAndHold: {
+                        container.setNumberToDial(container.number);
+                        container.done(true);
+                    }
                 }
+            }//Item: type (mobile/work/home) and actual number
+
+            TextMultiLine {
+                id: txtNotes
+                width: parent.width
+                enableBorder: false
+                readOnly: true
+                wrapMode: Text.WordWrap
+                textFormat: Text.RichText
+
+                text: container.note
+                visible: (container.note.length != 0)
+            }//notes
+
+            TextMultiLine {
+                id: txtSms
+                width: parent.width
+                enableBorder: true
+                readOnly: true
+                wrapMode: Text.WordWrap
+                textFormat: Text.RichText
+
+                text: container.smsText
+                visible: (container.smsText.length != 0)
+
+                onHeightChanged: console.debug("h = " + height)
+            }//SMS text
+
+            ProgressBar {
+                id: vmailProgress
+                minimumValue: 0
+                maximumValue: vmailDuration
+                value: vmailPosition
+                width: parent.width * 7/10
+                visible: (container.isVmail && !container.fetchingEmail)
+                anchors.horizontalCenter: parent.horizontalCenter
             }
 
-            MouseArea {
-                anchors.fill: parent
-                onPressAndHold: {
-                    container.done(true);
-                    if (container.cId.length != 0) {
-                        container.sigOpenContact(container.cId);
+            Row {
+                spacing: 25
+                visible: vmailProgress.visible
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                Image {
+                    source: container.showPlayBtn ? "qrc:/button_black_play.png" : "qrc:/button_black_pause.png"
+                    height: 70
+                    width: height
+                    smooth: true
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            if (container.showPlayBtn) {
+                                container.play();
+                            } else {
+                                container.pause();
+                            }
+                        }
+                    }
+                }
+                Image {
+                    source: "qrc:/button_black_stop.png"
+                    height: 70
+                    width: height
+                    smooth: true
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: { container.stop(); }
                     }
                 }
             }
-        }
 
-        Item {
-            width: parent.width
-            height: numberType.height
-
-            TextOneLine {
-                id: numberType
-                font.pixelSize: 30
-                readOnly: true
-                enableBorder: false
-                color: "transparent"
-                width: 170
-                horizontalAlignment: Text.AlignLeft
-
-                anchors {
-                    left: parent.left
-                    verticalCenter: parent.verticalCenter
-                }
-            }//type: mobile/work/home
-
-            TextOneLine {
-                id: contactNumber
-                width: parent.width - numberType.width - 2
-                font.pixelSize: 30
-                horizontalAlignment: Text.AlignRight
-                readOnly: true
-                enableBorder: false
-                color: "transparent"
-
-                anchors {
-                    right: parent.right
-                    verticalCenter: parent.verticalCenter
-                }
-            }//number
-
-            MouseArea {
-                anchors.fill: parent
-                onPressAndHold: {
-                    container.setNumberToDial(container.number);
-                    container.done(true);
-                }
+            Text {
+                text: "Fetching email"
+                visible: (container.isVmail && container.fetchingEmail)
+                anchors.horizontalCenter: parent.horizontalCenter
             }
-        }//type and number
-
-        TextMultiLine {
-            id: txtNotes
-            width: parent.width
-            enableBorder: false
-            readOnly: true
-            wrapMode: Text.WordWrap
-            textFormat: Text.RichText
-
-            onTextChanged: {
-                visible = (text.length != 0);
-            }
-        }//notes
-
-        TextMultiLine {
-            id: txtSms
-            width: parent.width
-            enableBorder: false
-            readOnly: true
-            wrapMode: Text.WordWrap
-            textFormat: Text.RichText
-
-            onTextChanged: {
-                visible = (text.length != 0);
-            }
-        }//SMS text
-    }//Column
+        }//Column
+    }//Flickable
 
     Row {
         id: btnRow
