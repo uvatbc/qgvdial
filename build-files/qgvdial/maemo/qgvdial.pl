@@ -55,8 +55,8 @@ system($cmd);
 system("cd $basedir/qtc_packaging/debian_fremantle/ ; cp changelog compat control copyright README rules ../../debian/");
 
 # Reverse the order of these two lines for a complete build 
-$cmd = "cd $basedir && dpkg-buildpackage -rfakeroot";
 $cmd = "cd $basedir && dpkg-buildpackage -rfakeroot -sa -S -uc -us";
+$cmd = "cd $basedir && dpkg-buildpackage -rfakeroot";
 # Execute the rest of the build command
 system($cmd);
 
