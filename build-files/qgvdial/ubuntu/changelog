@@ -1,5 +1,5 @@
-qgvdial (0.3.1562) unstable; urgency=low
+qgvdial (0.4.1573) unstable; urgency=low
 
-  * Initial Release of qt-not-qml
+  * Initial 0.4 Release of qt-not-qml
 
  -- Yuvraaj <yuvraaj@gmail.com>  Thu, 12 Dec 2013 09:37:10 -0700
