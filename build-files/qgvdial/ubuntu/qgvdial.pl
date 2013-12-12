@@ -45,15 +45,24 @@ system($cmd);
 
 # Do everything upto the preparation of the debian directory. Code is still not compiled.
 $cmd = "mv $basedir/qgvdial/qt-not-qml $basedir/qgvdial/qgvdial-$qver";
+print "$cmd\n";
+system($cmd);
 $cmd = "cd $basedir/qgvdial/qgvdial-$qver && echo y | dh_make --createorig --single -e yuvraaj\@gmail.com -c lgpl";
 print "$cmd\n";
 system($cmd);
 
 # Put all the debianization files into the debian folder
-system("cd $basedir/build-files/qgvdial/ubuntu ; mv postinst prerm control rules changelog $basedir/qgvdial/qgvdial-$qver/debian/");
+$cmd = "cd $basedir/build-files/qgvdial/ubuntu ; mv postinst prerm control rules changelog $basedir/qgvdial/qgvdial-$qver/debian/";
+print "$cmd\n";
+system("$cmd");
 
 # Built it all!
 $cmd = "cd $basedir/qgvdial/qgvdial-$qver && dpkg-buildpackage -rfakeroot -nc -uc -us";
+print "$cmd\n";
+system($cmd);
+
+$cmd = "cp $basedir/qgvdial/qgvdial*deb .";
+print "$cmd\n";
 system($cmd);
 
 exit(0);
