@@ -30,10 +30,9 @@ $basedir = "$basedir/qgvdial-$qver";
 system("rm -rf qgvdial-* qgvtp-* qgvdial_* qgvtp_*");
 
 system("svn export $repo $basedir");
-system("cp $basedir/icons/64/qgvdial.png $basedir/src/qgvdial.png");
 
 # Append the version to the pro file
-open(PRO_FILE, ">>$basedir/src/src.pro") || die "Cannot open pro file";
+open(PRO_FILE, ">>$basedir/qgvdial/maemo/maemo.pro") || die "Cannot open pro file";
 print PRO_FILE "VERSION=__QGVDIAL_VERSION__\n";
 close PRO_FILE;
 
@@ -42,19 +41,18 @@ $cmd = "perl $basedir/build-files/version.pl __QGVDIAL_VERSION__ $qver $basedir"
 print "$cmd\n";
 system($cmd);
 
-# Copy the correct pro file
-system("cp $basedir/build-files/qgvdial/maemo/pro.qgvdial $basedir/qgvdial.pro");
-
 # Do everything upto the preparation of the debian directory. Code is still not compiled.
-$cmd = "cd $basedir && echo y | dh_make --createorig --single -e yuvraaj\@gmail.com -c lgpl";
+$cmd = "cd $basedir/qgvdial ; mv maemo qgvdial-$qver";
+print "$cmd\n";
+system($cmd);
+
+$basedir = "$basedir/qgvdial/qgvdial-$qver";
+$cmd = "cd $basedir && echo y | dh_make -n --createorig --single -e yuvraaj\@gmail.com -c lgpl2";
 print "$cmd\n";
 system($cmd);
 
 # Put all the debianization files into the debian folder
-system("cd $basedir/build-files/qgvdial/maemo ; mv compat postinst prerm control rules $basedir/debian/");
-
-# Fix the changelog and put it into the correct location
-system("head -1 $basedir/debian/changelog >dest.txt && cat $basedir/build-files/qgvdial/changelog >>dest.txt && tail -2 $basedir/debian/changelog | sed 's/unknown/Yuvraaj Kelkar/g' >>dest.txt && mv dest.txt $basedir/debian/changelog");
+system("cd $basedir/qtc_packaging/debian_fremantle/ ; cp changelog compat control copyright README rules ../../debian/");
 
 # Reverse the order of these two lines for a complete build 
 $cmd = "cd $basedir && dpkg-buildpackage -rfakeroot";

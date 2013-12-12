@@ -37,6 +37,10 @@ Contact: yuvraaj@gmail.com
 #error Must define the unknown contact QRC path
 #endif
 
+#if !defined(USE_SINGLE_APPLICATION) || !USE_SINGLE_APPLICATION
+#error Maemo target MUST be a single application.
+#endif
+
 QApplication *
 createAppObject(int &argc, char **argv)
 {
@@ -83,6 +87,7 @@ MainWindow::MainWindow(QObject *parent)
 , edInboxUpdateFreq(NULL)
 , m_inboxDetailsShown(false)
 {
+    ((QtSingleApplication*)qApp)->setActivationWindow(m_view);
 }//MainWindow::MainWindow
 
 void
@@ -99,6 +104,9 @@ MainWindow::init()
     m_view->setMainQmlFile(QLatin1String("qml/maemo/main.qml"));
     m_view->showExpanded();
     m_view->showFullScreen ();
+
+    rv = connect(qApp, SIGNAL(messageReceived(QString)),
+                 this, SLOT(messageReceived(QString)));
 }//MainWindow::init
 
 MainWindow::~MainWindow()
@@ -370,6 +378,18 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
     } while(0);
     exit(-1);
 }//MainWindow::declStatusChanged
+
+void
+MainWindow::messageReceived(const QString &msg)
+{
+    if (msg == "show") {
+        Q_DEBUG ("Second instance asked us to show");
+        m_view->show ();
+    } else if (msg == "quit") {
+        Q_DEBUG ("Second instance asked us to quit");
+        qApp->quit ();
+    }
+}//MainWindow::messageReceived
 
 void
 MainWindow::showStatusMessage(QString msg, quint64 timeout)

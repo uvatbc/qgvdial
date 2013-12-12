@@ -53,7 +53,7 @@ install: build
 	dh_clean -k 
 	dh_installdirs
 	# Add here commands to install the package into debian/qgvdial.
-	$(MAKE) DESTDIR=$(CURDIR)/debian/qgvdial install
+	$(MAKE) DESTDIR=$(CURDIR)/debian/qgvdial INSTALL_ROOT=$(CURDIR)/debian/qgvdial install
 
 
 # Build architecture-independent files here.

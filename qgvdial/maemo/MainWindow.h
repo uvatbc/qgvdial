@@ -40,8 +40,10 @@ public:
 
 protected slots:
     void declStatusChanged(QDeclarativeView::Status status);
-    void onLoginButtonClicked();
+    void messageReceived(const QString &msg);
     void showStatusMessage(QString msg, quint64 timeout);
+
+    void onLoginButtonClicked();
 
     void onSigProxyChanges(bool enable, bool useSystemProxy, QString server,
                            int port, bool authRequired, QString user,

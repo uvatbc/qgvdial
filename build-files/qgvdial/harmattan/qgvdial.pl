@@ -53,7 +53,7 @@ print "$cmd\n";
 system($cmd);
 
 # Put all the debianization files into the debian folder
-system("cd $basedir && cd ./qtc_packaging/debian_harmattan/ ; cp changelog compat control copyright qgvdial.aegis README rules ../../debian/");
+system("cd $basedir/qtc_packaging/debian_harmattan/ ; cp changelog compat control copyright qgvdial.aegis README rules ../../debian/");
 # Speed up the make
 system("cd $basedir ; pushd ../features/dbus_api/gen/ ; ./create_ifaces.sh  ; popd ; qmake ; make -j4");
 system("cd $basedir ; dpkg-buildpackage -rfakeroot -nc -b -us -uc");
