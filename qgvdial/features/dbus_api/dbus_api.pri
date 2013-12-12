@@ -10,8 +10,10 @@ SOURCES  += $$PWD/gen/api_adapter.cpp \
 dbus_services.source = $$PWD/service_files/qgvdial.Call.service \
                        $$PWD/service_files/qgvdial.Text.service \
                        $$PWD/service_files/qgvdial.UI.service
-maemo5 {
+
+# Since we're using the QT auto-deployment feature (that always attempts to optify EVERYTHING),
+# this path munging is required whether it is Maemo, Harmattan or Ubuntu
 dbus_services.target = ../../usr/share/dbus-1/services
-}
+
 DEPLOYMENTFOLDERS += dbus_services
 
