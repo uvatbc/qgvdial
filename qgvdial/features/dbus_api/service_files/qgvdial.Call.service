@@ -1,3 +1,0 @@
-[D-BUS Service]
-Name=org.QGVDial.CallServer
-Exec=/opt/qgvdial/bin/qgvdial

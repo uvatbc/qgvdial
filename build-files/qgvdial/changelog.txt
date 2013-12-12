@@ -1,0 +1,5 @@
+qgvdial (__QGVDIAL_VERSION__) unstable; urgency=low
+
+  * Initial Release of 0.4 rewrite.
+
+ -- Yuvraaj <yuvraaj@gmail.com>  __CHANGELOG_DATETIME__ -0700

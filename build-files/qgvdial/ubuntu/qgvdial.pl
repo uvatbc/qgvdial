@@ -1,3 +1,9 @@
+#!/usr/bin/perl
+
+use DateTime;
+my $dt = DateTime->now;
+my $dtstr = sprintf("%s, %d %s %d %s", $dt->day_abbr(), $dt->day(), $dt->month_abbr(), $dt->year(), $dt->hms());
+
 my $repo = "https://qgvdial.googlecode.com/svn/trunk";
 my $cmd;
 
@@ -43,6 +49,11 @@ $cmd = "perl $basedir/build-files/version.pl __QGVDIAL_VERSION__ $qver $basedir"
 print "$cmd\n";
 system($cmd);
 
+# Date replacement
+$cmd = "perl $basedir/build-files/version.pl __CHANGELOG_DATETIME__ $dtstr $basedir";
+print "$cmd\n";
+system($cmd);
+
 # Do everything upto the preparation of the debian directory. Code is still not compiled.
 $cmd = "mv $basedir/qgvdial/qt-not-qml $basedir/qgvdial/qgvdial-$qver";
 print "$cmd\n";
@@ -53,6 +64,9 @@ system($cmd);
 
 # Put all the debianization files into the debian folder
 $cmd = "cd $basedir/build-files/qgvdial/ubuntu ; mv postinst prerm control rules changelog $basedir/qgvdial/qgvdial-$qver/debian/";
+print "$cmd\n";
+system("$cmd");
+$cmd = "cd $basedir/build-files/qgvdial ; cp changelog.txt $basedir/qgvdial/qgvdial-$qver/debian/changelog";
 print "$cmd\n";
 system("$cmd");
 
