@@ -1,8 +1,9 @@
 #!/usr/bin/perl
 
-use DateTime;
-my $dt = DateTime->now;
-my $dtstr = sprintf("%s, %d %s %d %s", $dt->day_abbr(), $dt->day(), $dt->month_abbr(), $dt->year(), $dt->hms());
+my @months = qw( Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec );
+my @days = qw(Sun Mon Tue Wed Thu Fri Sat Sun);
+($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime();
+my $dtstr = sprintf("%s, %d %s %d %02d:%02d:%02d", $days[$wday], $mday, $months[$mon], $year+1900, $hour, $min, $sec);
 
 my $repo = "https://qgvdial.googlecode.com/svn/trunk";
 my $cmd;
@@ -44,12 +45,12 @@ print PRO_FILE "VERSION=__QGVDIAL_VERSION__\n";
 close PRO_FILE;
 
 # Version replacement
-$cmd = "perl $basedir/build-files/version.pl __QGVDIAL_VERSION__ $qver $basedir";
+$cmd = "perl version.pl __QGVDIAL_VERSION__ $qver $basedir";
 print "$cmd\n";
 system($cmd);
 
 # Date replacement
-$cmd = "perl $basedir/build-files/version.pl __CHANGELOG_DATETIME__ $dtstr $basedir";
+$cmd = "perl version.pl __CHANGELOG_DATETIME__ '$dtstr' $basedir";
 print "$cmd\n";
 system($cmd);
 
@@ -65,7 +66,7 @@ system($cmd);
 
 # Put all the debianization files into the debian folder
 system("cd $basedir/qtc_packaging/debian_harmattan/ ; cp compat control copyright qgvdial.aegis README rules ../../debian/");
-system("cd $basedir/debian ; cp ../../build-files/qgvdial/changelog.txt changelog");
+system("cd $basedir/debian ; cp ../../../build-files/qgvdial/changelog.txt changelog");
 
 # Speed up the make
 system("cd $basedir ; pushd ../features/dbus_api/gen/ ; ./create_ifaces.sh  ; popd ; qmake ; make -j4");

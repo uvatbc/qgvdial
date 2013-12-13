@@ -97,7 +97,7 @@ sub action_on_entry
         {
             print "Working on $file\n";
             my $subst = "s/$srcsubst/$qver/g";
-            system("perl -pi.bak -l -e $subst $file");
+            system("perl -pi.bak -l -e '$subst' $file");
             unlink("$file.bak");
         }
     }
