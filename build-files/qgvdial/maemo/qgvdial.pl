@@ -62,9 +62,12 @@ system($cmd);
 system("cd $basedir/qgvdial/maemo/qtc_packaging/debian_fremantle/ ; cp compat control copyright README rules ../../../../debian/");
 system("cd $basedir/debian ; cp ../build-files/qgvdial/changelog.txt changelog");
 
+# Copy the top level pro file
+system("cp $basedir/build-files/qgvdial/maemo/maemo.pro $basedir");
+
 # Reverse the order of these two lines for a complete build 
-$cmd = "cd $basedir && dpkg-buildpackage -rfakeroot -sa -S -uc -us";
 $cmd = "cd $basedir && dpkg-buildpackage -rfakeroot";
+$cmd = "cd $basedir && dpkg-buildpackage -rfakeroot -sa -S -uc -us";
 # Execute the rest of the build command
 system($cmd);
 
