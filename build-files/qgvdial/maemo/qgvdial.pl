@@ -53,6 +53,11 @@ $cmd = "perl version.pl __CHANGELOG_DATETIME__ '$dtstr' $basedir";
 print "$cmd\n";
 system($cmd);
 
+# Cipher replacement
+$cmd = "perl version.pl __THIS_IS_MY_EXTREMELY_LONG_KEY_ '`cat qgvdial_cipher_key`' $basedir";
+print "$cmd\n";
+system($cmd);
+
 # Do everything upto the preparation of the debian directory. Code is still not compiled.
 $cmd = "cd $basedir && echo y | dh_make -n --createorig --single -e yuvraaj\@gmail.com -c lgpl2";
 print "$cmd\n";

@@ -52,17 +52,25 @@ open(PRO_FILE, ">>qgvdial-$qver/qgvdial/symbian/symbian.pro") || die "Cannot ope
 print PRO_FILE "VERSION=__QGVDIAL_VERSION__\n";
 close PRO_FILE;
 
-# Version changes
+# Version replacement
 $cmd = "cd qgvdial-$qver & perl ./build-files/version.pl __QGVDIAL_VERSION__ $qver";
 print("$cmd\n");
 system($cmd);
+
+# Cipher replacement
+open my $qgvcipfile, '<', "../qgvdial_cipher_key";
+my $cipher = <$qgvcipfile>;
+close $qgvcipfile;
+$cmd = "perl version.pl __THIS_IS_MY_EXTREMELY_LONG_KEY_ '$cipher' qgvdial-$qver";
+print "$cmd\n";
+#system($cmd);
 
 # Mosquitto is merged straight into the build
 $cmd = "cd qgvdial-$qver/qgvdial/symbian & prep_s3.bat";
 print "$cmd\n";
 system($cmd);
 
-# Symbian 3 (to including Belle)  should not have qt-components
+# Symbian 3 (to including Belle) should not have qt-components
 $cmd = "cd qgvdial-$qver/src & echo something>no-qt-components";
 print "$cmd\n";
 system($cmd);

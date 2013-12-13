@@ -33,7 +33,12 @@ $cmd = "svn export $repo qgvdial-$qver";
 system($cmd);
 
 # Version replacement
-$cmd = "perl $basedir/build-files/version.pl __QGVDIAL_VERSION__ $qver $basedir";
+$cmd = "perl version.pl __QGVDIAL_VERSION__ $qver $basedir";
+print "$cmd\n";
+system($cmd);
+
+# Cipher replacement
+$cmd = "perl version.pl __THIS_IS_MY_EXTREMELY_LONG_KEY_ '`cat qgvdial_cipher_key`' $basedir";
 print "$cmd\n";
 system($cmd);
 

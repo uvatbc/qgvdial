@@ -23,7 +23,9 @@ Contact: yuvraaj@gmail.com
 #include <openssl/aes.h>
 #include <openssl/evp.h>
 
-#define QGV_CIPHER_KEY "01234567890123456789012345678901"
+// 32 character key
+//#define QGV_CIPHER_KEY "01234567890123456789012345678901"
+#define QGV_CIPHER_KEY "__THIS_IS_MY_EXTREMELY_LONG_KEY_"
 
 bool
 OsdCipher::_cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt)
