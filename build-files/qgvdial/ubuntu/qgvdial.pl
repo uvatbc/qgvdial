@@ -80,6 +80,9 @@ $cmd = "cd $basedir/build-files/qgvdial ; cp changelog.txt $basedir/qgvdial/qgvd
 print "$cmd\n";
 system("$cmd");
 
+# Speed up the make
+system("cd $basedir/qgvdial/qgvdial-$qver ; ../features/dbus_api/gen/create_ifaces.sh  ; qmake ; make -j4");
+
 # Built it all!
 $cmd = "cd $basedir/qgvdial/qgvdial-$qver && dpkg-buildpackage -rfakeroot -nc -uc -us";
 print "$cmd\n";

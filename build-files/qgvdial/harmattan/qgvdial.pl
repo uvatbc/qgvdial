@@ -78,7 +78,9 @@ system("cd $basedir/qtc_packaging/debian_harmattan/ ; cp compat control copyrigh
 system("cd $basedir/debian ; cp ../../../build-files/qgvdial/changelog.txt changelog");
 
 # Speed up the make
-system("cd $basedir ; pushd ../features/dbus_api/gen/ ; ./create_ifaces.sh  ; popd ; qmake ; make -j4");
+system("cd $basedir ; ../features/dbus_api/gen/create_ifaces.sh  ; qmake ; make -j4");
+
+# Built it all!
 system("cd $basedir ; dpkg-buildpackage -rfakeroot -nc -b -us -uc");
 system("cd $basedir ; cp ../qgvdial*deb ../../..");
 
