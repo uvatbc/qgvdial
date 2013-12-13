@@ -58,7 +58,7 @@ print("$cmd\n");
 system($cmd);
 
 # Cipher replacement
-open my $qgvcipfile, '<', "../qgvdial_cipher_key";
+open my $qgvcipfile, '<', "../cipher_qgvdial";
 my $cipher = <$qgvcipfile>;
 close $qgvcipfile;
 $cmd = "perl version.pl __THIS_IS_MY_EXTREMELY_LONG_KEY_ '$cipher' qgvdial-$qver";

@@ -106,7 +106,9 @@ protected:
 // Inbox and contacts refresh period
 //#define GV_SETTINGS_VER     "2012-09-20 00:09:51"
 // Brand new qgvdial
-#define GV_SETTINGS_VER     "2013-07-26 08:53:58"
+//#define GV_SETTINGS_VER     "2013-07-26 08:53:58"
+// OSDCipher change
+#define GV_SETTINGS_VER     "2013-12-13 00:55:52"
 ////////////////////////////// GV Contacts table ///////////////////////////////
 #define GV_CONTACTS_TABLE   "gvcontacts"
 #define GV_C_ID             "id"
