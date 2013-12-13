@@ -25,7 +25,7 @@ configure-stamp:
 	dh_testdir
 	# Add here commands to configure the package.
 	for i in `find . | grep Makefile` ; do echo $$i ; rm $$i; done
-	pushd ../features/dbus_api/gen/ ; ./create_ifaces.sh ; popd
+	./qgvdial/features/dbus_api/gen/create_ifaces.sh
 	qmake
 	touch configure-stamp
 
