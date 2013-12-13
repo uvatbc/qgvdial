@@ -16,8 +16,7 @@ if ($startdir eq undef) {
 
 print("$srcsubst = $qver in dir $startdir\n");
 
-if (list_dir($startdir) == 0)
-{
+if (list_dir($startdir) == 0) {
     print $error_str;
 }
 
@@ -95,9 +94,10 @@ sub action_on_entry
         $_ = $file;
         if ( (m/.cpp$/i) || (m/.c$/i) || (m/.h$/i) || (m/.rc$/i) || (m/.iss$/i) || (m/.txt$/i) || (m/.desktop$/i) || (m/.qml$/i) || (m/.wxs$/i) || (m/.pro$/i) || (m/.desktop$/i) || (m/.xml$/i) )
         {
-            print "Working on $file\n";
             my $subst = "s/$srcsubst/$qver/g";
-            system("perl -pi.bak -l -e '$subst' $file");
+            my $cmd = "perl -pi.bak -l -e \"$subst\" $file"
+            print("$cmd\n");
+            system($cmd);
             unlink("$file.bak");
         }
     }

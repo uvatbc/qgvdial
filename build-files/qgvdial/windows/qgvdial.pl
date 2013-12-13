@@ -3,10 +3,8 @@ my $wixbase='C:/Program Files (x86)/Windows Installer XML v3/bin';
 my $cmd;
 my $line;
 
-# Delete any existing version file
-if (-f ver.cfg) { unlink(ver.cfg); }
 # Get the latest version file from the repository
-system("svn export $repo/build-files/ver.cfg");
+system("del ver.cfg & svn export $repo/build-files/ver.cfg");
 
 # Pull out the version from the file
 open(QVARFILE, "ver.cfg") or die;
@@ -40,11 +38,11 @@ close PRO_FILE;
 system("cd qgvdial-$qver & perl build-files/version.pl __QGVDIAL_VERSION__ $qver");
 
 # Cipher replacement
-open my $qgvcipfile, '<', "../qgvdial_cipher_key";
+open my $qgvcipfile, '<', "../cipher_qgvdial";
 my $cipher = <$qgvcipfile>;
 close $qgvcipfile;
 chomp $cipher;
-$cmd = "perl version.pl __THIS_IS_MY_EXTREMELY_LONG_KEY_ '$cipher' qgvdial-$qver";
+$cmd = "perl version.pl __THIS_IS_MY_EXTREMELY_LONG_KEY_ \"$cipher\" qgvdial-$qver";
 print "$cmd\n";
 #system($cmd);
 

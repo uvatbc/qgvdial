@@ -14,12 +14,8 @@ if ((!(-e $dest)) or (!(-d $dest))) {
     system($cmd);
 }
 
-# Delete any existing version file
-if (-f ver.cfg) {
-    unlink(ver.cfg);
-}
 # Get the latest version file from the repository
-$cmd = "svn export $repo/build-files/ver.cfg";
+$cmd = "del ver.cfg & svn export $repo/build-files/ver.cfg";
 system($cmd);
 
 # Pull out the version from the file
@@ -62,7 +58,7 @@ open my $qgvcipfile, '<', "../cipher_qgvdial";
 my $cipher = <$qgvcipfile>;
 close $qgvcipfile;
 chomp $cipher;
-$cmd = "perl version.pl __THIS_IS_MY_EXTREMELY_LONG_KEY_ '$cipher' qgvdial-$qver";
+$cmd = "perl version.pl __THIS_IS_MY_EXTREMELY_LONG_KEY_ \"$cipher\" qgvdial-$qver";
 print "$cmd\n";
 #system($cmd);
 
