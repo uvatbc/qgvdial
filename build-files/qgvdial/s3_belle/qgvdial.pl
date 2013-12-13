@@ -61,6 +61,7 @@ system($cmd);
 open my $qgvcipfile, '<', "../cipher_qgvdial";
 my $cipher = <$qgvcipfile>;
 close $qgvcipfile;
+chomp $cipher;
 $cmd = "perl version.pl __THIS_IS_MY_EXTREMELY_LONG_KEY_ '$cipher' qgvdial-$qver";
 print "$cmd\n";
 #system($cmd);
