@@ -115,26 +115,26 @@ PageStackWindow {
     TfaPinPage {
         id: tfaPinDlg
         objectName: "TFAPinDialog"
-        onDone: appWindow.pageStack.pop();
+        onDone: { appWindow.pageStack.pop(); }
     }//TFA Dialog
 
     AppPwPage {
         id: appPwDlg
         objectName: "AppPwDialog"
-        onDone: appWindow.pageStack.pop();
+        onDone: { appWindow.pageStack.pop(); }
     }
 
     RegNumberSelector {
         id: regNumberSelector
         objectName: "RegNumberSelector"
 
-        onSelected: appWindow.pageStack.pop();
+        onSelected: { appWindow.pageStack.pop(); }
     }
 
     ContactDetailsPage {
         id: contactDetails
         tools: commonTools
-        onDone: appWindow.pageStack.pop();
+        onDone: { appWindow.pageStack.pop(); }
         onSetNumberToDial: {
             dialTab.setNumberInDisp(number);
             tabgroup.setTab(0);
@@ -145,7 +145,7 @@ PageStackWindow {
         id: inboxDetails
         objectName: "InboxDetails"
 
-        onDone: appWindow.pageStack.pop();
+        onDone: { appWindow.pageStack.pop(); }
         onSetNumberToDial: {
             dialTab.setNumberInDisp(number);
             tabgroup.setTab(0);
@@ -156,7 +156,7 @@ PageStackWindow {
 
     MessageBox {
         id: msgBox
-        onDone: appWindow.pageStack.pop();
+        onDone: { appWindow.pageStack.pop(); }
     }
 
     InfoBanner {
@@ -167,13 +167,13 @@ PageStackWindow {
     CiPhoneSelectionPage {
         id: ciPhoneSelector
         objectName: "CiPhoneSelectionPage"
-        onDone: appWindow.pageStack.pop();
+        onDone: { appWindow.pageStack.pop(); }
     }
 
     SmsPage {
         id: smsPage
         objectName: "SmsPage"
-        onDone: appWindow.pageStack.pop();
+        onDone: { appWindow.pageStack.pop(); }
     }
 
     StatusBanner {

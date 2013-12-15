@@ -23,5 +23,134 @@ import QtQuick 1.1
 import com.nokia.symbian 1.1
 
 Page {
-    tools: commonTools
+    id: container
+    tools: mainTools
+
+    signal regNumBtnClicked
+
+    anchors {
+        top: parent.top
+        left: parent.left
+        right: parent.right
+    }
+
+    TabGroup {
+        id: tabgroup
+        objectName: "MainTabGroup"
+        currentTab: dialTab
+
+        anchors.fill: parent
+
+        function setTab(index) {
+            if (0 === index) {
+                currentTab = dialTab;
+            } else if (1 === index) {
+                currentTab = contactsTab;
+            } else if (2 === index) {
+                currentTab = inboxTab;
+            } else if (3 === index) {
+                currentTab = settingsTab;
+            }
+        }
+
+        DialPage {
+            id: dialTab
+            objectName: "DialPage"
+            tools: container.tools
+            onRegNumBtnClicked: { container.regNumBtnClicked(); }
+        }
+        ContactsPage {
+            id: contactsTab
+            objectName: "ContactsPage"
+            tools: container.tools
+        }
+        InboxPage {
+            id: inboxTab
+            tools: container.tools
+
+            onSetNumberToDial: {
+                dialTab.setNumberInDisp(number);
+                tabgroup.setTab(0);
+            }
+        }
+        SettingsPage {
+            id: settingsTab
+            tools: container.tools
+        }
+    }//TabGroup
+
+    ToolBar {
+        id: mainTools
+
+        anchors.bottom: parent.bottom
+        visible: true
+
+        tools: ToolBarLayout {
+            ToolButton {
+                iconSource: "toolbar-back";
+                onClicked: {
+                    if (appWindow.pageStack.depth > 1) {
+                        appWindow.popPageStack();
+                        if (appWindow._inboxDetailsShown) {
+                            appWindow._inboxDetailsShown = false;
+                            inboxDetails.done(false);
+                        }
+                    } else {
+                        console.debug("Quit!");
+                    }
+                }
+            }
+
+            ButtonRow {
+                TabButton {
+                    iconSource: "qrc:/dialpad.svg"
+                    tab: dialTab
+                }
+                TabButton {
+                    iconSource: "qrc:/people.svg"
+                    tab: contactsTab
+                }
+                TabButton {
+                    iconSource: "qrc:/history.svg"
+                    tab: inboxTab
+                }
+                TabButton {
+                    iconSource: "qrc:/settings.svg"
+                    tab: settingsTab
+                }
+            }
+            ToolButton {
+                iconSource: "toolbar-view-menu"
+                anchors.right: (parent === undefined) ? undefined : parent.right
+                onClicked: (myMenu.status === DialogStatus.Closed) ? myMenu.open() : myMenu.close()
+            }
+        }//ToolBarLayout
+    }//ToolBar
+
+    Menu {
+        id: myMenu
+        visualParent: container
+        MenuLayout {
+            MenuItem {
+                text: qsTr("Refresh")
+                onClicked: {
+                    if (tabgroup.currentTab === contactsTab) {
+                        appWindow.sigRefreshContacts();
+                    } else if (tabgroup.currentTab === inboxTab) {
+                        appWindow.sigRefreshInbox();
+                    }
+                }
+            }
+            MenuItem {
+                text: qsTr("Full refresh")
+                onClicked: {
+                    if (tabgroup.currentTab === contactsTab) {
+                        appWindow.sigRefreshContactsFull();
+                    } else if (tabgroup.currentTab === inboxTab) {
+                        appWindow.sigRefreshInboxFull();
+                    }
+                }
+            }
+        }
+    }//Menu
 }

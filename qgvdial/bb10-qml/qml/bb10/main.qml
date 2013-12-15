@@ -113,47 +113,23 @@ PageStackWindow {
         }
     }
 
-    Menu {
-        id: myMenu
-        visualParent: appWindow
-        MenuLayout {
-            MenuItem {
-                text: qsTr("Refresh")
-                onClicked: {
-                    if (tabgroup.currentTab === contactsTab) {
-                        appWindow.sigRefreshContacts();
-                    } else if (tabgroup.currentTab === inboxTab) {
-                        appWindow.sigRefreshInbox();
-                    }
-                }
-            }
-            MenuItem {
-                text: qsTr("Full refresh")
-                onClicked: {
-                    if (tabgroup.currentTab === contactsTab) {
-                        appWindow.sigRefreshContactsFull();
-                    } else if (tabgroup.currentTab === inboxTab) {
-                        appWindow.sigRefreshInboxFull();
-                    }
-                }
-            }
-        }
-    }//Menu
-
     TfaPinPage {
         id: tfaPinDlg
+        tools: commonTools
         objectName: "TFAPinDialog"
         onDone: { appWindow.popPageStack(); }
     }//TFA Dialog
 
     AppPwPage {
         id: appPwDlg
+        tools: commonTools
         objectName: "AppPwDialog"
         onDone: { appWindow.popPageStack(); }
     }
 
     RegNumberSelector {
         id: regNumberSelector
+        tools: commonTools
         objectName: "RegNumberSelector"
 
         onSelected: { appWindow.popPageStack(); }
@@ -172,6 +148,7 @@ PageStackWindow {
 
     InboxDetailsPage {
         id: inboxDetails
+        tools: commonTools
         objectName: "InboxDetails"
 
         onDone: { appWindow.popPageStack(); }
@@ -185,6 +162,7 @@ PageStackWindow {
 
     MessageBox {
         id: msgBox
+        tools: commonTools
         onDone: { appWindow.popPageStack(); }
     }
 
@@ -195,12 +173,14 @@ PageStackWindow {
 
     CiPhoneSelectionPage {
         id: ciPhoneSelector
+        tools: commonTools
         objectName: "CiPhoneSelectionPage"
         onDone: { appWindow.popPageStack(); }
     }
 
     SmsPage {
         id: smsPage
+        tools: commonTools
         objectName: "SmsPage"
         onDone: { appWindow.popPageStack(); }
     }
@@ -215,60 +195,10 @@ PageStackWindow {
         }
     }
 
-    Page {
+    MainPage {
         id: mainPage
-        tools: commonTools
-
-        anchors {
-            top: parent.top
-            left: parent.left
-            right: parent.right
-        }
-
-        TabGroup {
-            id: tabgroup
-            objectName: "MainTabGroup"
-            currentTab: dialTab
-
-            anchors.fill: parent
-
-            function setTab(index) {
-                if (0 === index) {
-                    currentTab = dialTab;
-                } else if (1 === index) {
-                    currentTab = contactsTab;
-                } else if (2 === index) {
-                    currentTab = inboxTab;
-                } else if (3 === index) {
-                    currentTab = settingsTab;
-                }
-            }
-
-            DialPage {
-                id: dialTab
-                objectName: "DialPage"
-                tools: commonTools
-                onRegNumBtnClicked: { appWindow.pageStack.push(regNumberSelector); }
-            }
-            ContactsPage {
-                id: contactsTab
-                objectName: "ContactsPage"
-                tools: commonTools
-            }
-            InboxPage {
-                id: inboxTab
-                tools: commonTools
-
-                onSetNumberToDial: {
-                    dialTab.setNumberInDisp(number);
-                    tabgroup.setTab(0);
-                }
-            }
-            SettingsPage {
-                id: settingsTab
-                tools: commonTools
-            }
-        }//TabGroup
+        // Has its own tools.
+        onRegNumBtnClicked: { appWindow.pageStack.push(regNumberSelector); }
     }
 
     ToolBar {
@@ -292,30 +222,6 @@ PageStackWindow {
                     }
                 }
             }
-
-            ButtonRow {
-                TabButton {
-                    iconSource: "qrc:/dialpad.svg"
-                    tab: dialTab
-                }
-                TabButton {
-                    iconSource: "qrc:/people.svg"
-                    tab: contactsTab
-                }
-                TabButton {
-                    iconSource: "qrc:/history.svg"
-                    tab: inboxTab
-                }
-                TabButton {
-                    iconSource: "qrc:/settings.svg"
-                    tab: settingsTab
-                }
-            }
-            ToolButton {
-                iconSource: "toolbar-view-menu"
-                anchors.right: (parent === undefined) ? undefined : parent.right
-                onClicked: (myMenu.status === DialogStatus.Closed) ? myMenu.open() : myMenu.close()
-            }
         }//ToolBarLayout
-    }
+    }//ToolBar (commonTools)
 }

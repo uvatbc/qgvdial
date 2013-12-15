@@ -23,7 +23,7 @@ Contact: yuvraaj@gmail.com
 #include "IMainWindow.h"
 #include "InboxModel.h"
 
-#define REFRESH_TIMEOUT (5 * 1000)  // 5 seconds
+#define REFRESH_TIMEOUT (1 * 1000)  // 1 seconds
 
 LibInbox::LibInbox(IMainWindow *parent)
 : QObject(parent)
