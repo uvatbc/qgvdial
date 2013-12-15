@@ -48,6 +48,11 @@ Item {
             id: lblEmail
             text: "Email:"
             anchors.verticalCenter: parent.verticalCenter
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: { container.forceActiveFocus(); }
+            }
         }//Label ("Email:")
 
         TextField {
@@ -65,6 +70,11 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             opacity: (1 - textUsername.opacity)
             text: container.username
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: { container.forceActiveFocus(); }
+            }
         }//Label (username)
     }//Row (username)
 
@@ -88,6 +98,11 @@ Item {
             id: lblPass
             text: "Password:"
             anchors.verticalCenter: parent.verticalCenter
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: { container.forceActiveFocus(); }
+            }
         }//Label ("Password:")
 
         TextField {
@@ -105,6 +120,11 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             opacity: (1 - textPassword.opacity)
             text: Array(container.password.length+1).join("*")
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: { container.forceActiveFocus(); }
+            }
         }//Label (password)
     }//Row (password)
 
@@ -117,7 +137,10 @@ Item {
             top: rowPass.bottom
             topMargin: 2
         }
+        width: container.width / 3
 
         text: "Login"
+
+        onClicked: { container.forceActiveFocus(); }
     }//Button (login/logout)
 }//Item (container)

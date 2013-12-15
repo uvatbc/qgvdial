@@ -37,14 +37,14 @@ PageStackWindow {
     signal sigRefreshInboxFull
 
     function pushTfaDlg() {
-        pageStack.push(tfaPinDlg);
+        appWindow.pageStack.push(tfaPinDlg);
     }
     function pushAppPwDlg() {
-        pageStack.push(appPwDlg);
+        appWindow.pageStack.push(appPwDlg);
     }
     function showMsgBox(msg) {
         msgBox.message = msg;
-        pageStack.push(msgBox);
+        appWindow.pageStack.push(msgBox);
     }
     function showContactDetails(imgSource, name) {
         contactDetails.imageSource = imgSource;
@@ -52,7 +52,7 @@ PageStackWindow {
         if (contactDetails.phonesModel == null) {
             contactDetails.phonesModel = g_ContactPhonesModel;
         }
-        pageStack.push(contactDetails);
+        appWindow.pageStack.push(contactDetails);
     }
     function showInboxDetails(imgSource, name, number, note, smsText, phType,
                               isVmail, cId, iId) {
@@ -69,7 +69,7 @@ PageStackWindow {
         inboxDetails.showPlayBtn = true;
         inboxDetails.fetchingEmail = true;
         inboxDetails.vmailPosition = 0;
-        pageStack.push(inboxDetails);
+        appWindow.pageStack.push(inboxDetails);
         appWindow._inboxDetailsShown = true;
     }
     function pushCiSelector(ciId) {
@@ -77,7 +77,7 @@ PageStackWindow {
         if (ciPhoneSelector.phonesModel == null) {
             ciPhoneSelector.phonesModel = g_CiPhonesModel;
         }
-        pageStack.push(ciPhoneSelector);
+        appWindow.pageStack.push(ciPhoneSelector);
     }
     function showSmsPage(imgSource, name, dest, conversation, text) {
         smsPage.imageSource  = imgSource;
@@ -85,7 +85,15 @@ PageStackWindow {
         smsPage.dest         = dest;
         smsPage.conversation = conversation;
         smsPage.smsText      = text;
-        pageStack.push(smsPage);
+        appWindow.pageStack.push(smsPage);
+    }
+    function popPageStack() {
+        if (appWindow.pageStack.depth > 1) {
+            console.debug("Its popping");
+            appWindow.pageStack.pop();
+        } else {
+            console.debug("No popping dammit!");
+        }
     }
 
     property bool _inboxDetailsShown: false
@@ -94,14 +102,14 @@ PageStackWindow {
 
     Component.onCompleted: {
         // Cheating: This seems to correct the position of the toolbar
-        pageStack.push(contactDetails);
+        appWindow.pageStack.push(contactDetails);
         pushPopTimer.start();
     }
     Timer {
         id: pushPopTimer
-        interval: 100
+        interval: 300
         onTriggered: {
-            pageStack.pop();
+            appWindow.popPageStack();
         }
     }
 
@@ -135,27 +143,27 @@ PageStackWindow {
     TfaPinPage {
         id: tfaPinDlg
         objectName: "TFAPinDialog"
-        onDone: appWindow.pageStack.pop();
+        onDone: { appWindow.popPageStack(); }
     }//TFA Dialog
 
     AppPwPage {
         id: appPwDlg
         objectName: "AppPwDialog"
-        onDone: appWindow.pageStack.pop();
+        onDone: { appWindow.popPageStack(); }
     }
 
     RegNumberSelector {
         id: regNumberSelector
         objectName: "RegNumberSelector"
 
-        onSelected: appWindow.pageStack.pop();
+        onSelected: { appWindow.popPageStack(); }
     }
 
     ContactDetailsPage {
         id: contactDetails
         tools: commonTools
         //height: pageHeights
-        onDone: appWindow.pageStack.pop();
+        onDone: { appWindow.popPageStack(); }
         onSetNumberToDial: {
             dialTab.setNumberInDisp(number);
             tabgroup.setTab(0);
@@ -166,7 +174,7 @@ PageStackWindow {
         id: inboxDetails
         objectName: "InboxDetails"
 
-        onDone: appWindow.pageStack.pop();
+        onDone: { appWindow.popPageStack(); }
         onSetNumberToDial: {
             dialTab.setNumberInDisp(number);
             tabgroup.setTab(0);
@@ -177,7 +185,7 @@ PageStackWindow {
 
     MessageBox {
         id: msgBox
-        onDone: appWindow.pageStack.pop();
+        onDone: { appWindow.popPageStack(); }
     }
 
     InfoBanner {
@@ -188,13 +196,13 @@ PageStackWindow {
     CiPhoneSelectionPage {
         id: ciPhoneSelector
         objectName: "CiPhoneSelectionPage"
-        onDone: appWindow.pageStack.pop();
+        onDone: { appWindow.popPageStack(); }
     }
 
     SmsPage {
         id: smsPage
         objectName: "SmsPage"
-        onDone: appWindow.pageStack.pop();
+        onDone: { appWindow.popPageStack(); }
     }
 
     StatusBanner {
@@ -240,7 +248,7 @@ PageStackWindow {
                 id: dialTab
                 objectName: "DialPage"
                 tools: commonTools
-                onRegNumBtnClicked: appWindow.pageStack.push(regNumberSelector);
+                onRegNumBtnClicked: { appWindow.pageStack.push(regNumberSelector); }
             }
             ContactsPage {
                 id: contactsTab
@@ -273,8 +281,8 @@ PageStackWindow {
             ToolButton {
                 iconSource: "toolbar-back";
                 onClicked: {
-                    if (pageStack.depth > 1) {
-                        pageStack.pop();
+                    if (appWindow.pageStack.depth > 1) {
+                        appWindow.popPageStack();
                         if (appWindow._inboxDetailsShown) {
                             appWindow._inboxDetailsShown = false;
                             inboxDetails.done(false);

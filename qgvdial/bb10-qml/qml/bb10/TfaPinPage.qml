@@ -57,12 +57,12 @@ Page {
             Button {
                 text: "Cancel"
                 width: 200
-                onClicked: container.done(false);
+                onClicked: { container.done(false); }
             }
             Button {
                 text: "Submit"
                 width: 200
-                onClicked: container.done(true);
+                onClicked: { container.done(true); }
             }//Button
         }//ButtonRow
     }//Column

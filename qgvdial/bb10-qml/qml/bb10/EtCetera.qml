@@ -38,18 +38,21 @@ Item {
         Button {
             anchors.horizontalCenter: parent.horizontalCenter
             text: "About"
+            width: container.width / 3
             onClicked: { container.sigAbout(); }
         }//Button (login/logout)
 
         Button {
             anchors.horizontalCenter: parent.horizontalCenter
             text: "Send logs"
+            width: container.width / 3
             onClicked: { container.sendLogs(); }
         }//Button (login/logout)
 
         Button {
             anchors.horizontalCenter: parent.horizontalCenter
             text: "Really quit"
+            width: container.width / 3
             onClicked: { container.reallyQuit(); }
         }//Button (really quit)
     }//Column of everything

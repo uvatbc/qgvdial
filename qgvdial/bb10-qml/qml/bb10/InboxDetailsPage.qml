@@ -213,6 +213,7 @@ Page {
             horizontalCenter: parent.horizontalCenter
         }
         width: parent.width * 8 / 10
+        spacing: 5
         exclusive: false
 
         Button {

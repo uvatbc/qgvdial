@@ -54,6 +54,7 @@ Item {
                 id: edContactsUpdateFreq
                 objectName: "EdContactsUpdateFreq"
                 visible: optContactsUpdate.checked
+                width: 200
                 validator: IntValidator { bottom: 1; top: 1440 }
                 anchors {
                     verticalCenter: parent.verticalCenter
@@ -69,7 +70,7 @@ Item {
             CheckBox {
                 id: optInboxUpdate
                 objectName: "OptInboxUpdate"
-                text: "Update contacts"
+                text: "Update inbox"
                 anchors {
                     verticalCenter: parent.verticalCenter
                     left: parent.left
@@ -79,6 +80,7 @@ Item {
                 id: edInboxUpdateFreq
                 objectName: "EdInboxUpdateFreq"
                 visible: optInboxUpdate.checked
+                width: 200
                 validator: IntValidator { bottom: 1; top: 1440 }
                 anchors {
                     verticalCenter: parent.verticalCenter

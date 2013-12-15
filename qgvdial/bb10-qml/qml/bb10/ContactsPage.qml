@@ -162,7 +162,7 @@ Page {
 
             MouseArea {
                 anchors.fill: parent
-                onClicked: container.contactClicked(id);
+                onClicked: { container.contactClicked(id); }
             }
         }// delegate Rectangle
     }// ListView (contacts list)

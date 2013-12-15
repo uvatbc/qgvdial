@@ -63,7 +63,7 @@ Page {
         placeholderText: "Enter number here"
 
         width: parent.width - 4
-        font.pointSize: 50
+        font.pointSize: 100
         
         readOnly: true
 
@@ -127,19 +127,18 @@ Page {
             horizontalCenter: parent.horizontalCenter
         }
         width: parent.width * 8/10
+        spacing: 5
 
         exclusive: false
         Button {
             text: "Text"
             height: 100
-            font.pixelSize: 35
             enabled: (numberField.text.length != 0)
             onClicked: container.sigText(numberField.text);
         }
         Button {
             text: "Call"
             height: 100
-            font.pixelSize: 35
             enabled: (numberField.text.length != 0)
             onClicked: container.sigCall(numberField.text);
         }
