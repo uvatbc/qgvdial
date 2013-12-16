@@ -138,8 +138,8 @@ PageStackWindow {
         tools: commonTools
         onDone: { appWindow.popPageStack(); }
         onSetNumberToDial: {
-            dialTab.setNumberInDisp(number);
-            tabgroup.setTab(0);
+            mainPage.setNumberInDisp(number);
+            mainPage.setTab(0);
         }
     }
 
@@ -150,8 +150,8 @@ PageStackWindow {
 
         onDone: { appWindow.popPageStack(); }
         onSetNumberToDial: {
-            dialTab.setNumberInDisp(number);
-            tabgroup.setTab(0);
+            mainPage.setNumberInDisp(number);
+            mainPage.setTab(0);
         }
 
         onSigShowContact: appWindow.sigShowContact(cId);

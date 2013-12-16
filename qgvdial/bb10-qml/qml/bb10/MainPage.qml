@@ -28,6 +28,14 @@ Page {
 
     signal regNumBtnClicked
 
+    function setNumberInDisp(number) {
+        dialTab.setNumberInDisp(number);
+    }
+
+    function setTab(number) {
+        tabgroup.setTab(number);
+    }
+
     anchors {
         top: parent.top
         left: parent.left
