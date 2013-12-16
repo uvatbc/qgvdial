@@ -265,6 +265,7 @@ PageStackWindow {
             }
 
             ButtonRow {
+                visible: (appWindow.pageStack.depth == 1)
                 TabButton {
                     iconSource: "qrc:/dialpad.svg"
                     tab: dialTab
@@ -283,6 +284,7 @@ PageStackWindow {
                 }
             }
             ToolButton {
+                visible: (appWindow.pageStack.depth == 1)
                 iconSource: "toolbar-view-menu"
                 anchors.right: (parent === undefined) ? undefined : parent.right
                 onClicked: (myMenu.status === DialogStatus.Closed) ? myMenu.open() : myMenu.close()

@@ -117,6 +117,7 @@ Item {
             top: rowPass.bottom
             topMargin: 2
         }
+        width: 150
 
         text: "Login"
     }//Button (login/logout)

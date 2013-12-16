@@ -21,5 +21,8 @@ dbus_services.source = $$PWD/service_files/regular/qgvdial.Call.service \
 # this path munging is required whether it is Maemo, Harmattan or Ubuntu
 dbus_services.target = ../../usr/share/dbus-1/services
 
+# Stupid
+contains($$PWD,export) {
+message Export!
 DEPLOYMENTFOLDERS += dbus_services
-
+}

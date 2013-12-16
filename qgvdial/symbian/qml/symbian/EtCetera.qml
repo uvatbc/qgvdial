@@ -39,18 +39,21 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             text: "About"
             onClicked: { container.sigAbout(); }
+            width: 150
         }//Button (login/logout)
 
         Button {
             anchors.horizontalCenter: parent.horizontalCenter
             text: "Send logs"
             onClicked: { container.sendLogs(); }
+            width: 150
         }//Button (login/logout)
 
         Button {
             anchors.horizontalCenter: parent.horizontalCenter
             text: "Really quit"
             onClicked: { container.reallyQuit(); }
+            width: 150
         }//Button (really quit)
     }//Column of everything
 }//Page (container)

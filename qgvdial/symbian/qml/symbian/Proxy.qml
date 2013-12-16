@@ -237,6 +237,8 @@ Item {
         ButtonRow {
             exclusive: false
             anchors.horizontalCenter: parent.horizontalCenter
+            width: parent.width * 3/4
+            spacing: 2
 
             Button {
                 text: "Revert"

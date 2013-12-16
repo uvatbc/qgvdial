@@ -59,6 +59,7 @@ Item {
                     verticalCenter: parent.verticalCenter
                     right: parent.right
                 }
+                width: 100
             }//TextField
         }
 
@@ -84,6 +85,7 @@ Item {
                     verticalCenter: parent.verticalCenter
                     right: parent.right
                 }
+                width: 100
             }//TextField
         }
     }// Column

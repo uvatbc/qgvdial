@@ -74,9 +74,7 @@ PageStackWindow {
     }
     function pushCiSelector(ciId) {
         ciPhoneSelector.ciId = ciId;
-        if (ciPhoneSelector.phonesModel == null) {
-            ciPhoneSelector.phonesModel = g_CiPhonesModel;
-        }
+        ciPhoneSelector.phonesModel = g_CiPhonesModel;
         appWindow.pageStack.push(ciPhoneSelector);
     }
     function showSmsPage(imgSource, name, dest, conversation, text) {
@@ -138,7 +136,6 @@ PageStackWindow {
     ContactDetailsPage {
         id: contactDetails
         tools: commonTools
-        //height: pageHeights
         onDone: { appWindow.popPageStack(); }
         onSetNumberToDial: {
             dialTab.setNumberInDisp(number);

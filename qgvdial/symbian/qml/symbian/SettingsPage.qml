@@ -51,7 +51,7 @@ Page {
         //onTriggered: container.contentY = setY;
     }//Timer for delayed setting of contentY so that when you click on an
     // ExpandView, it gets into focus. Especially important for the logs
-    
+
     Rectangle {
         anchors.fill: parent
         color: "black"
@@ -61,6 +61,7 @@ Page {
         // Cannot use childrenRect.height because it causes a binding loop
         contentHeight: (expandLoginDetails.height + 1 +
                         expandProxySettings.height + 1 +
+                        expandUpdateSettings.height + 1 +
                         expandEtCetera.height)
         contentWidth: width
         clip: true
