@@ -30,19 +30,20 @@ Page {
 
     Column {
         anchors.centerIn: parent
+        width: parent.width
         spacing: 5
 
         Label {
             text: "Enter the two-factor authentication PIN"
-            font.pixelSize: 40
             anchors.horizontalCenter: parent.horizontalCenter
+            horizontalAlignment: Text.AlignHCenter
         }
 
         TextField {
             id: textTfaPin
             placeholderText: "PIN"
             anchors.horizontalCenter: parent.horizontalCenter
-            width: 400
+            width: parent.width * 5/8
             validator: IntValidator {
                 bottom: 0
                 top: 999999
@@ -52,6 +53,8 @@ Page {
         ButtonRow {
             exclusive: false
             spacing: 5
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: parent.width * 5/8
 
             Button {
                 text: "Cancel"

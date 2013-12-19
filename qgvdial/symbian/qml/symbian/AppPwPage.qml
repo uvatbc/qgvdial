@@ -30,29 +30,28 @@ Page {
 
     Column {
         anchors.centerIn: parent
+        width: parent.width
         spacing: 5
 
         Label {
             id: label
             text: "Enter the application specific password\nfor Google Contacts"
-            font.pixelSize: 40
             anchors.horizontalCenter: parent.horizontalCenter
+            horizontalAlignment: Text.AlignHCenter
         }
 
         TextField {
             id: textAppPw
             placeholderText: "App specific password"
             anchors.horizontalCenter: parent.horizontalCenter
-            width: 400
-            validator: IntValidator {
-                bottom: 0
-                top: 999999
-            }
+            width: parent.width * 4/5
         }
 
         ButtonRow {
             exclusive: false
             spacing: 5
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: parent.width * 5/8
 
             Button {
                 text: "Cancel"

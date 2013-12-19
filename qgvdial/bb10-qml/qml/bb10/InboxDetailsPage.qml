@@ -73,6 +73,13 @@ Page {
                 width: parent.width
                 height: 200
 
+                Rectangle {
+                    id: hitRectContact
+                    anchors.fill: parent
+                    color: "orange"
+                    opacity: 0
+                }
+
                 Row {
                     anchors.fill: parent
 
@@ -93,7 +100,10 @@ Page {
 
                 MouseArea {
                     anchors.fill: parent
+                    onPressed: { hitRectContact.opacity = 1.0; }
+                    onReleased: { hitRectContact.opacity = 0.0; }
                     onPressAndHold: {
+                        hitRectContact.opacity = 0.0;
                         if (container.cId.length != 0) {
                             container.sigShowContact(container.cId);
                         }
@@ -104,6 +114,13 @@ Page {
             Item {
                 width: parent.width
                 height: 60
+
+                Rectangle {
+                    id: hitRectNumber
+                    anchors.fill: parent
+                    color: "orange"
+                    opacity: 0
+                }
 
                 Row {
                     anchors.fill: parent
@@ -128,7 +145,10 @@ Page {
 
                 MouseArea {
                     anchors.fill: parent
+                    onPressed: { hitRectNumber.opacity = 1.0; }
+                    onReleased: { hitRectNumber.opacity = 0.0; }
                     onPressAndHold: {
+                        hitRectNumber.opacity = 0.0;
                         container.setNumberToDial(container.number);
                         container.done(true);
                     }
@@ -203,7 +223,6 @@ Page {
             }
         }//Column
     }//Flickable
-
 
     ButtonRow {
         id: btnRow

@@ -30,6 +30,7 @@ Page {
 
     Column {
         anchors.centerIn: parent
+        width: parent.width
         spacing: 5
 
         Label {

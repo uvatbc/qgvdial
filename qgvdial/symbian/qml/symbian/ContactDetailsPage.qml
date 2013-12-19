@@ -73,6 +73,13 @@ Page {
                 height: lblNumber.height + 4
                 width: parent.width
 
+                Rectangle {
+                    id: hitRectNumber
+                    anchors.fill: parent
+                    color: "orange"
+                    opacity: 0
+                }
+
                 Row {
                     width: parent.width
 
@@ -93,7 +100,10 @@ Page {
 
                 MouseArea {
                     anchors.fill: parent
+                    onPressed: { hitRectNumber.opacity = 1.0; }
+                    onReleased: { hitRectNumber.opacity = 0.0; }
                     onPressAndHold: {
+                        hitRectNumber.opacity = 0.0;
                         container.setNumberToDial(number);
                         container.done(true);
                     }

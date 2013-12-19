@@ -30,12 +30,14 @@ Page {
 
     Column {
         anchors.centerIn: parent
+        width: parent.width
         spacing: 5
 
         Label {
             text: "Enter the two-factor authentication PIN"
             font.pixelSize: 40
             anchors.horizontalCenter: parent.horizontalCenter
+            horizontalAlignment: Text.AlignHCenter
         }
 
         TextField {
