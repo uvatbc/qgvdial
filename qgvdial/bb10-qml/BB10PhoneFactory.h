@@ -25,8 +25,6 @@ Contact: yuvraaj@gmail.com
 #include <QObject>
 #include "IPhoneAccountFactory.h"
 
-class BBPhoneAccount;
-
 class BB10PhoneFactory : public IPhoneAccountFactory
 {
     Q_OBJECT

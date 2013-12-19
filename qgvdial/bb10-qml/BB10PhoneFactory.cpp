@@ -20,8 +20,13 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "BB10PhoneFactory.h"
-#include "BBPhoneAccount.h"
 #include "LibGvPhones.h"
+
+#ifndef Q_WS_SIMULATOR
+#include "BBPhoneAccount.h"
+#else
+#include "IPhoneAccount.h"
+#endif
 
 IPhoneAccountFactory *
 createPhoneAccountFactory(QObject *parent)
@@ -42,6 +47,7 @@ BB10PhoneFactory::identifyAll(AsyncTaskToken *task)
     }
     m_accounts.clear();
 
+#ifndef Q_WS_SIMULATOR
     BBPhoneAccount *acct = new BBPhoneAccount(this);
     if (NULL == acct) {
         task->status = ATTS_FAILURE;
@@ -57,5 +63,9 @@ BB10PhoneFactory::identifyAll(AsyncTaskToken *task)
             p->linkCiToNumber(acct->id(), num);
         }
     }
+#else
+    task->status = ATTS_SUCCESS;
+    task->emitCompleted ();
+#endif
     return (true);
 }//BB10PhoneFactory::identifyAll

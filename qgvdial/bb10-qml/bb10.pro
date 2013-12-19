@@ -20,13 +20,17 @@ MOBILITY *= multimedia
 # Add dependency to Symbian components
 # CONFIG += qt-components
 
-LIBS += -lbbsystem
-
-SOURCES  += BB10PhoneFactory.cpp \
-            BBPhoneAccount.cpp
+SOURCES  += BB10PhoneFactory.cpp
 HEADERS  += platform_specific.h \
-            BB10PhoneFactory.h \
-            BBPhoneAccount.h
+            BB10PhoneFactory.h
+RESOURCES += bb10.qrc
+
+# So that I can open this project in the Qt SDK and have it compile correctly:
+!simulator {
+SOURCES  += BBPhoneAccount.cpp
+HEADERS  += BBPhoneAccount.h
+LIBS += -lbbsystem
+}
 
 include(../common/common.pri)
 include(../../api/api.pri)
@@ -35,8 +39,6 @@ include(../features/dirs/bb10/bb10-dirs.pri)
 include(../features/qml/mainwindow/qml-mainwindow.pri)
 include(../features/cookie-cutter/osdependent/cc-osdependent.pri)
 include(../features/osver/bb10/osv-bb10.pri)
-
-RESOURCES += bb10.qrc
 
 # Please do not modify the following two lines. Required for deployment.
 include(qmlapplicationviewer/qmlapplicationviewer.pri)
