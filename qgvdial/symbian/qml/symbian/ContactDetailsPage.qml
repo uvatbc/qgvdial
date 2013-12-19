@@ -111,4 +111,4 @@ Page {
             }//delegate
         }//ListView
     }//Column
-}//TFA Dialog
+}//Contact details Page

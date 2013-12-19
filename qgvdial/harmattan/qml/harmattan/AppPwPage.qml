@@ -30,18 +30,21 @@ Page {
 
     Column {
         anchors.centerIn: parent
+        width: parent.width
         spacing: 5
 
         Label {
             id: label
             text: "Enter the application specific password\nfor Google Contacts"
             anchors.horizontalCenter: parent.horizontalCenter
+            horizontalAlignment: Text.AlignHCenter
         }
 
         TextField {
             id: textAppPw
             placeholderText: "App specific password"
             anchors.horizontalCenter: parent.horizontalCenter
+            width: parent.width * 4/5
             echoMode: TextInput.Password
 
             onAccepted: container.done(true);
@@ -61,5 +64,4 @@ Page {
             }//Button
         }//ButtonRow
     }//Column
-
 }//TFA Dialog

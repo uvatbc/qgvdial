@@ -37,6 +37,7 @@ Page {
             text: "Enter the application specific password\nfor Google Contacts"
             font.pixelSize: 40
             anchors.horizontalCenter: parent.horizontalCenter
+            horizontalAlignment: Text.AlignHCenter
         }
 
         TextField {
@@ -44,6 +45,7 @@ Page {
             placeholderText: "App specific password"
             anchors.horizontalCenter: parent.horizontalCenter
             width: 400
+            echoMode: TextInput.Password
         }
 
         ButtonRow {

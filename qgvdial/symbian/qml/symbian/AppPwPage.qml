@@ -34,7 +34,6 @@ Page {
         spacing: 5
 
         Label {
-            id: label
             text: "Enter the application specific password\nfor Google Contacts"
             anchors.horizontalCenter: parent.horizontalCenter
             horizontalAlignment: Text.AlignHCenter
@@ -45,6 +44,7 @@ Page {
             placeholderText: "App specific password"
             anchors.horizontalCenter: parent.horizontalCenter
             width: parent.width * 4/5
+            echoMode: TextInput.Password
         }
 
         ButtonRow {

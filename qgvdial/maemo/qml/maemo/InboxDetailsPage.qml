@@ -78,6 +78,13 @@ Rectangle {
                 width: parent.width
                 height: 100
 
+                Rectangle {
+                    id: hitRectContact
+                    anchors.fill: parent
+                    color: "orange"
+                    opacity: 0
+                }
+
                 Row {
                     anchors.fill: parent
 
@@ -101,7 +108,10 @@ Rectangle {
 
                 MouseArea {
                     anchors.fill: parent
+                    onPressed: { hitRectContact.opacity = 1.0; }
+                    onReleased: { hitRectContact.opacity = 0.0; }
                     onPressAndHold: {
+                        hitRectContact.opacity = 0.0;
                         container.done(true);
                         if (container.cId.length != 0) {
                             container.sigOpenContact(container.cId);
@@ -113,6 +123,13 @@ Rectangle {
             Item {
                 width: parent.width
                 height: numberType.height
+
+                Rectangle {
+                    id: hitRectNumber
+                    anchors.fill: parent
+                    color: "orange"
+                    opacity: 0
+                }
 
                 TextOneLine {
                     id: numberType
@@ -146,7 +163,10 @@ Rectangle {
 
                 MouseArea {
                     anchors.fill: parent
+                    onPressed: { hitRectNumber.opacity = 1.0; }
+                    onReleased: { hitRectNumber.opacity = 0.0; }
                     onPressAndHold: {
+                        hitRectNumber.opacity = 0.0;
                         container.setNumberToDial(container.number);
                         container.done(true);
                     }

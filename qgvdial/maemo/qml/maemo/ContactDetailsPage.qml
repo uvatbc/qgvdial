@@ -71,6 +71,13 @@ Rectangle {
                 width: detailsView.width
                 height: lblNumber.height + 4
 
+                Rectangle {
+                    id: hitRectNumber
+                    anchors.fill: parent
+                    color: "orange"
+                    opacity: 0
+                }
+
                 TextOneLine {
                     id: lblType
                     text: type
@@ -100,7 +107,10 @@ Rectangle {
 
                 MouseArea {
                     anchors.fill: parent
+                    onPressed: { hitRectNumber.opacity = 1.0; }
+                    onReleased: { hitRectNumber.opacity = 0.0; }
                     onPressAndHold: {
+                        hitRectNumber.opacity = 0.0;
                         container.setNumberToDial(number);
                         container.done(true);
                     }
@@ -108,4 +118,4 @@ Rectangle {
             }//delegate
         }//ListView
     }//Column
-}//TFA Dialog
+}//Contact details Rectangle
