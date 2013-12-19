@@ -49,6 +49,9 @@ public slots:
 
     void onKeypadKeyClicked();
 
+    void uiShowStatusMessage(const QString &msg, quint64 millisec);
+    void uiClearStatusMessage();
+
 protected:
     void uiUpdateProxySettings(const ProxyInfo &info);
     void uiRequestLoginDetails();
@@ -71,10 +74,6 @@ protected:
     void uiShowContactDetails(const ContactInfo &cinfo);
 
     void uiGetCIDetails(GVRegisteredNumber &num, GVNumModel *model);
-
-    void uiLongTaskBegins();
-    void uiLongTaskContinues();
-    void uiLongTaskEnds();
 
     void uiFailedToSendMessage(const QString &dest, const QString &text);
 

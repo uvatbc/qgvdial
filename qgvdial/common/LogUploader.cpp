@@ -55,7 +55,9 @@ void
 LogUploader::sendLogs()
 {
     IMainWindow *win = (IMainWindow *) parent ();
+    win->startLongTask (LT_LogsUpload);
 
+    bool ok = false;
     do { // Begin cleanup block (not a loop)
         AsyncTaskToken *task = new AsyncTaskToken(this);
         if (!task) {
@@ -132,7 +134,14 @@ LogUploader::sendLogs()
         }
         connect(tracker, SIGNAL(sigDone(bool,QByteArray,QNetworkReply*,void*)),
                 this, SLOT(onLogPosted(bool,QByteArray,QNetworkReply*,void*)));
+
+        ok = true;
     } while (0); // End cleanup block (not a loop)
+
+    if (!ok) {
+        win->endLongTask ();
+        win->uiShowStatusMessage ("Failed to upload logs!", SHOW_5SEC);
+    }
 }//LogUploader::sendLogs
 
 /** Invoked when the XML document containing the logs has finished uploading
@@ -146,9 +155,16 @@ LogUploader::onLogPosted(bool success, const QByteArray & /*response*/,
     AsyncTaskToken *task = (AsyncTaskToken *) ctx;
     task->deleteLater ();
 
-    if (!success) {
+    IMainWindow *win = (IMainWindow *) parent ();
+    win->endLongTask ();
+
+    if (success) {
+        Q_DEBUG("Logs uploaded");
+        win->uiShowStatusMessage (tr("Logs uploaded!"), SHOW_3SEC);
+    } else {
         QString strR = reply->readAll ();
-        Q_WARN("Failed to post the logs") << strR;
+        Q_WARN(QString("Failed to post the logs. Response = %1").arg(strR));
+        win->uiShowStatusMessage (tr("Failed to upload the logs!"), SHOW_5SEC);
     }
 }//LogUploader::onLogPosted
 

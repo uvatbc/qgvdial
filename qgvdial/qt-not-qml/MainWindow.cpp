@@ -739,33 +739,16 @@ MainWindow::onCbNumDoModify(int index)
 }//MainWindow::onCbNumDoModify
 
 void
-MainWindow::uiLongTaskBegins()
+MainWindow::uiShowStatusMessage(const QString &msg, quint64 millisec)
 {
-    switch (m_taskInfo.type) {
-    case LT_Login:
-        d->ui->statusBar->showMessage (m_taskInfo.suggestedStatus,
-                                       m_taskInfo.suggestedMillisconds);
-        break;
-    case LT_Call:
-        d->ui->statusBar->showMessage ("Setting up a call ...", SHOW_INF);
-        break;
-    default:
-        break;
-    }
-}//MainWindow::uiLongTaskBegins
+    d->ui->statusBar->showMessage (msg, millisec);
+}//MainWindow::uiShowStatusMessage
 
 void
-MainWindow::uiLongTaskContinues()
-{
-    d->ui->statusBar->showMessage (m_taskInfo.suggestedStatus,
-                                   m_taskInfo.suggestedMillisconds);
-}//MainWindow::uiLongTaskContinues
-
-void
-MainWindow::uiLongTaskEnds()
+MainWindow::uiClearStatusMessage()
 {
     d->ui->statusBar->clearMessage ();
-}//MainWindow::uiLongTaskEnds
+}//MainWindow::uiClearStatusMessage
 
 void
 MainWindow::onSystrayActivated(QSystemTrayIcon::ActivationReason reason)

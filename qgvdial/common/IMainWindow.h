@@ -105,7 +105,8 @@ Contact: yuvraaj@gmail.com
 enum LongTaskType {
     LT_Invalid = 0,
     LT_Login,
-    LT_Call
+    LT_Call,
+    LT_LogsUpload
 };
 
 #define SHOW_3SEC   ( 3 * 1000)
@@ -117,9 +118,6 @@ struct LongTaskInfo
 {
     LongTaskType type;
     int seconds;
-
-    QString suggestedStatus;
-    int suggestedMillisconds;
 };
 
 class IMainWindow : public QObject
@@ -189,9 +187,9 @@ protected:
 
     void startLongTask(LongTaskType newType);
     void endLongTask();
-    virtual void uiLongTaskBegins() = 0;
-    virtual void uiLongTaskContinues() = 0;
-    virtual void uiLongTaskEnds() = 0;
+
+    virtual void uiShowStatusMessage(const QString &msg, quint64 millisec) = 0;
+    virtual void uiClearStatusMessage() = 0;
 
     virtual void uiFailedToSendMessage(const QString &destination,
                                        const QString &text) = 0;

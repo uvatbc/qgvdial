@@ -480,12 +480,12 @@ MainWindow::messageReceived(const QString &msg)
 }//MainWindow::messageReceived
 
 void
-MainWindow::showStatusMessage(QString msg, quint64 timeout)
+MainWindow::uiShowStatusMessage(const QString &msg, quint64 millisec)
 {
     QMetaObject::invokeMethod(statusBanner, "showMessage",
                               Q_ARG(QVariant, QVariant(msg)),
-                              Q_ARG(QVariant, QVariant(timeout)));
-}//MainWindow::showStatusMessage
+                              Q_ARG(QVariant, QVariant(millisec)));
+}//MainWindow::uiShowStatusMessage
 
 void
 MainWindow::uiUpdateProxySettings(const ProxyInfo &info)
@@ -700,7 +700,7 @@ MainWindow::onInboxClicked(QString id)
 
     event.id = id;
     if (!oInbox.getEventInfo (event, cinfo, type)) {
-        showStatusMessage ("Can't fetch inbox event", SHOW_3SEC);
+        uiShowStatusMessage ("Can't fetch inbox event", SHOW_3SEC);
         return;
     }
 
@@ -732,7 +732,7 @@ MainWindow::onInboxClicked(QString id)
     } else {
         if (!oVmail.fetchVmail (event.id)) {
             Q_WARN("Failed to fetch voice mail");
-            showStatusMessage ("Unable to fetch voicemail", SHOW_3SEC);
+            uiShowStatusMessage ("Unable to fetch voicemail", SHOW_3SEC);
         }
 
         Q_ASSERT(isVmail); // Reuse this "true" value
@@ -757,24 +757,10 @@ MainWindow::uiGetCIDetails(GVRegisteredNumber &num, GVNumModel *model)
 }//MainWindow::uiGetCIDetails
 
 void
-MainWindow::uiLongTaskBegins()
-{
-    showStatusMessage (m_taskInfo.suggestedStatus,
-                       m_taskInfo.suggestedMillisconds);
-}//MainWindow::uiLongTaskBegins
-
-void
-MainWindow::uiLongTaskContinues()
-{
-    showStatusMessage (m_taskInfo.suggestedStatus,
-                       m_taskInfo.suggestedMillisconds);
-}//MainWindow::uiLongTaskContinues
-
-void
-MainWindow::uiLongTaskEnds()
+MainWindow::uiClearStatusMessage()
 {
     QMetaObject::invokeMethod (statusBanner, "clearMessage");
-}//MainWindow::uiLongTaskEnds
+}//MainWindow::uiClearStatusMessage
 
 void
 MainWindow::onUserTextBtnClicked(QString dest)
@@ -859,12 +845,12 @@ MainWindow::onVmailFetched(const QString & /*id*/, const QString &localPath, boo
     }
 
     if (!ok) {
-        showStatusMessage ("Unable to fetch voicemail", SHOW_3SEC);
+        uiShowStatusMessage ("Unable to fetch voicemail", SHOW_3SEC);
         return;
     }
 
     if (!oVmail.loadVmail (localPath)) {
-        showStatusMessage ("Unable to load voicemail", SHOW_3SEC);
+        uiShowStatusMessage ("Unable to load voicemail", SHOW_3SEC);
         return;
     }
 

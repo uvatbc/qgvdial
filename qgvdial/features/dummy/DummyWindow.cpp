@@ -152,22 +152,17 @@ DummyMainWindow::uiGetCIDetails(GVRegisteredNumber &, GVNumModel *)
 }//DummyMainWindow::uiGetCIDetails
 
 void
-DummyMainWindow::uiLongTaskBegins()
+DummyMainWindow::uiShowStatusMessage(const QString & /*msg*/,
+                                     quint64 /*millisec*/)
 {
     Q_ASSERT(0 == "Not implemented");
-}//DummyMainWindow::uiLongTaskBegins
+}//DummyMainWindow::uiShowStatusMessage
 
 void
-DummyMainWindow::uiLongTaskContinues()
+DummyMainWindow::uiClearStatusMessage()
 {
     Q_ASSERT(0 == "Not implemented");
-}//DummyMainWindow::uiLongTaskContinues
-
-void
-DummyMainWindow::uiLongTaskEnds()
-{
-    Q_ASSERT(0 == "Not implemented");
-}//DummyMainWindow::uiLongTaskEnds
+}//DummyMainWindow::uiClearStatusMessage
 
 void
 DummyMainWindow::uiFailedToSendMessage(const QString & /*destination*/,

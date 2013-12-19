@@ -38,7 +38,9 @@ public:
 protected slots:
     void declStatusChanged(QDeclarativeView::Status status);
     void messageReceived(const QString &msg);
-    void showStatusMessage(QString msg, quint64 timeout);
+
+    void uiShowStatusMessage(const QString &msg, quint64 millisec);
+    void uiClearStatusMessage();
 
     void onLoginButtonClicked();
     void onTfaPinDlg(bool accepted);
@@ -94,10 +96,6 @@ protected:
     void uiShowContactDetails(const ContactInfo &cinfo);
 
     void uiGetCIDetails(GVRegisteredNumber &num, GVNumModel *model);
-
-    void uiLongTaskBegins();
-    void uiLongTaskContinues();
-    void uiLongTaskEnds();
 
     void uiFailedToSendMessage(const QString &dest, const QString &text);
 

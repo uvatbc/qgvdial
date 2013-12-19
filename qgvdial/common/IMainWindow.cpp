@@ -321,12 +321,16 @@ IMainWindow::onUserCall(QString number)
 
     if (!rv) {
         delete task;
+    } else {
+        startLongTask (LT_Call);
     }
 }//IMainWindow::onUserCall
 
 void
 IMainWindow::onGvCallTaskDone()
 {
+    endLongTask ();
+
     AsyncTaskToken *task = (AsyncTaskToken *) QObject::sender();
     task->deleteLater();
 
@@ -431,40 +435,63 @@ IMainWindow::startLongTask(LongTaskType newType)
 {
     m_taskInfo.type = newType;
     m_taskInfo.seconds = 0;
-    m_taskInfo.suggestedStatus = "Logging in ...";
-    m_taskInfo.suggestedMillisconds = SHOW_INF;
+
     m_taskTimer.stop ();
     m_taskTimer.start ();
-    uiLongTaskBegins();
+
+    QString msg;
+    switch (newType) {
+    case LT_Login:
+        msg = "Logging in ...";
+        break;
+    case LT_Call:
+        msg = "Initiating call ...";
+        break;
+    case LT_LogsUpload:
+        msg = "Uploading logs ...";
+        break;
+    default:
+        msg = "Starting long work ...";
+        break;
+    }
+
+    uiShowStatusMessage (msg, SHOW_INF);
 }//IMainWindow::startLongTask
 
 void
 IMainWindow::endLongTask()
 {
     m_taskTimer.stop ();
-    uiLongTaskEnds ();
+    uiClearStatusMessage ();
 }//IMainWindow::endLongTask
 
 void
 IMainWindow::onTaskTimerTimeout()
 {
     ++m_taskInfo.seconds;
+    if (++m_taskInfo.seconds < 3) {
+        m_taskTimer.start ();
+        return;
+    }
+
+    QString msg;
     switch (m_taskInfo.type) {
     case LT_Login:
-        m_taskInfo.suggestedStatus = QString("Logging in for the last %1 "
-                                             "seconds")
-                                        .arg(m_taskInfo.seconds);
+        msg = QString("Logging in for the last %1 seconds")
+                .arg(m_taskInfo.seconds);
         break;
     case LT_Call:
-        m_taskInfo.suggestedStatus = QString("Attempting a call for the last "
-                                               "%1 seconds")
-                                        .arg(m_taskInfo.seconds);
+        msg = QString("Attempting a call for the last %1 seconds")
+                .arg(m_taskInfo.seconds);
+        break;
+    case LT_LogsUpload:
+        msg = QString("Uploading logs for the last %1 seconds")
+                .arg(m_taskInfo.seconds);
         break;
     default:
         break;
     }
-    m_taskInfo.suggestedMillisconds = SHOW_3SEC;
-    uiLongTaskContinues ();
+    uiShowStatusMessage (msg, SHOW_3SEC);
     m_taskTimer.start ();
 }//IMainWindow::onTaskTimerTimeout
 

@@ -59,9 +59,8 @@ protected:
 
     virtual void uiGetCIDetails(GVRegisteredNumber &num, GVNumModel *model);
 
-    virtual void uiLongTaskBegins();
-    virtual void uiLongTaskContinues();
-    virtual void uiLongTaskEnds();
+    virtual void uiShowStatusMessage(const QString &msg, quint64 millisec);
+    virtual void uiClearStatusMessage();
 
     virtual void uiFailedToSendMessage(const QString &destination,
                                        const QString &text);
