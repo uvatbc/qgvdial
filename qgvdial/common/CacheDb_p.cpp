@@ -37,6 +37,7 @@ CacheDbPrivate::setDbDir(const QString &dbDir)
 CacheDbPrivate &
 CacheDbPrivate::ref() {
     if (cdbp_singleton == NULL) {
+        Q_ASSERT(!g_dbDir.isEmpty());
         cdbp_singleton = new CacheDbPrivate;
 
         QString path = g_dbDir + QDir::separator() + DB_FILENAME;

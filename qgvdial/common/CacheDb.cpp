@@ -39,9 +39,8 @@ CacheDb::~CacheDb()
 bool
 CacheDb::init(const QString &dbDir)
 {
-    if (!dbDir.isEmpty ()) {
-        CacheDbPrivate::setDbDir (dbDir);
-    }
+    Q_ASSERT(!dbDir.isEmpty ());
+    CacheDbPrivate::setDbDir (dbDir);
 
     CacheDbPrivate &p = CacheDbPrivate::ref ();
 
