@@ -254,22 +254,27 @@ Rectangle {
         id: btnRow
         anchors {
             bottom: parent.bottom
+            bottomMargin: 5
             horizontalCenter: parent.horizontalCenter
         }
-        width: parent.width * 8 / 10
+        spacing: 3
+
+        width: (btnReply.visible ? parent.width * 8 / 10
+                                 : parent.width * 4 / 10)
 
         Button {
+            id: btnReply
             text: "Reply"
             visible: (smsText.length != 0)
             width: ((container.width - parent.spacing) / 2) * 8 / 10
 
-            onClicked: {
-                container.replySms(container.iId);
-            }
+            onClicked: { container.replySms(container.iId); }
         }
         Button {
             text: "Delete"
-            width: ((container.width - parent.spacing) / 2) * 8 / 10
+
+            width: (btnReply.visible ? (((container.width - parent.spacing) / 2) * 8 / 10)
+                                     : parent.width)
 
             onClicked: {
                 container.deleteEntry(container.iId);

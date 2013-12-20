@@ -225,19 +225,31 @@ Page {
 
     ButtonRow {
         id: btnRow
-        anchors.bottom: parent.bottom
-        width: parent.width
+        anchors {
+            bottom: parent.bottom
+            bottomMargin: 5
+            horizontalCenter: parent.horizontalCenter
+        }
+        spacing: 3
         exclusive: false
 
+        width: (btnReply.visible ? parent.width * 8 / 10
+                                 : parent.width * 4 / 10)
+
         Button {
+            id: btnReply
             text: "Reply"
             visible: (smsText.length != 0)
-            onClicked: {
-                container.replySms(container.iId);
-            }
+            width: ((container.width - parent.spacing) / 2) * 8 / 10
+
+            onClicked: { container.replySms(container.iId); }
         }
         Button {
             text: "Delete"
+
+            width: (btnReply.visible ? (((container.width - parent.spacing) / 2) * 8 / 10)
+                                     : parent.width)
+
             onClicked: {
                 container.deleteEntry(container.iId);
                 container.done(true);
