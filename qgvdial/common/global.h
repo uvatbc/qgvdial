@@ -25,6 +25,7 @@ Contact: yuvraaj@gmail.com
 #ifdef __cplusplus
 
 #include "api_common.h"
+#include <QtSql>
 
 #define APPLICATION_NAME "qgvdial"
 #define ABOUT_URL "http://www.yuvraaj.net/qgvdial/about.html"

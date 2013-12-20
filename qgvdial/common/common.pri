@@ -1,5 +1,6 @@
 INCLUDEPATH += $$PWD
 PRECOMPILED_HEADER = $$PWD/global.h
+QT *= sql
 
 ##############################################################
 # YOU MUST ADD YOUR OWN MOBILITY OR PHONON LIBRARY: Either:

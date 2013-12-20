@@ -24,7 +24,6 @@ Contact: yuvraaj@gmail.com
 
 #include <QtCore>
 #include <QtNetwork>
-#include <QtSql>
 #include <QtXml>
 #include <QtScript>
 

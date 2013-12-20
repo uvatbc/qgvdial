@@ -21,4 +21,4 @@ HEADERS  += $$PWD/api_common.h \
             $$PWD/ContactsXmlHandler.h \
             $$PWD/HtmlFieldParser.h
 
-QT *= network sql xml xmlpatterns script
+QT *= network xml xmlpatterns script
