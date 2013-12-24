@@ -73,7 +73,7 @@ print "$cmd\n";
 system($cmd);
 
 # Put all the debianization files into the debian folder
-$cmd = "cd $basedir/build-files/qgvdial/ubuntu ; mv postinst prerm control rules changelog $basedir/qgvdial/qgvdial-$qver/debian/";
+$cmd = "cd $basedir/build-files/qgvdial/ubuntu ; mv control rules changelog $basedir/qgvdial/qgvdial-$qver/debian/";
 print "$cmd\n";
 system("$cmd");
 $cmd = "cd $basedir/build-files/qgvdial ; cp changelog.txt $basedir/qgvdial/qgvdial-$qver/debian/changelog";
