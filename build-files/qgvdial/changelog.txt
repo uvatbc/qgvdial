@@ -1,5 +1,5 @@
 qgvdial (__QGVDIAL_VERSION__) unstable; urgency=low
 
-  * OpenSSL cipher changed
+  * Fix build scripts, QML improvements
 
  -- Yuvraaj <yuvraaj@gmail.com>  __CHANGELOG_DATETIME__ -0700
