@@ -608,16 +608,7 @@ MainWindow::uiLoginDone(int status, const QString &errStr)
         return;
     }
 
-    QString msg;
-    if (ATTS_NW_ERROR == status) {
-        msg = "Network error. Try again later.";
-    } else if (ATTS_USER_CANCEL == status) {
-        msg = "User canceled login.";
-    } else {
-        msg = QString("Login failed: %1").arg (errStr);
-    }
-
-    infoBanner->setProperty ("text", msg);
+    infoBanner->setProperty ("text", errStr);
     QMetaObject::invokeMethod (infoBanner, "show");
 }//MainWindow::uiLoginDone
 

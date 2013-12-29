@@ -1,5 +1,5 @@
 qgvdial (__QGVDIAL_VERSION__) unstable; urgency=low
 
-  * Fix build scripts, QML improvements
+  * Re-login if session terminates
 
  -- Yuvraaj <yuvraaj@gmail.com>  __CHANGELOG_DATETIME__ -0700

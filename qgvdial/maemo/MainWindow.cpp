@@ -509,17 +509,8 @@ MainWindow::uiLoginDone(int status, const QString &errStr)
         return;
     }
 
-    QString msg;
-    if (ATTS_NW_ERROR == status) {
-        msg = "Network error. Try again later.";
-    } else if (ATTS_USER_CANCEL == status) {
-        msg = "User canceled login.";
-    } else {
-        msg = QString("Login failed: %1").arg (errStr);
-    }
-
 #ifdef Q_WS_MAEMO_5
-    QMaemo5InformationBox::information(m_view, msg);
+    QMaemo5InformationBox::information(m_view, errStr);
 #endif
 }//MainWindow::uiLoginDone
 

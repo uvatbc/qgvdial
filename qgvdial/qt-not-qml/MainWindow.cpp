@@ -367,23 +367,26 @@ void
 MainWindow::uiLoginDone(int status, const QString &errStr)
 {
     do {
-        if (ATTS_NW_ERROR == status) {
-            d->ui->statusBar->showMessage ("Network error. Try again later.",
-                                           SHOW_10SEC);
-            break;
-        } else if (ATTS_USER_CANCEL == status) {
-            d->ui->statusBar->showMessage ("User canceled login.", SHOW_5SEC);
-            break;
-        } else if (ATTS_SUCCESS != status) {
-            QMessageBox msg;
-            msg.setIcon (QMessageBox::Critical);
-            msg.setText (errStr);
-            msg.setWindowTitle ("Login failed");
-            msg.exec ();
+        if (ATTS_SUCCESS == status) {
+            d->ui->statusBar->showMessage ("Login successful", SHOW_5SEC);
             break;
         }
 
-        d->ui->statusBar->showMessage ("Login successful", SHOW_5SEC);
+        if (ATTS_NW_ERROR == status) {
+            d->ui->statusBar->showMessage (errStr, SHOW_10SEC);
+            break;
+        }
+
+        if (ATTS_USER_CANCEL == status) {
+            d->ui->statusBar->showMessage (errStr, SHOW_5SEC);
+            break;
+        }
+
+        QMessageBox msg;
+        msg.setIcon (QMessageBox::Critical);
+        msg.setText (errStr);
+        msg.setWindowTitle ("Login failed");
+        msg.exec ();
     } while (0);
 }//MainWindow::uiLoginDone
 

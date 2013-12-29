@@ -2015,7 +2015,7 @@ GVApi::callOut(AsyncTaskToken *token)
 }//GVApi::callOut
 
 void
-GVApi::onCallout(bool success, const QByteArray &response, QNetworkReply *,
+GVApi::onCallout(bool success, const QByteArray &response, QNetworkReply *reply,
                  void *ctx)
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
@@ -2023,8 +2023,12 @@ GVApi::onCallout(bool success, const QByteArray &response, QNetworkReply *,
 
     do {
         if (!success) {
+            if (QNetworkReply::AuthenticationRequiredError != reply->error ()) {
+                token->status = ATTS_NW_ERROR;
+            } else {
+                token->status = ATTS_NOT_LOGGED_IN;
+            }
             Q_WARN("Failed to call out");
-            token->status = ATTS_NW_ERROR;
             break;
         }
         success = false;

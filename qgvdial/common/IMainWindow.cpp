@@ -211,16 +211,20 @@ IMainWindow::loginCompleted()
             }
         } else if (ATTS_NW_ERROR == task->status) {
             Q_WARN("Login failed because of network error");
+            task->errorString = "Network error. Try again later.";
             uiSetUserPass (true);
             uiRequestLoginDetails();
         } else if (ATTS_USER_CANCEL == task->status) {
             Q_WARN("User canceled login");
+            task->errorString = "User canceled login";
             uiSetUserPass (true);
             uiRequestLoginDetails();
             db.clearCookies ();
             db.clearTFAFlag ();
         } else {
-            Q_WARN(QString("Login failed: %1").arg (task->errorString));
+            task->errorString = QString("Login failed: %1")
+                                    .arg(task->errorString);
+            Q_WARN(task->errorString);
 
             m_pass.clear ();
             uiSetUserPass(true);
@@ -337,9 +341,20 @@ IMainWindow::onGvCallTaskDone()
     QString id = task->outParams["id"].toString();
     QString dest = task->inParams["destination"].toString();
 
+    if (ATTS_NOT_LOGGED_IN == task->status) {
+        Q_WARN(QString("Failed to initiate call to %1 using id %2 because a "
+                       "re-login is required.").arg(dest, id));
+        uiShowStatusMessage ("Re-login required", SHOW_10SEC);
+        beginLogin (m_user, m_pass);
+        return;
+    }
+
     if (ATTS_SUCCESS != task->status) {
         Q_WARN(QString("Failed to initiate call to %1 using id %2. status = %3")
                .arg(dest, id).arg(task->status));
+        uiShowStatusMessage (QString("Failed to initiate call. Error = %1")
+                             .arg(task->status), SHOW_10SEC);
+        return;
     }
 
     if (task->outParams.contains ("access_number")) {
@@ -348,13 +363,16 @@ IMainWindow::onGvCallTaskDone()
         if (!oPhones.dialOut (id, accessNumber)) {
             Q_WARN(QString("Dialout failed for access number %1 to call %2")
                    .arg(accessNumber, dest));
+            uiShowStatusMessage("Failed to initiate dial out call.",SHOW_10SEC);
         } else {
             Q_DEBUG(QString("Dialed access number %1 to call %2")
                     .arg(accessNumber, dest));
+            uiShowStatusMessage ("Dial out successful", SHOW_3SEC);
         }
     } else {
         Q_DEBUG(QString("Callback initiated to id %1 to dest %2")
                 .arg(id, dest));
+        uiShowStatusMessage ("Dial back successful", SHOW_3SEC);
     }
 }//IMainWindow::onGvCallTaskDone
 
@@ -406,15 +424,26 @@ IMainWindow::onGvTextTaskDone()
     task->deleteLater();
 
     if (ATTS_SUCCESS != task->status) {
-        Q_WARN(QString("Failed to send text. status = %1")
-               .arg(task->status));
-
         QString dest = task->inParams["destination"].toString();
         QString text = task->inParams["text"].toString();
+
+        if (ATTS_NOT_LOGGED_IN == task->status) {
+            Q_WARN(QString("Failed to send text to %1 because a re-login is "
+                           "required.").arg(dest));
+            uiShowStatusMessage ("Re-login required", SHOW_10SEC);
+            beginLogin (m_user, m_pass);
+        } else {
+            QString msg = QString("Failed to send text. status = %1")
+                    .arg(task->status);
+            Q_WARN(msg);
+            uiShowStatusMessage (msg, SHOW_10SEC);
+        }
+
         uiFailedToSendMessage (dest, text);
     } else {
         Q_DEBUG(QString("Successfully sent text to %1")
                 .arg(task->inParams["destination"].toString()));
+        uiShowStatusMessage ("Text sent", SHOW_3SEC);
     }
 }//IMainWindow::onGvTextTaskDone
 
