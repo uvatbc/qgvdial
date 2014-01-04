@@ -85,33 +85,6 @@ PageStackWindow {
 
     initialPage: mainPage
 
-    Menu {
-        id: myMenu
-        visualParent: appWindow
-        MenuLayout {
-            MenuItem {
-                text: qsTr("Refresh")
-                onClicked: {
-                    if (tabgroup.currentTab === contactsTab) {
-                        appWindow.sigRefreshContacts();
-                    } else if (tabgroup.currentTab === inboxTab) {
-                        appWindow.sigRefreshInbox();
-                    }
-                }
-            }
-            MenuItem {
-                text: qsTr("Full refresh")
-                onClicked: {
-                    if (tabgroup.currentTab === contactsTab) {
-                        appWindow.sigRefreshContactsFull();
-                    } else if (tabgroup.currentTab === inboxTab) {
-                        appWindow.sigRefreshInboxFull();
-                    }
-                }
-            }
-        }
-    }//Menu
-
     TfaPinPage {
         id: tfaPinDlg
         objectName: "TFAPinDialog"
@@ -225,6 +198,8 @@ PageStackWindow {
                 id: contactsTab
                 objectName: "ContactsPage"
                 tools: commonTools
+                onSigRefreshContacts: { appWindow.sigRefreshContacts(); }
+                onSigRefreshContactsFull: { appWindow.sigRefreshContactsFull(); }
             }
             InboxPage {
                 id: inboxTab
@@ -234,6 +209,9 @@ PageStackWindow {
                     dialTab.setNumberInDisp(number);
                     tabgroup.setTab(0);
                 }
+
+                onSigRefreshInbox: { appWindow.sigRefreshInbox(); }
+                onSigRefreshInboxFull: { appWindow.sigRefreshInboxFull(); }
             }
             SettingsPage {
                 id: settingsTab
@@ -251,6 +229,7 @@ PageStackWindow {
         tools: ToolBarLayout {
             ToolButton {
                 iconSource: "toolbar-back";
+                enabled: (appWindow.pageStack.depth > 1)
                 onClicked: {
                     if (pageStack.depth > 1) {
                         pageStack.pop();
@@ -283,12 +262,6 @@ PageStackWindow {
                     tab: settingsTab
                 }
             }
-            ToolButton {
-                visible: (appWindow.pageStack.depth == 1)
-                iconSource: "toolbar-view-menu"
-                anchors.right: (parent === undefined) ? undefined : parent.right
-                onClicked: (myMenu.status === DialogStatus.Closed) ? myMenu.open() : myMenu.close()
-            }
         }//ToolBarLayout
     }
-}
+}//PageStackWindow

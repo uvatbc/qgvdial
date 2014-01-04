@@ -30,6 +30,8 @@ Page {
 
     signal contactClicked(string id)
     signal searchContact(string searchTerm)
+    signal sigRefreshContacts
+    signal sigRefreshContactsFull
 
     function setMyModel(searchTerm) {
         contactsList.model = g_ContactsModel;
@@ -111,6 +113,14 @@ Page {
         }
     }//Search row: text and button
 
+    RefreshButton {
+        id: bgRefreshBtn
+        anchors {
+            top: searchRow.bottom
+        }
+        width: parent.width
+    }
+
     ListView {
         id: contactsList
 
@@ -120,6 +130,18 @@ Page {
         }
         width: parent.width
         clip: true
+
+        header: RefreshButton {
+            isHeader: true
+            width: parent.width
+            contentY: contactsList.contentY
+            onVisibleChanged: {
+                bgRefreshBtn.visible = !visible;
+            }
+
+            onClicked: { container.sigRefreshContacts(); }
+            onPressAndHold: { container.sigRefreshContactsFull(); }
+        }
 
         delegate: Rectangle {
             id: listDelegate

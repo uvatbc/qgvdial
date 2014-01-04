@@ -28,6 +28,8 @@ Page {
     anchors.fill: parent
 
     signal setNumberToDial(string number)
+    signal sigRefreshInbox
+    signal sigRefreshInboxFull
 
     Button {
         id: inboxSelectorBtn
@@ -78,6 +80,14 @@ Page {
         }
     }
 
+    RefreshButton {
+        id: bgRefreshBtn
+        anchors {
+            top: inboxSelectorBtn.bottom
+        }
+        width: parent.width
+    }
+
     ListView {
         id: inboxList
         objectName: "InboxList"
@@ -94,6 +104,18 @@ Page {
         }
         width: parent.width
         clip: true
+
+        header: RefreshButton {
+            isHeader: true
+            width: parent.width
+            contentY: inboxList.contentY
+            onVisibleChanged: {
+                bgRefreshBtn.visible = !visible;
+            }
+
+            onClicked: { container.sigRefreshInbox(); }
+            onPressAndHold: { container.sigRefreshInboxFull(); }
+        }
 
         delegate: Rectangle {
             id: listDelegate

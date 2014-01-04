@@ -51,6 +51,8 @@ Rectangle {
         }
 
         if (isExpanded) yTimer.setY = y;
+
+        container.forceActiveFocus();
     }
 
     Row {

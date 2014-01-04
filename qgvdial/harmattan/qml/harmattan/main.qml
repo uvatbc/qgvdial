@@ -90,6 +90,7 @@ PageStackWindow {
 
     initialPage: Page {
         tools: commonTools
+        pageStack: appWindow.pageStack
 
         TabGroup {
             id: tabgroup
@@ -117,6 +118,8 @@ PageStackWindow {
                 id: contactsTab
                 objectName: "ContactsPage"
                 toolbarHeight: appWindow.platformToolBarHeight
+                onSigRefreshContacts: { appWindow.sigRefreshContacts(); }
+                onSigRefreshContactsFull: { appWindow.sigRefreshContactsFull(); }
             }
             InboxPage {
                 id: inboxTab
@@ -126,6 +129,9 @@ PageStackWindow {
                     dialTab.setNumberInDisp(number);
                     tabgroup.setTab(0);
                 }
+
+                onSigRefreshInbox: { appWindow.sigRefreshInbox(); }
+                onSigRefreshInboxFull: { appWindow.sigRefreshInboxFull(); }
             }
             SettingsPage {
                 id: settingsTab
@@ -139,6 +145,7 @@ PageStackWindow {
 
             ToolIcon {
                 iconId: "toolbar-back";
+                visible: appWindow.pageStack.depth > 1
                 onClicked: {
                     pageStack.pop();
                     if (appWindow._inboxDetailsShown) {
@@ -149,6 +156,7 @@ PageStackWindow {
             }
 
             ButtonRow {
+                visible: appWindow.pageStack.depth == 1
                 TabButton {
                     iconSource: "qrc:/dialpad.svg"
                     tab: dialTab
@@ -166,55 +174,8 @@ PageStackWindow {
                     tab: settingsTab
                 }
             }
-            ToolIcon {
-                platformIconId: "toolbar-view-menu"
-                anchors.right: (parent === undefined) ? undefined : parent.right
-                onClicked: (myMenu.status === DialogStatus.Closed) ? myMenu.open() : myMenu.close()
-            }
         }//ToolBarLayout
     }
-
-    Menu {
-        id: myMenu
-        visualParent: appWindow
-        MenuLayout {
-            MyMenuItem {
-                text: qsTr("Refresh")
-                onClicked: {
-                    if (pageStack.depth > 1) {
-                        console.debug("Refresh a pushed page?? Nope.");
-                        return;
-                    }
-
-                    if (tabgroup.currentTab === dialTab) {
-                        console.debug("Refresh the dialPage");
-                    } else if (tabgroup.currentTab === contactsTab) {
-                        console.debug("Refresh the contactsTab");
-                        appWindow.sigRefreshContacts();
-                    } else if (tabgroup.currentTab === inboxTab) {
-                        console.debug("Refresh the inboxTab");
-                        appWindow.sigRefreshInbox();
-                    } else if (tabgroup.currentTab === settingsTab) {
-                        console.debug("Refresh the settingsTab");
-                    }
-                }
-
-                onPressHold: {
-                    if (pageStack.depth > 1) {
-                        return;
-                    }
-
-                    if (tabgroup.currentTab === contactsTab) {
-                        console.debug("Full refresh contacts");
-                        appWindow.sigRefreshContactsFull();
-                    } else if (tabgroup.currentTab === inboxTab) {
-                        console.debug("Full refresh inbox");
-                        appWindow.sigRefreshInboxFull();
-                    }
-                }
-            }
-        }
-    }//Menu
 
     TfaPinPage {
         id: tfaPinDlg
@@ -288,4 +249,4 @@ PageStackWindow {
             bottomMargin: commonTools.height + 5
         }
     }
-}
+}//PageStackWindow

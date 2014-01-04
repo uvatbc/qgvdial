@@ -58,7 +58,35 @@ Page {
             width: parent.width
             height: 290
             font.pointSize: 30
-        }
+
+            ToolButton {
+                iconSource: "toolbar-back"
+
+                anchors {
+                    verticalCenter: parent.verticalCenter
+                    right: parent.right
+                    rightMargin: 4
+                }
+
+                visible: numberField.text.length != 0 ? true : false
+                ToolButtonStyle { inverted: true }
+
+                onClicked: {
+                    if (numberField.selectedText.length == 0) {
+                        numberField.text = numberField.text.slice(0, numberField.text.length - 1);
+                    } else {
+                        numberField.cut();
+                    }
+                }
+
+                // No press and hold.... :(
+                /*
+                onPressAndHold: {
+                    numberField.text = "";
+                }
+                */
+            }//ToolButton
+        }//TextField
 
         Keypad {
             id: keypad

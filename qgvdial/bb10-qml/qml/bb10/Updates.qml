@@ -60,8 +60,9 @@ Item {
                     verticalCenter: parent.verticalCenter
                     right: parent.right
                 }
+                placeholderText: "Minutes"
             }//TextField
-        }
+        }//Item
 
         Item {
             width: parent.width
@@ -86,7 +87,8 @@ Item {
                     verticalCenter: parent.verticalCenter
                     right: parent.right
                 }
+                placeholderText: "Minutes"
             }//TextField
-        }
+        }//Item
     }// Column
 }// Item (top level)

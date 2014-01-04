@@ -71,6 +71,8 @@ Page {
             id: contactsTab
             objectName: "ContactsPage"
             tools: container.tools
+            onSigRefreshContacts: { appWindow.sigRefreshContacts(); }
+            onSigRefreshContactsFull: { appWindow.sigRefreshContactsFull(); }
         }
         InboxPage {
             id: inboxTab
@@ -80,6 +82,9 @@ Page {
                 dialTab.setNumberInDisp(number);
                 tabgroup.setTab(0);
             }
+
+            onSigRefreshInbox: { appWindow.sigRefreshInbox(); }
+            onSigRefreshInboxFull: { appWindow.sigRefreshInboxFull(); }
         }
         SettingsPage {
             id: settingsTab
@@ -96,6 +101,7 @@ Page {
         tools: ToolBarLayout {
             ToolButton {
                 iconSource: "toolbar-back";
+                visible: (appWindow.pageStack.depth > 1)
                 onClicked: {
                     if (appWindow.pageStack.depth > 1) {
                         appWindow.popPageStack();
@@ -110,6 +116,7 @@ Page {
             }
 
             ButtonRow {
+                visible: (appWindow.pageStack.depth == 1)
                 TabButton {
                     iconSource: "qrc:/dialpad.svg"
                     tab: dialTab
@@ -127,38 +134,6 @@ Page {
                     tab: settingsTab
                 }
             }
-            ToolButton {
-                iconSource: "toolbar-view-menu"
-                anchors.right: (parent === undefined) ? undefined : parent.right
-                onClicked: (myMenu.status === DialogStatus.Closed) ? myMenu.open() : myMenu.close()
-            }
         }//ToolBarLayout
     }//ToolBar
-
-    Menu {
-        id: myMenu
-        visualParent: container
-        MenuLayout {
-            MenuItem {
-                text: qsTr("Refresh")
-                onClicked: {
-                    if (tabgroup.currentTab === contactsTab) {
-                        appWindow.sigRefreshContacts();
-                    } else if (tabgroup.currentTab === inboxTab) {
-                        appWindow.sigRefreshInbox();
-                    }
-                }
-            }
-            MenuItem {
-                text: qsTr("Full refresh")
-                onClicked: {
-                    if (tabgroup.currentTab === contactsTab) {
-                        appWindow.sigRefreshContactsFull();
-                    } else if (tabgroup.currentTab === inboxTab) {
-                        appWindow.sigRefreshInboxFull();
-                    }
-                }
-            }
-        }
-    }//Menu
 }

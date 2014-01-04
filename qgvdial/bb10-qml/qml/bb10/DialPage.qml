@@ -67,33 +67,31 @@ Page {
         
         readOnly: true
 
-        Image {
+        ToolButton {
+            iconSource: "toolbar-back"
+
             anchors {
                 verticalCenter: parent.verticalCenter
                 right: parent.right
                 rightMargin: 4
             }
-            source: "qrc:/u232B.gif"
-            smooth: true
+
             visible: numberField.text.length != 0 ? true : false
+            platformInverted: true
 
-            height: 90
-            width: height
-
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    if (numberField.selectedText.length == 0) {
-                        numberField.text = numberField.text.slice(0, numberField.text.length - 1);
-                    } else {
-                        numberField.cut();
-                    }
+            onClicked: {
+                if (numberField.selectedText.length == 0) {
+                    numberField.text = numberField.text.slice(0, numberField.text.length - 1);
+                } else {
+                    numberField.cut();
                 }
+            }
 
-                onPressAndHold: { numberField.text = ""; }
+            onPlatformPressAndHold: {
+                numberField.text = "";
             }
         }
-    }
+    }//TextField
 
     Keypad {
         id: keypad
@@ -142,5 +140,5 @@ Page {
             enabled: (numberField.text.length != 0)
             onClicked: container.sigCall(numberField.text);
         }
-    }//Buttonrow
-}
+    }//ButtonRow: Text & Call
+}//Page

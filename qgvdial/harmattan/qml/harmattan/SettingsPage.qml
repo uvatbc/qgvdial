@@ -58,6 +58,7 @@ Page {
         // Cannot use childrenRect.height because it causes a binding loop
         contentHeight: (expandLoginDetails.height + 1 +
                         expandProxySettings.height + 1 +
+                        expandUpdateSettings.height + 1 +
                         expandEtCetera.height)
         contentWidth: width
         clip: true
