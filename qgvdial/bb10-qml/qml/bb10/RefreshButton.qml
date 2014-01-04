@@ -70,7 +70,7 @@ Rectangle {
         id: lblRefresh
         anchors.centerIn: parent
         text: "Refresh"
-        font.pixelSize: 25
+        font.pixelSize: 50
     }
 
     MouseArea {

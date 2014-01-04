@@ -64,18 +64,21 @@ Page {
         DialPage {
             id: dialTab
             objectName: "DialPage"
+            pageStack: container.pageStack
             tools: container.tools
             onRegNumBtnClicked: { container.regNumBtnClicked(); }
         }
         ContactsPage {
             id: contactsTab
             objectName: "ContactsPage"
+            pageStack: container.pageStack
             tools: container.tools
-            onSigRefreshContacts: { appWindow.sigRefreshContacts(); }
-            onSigRefreshContactsFull: { appWindow.sigRefreshContactsFull(); }
+            onSigRefreshContacts: { container.sigRefreshContacts(); }
+            onSigRefreshContactsFull: { container.sigRefreshContactsFull(); }
         }
         InboxPage {
             id: inboxTab
+            pageStack: container.pageStack
             tools: container.tools
 
             onSetNumberToDial: {
@@ -83,11 +86,12 @@ Page {
                 tabgroup.setTab(0);
             }
 
-            onSigRefreshInbox: { appWindow.sigRefreshInbox(); }
-            onSigRefreshInboxFull: { appWindow.sigRefreshInboxFull(); }
+            onSigRefreshInbox: { container.sigRefreshInbox(); }
+            onSigRefreshInboxFull: { container.sigRefreshInboxFull(); }
         }
         SettingsPage {
             id: settingsTab
+            pageStack: container.pageStack
             tools: container.tools
         }
     }//TabGroup
@@ -99,24 +103,8 @@ Page {
         visible: true
 
         tools: ToolBarLayout {
-            ToolButton {
-                iconSource: "toolbar-back";
-                visible: (appWindow.pageStack.depth > 1)
-                onClicked: {
-                    if (appWindow.pageStack.depth > 1) {
-                        appWindow.popPageStack();
-                        if (appWindow._inboxDetailsShown) {
-                            appWindow._inboxDetailsShown = false;
-                            inboxDetails.done(false);
-                        }
-                    } else {
-                        console.debug("Quit!");
-                    }
-                }
-            }
-
             ButtonRow {
-                visible: (appWindow.pageStack.depth == 1)
+                visible: (container.pageStack.depth == 1)
                 TabButton {
                     iconSource: "qrc:/dialpad.svg"
                     tab: dialTab
