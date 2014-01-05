@@ -39,7 +39,7 @@ Item {
 
         Item {
             width: parent.width
-            height: (optContactsUpdate.height > edContactsUpdateFreq.height ? optContactsUpdate.height : edContactsUpdateFreq.height) + 4
+            height: 60
 
             CheckBox {
                 id: optContactsUpdate
@@ -59,17 +59,19 @@ Item {
                     verticalCenter: parent.verticalCenter
                     right: parent.right
                 }
+                placeholderText: "Minutes"
+                width: 200
             }//TextField
         }
 
         Item {
             width: parent.width
-            height: (optInboxUpdate.height > edInboxUpdateFreq.height ? optInboxUpdate.height : edInboxUpdateFreq.height) + 4
+            height: 60
 
             CheckBox {
                 id: optInboxUpdate
                 objectName: "OptInboxUpdate"
-                text: "Update contacts"
+                text: "Update inbox"
                 anchors {
                     verticalCenter: parent.verticalCenter
                     left: parent.left
@@ -84,6 +86,8 @@ Item {
                     verticalCenter: parent.verticalCenter
                     right: parent.right
                 }
+                placeholderText: "Minutes"
+                width: 200
             }//TextField
         }
     }// Column
