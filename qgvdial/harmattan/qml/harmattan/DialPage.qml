@@ -36,6 +36,11 @@ Page {
         numberField.text = number;
     }
 
+    Component.onCompleted: {
+        // Use the dark theme.
+        theme.inverted = true;
+    }
+
     Column {
         anchors.fill: parent
         spacing: 8
@@ -61,7 +66,7 @@ Page {
             readOnly: true
 
             ToolIcon {
-                iconId: "toolbar-backspace"
+                iconId: "icon-m-toolbar-backspace"
 
                 anchors {
                     verticalCenter: parent.verticalCenter
@@ -69,8 +74,6 @@ Page {
                     rightMargin: 4
                 }
 
-                height: 50
-                width: height
                 visible: numberField.text.length != 0 ? true : false
 
                 onClicked: {
