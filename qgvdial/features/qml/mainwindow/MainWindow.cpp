@@ -757,7 +757,10 @@ void
 MainWindow::onUserTextBtnClicked(QString dest)
 {
     ContactInfo cinfo;
+
     if (!oContacts.getContactInfoFromNumber(dest, cinfo)) {
+        // Couldn't find a contact with that number. Use the number as the
+        // contact title.
         cinfo.strTitle = dest;
     }
 

@@ -28,64 +28,98 @@ Page {
 
     signal done(bool accepted)
 
-    property alias imageSource: contactImage.source
-    property alias name: contactName.text
+    property string imageSource
+    property string name
     property string dest
-    property alias conversation: lblConversation.text
-    property alias smsText: txtSmsText.text
+    property string conversation
+    property string smsText
 
-    Column {
+    function flickToEnd() {
+        mainFlick.contentY = mainFlick.contentHeight - container.height;
+    }
+
+    Flickable {
+        id: mainFlick
         anchors.fill: parent
-        spacing: 5
 
-        Row {
-            id: titleRow
-            width: parent.width
-            height: contactImage.height
+        contentWidth: parent.width
+        contentHeight: mainColumn.height
+        clip: true
 
-            Image {
-                id: contactImage
-                fillMode: Image.PreserveAspectFit
-                height: 100
-                width: 100
-            }
-            Label {
-                id: contactName
-                anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: 40
-                smooth: true
-                width: parent.width - contactImage.width - parent.spacing
-            }
-        }//row: contact image and name
-
-        Label {
-            text: "Conversation so far:"
-            width: parent.width
-            visible: (lblConversation.text.length != 0)
-        }
-
-        Label {
-            id: lblConversation
-            width: parent.width
-        }
-
-        TextArea {
-            id: txtSmsText
-            width: parent.width
-        }
-
-        ButtonRow {
-            exclusive: false
+        Column {
+            id: mainColumn
             spacing: 5
 
-            Button {
-                text: "Cancel"
-                onClicked: { container.done(false); }
+            width: parent.width
+
+            Row {
+                id: titleRow
+                width: parent.width - 4
+                height: contactImage.height
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                Image {
+                    id: contactImage
+                    fillMode: Image.PreserveAspectFit
+                    height: 100
+                    width: 100
+                    source: container.imageSource
+                }
+                Label {
+                    id: contactName
+                    anchors.verticalCenter: parent.verticalCenter
+                    font.pixelSize: 40
+                    smooth: true
+                    width: parent.width - contactImage.width - parent.spacing
+                    text: container.name
+                    horizontalAlignment: Text.AlignRight
+                }
+            }//row: contact image and name
+
+            Label {
+                id: lblContactNumber
+                width: parent.width - 4
+                text: container.dest
+                horizontalAlignment: Text.AlignRight
+                anchors.horizontalCenter: parent.horizontalCenter
             }
-            Button {
-                text: "Send"
-                onClicked: { container.done(true); }
-            }//Button
-        }//ButtonRow
-    }//Column
+
+            Label {
+                id: lblSoFar
+                text: "Conversation so far:"
+                width: parent.width - 4
+                visible: (container.conversation.length != 0)
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+
+            Label {
+                id: lblConversation
+                width: parent.width - 4
+                text: container.conversation
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+
+            TextArea {
+                id: txtSmsText
+                width: parent.width - 4
+                text: container.smsText
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+
+            ButtonRow {
+                anchors.horizontalCenter: parent.horizontalCenter
+                exclusive: false
+                spacing: 5
+
+                Button {
+                    text: "Cancel"
+                    onClicked: { container.done(false); }
+                }
+                Button {
+                    text: "Send"
+                    onClicked: { container.done(true); }
+                }//Button
+            }//ButtonRow
+        }//Column
+    }
 }//Sms Page

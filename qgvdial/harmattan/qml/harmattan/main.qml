@@ -71,7 +71,6 @@ PageStackWindow {
         inboxDetails.iId         = iId;
         inboxDetails.vmailPosition = 0;
         pageStack.push(inboxDetails);
-        appWindow._inboxDetailsShown = true;
     }
     function pushCiSelector(ciId) {
         ciPhoneSelector.ciId = ciId;
@@ -85,9 +84,8 @@ PageStackWindow {
         smsPage.conversation = conversation;
         smsPage.smsText      = text;
         pageStack.push(smsPage);
+        smsPage.flickToEnd();
     }
-
-    property bool _inboxDetailsShown: false
 
     initialPage: Page {
         tools: commonTools
@@ -146,13 +144,7 @@ PageStackWindow {
             ToolIcon {
                 iconId: "toolbar-back";
                 visible: appWindow.pageStack.depth > 1
-                onClicked: {
-                    appWindow.pageStack.pop();
-                    if (appWindow._inboxDetailsShown) {
-                        appWindow._inboxDetailsShown = false;
-                        inboxDetails.done(false);
-                    }
-                }
+                onClicked: { appWindow.pageStack.pop(); }
             }
 
             ButtonRow {
