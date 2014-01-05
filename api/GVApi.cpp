@@ -2276,6 +2276,16 @@ GVApi::onSendSms(bool success, const QByteArray &response, QNetworkReply *,
             break;
         }
 
+        // SMS response also contains the new rnr_se token
+        strTemp = scriptEngine.evaluate ("o.rnr_xsrf_token;").toString ();
+        if (scriptEngine.hasUncaughtException ()) {
+            Q_WARN("Failed to parse rnr_se: ") << strReply;
+            Q_WARN("Error is: ") << strTemp;
+        }
+        if ((strTemp != "undefined") && (!strTemp.isEmpty())) {
+            rnr_se = strTemp;
+        }
+
         token->status = ATTS_SUCCESS;
         token->emitCompleted ();
         token = NULL;

@@ -21,7 +21,7 @@
        <enum>QTabWidget::East</enum>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="dialTab">
        <attribute name="title">
@@ -45,7 +45,11 @@
             </widget>
            </item>
            <item>
-            <widget class="QPlainTextEdit" name="dispNum"/>
+            <widget class="QPlainTextEdit" name="dispNum">
+             <property name="tabChangesFocus">
+              <bool>true</bool>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
@@ -236,6 +240,9 @@
              <property name="text">
               <string>Call</string>
              </property>
+             <property name="default">
+              <bool>true</bool>
+             </property>
             </widget>
            </item>
           </layout>
@@ -295,8 +302,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>96</width>
-             <height>101</height>
+             <width>98</width>
+             <height>93</height>
             </rect>
            </property>
            <attribute name="label">
@@ -334,8 +341,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>252</width>
-             <height>240</height>
+             <width>220</width>
+             <height>211</height>
             </rect>
            </property>
            <attribute name="label">
@@ -448,8 +455,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>436</width>
-             <height>138</height>
+             <width>213</width>
+             <height>64</height>
             </rect>
            </property>
            <attribute name="label">
@@ -506,8 +513,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>96</width>
-             <height>77</height>
+             <width>98</width>
+             <height>70</height>
             </rect>
            </property>
            <attribute name="label">
@@ -544,7 +551,7 @@
      <x>0</x>
      <y>0</y>
      <width>497</width>
-     <height>25</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -605,6 +612,45 @@
    <header>MyLineEdit.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>dispNum</tabstop>
+  <tabstop>cbNumbers</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>k4</tabstop>
+  <tabstop>k5</tabstop>
+  <tabstop>k6</tabstop>
+  <tabstop>k8</tabstop>
+  <tabstop>k9</tabstop>
+  <tabstop>kstar</tabstop>
+  <tabstop>k0</tabstop>
+  <tabstop>khash</tabstop>
+  <tabstop>k1</tabstop>
+  <tabstop>k2</tabstop>
+  <tabstop>k3</tabstop>
+  <tabstop>k7</tabstop>
+  <tabstop>btnText</tabstop>
+  <tabstop>btnCall</tabstop>
+  <tabstop>contactsView</tabstop>
+  <tabstop>cbInboxSelector</tabstop>
+  <tabstop>inboxView</tabstop>
+  <tabstop>textUsername</tabstop>
+  <tabstop>textPassword</tabstop>
+  <tabstop>loginButton</tabstop>
+  <tabstop>useSystemProxy</tabstop>
+  <tabstop>enableProxy</tabstop>
+  <tabstop>proxyServer</tabstop>
+  <tabstop>proxyPort</tabstop>
+  <tabstop>proxyUser</tabstop>
+  <tabstop>proxyPass</tabstop>
+  <tabstop>proxyAuthRequired</tabstop>
+  <tabstop>proxyButtonBox</tabstop>
+  <tabstop>optContacts</tabstop>
+  <tabstop>sbContactsFreq</tabstop>
+  <tabstop>optInbox</tabstop>
+  <tabstop>sbInboxFreq</tabstop>
+  <tabstop>btnAbout</tabstop>
+  <tabstop>btnSendLogs</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
