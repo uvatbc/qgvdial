@@ -63,6 +63,7 @@ Page {
 
         contentWidth: width
         contentHeight: mainColumn.height
+        clip: true
 
         Column {
             id: mainColumn

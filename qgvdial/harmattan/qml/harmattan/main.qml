@@ -69,6 +69,7 @@ PageStackWindow {
         inboxDetails.isVmail     = isVmail;
         inboxDetails.cId         = cId;
         inboxDetails.iId         = iId;
+        inboxDetails.vmailPosition = 0;
         pageStack.push(inboxDetails);
         appWindow._inboxDetailsShown = true;
     }
@@ -90,7 +91,6 @@ PageStackWindow {
 
     initialPage: Page {
         tools: commonTools
-        pageStack: appWindow.pageStack
 
         TabGroup {
             id: tabgroup
@@ -112,7 +112,7 @@ PageStackWindow {
             DialPage {
                 id: dialTab
                 objectName: "DialPage"
-                onRegNumBtnClicked: appWindow.pageStack.push(regNumberSelector);
+                onRegNumBtnClicked: { appWindow.pageStack.push(regNumberSelector); }
             }
             ContactsPage {
                 id: contactsTab
@@ -147,7 +147,7 @@ PageStackWindow {
                 iconId: "toolbar-back";
                 visible: appWindow.pageStack.depth > 1
                 onClicked: {
-                    pageStack.pop();
+                    appWindow.pageStack.pop();
                     if (appWindow._inboxDetailsShown) {
                         appWindow._inboxDetailsShown = false;
                         inboxDetails.done(false);
@@ -180,25 +180,25 @@ PageStackWindow {
     TfaPinPage {
         id: tfaPinDlg
         objectName: "TFAPinDialog"
-        onDone: appWindow.pageStack.pop();
+        onDone: { appWindow.pageStack.pop(); }
     }//TFA Dialog
 
     AppPwPage {
         id: appPwDlg
         objectName: "AppPwDialog"
-        onDone: appWindow.pageStack.pop();
+        onDone: { appWindow.pageStack.pop(); }
     }
 
     RegNumberSelector {
         id: regNumberSelector
         objectName: "RegNumberSelector"
 
-        onSelected: appWindow.pageStack.pop();
+        onSelected: { appWindow.pageStack.pop(); }
     }
 
     ContactDetailsPage {
         id: contactDetails
-        onDone: appWindow.pageStack.pop();
+        onDone: { appWindow.pageStack.pop(); }
         onSetNumberToDial: {
             dialTab.setNumberInDisp(number);
             tabgroup.setTab(0);
@@ -209,18 +209,18 @@ PageStackWindow {
         id: inboxDetails
         objectName: "InboxDetails"
 
-        onDone: appWindow.pageStack.pop();
+        onDone: { appWindow.pageStack.pop(); }
         onSetNumberToDial: {
             dialTab.setNumberInDisp(number);
             tabgroup.setTab(0);
         }
 
-        onSigShowContact: appWindow.sigShowContact(cId);
+        onSigShowContact: { appWindow.sigShowContact(cId); }
     }
 
     MessageBox {
         id: msgBox
-        onDone: appWindow.pageStack.pop();
+        onDone: { appWindow.pageStack.pop(); }
     }
 
     InfoBanner {
@@ -231,13 +231,13 @@ PageStackWindow {
     CiPhoneSelectionPage {
         id: ciPhoneSelector
         objectName: "CiPhoneSelectionPage"
-        onDone: appWindow.pageStack.pop();
+        onDone: { appWindow.pageStack.pop(); }
     }
 
     SmsPage {
         id: smsPage
         objectName: "SmsPage"
-        onDone: appWindow.pageStack.pop();
+        onDone: { appWindow.pageStack.pop(); }
     }
 
     StatusBanner {

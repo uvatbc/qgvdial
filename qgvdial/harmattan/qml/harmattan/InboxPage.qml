@@ -108,7 +108,7 @@ Page {
 
         header: RefreshButton {
             isHeader: true
-            width: parent.width
+            width: inboxList.width
             contentY: inboxList.contentY
             onVisibleChanged: {
                 bgRefreshBtn.visible = !visible;

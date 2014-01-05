@@ -58,9 +58,10 @@ Page {
             width: parent.width
             height: 290
             font.pointSize: 30
+            readOnly: true
 
-            ToolButton {
-                iconSource: "toolbar-back"
+            ToolIcon {
+                iconId: "toolbar-backspace"
 
                 anchors {
                     verticalCenter: parent.verticalCenter
@@ -68,8 +69,9 @@ Page {
                     rightMargin: 4
                 }
 
+                height: 50
+                width: height
                 visible: numberField.text.length != 0 ? true : false
-                ToolButtonStyle { inverted: true }
 
                 onClicked: {
                     if (numberField.selectedText.length == 0) {
