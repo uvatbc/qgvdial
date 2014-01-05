@@ -196,6 +196,11 @@ PageStackWindow {
         id: mainPage
         // Has its own tools.
         onRegNumBtnClicked: { appWindow.pageStack.push(regNumberSelector); }
+
+        onSigRefreshContacts: { appWindow.sigRefreshContacts(); }
+        onSigRefreshContactsFull: { appWindow.sigRefreshContactsFull(); }
+        onSigRefreshInbox: { appWindow.sigRefreshInbox(); }
+        onSigRefreshInboxFull: { appWindow.sigRefreshInboxFull(); }
     }
 
     ToolBar {

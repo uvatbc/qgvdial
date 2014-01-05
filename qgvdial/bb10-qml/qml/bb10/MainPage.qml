@@ -28,6 +28,12 @@ Page {
 
     signal regNumBtnClicked
 
+    signal sigRefreshContacts
+    signal sigRefreshInbox
+
+    signal sigRefreshContactsFull
+    signal sigRefreshInboxFull
+
     function setNumberInDisp(number) {
         dialTab.setNumberInDisp(number);
     }
