@@ -44,11 +44,7 @@ OsdDirs::_getTempDir()
 QString
 OsdDirs::_getDbDir()
 {
-    //return QDir::homePath();
-
-    // Don't use the "homePath". This maps to "/accounts/1000/appdata/<app>/data"
-    // There is a special directory for database files:
-    return (QDir::currentPath() + "/db");
+    return QDir::homePath();
 }//OsdDirs::_getDbDir
 
 QString
