@@ -175,10 +175,16 @@ IMainWindow::loginCompleted()
             db.putUserPass (m_user, m_pass);
             if (task->inParams.contains ("user_pin")) {
                 db.setTFAFlag (true);
-                // Open UI to ask for application specific password
-                uiRequestApplicationPassword();
-            } else if (db.getAppPass (strAppPw)) {
-                onUiGotApplicationPassword (strAppPw);
+            }
+
+            if (db.getTFAFlag ()) {
+                if (db.getAppPass (strAppPw)) {
+                    // Got the app pw, use it.
+                    onUiGotApplicationPassword (strAppPw);
+                } else {
+                    // There was no app password stored, ask for it
+                    uiRequestApplicationPassword();
+                }
             } else {
                 // Assume that the GV password is the contacts password.
                 // If this is not true then the login will fail and the

@@ -30,6 +30,12 @@ class ContactsModel;
 class IMainWindow;
 class ContactNumbersModel;
 
+struct PhotoLink {
+    QString id;     // Contact ID
+    QString href;   // Photo URL
+};
+typedef QList<PhotoLink> PhotoLinkList;
+
 class LibContacts : public QObject
 {
     Q_OBJECT
@@ -58,6 +64,7 @@ public slots:
 
 protected:
     ContactsModel *createModel(const QString &query = QString());
+    void startNextPhoto();
 
 protected slots:
     void loginCompleted();
@@ -74,6 +81,8 @@ protected:
 
     QTimer      m_updateTimer;
     bool        m_enableTimerUpdate;
+
+    PhotoLinkList m_noPhotos;
 
 public:
     ContactsModel       *m_contactsModel;

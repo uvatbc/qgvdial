@@ -601,9 +601,10 @@ CacheDb::refreshContactsModel (ContactsModel *modelContacts,
     QString strRem = "FROM "GV_CONTACTS_TABLE" c LEFT JOIN "GV_TEMP_TABLE" t "
                      "ON c."GV_C_PICLINK"=t."GV_TT_LINK;
     if (!query.isEmpty ()) {
-        strRem += QString(" WHERE c."GV_C_NAME" LIKE '%%%1%%'").arg (scrubQuery);
+        strRem += QString(" WHERE c." GV_C_NAME " LIKE '%%%1%%'")
+                    .arg (scrubQuery);
     }
-    strQ += strRem + " ORDER BY c."GV_C_NAME ";";
+    strQ  += strRem + " ORDER BY c." GV_C_NAME ";";
     strQ1 += strRem + ";";
 
     QString strQ2 = "SELECT COUNT(*) FROM "GV_CONTACTS_TABLE;

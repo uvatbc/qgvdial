@@ -162,6 +162,13 @@ LibContacts::onOneContact(ContactInfo cinfo)
         win->db.deleteContact (cinfo.strId);
     } else {
         win->db.insertContact (cinfo);
+
+        if (!cinfo.hrefPhoto.isEmpty ()) {
+            PhotoLink l;
+            l.id = cinfo.strId;
+            l.href = cinfo.hrefPhoto;
+            m_noPhotos.append (l);
+        }
     }
 }//LibContacts::onOneContact
 
@@ -169,6 +176,8 @@ void
 LibContacts::onContactsFetched()
 {
     AsyncTaskToken *task = (AsyncTaskToken *) QObject::sender ();
+    task->deleteLater ();
+
     IMainWindow *win = (IMainWindow *) this->parent ();
     win->db.setQuickAndDirty (false);
 
@@ -192,9 +201,9 @@ LibContacts::onContactsFetched()
         } else {
             m_contactsModel = oldModel;
         }
-   }
+    }
 
-    task->deleteLater ();
+    startNextPhoto ();
 
     if (m_enableTimerUpdate && (m_updateTimer.interval () >= 60)) {
         m_updateTimer.stop ();
@@ -211,6 +220,15 @@ LibContacts::createModel(const QString &query)
     win->db.refreshContactsModel (model, query);
     return (model);
 }//LibContacts::createModel
+
+void
+LibContacts::startNextPhoto()
+{
+    if (!m_noPhotos.isEmpty ()) {
+        PhotoLink l = m_noPhotos.takeFirst ();
+        onNoContactPhoto (l.id, l.href);
+    }
+}//LibContacts::startNextPhoto
 
 void
 LibContacts::onNoContactPhoto(QString contactId, QString photoUrl)
@@ -288,6 +306,8 @@ LibContacts::onGotPhoto()
     } while(0);
 
     task->deleteLater ();
+
+    startNextPhoto ();
 }//LibContacts::onGotPhoto
 
 void

@@ -24,13 +24,31 @@ Contact: yuvraaj@gmail.com
 QString
 OsdDirs::_getTempDir()
 {
-	return QDir::temp().absolutePath();
+    //return QDir::temp().absolutePath();
+
+    // Don't use the actual temp directory: All files in this directory are
+    // purged the instant the app closes. All image files will then need to be
+    // downloaded again every single time the app is opened.
+    // This will blow up the network data requirements.
+    // Instead use a directory that isn't subject to aggressive house keeping.
+    QString rv = QDir::homePath();
+
+    if (!QFileInfo(rv + "/temp").exists ()) {
+        QDir(rv).mkdir ("temp");
+    }
+
+    rv += "/temp";
+    return (rv);
 }//OsdDirs::_getTempDir
 
 QString
 OsdDirs::_getDbDir()
 {
-	return QDir::homePath();
+    //return QDir::homePath();
+
+    // Don't use the "homePath". This maps to "/accounts/1000/appdata/<app>/data"
+    // There is a special directory for database files:
+    return (QDir::currentPath() + "/db");
 }//OsdDirs::_getDbDir
 
 QString
@@ -53,7 +71,7 @@ OsdDirs::_getVmailDir()
     if (!QFileInfo(rv + "/voicemail").exists ()) {
         QDir(rv).mkdir ("voicemail");
     }
-    
+
     rv += "/voicemail";
     return (rv);
 }//OsdDirs::_getVmailDir
