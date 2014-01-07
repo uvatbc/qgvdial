@@ -188,7 +188,7 @@ Rectangle {
             TextMultiLine {
                 id: txtSms
                 width: parent.width
-                enableBorder: true
+                enableBorder: false
                 readOnly: true
                 wrapMode: Text.WordWrap
                 textFormat: Text.RichText
