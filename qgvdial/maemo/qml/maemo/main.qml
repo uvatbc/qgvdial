@@ -69,13 +69,7 @@ Rectangle {
         tabsHeight: (main.height + main.width) / 20
         tabIndex: 3
         tabsModel: tabsModel
-        anchors {
-            top: parent.top
-            topMargin: 1
-            bottomMargin: 1
-        }
-        width: main.centralWidth - 1
-        height: main.centralHeight - 1
+        anchors.fill: parent
 
         onSetNumberToDial: {
             tabClicked(0);

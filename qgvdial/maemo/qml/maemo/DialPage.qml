@@ -28,21 +28,9 @@ Rectangle {
     signal sigHaptic
     signal sigCall(string dest)
     signal sigText(string dest)
-    
-    property real toolbarHeight: 50
 
-    function _keypadBtnClick(strText) {
-        /*
-        var origStart = numberField.selectionStart;
-        var result = numberField.text.substr(0, origStart);
-        result += strText;
-        result += numberField.text.substr(numberField.selectionEnd);
-        numberField.text = result;
-        numberField.cursorPosition = origStart + strText.length;
-        */
-        
-        numberField.text += strText;
-    }
+    property real toolbarHeight: 50
+    property real _spacing: 2
 
     function setNumberToDial(number) {
         numberField.text = number;
@@ -50,55 +38,129 @@ Rectangle {
 
     color: "black"
 
-    Column {
-        anchors.fill: parent
+    Button {
+        id: btnSelectedNumber
+        objectName: "SelectedNumberButton"
+    }
+
+    TextOneLine {
+        id: numberField
+
+        // Same anchors for landscape and portrait
+        anchors {
+            top: btnSelectedNumber.bottom
+            left: container.left
+        }
+
+        //inputMethodHints: Qt.ImhDialableCharactersOnly
+        placeholderText: "Enter number here"
+
+        font.pointSize: 14
+    }
+
+    Keypad {
+        id: keypad
+
+        onBtnClick: { numberField.text += strText; }
+        onSigHaptic: { container.sigHaptic(); }
+    }
+
+    Row {
+        id: btnRow
         spacing: 2
 
+        property real btnWidth: 170
+        width: (btnWidth * 2) + spacing
+
         Button {
-            objectName: "SelectedNumberButton"
-            width: parent.width
-            //mainPixelSize: 30
+            text: "Text"
+            height: 80
+            font.pixelSize: 35
+            width: parent.btnWidth
+            onClicked: { container.sigText(numberField.text); }
         }
-
-        TextOneLine {
-            id: numberField
-
-            //inputMethodHints: Qt.ImhDialableCharactersOnly
-            placeholderText: "Enter number here"
-
-            width: parent.width
-            height: 200
-            font.pointSize: 14
+        Button {
+            text: "Call"
+            height: 80
+            font.pixelSize: 35
+            width: parent.btnWidth
+            onClicked: { container.sigCall(numberField.text); }
         }
+    }//Row
 
-        Keypad {
-            id: keypadVert
+    state: (container.height > container.width) ? "portrait" : "landscape"
+    states: [
+        State {
+            name: "portrait"
 
-            width: parent.width - 8
-            height: parent.height * 7/18
-
-            onBtnClick: container._keypadBtnClick(strText);
-            onSigHaptic: container.sigHaptic();
-        }
-
-        Row {
-            id: btnRowVert
-            anchors.horizontalCenter: parent.horizontalCenter
-
-            Button {
-                text: "Text"
-                height: 80
-                font.pixelSize: 35
-                width: container.width/2 - 20
-                onClicked: { container.sigText(numberField.text); }
+            /// target: btnSelectedNumber
+            PropertyChanges {
+                target: btnSelectedNumber
+                width: container.width
             }
-            Button {
-                text: "Call"
-                height: 80
-                font.pixelSize: 35
-                width: container.width/2 - 20
-                onClicked: { container.sigCall(numberField.text); }
+            /// target: numberField
+            PropertyChanges {
+                target: numberField
+                width: container.width
+                height: container.height - (btnSelectedNumber.height + keypad.height + btnRow.height)
             }
-        }//Row
-    }//Column
-}//Item
+            /// target: keypad
+            AnchorChanges {
+                target: keypad
+                anchors {
+                    top: numberField.bottom
+                    left: container.left
+                }
+            }
+            PropertyChanges {
+                target: keypad
+                width: container.width - 8
+                height: container.height * 7/18
+            }
+            /// target: btnRow
+            AnchorChanges {
+                target: btnRow
+                anchors {
+                    top: keypad.bottom
+                    horizontalCenter: container.horizontalCenter
+                }
+            }
+        },// State
+        State {
+            name: "landscape"
+
+            /// target: btnSelectedNumber
+            PropertyChanges {
+                target: btnSelectedNumber
+                width: (container.width / 2) - _spacing;
+            }
+            /// target: numberField
+            PropertyChanges {
+                target: numberField
+                width: (container.width / 2) - _spacing;
+                height: container.height - btnSelectedNumber.height - _spacing
+            }
+            /// target: keypad
+            AnchorChanges {
+                target: keypad
+                anchors {
+                    top: container.top
+                    left: numberField.right
+                }
+            }
+            PropertyChanges {
+                target: keypad
+                width: (container.width / 2) - container._spacing;
+                height: container.height - btnRow.height
+            }
+            /// target: btnRow
+            AnchorChanges {
+                target: btnRow
+                anchors {
+                    top: keypad.bottom
+                    horizontalCenter: keypad.horizontalCenter
+                }
+            }
+        }//State
+    ]//states
+}//Rectangle
