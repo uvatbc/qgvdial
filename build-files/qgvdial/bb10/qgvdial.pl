@@ -55,7 +55,7 @@ $cmd = "cd $basedir/qgvdial/bb10-qml ; qmake ; make -j4 ; blackberry-nativepacka
 print "$cmd\n";
 system($cmd);
 
-$cmd = "cd $basedir ; mkdir -p bundle/qgvdial_10.1.0.4200 ; cp qgvdial.bar bundle/qgvdial_10.1.0.4200 ; cp build-files/qgvdial/bb10/release.xml bundle ; mv bundle ..";
+$cmd = "cd $basedir ; mkdir -p bundle/qgvdial_10.1.0.4200 ; mv ../qgvdial.bar bundle/qgvdial_10.1.0.4200 ; cp build-files/qgvdial/bb10/release.xml bundle ; mv bundle ..";
 print "$cmd\n";
 system($cmd);
 
