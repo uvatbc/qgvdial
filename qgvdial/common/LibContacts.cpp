@@ -137,20 +137,21 @@ LibContacts::refresh(QDateTime after /* = QDateTime()*/)
 bool
 LibContacts::refreshLatest()
 {
-    bool rv = false;
     QDateTime latest;
     IMainWindow *win = (IMainWindow *) this->parent ();
-    if (win->db.getLatestContact (latest)) {
-        refresh (latest);
-        rv = true;
+    if (!win->db.getLatestContact (latest)) {
+        return (false);
     }
 
-    return (rv);
+    win->uiShowStatusMessage ("Starting contacts refresh", SHOW_3SEC);
+    return (refresh (latest));
 }//LibContacts::refreshLatest
 
 bool
 LibContacts::refreshFull()
 {
+    IMainWindow *win = (IMainWindow *) this->parent ();
+    win->uiShowStatusMessage ("Starting FULL contacts refresh", SHOW_3SEC);
     return refresh();
 }//LibContacts::refreshFull
 
@@ -210,6 +211,8 @@ LibContacts::onContactsFetched()
         m_updateTimer.start ();
         Q_DEBUG("Restarting update timer");
     }
+
+    win->uiShowStatusMessage ("Contacts fetched", SHOW_3SEC);
 }//LibContacts::onContactsFetched
 
 ContactsModel *
@@ -227,6 +230,9 @@ LibContacts::startNextPhoto()
     if (!m_noPhotos.isEmpty ()) {
         PhotoLink l = m_noPhotos.takeFirst ();
         onNoContactPhoto (l.id, l.href);
+    } else {
+        IMainWindow *win = (IMainWindow *) this->parent ();
+        win->uiShowStatusMessage ("Contact photos fetched", SHOW_3SEC);
     }
 }//LibContacts::startNextPhoto
 

@@ -76,6 +76,8 @@ LibInbox::refreshLatest(QString type)
     IMainWindow *win = (IMainWindow *) this->parent ();
 
     if (win->db.getLatestInboxEntry (latest)) {
+        IMainWindow *win = (IMainWindow *) this->parent ();
+        win->uiShowStatusMessage ("Starting inbox refresh", SHOW_3SEC);
         rv = this->refresh (type, latest);
     }
 
@@ -91,6 +93,8 @@ LibInbox::refreshLatest()
 bool
 LibInbox::refreshFull()
 {
+    IMainWindow *win = (IMainWindow *) this->parent ();
+    win->uiShowStatusMessage ("Starting FULL inbox refresh", SHOW_3SEC);
     return refresh();
 }//LibInbox::refreshFull
 
@@ -210,6 +214,8 @@ LibInbox::onRefreshDone()
             } else {
                 m_inboxModel = oldModel;
             }
+
+            win->uiShowStatusMessage ("Inbox fetched", SHOW_3SEC);
         }
         task->deleteLater ();
 
