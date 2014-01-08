@@ -51,7 +51,11 @@ $cmd = "cd $basedir/qgvdial/bb10-qml ; mv bar-descriptor-deploy.xml bar-descript
 print "$cmd\n";
 system($cmd);
 
-$cmd = "cd $basedir/qgvdial/bb10-qml ; qmake ; make -j4 ; blackberry-nativepackager -package qgvdial.bar bar-descriptor.xml -debugToken /media/drobo/uv/work/bb_dev_cert/z10-dbgtoken.bar ; cp qgvdial.bar ../../..";
+$cmd = "cd $basedir/qgvdial/bb10-qml ; qmake ; make -j4";
+print "$cmd\n";
+system($cmd);
+
+$cmd = "cd $basedir/qgvdial/bb10-qml ; blackberry-nativepackager -package qgvdial.bar bar-descriptor.xml -debugToken /media/drobo/uv/work/bb_dev_cert/2/z10-dbgtoken.bar ; cp qgvdial.bar ../../..";
 print "$cmd\n";
 system($cmd);
 
