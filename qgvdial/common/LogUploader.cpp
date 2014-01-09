@@ -114,12 +114,12 @@ LogUploader::sendLogs()
 
         // Post the logs to my server
         QUrl url(LOGS_SERVER "/tracker/postLogs");
-        url.addQueryItem ("email", win->m_user.toAscii());
+        url.addQueryItem ("email", win->m_user.toLatin1());
         url.addQueryItem ("version", "__QGVDIAL_VERSION__");
         QNetworkRequest req(url);
         req.setHeader (QNetworkRequest::ContentTypeHeader, POST_TEXT);
 
-        QNetworkReply *reply = m_nwMgr->post (req, doc.toString().toAscii ());
+        QNetworkReply *reply = m_nwMgr->post (req, doc.toString().toLatin1 ());
         if (!reply) {
             delete task;
             break;
@@ -192,7 +192,7 @@ LogUploader::reportLogin()
                     .arg(lib.getOsDetails ())
                     .arg("__QGVDIAL_VERSION__");
 
-    QNetworkReply *reply = m_nwMgr->post (req, json.toAscii ());
+    QNetworkReply *reply = m_nwMgr->post (req, json.toLatin1 ());
 
     NwReqTracker *tracker = new NwReqTracker(reply, *m_nwMgr, task,
                                              NW_REPLY_TIMEOUT, true, this);

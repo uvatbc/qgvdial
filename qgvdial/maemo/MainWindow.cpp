@@ -179,7 +179,8 @@ MainWindow::connectToChangeNotify(QObject *item, const QString &propName,
 
         Q_DEBUG(QString("Connect %1 to %2").arg(signalName).arg(slotName));
 
-        rv = connect(item, signalName.toAscii().constData(), receiver, slotName);
+        rv =
+        connect(item, signalName.toLatin1().constData(), receiver, slotName);
     } while(0);
 
     return (rv);

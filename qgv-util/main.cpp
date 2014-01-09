@@ -51,8 +51,8 @@ void dbgHandler(QtMsgType type, const char *msg)
                      .arg(level)
                      .arg(msg);
     open_logfile ();
-    logfile << strLog.toAscii().data() << endl;
-    cout << strLog.toAscii().data() << endl;
+    logfile << strLog.toLatin1().data() << endl;
+    cout << strLog.toLatin1().data() << endl;
 
     if (QtFatalMsg == type) {
         abort ();

@@ -238,7 +238,7 @@ CacheDb::getUserPass (QString &strUser, QString &strPass)
 
     if (p.settings->contains (GV_S_VAR_USER)) {
         strResult = p.settings->value(GV_S_VAR_USER).toString();
-        lib.cipher (QByteArray::fromHex (strResult.toAscii ()), byD, false);
+        lib.cipher (QByteArray::fromHex (strResult.toLatin1 ()), byD, false);
         strUser = byD;
         bGotUser = true;
     }
@@ -248,7 +248,7 @@ CacheDb::getUserPass (QString &strUser, QString &strPass)
         if (!bGotUser) {
             p.settings->remove (GV_S_VAR_PASS);
         } else {
-            lib.cipher (QByteArray::fromHex (strResult.toAscii ()), byD, false);
+            lib.cipher (QByteArray::fromHex (strResult.toLatin1 ()), byD, false);
             strPass = byD;
         }
     }
@@ -263,10 +263,10 @@ CacheDb::putUserPass (const QString &strUser, const QString &strPass)
     Lib &lib = Lib::ref();
     CacheDbPrivate &p = CacheDbPrivate::ref();
 
-    lib.cipher (strUser.toAscii (), byD, true);
+    lib.cipher (strUser.toLatin1 (), byD, true);
     p.settings->setValue (GV_S_VAR_USER, QString (byD.toHex ()));
 
-    lib.cipher (strPass.toAscii (), byD, true);
+    lib.cipher (strPass.toLatin1 (), byD, true);
     p.settings->setValue (GV_S_VAR_PASS, QString (byD.toHex ()));
 
     return (true);
@@ -434,7 +434,7 @@ CacheDb::getAppPass(QString &strPass)
 
     if (p.settings->contains (GV_S_VAR_CPASS)) {
         strResult = p.settings->value(GV_S_VAR_CPASS).toString();
-        lib.cipher (QByteArray::fromHex (strResult.toAscii ()), byD, false);
+        lib.cipher (QByteArray::fromHex (strResult.toLatin1 ()), byD, false);
         strPass = byD;
 
         return (true);
@@ -450,7 +450,7 @@ CacheDb::setAppPass(const QString &strPass)
     Lib &lib = Lib::ref();
     CacheDbPrivate &p = CacheDbPrivate::ref();
 
-    lib.cipher (strPass.toAscii (), byD, true);
+    lib.cipher (strPass.toLatin1 (), byD, true);
     p.settings->setValue (GV_S_VAR_CPASS, QString (byD.toHex ()));
 
     return (true);
@@ -848,7 +848,7 @@ CacheDb::getContactFromLink (ContactInfo &info) const
 
         if (strType == GV_L_TYPE_NUMBER) {
             PhoneInfo num;
-            num.Type      = PhoneInfo::charToType (strData[0].toAscii ());
+            num.Type      = PhoneInfo::charToType (strData[0].toLatin1 ());
             num.strNumber = strData.mid (1);
             info.arrPhones += num;
         }

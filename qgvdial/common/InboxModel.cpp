@@ -88,7 +88,7 @@ InboxModel::data (const QModelIndex &index, int role) const
         if (0 == column) {          // GV_IN_ID
             // No modifications
         } else if (1 == column) {   // GV_IN_TYPE
-            char chType = var.toChar().toAscii ();
+            char chType = var.toChar().toLatin1 ();
             QString strDisp = type_to_string ((GVI_Entry_Type) chType);
             var.clear ();
             if (0 == strDisp.size ()) {
@@ -103,7 +103,7 @@ InboxModel::data (const QModelIndex &index, int role) const
                 QVariant v;
                 v = QSqlQueryModel::data (index.sibling(index.row (), 1), //Type
                                           Qt::EditRole);
-                GVI_Entry_Type type = (GVI_Entry_Type) v.toChar().toAscii();
+                GVI_Entry_Type type = (GVI_Entry_Type) v.toChar().toLatin1();
                 QString path;
                 switch (type) {
                 case GVIE_Placed:

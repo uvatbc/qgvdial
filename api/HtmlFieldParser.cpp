@@ -54,7 +54,7 @@ HtmlFieldParser::endElement (const QString & /*namespaceURI*/,
 #if 0
     QFile temp(QString("dump-%1.txt").arg(localName));
     temp.open (QIODevice::ReadWrite);
-    temp.write (strChars.toAscii ());
+    temp.write (strChars.toLatin1 ());
     temp.close ();
 #endif
 

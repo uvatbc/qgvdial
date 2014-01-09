@@ -1363,7 +1363,7 @@ GVApi::onGetPhones(bool success, const QByteArray &response, QNetworkReply *,
                 } else if (strPName == "phoneNumber") {
                     regNumber.number = strVal;
                 } else if (strPName == "type") {
-                    regNumber.chType = strVal[0].toAscii ();
+                    regNumber.chType = strVal[0].toLatin1 ();
                 } else if (strPName == "verified") {
                     regNumber.verified = (strVal == "true");
                 } else if (strPName == "smsEnabled") {
@@ -1726,7 +1726,7 @@ GVApi::parseInboxJson(AsyncTaskToken *token, const QString &strJson,
                 }
 
                 fSms.resize (0);
-                fSms.write (QString("<html>" + result + "</html>").toAscii ());
+                fSms.write (QString("<html>" + result + "</html>").toLatin1 ());
                 fSms.seek (0);
 
                 strQuery =
@@ -2120,7 +2120,7 @@ GVApi::callBack(AsyncTaskToken *token)
     Q_DEBUG(QString("Call back request = %1").arg(strContent));
 
     bool rv =
-    doPostForm(url, strContent.toAscii (), token, this,
+    doPostForm(url, strContent.toLatin1 (), token, this,
                SLOT(onCallback(bool,const QByteArray&,QNetworkReply*,void*)));
     Q_ASSERT(rv);
 
@@ -2404,7 +2404,7 @@ GVApi::markInboxEntryAsRead(AsyncTaskToken *token)
 
     QUrl url(GV_HTTPS "/b/0/inbox/mark");
     bool rv =
-    doPost(url, strContent.toAscii(), POST_FORM, UA_DESKTOP, token, this,
+    doPost(url, strContent.toLatin1(), POST_FORM, UA_DESKTOP, token, this,
            SLOT(onMarkAsRead(bool,const QByteArray&,QNetworkReply*,void*)));
     Q_ASSERT(rv);
 
@@ -2499,7 +2499,7 @@ GVApi::deleteInboxEntry(AsyncTaskToken *token)
 //    QUrl url(GV_HTTPS "/b/0/inbox/deleteMessages");
     QUrl url(GV_HTTPS "/inbox/deleteMessages");
     bool rv =
-    doPost(url, strContent.toAscii(), POST_FORM, UA_DESKTOP, token, this,
+    doPost(url, strContent.toLatin1(), POST_FORM, UA_DESKTOP, token, this,
            SLOT(onEntryDeleted(bool,const QByteArray&,QNetworkReply*,void*)));
     Q_ASSERT(rv);
 

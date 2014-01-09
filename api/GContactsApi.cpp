@@ -41,7 +41,7 @@ GContactsApi::doGet(QUrl url, void *ctx, QObject *obj, const char *method)
     QNetworkRequest req(url);
 
     QByteArray byAuth = QString("GoogleLogin auth=%1")
-                                .arg(m_GoogleAuthToken).toAscii ();
+                                .arg(m_GoogleAuthToken).toLatin1 ();
     req.setRawHeader ("Authorization", byAuth);
     req.setRawHeader("User-Agent", UA_IPHONE4);
 

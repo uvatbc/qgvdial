@@ -46,7 +46,7 @@ MqPublisher::MqPublisher (const QString &name,
 void
 MqPublisher::publish (const QByteArray &byPayload)
 {
-    mosq = mosquitto_new(m_strName.toAscii ().data (), this);
+    mosq = mosquitto_new(m_strName.toLatin1 ().data (), this);
     if (NULL == mosq) {
         qWarning ("MqPub: Failed to allocate mosquitto context");
         return;
