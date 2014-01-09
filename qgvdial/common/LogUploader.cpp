@@ -23,6 +23,10 @@ Contact: yuvraaj@gmail.com
 #include "IMainWindow.h"
 #include "Lib.h"
 
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+   #include <QUrlQuery>
+#endif
+
 //#define LOGS_SERVER "http://localhost:8000"
 #define LOGS_SERVER "https://qgvdial.yuvraaj.net"
 
@@ -112,13 +116,21 @@ LogUploader::sendLogs()
             oneLogFile.appendChild(t);
         }
 
-        // Post the logs to my server
         QUrl url(LOGS_SERVER "/tracker/postLogs");
+        
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+        QUrlQuery urlQ;
+        urlQ.addQueryItem ("email", win->m_user.toLatin1());
+        urlQ.addQueryItem ("version", "__QGVDIAL_VERSION__");
+        url.setQuery(urlQ);
+#else
         url.addQueryItem ("email", win->m_user.toLatin1());
         url.addQueryItem ("version", "__QGVDIAL_VERSION__");
+#endif
         QNetworkRequest req(url);
         req.setHeader (QNetworkRequest::ContentTypeHeader, POST_TEXT);
 
+        // Post the logs to my server
         QNetworkReply *reply = m_nwMgr->post (req, doc.toString().toLatin1 ());
         if (!reply) {
             delete task;

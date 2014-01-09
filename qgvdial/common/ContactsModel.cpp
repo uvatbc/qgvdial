@@ -29,12 +29,17 @@ ContactsModel::ContactsModel(bool bLocalPic, QObject *parent)
 , mandatoryLocalPic(bLocalPic)
 , modelContacts(NULL)
 {
+}//ContactsModel::ContactsModel
+
+QHash<int, QByteArray>
+ContactsModel::roleNames() const
+{
     QHash<int, QByteArray> roles;
     roles[CT_IDRole] = "id";
     roles[CT_NameRole] = "name";
     roles[CT_ImagePathRole] = "imagePath";
-    setRoleNames(roles);
-}//ContactsModel::ContactsModel
+    return (roles);
+}//ContactsModel::roleNames
 
 QVariant
 ContactsModel::getPic(const QModelIndex &index, bool isQML) const

@@ -46,6 +46,7 @@ public:
 
     explicit ContactNumbersModel (QObject *parent = 0);
     ~ContactNumbersModel ();
+    QHash<int, QByteArray> roleNames() const;
 
     void setPhones(const ContactInfo &i);
 

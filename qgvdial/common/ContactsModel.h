@@ -41,7 +41,8 @@ public:
     };
 
     explicit ContactsModel(bool bLocalPic, QObject *parent = 0);
-
+    
+    QHash<int, QByteArray> roleNames() const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
     void clearAll ();

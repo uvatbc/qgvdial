@@ -25,15 +25,20 @@ Contact: yuvraaj@gmail.com
 ContactNumbersModel::ContactNumbersModel (QObject *parent)
 : QAbstractListModel (parent)
 {
-    QHash<int, QByteArray> roles;
-    roles[CD_TypeRole]   = "type";
-    roles[CD_NumberRole] = "number";
-    setRoleNames(roles);
 }//ContactNumbersModel::ContactNumbersModel
 
 ContactNumbersModel::~ContactNumbersModel ()
 {
 }//ContactNumbersModel::~ContactNumbersModel
+
+QHash<int, QByteArray>
+ContactNumbersModel::roleNames() const
+{
+    QHash<int, QByteArray> roles;
+    roles[CD_TypeRole]   = "type";
+    roles[CD_NumberRole] = "number";
+    return (roles);
+}//ContactNumbersModel::roleNames
 
 void
 ContactNumbersModel::setPhones(const ContactInfo &i)

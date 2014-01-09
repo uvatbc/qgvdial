@@ -30,6 +30,11 @@ InboxModel::InboxModel (QObject * parent)
 , strSelectType ("all")
 , m_eSelectType (GVIE_Unknown)
 {
+}//InboxModel::InboxModel
+
+QHash<int, QByteArray>
+InboxModel::roleNames() const
+{
     QHash<int, QByteArray> roles;
     roles[IN_IdRole]    = "id";
     roles[IN_TypeRole]  = "type";
@@ -38,8 +43,8 @@ InboxModel::InboxModel (QObject * parent)
     roles[IN_TimeRole]  = "time";
     roles[IN_TimeDetail]= "time_detail";
     roles[IN_ReadFlag]  = "is_read";
-    setRoleNames(roles);
-}//InboxModel::InboxModel
+    return (roles);
+}//InboxModel::roleNames
 
 QVariant
 InboxModel::data (const QModelIndex &index, int role) const

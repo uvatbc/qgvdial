@@ -24,13 +24,18 @@ Contact: yuvraaj@gmail.com
 GVNumModel::GVNumModel(QObject *parent)
 : QAbstractListModel(parent)
 {
+}//GVNumModel::GVNumModel
+
+QHash<int, QByteArray>
+GVNumModel::roleNames() const
+{
     QHash<int, QByteArray> roles;
     roles[IdRole]       = "id";
     roles[TypeRole]     = "type";
     roles[NameRole]     = "name";
     roles[NumberRole]   = "number";
-    setRoleNames(roles);
-}//GVNumModel::GVNumModel
+    return (roles);
+}//GVNumModel::roleNames
 
 int
 GVNumModel::rowCount (const QModelIndex & /*parent*/) const

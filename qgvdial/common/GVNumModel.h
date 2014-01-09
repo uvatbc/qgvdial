@@ -37,6 +37,7 @@ public:
     };
 
     explicit GVNumModel(QObject *parent = 0);
+    QHash<int, QByteArray> roleNames() const;
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     int columnCount(const QModelIndex &parent = QModelIndex()) const;

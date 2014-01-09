@@ -24,16 +24,21 @@ Contact: yuvraaj@gmail.com
 #include "Lib.h"
 
 #if PHONON_ENABLED
-#ifdef OS_DIABLO
-#include <Phonon/AudioOutput>
-#include <Phonon/AudioOutputDevice>
+    #ifdef OS_DIABLO
+        #include <Phonon/AudioOutput>
+        #include <Phonon/AudioOutputDevice>
+    #else
+        #include <phonon/AudioOutput>
+        #include <phonon/AudioOutputDevice>
+    #endif
 #else
-#include <phonon/AudioOutput>
-#include <phonon/AudioOutputDevice>
-#endif
-#else
-#include <QtMultimediaKit/QMediaContent>
-#include <QtMultimediaKit/QMediaPlaylist>
+    #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+        #include <QtMultimedia/QMediaContent>
+        #include <QtMultimedia/QMediaPlaylist>
+    #else
+        #include <QtMultimediaKit/QMediaContent>
+        #include <QtMultimediaKit/QMediaPlaylist>
+    #endif
 #endif
 
 #define NOTIFY_INTERVAL 100
