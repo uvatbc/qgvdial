@@ -23,6 +23,6 @@ dbus_services.target = ../../usr/share/dbus-1/services
 
 # Stupid
 contains($$PWD,export) {
-message Export!
+message(Export!)
 DEPLOYMENTFOLDERS += dbus_services
 }

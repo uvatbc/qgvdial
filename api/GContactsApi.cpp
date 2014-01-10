@@ -126,16 +126,21 @@ GContactsApi::login(AsyncTaskToken *task)
 }//GContactsApi::login
 
 bool
-GContactsApi::startLogin(AsyncTaskToken *task, QUrl url) {
+GContactsApi::startLogin(AsyncTaskToken *task, QUrl url)
+{
+    QVariantMap m;
+    m["accountType"] = "GOOGLE";
+    m["Email"]       = task->inParams["user"].toString();
+    m["Passwd"]      = task->inParams["pass"].toString();
+    m["service"]     = "cp"; // name for contacts service
+    m["source"]      = "MyCompany-qgvdial-ver01";
+    NwHelpers::appendQueryItems (url, m);
 
-    url.addQueryItem ("accountType" , "GOOGLE");
-    url.addQueryItem ("Email"       , task->inParams["user"].toString());
-    url.addQueryItem ("Passwd"      , task->inParams["pass"].toString());
-    url.addQueryItem ("service"     , "cp"); // name for contacts service
-    url.addQueryItem ("source"      , "MyCompany-qgvdial-ver01");
+    QByteArray content = NwHelpers::createPostContent (url);
 
-    bool rv = doPost(url, url.encodedQuery(),
-                     "application/x-www-form-urlencoded", task, this,
+    bool rv = doPost(url, content,
+                     "application/x-www-form-urlencoded",
+                     task, this,
                    SLOT(onLoginResponse(bool,QByteArray,QNetworkReply*,void*)));
     Q_ASSERT(rv);
 
@@ -234,24 +239,27 @@ GContactsApi::getContacts(AsyncTaskToken *task)
     QString temp = QString ("http://www.google.com/m8/feeds/contacts/%1/full")
                             .arg (m_user);
     QUrl url(temp);
-    url.addQueryItem ("max-results", "10000");
+    QVariantMap m;
+    m["max-results"] = "10000";
 
     if (updatedMin.isValid ()) {
         temp = updatedMin.toUTC().toString (Qt::ISODate);
-        url.addQueryItem ("updated-min", temp);
+        m["updated-min"] = temp;
         msg += QString(" Minimum = %1.").arg(temp);
     } else {
         msg += " Full update.";
     }
 
     if (task->inParams["showDeleted"].toBool()) {
-        url.addQueryItem ("showdeleted", "true");
+        m["showdeleted"] = "true";
         msg += " Show deleted.";
     }
 
 #if USE_JSON_FEED
-    url.addQueryItem ("alt", "json");
+    m["alt"] = "json";
 #endif
+
+    NwHelpers::appendQueryItems (url, m);
 
     bool rv =
     doGet(url, task, this,

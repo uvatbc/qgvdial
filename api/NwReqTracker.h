@@ -85,4 +85,16 @@ protected:
     QNetworkAccessManager &nwMgr;
 };
 
+class NwHelpers {
+public:
+    static QString getLastQueryItemValue(const QUrl &url, const QString &key);
+    static void appendQueryItem(QUrl &url,
+                                const QString &key, const QString &val);
+    static void appendQueryItems(QUrl &url, const QVariantMap &m);
+    static QByteArray createPostContent(QVariantMap m,
+                                        QStringList ignoreKeys = QStringList());
+    static QByteArray createPostContent(const QUrl &url);
+    static void appendQVMap(QVariantMap &dst, const QVariantMap &src);
+};
+
 #endif // NWREQTRACKER_H

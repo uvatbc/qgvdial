@@ -10,7 +10,12 @@ SOURCES  += desktop_linux/PhoneFactory.cpp
 HEADERS  += desktop_linux/platform_specific.h \
             desktop_linux/PhoneFactory.h
 
+greaterThan(QT_MAJOR_VERSION, 4) {
+CONFIG *= mobility
+MOBILITY *= multimedia
+} else {
 QT *= phonon
+}
 
 # Please do not modify the following two lines. Required for deployment.
 include(deployment.pri)

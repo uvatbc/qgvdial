@@ -529,14 +529,14 @@ GVApi::onLogin1(bool success, const QByteArray &response, QNetworkReply *reply,
         QUrl url(nextAction);
 
         QUrl oldUrl = reply->request().url();
-        QString lastVal = getLastQueryItemValue (oldUrl, "continue");
+        QString lastVal = NwHelpers::getLastQueryItemValue (oldUrl, "continue");
         if (lastVal.length () != 0) {
-            appendQueryItem (url, "continue", lastVal);
+            NwHelpers::appendQueryItem (url, "continue", lastVal);
         }
 
-        lastVal = getLastQueryItemValue (oldUrl, "followup");
+        lastVal = NwHelpers::getLastQueryItemValue (oldUrl, "followup");
         if (lastVal.length () != 0) {
-            appendQueryItem (url, "followup", lastVal);
+            NwHelpers::appendQueryItem (url, "followup", lastVal);
         }
 
         success = postLogin (url, token);
@@ -552,31 +552,6 @@ GVApi::onLogin1(bool success, const QByteArray &response, QNetworkReply *reply,
         token->emitCompleted ();
     }
 }//GVApi::onLogin1
-
-QString
-GVApi::getLastQueryItemValue(const QUrl &url, const QString &key)
-{
-    QString rv;
-
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-#else
-    QStringList qiVal = url.allQueryItemValues (key);
-    if (qiVal.length () != 0) {
-        rv = qiVal[qiVal.length () - 1];
-    }
-#endif
-
-    return rv;
-}//GVApi::getLastQueryItemValue
-
-void
-GVApi::appendQueryItem(QUrl &url, const QString &key, const QString &val)
-{
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-#else
-    url.addQueryItem (key, val);
-#endif
-}//GVApi::appendQueryItem
 
 bool
 GVApi::parseHiddenLoginFields(const QString &strResponse, QVariantMap &ret)
@@ -670,7 +645,6 @@ gonext:
 bool
 GVApi::postLogin(QUrl url, AsyncTaskToken *token)
 {
-    QUrl content;
     QNetworkCookie galx;
     bool found = false;
 
@@ -710,14 +684,11 @@ GVApi::postLogin(QUrl url, AsyncTaskToken *token)
 
     keys = allLoginFields.keys();
 
-    foreach (QString key, keys) {
-        if (key != "dsh") {
-            content.addQueryItem(key, allLoginFields[key].toString());
-        }
-    }
+    QByteArray content =
+            NwHelpers::createPostContent (allLoginFields, QStringList("dsh"));
 
     found =
-    doPostForm(url, content.encodedQuery(), token, this,
+    doPostForm(url, content, token, this,
                SLOT(onLogin2(bool,const QByteArray&,QNetworkReply*,void*)));
     Q_ASSERT(found);
 
@@ -1002,19 +973,17 @@ GVApi::resumeTFALogin(AsyncTaskToken *token)
 
         QUrl twoFactorUrl = QUrl::fromPercentEncoding(formAction.toLatin1 ());
 
-        QUrl content = twoFactorUrl;
-        content.addQueryItem("smsUserPin"      , smsUserPin);
-        content.addQueryItem("smsVerifyPin"    , "Verify");
-        content.addQueryItem("PersistentCookie", "yes");
-//        content.addQueryItem("GALX"            , galx.value());
+        QVariantMap m;
+        m["smsUserPin"]       = smsUserPin;
+        m["smsVerifyPin"]     = "Verify";
+        m["PersistentCookie"] = "yes";
+        m["GALX"]             = galx.value();
+        NwHelpers::appendQVMap (m, hiddenLoginFields);
 
-        QStringList keys = hiddenLoginFields.keys();
-        foreach (QString key, keys) {
-            content.addQueryItem(key, hiddenLoginFields[key].toString());
-        }
+        QByteArray content = NwHelpers::createPostContent (m);
 
-        rv = doPostForm(twoFactorUrl, content.encodedQuery(), token, this,
-              SLOT(onLogin2(bool,QByteArray,QNetworkReply*,void*)));
+        rv = doPostForm(twoFactorUrl, content, token, this,
+                        SLOT(onLogin2(bool,QByteArray,QNetworkReply*,void*)));
         Q_ASSERT(rv);
     } while (0);
 
@@ -2007,11 +1976,14 @@ GVApi::callOut(AsyncTaskToken *token)
 
     QString fwdingNum = token->inParams["source"].toString();
     QString dest = token->inParams["destination"].toString();
+
     QUrl url(GV_HTTPS_M "/x");
-    url.addQueryItem("m" , "call");
-    url.addQueryItem("n" , dest);
-    url.addQueryItem("f" , fwdingNum);
-    url.addQueryItem("v" , "11");
+    QVariantMap m;
+    m["m"] = "call";
+    m["n"] = dest;
+    m["f"] = fwdingNum;
+    m["v"] = "11";
+    NwHelpers::appendQueryItems (url, m);
 
     if (emitLog) {
         Q_DEBUG(QString("Call out: dest=%1, using=%2").arg(dest, fwdingNum));
@@ -2230,11 +2202,13 @@ GVApi::sendSms(AsyncTaskToken *token)
     }
 
     QUrl url(GV_HTTPS_M "/x");
-    url.addQueryItem("m" , "sms");
-    url.addQueryItem("n" , token->inParams["destination"].toString());
-    url.addQueryItem("f" , "");
-    url.addQueryItem("v" , "11");
-    url.addQueryItem("txt",token->inParams["text"].toString());
+    QVariantMap m;
+    m["m"]   = "sms";
+    m["n"]   = token->inParams["destination"].toString();
+    m["f"]   = "";
+    m["v"]   = "11";
+    m["txt"] = token->inParams["text"].toString();
+    NwHelpers::appendQueryItems (url, m);
 
     return doSendSms (url, token);
 }//GVApi::sendSms

@@ -415,3 +415,106 @@ NwReqTracker::dumpReplyInfo(QNetworkReply *reply)
 
     Q_DEBUG(msg);
 }//NwReqTracker::dumpReplyInfo
+
+//////////////////////////////////// Helpers ///////////////////////////////////
+QString
+NwHelpers::getLastQueryItemValue(const QUrl &url, const QString &key)
+{
+    QString rv;
+    QStringList qiVal;
+
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+    QUrlQuery q(url.query ());
+    qiVal = q.allQueryItemValues (key);
+#else
+    qiVal = url.allQueryItemValues (key);
+#endif
+    if (qiVal.length () != 0) {
+        rv = qiVal[qiVal.length () - 1];
+    }
+
+    return rv;
+}//NwHelpers::getLastQueryItemValue
+
+void
+NwHelpers::appendQueryItem(QUrl &url, const QString &key, const QString &val)
+{
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+    QUrlQuery q(url.query ());
+    q.addQueryItem (key, val);
+    url.setQuery (q);
+#else
+    url.addQueryItem (key, val);
+#endif
+}//NwHelpers::appendQueryItem
+
+void
+NwHelpers::appendQueryItems(QUrl &url, const QVariantMap &m)
+{
+    QStringList keys = m.keys ();
+
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+    QUrlQuery q(url.query ());
+#else
+    QUrl &q = url;
+#endif
+
+    foreach (QString key, keys) {
+        q.addQueryItem (key, m[key].toString());
+    }
+
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+    url.setQuery (q);
+#endif
+}//NwHelpers::appendQueryItems
+
+QByteArray
+NwHelpers::createPostContent(QVariantMap m, QStringList ignoreKeys)
+{
+    QByteArray rv;
+    QStringList keys = m.keys ();
+
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+    QUrlQuery content;
+#else
+    QUrl content;
+#endif
+
+    foreach (QString key, keys) {
+        if (!ignoreKeys.contains (key)) {
+            content.addQueryItem(key, m[key].toString());
+        }
+    }
+
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+    rv = content.toString (QUrl::FullyDecoded).toLatin1 ();
+#else
+    rv = content.encodedQuery();
+#endif
+
+    return (rv);
+}//NwHelpers::createPostContent
+
+QByteArray
+NwHelpers::createPostContent(const QUrl &url)
+{
+    QByteArray rv;
+
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+    rv = url.query (QUrl::FullyDecoded).toLatin1 ();
+#else
+    rv = url.encodedQuery ();
+#endif
+
+    return (rv);
+}//NwHelpers::createPostContent
+
+void
+NwHelpers::appendQVMap(QVariantMap &dst, const QVariantMap &src)
+{
+    QStringList keys = src.keys ();
+
+    foreach (QString key, keys) {
+        dst[key] = src[key];
+    }
+}//NwHelpers::appendQVMap

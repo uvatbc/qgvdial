@@ -1,6 +1,11 @@
 INCLUDEPATH += $$PWD
 QT *= dbus
+
+greaterThan(QT_MAJOR_VERSION, 4) {
+LIBS += -ltelepathy-qt5
+} else {
 LIBS += -ltelepathy-qt4
+}
 
 HEADERS  += $$PWD/TpCalloutInitiator.h \
             $$PWD/TpPhoneFactory.h \
