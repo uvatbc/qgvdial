@@ -35,6 +35,7 @@ Contact: yuvraaj@gmail.com
     #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
         #include <QtMultimedia/QMediaContent>
         #include <QtMultimedia/QMediaPlaylist>
+        #include <QtMultimedia/QMediaPlayer>
     #else
         #include <QtMultimediaKit/QMediaContent>
         #include <QtMultimediaKit/QMediaPlaylist>
