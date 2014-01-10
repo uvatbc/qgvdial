@@ -529,14 +529,14 @@ GVApi::onLogin1(bool success, const QByteArray &response, QNetworkReply *reply,
         QUrl url(nextAction);
 
         QUrl oldUrl = reply->request().url();
-        QStringList qiVal = oldUrl.allQueryItemValues ("continue");
-        if (qiVal.length () != 0) {
-            url.addQueryItem ("continue", qiVal[qiVal.length () - 1]);
+        QString lastVal = getLastQueryItemValue (oldUrl, "continue");
+        if (lastVal.length () != 0) {
+            appendQueryItem (url, "continue", lastVal);
         }
 
-        qiVal = oldUrl.allQueryItemValues ("followup");
-        if (qiVal.length () != 0) {
-            url.addQueryItem ("followup", qiVal[qiVal.length () - 1]);
+        lastVal = getLastQueryItemValue (oldUrl, "followup");
+        if (lastVal.length () != 0) {
+            appendQueryItem (url, "followup", lastVal);
         }
 
         success = postLogin (url, token);
@@ -552,6 +552,31 @@ GVApi::onLogin1(bool success, const QByteArray &response, QNetworkReply *reply,
         token->emitCompleted ();
     }
 }//GVApi::onLogin1
+
+QString
+GVApi::getLastQueryItemValue(const QUrl &url, const QString &key)
+{
+    QString rv;
+
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+#else
+    QStringList qiVal = url.allQueryItemValues (key);
+    if (qiVal.length () != 0) {
+        rv = qiVal[qiVal.length () - 1];
+    }
+#endif
+
+    return rv;
+}//GVApi::getLastQueryItemValue
+
+void
+GVApi::appendQueryItem(QUrl &url, const QString &key, const QString &val)
+{
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+#else
+    url.addQueryItem (key, val);
+#endif
+}//GVApi::appendQueryItem
 
 bool
 GVApi::parseHiddenLoginFields(const QString &strResponse, QVariantMap &ret)

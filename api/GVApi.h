@@ -166,6 +166,9 @@ private:
     bool execXQuery(const QString &strQuery, QString &result);
     bool parseMessageRow(QString strRow, GVInboxEntry &entry);
 
+    QString getLastQueryItemValue(const QUrl &url, const QString &key);
+    void appendQueryItem(QUrl &url, const QString &key, const QString &val);
+
 private:
     bool emitLog;
 
