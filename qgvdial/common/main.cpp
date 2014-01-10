@@ -25,7 +25,12 @@ Contact: yuvraaj@gmail.com
 #include <iostream>
 using namespace std;
 
-QtMsgHandler    pOldHandler = NULL;
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+QtMessageHandler pOldHandler = NULL;
+#else
+QtMsgHandler     pOldHandler = NULL;
+#endif
+
 MainWindow     *win = NULL;
 
 QFile fLogfile;       //! Logfile
@@ -111,6 +116,17 @@ myMessageOutput(QtMsgType type, const char *msg)
     }
 }//myMessageOutput
 
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+void
+myQt5MessageOutput(QtMsgType type, const QMessageLogContext &ctx,
+                   const QString &msg)
+{
+   QString msg1 = QString("%1(%2): %3")
+                     .arg(ctx.function).arg(ctx.line).arg(msg);
+   myMessageOutput(type, msg1.toLatin1().constData());
+}//myQt5MessageOutput
+#endif
+
 static void
 initLogging ()
 {
@@ -122,7 +138,11 @@ initLogging ()
     fLogfile.setFileName (strLogfile);
     fLogfile.open (QIODevice::ReadWrite);
 
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+    pOldHandler = qInstallMessageHandler(myQt5MessageOutput);
+#else
     pOldHandler = qInstallMsgHandler(myMessageOutput);
+#endif
 }//initLogging
 
 static void
