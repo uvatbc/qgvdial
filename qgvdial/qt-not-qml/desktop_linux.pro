@@ -11,8 +11,7 @@ HEADERS  += desktop_linux/platform_specific.h \
             desktop_linux/PhoneFactory.h
 
 greaterThan(QT_MAJOR_VERSION, 4) {
-CONFIG *= mobility
-MOBILITY *= multimedia
+QT *= multimedia
 } else {
 QT *= phonon
 }

@@ -332,7 +332,7 @@ GContactsApi::onGotContactsFeed(bool success, const QByteArray &response,
         Q_ASSERT(success);
         // thread.quit -> thread.deleteLater
         success =
-        connect (workerThread, SIGNAL(terminated()),
+        connect (workerThread, SIGNAL(finished()),
                  workerThread, SLOT  (deleteLater()));
         Q_ASSERT(success);
 

@@ -16,8 +16,7 @@ HEADERS  += $$PWD/desktop_windows/platform_specific.h \
 #include($$PWD/../features/skype-desktop/skype.pri)
 
 greaterThan(QT_MAJOR_VERSION, 4) {
-CONFIG *= mobility
-MOBILITY *= multimedia
+QT *= multimedia
 } else {
 QT *= phonon
 }
