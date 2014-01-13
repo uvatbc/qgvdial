@@ -98,6 +98,10 @@ else
 	CFLAGS?=-Wall -ggdb -O2
 endif
 
+ifneq ($(QNX_TARGET),)
+UNAME=BB10
+endif
+
 LIB_CFLAGS:=${CFLAGS} ${CPPFLAGS} -I. -I.. -I../lib
 LIB_CXXFLAGS:=$(LIB_CFLAGS) ${CPPFLAGS}
 LIB_LDFLAGS:=${LDFLAGS}
@@ -167,7 +171,9 @@ ifeq ($(WITH_TLS),yes)
 endif
 
 ifeq ($(WITH_THREADING),yes)
-	LIB_LIBS:=$(LIB_LIBS) -lpthread
+    ifneq ($(UNAME),BB10)
+        LIB_LIBS:=$(LIB_LIBS) -lpthread
+    endif
 	LIB_CFLAGS:=$(LIB_CFLAGS) -DWITH_THREADING
 endif
 
