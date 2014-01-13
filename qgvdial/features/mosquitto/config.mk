@@ -100,6 +100,8 @@ endif
 
 ifneq ($(QNX_TARGET),)
 UNAME=BB10
+CXX=cc
+CFLAGS:=${CFLAGS} -DNO_PSELECT
 endif
 
 LIB_CFLAGS:=${CFLAGS} ${CPPFLAGS} -I. -I.. -I../lib
