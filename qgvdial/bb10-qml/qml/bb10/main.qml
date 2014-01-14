@@ -26,6 +26,7 @@ import com.nokia.extras 1.1
 PageStackWindow {
     id: appWindow
     objectName: "MainPageStack"
+    // Status bar isn't the status at the bottom: its the status at the top: battery status, bars, etc.
     showStatusBar: false
 
     signal sigShowContact(string cId)
@@ -105,7 +106,7 @@ PageStackWindow {
     }
     Timer {
         id: pushPopTimer
-        interval: 300
+        interval: 1000
         onTriggered: {
             appWindow.popPageStack();
         }
@@ -188,7 +189,7 @@ PageStackWindow {
 
         anchors {
             bottom: parent.bottom
-            bottomMargin: commonTools.height + 5
+            bottomMargin: 110 //commonTools.height + 5
         }
     }
 
