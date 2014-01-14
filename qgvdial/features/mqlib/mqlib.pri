@@ -39,3 +39,8 @@ SOURCES  += $$PWD/cpp/mosquittopp.cpp
 DEFINES *= WITH_TLS WITH_TLS_PSK WITH_THREADING WITH_STATIC_MOSQ
 # These aren't strictly required. They're here for completeness
 DEFINES *= WITH_BRIDGE WITH_PERSISTENCE WITH_MEMORY_TRACKING WITH_SYS_TREE
+
+blackberry {
+    DEFINES *= NO_PSELECT
+}
+

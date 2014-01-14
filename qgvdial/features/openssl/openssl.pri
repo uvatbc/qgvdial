@@ -8,7 +8,7 @@ win32 {
 } else {
 # For blackberry, add the openssl library:
 blackberry {
-    LIBS += -lcrypto
+    LIBS += -lssl -lcrypto
 } else {
 symbian {
 LIBS += -llibcrypto
