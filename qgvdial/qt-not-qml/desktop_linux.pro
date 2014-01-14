@@ -1,7 +1,6 @@
 include(./common-code.pri)
 include(../features/dirs/linux/linux-dirs.pri)
 #include(../features/skype-desktop/skype.pri)
-include(../features/dbus_api/dbus_api.pri)
 include(../features/tp/linux/tp.pri)
 include(../features/osver/desktop/linux/osv-linux.pri)
 

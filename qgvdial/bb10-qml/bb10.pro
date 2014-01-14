@@ -33,12 +33,12 @@ LIBS += -lbbsystem
 }
 
 include(../common/common.pri)
-include(../../api/api.pri)
 include(../features/openssl/openssl.pri)
 include(../features/dirs/bb10/bb10-dirs.pri)
 include(../features/qml/mainwindow/qml-mainwindow.pri)
 include(../features/cookie-cutter/osdependent/cc-osdependent.pri)
 include(../features/osver/bb10/osv-bb10.pri)
+include(../features/mqlib/mqlib.pri)
 
 # Please do not modify the following two lines. Required for deployment.
 include(qmlapplicationviewer/qmlapplicationviewer.pri)

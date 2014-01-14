@@ -30,7 +30,6 @@ HEADERS  += platform_specific.h \
             HarmattanPhoneFactory.h
 
 include(../common/common.pri)
-include(../../api/api.pri)
 include(../features/openssl/openssl.pri)
 include(../features/dirs/linux/linux-dirs.pri)
 include(../features/qtsingleapplication/qtsingleapplication.pri)
@@ -38,6 +37,7 @@ include(../features/dbus_api/dbus_api.pri)
 include(../features/qml/mainwindow/qml-mainwindow.pri)
 include(../features/cookie-cutter/osdependent/cc-osdependent.pri)
 include(../features/osver/nokia/harmattan/osv-harmattan.pri)
+include(../features/mqlib/mqlib.pri)
 
 simulator {
 include(../features/tp/linux/tp.pri)

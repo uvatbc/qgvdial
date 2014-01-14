@@ -24,13 +24,13 @@ HEADERS  += platform_specific.h \
             MaemoPhoneFactory.h
 
 include(../common/common.pri)
-include(../../api/api.pri)
 include(../features/openssl/openssl.pri)
 include(../features/dirs/linux/linux-dirs.pri)
 include(../features/dbus_api/dbus_api.pri)
 include(../features/qtsingleapplication/qtsingleapplication.pri)
 include(../features/cookie-cutter/osdependent/cc-osdependent.pri)
 include(../features/osver/nokia/maemo/osv-maemo.pri)
+include(../features/mqlib/mqlib.pri)
 
 simulator {
 include(../features/tp/linux/tp.pri)

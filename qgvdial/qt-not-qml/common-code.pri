@@ -31,6 +31,7 @@ SOURCES  += $$PWD/MainWindow.cpp \
             $$PWD/MyLineEdit.cpp \
             $$PWD/SmsDialog.cpp \
             $$PWD/VmailDialog.cpp
+
 HEADERS  += $$PWD/MainWindow.h \
             $$PWD/MainWindow_p.h \
             $$PWD/OsDependant.h \
@@ -55,8 +56,8 @@ FORMS    += $$PWD/mainwindow.ui \
 RESOURCES += $$PWD/qtnotqml.qrc
 
 include($$PWD/../common/common.pri)
-include($$PWD/../../api/api.pri)
 include($$PWD/../features/openssl/openssl.pri)
+include($$PWD/../features/mqlib/mqlib.pri)
 
 !blackberry {
     include($$PWD/../features/qtsingleapplication/qtsingleapplication.pri)

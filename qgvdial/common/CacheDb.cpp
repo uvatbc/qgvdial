@@ -72,7 +72,7 @@ CacheDb::init(const QString &dbDir)
 
     ensureCache ();
 
-    //TODO: Clean out the temp table of dead entries
+    // Clean out the temp table of dead entries
     cleanup_dangling_temp_ids ();
     return (true);
 }//CacheDb::init

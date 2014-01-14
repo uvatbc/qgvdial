@@ -47,3 +47,5 @@ HEADERS  += $$PWD/global.h \
             $$PWD/GVNumModel.h \
             $$PWD/LogUploader.h \
             $$PWD/LibVmail.h
+
+include($$PWD/../../api/api.pri)
