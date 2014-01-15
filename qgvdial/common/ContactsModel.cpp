@@ -29,6 +29,9 @@ ContactsModel::ContactsModel(bool bLocalPic, QObject *parent)
 , mandatoryLocalPic(bLocalPic)
 , modelContacts(NULL)
 {
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
+    setRoleNames(roleNames());
+#endif
 }//ContactsModel::ContactsModel
 
 QHash<int, QByteArray>

@@ -24,6 +24,9 @@ Contact: yuvraaj@gmail.com
 GVNumModel::GVNumModel(QObject *parent)
 : QAbstractListModel(parent)
 {
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
+    setRoleNames(roleNames());
+#endif
 }//GVNumModel::GVNumModel
 
 QHash<int, QByteArray>

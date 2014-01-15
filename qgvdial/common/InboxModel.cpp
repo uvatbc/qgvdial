@@ -30,6 +30,9 @@ InboxModel::InboxModel (QObject * parent)
 , strSelectType ("all")
 , m_eSelectType (GVIE_Unknown)
 {
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
+    setRoleNames(roleNames());
+#endif
 }//InboxModel::InboxModel
 
 QHash<int, QByteArray>
