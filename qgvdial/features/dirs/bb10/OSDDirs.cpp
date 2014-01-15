@@ -62,7 +62,7 @@ OsdDirs::_getLogsDir()
 QString
 OsdDirs::_getVmailDir()
 {
-    QString rv = QDir::currentPath() + "/shared/music";
+    QString rv = QDir::currentPath() + "/shared/voice";
 
     if (!QFileInfo(rv + "/voicemail").exists ()) {
         QDir(rv).mkdir ("voicemail");
