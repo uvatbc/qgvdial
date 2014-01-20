@@ -2206,9 +2206,10 @@ GVApi::sendSms(AsyncTaskToken *token)
     m["m"]   = "sms";
     m["n"]   = token->inParams["destination"].toString();
     m["f"]   = "";
-    m["v"]   = "11";
+    m["v"]   = "13";
     m["txt"] = token->inParams["text"].toString();
     NwHelpers::appendQueryItems (url, m);
+    url = QUrl(NwHelpers::fullyEncodedString (url));
 
     return doSendSms (url, token);
 }//GVApi::sendSms

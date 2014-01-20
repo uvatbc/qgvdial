@@ -32,7 +32,7 @@ Page {
     property string name
     property string dest
     property string conversation
-    property string smsText
+    property alias smsText: txtSmsText.text
 
     function flickToEnd() {
         mainFlick.contentY = mainFlick.contentHeight - container.height;

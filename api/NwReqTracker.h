@@ -91,6 +91,8 @@ public:
     static void appendQueryItem(QUrl &url,
                                 const QString &key, const QString &val);
     static void appendQueryItems(QUrl &url, const QVariantMap &m);
+    static QString fullyEncodedString(const QUrl &url);
+
     static QByteArray createPostContent(QVariantMap m,
                                         QStringList ignoreKeys = QStringList());
     static QByteArray createPostContent(const QUrl &url);

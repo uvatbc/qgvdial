@@ -1,5 +1,6 @@
 qgvdial (__QGVDIAL_VERSION__) unstable; urgency=low
 
-  * Fix a lot of QML issues
+  * Maemo: Add refresh buttons
+  * Harmattan: Fix the text message send failure
 
  -- Yuvraaj <yuvraaj@gmail.com>  __CHANGELOG_DATETIME__ -0700

@@ -38,12 +38,23 @@ Rectangle {
         onClicked: { inboxList.showInboxSelector(); }
     }
 
+    RefreshButton {
+        id: bgRefreshBtn
+        anchors {
+            top: inboxSelectorBtn.bottom
+        }
+        width: parent.width
+    }
+
     ListView {
         id: inboxList
         objectName: "InboxList"
 
         signal clicked(string id)
         signal showInboxSelector
+
+        signal sigRefreshInbox
+        signal sigRefreshInboxFull
 
         function setMyModel() {
             inboxList.model = g_InboxModel;
@@ -59,6 +70,18 @@ Rectangle {
         }
         width: parent.width
         clip: true
+
+        header: RefreshButton {
+            isHeader: true
+            width: inboxList.width
+            contentY: inboxList.contentY
+            onVisibleChanged: {
+                bgRefreshBtn.visible = !visible;
+            }
+
+            onClicked: { inboxList.sigRefreshInbox(); }
+            onPressAndHold: { inboxList.sigRefreshInboxFull(); }
+        }
 
         delegate: Rectangle {
             id: listDelegate

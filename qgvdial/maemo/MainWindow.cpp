@@ -244,6 +244,10 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
                 &oContacts, SLOT(getContactInfoAndModel(QString)));
         connect(contactsPage, SIGNAL(searchContact(QString)),
                 &oContacts, SLOT(searchContacts(QString)));
+        connect(contactsPage, SIGNAL(sigRefreshContacts()),
+                &oContacts, SLOT(refreshLatest()));
+        connect(contactsPage, SIGNAL(sigRefreshContactsFull()),
+                &oContacts, SLOT(refreshFull()));
 
         inboxList = getQMLObject ("InboxList");
         if (NULL == inboxList) {
@@ -253,6 +257,10 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
                 this, SLOT(onInboxClicked(QString)));
         connect(inboxList, SIGNAL(showInboxSelector()),
                 this, SLOT(onInboxSelBtnClicked()));
+        connect(inboxList, SIGNAL(sigRefreshInbox()),
+                &oInbox, SLOT(refreshLatest()));
+        connect(inboxList, SIGNAL(sigRefreshInboxFull()),
+                &oInbox, SLOT(refreshFull()));
 
         inboxSelector = getQMLObject ("InboxSelector");
         if (NULL == inboxList) {

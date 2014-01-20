@@ -468,6 +468,23 @@ NwHelpers::appendQueryItems(QUrl &url, const QVariantMap &m)
 #endif
 }//NwHelpers::appendQueryItems
 
+QString
+NwHelpers::fullyEncodedString(const QUrl &url)
+{
+    QString rv;
+
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+    QUrlQuery q(url.query ());
+    rv = url.toString(QUrl::RemoveQuery | QUrl::StripTrailingSlash)
+       + "?"
+       + q.toString (QUrl::FullyEncoded);
+#else
+    rv = url.toString ();
+#endif
+
+    return rv;
+}//NwHelpers::fullyEncodedString
+
 QByteArray
 NwHelpers::createPostContent(QVariantMap m, QStringList ignoreKeys)
 {

@@ -406,6 +406,10 @@ IMainWindow::onUserSendSMS (QStringList arrNumbers, QString strText)
         task->inParams["destination"] = arrNumbers[i];
         task->inParams["text"] = strText;
 
+        if (strText.isEmpty ()) {
+            Q_WARN("User has sent an empty text!");
+        }
+
         if (!gvApi.sendSms (task)) {
             task->deleteLater ();
             msg = QString ("Failed to send an SMS to %1").arg (arrNumbers[i]);
