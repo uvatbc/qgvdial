@@ -1,19 +1,21 @@
-include($$PWD/common-code.pri)
+include(common-code.pri)
 include(../features/osver/desktop/windows/osv-windows.pri)
 
 # Surprisingly enough, this works just perfectly in Windows
-include($$PWD/../features/dirs/linux/linux-dirs.pri)
+include(../features/dirs/linux/linux-dirs.pri)
 
-INCLUDEPATH += $$PWD/desktop_windows
-SOURCES  += $$PWD/desktop_windows/PhoneFactory.cpp
-HEADERS  += $$PWD/desktop_windows/platform_specific.h \
-            $$PWD/desktop_windows/PhoneFactory.h
+PRECOMPILED_HEADER *= desktop_windows/platform_specific.h
 
-#SOURCES  += $$PWD/desktop_windows/MainApp.cpp \
-#            $$PWD/desktop_windows/ObserverFactory.cpp
-#HEADERS  += $$PWD/desktop_windows/MainApp.h \
-#            $$PWD/desktop_windows/ObserverFactory.h
-#include($$PWD/../features/skype-desktop/skype.pri)
+INCLUDEPATH += desktop_windows
+SOURCES  += desktop_windows/PhoneFactory.cpp
+HEADERS  += desktop_windows/platform_specific.h \
+            desktop_windows/PhoneFactory.h
+
+#SOURCES  += desktop_windows/MainApp.cpp \
+#            desktop_windows/ObserverFactory.cpp
+#HEADERS  += desktop_windows/MainApp.h \
+#            desktop_windows/ObserverFactory.h
+#include(../features/skype-desktop/skype.pri)
 
 greaterThan(QT_MAJOR_VERSION, 4) {
 QT *= multimedia
@@ -22,5 +24,5 @@ QT *= phonon
 }
 
 # Please do not modify the following two lines. Required for deployment.
-include($$PWD/deployment.pri)
+include(deployment.pri)
 qtcAddDeployment()

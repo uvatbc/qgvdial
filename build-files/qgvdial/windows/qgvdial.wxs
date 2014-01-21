@@ -39,9 +39,6 @@
             <Component Id="ssleay32.dll" Guid="5A660879-F547-49C0-A7D8-F93BFBF92E5C">
                 <File Id="ssleay32.dll" Source="C:\Users\Uv\work\cc\qt-everywhere-opensource-src-4.8.1-dll-x86\bin\ssleay32.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
-            <Component Id="mosquitto.dll" Guid="265055C2-2229-458A-A31A-90D7F11B3EA9">
-                <File Id="mosquitto.dll" Source="__QTDIR__\lib\mosquitto.dll" KeyPath="yes" Checksum="yes"/>
-            </Component>
             <Component Id="qt.conf" Guid="F5AA101C-FD8B-4525-9E72-4E32641C11A7">
                 <File Id="qt.conf" Source="..\..\..\build-files\qgvdial\windows\qt.conf" KeyPath="yes" Checksum="yes"/>
             </Component>
@@ -51,38 +48,38 @@
         </DirectoryRef>
 
         <DirectoryRef Id="qtbins">
-            <Component Id="phonon4.dll" Guid="CDD1458E-9824-4ECC-960F-E81078317EFB">
-                <File Id="phonon4.dll" Source="__QTDIR__\lib\phonon4.dll" KeyPath="yes" Checksum="yes"/>
+            <Component Id="Qt5Core.dll" Guid="E35D7C13-FE4E-4BFD-A112-8E040D03469D">
+                <File Id="Qt5Core.dll" Source="__QTDIR__\bin\Qt5Core.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
-            <Component Id="QtCore4.dll" Guid="E35D7C13-FE4E-4BFD-A112-8E040D03469D">
-                <File Id="QtCore4.dll" Source="__QTDIR__\lib\QtCore4.dll" KeyPath="yes" Checksum="yes"/>
+            <Component Id="Qt5Gui.dll" Guid="774C1356-53CF-4F65-94BF-A6B4C4755E41">
+                <File Id="Qt5Gui.dll" Source="__QTDIR__\bin\Qt5Gui.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
-            <Component Id="QtGui4.dll" Guid="774C1356-53CF-4F65-94BF-A6B4C4755E41">
-                <File Id="QtGui4.dll" Source="__QTDIR__\lib\QtGui4.dll" KeyPath="yes" Checksum="yes"/>
+            <Component Id="Qt5Widgets.dll" Guid="12B851E1-165D-4C25-8D6F-CEB6C446DC37">
+                <File Id="Qt5Widgets.dll" Source="__QTDIR__\bin\Qt5Widgets.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
-            <Component Id="QtNetwork4.dll" Guid="5986CCCC-B1DD-462C-8866-0EF57136928B">
-                <File Id="QtNetwork4.dll" Source="__QTDIR__\lib\QtNetwork4.dll" KeyPath="yes" Checksum="yes"/>
+            <Component Id="Qt5Network.dll" Guid="5986CCCC-B1DD-462C-8866-0EF57136928B">
+                <File Id="Qt5Network.dll" Source="__QTDIR__\bin\Qt5Network.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
-            <Component Id="QtOpenGL4.dll" Guid="5E2E7628-ECB7-41DC-8A9C-CFEEDF9826DD">
-                <File Id="QtOpenGL4.dll" Source="__QTDIR__\lib\QtOpenGL4.dll" KeyPath="yes" Checksum="yes"/>
+            <!-- <Component Id="Qt5OpenGL.dll" Guid="5E2E7628-ECB7-41DC-8A9C-CFEEDF9826DD">
+                <File Id="Qt5OpenGL.dll" Source="__QTDIR__\bin\Qt5OpenGL.dll" KeyPath="yes" Checksum="yes"/>
+            </Component> -->
+            <Component Id="Qt5Script.dll" Guid="321104F1-FE22-4176-9D8C-5B842394E17E">
+                <File Id="Qt5Script.dll" Source="__QTDIR__\bin\Qt5Script.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
-            <Component Id="QtScript4.dll" Guid="321104F1-FE22-4176-9D8C-5B842394E17E">
-                <File Id="QtScript4.dll" Source="__QTDIR__\lib\QtScript4.dll" KeyPath="yes" Checksum="yes"/>
+            <Component Id="Qt5Sql.dll" Guid="BEACF7C2-1BFD-44FC-AB2D-6B0A71BF99B5">
+                <File Id="Qt5Sql.dll" Source="__QTDIR__\bin\Qt5Sql.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
-            <Component Id="QtSql4.dll" Guid="BEACF7C2-1BFD-44FC-AB2D-6B0A71BF99B5">
-                <File Id="QtSql4.dll" Source="__QTDIR__\lib\QtSql4.dll" KeyPath="yes" Checksum="yes"/>
+            <Component Id="Qt5Svg.dll" Guid="AC5A10A7-A92F-4C4B-B058-B89EA0AE086E">
+                <File Id="Qt5Svg.dll" Source="__QTDIR__\bin\Qt5Svg.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
-            <Component Id="QtSvg4.dll" Guid="AC5A10A7-A92F-4C4B-B058-B89EA0AE086E">
-                <File Id="QtSvg4.dll" Source="__QTDIR__\lib\QtSvg4.dll" KeyPath="yes" Checksum="yes"/>
+            <Component Id="Qt5Xml.dll" Guid="9D13C144-B2DD-4073-8FCA-48A46928ED8C">
+                <File Id="Qt5Xml.dll" Source="__QTDIR__\bin\Qt5Xml.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
-            <Component Id="QtWebKit4.dll" Guid="12B851E1-165D-4C25-8D6F-CEB6C446DC37">
-                <File Id="QtWebKit4.dll" Source="__QTDIR__\lib\QtWebKit4.dll" KeyPath="yes" Checksum="yes"/>
+            <Component Id="Qt5XmlPatterns.dll" Guid="27574D0D-D570-40AB-A248-CEE276C6F05F">
+                <File Id="Qt5XmlPatterns.dll" Source="__QTDIR__\bin\Qt5XmlPatterns.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
-            <Component Id="QtXml4.dll" Guid="9D13C144-B2DD-4073-8FCA-48A46928ED8C">
-                <File Id="QtXml4.dll" Source="__QTDIR__\lib\QtXml4.dll" KeyPath="yes" Checksum="yes"/>
-            </Component>
-            <Component Id="QtXmlPatterns4.dll" Guid="27574D0D-D570-40AB-A248-CEE276C6F05F">
-                <File Id="QtXmlPatterns4.dll" Source="__QTDIR__\lib\QtXmlPatterns4.dll" KeyPath="yes" Checksum="yes"/>
+            <Component Id="Qt5Multimedia.dll" Guid="CDD1458E-9824-4ECC-960F-E81078317EFB">
+                <File Id="Qt5Multimedia.dll" Source="__QTDIR__\bin\Qt5Multimedia.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
             <Component Id="QtSystemInfo1.dll" Guid="66F18195-A4CD-4AB2-95C6-643D58FF6D36">
                 <File Id="QtSystemInfo1.dll" Source="__QTDIR__\lib\QtSystemInfo1.dll" KeyPath="yes" Checksum="yes"/>
@@ -90,32 +87,38 @@
         </DirectoryRef>
 
         <DirectoryRef Id="plugins_bearer">
-            <Component Id="qgenericbearer4.dll" Guid="AABF8088-5E99-48EA-9BAE-D53A949D20EB">
-                <File Id="qgenericbearer4.dll" Source="__QTDIR__\plugins\bearer\qgenericbearer4.dll" KeyPath="yes" Checksum="yes"/>
+            <Component Id="qgenericbearer.dll" Guid="AABF8088-5E99-48EA-9BAE-D53A949D20EB">
+                <File Id="qgenericbearer.dll" Source="__QTDIR__\plugins\bearer\qgenericbearer.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
-            <Component Id="qnativewifibearer4.dll" Guid="B10D3DBB-2E41-412E-B23C-C0270C132996">
-                <File Id="qnativewifibearer4.dll" Source="__QTDIR__\plugins\bearer\qnativewifibearer4.dll" KeyPath="yes" Checksum="yes"/>
+            <Component Id="qnativewifibearer.dll" Guid="B10D3DBB-2E41-412E-B23C-C0270C132996">
+                <File Id="qnativewifibearer.dll" Source="__QTDIR__\plugins\bearer\qnativewifibearer.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
         </DirectoryRef>
 
         <DirectoryRef Id="plugins_imageformats">
-            <Component Id="qgif4.dll" Guid="70A2D65E-7A40-43F3-B72A-07E6E9D4711F">
-                <File Id="qgif4.dll" Source="__QTDIR__\plugins\imageformats\qgif4.dll" KeyPath="yes" Checksum="yes"/>
+            <Component Id="qgif.dll" Guid="70A2D65E-7A40-43F3-B72A-07E6E9D4711F">
+                <File Id="qgif.dll" Source="__QTDIR__\plugins\imageformats\qgif.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
-            <Component Id="qico4.dll" Guid="ADF74286-E2C7-409E-B984-50C08F966C1D">
-                <File Id="qico4.dll" Source="__QTDIR__\plugins\imageformats\qico4.dll" KeyPath="yes" Checksum="yes"/>
+            <Component Id="qico.dll" Guid="ADF74286-E2C7-409E-B984-50C08F966C1D">
+                <File Id="qico.dll" Source="__QTDIR__\plugins\imageformats\qico.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
-            <Component Id="qjpeg4.dll" Guid="A11AA286-EB9C-4309-838F-080AAEF110EF">
-                <File Id="qjpeg4.dll" Source="__QTDIR__\plugins\imageformats\qjpeg4.dll" KeyPath="yes" Checksum="yes"/>
+            <Component Id="qjpeg.dll" Guid="A11AA286-EB9C-4309-838F-080AAEF110EF">
+                <File Id="qjpeg.dll" Source="__QTDIR__\plugins\imageformats\qjpeg.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
-            <Component Id="qmng4.dll" Guid="040FB712-2FC1-4309-9BEE-95479407836E">
-                <File Id="qmng4.dll" Source="__QTDIR__\plugins\imageformats\qmng4.dll" KeyPath="yes" Checksum="yes"/>
+            <Component Id="qmng.dll" Guid="040FB712-2FC1-4309-9BEE-95479407836E">
+                <File Id="qmng.dll" Source="__QTDIR__\plugins\imageformats\qmng.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
-            <Component Id="qsvg4.dll" Guid="9243B8C9-3FC5-433B-AA15-B9F5677D8DC9">
-                <File Id="qsvg4.dll" Source="__QTDIR__\plugins\imageformats\qsvg4.dll" KeyPath="yes" Checksum="yes"/>
+            <Component Id="qsvg.dll" Guid="9243B8C9-3FC5-433B-AA15-B9F5677D8DC9">
+                <File Id="qsvg.dll" Source="__QTDIR__\plugins\imageformats\qsvg.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
-            <Component Id="qtiff4.dll" Guid="0D0F16F0-111C-44A3-BEB4-ABF96C201914">
-                <File Id="qtiff4.dll" Source="__QTDIR__\plugins\imageformats\qtiff4.dll" KeyPath="yes" Checksum="yes"/>
+            <Component Id="qtga.dll" Guid="0D0F16F0-111C-44A3-BEB4-ABF96C201914">
+                <File Id="qtga.dll" Source="__QTDIR__\plugins\imageformats\qtga.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="qtiff.dll" Guid="B69DC052-7A27-47BA-8C5A-7A58BBB290A4">
+                <File Id="qtiff.dll" Source="__QTDIR__\plugins\imageformats\qtiff.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="qwbmp.dll" Guid="0F6CE2B6-92E9-42AC-AA31-3AFB1A56A21D">
+                <File Id="qwbmp.dll" Source="__QTDIR__\plugins\imageformats\qwbmp.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
         </DirectoryRef>
 
@@ -126,14 +129,14 @@
         </DirectoryRef>
 
         <DirectoryRef Id="plugins_playlistformats">
-            <Component Id="qtmultimediakit_m3u.dll" Guid="BF946856-E76F-4331-9F1B-6213170D52FD">
-                <File Id="qtmultimediakit_m3u.dll" Source="__QTDIR__\plugins\playlistformats\qtmultimediakit_m3u.dll" KeyPath="yes" Checksum="yes"/>
+            <Component Id="qtmultimedia_m3u.dll" Guid="BF946856-E76F-4331-9F1B-6213170D52FD">
+                <File Id="qtmultimedia_m3u.dll" Source="__QTDIR__\plugins\playlistformats\qtmultimedia_m3u.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
         </DirectoryRef>
 
         <DirectoryRef Id="plugins_sqldrivers">
-            <Component Id="qsqlite4.dll" Guid="7AE6234B-0BA7-4381-9F85-1A47D269D644">
-                <File Id="qsqlite4.dll" Source="__QTDIR__\plugins\sqldrivers\qsqlite4.dll" KeyPath="yes" Checksum="yes"/>
+            <Component Id="qsqlite.dll" Guid="7AE6234B-0BA7-4381-9F85-1A47D269D644">
+                <File Id="qsqlite.dll" Source="__QTDIR__\plugins\sqldrivers\qsqlite.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
         </DirectoryRef>
         
@@ -142,32 +145,33 @@
             <ComponentRef Id="qgvdial.exe" />
             <ComponentRef Id="libeay32.dll" />
             <ComponentRef Id="ssleay32.dll" />
-            <ComponentRef Id="mosquitto.dll" />
             <ComponentRef Id="qt.conf" />
             <ComponentRef Id="run.bat" />
-            <ComponentRef Id="phonon4.dll" />
-            <ComponentRef Id="QtCore4.dll" />
-            <ComponentRef Id="QtGui4.dll" />
-            <ComponentRef Id="QtNetwork4.dll" />
-            <ComponentRef Id="QtOpenGL4.dll" />
-            <ComponentRef Id="QtScript4.dll" />
-            <ComponentRef Id="QtSql4.dll" />
-            <ComponentRef Id="QtSvg4.dll" />
-            <ComponentRef Id="QtWebKit4.dll" />
-            <ComponentRef Id="QtXml4.dll" />
-            <ComponentRef Id="QtXmlPatterns4.dll" />
+            <ComponentRef Id="Qt5Core.dll" />
+            <ComponentRef Id="Qt5Gui.dll" />
+            <ComponentRef Id="Qt5Widgets.dll" />
+            <ComponentRef Id="Qt5Network.dll" />
+            <!-- <ComponentRef Id="Qt5OpenGL.dll" /> -->
+            <ComponentRef Id="Qt5Script.dll" />
+            <ComponentRef Id="Qt5Sql.dll" />
+            <ComponentRef Id="Qt5Svg.dll" />
+            <ComponentRef Id="Qt5Xml.dll" />
+            <ComponentRef Id="Qt5XmlPatterns.dll" />
+            <ComponentRef Id="Qt5Multimedia.dll" />
             <ComponentRef Id="QtSystemInfo1.dll" />
-            <ComponentRef Id="qgenericbearer4.dll" />
-            <ComponentRef Id="qnativewifibearer4.dll" />
-            <ComponentRef Id="qgif4.dll" />
-            <ComponentRef Id="qico4.dll" />
-            <ComponentRef Id="qjpeg4.dll" />
-            <ComponentRef Id="qmng4.dll" />
-            <ComponentRef Id="qsvg4.dll" />
-            <ComponentRef Id="qtiff4.dll" />
+            <ComponentRef Id="qgenericbearer.dll" />
+            <ComponentRef Id="qnativewifibearer.dll" />
+            <ComponentRef Id="qgif.dll" />
+            <ComponentRef Id="qico.dll" />
+            <ComponentRef Id="qjpeg.dll" />
+            <ComponentRef Id="qmng.dll" />
+            <ComponentRef Id="qsvg.dll" />
+            <ComponentRef Id="qtga.dll" />
+            <ComponentRef Id="qtiff.dll" />
+            <ComponentRef Id="qwbmp.dll" />
             <ComponentRef Id="phonon_ds94.dll" />
-            <ComponentRef Id="qtmultimediakit_m3u.dll" />
-            <ComponentRef Id="qsqlite4.dll" />
+            <ComponentRef Id="qtmultimedia_m3u.dll" />
+            <ComponentRef Id="qsqlite.dll" />
             
             <!-- Tell WiX to install the shortcut -->
             <ComponentRef Id="ApplicationShortcut" />   

@@ -38,10 +38,10 @@ Contact: yuvraaj@gmail.com
    #else
       #include <phonon/MediaObject>
    #endif
-#elif QT_VERSION < 0x050000
-   #include <QtMultimediaKit/QMediaPlayer>
-#else
+#elif QT_VERSION >= QT_VERSION_CHECK(5,0,0)
    #include <QtMultimedia/QtMultimedia>
+#else
+   #include <QtMultimediaKit/QMediaPlayer>
 #endif
 
 enum LVPlayerState {
