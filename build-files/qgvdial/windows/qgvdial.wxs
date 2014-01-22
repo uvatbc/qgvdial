@@ -14,9 +14,10 @@
                         <Directory Id="pluginsdir" Name="plugins">
                             <Directory Id="plugins_bearer" Name="bearer" />
                             <Directory Id="plugins_imageformats" Name="imageformats" />
-                            <Directory Id="phonon_backend" Name="phonon_backend" />
+                            <Directory Id="plugins_mediaservice" Name="mediaservice" />
                             <Directory Id="plugins_playlistformats" Name="playlistformats" />
                             <Directory Id="plugins_sqldrivers" Name="sqldrivers" />
+                            <Directory Id="plugins_platforms" Name="platforms" />
                         </Directory>
                     </Directory>
                 </Directory>
@@ -81,8 +82,20 @@
             <Component Id="Qt5Multimedia.dll" Guid="CDD1458E-9824-4ECC-960F-E81078317EFB">
                 <File Id="Qt5Multimedia.dll" Source="__QTDIR__\bin\Qt5Multimedia.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
-            <Component Id="QtSystemInfo1.dll" Guid="66F18195-A4CD-4AB2-95C6-643D58FF6D36">
-                <File Id="QtSystemInfo1.dll" Source="__QTDIR__\lib\QtSystemInfo1.dll" KeyPath="yes" Checksum="yes"/>
+            <Component Id="libGLESv2.dll" Guid="66F18195-A4CD-4AB2-95C6-643D58FF6D36">
+                <File Id="libGLESv2.dll" Source="__QTDIR__\bin\libGLESv2.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="icuin51.dll" Guid="BEB57FA1-456B-4F1D-B29C-756755684E61">
+                <File Id="icuin51.dll" Source="__QTDIR__\bin\icuin51.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="icuuc51.dll" Guid="46B23389-419C-48E1-98BD-567A72148635">
+                <File Id="icuuc51.dll" Source="__QTDIR__\bin\icuuc51.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="icudt51.dll" Guid="EEC290F1-90A4-4839-955A-35A7A57665EA">
+                <File Id="icudt51.dll" Source="__QTDIR__\bin\icudt51.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="libEGL.dll" Guid="6764CFD3-3079-4CBA-A066-A362D0658E97">
+                <File Id="libEGL.dll" Source="__QTDIR__\bin\libEGL.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
         </DirectoryRef>
 
@@ -122,9 +135,9 @@
             </Component>
         </DirectoryRef>
 
-        <DirectoryRef Id="phonon_backend">
-            <Component Id="phonon_ds94.dll" Guid="1DD7E0A9-026B-464C-9C06-016A856B04C7">
-                <File Id="phonon_ds94.dll" Source="__QTDIR__\plugins\phonon_backend\phonon_ds94.dll" KeyPath="yes" Checksum="yes"/>
+        <DirectoryRef Id="plugins_mediaservice">
+            <Component Id="dsengine.dll" Guid="1DD7E0A9-026B-464C-9C06-016A856B04C7">
+                <File Id="dsengine.dll" Source="__QTDIR__\plugins\mediaservice\dsengine.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
         </DirectoryRef>
 
@@ -135,11 +148,17 @@
         </DirectoryRef>
 
         <DirectoryRef Id="plugins_sqldrivers">
-            <Component Id="qsqlite.dll" Guid="7AE6234B-0BA7-4381-9F85-1A47D269D644">
+            <Component Id="qsqlite.dll" Guid="FBA288D6-CAE4-4594-898B-F313C4FB436F">
                 <File Id="qsqlite.dll" Source="__QTDIR__\plugins\sqldrivers\qsqlite.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
         </DirectoryRef>
-        
+
+        <DirectoryRef Id="plugins_platforms">
+            <Component Id="qwindows.dll" Guid="7AE6234B-0BA7-4381-9F85-1A47D269D644">
+                <File Id="qwindows.dll" Source="__QTDIR__\plugins\platforms\qwindows.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+        </DirectoryRef>
+
         <!-- Install binaries to the install location -->
         <Feature Id="Binaries" Title="QGVDial binaries" Level="1">
             <ComponentRef Id="qgvdial.exe" />
@@ -158,7 +177,11 @@
             <ComponentRef Id="Qt5Xml.dll" />
             <ComponentRef Id="Qt5XmlPatterns.dll" />
             <ComponentRef Id="Qt5Multimedia.dll" />
-            <ComponentRef Id="QtSystemInfo1.dll" />
+            <ComponentRef Id="libGLESv2.dll" />
+            <ComponentRef Id="icuin51.dll" />
+            <ComponentRef Id="icuuc51.dll" />
+            <ComponentRef Id="icudt51.dll" />
+            <ComponentRef Id="libEGL.dll" />
             <ComponentRef Id="qgenericbearer.dll" />
             <ComponentRef Id="qnativewifibearer.dll" />
             <ComponentRef Id="qgif.dll" />
@@ -169,10 +192,11 @@
             <ComponentRef Id="qtga.dll" />
             <ComponentRef Id="qtiff.dll" />
             <ComponentRef Id="qwbmp.dll" />
-            <ComponentRef Id="phonon_ds94.dll" />
+            <ComponentRef Id="dsengine.dll" />
             <ComponentRef Id="qtmultimedia_m3u.dll" />
             <ComponentRef Id="qsqlite.dll" />
-            
+            <ComponentRef Id="qwindows.dll" />
+
             <!-- Tell WiX to install the shortcut -->
             <ComponentRef Id="ApplicationShortcut" />   
         </Feature>
