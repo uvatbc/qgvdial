@@ -188,7 +188,7 @@ Page {
 
                 Image {
                     source: container.showPlayBtn ? "qrc:/button_black_play.png" : "qrc:/button_black_pause.png"
-                    height: 70
+                    height: 100
                     width: height
                     smooth: true
 
@@ -205,7 +205,7 @@ Page {
                 }
                 Image {
                     source: "qrc:/button_black_stop.png"
-                    height: 70
+                    height: 100
                     width: height
                     smooth: true
 
@@ -217,7 +217,7 @@ Page {
             }
 
             Label {
-                text: "Fetching email"
+                text: "Fetching voicemail"
                 visible: (container.isVmail && container.fetchingEmail)
                 anchors.horizontalCenter: parent.horizontalCenter
             }

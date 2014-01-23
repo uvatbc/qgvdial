@@ -73,7 +73,7 @@ Page {
             id: searchField
             placeholderText: "Search"
             width: parent.width - searchButton.width - parent.spacing - 5
-            onTextChanged: container._updateSearchBtnIcon();
+            onTextChanged: { container.searchContact(searchField.text); }
             anchors.verticalCenter: parent.verticalCenter
         }
 
