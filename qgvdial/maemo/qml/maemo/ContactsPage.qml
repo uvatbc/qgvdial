@@ -75,9 +75,9 @@ Rectangle {
         TextOneLine {
             id: searchField
             placeholderText: "Search"
-            readOnly: true
+            readOnly: false
             width: parent.width - searchButton.width - parent.spacing - 5
-            onTextChanged: container._updateSearchBtnIcon();
+            onTextChanged: { container.searchContact(searchField.text); }
         }
 
         Button {
