@@ -32,7 +32,7 @@ public:
     explicit QmlMainWindow(QObject *parent = 0);
     virtual ~QmlMainWindow();
 
-    void init();
+    virtual void init();
     void log(QDateTime dt, int level, const QString &strLog);
 
 protected slots:
