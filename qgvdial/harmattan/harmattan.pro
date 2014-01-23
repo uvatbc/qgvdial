@@ -25,9 +25,11 @@ CONFIG += qdeclarative-boostable
 # CONFIG += qt-components
 
 INCLUDEPATH += $$PWD
-SOURCES  += HarmattanPhoneFactory.cpp
+SOURCES  += HarmattanPhoneFactory.cpp \
+            MainWindow.cpp
 HEADERS  += platform_specific.h \
-            HarmattanPhoneFactory.h
+            HarmattanPhoneFactory.h \
+            MainWindow.h
 
 include(../common/common.pri)
 include(../features/openssl/openssl.pri)

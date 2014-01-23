@@ -1,5 +1,5 @@
 QT *= opengl
 
 INCLUDEPATH += $$PWD
-SOURCES  += $$PWD/MainWindow.cpp
-HEADERS  += $$PWD/MainWindow.h
+SOURCES  += $$PWD/QmlMainWindow.cpp
+HEADERS  += $$PWD/QmlMainWindow.h

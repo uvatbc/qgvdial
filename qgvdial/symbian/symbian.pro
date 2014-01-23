@@ -22,9 +22,11 @@ CONFIG += qt-components
 DEFINES += ENABLE_FUZZY_TIMER
 
 INCLUDEPATH += $$PWD
-SOURCES  += SymbianPhoneFactory.cpp
+SOURCES  += SymbianPhoneFactory.cpp \
+            MainWindow.cpp
 HEADERS  += platform_specific.h \
-            SymbianPhoneFactory.h
+            SymbianPhoneFactory.h \
+            MainWindow.h
 
 !simulator {
 SOURCES  += SymbianPhoneAccount.cpp \

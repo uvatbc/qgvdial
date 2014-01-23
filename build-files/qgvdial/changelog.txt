@@ -1,6 +1,5 @@
 qgvdial (__QGVDIAL_VERSION__) unstable; urgency=low
 
-  * Maemo: Add refresh buttons
-  * Harmattan: Fix the text message send failure
+  * Search contacts as you type
 
  -- Yuvraaj <yuvraaj@gmail.com>  __CHANGELOG_DATETIME__ -0700

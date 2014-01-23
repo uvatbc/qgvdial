@@ -20,9 +20,11 @@ MOBILITY *= multimedia
 # Add dependency to Symbian components
 # CONFIG += qt-components
 
-SOURCES  += BB10PhoneFactory.cpp
+SOURCES  += BB10PhoneFactory.cpp \
+            MainWindow.cpp
 HEADERS  += platform_specific.h \
-            BB10PhoneFactory.h
+            BB10PhoneFactory.h \
+            MainWindow.h
 RESOURCES += bb10.qrc
 
 # So that I can open this project in the Qt SDK and have it compile correctly:

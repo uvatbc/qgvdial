@@ -1,6 +1,6 @@
 /*
 qgvdial is a cross platform Google Voice Dialer
-Copyright (C) 2009-2013  Yuvraaj Kelkar
+Copyright (C) 2009-2014  Yuvraaj Kelkar
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -19,13 +19,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#include "MainWindow.h"
+#include "QmlMainWindow.h"
 #include "qmlapplicationviewer.h"
-
-#ifdef Q_OS_BLACKBEERRY
-#include <QGLWidget>
-#include <QGLFormat>
-#endif
 
 #ifndef UNKNOWN_CONTACT_QRC_PATH
 #error Must define the unknown contact QRC path
@@ -45,18 +40,9 @@ Contact: yuvraaj@gmail.com
 #include "ContactNumbersModel.h"
 
 QApplication *
-createAppObject(int &argc, char **argv)
+createSingleAppObject(int &argc, char **argv)
 {
-#ifdef Q_OS_BLACKBERRY
-#define DRAG_DIST 16
-    int startDragDistance = QApplication::startDragDistance ();
-    if (DRAG_DIST != startDragDistance) {
-        Q_DEBUG(QString("Original startDragDistance = %1")
-                .arg (startDragDistance));
-        QApplication::setStartDragDistance (DRAG_DIST);
-    }
-#endif
-
+    Q_ASSERT(USE_SINGLE_APPLICATION);
 #if USE_SINGLE_APPLICATION
     QtSingleApplication *app;
 
@@ -75,20 +61,31 @@ createAppObject(int &argc, char **argv)
     } else {
         Q_DEBUG("I am the first instance");
     }
+
+    app->setQuitOnLastWindowClosed (false);
+
+    return app;
 #else
+    return NULL;
+#endif
+}//createSingleAppObject
+
+QApplication *
+createNormalAppObject(int &argc, char **argv)
+{
+    Q_ASSERT(USE_SINGLE_APPLICATION);
     QApplication *app = createApplication(argc, argv);
     if (NULL == app) {
         Q_WARN("Failed to create QApplication object");
         return app;
     }
-#endif
 
     app->setQuitOnLastWindowClosed (false);
 
     return app;
-}//createAppObject
+}//createNormalAppObject
 
-MainWindow::MainWindow(QObject *parent)
+QmlMainWindow::QmlMainWindow(QObject *parent)
 : IMainWindow(parent)
 , m_view(new QmlApplicationViewer)
 , mainPageStack(NULL)
@@ -117,38 +114,21 @@ MainWindow::MainWindow(QObject *parent)
 , edContactsUpdateFreq(NULL)
 , edInboxUpdateFreq(NULL)
 {
-#ifdef Q_OS_BLACKBEERRY
-    // GL viewport increases performance on blackberry
-    QGLFormat format = QGLFormat::defaultFormat();
-    format.setSampleBuffers(false);
-    QGLWidget *glWidget = new QGLWidget(format);
-    glWidget->setAutoFillBackground(false);
-
-    m_view->setViewport(glWidget);
-
-    // More gfx performance
-    m_view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
-    m_view->setAttribute(Qt::WA_OpaquePaintEvent);
-    m_view->setAttribute(Qt::WA_NoSystemBackground);
-    m_view->viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
-    m_view->viewport()->setAttribute(Qt::WA_NoSystemBackground);
-#endif
-
 #if USE_SINGLE_APPLICATION
     ((QtSingleApplication*)qApp)->setActivationWindow(m_view);
 #endif
-}//MainWindow::MainWindow
+}//QmlMainWindow::QmlMainWindow
 
-MainWindow::~MainWindow()
+QmlMainWindow::~QmlMainWindow()
 {
     if (NULL != m_view) {
         delete m_view;
         m_view = NULL;
     }
-}//MainWindow::~MainWindow
+}//QmlMainWindow::~QmlMainWindow
 
 void
-MainWindow::init()
+QmlMainWindow::init()
 {
     IMainWindow::init ();
 
@@ -177,10 +157,10 @@ MainWindow::init()
         return;
     }
 #endif
-}//MainWindow::init
+}//QmlMainWindow::init
 
 QObject *
-MainWindow::getQMLObject(const char *pageName)
+QmlMainWindow::getQMLObject(const char *pageName)
 {
     QObject *pObj = NULL;
     do { // Begin cleanup block (not a loop)
@@ -204,10 +184,10 @@ MainWindow::getQMLObject(const char *pageName)
     } while (0); // End cleanup block (not a loop)
 
     return (pObj);
-}//MainWindow::getQMLObject
+}//QmlMainWindow::getQMLObject
 
 bool
-MainWindow::connectToChangeNotify(QObject *item, const QString &propName,
+QmlMainWindow::connectToChangeNotify(QObject *item, const QString &propName,
                                   QObject *receiver, const char *slotName)
 {
     bool rv = false;
@@ -249,16 +229,16 @@ MainWindow::connectToChangeNotify(QObject *item, const QString &propName,
     } while(0);
 
     return (rv);
-}//MainWindow::connectToChangeNotify
+}//QmlMainWindow::connectToChangeNotify
 
 void
-MainWindow::log(QDateTime /*dt*/, int /*level*/, const QString & /*strLog*/)
+QmlMainWindow::log(QDateTime /*dt*/, int /*level*/, const QString & /*strLog*/)
 {
     //TODO: Show it in the logs view
-}//MainWindow::log
+}//QmlMainWindow::log
 
 void
-MainWindow::declStatusChanged(QDeclarativeView::Status status)
+QmlMainWindow::declStatusChanged(QDeclarativeView::Status status)
 {
     do {
         if (QDeclarativeView::Ready != status) {
@@ -466,10 +446,10 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
         return;
     } while(0);
     exit(-1);
-}//MainWindow::declStatusChanged
+}//QmlMainWindow::declStatusChanged
 
 void
-MainWindow::messageReceived(const QString &msg)
+QmlMainWindow::messageReceived(const QString &msg)
 {
     if (msg == "show") {
         Q_DEBUG ("Second instance asked us to show");
@@ -478,18 +458,18 @@ MainWindow::messageReceived(const QString &msg)
         Q_DEBUG ("Second instance asked us to quit");
         qApp->quit ();
     }
-}//MainWindow::messageReceived
+}//QmlMainWindow::messageReceived
 
 void
-MainWindow::uiShowStatusMessage(const QString &msg, quint64 millisec)
+QmlMainWindow::uiShowStatusMessage(const QString &msg, quint64 millisec)
 {
     QMetaObject::invokeMethod(statusBanner, "showMessage",
                               Q_ARG(QVariant, QVariant(msg)),
                               Q_ARG(QVariant, QVariant(millisec)));
-}//MainWindow::uiShowStatusMessage
+}//QmlMainWindow::uiShowStatusMessage
 
 void
-MainWindow::uiUpdateProxySettings(const ProxyInfo &info)
+QmlMainWindow::uiUpdateProxySettings(const ProxyInfo &info)
 {
     QMetaObject::invokeMethod (proxySettingsPage, "setValues",
                                Q_ARG (QVariant, QVariant(info.enableProxy)),
@@ -499,12 +479,12 @@ MainWindow::uiUpdateProxySettings(const ProxyInfo &info)
                                Q_ARG (QVariant, QVariant(info.authRequired)),
                                Q_ARG (QVariant, QVariant(info.user)),
                                Q_ARG (QVariant, QVariant(info.pass)));
-}//MainWindow::uiUpdateProxySettings
+}//QmlMainWindow::uiUpdateProxySettings
 
 void
-MainWindow::onSigProxyChanges(bool enable, bool useSystemProxy, QString server,
-                              int port, bool authRequired, QString user,
-                              QString pass)
+QmlMainWindow::onSigProxyChanges(bool enable, bool useSystemProxy,
+                                 QString server, int port, bool authRequired,
+                                 QString user, QString pass)
 {
     ProxyInfo info;
     info.enableProxy    = enable;
@@ -516,10 +496,10 @@ MainWindow::onSigProxyChanges(bool enable, bool useSystemProxy, QString server,
     info.pass           = pass;
 
     onUiProxyChanged (info);
-}//MainWindow::onSigProxyChanges
+}//QmlMainWindow::onSigProxyChanges
 
 void
-MainWindow::onLoginButtonClicked()
+QmlMainWindow::onLoginButtonClicked()
 {
     if ("Login" == loginButton->property("text").toString()) {
         QString user, pass;
@@ -530,16 +510,16 @@ MainWindow::onLoginButtonClicked()
     } else {
         onUserLogoutRequest ();
     }
-}//MainWindow::onLoginButtonClicked
+}//QmlMainWindow::onLoginButtonClicked
 
 void
-MainWindow::onUserLogoutDone()
+QmlMainWindow::onUserLogoutDone()
 {
     Q_DEBUG("Logout complete");
-}//MainWindow::onUserLogoutDone
+}//QmlMainWindow::onUserLogoutDone
 
 void
-MainWindow::uiRequestLoginDetails()
+QmlMainWindow::uiRequestLoginDetails()
 {
     // Show the settings tab
     QMetaObject::invokeMethod (mainTabGroup, "setTab", Q_ARG(QVariant, 3));
@@ -548,19 +528,19 @@ MainWindow::uiRequestLoginDetails()
         bool val = true;
         loginExpand->setProperty("isExpanded", val);
     }
-}//MainWindow::uiRequestLoginDetails
+}//QmlMainWindow::uiRequestLoginDetails
 
 void
-MainWindow::uiRequestTFALoginDetails(void *ctx)
+QmlMainWindow::uiRequestTFALoginDetails(void *ctx)
 {
     loginCtx = ctx;
 
     // Push the TFA dialog on to the main page
     QMetaObject::invokeMethod (mainPageStack, "pushTfaDlg");
-}//MainWindow::uiRequestTFALoginDetails
+}//QmlMainWindow::uiRequestTFALoginDetails
 
 void
-MainWindow::onTfaPinDlg(bool accepted)
+QmlMainWindow::onTfaPinDlg(bool accepted)
 {
     QString strPin = tfaPinDlg->property("textPin").toString();
     int pin = strPin.toInt();
@@ -572,10 +552,10 @@ MainWindow::onTfaPinDlg(bool accepted)
             resumeTFAAuth (loginCtx, pin, false);
         }
     }
-}//MainWindow::onTfaPinDlg
+}//QmlMainWindow::onTfaPinDlg
 
 void
-MainWindow::uiSetUserPass(bool editable)
+QmlMainWindow::uiSetUserPass(bool editable)
 {
     textUsername->setProperty ("text", m_user);
     textPassword->setProperty ("text", m_pass);
@@ -585,25 +565,25 @@ MainWindow::uiSetUserPass(bool editable)
     textPassword->setProperty ("opacity", val);
 
     loginButton->setProperty ("text", editable ? "Login" : "Logout");
-}//MainWindow::uiSetUserPass
+}//QmlMainWindow::uiSetUserPass
 
 void
-MainWindow::uiRequestApplicationPassword()
+QmlMainWindow::uiRequestApplicationPassword()
 {
     QMetaObject::invokeMethod (mainPageStack, "pushAppPwDlg");
-}//MainWindow::uiRequestApplicationPassword
+}//QmlMainWindow::uiRequestApplicationPassword
 
 void
-MainWindow::onAppPwDlg(bool accepted)
+QmlMainWindow::onAppPwDlg(bool accepted)
 {
     if (accepted) {
         QString appPw = appPwDlg->property("appPw").toString();
         oContacts.login (m_user, appPw);
     }
-}//MainWindow::onAppPwDlg
+}//QmlMainWindow::onAppPwDlg
 
 void
-MainWindow::uiLoginDone(int status, const QString &errStr)
+QmlMainWindow::uiLoginDone(int status, const QString &errStr)
 {
     if (ATTS_SUCCESS == status) {
         return;
@@ -611,10 +591,10 @@ MainWindow::uiLoginDone(int status, const QString &errStr)
 
     infoBanner->setProperty ("text", errStr);
     QMetaObject::invokeMethod (infoBanner, "show");
-}//MainWindow::uiLoginDone
+}//QmlMainWindow::uiLoginDone
 
 void
-MainWindow::uiRefreshContacts(ContactsModel *model, QString query)
+QmlMainWindow::uiRefreshContacts(ContactsModel *model, QString query)
 {
     Q_ASSERT(NULL != model);
 
@@ -622,34 +602,34 @@ MainWindow::uiRefreshContacts(ContactsModel *model, QString query)
                     ->setContextProperty("g_ContactsModel", model);
     QMetaObject::invokeMethod (contactsPage, "setMyModel",
                                Q_ARG(QVariant, QVariant(query)));
-}//MainWindow::uiRefreshContacts
+}//QmlMainWindow::uiRefreshContacts
 
 void
-MainWindow::uiRefreshInbox()
+QmlMainWindow::uiRefreshInbox()
 {
     m_view->engine()->rootContext()
                     ->setContextProperty("g_InboxModel",
                                          oInbox.m_inboxModel);
     QMetaObject::invokeMethod (inboxList, "setMyModel");
-}//MainWindow::uiRefreshInbox
+}//QmlMainWindow::uiRefreshInbox
 
 void
-MainWindow::uiSetSelelctedInbox(const QString &selection)
+QmlMainWindow::uiSetSelelctedInbox(const QString &selection)
 {
     QMetaObject::invokeMethod (inboxSelector, "setSelection",
                                Q_ARG(QVariant, QVariant(selection)));
-}//MainWindow::uiSetSelelctedInbox
+}//QmlMainWindow::uiSetSelelctedInbox
 
 void
-MainWindow::uiSetNewRegNumbersModel()
+QmlMainWindow::uiSetNewRegNumbersModel()
 {
     m_view->engine()->rootContext()->setContextProperty("g_RegNumberModel",
                                                         oPhones.m_numModel);
     QMetaObject::invokeMethod (regNumberSelector, "setMyModel");
-}//MainWindow::uiSetNewRegNumbersModel
+}//QmlMainWindow::uiSetNewRegNumbersModel
 
 void
-MainWindow::uiRefreshNumbers()
+QmlMainWindow::uiRefreshNumbers()
 {
     Q_ASSERT(NULL != oPhones.m_numModel);
     if (NULL == oPhones.m_numModel) {
@@ -665,26 +645,26 @@ MainWindow::uiRefreshNumbers()
 
     QString btnText = QString("%1 (%2)").arg(num.name, num.number);
     selectedNumberButton->setProperty ("text", btnText);
-}//MainWindow::uiRefreshNumbers
+}//QmlMainWindow::uiRefreshNumbers
 
 void
-MainWindow::uiSetNewContactDetailsModel()
+QmlMainWindow::uiSetNewContactDetailsModel()
 {
     m_view->engine()->rootContext()
                     ->setContextProperty("g_ContactPhonesModel",
                                          oContacts.m_contactPhonesModel);
-}//MainWindow::uiSetNewContactDetailsModel
+}//QmlMainWindow::uiSetNewContactDetailsModel
 
 void
-MainWindow::uiShowContactDetails(const ContactInfo &cinfo)
+QmlMainWindow::uiShowContactDetails(const ContactInfo &cinfo)
 {
     QMetaObject::invokeMethod (mainPageStack, "showContactDetails",
                                Q_ARG (QVariant, QVariant(cinfo.strPhotoPath)),
                                Q_ARG (QVariant, QVariant(cinfo.strTitle)));
-}//MainWindow::uiShowContactDetails
+}//QmlMainWindow::uiShowContactDetails
 
 void
-MainWindow::onInboxClicked(QString id)
+QmlMainWindow::onInboxClicked(QString id)
 {
     GVInboxEntry event;
     QString type;
@@ -730,32 +710,32 @@ MainWindow::onInboxClicked(QString id)
         Q_ASSERT(isVmail); // Reuse this "true" value
         inboxDetails->setProperty ("fetchingEmail", isVmail);
     }
-}//MainWindow::onInboxClicked
+}//QmlMainWindow::onInboxClicked
 
 void
-MainWindow::onInboxSelectionChanged(QString sel)
+QmlMainWindow::onInboxSelectionChanged(QString sel)
 {
     oInbox.onUserSelect (sel);
-}//MainWindow::onInboxSelectionChanged
+}//QmlMainWindow::onInboxSelectionChanged
 
 void
-MainWindow::uiGetCIDetails(GVRegisteredNumber &num, GVNumModel *model)
+QmlMainWindow::uiGetCIDetails(GVRegisteredNumber &num, GVNumModel *model)
 {
     m_view->engine()->rootContext()
                     ->setContextProperty("g_CiPhonesModel", model);
 
     QMetaObject::invokeMethod (mainPageStack, "pushCiSelector",
                                Q_ARG (QVariant, QVariant(num.id)));
-}//MainWindow::uiGetCIDetails
+}//QmlMainWindow::uiGetCIDetails
 
 void
-MainWindow::uiClearStatusMessage()
+QmlMainWindow::uiClearStatusMessage()
 {
     QMetaObject::invokeMethod (statusBanner, "clearMessage");
-}//MainWindow::uiClearStatusMessage
+}//QmlMainWindow::uiClearStatusMessage
 
 void
-MainWindow::onUserTextBtnClicked(QString dest)
+QmlMainWindow::onUserTextBtnClicked(QString dest)
 {
     ContactInfo cinfo;
 
@@ -771,10 +751,10 @@ MainWindow::onUserTextBtnClicked(QString dest)
                                Q_ARG (QVariant, QVariant(dest)),
                                Q_ARG (QVariant, QVariant(QString())),
                                Q_ARG (QVariant, QVariant(QString())));
-}//MainWindow::onUserTextBtnClicked
+}//QmlMainWindow::onUserTextBtnClicked
 
 void
-MainWindow::uiFailedToSendMessage(const QString &dest, const QString &text)
+QmlMainWindow::uiFailedToSendMessage(const QString &dest, const QString &text)
 {
     ContactInfo cinfo;
     if (!oContacts.getContactInfoFromNumber(dest, cinfo)) {
@@ -787,10 +767,10 @@ MainWindow::uiFailedToSendMessage(const QString &dest, const QString &text)
                                Q_ARG (QVariant, QVariant(dest)),
                                Q_ARG (QVariant, QVariant(QString())),
                                Q_ARG (QVariant, QVariant(text)));
-}//MainWindow::uiFailedToSendMessage
+}//QmlMainWindow::uiFailedToSendMessage
 
 void
-MainWindow::onUserSmsTextDone(bool ok)
+QmlMainWindow::onUserSmsTextDone(bool ok)
 {
     if (!ok) {
         return;
@@ -801,10 +781,10 @@ MainWindow::onUserSmsTextDone(bool ok)
     text = smsPage->property("smsText").toString();
 
     onUserSendSMS (QStringList(dest), text);
-}//MainWindow::onUserSmsTextDone
+}//QmlMainWindow::onUserSmsTextDone
 
 void
-MainWindow::onUserReplyToInboxEntry(QString id)
+QmlMainWindow::onUserReplyToInboxEntry(QString id)
 {
     GVInboxEntry event;
     event.id = id;
@@ -822,18 +802,19 @@ MainWindow::onUserReplyToInboxEntry(QString id)
                                Q_ARG (QVariant, QVariant(event.strPhoneNumber)),
                                Q_ARG (QVariant, QVariant(event.strText)),
                                Q_ARG (QVariant, QVariant(QString())));
-}//MainWindow::onUserReplyToInboxEntry
+}//QmlMainWindow::onUserReplyToInboxEntry
 
 void
-MainWindow::onInboxDetailsDone(bool /*accepted*/)
+QmlMainWindow::onInboxDetailsDone(bool /*accepted*/)
 {
     m_inboxDetailsShown = false;
     oVmail.stop ();
     oVmail.deinitPlayer ();
-}//MainWindow::onInboxDetailsDone
+}//QmlMainWindow::onInboxDetailsDone
 
 void
-MainWindow::onVmailFetched(const QString & /*id*/, const QString &localPath, bool ok)
+QmlMainWindow::onVmailFetched(const QString & /*id*/, const QString &localPath,
+                              bool ok)
 {
     if (!m_inboxDetailsShown) {
         return;
@@ -851,10 +832,10 @@ MainWindow::onVmailFetched(const QString & /*id*/, const QString &localPath, boo
 
     ok = false;
     inboxDetails->setProperty ("fetchingEmail", ok);
-}//MainWindow::onVmailFetched
+}//QmlMainWindow::onVmailFetched
 
 void
-MainWindow::onVmailPlayerStateUpdate(LVPlayerState newState)
+QmlMainWindow::onVmailPlayerStateUpdate(LVPlayerState newState)
 {
     if (!m_inboxDetailsShown) {
         return;
@@ -878,20 +859,20 @@ MainWindow::onVmailPlayerStateUpdate(LVPlayerState newState)
     default:
         break;
     }
-}//MainWindow::onVmailPlayerStateUpdate
+}//QmlMainWindow::onVmailPlayerStateUpdate
 
 void
-MainWindow::onVmailDurationChanged(quint64 duration)
+QmlMainWindow::onVmailDurationChanged(quint64 duration)
 {
     if (!m_inboxDetailsShown) {
         return;
     }
 
     inboxDetails->setProperty ("vmailDuration", duration);
-}//MainWindow::onVmailDurationChanged
+}//QmlMainWindow::onVmailDurationChanged
 
 void
-MainWindow::onVmailCurrentPositionChanged(quint64 position, quint64 duration)
+QmlMainWindow::onVmailCurrentPositionChanged(quint64 position, quint64 duration)
 {
     if (!m_inboxDetailsShown) {
         return;
@@ -899,28 +880,28 @@ MainWindow::onVmailCurrentPositionChanged(quint64 position, quint64 duration)
 
     inboxDetails->setProperty ("vmailPosition", position);
     inboxDetails->setProperty ("vmailDuration", duration);
-}//MainWindow::onVmailCurrentPositionChanged
+}//QmlMainWindow::onVmailCurrentPositionChanged
 
 void
-MainWindow::onOptContactsUpdateClicked(bool updateDb /*= true*/)
+QmlMainWindow::onOptContactsUpdateClicked(bool updateDb /*= true*/)
 {
     bool enable = optContactsUpdate->property("checked").toBool ();
     if (updateDb) {
         oContacts.enableUpdateFrequency (enable);
     }
-}//MainWindow::onOptContactsUpdateClicked
+}//QmlMainWindow::onOptContactsUpdateClicked
 
 void
-MainWindow::onOptInboxUpdateClicked(bool updateDb /*= true*/)
+QmlMainWindow::onOptInboxUpdateClicked(bool updateDb /*= true*/)
 {
     bool enable = optInboxUpdate->property("checked").toBool ();
     if (updateDb) {
         oInbox.enableUpdateFrequency (enable);
     }
-}//MainWindow::onOptInboxUpdateClicked
+}//QmlMainWindow::onOptInboxUpdateClicked
 
 void
-MainWindow::onEdContactsUpdateTextChanged()
+QmlMainWindow::onEdContactsUpdateTextChanged()
 {
     quint32 mins = edContactsUpdateFreq->property ("text").toInt ();
     if (0 == mins) {
@@ -929,10 +910,10 @@ MainWindow::onEdContactsUpdateTextChanged()
     }
 
     oContacts.setUpdateFrequency (mins);
-}//MainWindow::onEdContactsUpdateTextChanged
+}//QmlMainWindow::onEdContactsUpdateTextChanged
 
 void
-MainWindow::onEdInboxUpdateTextChanged()
+QmlMainWindow::onEdInboxUpdateTextChanged()
 {
     quint32 mins = edInboxUpdateFreq->property ("text").toInt ();
     if (0 == mins) {
@@ -941,28 +922,28 @@ MainWindow::onEdInboxUpdateTextChanged()
     }
 
     oInbox.setUpdateFrequency (mins);
-}//MainWindow::onEdInboxUpdateTextChanged
+}//QmlMainWindow::onEdInboxUpdateTextChanged
 
 void
-MainWindow::uiEnableContactUpdateFrequency(bool enable)
+QmlMainWindow::uiEnableContactUpdateFrequency(bool enable)
 {
     optContactsUpdate->setProperty ("checked", enable);
-}//MainWindow::uiEnableContactUpdateFrequency
+}//QmlMainWindow::uiEnableContactUpdateFrequency
 
 void
-MainWindow::uiSetContactUpdateFrequency(quint32 mins)
+QmlMainWindow::uiSetContactUpdateFrequency(quint32 mins)
 {
     edContactsUpdateFreq->setProperty ("text", QString::number (mins));
-}//MainWindow::uiSetContactUpdateFrequency
+}//QmlMainWindow::uiSetContactUpdateFrequency
 
 void
-MainWindow::uiEnableInboxUpdateFrequency(bool enable)
+QmlMainWindow::uiEnableInboxUpdateFrequency(bool enable)
 {
     optInboxUpdate->setProperty ("checked", enable);
-}//MainWindow::uiEnableInboxUpdateFrequency
+}//QmlMainWindow::uiEnableInboxUpdateFrequency
 
 void
-MainWindow::uiSetInboxUpdateFrequency(quint32 mins)
+QmlMainWindow::uiSetInboxUpdateFrequency(quint32 mins)
 {
     edInboxUpdateFreq->setProperty ("text", QString::number (mins));
-}//MainWindow::uiSetInboxUpdateFrequency
+}//QmlMainWindow::uiSetInboxUpdateFrequency

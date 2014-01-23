@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2010-2013 Roger Light <roger@atchoo.org>
+Copyright (c) 2010-2014 Roger Light <roger@atchoo.org>
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

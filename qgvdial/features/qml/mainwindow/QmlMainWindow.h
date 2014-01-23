@@ -1,6 +1,6 @@
 /*
 qgvdial is a cross platform Google Voice Dialer
-Copyright (C) 2009-2013  Yuvraaj Kelkar
+Copyright (C) 2009-2014  Yuvraaj Kelkar
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -19,18 +19,18 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef QMLMAINWINDOW_H
+#define QMLMAINWINDOW_H
 
 #include "IMainWindow.h"
 
 class QmlApplicationViewer;
-class MainWindow : public IMainWindow
+class QmlMainWindow : public IMainWindow
 {
     Q_OBJECT
 public:
-    explicit MainWindow(QObject *parent = 0);
-    virtual ~MainWindow();
+    explicit QmlMainWindow(QObject *parent = 0);
+    virtual ~QmlMainWindow();
 
     void init();
     void log(QDateTime dt, int level, const QString &strLog);
@@ -104,7 +104,7 @@ protected:
     void uiEnableInboxUpdateFrequency(bool enable);
     void uiSetInboxUpdateFrequency(quint32 mins);
 
-private:
+protected:
     QmlApplicationViewer *m_view;
 
     QObject *mainPageStack;
@@ -139,6 +139,8 @@ private:
 };
 
 QApplication *
-createAppObject(int &argc, char **argv);
+createSingleAppObject(int &argc, char **argv);
+QApplication *
+createNormalAppObject(int &argc, char **argv);
 
-#endif // MAINWINDOW_H
+#endif // QMLMAINWINDOW_H
