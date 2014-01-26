@@ -69,5 +69,4 @@ MainWindow::init()
     //m_view->setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
     //m_view->setOrientation(QmlApplicationViewer::ScreenOrientationLockPortrait);
     //m_view->setOrientation(QmlApplicationViewer::ScreenOrientationLockLandscape);
-    //m_view->setAttribute (Qt::WA_SymbianNoSystemRotation);
 }//MainWindow::init

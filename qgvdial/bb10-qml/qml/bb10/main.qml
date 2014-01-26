@@ -227,4 +227,15 @@ PageStackWindow {
             }
         }//ToolBarLayout
     }//ToolBar (commonTools)
+
+    onWidthChanged: {
+        console.debug("QML: Page width changed: " + appWindow.width);
+        console.debug("QML: Screen width: " + screen.width);
+
+//        if (width < height) {   // Portrait
+//            screen.privateSetOrientation(1);
+//        } else {                // Landscape
+//            screen.privateSetOrientation(2);
+//        }
+    }
 }
