@@ -25,6 +25,7 @@ import com.nokia.extras 1.1
 
 PageStackWindow {
     id: appWindow
+    
     objectName: "MainPageStack"
     // Status bar isn't the status at the bottom: its the status at the top: battery status, bars, etc.
     showStatusBar: false
@@ -88,7 +89,6 @@ PageStackWindow {
     }
     function popPageStack() {
         if (appWindow.pageStack.depth > 1) {
-            console.debug("Its popping");
             appWindow.pageStack.pop();
         } else {
             console.debug("No popping dammit!");
@@ -229,13 +229,17 @@ PageStackWindow {
     }//ToolBar (commonTools)
 
     onWidthChanged: {
-        console.debug("QML: Page width changed: " + appWindow.width);
-        console.debug("QML: Screen width: " + screen.width);
+        console.debug("width: " + appWindow.width  + ", height: " + appWindow.height);
+        console.debug("screen width: " + screen.width  + ", height: " + screen.height);
 
-//        if (width < height) {   // Portrait
-//            screen.privateSetOrientation(1);
-//        } else {                // Landscape
-//            screen.privateSetOrientation(2);
-//        }
+/*
+        if (screen.width == appWindow.height) {   // Portrait
+            console.debug("width < height: Set Portrait");
+            screen.privateSetOrientation(1);
+        } else {                // Landscape
+            console.debug("width < height: Set Landscape");
+            screen.privateSetOrientation(2);
+        }
+*/
     }
 }

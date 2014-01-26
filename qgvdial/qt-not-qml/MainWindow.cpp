@@ -62,17 +62,39 @@ createAppObject(int argc, char *argv[])
     app = new QtSingleApplication(argc, argv);
 //#endif
 
-    if (NULL == app) {
-        return app;
-    }
+    do {
+        if (NULL == app) {
+            break;
+        }
 
-    if (app->isRunning ()) {
+        if (!app->isRunning ()) {
+            app->setQuitOnLastWindowClosed (false);
+            break;
+        }
+
+        // Show first always
         app->sendMessage ("show");
+
+        QStringList args = app->arguments ();
+        do {
+            if (args.count() == 3) {
+                if (0 == args[1].compare("call", Qt::CaseInsensitive)) {
+                    if (args[2].contains(',')) {
+                        Q_WARN("Invalid characters in phone number");
+                        break;
+                    }
+
+                    app->sendMessage (QString("call,%1").arg(args[2]));
+                    break;
+                }
+            }
+
+            // No valid commands
+        } while (0);
+
         delete app;
         app = NULL;
-    } else {
-        app->setQuitOnLastWindowClosed (false);
-    }
+    } while (0);
 
     return app;
 }//createAppObject
@@ -480,6 +502,12 @@ MainWindow::messageReceived(const QString &msg)
     } else if (msg == "quit") {
         Q_DEBUG ("Second instance asked us to quit");
         qApp->quit ();
+    } else if (msg.startsWith ("call,")) {
+        QString dest = msg.mid (sizeof("call,") - 1);
+        Q_DEBUG(QString("Command line call to: %1").arg(dest));
+        onUserCall (dest);
+    } else {
+        Q_DEBUG(QString("Unknown command: '%q'").arg(msg));
     }
 }//MainWindow::messageReceived
 
