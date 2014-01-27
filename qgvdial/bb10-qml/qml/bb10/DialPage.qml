@@ -36,35 +36,36 @@ Page {
         numberField.text = number;
     }
 
+    property real _spacing: 2
+
     Button {
         id: btnSelectedNumber
         objectName: "SelectedNumberButton"
         height: 100
-        width: parent.width
+
+        // Same anchors for landscape and portrait
         anchors {
-            top: parent.top
+            top: container.top
+            left: container.left
         }
 
-        onClicked: container.regNumBtnClicked();
+        onClicked: { container.regNumBtnClicked(); }
     }//currently selected phone
 
     TextField {
         id: numberField
 
-        anchors {
-            top: btnSelectedNumber.bottom
-            topMargin: 8
-            bottom: keypad.top
-            bottomMargin: 8
-            horizontalCenter: parent.horizontalCenter
-        }
-
         inputMethodHints: Qt.ImhDialableCharactersOnly
         placeholderText: "Enter number here"
 
-        width: parent.width - 4
+        // Same anchors for landscape and portrait
+        anchors {
+            top: btnSelectedNumber.bottom
+            topMargin: 5
+            left: container.left
+        }
+
         font.pointSize: 100
-        
         readOnly: true
 
         ToolButton {
@@ -96,15 +97,6 @@ Page {
     Keypad {
         id: keypad
 
-        anchors {
-            bottom: btnRow.top
-            bottomMargin: 8
-            horizontalCenter: parent.horizontalCenter
-        }
-
-        width: parent.width - 8
-        height: parent.height * 7/18
-
         onBtnClick: {
             var origStart = numberField.selectionStart;
             var result = numberField.text.substr(0, origStart);
@@ -114,20 +106,14 @@ Page {
             numberField.cursorPosition = origStart + strText.length;
         }
         onSigHaptic: container.sigHaptic();
-    }
+    }//Keypad
 
     ButtonRow {
         id: btnRow
 
-        anchors {
-            bottom: parent.bottom
-            bottomMargin: 8
-            horizontalCenter: parent.horizontalCenter
-        }
-        width: parent.width * 8/10
         spacing: 5
-
         exclusive: false
+
         Button {
             text: "Text"
             height: 100
@@ -141,4 +127,88 @@ Page {
             onClicked: container.sigCall(numberField.text);
         }
     }//ButtonRow: Text & Call
+
+    state: (screen.currentOrientation == Screen.Portrait) ? "portrait" : "landscape"
+    states: [
+        State {
+            name: "portrait"
+
+            /// target: btnSelectedNumber
+            PropertyChanges {
+                target: btnSelectedNumber
+                width: container.width
+            }
+            /// target: numberField
+            PropertyChanges {
+                target: numberField
+                width: container.width
+                height: container.height - (btnSelectedNumber.height + keypad.height + btnRow.height + 5)
+            }
+            /// target: keypad
+            AnchorChanges {
+                target: keypad
+                anchors {
+                    top: numberField.bottom
+                    left: container.left
+                }
+            }
+            PropertyChanges {
+                target: keypad
+                width: container.width - 8
+                height: container.height * 7/18
+            }
+            /// target: btnRow
+            AnchorChanges {
+                target: btnRow
+                anchors {
+                    top: keypad.bottom
+                    horizontalCenter: container.horizontalCenter
+                }
+            }
+            PropertyChanges {
+                target: btnRow
+                width: container.width - _spacing;
+            }
+        },// State
+        State {
+            name: "landscape"
+
+            /// target: btnSelectedNumber
+            PropertyChanges {
+                target: btnSelectedNumber
+                width: (container.width / 2) - _spacing;
+            }
+            /// target: numberField
+            PropertyChanges {
+                target: numberField
+                width: (container.width / 2) - _spacing;
+                height: container.height - btnSelectedNumber.height - _spacing
+            }
+            /// target: keypad
+            AnchorChanges {
+                target: keypad
+                anchors {
+                    top: container.top
+                    left: numberField.right
+                }
+            }
+            PropertyChanges {
+                target: keypad
+                width: (container.width / 2) - _spacing;
+                height: container.height - btnRow.height - 10
+            }
+            /// target: btnRow
+            AnchorChanges {
+                target: btnRow
+                anchors {
+                    top: keypad.bottom
+                    horizontalCenter: keypad.horizontalCenter
+                }
+            }
+            PropertyChanges {
+                target: btnRow
+                width: (container.width / 2) - _spacing;
+            }
+        }//State
+    ]//states
 }//Page

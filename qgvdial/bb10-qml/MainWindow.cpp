@@ -67,6 +67,6 @@ MainWindow::init()
 
     // None of these seem to have any effect
     //m_view->setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
-    //m_view->setOrientation(QmlApplicationViewer::ScreenOrientationLockPortrait);
+    m_view->setOrientation(QmlApplicationViewer::ScreenOrientationLockPortrait);
     //m_view->setOrientation(QmlApplicationViewer::ScreenOrientationLockLandscape);
 }//MainWindow::init

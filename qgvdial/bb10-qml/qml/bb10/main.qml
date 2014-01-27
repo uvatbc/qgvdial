@@ -109,6 +109,7 @@ PageStackWindow {
         interval: 1000
         onTriggered: {
             appWindow.popPageStack();
+            screen.setAllowedOrientations(Screen.Portrait);
         }
     }
 
@@ -229,17 +230,18 @@ PageStackWindow {
     }//ToolBar (commonTools)
 
     onWidthChanged: {
+        /*
         console.debug("width: " + appWindow.width  + ", height: " + appWindow.height);
         console.debug("screen width: " + screen.width  + ", height: " + screen.height);
+        console.debug("screen displayWidth: " + screen.displayWidth  + ", displayHeight: " + screen.displayHeight);
+        */
 
-/*
-        if (screen.width == appWindow.height) {   // Portrait
-            console.debug("width < height: Set Portrait");
+        if (screen.width == screen.displayWidth) {  // Portrait
+            //console.debug("Set Portrait");
             screen.privateSetOrientation(1);
-        } else {                // Landscape
-            console.debug("width < height: Set Landscape");
+        } else {                                    // Landscape
+            //console.debug("Set Landscape");
             screen.privateSetOrientation(2);
         }
-*/
     }
 }

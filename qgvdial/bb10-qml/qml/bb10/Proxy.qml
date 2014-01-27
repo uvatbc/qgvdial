@@ -241,7 +241,10 @@ Item {
 
             Button {
                 text: "Revert"
-                onClicked: container.sigRevertChanges(false);
+                onClicked: {
+                    container.sigRevertChanges(false);
+                    container.forceActiveFocus();
+                }
             }
             Button {
                 text: "Submit"
@@ -254,6 +257,7 @@ Item {
                                                bProxyUserPass,
                                                textUserProxyUser.text,
                                                textUserProxyPass.text);
+                    container.forceActiveFocus();
                 }
             }
         }
