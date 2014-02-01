@@ -35,10 +35,10 @@
                 <File Id="qgvdial.exe" Source="..\..\..\qgvdial\qt-not-qml\desktop_windows\release\qgvdial.exe" KeyPath="yes" Checksum="yes"/>
             </Component>
             <Component Id="libeay32.dll" Guid="85006557-DB29-43E1-B60D-D42457E2293F">
-                <File Id="libeay32.dll" Source="C:\Users\Uv\work\cc\qt-everywhere-opensource-src-4.8.1-dll-x86\bin\libeay32.dll" KeyPath="yes" Checksum="yes"/>
+                <File Id="libeay32.dll" Source="__QTDIR__\bin\libeay32.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
             <Component Id="ssleay32.dll" Guid="5A660879-F547-49C0-A7D8-F93BFBF92E5C">
-                <File Id="ssleay32.dll" Source="C:\Users\Uv\work\cc\qt-everywhere-opensource-src-4.8.1-dll-x86\bin\ssleay32.dll" KeyPath="yes" Checksum="yes"/>
+                <File Id="ssleay32.dll" Source="__QTDIR__\bin\ssleay32.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
             <Component Id="qt.conf" Guid="F5AA101C-FD8B-4525-9E72-4E32641C11A7">
                 <File Id="qt.conf" Source="..\..\..\build-files\qgvdial\windows\qt.conf" KeyPath="yes" Checksum="yes"/>
