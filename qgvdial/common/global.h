@@ -56,7 +56,7 @@ void qgv_LogFlush();
 #define DIABLO_OS 0
 #endif
 
-#if defined(Q_WS_X11) && !defined(Q_WS_MAEMO_5) && !defined(MEEGO_HARMATTAN) && !defined(Q_OS_BLACKBERRY) && !DIABLO_OS
+#if (defined(Q_OS_LINUX) || defined(Q_WS_X11)) && !defined(Q_WS_MAEMO_5) && !defined(MEEGO_HARMATTAN) && !defined(Q_OS_BLACKBERRY) && !DIABLO_OS
 #define LINUX_DESKTOP 1
 #else
 #define LINUX_DESKTOP 0
