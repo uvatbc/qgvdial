@@ -355,8 +355,14 @@ Q_DECLARE_METATYPE(ContactInfo)
 #define __FULLFUNC__ __FUNCTION__
 #endif
 
-#define Q_DEBUG(_s) qDebug() << QString("%1(%2): %3").arg(__FULLFUNC__).arg(__LINE__).arg(_s)
-#define Q_WARN(_s) qWarning() << QString("%1(%2): %3").arg(__FULLFUNC__).arg(__LINE__).arg(_s)
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+#define Q_DEBUG(_s) qDebug()   << QString("%1").arg(_s)
+#define Q_WARN(_s) qWarning()  << QString("%1").arg(_s)
+#define Q_CRIT(_s) qCritical() << QString("%1").arg(_s)
+#else
+#define Q_DEBUG(_s) qDebug()   << QString("%1(%2): %3").arg(__FULLFUNC__).arg(__LINE__).arg(_s)
+#define Q_WARN(_s) qWarning()  << QString("%1(%2): %3").arg(__FULLFUNC__).arg(__LINE__).arg(_s)
 #define Q_CRIT(_s) qCritical() << QString("%1(%2): %3").arg(__FULLFUNC__).arg(__LINE__).arg(_s)
+#endif
 
 #endif //GAPI_COMMON_H
