@@ -121,9 +121,7 @@ void
 myQt5MessageOutput(QtMsgType type, const QMessageLogContext &ctx,
                    const QString &msg)
 {
-   QString msg1 = QString("%1(%2): %3")
-                     .arg(ctx.function).arg(ctx.line).arg(msg);
-   myMessageOutput(type, msg1.toLatin1().constData());
+   myMessageOutput(type, msg.toLatin1().constData());
 }//myQt5MessageOutput
 #endif
 
