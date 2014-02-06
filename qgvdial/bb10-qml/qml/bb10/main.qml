@@ -109,7 +109,6 @@ PageStackWindow {
         interval: 1000
         onTriggered: {
             appWindow.popPageStack();
-            screen.setAllowedOrientations(Screen.Portrait);
         }
     }
 
