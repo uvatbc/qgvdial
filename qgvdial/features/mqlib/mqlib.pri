@@ -39,8 +39,10 @@ SOURCES  += $$PWD/cpp/mosquittopp.cpp
 win32 {
     LIBS *= -lssleay32 -lWs2_32
 } else {
-    # Win32 doesn't have pthreads, everyone else does.
+!symbian {
+    # Win32 and symbian don't have pthreads, everyone else does.
     DEFINES *= WITH_THREADING
+}
 }
 
 DEFINES *= WITH_TLS WITH_TLS_PSK WITH_STATIC_MOSQ
