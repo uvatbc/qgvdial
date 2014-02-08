@@ -6,13 +6,9 @@ HEADERS  += $$PWD/OSDCipher.h
 win32 {
     LIBS *= -llibeay32
 } else {
-# For blackberry, add the openssl library:
-blackberry {
-    LIBS += -lssl -lcrypto
-} else {
 symbian {
-LIBS += -llibcrypto
+    LIBS += -llibssl -llibcrypto
 } else {
-# For all Linux variants, add openssl
+# For all Linux variants, and blackberry: add openssl
     LIBS += -lssl -lcrypto
-} } }
+} }
