@@ -34,17 +34,17 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <NMakeBuildCommandLine>nmake -nologo</NMakeBuildCommandLine>
+    <NMakeBuildCommandLine>nmake -nologo debug</NMakeBuildCommandLine>
     <NMakeOutput>debug\qgvdial.exe</NMakeOutput>
     <NMakeCleanCommandLine>nmake -nologo clean</NMakeCleanCommandLine>
-    <NMakeReBuildCommandLine>nmake -nologo clean all</NMakeReBuildCommandLine>
+    <NMakeReBuildCommandLine>nmake -nologo clean debug</NMakeReBuildCommandLine>
     <NMakePreprocessorDefinitions>WIN32;_DEBUG;$(NMakePreprocessorDefinitions);Q_WS_WIN32</NMakePreprocessorDefinitions>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <NMakeBuildCommandLine>nmake -nologo</NMakeBuildCommandLine>
-    <NMakeOutput>debug\qgvdial.exe</NMakeOutput>
+    <NMakeBuildCommandLine>nmake -nologo release</NMakeBuildCommandLine>
+    <NMakeOutput>release\qgvdial.exe</NMakeOutput>
     <NMakeCleanCommandLine>nmake -nologo clean</NMakeCleanCommandLine>
-    <NMakeReBuildCommandLine>nmake -nologo clean all</NMakeReBuildCommandLine>
+    <NMakeReBuildCommandLine>nmake -nologo clean release</NMakeReBuildCommandLine>
     <NMakePreprocessorDefinitions>WIN32;NDEBUG;$(NMakePreprocessorDefinitions);Q_WS_WIN32</NMakePreprocessorDefinitions>
   </PropertyGroup>
   <ItemDefinitionGroup>

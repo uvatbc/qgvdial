@@ -81,6 +81,10 @@ LibGvPhones::onGotPhones()
             }
         }
 
+        if (m_numModel->m_dialBack.count() == 0) {
+            return;
+        }
+
         // Either id not found, or nothing saved:
         id = m_numModel->m_dialBack[0].id;
     } while(0);

@@ -38,17 +38,16 @@ MyXmlErrorHandler::handleMessage (QtMsgType type, const QString &description,
                 .arg(sourceLocation.line ())
                 .arg(sourceLocation.column ());
 
-    switch (type)
-    {
+    switch (type) {
     case QtDebugMsg:
-        qDebug() << msg;
+        Q_DEBUG(msg);
         break;
     case QtWarningMsg:
-        qWarning() << msg;
+        Q_WARN(msg);
         break;
     case QtCriticalMsg:
     case QtFatalMsg:
-        qCritical() << msg;
+        Q_CRIT(msg);
         break;
     }
 }//MyXmlErrorHandler::handleMessage

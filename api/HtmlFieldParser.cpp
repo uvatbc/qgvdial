@@ -46,7 +46,7 @@ HtmlFieldParser::startElement (const QString        & /*namespaceURI*/,
 
 bool
 HtmlFieldParser::endElement (const QString & /*namespaceURI*/,
-                             const QString &localName   ,
+                             const QString &   localName     ,
                              const QString & /*qName       */)
 {
     elems[localName] = strChars;

@@ -1550,27 +1550,27 @@ GVApi::parseInboxJson(AsyncTaskToken *token, const QString &strJson,
 
     QTemporaryFile fHtml, fSms;
     if (!fHtml.open()) {
-        Q_WARN ("Failed to open HTML buffer temporary file");
+        Q_WARN ("Failed to open HTML buffer temporary output");
         return false;
     }
     if (!fSms.open()) {
-        Q_WARN ("Failed to open SMS buffer temporary file");
+        Q_WARN ("Failed to open SMS buffer temporary output");
         return false;
     }
-    fHtml.write(strFixedHtml.toUtf8());
+    fHtml.write(strFixedHtml.toLatin1());
     fHtml.seek(0);
 
 #if 0
     QFile fTemp1("inbox-html.html");
     fTemp1.open (QFile::ReadWrite);
-    fTemp1.write (strFixedHtml.toUtf8());
+    fTemp1.write (strFixedHtml.toLatin1());
     fTemp1.close ();
 #endif
 
 #if 0
     QFile fTemp2("inbox-json.json");
     fTemp2.open (QFile::ReadWrite);
-    fTemp2.write (strJson.toUtf8());
+    fTemp2.write (strJson.toLatin1());
     fTemp2.close ();
 #endif
 
@@ -1709,24 +1709,24 @@ GVApi::parseInboxJson(AsyncTaskToken *token, const QString &strJson,
                 (GVIE_Voicemail   == inboxEntry.Type))
             {
                 QString strQuery =
-                    QString("for $i in doc('%1')//div[@id=\"%2\"]\n"
-                    "  return $i//div[@class=\"gc-message-message-display\"]")
-                    .arg (fHtml.fileName ()).arg (inboxEntry.id);
+                    QString("<html>for $i in doc('%1')//div[@id=\"%2\"]\n"
+                    "  return $i//div[@class=\"gc-message-message-display\"]"
+                    "</html>").arg(fHtml.fileName()).arg(inboxEntry.id);
 
                 QString result, resultSms;
                 if (!execXQuery (strQuery, result)) {
-                    Q_WARN("XQuery failed for Message :") << strQuery;
+                    Q_WARN(QString("XQuery failed for Message : %1")
+                            .arg(strQuery));
                     continue;
                 }
 
                 fSms.resize (0);
-                fSms.write (QString("<html>" + result + "</html>").toLatin1 ());
+                fSms.write (result.toLatin1 ());
                 fSms.seek (0);
 
                 strQuery =
-                QString("for $i in doc('%1')//div[@class=\"gc-message-sms-row\"]/span\n"
-                        "  return $i")
-                        .arg (fSms.fileName ());
+                QString("<div>for $i in doc('%1')//div[@class=\"gc-message-sms-"
+                        "row\"]/span\nreturn $i</div>").arg(fSms.fileName());
                 if (!execXQuery (strQuery, resultSms)) {
                     Q_WARN(QString("XQuery failed for Text: %1").arg(strQuery));
                 }
@@ -1734,9 +1734,9 @@ GVApi::parseInboxJson(AsyncTaskToken *token, const QString &strJson,
 
                 QString strSmsRow;
                 if (!resultSms.isEmpty ()) {
-                    result = "<div><div class=\"gc-message-sms-row\">"
+                    result = "<div class=\"gc-message-sms-row\">"
                            + resultSms
-                           + "</div></div>";
+                           + "</div>";
                 }
 
                 if ((parseMessageRow (result, inboxEntry)) &&
@@ -1758,9 +1758,11 @@ GVApi::parseInboxJson(AsyncTaskToken *token, const QString &strJson,
 bool
 GVApi::execXQuery(const QString &strQuery, QString &result)
 {
-    QByteArray outArray;
-    QBuffer buffer(&outArray);
-    buffer.open(QIODevice::ReadWrite);
+    QTemporaryFile output;
+    if (!output.open()) {
+        Q_WARN ("Failed to open temporary file");
+        return false;
+    }
 
     MyXmlErrorHandler xmlError;
     QXmlQuery xQuery;
@@ -1769,11 +1771,18 @@ GVApi::execXQuery(const QString &strQuery, QString &result)
 
     result.clear ();
 
-    QXmlFormatter formatter(xQuery, &buffer);
-    if (!xQuery.isValid() || !xQuery.evaluateTo (&formatter)) {
+    QXmlFormatter formatter(xQuery, &output);
+    if (!xQuery.isValid()) {
+        Q_WARN("Invalid query");
         return false;
     }
-    result = QString::fromUtf8(outArray.constData(),outArray.length());
+    if (!xQuery.evaluateTo(&formatter)) {
+        Q_WARN("Failed to evaluate XQuery");
+        return false;
+    }
+
+    output.seek (0);
+    result = output.readAll ();
 
     return true;
 }//GVApi::execXQuery
