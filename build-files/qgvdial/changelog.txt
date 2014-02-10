@@ -1,5 +1,5 @@
 qgvdial (__QGVDIAL_VERSION__) unstable; urgency=low
 
-  * Search contacts as you type
+  * Fix inbox parsing to be robust across qt4 and qt5
 
  -- Yuvraaj <yuvraaj@gmail.com>  __CHANGELOG_DATETIME__ -0700
