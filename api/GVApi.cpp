@@ -1548,18 +1548,6 @@ GVApi::parseInboxJson(AsyncTaskToken *token, const QString &strJson,
     QString strFixedHtml = "<html>" + strHtml + "</html>";
     strFixedHtml.replace ("&", "&amp;");
 
-    QTemporaryFile fHtml, fSms;
-    if (!fHtml.open()) {
-        Q_WARN ("Failed to open HTML buffer temporary output");
-        return false;
-    }
-    if (!fSms.open()) {
-        Q_WARN ("Failed to open SMS buffer temporary output");
-        return false;
-    }
-    fHtml.write(strFixedHtml.toLatin1());
-    fHtml.seek(0);
-
 #if 0
     QFile fTemp1("inbox-html.html");
     fTemp1.open (QFile::ReadWrite);
@@ -1708,40 +1696,21 @@ GVApi::parseInboxJson(AsyncTaskToken *token, const QString &strJson,
             if ((GVIE_TextMessage == inboxEntry.Type) ||
                 (GVIE_Voicemail   == inboxEntry.Type))
             {
-                QString strQuery =
-                    QString("<html>for $i in doc('%1')//div[@id=\"%2\"]\n"
-                    "  return $i//div[@class=\"gc-message-message-display\"]"
-                    "</html>").arg(fHtml.fileName()).arg(inboxEntry.id);
-
-                QString result, resultSms;
-                if (!execXQuery (strQuery, result)) {
-                    Q_WARN(QString("XQuery failed for Message : %1")
-                            .arg(strQuery));
+                QString msgDiv = parseDomElement (strHtml, "div", "id",
+                                                  inboxEntry.id);
+                if (msgDiv.isEmpty ()) {
                     continue;
                 }
 
-                fSms.resize (0);
-                fSms.write (result.toLatin1 ());
-                fSms.seek (0);
-
-                strQuery =
-                QString("<div>for $i in doc('%1')//div[@class=\"gc-message-sms-"
-                        "row\"]/span\nreturn $i</div>").arg(fSms.fileName());
-                if (!execXQuery (strQuery, resultSms)) {
-                    Q_WARN(QString("XQuery failed for Text: %1").arg(strQuery));
-                }
-                resultSms = resultSms.trimmed ();
-
-                QString strSmsRow;
-                if (!resultSms.isEmpty ()) {
-                    result = "<div class=\"gc-message-sms-row\">"
-                           + resultSms
-                           + "</div>";
+                QString msgDispDiv =
+                        parseDomElement (msgDiv, "div", "class",
+                                         "gc-message-message-display");
+                if (msgDispDiv.isEmpty ()) {
+                    continue;
                 }
 
-                if ((parseMessageRow (result, inboxEntry)) &&
-                    (!strSmsRow.isEmpty ())) {
-                    inboxEntry.strText = strSmsRow;
+                if (!parseMessageDiv (msgDispDiv, inboxEntry)) {
+                    continue;
                 }
             }
 
@@ -1755,39 +1724,7 @@ GVApi::parseInboxJson(AsyncTaskToken *token, const QString &strJson,
     return (rv);
 }//GVApi::parseInboxJson
 
-bool
-GVApi::execXQuery(const QString &strQuery, QString &result)
-{
-    QTemporaryFile output;
-    if (!output.open()) {
-        Q_WARN ("Failed to open temporary file");
-        return false;
-    }
-
-    MyXmlErrorHandler xmlError;
-    QXmlQuery xQuery;
-    xQuery.setMessageHandler (&xmlError);
-    xQuery.setQuery (strQuery);
-
-    result.clear ();
-
-    QXmlFormatter formatter(xQuery, &output);
-    if (!xQuery.isValid()) {
-        Q_WARN("Invalid query");
-        return false;
-    }
-    if (!xQuery.evaluateTo(&formatter)) {
-        Q_WARN("Failed to evaluate XQuery");
-        return false;
-    }
-
-    output.seek (0);
-    result = output.readAll ();
-
-    return true;
-}//GVApi::execXQuery
-
-static void
+static inline void
 fixAmpersandEncoded(QString &strTemp)
 {
     strTemp.replace ("&amp", "&");
@@ -1803,156 +1740,200 @@ fixAmpersandEncoded(QString &strTemp)
 }//fixAmpersandEncoded
 
 /** Parse the HTML document for a message row
- * @param strRow The text of the html
+ * @param strRows The text of the html
  * @param entry The inbox entry generated out of this function (OUT).
  *
  * strRow should have
  *  <div class="gc-message-message-display" ...> ... </div>
  */
 bool
-GVApi::parseMessageRow(QString strRow, GVInboxEntry &entry)
+GVApi::parseMessageDiv(QString strRows, GVInboxEntry &entry)
 {
-    bool rv = false;
-    QString strSmsRow;
     ConversationEntry convEntry;
+    int pos;
 
-    do {
-        QDomDocument doc;
-        doc.setContent (strRow);
-        QDomElement rootElement = doc.documentElement();
-        if (rootElement.isNull ()) {
-            Q_WARN("Top element is null");
+    pos = 0;
+    while (true) {
+        QString currRow = strRows.mid(pos);
+        QString msgSmsRow = parseDomElement (currRow, "div", "class",
+                                             "gc-message-sms-row");
+        if (msgSmsRow.isEmpty ()) {
             break;
         }
 
-        QDomNamedNodeMap attrs;
-        QDomNodeList divNodes, spanNodes;
-        QDomNode oneSpan;
-        QDomAttr oneAttr;
-        QString attrValue, strTemp;
+        convEntry.init ();
 
-        // Pick up all "span"s to look for voicemail translations
-        spanNodes = rootElement.elementsByTagName ("span");
-        if (spanNodes.isEmpty ()) {
-            Q_WARN("No span nodes!");
-            break;
-        }
+        convEntry.from = parseDomElement (msgSmsRow, "span", "class",
+                                          "gc-message-sms-from");
+        convEntry.text = parseDomElement (msgSmsRow, "span", "class",
+                                          "gc-message-sms-text");
+        convEntry.time = parseDomElement (msgSmsRow, "span", "class",
+                                          "gc-message-sms-time");
 
-        // Loop through all spans looking for the attribute "class"
-        rv = false;
-        for (int i = 0; i < spanNodes.count(); i++) {
-            oneSpan = spanNodes.at(i);
+        convEntry.from = getSmsSpanText (convEntry.from);
+        convEntry.text = getSmsSpanText (convEntry.text);
+        convEntry.time = getSmsSpanText (convEntry.time);
 
-            attrs = oneSpan.attributes ();
-            if (!attrs.contains ("class")) {
-                continue;
-            }
+        entry.conversation.append (convEntry);
 
-            oneAttr = attrs.namedItem("class").toAttr();
-            if (!oneAttr.isAttr ()) {
-                Q_WARN("Invalid attribute");
-                continue;
-            }
+        pos += msgSmsRow.length ();
+    }
 
-            attrValue = oneAttr.value();
-            if (attrValue == "gc-edited-trans-text") {
-                //Q_DEBUG("Found a voicemail translation!");
-                convEntry.init ();
-                convEntry.text = oneSpan.toElement().text().simplified();
-                entry.conversation.append (convEntry);
-                rv = true;
-                break;
-            }
-        }
+    entry.strText.clear ();
+    foreach (convEntry, entry.conversation) {
+        entry.strText += "<b>" + convEntry.from + "</b> "
+                      + convEntry.text
+                      + " <i>" + convEntry.time + "</i><br>";
+    }
 
-        if (rv) {
-            break;
-        }
+    return true;
+}//GVApi::parseMessageDiv
 
-        // Now look for "div"s with class="gc-message-sms-row"
-        divNodes = rootElement.elementsByTagName ("div");
-        strSmsRow.clear ();
+QString
+GVApi::getSmsSpanText(QString span)
+{
+    QXmlInputSource inputSource;
+    QXmlSimpleReader simpleReader;
+    inputSource.setData (span);
+    HtmlFieldParser xmlHandler;
+    xmlHandler.setEmitLog (emitLog);
 
-        // Loop through all divs looking for the attribute "class"
-        rv = false;
-        for (int i = 0; i < divNodes.count(); i++) {
-            QDomNode oneDiv = divNodes.at(i);
+    simpleReader.setContentHandler (&xmlHandler);
+    simpleReader.setErrorHandler (&xmlHandler);
 
-            attrs = oneDiv.attributes ();
-            if (!attrs.contains ("class")) {
-                continue;
-            }
+    if (!simpleReader.parse (&inputSource, false)) {
+        Q_WARN("Failed to parse span.");
+        return "";
+    }
 
-            oneAttr = attrs.namedItem("class").toAttr();
-            if (!oneAttr.isAttr ()) {
-                Q_WARN("Invalid attribute");
-                continue;
-            }
 
-            attrValue = oneAttr.value();
-            if (attrValue != "gc-message-sms-row") {
-                Q_DEBUG(QString("Uninteresting div class: %1").arg(attrValue));
-                continue;
-            }
+    QString rv = xmlHandler.elems["span"].toString();
 
-            spanNodes = oneDiv.toElement().elementsByTagName ("span");
-            if (spanNodes.isEmpty ()) {
-                //Q_WARN("No span nodes!");
-                continue;
-            }
-
-            convEntry.init();
-
-            // Loop through all spans looking for the attribute "class"
-            rv = false;
-            for (int i = 0; i < spanNodes.count(); i++) {
-                oneSpan = spanNodes.at(i);
-
-                attrs = oneSpan.attributes ();
-                if (!attrs.contains ("class")) {
-                    continue;
-                }
-
-                oneAttr = attrs.namedItem("class").toAttr();
-                if (!oneAttr.isAttr ()) {
-                    Q_WARN("Invalid attribute");
-                    continue;
-                }
-
-                strTemp = oneSpan.toElement().text().simplified ();
-                attrValue = oneAttr.value();
-                if (attrValue == "gc-message-sms-from") {
-                    strSmsRow += "<b>" + strTemp + "</b> ";
-                    convEntry.from = strTemp;
-                } else if (attrValue == "gc-message-sms-text") {
-                    strSmsRow += strTemp;
-                    convEntry.text += strTemp;
-                } else if (attrValue == "gc-message-sms-time") {
-                    strSmsRow += " <i>(" + strTemp + ")</i><br>";
-                    convEntry.time = strTemp;
-                } else if (attrValue.startsWith ("gc-word-")) {
-                    if (!strSmsRow.isEmpty ()) {
-                        strSmsRow += ' ';
-                        convEntry.text += ' ';
-                    }
-
-                    strSmsRow += strTemp;
-                    convEntry.text += strTemp;
-                }
-            }// for loop thru all spans in the div
-
-            fixAmpersandEncoded (convEntry.text);
-            entry.conversation.append (convEntry);
-        }//for loop thru all divs with class="gc-message-sms-row"
-
-        fixAmpersandEncoded (strSmsRow);
-
-        entry.strText = strSmsRow;
-        rv = true;
-    } while (0);
+    fixAmpersandEncoded (rv);
+    rv = rv.trimmed ();
 
     return rv;
-}//GVApi::parseMessageRow
+}//GVApi::getSmsSpanText
+
+QString
+GVApi::parseDomElement(const QString &domStr,
+                       const QString &element,
+                       const QString &attribute,
+                       const QString &values)
+{
+    bool isStart;
+    int pos = 0;
+    int startingPos;
+    QString nodeDef;
+
+    // Find the first instance of the element with the attribute AND value
+    while (true) {
+        pos = findDomElement (domStr, element, pos, isStart);
+        if (-1 == pos) {
+            return "";
+        }
+
+        startingPos = pos;
+
+        if (!isStart) {
+            pos = startingPos + element.length ();
+            continue;
+        }
+
+        pos = domStr.indexOf ('>', pos);
+        if (-1 == pos) {
+            return "";
+        }
+
+        nodeDef = domStr.mid (startingPos, pos - startingPos + 1);
+
+        pos = nodeDef.indexOf (attribute);
+        if (-1 == pos) {
+            pos = startingPos + nodeDef.length ();
+            continue;
+        }
+
+        pos = nodeDef.indexOf (values, pos + attribute.length ());
+        if (-1 == pos) {
+            pos = startingPos + nodeDef.length ();
+            continue;
+        }
+
+        break;
+    }
+
+    pos = startingPos + nodeDef.length () - element.length ();
+
+    bool found = false;
+    quint32 depth = 1;
+    // Now start looking for the end of this XML node.
+    while (true) {
+        pos = findDomElement (domStr, element, pos + element.length(), isStart);
+        if (-1 == pos) {
+            break;
+        }
+
+        if (isStart) {
+            depth++;
+            continue;
+        }
+
+        depth--;
+        if (0 == depth) {
+            found = true;
+            break;
+        }
+    }
+
+    if (!found) {
+        Q_WARN("Partial node found");
+    }
+
+    pos += element.length () + 3 - startingPos;
+
+    return domStr.mid (startingPos, pos);
+}//GVApi::parseDomElement
+
+int
+GVApi::findDomElement(const QString &domStr, const QString &element, int pos,
+                      bool &isNewStart)
+{
+    while (true) {
+        pos = domStr.indexOf (element, pos);
+        if (-1 == pos) {
+            break;
+        }
+
+        if (0 == pos) {
+            // This isnt a real tag
+            pos = -1;
+            Q_WARN("Invalid tag search");
+            break;
+        }
+
+        if (domStr[pos - 1] == '<') {
+            isNewStart = true;
+            pos--;
+            break;
+        }
+
+        if (pos < 2) {
+            pos += element.length ();
+            continue;
+        }
+
+        if ((domStr[pos - 1] != '/') || (domStr[pos - 2] != '<')) {
+            pos += element.length ();
+            continue;
+        }
+
+        pos -= 2;
+        isNewStart = false;
+        break;
+    }
+
+    return pos;
+}//GVApi::findDomElement
 
 bool
 GVApi::callOut(AsyncTaskToken *token)

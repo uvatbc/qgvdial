@@ -49,10 +49,10 @@ MainWindowPrivate::setOrientation(ScreenOrientation orientation)
     }
 #endif // Q_OS_SYMBIAN
 
-#if QT_VERSION < 0x050000
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
     Qt::WidgetAttribute attribute;
     switch (orientation) {
-#if QT_VERSION < 0x040702
+#if QT_VERSION < QT_VERSION_CHECK(4,7,2)
     // Qt < 4.7.2 does not yet have the Qt::WA_*Orientation attributes
     case ScreenOrientationLockPortrait:
         attribute = static_cast<Qt::WidgetAttribute>(128);
@@ -64,7 +64,7 @@ MainWindowPrivate::setOrientation(ScreenOrientation orientation)
     case ScreenOrientationAuto:
         attribute = static_cast<Qt::WidgetAttribute>(130);
         break;
-#elif QT_VERSION < 0x050000 // QT_VERSION >= 0x040702
+#else // QT_VERSION >= QT_VERSION_CHECK(4,7,2)
     case ScreenOrientationLockPortrait:
         attribute = Qt::WA_LockPortraitOrientation;
         break;
@@ -75,7 +75,7 @@ MainWindowPrivate::setOrientation(ScreenOrientation orientation)
     case ScreenOrientationAuto:
         attribute = Qt::WA_AutoOrientation;
         break;
-#endif // QT_VERSION < 0x040702
+#endif
     };
     setAttribute(attribute, true);
 #endif

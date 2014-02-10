@@ -163,8 +163,14 @@ private:
     // Inbox related
     bool parseInboxJson(AsyncTaskToken *token, const QString &strJson,
                         const QString &strHtml, qint32 &msgCount);
-    bool execXQuery(const QString &strQuery, QString &result);
-    bool parseMessageRow(QString strRow, GVInboxEntry &entry);
+    bool parseMessageDiv(QString strRow, GVInboxEntry &entry);
+    QString getSmsSpanText(QString span);
+    QString parseDomElement(const QString &domStr,
+                            const QString &element,
+                            const QString &attribute,
+                            const QString &values);
+    int findDomElement(const QString &domStr, const QString &element, int pos,
+                       bool &isNewStart);
 
 private:
     bool emitLog;

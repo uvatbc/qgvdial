@@ -44,9 +44,11 @@ public:
 
     // Note that this will only have an effect on Symbian and Fremantle.
     void setOrientation(ScreenOrientation orientation);
-    void showExpanded();
 
     void setAllowClose(bool allow);
+
+public slots:
+    void showExpanded();
 
 protected:
     void closeEvent(QCloseEvent *event);

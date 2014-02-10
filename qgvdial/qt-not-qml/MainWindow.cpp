@@ -154,11 +154,13 @@ MainWindow::init()
     d->setFixedSize (d->size ());
 #endif
 
+    d->setOrientation(MainWindowPrivate::ScreenOrientationAuto);
+    QTimer::singleShot (100, d, SLOT(showExpanded()));
+    //d->showExpanded();
+
     Lib &lib = Lib::ref ();
     ((OsDependant *)lib.osd())->setMainWidget (d);
 
-    d->setOrientation(MainWindowPrivate::ScreenOrientationAuto);
-    d->showExpanded();
     connect(d->ui->loginButton, SIGNAL(clicked()),
             this, SLOT(onLoginClicked()));
 
@@ -232,7 +234,8 @@ MainWindow::init()
 
         m_systrayIcon->setIcon (m_appIcon);
         m_systrayIcon->setContextMenu (d->ui->menu_File);
-        m_systrayIcon->show ();
+        QTimer::singleShot (100, m_systrayIcon, SLOT(show()));
+        //m_systrayIcon->show ();
     }
 
     d->setWindowIcon (m_appIcon);

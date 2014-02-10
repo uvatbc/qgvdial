@@ -118,7 +118,7 @@ myMessageOutput(QtMsgType type, const char *msg)
 
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 void
-myQt5MessageOutput(QtMsgType type, const QMessageLogContext &ctx,
+myQt5MessageOutput(QtMsgType type, const QMessageLogContext & /*ctx*/,
                    const QString &msg)
 {
    myMessageOutput(type, msg.toLatin1().constData());
