@@ -48,6 +48,24 @@ MainWindow::MainWindow(QObject *parent)
 void
 MainWindow::init()
 {
+    qreal val;
+    int width = QApplication::desktop()->screenGeometry().size().width();
+    if (width == 720) {
+        Q_DEBUG("Its a Q1!");
+        val = 0.7;
+        m_view->engine()->rootContext()
+                    ->setContextProperty("g_keypadScaleFactor1", val);
+        val = 0.8;
+        m_view->engine()->rootContext()
+                    ->setContextProperty("g_keypadScaleFactor2", val);
+    } else {
+        val = 1.0;
+        m_view->engine()->rootContext()
+                    ->setContextProperty("g_keypadScaleFactor1", val);
+        m_view->engine()->rootContext()
+                    ->setContextProperty("g_keypadScaleFactor2", val);
+    }
+
     QmlMainWindow::init ();
 
     // GL viewport increases performance on blackberry
@@ -67,6 +85,7 @@ MainWindow::init()
 
     // None of these seem to have any effect
     //m_view->setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
-    m_view->setOrientation(QmlApplicationViewer::ScreenOrientationLockPortrait);
+    //m_view->setOrientation(QmlApplicationViewer::ScreenOrientationLockPortrait);
     //m_view->setOrientation(QmlApplicationViewer::ScreenOrientationLockLandscape);
+	
 }//MainWindow::init

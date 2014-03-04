@@ -37,12 +37,12 @@ Item {
     signal clicked(string strText)
     // Button can also emit a delete
     signal delClicked()
-
+	
     MyButton {
         id: btn
         mainText: digButton.mainText
         anchors.fill: parent
-        mainPixelSize: parent.height - 6
+        mainPixelSize: g_keypadScaleFactor1 * parent.height - 6
 
         onClicked: {
             if (digButton.isDel) {
@@ -69,9 +69,13 @@ Item {
             id: sText
             text: subText
             color: "grey"
-            anchors.right: parent.right
-            anchors.bottom: parent.bottom
-            font.pixelSize: btn.mainPixelSize / 3
+			anchors {
+				right: parent.right
+				bottom: parent.bottom
+				rightMargin: 2
+				bottomMargin: 2
+			}
+            font.pixelSize: g_keypadScaleFactor2 * btn.mainPixelSize / 3
         }// Text
     }//MyButton
 }// Item
