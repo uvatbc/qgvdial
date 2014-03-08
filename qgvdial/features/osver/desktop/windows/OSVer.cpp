@@ -55,17 +55,14 @@ OsVer::_getOsDetails()
     case QSysInfo::WV_6_0:
         rv += " 6.0 (Vista)";
         break;
-    case QSysInfo::WV_6_1:
-    case QSysInfo::WV_WINDOWS7:
+    case QSysInfo::WV_6_1: // QSysInfo::WV_WINDOWS7
         rv += " 6.1 (Win 7)";
         break;
-    case QSysInfo::WV_6_2:
-    case QSysInfo::WV_WINDOWS8:
+    case QSysInfo::WV_6_2: // QSysInfo::WV_WINDOWS8
         rv += " 6.2 (Win 8)";
         break;
 #if (QT_VERSION >= QT_VERSION_CHECK(5,2,0))
-    case QSysInfo::WV_6_3:
-    case QSysInfo::WV_WINDOWS8_1:
+    case QSysInfo::WV_6_3: // QSysInfo::WV_WINDOWS8_1
         rv += " 6.3 (Win 8.1)";
         break;
 #endif
