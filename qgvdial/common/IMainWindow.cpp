@@ -103,6 +103,14 @@ IMainWindow::beginLogin(const QString &user, const QString &pass)
             break;
         }
 
+        // If the user doesnt put in the domain, put it in....
+        QString temp_user;
+        if (!user.contains ('@')) {
+            temp_user = user.trimmed() + "@gmail.com";
+        } else {
+            temp_user = user;
+        }
+
         uiEnableContactUpdateFrequency (false);
         uiEnableInboxUpdateFrequency (false);
 
@@ -120,10 +128,10 @@ IMainWindow::beginLogin(const QString &user, const QString &pass)
             Q_CRIT("Failed to connect signal");
         }
 
-        m_loginTask->inParams["user"] = user;
+        m_loginTask->inParams["user"] = temp_user;
         m_loginTask->inParams["pass"] = pass;
 
-        Q_DEBUG(QString("Login using user %1").arg(user));
+        Q_DEBUG(QString("Login using user %1").arg(temp_user));
         startLongTask (LT_Login);
 
         if (!gvApi.login (m_loginTask)) {
@@ -131,7 +139,7 @@ IMainWindow::beginLogin(const QString &user, const QString &pass)
             break;
         }
 
-        m_user = user;
+        m_user = temp_user;
         m_pass = pass;
         uiSetUserPass(false);
     } while (0);
