@@ -2147,7 +2147,8 @@ GVApi::onCallback(bool success, const QByteArray &response, QNetworkReply *,
         }
 
         if (strTemp != "true") {
-            Q_WARN("Failed to call back! response ok= ") << strTemp;
+            Q_WARN(QString("Failed to call back! response ok=%1. response='%2'")
+                   .arg(strTemp).arg(QString(response)));
             break;
         }
 

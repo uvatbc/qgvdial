@@ -43,6 +43,11 @@ LibGvPhones::~LibGvPhones()
 {
 }//LibGvPhones::~LibGvPhones
 
+/** Fetch the numbers registered with Google Voice
+ * This function will initiate the request to pull the registered Google Voice
+ * numbers from the GVApi.
+ * These numbers will become the callback list.
+ */
 bool
 LibGvPhones::refresh()
 {
@@ -85,7 +90,8 @@ LibGvPhones::onGotPhones()
             return;
         }
 
-        // Either id not found, or nothing saved:
+        // Either id not found, or nothing saved: In this case, the default
+        // starting dialout value is the first phone.
         id = m_numModel->m_dialBack[0].id;
     } while(0);
     m_numModel->m_selectedId = id;
@@ -203,6 +209,10 @@ LibGvPhones::ensurePhoneAccountFactory()
     return true;
 }//LibGvPhones::ensurePhoneAccountFactory
 
+/** Identify the dialing methods in the platform
+ * Mobile platforms can have one or more ways of dialing out.
+ * This function initiates the work of looking up all those dial out methods.
+ */
 bool
 LibGvPhones::refreshOutgoing()
 {
@@ -241,8 +251,9 @@ LibGvPhones::onAllAccountsIdentified()
     Q_DEBUG(QString("count = %1")
             .arg (m_acctFactory->m_accounts.keys ().count ()));
 
+    QString id;
     GVRegisteredNumber num;
-    foreach (QString id, m_acctFactory->m_accounts.keys ()) {
+    foreach (id, m_acctFactory->m_accounts.keys ()) {
         IPhoneAccount *acc = m_acctFactory->m_accounts[id];
         Q_ASSERT(id == acc->id ());
 
@@ -250,10 +261,19 @@ LibGvPhones::onAllAccountsIdentified()
         num.init ();
         num.id = acc->id ();
         num.name = acc->name ();
-        num.dialBack = 0;
+        num.dialBack = false;
         // Find out the number from the cache
         win->db.getCINumber (num.id, num.number);
         m_numModel->m_dialOut += num;
+    }
+
+    if (win->db.getSelectedPhone (id)) {
+        bool dialBack;
+        int index;
+
+        if (m_numModel->findById (id, dialBack, index)) {
+            m_numModel->m_selectedId = id;
+        }
     }
 
     m_numModel->informViewsOfNewData ();
