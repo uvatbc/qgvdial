@@ -43,7 +43,7 @@ MainWindowPrivate::setOrientation(ScreenOrientation orientation)
     if (orientation != ScreenOrientationAuto) {
         const QStringList v = QString::fromAscii(qVersion()).split(QLatin1Char('.'));
         if (v.count() == 3 && (v.at(0).toInt() << 16 | v.at(1).toInt() << 8 | v.at(2).toInt()) < 0x040702) {
-            qWarning("Screen orientation locking only supported with Qt 4.7.2 and above");
+            Q_WARN("Screen orientation locking only supported with Qt 4.7.2 and above");
             return;
         }
     }
@@ -78,6 +78,8 @@ MainWindowPrivate::setOrientation(ScreenOrientation orientation)
 #endif
     };
     setAttribute(attribute, true);
+#else
+    Q_UNUSED(orientation);
 #endif
 }//MainWindowPrivate::setOrientation
 
