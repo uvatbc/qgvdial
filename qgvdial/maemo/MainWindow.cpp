@@ -343,6 +343,7 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
             break;
         }
         connect(etCetera, SIGNAL(sendLogs()), &oLogUploader, SLOT(sendLogs()));
+        connect(etCetera, SIGNAL(reallyQuit()), qApp, SLOT(quit()));
 
         // Vmail:
         connect(&oVmail, SIGNAL(vmailFetched(QString,QString,bool)),
@@ -684,6 +685,14 @@ MainWindow::uiClearStatusMessage()
 {
     QMetaObject::invokeMethod (statusBanner, "clearMessage");
 }//MainWindow::uiClearStatusMessage
+
+void
+MainWindow::uiShowMessageBox(const QString &msg)
+{
+    QMessageBox dlg;
+    dlg.setText (msg);
+    dlg.exec ();
+}//MainWindow::uiShowMessageBox
 
 void
 MainWindow::uiFailedToSendMessage(const QString &dest, const QString &text)

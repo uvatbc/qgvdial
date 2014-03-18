@@ -35,6 +35,8 @@ Page {
         Label {
             text: container.message
             anchors.horizontalCenter: parent.horizontalCenter
+            width: container.width * 0.8
+            horizontalAlignment: Text.AlignHCenter
         }
 
         Button {

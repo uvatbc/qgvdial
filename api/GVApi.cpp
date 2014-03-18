@@ -1088,6 +1088,10 @@ GVApi::onGotRnr(bool success, const QByteArray &response, QNetworkReply *reply,
         if (pos == -1) {
             if (token->outParams["attempts"].toInt() != 0) {
                 Q_WARN("Too many attempts at relogin");
+
+                if (strReplyUrl.contains("setupMobile", Qt::CaseInsensitive)) {
+                    token->status = ATTS_SETUP_REQUIRED;
+                }
                 break;
             }
 

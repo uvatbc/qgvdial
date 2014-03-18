@@ -95,7 +95,6 @@ QmlMainWindow::QmlMainWindow(QObject *parent)
 , tfaPinDlg(NULL)
 , textUsername(NULL)
 , textPassword(NULL)
-, infoBanner(NULL)
 , appPwDlg(NULL)
 , contactsPage(NULL)
 , inboxList(NULL)
@@ -291,11 +290,6 @@ QmlMainWindow::declStatusChanged(QDeclarativeView::Status status)
 
         textPassword = getQMLObject ("TextPassword");
         if (NULL == textPassword) {
-            break;
-        }
-
-        infoBanner = getQMLObject ("InfoBanner");
-        if (NULL == infoBanner) {
             break;
         }
 
@@ -588,9 +582,6 @@ QmlMainWindow::uiLoginDone(int status, const QString &errStr)
     if (ATTS_SUCCESS == status) {
         return;
     }
-
-    infoBanner->setProperty ("text", errStr);
-    QMetaObject::invokeMethod (infoBanner, "open");
 }//QmlMainWindow::uiLoginDone
 
 void
@@ -733,6 +724,13 @@ QmlMainWindow::uiClearStatusMessage()
 {
     QMetaObject::invokeMethod (statusBanner, "clearMessage");
 }//QmlMainWindow::uiClearStatusMessage
+
+void
+QmlMainWindow::uiShowMessageBox(const QString &msg)
+{
+    QMetaObject::invokeMethod (mainPageStack, "showMsgBox",
+                               Q_ARG (QVariant, QVariant(msg)));
+}//QmlMainWindow::uiShowMessageBox
 
 void
 QmlMainWindow::onUserTextBtnClicked(QString dest)

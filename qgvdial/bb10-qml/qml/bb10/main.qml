@@ -25,7 +25,7 @@ import com.nokia.extras 1.1
 
 PageStackWindow {
     id: appWindow
-    
+
     objectName: "MainPageStack"
     // Status bar isn't the status at the bottom: its the status at the top: battery status, bars, etc.
     showStatusBar: false
@@ -162,11 +162,6 @@ PageStackWindow {
         id: msgBox
         tools: commonTools
         onDone: { appWindow.popPageStack(); }
-    }
-
-    InfoBanner {
-        id: infoBanner
-        objectName: "InfoBanner"
     }
 
     CiPhoneSelectionPage {

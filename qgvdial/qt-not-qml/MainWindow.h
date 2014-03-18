@@ -51,6 +51,7 @@ public slots:
 
     void uiShowStatusMessage(const QString &msg, quint64 millisec);
     void uiClearStatusMessage();
+    void uiShowMessageBox(const QString &msg);
 
 protected:
     void uiUpdateProxySettings(const ProxyInfo &info);

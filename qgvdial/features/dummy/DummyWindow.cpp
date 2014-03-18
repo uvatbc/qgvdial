@@ -165,6 +165,12 @@ DummyMainWindow::uiClearStatusMessage()
 }//DummyMainWindow::uiClearStatusMessage
 
 void
+DummyMainWindow::uiShowMessageBox(const QString &msg)
+{
+    Q_ASSERT(0 == "Not implemented");
+}//DummyMainWindow::uiShowMessageBox
+
+void
 DummyMainWindow::uiFailedToSendMessage(const QString & /*destination*/,
                                        const QString & /*text*/)
 {

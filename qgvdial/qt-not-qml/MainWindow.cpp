@@ -785,6 +785,14 @@ MainWindow::uiClearStatusMessage()
 }//MainWindow::uiClearStatusMessage
 
 void
+MainWindow::uiShowMessageBox(const QString &msg)
+{
+    QMessageBox dlg;
+    dlg.setText (msg);
+    dlg.exec ();
+}//MainWindow::uiShowMessageBox
+
+void
 MainWindow::onSystrayActivated(QSystemTrayIcon::ActivationReason reason)
 {
     switch (reason) {

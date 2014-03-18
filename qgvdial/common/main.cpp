@@ -48,7 +48,8 @@ const char *ignoreMsgs[] = {
     "hijackWindow",
     "link  hasn't been detected!",
     "link Icon-bounder-box hasn't been detected!",
-    "PpsObject::read failed to read pps data"
+    "PpsObject::read failed to read pps data",
+    "QGLShader::link: \"--From Fragment Shader:"
 };
 
 void

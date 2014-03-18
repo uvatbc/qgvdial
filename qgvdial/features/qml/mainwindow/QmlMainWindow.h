@@ -41,6 +41,7 @@ protected slots:
 
     void uiShowStatusMessage(const QString &msg, quint64 millisec);
     void uiClearStatusMessage();
+    void uiShowMessageBox(const QString &msg);
 
     void onLoginButtonClicked();
     void onTfaPinDlg(bool accepted);
@@ -114,7 +115,6 @@ protected:
     QObject *tfaPinDlg;
     QObject *textUsername;
     QObject *textPassword;
-    QObject *infoBanner;
     QObject *appPwDlg;
     QObject *contactsPage;
     QObject *inboxList;

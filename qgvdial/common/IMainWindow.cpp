@@ -235,6 +235,16 @@ IMainWindow::loginCompleted()
             uiRequestLoginDetails();
             db.clearCookies ();
             db.clearTFAFlag ();
+        } else if (ATTS_SETUP_REQUIRED == task->status) {
+            Q_WARN("GVApi has determined that user setup is required");
+            uiSetUserPass (true);
+            uiRequestLoginDetails();
+            db.clearCookies ();
+            db.clearTFAFlag ();
+
+            uiShowMessageBox ("Your Google Voice account is not set up. Please "
+                              "access Google Voice from a desktop or laptop "
+                              "computer to setup your account");
         } else {
             task->errorString = QString("Login failed: %1")
                                     .arg(task->errorString);

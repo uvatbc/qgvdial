@@ -132,11 +132,6 @@ PageStackWindow {
         onDone: { appWindow.pageStack.pop(); }
     }
 
-    InfoBanner {
-        id: infoBanner
-        objectName: "InfoBanner"
-    }
-
     CiPhoneSelectionPage {
         id: ciPhoneSelector
         objectName: "CiPhoneSelectionPage"

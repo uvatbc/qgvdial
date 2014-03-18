@@ -36,6 +36,7 @@ Contact: yuvraaj@gmail.com
 #define ATTS_USER_CANCEL        8
 #define ATTS_IN_PROGRESS        9
 #define ATTS_MALLOC_FAIL       10
+#define ATTS_SETUP_REQUIRED    11
 
 class AsyncTaskToken : public QObject
 {
