@@ -590,7 +590,7 @@ QmlMainWindow::uiLoginDone(int status, const QString &errStr)
     }
 
     infoBanner->setProperty ("text", errStr);
-    QMetaObject::invokeMethod (infoBanner, "show");
+    QMetaObject::invokeMethod (infoBanner, "open");
 }//QmlMainWindow::uiLoginDone
 
 void

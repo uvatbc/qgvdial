@@ -45,7 +45,10 @@ const char *ignoreMsgs[] = {
     "QGLWindowSurface",
     "brokenTexSubImage",
     "FullClearOnEveryFrame",
-    "hijackWindow"
+    "hijackWindow",
+    "link  hasn't been detected!",
+    "link Icon-bounder-box hasn't been detected!",
+    "PpsObject::read failed to read pps data"
 };
 
 void
