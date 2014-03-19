@@ -27,7 +27,7 @@ chomp $basedir;
 $basedir = "$basedir/qgvdial-$qver";
 
 # Delete any previous checkout directories
-system("rm -rf qgvdial-* qgvtp-* qgvdial_* qgvtp_* qgvdial.bar");
+system("rm -rf qgvdial-* qgvtp-* qgvdial_* qgvtp_* qgvdial*.bar");
 
 $cmd = "svn export $repo qgvdial-$qver";
 system($cmd);
@@ -55,11 +55,11 @@ $cmd = "cd $basedir/qgvdial/bb10-qml ; qmake ; make -j4";
 print "$cmd\n";
 system($cmd);
 
-$cmd = "cd $basedir/qgvdial/bb10-qml ; blackberry-nativepackager -package qgvdial.bar bar-descriptor.xml ; cp qgvdial.bar ../../..";
+$cmd = "cd $basedir/qgvdial/bb10-qml ; blackberry-nativepackager -package qgvdial_$qver.bar bar-descriptor.xml ; cp qgvdial_$qver.bar ../../..";
 print "$cmd\n";
 system($cmd);
 
-$cmd = "cd $basedir ; mkdir -p bundle/qgvdial_10.1.0.4200 ; mv ../qgvdial.bar bundle/qgvdial_10.1.0.4200 ; cp build-files/qgvdial/bb10/release.xml bundle ; mv bundle ..";
+$cmd = "cd $basedir ; mkdir -p bundle/qgvdial_10.1.0.4200 ; mv ../qgvdial_$qver.bar bundle/qgvdial_10.1.0.4200 ; cp build-files/qgvdial/bb10/release.xml bundle ; mv bundle ..";
 print "$cmd\n";
 system($cmd);
 
