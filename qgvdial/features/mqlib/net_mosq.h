@@ -74,6 +74,8 @@ int _mosquitto_packet_queue(struct mosquitto *mosq, struct _mosquitto_packet *pa
 int _mosquitto_socket_connect(struct mosquitto *mosq, const char *host, uint16_t port, const char *bind_address, bool blocking);
 int _mosquitto_socket_close(struct mosquitto *mosq);
 int _mosquitto_try_connect(const char *host, uint16_t port, int *sock, const char *bind_address, bool blocking);
+int _mosquitto_socket_nonblock(int sock);
+int _mosquitto_socketpair(int *sp1, int *sp2);
 
 int _mosquitto_read_byte(struct _mosquitto_packet *packet, uint8_t *byte);
 int _mosquitto_read_bytes(struct _mosquitto_packet *packet, void *bytes, uint32_t count);

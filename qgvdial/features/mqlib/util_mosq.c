@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2009-2014 Roger Light <roger@atchoo.org>
+Copyright (c) 2009-2013 Roger Light <roger@atchoo.org>
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -107,7 +107,7 @@ void _mosquitto_check_keepalive(struct mosquitto *mosq)
 	last_msg_out = mosq->last_msg_out;
 	last_msg_in = mosq->last_msg_in;
 	pthread_mutex_unlock(&mosq->msgtime_mutex);
-	if(mosq->sock != INVALID_SOCKET &&
+	if(mosq->keepalive && mosq->sock != INVALID_SOCKET &&
 			(now - last_msg_out >= mosq->keepalive || now - last_msg_in >= mosq->keepalive)){
 
 		if(mosq->state == mosq_cs_connected && mosq->ping_t == 0){
@@ -146,40 +146,6 @@ void _mosquitto_check_keepalive(struct mosquitto *mosq)
 	}
 }
 
-/* Convert ////some////over/slashed///topic/etc/etc//
- * into some/over/slashed/topic/etc/etc
- */
-int _mosquitto_fix_sub_topic(char **subtopic)
-{
-	char *fixed = NULL;
-	char *token;
-	char *saveptr = NULL;
-
-	assert(subtopic);
-	assert(*subtopic);
-
-	if(strlen(*subtopic) == 0) return MOSQ_ERR_SUCCESS;
-	/* size of fixed here is +1 for the terminating 0 and +1 for the spurious /
-	 * that gets appended. */
-	fixed = _mosquitto_calloc(strlen(*subtopic)+2, 1);
-	if(!fixed) return MOSQ_ERR_NOMEM;
-
-	if((*subtopic)[0] == '/'){
-		fixed[0] = '/';
-	}
-	token = strtok_r(*subtopic, "/", &saveptr);
-	while(token){
-		strcat(fixed, token);
-		strcat(fixed, "/");
-		token = strtok_r(NULL, "/", &saveptr);
-	}
-
-	fixed[strlen(fixed)-1] = '\0';
-	_mosquitto_free(*subtopic);
-	*subtopic = fixed;
-	return MOSQ_ERR_SUCCESS;
-}
-
 uint16_t _mosquitto_mid_generate(struct mosquitto *mosq)
 {
 	assert(mosq);
@@ -212,80 +178,71 @@ int _mosquitto_topic_wildcard_len_check(const char *str)
 /* Does a topic match a subscription? */
 int mosquitto_topic_matches_sub(const char *sub, const char *topic, bool *result)
 {
-	char *local_sub, *local_topic;
 	int slen, tlen;
 	int spos, tpos;
-	int rc;
 	bool multilevel_wildcard = false;
 
 	if(!sub || !topic || !result) return MOSQ_ERR_INVAL;
 
-	local_sub = _mosquitto_strdup(sub);
-	if(!local_sub) return MOSQ_ERR_NOMEM;
-	rc = _mosquitto_fix_sub_topic(&local_sub);
-	if(rc){
-		_mosquitto_free(local_sub);
-		return rc;
-	}
+	slen = strlen(sub);
+	tlen = strlen(topic);
 
-	local_topic = _mosquitto_strdup(topic);
-	if(!local_topic){
-		_mosquitto_free(local_sub);
-		return MOSQ_ERR_NOMEM;
-	}
-	rc = _mosquitto_fix_sub_topic(&local_topic);
-	if(rc){
-		_mosquitto_free(local_sub);
-		_mosquitto_free(local_topic);
-		return rc;
-	}
+	if(slen && tlen){
+		if((sub[0] == '$' && topic[0] != '$')
+				|| (topic[0] == '$' && sub[0] != '$')){
 
-	slen = strlen(local_sub);
-	tlen = strlen(local_topic);
+			*result = false;
+			return MOSQ_ERR_SUCCESS;
+		}
+	}
 
 	spos = 0;
 	tpos = 0;
 
 	while(spos < slen && tpos < tlen){
-		if(local_sub[spos] == local_topic[tpos]){
+		if(sub[spos] == topic[tpos]){
 			spos++;
 			tpos++;
 			if(spos == slen && tpos == tlen){
 				*result = true;
-				break;
+				return MOSQ_ERR_SUCCESS;
+			}else if(tpos == tlen && spos == slen-1 && sub[spos] == '+'){
+				spos++;
+				*result = true;
+				return MOSQ_ERR_SUCCESS;
 			}
 		}else{
-			if(local_sub[spos] == '+'){
+			if(sub[spos] == '+'){
 				spos++;
-				while(tpos < tlen && local_topic[tpos] != '/'){
+				while(tpos < tlen && topic[tpos] != '/'){
 					tpos++;
 				}
 				if(tpos == tlen && spos == slen){
 					*result = true;
-					break;
+					return MOSQ_ERR_SUCCESS;
 				}
-			}else if(local_sub[spos] == '#'){
+			}else if(sub[spos] == '#'){
 				multilevel_wildcard = true;
 				if(spos+1 != slen){
 					*result = false;
-					break;
+					return MOSQ_ERR_SUCCESS;
 				}else{
 					*result = true;
-					break;
+					return MOSQ_ERR_SUCCESS;
 				}
 			}else{
 				*result = false;
-				break;
+				return MOSQ_ERR_SUCCESS;
 			}
 		}
 		if(tpos == tlen-1){
 			/* Check for e.g. foo matching foo/# */
 			if(spos == slen-3 
-					&& local_sub[spos+1] == '/'
-					&& local_sub[spos+2] == '#'){
+					&& sub[spos+1] == '/'
+					&& sub[spos+2] == '#'){
 				*result = true;
 				multilevel_wildcard = true;
-				break;
+				return MOSQ_ERR_SUCCESS;
 			}
 		}
 	}
@@ -293,8 +250,6 @@ int mosquitto_topic_matches_sub(const char *sub, const char *topic, bool *result
 		*result = false;
 	}
 
-	_mosquitto_free(local_sub);
-	_mosquitto_free(local_topic);
 	return MOSQ_ERR_SUCCESS;
 }
 

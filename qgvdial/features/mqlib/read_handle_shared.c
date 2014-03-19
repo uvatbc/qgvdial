@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2009-2014 Roger Light <roger@atchoo.org>
+Copyright (c) 2009-2013 Roger Light <roger@atchoo.org>
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -135,7 +135,7 @@ int _mosquitto_handle_pubrec(struct mosquitto *mosq)
 #else
 	_mosquitto_log_printf(mosq, MOSQ_LOG_DEBUG, "Client %s received PUBREC (Mid: %d)", mosq->id, mid);
 
-	rc = _mosquitto_message_update(mosq, mid, mosq_md_out, mosq_ms_wait_for_pubcomp);
+	rc = _mosquitto_message_out_update(mosq, mid, mosq_ms_wait_for_pubcomp);
 #endif
 	if(rc) return rc;
 	rc = _mosquitto_send_pubrel(mosq, mid, false);
@@ -158,6 +158,11 @@ int _mosquitto_handle_pubrel(struct mosquitto_db *db, struct mosquitto *mosq)
 		return MOSQ_ERR_PROTOCOL;
 	}
 #endif
+	if(mosq->protocol == mosq_p_mqtt311){
+		if((mosq->in_packet.command&0x0F) != 0x02){
+			return MOSQ_ERR_PROTOCOL;
+		}
+	}
 	rc = _mosquitto_read_uint16(&mosq->in_packet, &mid);
 	if(rc) return rc;
 #ifdef WITH_BROKER

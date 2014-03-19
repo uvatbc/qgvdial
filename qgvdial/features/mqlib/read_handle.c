@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2009-2014 Roger Light <roger@atchoo.org>
+Copyright (c) 2009-2013 Roger Light <roger@atchoo.org>
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -88,17 +88,11 @@ int _mosquitto_handle_publish(struct mosquitto *mosq)
 
 	header = mosq->in_packet.command;
 
-	message->direction = mosq_md_in;
 	message->dup = (header & 0x08)>>3;
 	message->msg.qos = (header & 0x06)>>1;
 	message->msg.retain = (header & 0x01);
 
 	rc = _mosquitto_read_string(&mosq->in_packet, &message->msg.topic);
-	if(rc){
-		_mosquitto_message_cleanup(&message);
-		return rc;
-	}
-	rc = _mosquitto_fix_sub_topic(&message->msg.topic);
 	if(rc){
 		_mosquitto_message_cleanup(&message);
 		return rc;
@@ -161,10 +155,10 @@ int _mosquitto_handle_publish(struct mosquitto *mosq)
 			return rc;
 		case 2:
 			rc = _mosquitto_send_pubrec(mosq, message->msg.mid);
-			pthread_mutex_lock(&mosq->message_mutex);
+			pthread_mutex_lock(&mosq->in_message_mutex);
 			message->state = mosq_ms_wait_for_pubrel;
-			_mosquitto_message_queue(mosq, message, true);
-			pthread_mutex_unlock(&mosq->message_mutex);
+			_mosquitto_message_queue(mosq, message, mosq_md_in);
+			pthread_mutex_unlock(&mosq->in_message_mutex);
 			return rc;
 		default:
 			_mosquitto_message_cleanup(&message);

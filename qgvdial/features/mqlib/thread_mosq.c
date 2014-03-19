@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2011-2014 Roger Light <roger@atchoo.org>
+Copyright (c) 2011-2013 Roger Light <roger@atchoo.org>
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -40,52 +40,58 @@ void *_mosquitto_thread_main(void *obj);
 int mosquitto_loop_start(struct mosquitto *mosq)
 {
 #ifdef WITH_THREADING
-    if(!mosq) return MOSQ_ERR_INVAL;
+	if(!mosq || mosq->threaded) return MOSQ_ERR_INVAL;
 
-    pthread_create(&mosq->thread_id, NULL, _mosquitto_thread_main, mosq);
-    return MOSQ_ERR_SUCCESS;
+	mosq->threaded = true;
+	pthread_create(&mosq->thread_id, NULL, _mosquitto_thread_main, mosq);
+	return MOSQ_ERR_SUCCESS;
 #else
-    return MOSQ_ERR_NOT_SUPPORTED;
+	return MOSQ_ERR_NOT_SUPPORTED;
 #endif
 }
 
 int mosquitto_loop_stop(struct mosquitto *mosq, bool force)
 {
 #ifdef WITH_THREADING
-    if(!mosq) return MOSQ_ERR_INVAL;
+	if(!mosq || !mosq->threaded) return MOSQ_ERR_INVAL;
+	
+	if(force){
+		pthread_cancel(mosq->thread_id);
+	}
+	pthread_join(mosq->thread_id, NULL);
+	mosq->thread_id = pthread_self();
+	mosq->threaded = false;
 
-    if(force){
-        pthread_cancel(mosq->thread_id);
-    }
-    pthread_join(mosq->thread_id, NULL);
-    mosq->thread_id = pthread_self();
-
-    return MOSQ_ERR_SUCCESS;
+	return MOSQ_ERR_SUCCESS;
 #else
-    return MOSQ_ERR_NOT_SUPPORTED;
+	return MOSQ_ERR_NOT_SUPPORTED;
 #endif
 }
 
 #ifdef WITH_THREADING
 void *_mosquitto_thread_main(void *obj)
 {
-    struct mosquitto *mosq = obj;
+	struct mosquitto *mosq = obj;
 
-    if(!mosq) return NULL;
+	if(!mosq) return NULL;
 
-    mosq->threaded = true;
-    pthread_mutex_lock(&mosq->state_mutex);
-    if(mosq->state == mosq_cs_connect_async){
-        pthread_mutex_unlock(&mosq->state_mutex);
-        mosquitto_reconnect(mosq);
-    }else{
-        pthread_mutex_unlock(&mosq->state_mutex);
-    }
+	pthread_mutex_lock(&mosq->state_mutex);
+	if(mosq->state == mosq_cs_connect_async){
+		pthread_mutex_unlock(&mosq->state_mutex);
+		mosquitto_reconnect(mosq);
+	}else{
+		pthread_mutex_unlock(&mosq->state_mutex);
+	}
 
-    mosquitto_loop_forever(mosq, -1, 1);
+	if(!mosq->keepalive){
+		/* Sleep for a day if keepalive disabled. */
+		mosquitto_loop_forever(mosq, mosq->keepalive*1000*86400, 1);
+	}else{
+		/* Sleep for our keepalive value. publish() etc. will wake us up. */
+		mosquitto_loop_forever(mosq, mosq->keepalive*1000, 1);
+	}
 
-    mosq->threaded = false;
-    return obj;
+	return obj;
 }
 #endif
 

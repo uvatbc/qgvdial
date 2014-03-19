@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2009-2014 Roger Light <roger@atchoo.org>
+Copyright (c) 2009-2013 Roger Light <roger@atchoo.org>
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -52,83 +52,83 @@ static unsigned long max_memcount = 0;
 
 void *_mosquitto_calloc(size_t nmemb, size_t size)
 {
-    void *mem = calloc(nmemb, size);
+	void *mem = calloc(nmemb, size);
 
 #ifdef REAL_WITH_MEMORY_TRACKING
-    memcount += malloc_usable_size(mem);
-    if(memcount > max_memcount){
-        max_memcount = memcount;
-    }
+	memcount += malloc_usable_size(mem);
+	if(memcount > max_memcount){
+		max_memcount = memcount;
+	}
 #endif
 
-    return mem;
+	return mem;
 }
 
 void _mosquitto_free(void *mem)
 {
 #ifdef REAL_WITH_MEMORY_TRACKING
-    memcount -= malloc_usable_size(mem);
+	memcount -= malloc_usable_size(mem);
 #endif
-    free(mem);
+	free(mem);
 }
 
 void *_mosquitto_malloc(size_t size)
 {
-    void *mem = malloc(size);
+	void *mem = malloc(size);
 
 #ifdef REAL_WITH_MEMORY_TRACKING
-    memcount += malloc_usable_size(mem);
-    if(memcount > max_memcount){
-        max_memcount = memcount;
-    }
+	memcount += malloc_usable_size(mem);
+	if(memcount > max_memcount){
+		max_memcount = memcount;
+	}
 #endif
 
-    return mem;
+	return mem;
 }
 
 #ifdef REAL_WITH_MEMORY_TRACKING
 unsigned long _mosquitto_memory_used(void)
 {
-    return memcount;
+	return memcount;
 }
 
 unsigned long _mosquitto_max_memory_used(void)
 {
-    return max_memcount;
+	return max_memcount;
 }
 #endif
 
 void *_mosquitto_realloc(void *ptr, size_t size)
 {
-    void *mem;
+	void *mem;
 #ifdef REAL_WITH_MEMORY_TRACKING
-    if(ptr){
-        memcount -= malloc_usable_size(ptr);
-    }
+	if(ptr){
+		memcount -= malloc_usable_size(ptr);
+	}
 #endif
-    mem = realloc(ptr, size);
+	mem = realloc(ptr, size);
 
 #ifdef REAL_WITH_MEMORY_TRACKING
-    memcount += malloc_usable_size(mem);
-    if(memcount > max_memcount){
-        max_memcount = memcount;
-    }
+	memcount += malloc_usable_size(mem);
+	if(memcount > max_memcount){
+		max_memcount = memcount;
+	}
 #endif
 
-    return mem;
+	return mem;
 }
 
 char *_mosquitto_strdup(const char *s)
 {
-    char *str = strdup(s);
+	char *str = strdup(s);
 
 #ifdef REAL_WITH_MEMORY_TRACKING
-    memcount += malloc_usable_size(str);
-    if(memcount > max_memcount){
-        max_memcount = memcount;
-    }
+	memcount += malloc_usable_size(str);
+	if(memcount > max_memcount){
+		max_memcount = memcount;
+	}
 #endif
 
-    return str;
+	return str;
 }
 

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2010-2014 Roger Light <roger@atchoo.org>
+Copyright (c) 2010-2013 Roger Light <roger@atchoo.org>
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -35,10 +35,10 @@ POSSIBILITY OF SUCH DAMAGE.
 void _mosquitto_message_cleanup_all(struct mosquitto *mosq);
 void _mosquitto_message_cleanup(struct mosquitto_message_all **message);
 int _mosquitto_message_delete(struct mosquitto *mosq, uint16_t mid, enum mosquitto_msg_direction dir);
-void _mosquitto_message_queue(struct mosquitto *mosq, struct mosquitto_message_all *message, bool doinc);
+void _mosquitto_message_queue(struct mosquitto *mosq, struct mosquitto_message_all *message, enum mosquitto_msg_direction dir);
 void _mosquitto_messages_reconnect_reset(struct mosquitto *mosq);
 int _mosquitto_message_remove(struct mosquitto *mosq, uint16_t mid, enum mosquitto_msg_direction dir, struct mosquitto_message_all **message);
 void _mosquitto_message_retry_check(struct mosquitto *mosq);
-int _mosquitto_message_update(struct mosquitto *mosq, uint16_t mid, enum mosquitto_msg_direction dir, enum mosquitto_msg_state state);
+int _mosquitto_message_out_update(struct mosquitto *mosq, uint16_t mid, enum mosquitto_msg_state state);
 
 #endif

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2009-2014 Roger Light <roger@atchoo.org>
+Copyright (c) 2009-2013 Roger Light <roger@atchoo.org>
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -49,7 +49,7 @@ int _mosquitto_send_connect(struct mosquitto *mosq, uint16_t keepalive, bool cle
 	uint8_t will = 0;
 	uint8_t byte;
 	int rc;
-	uint8_t version = PROTOCOL_VERSION;
+	uint8_t version = PROTOCOL_VERSION_v31;
 
 	assert(mosq);
 	assert(mosq->id);
@@ -80,7 +80,7 @@ int _mosquitto_send_connect(struct mosquitto *mosq, uint16_t keepalive, bool cle
 	}
 
 	/* Variable header */
-	_mosquitto_write_string(packet, PROTOCOL_NAME, strlen(PROTOCOL_NAME));
+	_mosquitto_write_string(packet, PROTOCOL_NAME_v31, strlen(PROTOCOL_NAME_v31));
 #if defined(WITH_BROKER) && defined(WITH_BRIDGE)
 	if(mosq->bridge && mosq->bridge->try_private && mosq->bridge->try_private_accepted){
 		version |= 0x80;
