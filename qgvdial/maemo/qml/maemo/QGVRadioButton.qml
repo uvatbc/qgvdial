@@ -67,7 +67,6 @@ Rectangle {
             text: container.text
             anchors.verticalCenter: parent.verticalCenter
             font { family: "Nokia Sans"; pointSize: container.pointSize }
-
             color: "white"
         }//Text
     }//Row (tick mark and text)

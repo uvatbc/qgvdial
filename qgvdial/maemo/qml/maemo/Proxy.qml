@@ -49,7 +49,7 @@ Item {
     property bool bEnableProxy: proxySupport.checked
     property bool bSystemProxy: proxySystem.checked
     property bool bProxyUserPass: proxyUserPassRequired.checked
-    property real internalPointSize: 14
+    property real internalPointSize: 16
 
     Column {
         id: mainColumn
@@ -99,6 +99,7 @@ Item {
                 width: parent.width - lblHost.width
                 anchors.verticalCenter: parent.verticalCenter
                 placeholderText: "Proxy server"
+                font.pointSize: internalPointSize
                 KeyNavigation.tab: textUserProxyPort
                 KeyNavigation.backtab: (bEnableProxy && !bSystemProxy && bProxyUserPass ? textUserProxyPass : textUserProxyPort)
             }//QGVTextInput (proxy host)
@@ -117,6 +118,7 @@ Item {
                 id: lblPort
                 text: "Port:"
                 color: "white"
+                font.pointSize: internalPointSize
                 anchors.verticalCenter: parent.verticalCenter
             }//QGVLabel ("Port:")
 
@@ -125,6 +127,7 @@ Item {
                 width: parent.width - lblPort.width
                 anchors.verticalCenter: parent.verticalCenter
                 placeholderText: "Proxy port"
+                font.pointSize: internalPointSize
                 //validator: IntValidator { bottom: 0; top: 65535 }
                 KeyNavigation.tab: (bEnableProxy && !bSystemProxy && bProxyUserPass ? textUserProxyUser : textUserProxyHost)
                 KeyNavigation.backtab: textUserProxyHost
@@ -153,6 +156,7 @@ Item {
                 id: lblProxyUser
                 text: "Proxy user:"
                 color: "white"
+                font.pointSize: internalPointSize
                 anchors.verticalCenter: parent.verticalCenter
             }//QGVLabel ("Proxy user:")
 
@@ -161,6 +165,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 width: parent.width - lblProxyUser.width
                 placeholderText: "Proxy Username"
+                font.pointSize: internalPointSize
                 KeyNavigation.tab: textUserProxyPass
                 KeyNavigation.backtab: textUserProxyPort
             }//QGVTextInput (proxy user)
@@ -178,6 +183,7 @@ Item {
             Text {
                 id: lblProxyPass
                 text: "Proxy password:"
+                font.pointSize: internalPointSize
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
             }//QGVLabel ("Proxy password:")
@@ -187,6 +193,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 width: parent.width - lblProxyPass.width
                 placeholderText: "Proxy password"
+                font.pointSize: internalPointSize
                 echoMode: TextInput.Password
                 KeyNavigation.tab: textUserProxyHost
                 KeyNavigation.backtab: textUserProxyUser

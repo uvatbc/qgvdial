@@ -49,6 +49,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             height: paintedHeight + 2
             color: "white"
+            font.pixelSize: 25
         }//Label ("Email:")
 
         TextOneLine {
@@ -71,6 +72,7 @@ Item {
             opacity: (1 - textUsername.opacity)
             text: container.username
             color: "white"
+            font.pixelSize: 25
         }//Label (username)
     }//Row (username)
 
@@ -93,6 +95,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             height: paintedHeight + 2
             color: "white"
+            font.pixelSize: 25
         }//Label ("Password:")
 
         TextOneLine {
@@ -116,6 +119,7 @@ Item {
             opacity: (1 - textPassword.opacity)
             text: Array(container.password.length+1).join("*")
             color: "white"
+            font.pixelSize: 25
         }//Label (password)
     }//Row (password)
 

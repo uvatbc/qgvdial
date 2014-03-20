@@ -36,9 +36,12 @@ Item {
         spacing: 5
         width: parent.width
 
+        property real internalPointSize: 14
+
         Item {
             width: parent.width
-            height: (optContactsUpdate.height > edContactsUpdateFreq.height ? optContactsUpdate.height : edContactsUpdateFreq.height) + 4
+            height: (optContactsUpdate.height > edContactsUpdateFreq.height ?
+                     optContactsUpdate.height : edContactsUpdateFreq.height) + 4
 
             QGVRadioButton {
                 id: optContactsUpdate
@@ -48,7 +51,7 @@ Item {
                     verticalCenter: parent.verticalCenter
                     left: parent.left
                 }
-                pointSize: 12
+                pointSize: mainColumn.internalPointSize
             }//QGVRadioButton
             TextOneLine {
                 id: edContactsUpdateFreq
@@ -59,15 +62,16 @@ Item {
                     verticalCenter: parent.verticalCenter
                     right: parent.right
                 }
-                font.pixelSize: 20
+                font.pointSize: mainColumn.internalPointSize
                 width: 150
                 placeholderText: "Minutes"
-            }//TextField
+            }//TextOneLine
         }
 
         Item {
             width: parent.width
-            height: (optInboxUpdate.height > edInboxUpdateFreq.height ? optInboxUpdate.height : edInboxUpdateFreq.height) + 4
+            height: (optInboxUpdate.height > edInboxUpdateFreq.height ?
+                     optInboxUpdate.height : edInboxUpdateFreq.height) + 4
 
             QGVRadioButton {
                 id: optInboxUpdate
@@ -77,7 +81,7 @@ Item {
                     verticalCenter: parent.verticalCenter
                     left: parent.left
                 }
-                pointSize: 12
+                pointSize: mainColumn.internalPointSize
             }//QGVRadioButton
             TextOneLine {
                 id: edInboxUpdateFreq
@@ -88,7 +92,7 @@ Item {
                     verticalCenter: parent.verticalCenter
                     right: parent.right
                 }
-                font.pixelSize: 20
+                font.pointSize: mainColumn.internalPointSize
                 width: 150
                 placeholderText: "Minutes"
             }//TextField

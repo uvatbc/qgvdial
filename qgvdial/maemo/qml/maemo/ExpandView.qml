@@ -61,15 +61,15 @@ Rectangle {
             leftMargin: 3
         }
         width: parent.width
-        height: 34
+        height: 40
         spacing: 2
 
         Image {
             id: imgArrow
             source: "qrc:/play.svg"
 
-            height: 30
-            width: 30
+            height: 38
+            width: 38
 
             smooth: true
             anchors.verticalCenter: parent.verticalCenter
@@ -90,6 +90,7 @@ Rectangle {
             width: parent.width - imgArrow.width - parent.spacing
             anchors.verticalCenter: parent.verticalCenter
             color: "white"
+            font.pixelSize: 30
         }//Label (text)
     }//Row (arrow and text)
 
