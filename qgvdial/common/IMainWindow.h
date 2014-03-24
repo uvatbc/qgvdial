@@ -161,7 +161,7 @@ protected:
     virtual void uiRequestTFALoginDetails(void *ctx) = 0;
     virtual void uiSetUserPass(bool editable) = 0;
 
-    void beginLogin(const QString &user, const QString &pass);
+    void beginLogin(QString user, QString pass);
     virtual void uiLoginDone(int status, const QString &errStr) = 0;
 
     virtual void uiRequestApplicationPassword() = 0;
