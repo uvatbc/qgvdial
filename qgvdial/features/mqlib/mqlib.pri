@@ -31,7 +31,8 @@ SOURCES  += $$PWD/mosquitto.c           \
             $$PWD/time_mosq.c           \
             $$PWD/tls_mosq.c            \
             $$PWD/util_mosq.c           \
-            $$PWD/will_mosq.c
+            $$PWD/will_mosq.c           \
+            $$PWD/srv_mosq.c
 
 HEADERS  += $$PWD/cpp/mosquittopp.h
 SOURCES  += $$PWD/cpp/mosquittopp.cpp
