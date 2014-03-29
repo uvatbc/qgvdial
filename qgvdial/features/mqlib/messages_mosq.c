@@ -309,6 +309,7 @@ int _mosquitto_message_remove(struct mosquitto *mosq, uint16_t mid, enum mosquit
 	}
 }
 
+#if defined(WITH_THREADING)
 void _mosquitto_message_retry_check_actual(struct mosquitto *mosq, struct mosquitto_message_all *messages, pthread_mutex_t mutex)
 {
 	time_t now = mosquitto_time();
@@ -343,11 +344,14 @@ void _mosquitto_message_retry_check_actual(struct mosquitto *mosq, struct mosqui
 	}
 	pthread_mutex_unlock(&mutex);
 }
+#endif
 
 void _mosquitto_message_retry_check(struct mosquitto *mosq)
 {
+#if defined(WITH_THREADING)
 	_mosquitto_message_retry_check_actual(mosq, mosq->out_messages, mosq->out_message_mutex);
 	_mosquitto_message_retry_check_actual(mosq, mosq->in_messages, mosq->in_message_mutex);
+#endif
 }
 
 void mosquitto_message_retry_set(struct mosquitto *mosq, unsigned int message_retry)
