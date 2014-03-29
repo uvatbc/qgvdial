@@ -789,7 +789,7 @@ void
 GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
                 void *ctx)
 {
-    AsyncTaskToken *token = (AsyncTaskToken *)ctx;
+    AsyncTaskToken *task = (AsyncTaskToken *)ctx;
     QString strResponse = response;
     bool accountConfigured = true;
     bool accountReviewRequested = false;
@@ -806,10 +806,10 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
     fTemp.close ();
 #endif
 
-    token->errorString.clear();
+    task->errorString.clear();
     do {
         if (!success) {
-            token->status = ATTS_NW_ERROR;
+            task->status = ATTS_NW_ERROR;
             break;
         }
 
@@ -855,7 +855,7 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
                 break;
             }
 
-            success = getRnr (token);
+            success = getRnr (task);
             break;
         }
 
@@ -897,48 +897,89 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
             Q_DEBUG(nextAction);
         }
 
-        if (!parseAlternateLogins (rxForm.cap(0), token)) {
+        if (!parseAlternateLogins (rxForm.cap(0), task)) {
             Q_WARN("Failed to get alternate delivery");
         }
 
         if (emitLog) {
             Q_DEBUG("Two factor AUTH required!");
         }
-        token->inParams["tfaAction"] = nextAction;
-        emit twoStepAuthentication(token);
+        task->inParams["tfaAction"] = nextAction;
+        emit twoStepAuthentication(task);
         success = true;
     } while (0);
 
     if (!success) {
-        if (token->status == ATTS_NW_ERROR) {
+        if (task->status == ATTS_NW_ERROR) {
         } else if (accountConfigured) {
             Q_WARN("Login failed.") << strResponse << hiddenLoginFields;
 
-            if (token->errorString.isEmpty()) {
-                token->errorString = tr("The username or password you entered "
-                                        "is incorrect.");
-            }
-            token->status = ATTS_LOGIN_FAILURE;
+            lookForLoginErrorMessage (strResponse, task);
+
+            task->status = ATTS_LOGIN_FAILURE;
         }
         else if (accountReviewRequested) {
-            token->errorString = "User login failed: Account recovery "
+            task->errorString = "User login failed: Account recovery "
                                  "requested by Google";
-            token->status = ATTS_LOGIN_FAIL_SHOWURL;
+            task->status = ATTS_LOGIN_FAIL_SHOWURL;
         } else {
             Q_WARN("Login failed because user account was not configured.");
 
-            token->errorString = tr("The username that you have entered is not "
+            task->errorString = tr("The username that you have entered is not "
                                     "configured for Google Voice. Please go "
                                     "to www.google.com/voice on a desktop "
                                     "browser and complete the setup of your "
                                     "Google Voice account.");
-            token->status = ATTS_AC_NOT_CONFIGURED;
+            task->status = ATTS_AC_NOT_CONFIGURED;
         }
 
         // In all cases, emit completed
-        token->emitCompleted ();
+        task->emitCompleted ();
     }
 }//GVApi::onLogin2
+
+void
+GVApi::lookForLoginErrorMessage(const QString &resp, AsyncTaskToken *task)
+{
+    QString span;
+    do {
+        span = parseDomElement (resp, "span", "id", "errormsg_0_Passwd");
+        if (span.isEmpty ()) {
+            Q_WARN("Didn't find errormsg_0_Passwd");
+            break;
+        }
+
+        int pos = span.indexOf ('>');
+        if (-1 == pos) {
+            Q_WARN(QString("Couldn't parse out start of text from span '%1'")
+                   .arg(span));
+            break;
+        }
+
+        span = span.mid(pos+1);
+        pos = span.indexOf ('<');
+        if (-1 == pos) {
+            Q_WARN(QString("Couldn't parse out end of text from span '%1'")
+                   .arg(span));
+            break;
+        }
+
+        span = span.mid (0, pos).trimmed ();
+
+        if (span.isEmpty ()) {
+            Q_WARN("Empty span text :(");
+            break;
+        }
+
+        Q_WARN(QString("Google login failure reported: '%1'").arg(span));
+
+        task->errorString = span;
+    } while (0);
+    if (task->errorString.isEmpty()) {
+        task->errorString = tr("The username or password you entered "
+                               "is incorrect.");
+    }
+}//GVApi::lookForLoginErrorMessage
 
 bool
 GVApi::resumeTFALogin(AsyncTaskToken *token)

@@ -157,6 +157,8 @@ private:
     bool getRnr(AsyncTaskToken *token);
     bool parseAlternateLogins(const QString &form, AsyncTaskToken *task);
 
+    void lookForLoginErrorMessage(const QString &resp, AsyncTaskToken *task);
+
     // Send SMS
     bool doSendSms(QUrl url, AsyncTaskToken *token);
 
