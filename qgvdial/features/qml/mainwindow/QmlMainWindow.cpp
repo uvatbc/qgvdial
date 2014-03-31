@@ -87,7 +87,11 @@ createNormalAppObject(int &argc, char **argv)
 
 QmlMainWindow::QmlMainWindow(QObject *parent)
 : IMainWindow(parent)
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+, m_view(NULL)
+#else
 , m_view(new QmlApplicationViewer)
+#endif
 , mainPageStack(NULL)
 , mainTabGroup(NULL)
 , loginExpand(NULL)
@@ -113,9 +117,6 @@ QmlMainWindow::QmlMainWindow(QObject *parent)
 , edContactsUpdateFreq(NULL)
 , edInboxUpdateFreq(NULL)
 {
-#if USE_SINGLE_APPLICATION
-    ((QtSingleApplication*)qApp)->setActivationWindow(m_view);
-#endif
 }//QmlMainWindow::QmlMainWindow
 
 QmlMainWindow::~QmlMainWindow()
@@ -129,11 +130,20 @@ QmlMainWindow::~QmlMainWindow()
 void
 QmlMainWindow::init()
 {
+#if USE_SINGLE_APPLICATION
+    ((QtSingleApplication*)qApp)->setActivationWindow(m_view);
+#endif
+
     IMainWindow::init ();
 
     bool rv =
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+    connect(m_view, SIGNAL(statusChanged(QQuickView::Status)),
+            this, SLOT(declStatusChanged(QQuickView::Status)));
+#else
     connect(m_view, SIGNAL(statusChanged(QDeclarativeView::Status)),
             this, SLOT(declStatusChanged(QDeclarativeView::Status)));
+#endif
     Q_ASSERT(rv);
     if (!rv) {
         Q_WARN("Failed to connect to declStatusChanged signal");
@@ -236,15 +246,42 @@ QmlMainWindow::log(QDateTime /*dt*/, int /*level*/, const QString & /*strLog*/)
     //TODO: Show it in the logs view
 }//QmlMainWindow::log
 
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+void
+QmlMainWindow::declStatusChanged(QQuickView::Status status)
+{
+    if (QQuickView::Error == status) {
+        Q_WARN(QString("status = %1").arg (status));
+        exit(-1);
+    }
+    if (QQuickView::Ready != status) {
+        Q_WARN(QString("status = %1").arg (status));
+    }
+
+    if (!initQmlObjects ()) {
+        exit(-1);
+    }
+}//QmlMainWindow::declStatusChanged
+#else
 void
 QmlMainWindow::declStatusChanged(QDeclarativeView::Status status)
 {
-    do {
-        if (QDeclarativeView::Ready != status) {
-            Q_WARN(QString("status = %1").arg (status));
-            break;
-        }
+    if (QDeclarativeView::Ready != status) {
+        Q_WARN(QString("status = %1").arg (status));
+        exit(-1);
+    }
 
+    if (!initQmlObjects ()) {
+        exit(-1);
+    }
+}//QmlMainWindow::declStatusChanged
+#endif
+
+bool
+QmlMainWindow::initQmlObjects()
+{
+    bool rv = false;
+    do {
         mainPageStack = getQMLObject ("MainPageStack");
         if (NULL == mainPageStack) {
             break;
@@ -437,9 +474,9 @@ QmlMainWindow::declStatusChanged(QDeclarativeView::Status status)
                               this, SLOT(onEdInboxUpdateTextChanged()));
 
         onInitDone();
-        return;
+        rv = true;
     } while(0);
-    exit(-1);
+    return rv;
 }//QmlMainWindow::declStatusChanged
 
 void

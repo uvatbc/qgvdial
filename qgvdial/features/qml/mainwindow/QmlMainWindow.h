@@ -36,7 +36,12 @@ public:
     void log(QDateTime dt, int level, const QString &strLog);
 
 protected slots:
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+    void declStatusChanged(QQuickView::Status status);
+#else
     void declStatusChanged(QDeclarativeView::Status status);
+#endif
+
     void messageReceived(const QString &msg);
 
     void uiShowStatusMessage(const QString &msg, quint64 millisec);
@@ -76,6 +81,8 @@ protected:
     bool connectToChangeNotify(QObject *item, const QString &propName,
                                QObject *receiver, const char *slotName);
 
+    bool initQmlObjects();
+
     void uiUpdateProxySettings(const ProxyInfo &info);
     void uiRequestLoginDetails();
     void uiRequestTFALoginDetails(void *ctx);
@@ -106,7 +113,11 @@ protected:
     void uiSetInboxUpdateFrequency(quint32 mins);
 
 protected:
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+    QQuickView           *m_view;
+#else
     QmlApplicationViewer *m_view;
+#endif
 
     QObject *mainPageStack;
     QObject *mainTabGroup;
