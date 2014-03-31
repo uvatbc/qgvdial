@@ -20,7 +20,7 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "QmlMainWindow.h"
-#include "qmlapplicationviewer.h"
+#include "CQmlViewer.h"
 
 #ifndef UNKNOWN_CONTACT_QRC_PATH
 #error Must define the unknown contact QRC path
@@ -87,11 +87,7 @@ createNormalAppObject(int &argc, char **argv)
 
 QmlMainWindow::QmlMainWindow(QObject *parent)
 : IMainWindow(parent)
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-, m_view(NULL)
-#else
-, m_view(new QmlApplicationViewer)
-#endif
+, m_view(createQmlViewer())
 , mainPageStack(NULL)
 , mainTabGroup(NULL)
 , loginExpand(NULL)
@@ -136,17 +132,11 @@ QmlMainWindow::init()
 
     IMainWindow::init ();
 
-    bool rv =
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-    connect(m_view, SIGNAL(statusChanged(QQuickView::Status)),
-            this, SLOT(declStatusChanged(QQuickView::Status)));
-#else
-    connect(m_view, SIGNAL(statusChanged(QDeclarativeView::Status)),
-            this, SLOT(declStatusChanged(QDeclarativeView::Status)));
-#endif
+    bool rv = connect(m_view, SIGNAL(viewerStatusChanged(bool)),
+                      this, SLOT(onViewerStatusChanged(bool)));
     Q_ASSERT(rv);
     if (!rv) {
-        Q_WARN("Failed to connect to declStatusChanged signal");
+        Q_WARN("Failed to connect to viewerStatusChanged signal");
         qApp->quit ();
         exit(-1);
         return;
@@ -246,36 +236,13 @@ QmlMainWindow::log(QDateTime /*dt*/, int /*level*/, const QString & /*strLog*/)
     //TODO: Show it in the logs view
 }//QmlMainWindow::log
 
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 void
-QmlMainWindow::declStatusChanged(QQuickView::Status status)
+QmlMainWindow::onViewerStatusChanged(bool ready)
 {
-    if (QQuickView::Error == status) {
-        Q_WARN(QString("status = %1").arg (status));
-        exit(-1);
-    }
-    if (QQuickView::Ready != status) {
-        Q_WARN(QString("status = %1").arg (status));
-    }
-
     if (!initQmlObjects ()) {
         exit(-1);
     }
-}//QmlMainWindow::declStatusChanged
-#else
-void
-QmlMainWindow::declStatusChanged(QDeclarativeView::Status status)
-{
-    if (QDeclarativeView::Ready != status) {
-        Q_WARN(QString("status = %1").arg (status));
-        exit(-1);
-    }
-
-    if (!initQmlObjects ()) {
-        exit(-1);
-    }
-}//QmlMainWindow::declStatusChanged
-#endif
+}//QmlMainWindow::onViewerStatusChanged
 
 bool
 QmlMainWindow::initQmlObjects()
@@ -477,7 +444,7 @@ QmlMainWindow::initQmlObjects()
         rv = true;
     } while(0);
     return rv;
-}//QmlMainWindow::declStatusChanged
+}//QmlMainWindow::initQmlObjects
 
 void
 QmlMainWindow::messageReceived(const QString &msg)

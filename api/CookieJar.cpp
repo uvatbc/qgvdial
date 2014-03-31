@@ -37,3 +37,10 @@ CookieJar::getAllCookies() const
 {
     return allCookies ();
 }//CookieJar::getAllCookies
+
+void
+CookieJar::clearAllCookies()
+{
+    QList<QNetworkCookie> cookies;
+    setNewCookies (cookies);
+}//CookieJar::clearAllCookies

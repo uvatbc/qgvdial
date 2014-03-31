@@ -933,6 +933,10 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
             task->status = ATTS_AC_NOT_CONFIGURED;
         }
 
+        if (jar) {
+            jar->clearAllCookies ();
+        }
+
         // In all cases, emit completed
         task->emitCompleted ();
     }

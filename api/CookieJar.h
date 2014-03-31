@@ -35,6 +35,7 @@ public:
 
     QList<QNetworkCookie> getAllCookies() const;
     void setNewCookies(const QList<QNetworkCookie> &cookies);
+    void clearAllCookies();
 };
 
 #endif // COOKIEJAR_H

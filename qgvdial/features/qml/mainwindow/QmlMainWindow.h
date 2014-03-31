@@ -24,7 +24,7 @@ Contact: yuvraaj@gmail.com
 
 #include "IMainWindow.h"
 
-class QmlApplicationViewer;
+class CQmlViewer;
 class QmlMainWindow : public IMainWindow
 {
     Q_OBJECT
@@ -36,11 +36,7 @@ public:
     void log(QDateTime dt, int level, const QString &strLog);
 
 protected slots:
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-    void declStatusChanged(QQuickView::Status status);
-#else
-    void declStatusChanged(QDeclarativeView::Status status);
-#endif
+    void onViewerStatusChanged(bool ready);
 
     void messageReceived(const QString &msg);
 
@@ -113,11 +109,7 @@ protected:
     void uiSetInboxUpdateFrequency(quint32 mins);
 
 protected:
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-    QQuickView           *m_view;
-#else
-    QmlApplicationViewer *m_view;
-#endif
+    CQmlViewer *m_view;
 
     QObject *mainPageStack;
     QObject *mainTabGroup;

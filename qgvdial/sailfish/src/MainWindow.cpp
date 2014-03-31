@@ -10,5 +10,4 @@ createAppObject(int &argc, char **argv)
 MainWindow::MainWindow(QObject *parent)
 : QmlMainWindow(parent)
 {
-    m_view = SailfishApp::createView();
 }//MainWindow::MainWindow
