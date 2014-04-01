@@ -61,6 +61,8 @@ LibContacts::login(const QString &user, const QString &pass)
         return false;
     }
 
+    Q_DEBUG("Starting contacts login");
+
     connect(token, SIGNAL(completed()),
             this, SLOT(loginCompleted()));
 
@@ -78,14 +80,15 @@ LibContacts::loginCompleted()
     IMainWindow *win = (IMainWindow *) this->parent ();
 
     if (ATTS_SUCCESS == task->status) {
-        Q_DEBUG("Login successful");
+        Q_DEBUG("Contacts login successful");
         win->db.setAppPass (task->inParams["pass"].toString());
 
         QDateTime after;
         win->db.getLatestContact (after);
         refresh (after);
     } else {
-        Q_WARN("Login failed");
+        Q_WARN("Contacts login failed. Ask user for contacts password");
+        win->db.clearAppPass ();
         win->uiRequestApplicationPassword ();
     }
 

@@ -153,6 +153,7 @@ void
 IMainWindow::onTFARequest(AsyncTaskToken *task)
 {
     Q_ASSERT(m_loginTask == task);
+    Q_DEBUG("TFA required. Ask user for TFA PIN");
     uiRequestTFALoginDetails(task);
 }//IMainWindow::onTFARequest
 
@@ -163,6 +164,9 @@ IMainWindow::resumeTFAAuth(void *ctx, int pin, bool useAlt)
     if (m_loginTask != ctx) {
         Q_CRIT("Context mismatch!!");
     }
+
+    Q_DEBUG("TFA required. User provided TFA PIN");
+    db.setTFAFlag (true);
 
     if (useAlt) {
         gvApi.resumeTFAAltLogin (m_loginTask);
@@ -185,15 +189,13 @@ IMainWindow::loginCompleted()
             Q_DEBUG("Login successful");
 
             db.putUserPass (m_user, m_pass);
-            if (task->inParams.contains ("user_pin")) {
-                db.setTFAFlag (true);
-            }
-
             if (db.getTFAFlag ()) {
                 if (db.getAppPass (strAppPw)) {
-                    // Got the app pw, use it.
+                    Q_DEBUG("We had the application password... Use it!");
                     onUiGotApplicationPassword (strAppPw);
                 } else {
+                    Q_DEBUG("We need the application password because of TFA. "
+                            "Ask the user for it");
                     // There was no app password stored, ask for it
                     uiRequestApplicationPassword();
                 }
@@ -201,6 +203,7 @@ IMainWindow::loginCompleted()
                 // Assume that the GV password is the contacts password.
                 // If this is not true then the login will fail and the
                 // application password will be requested.
+                Q_DEBUG("Using GV password as contacts password");
                 onUiGotApplicationPassword (m_pass);
             }
 
@@ -270,7 +273,6 @@ IMainWindow::loginCompleted()
 void
 IMainWindow::onUiGotApplicationPassword(const QString &appPw)
 {
-    Q_DEBUG("User gave app specific password");
     // Begin contacts login
     oContacts.login (m_user, appPw);
 }//IMainWindow::onUiGotApplicationPassword
