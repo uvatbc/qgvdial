@@ -39,7 +39,7 @@ public:
     explicit GContactsApi(QObject *parent = 0);
 
     bool login(AsyncTaskToken *task);
-    inline bool isLoggedIn() { return m_isLoggedIn; }
+    inline bool isLoggedIn() { return !m_GoogleAuthToken.isEmpty (); }
     bool logout(AsyncTaskToken *task);
 
     bool getContacts(AsyncTaskToken *task);
@@ -75,11 +75,9 @@ private:
     //! User name and password (may be application specific)
     QString m_user, m_pass;
 
-    //! The authentication string returned by the contacts API
+    //! The authentication string returned by the contacts API.
+    // Not empty = logged in.
     QString m_GoogleAuthToken;
-
-    //! Have we successfully logged in?
-    bool    m_isLoggedIn;
 };
 
 #endif // GCONTACTSAPI_H

@@ -22,3 +22,5 @@ HEADERS  += $$PWD/api_common.h \
             $$PWD/HtmlFieldParser.h
 
 QT *= network xml xmlpatterns script
+
+include($$PWD/o2/o2.pri)

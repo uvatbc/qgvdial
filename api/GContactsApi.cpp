@@ -26,7 +26,6 @@ Contact: yuvraaj@gmail.com
 
 GContactsApi::GContactsApi(QObject *parent)
 : QObject(parent)
-, m_isLoggedIn(false)
 {
 }//GContactsApi::GContactsApi
 
@@ -183,7 +182,7 @@ GContactsApi::onLoginResponse(bool success, const QByteArray &response,
             break;
         }
 
-        if (m_GoogleAuthToken.isEmpty ()) {
+        if (!isLoggedIn ()) {
             Q_WARN("Failed to login!!");
             task->status = ATTS_LOGIN_FAILURE;
             break;
@@ -191,14 +190,13 @@ GContactsApi::onLoginResponse(bool success, const QByteArray &response,
 
         m_user = task->inParams["user"].toString();
         m_pass = task->inParams["pass"].toString();
-        m_isLoggedIn = true;
 
         task->status = ATTS_SUCCESS;
 
         Q_DEBUG("Login success");
     } while (0);
 
-    if (!m_isLoggedIn) {
+    if (!isLoggedIn ()) {
         m_pass.clear ();
     }
 
@@ -210,7 +208,6 @@ GContactsApi::onLoginResponse(bool success, const QByteArray &response,
 bool
 GContactsApi::logout(AsyncTaskToken *task)
 {
-    m_isLoggedIn = false;
     m_user.clear ();
     m_pass.clear ();
     m_GoogleAuthToken.clear ();
@@ -395,7 +392,7 @@ GContactsApi::getPhotoFromLink(AsyncTaskToken *task)
         return false;
     }
 
-    if (!m_isLoggedIn) {
+    if (!isLoggedIn ()) {
         Q_WARN("Not logged in. Cannot download");
         return false;
     }
