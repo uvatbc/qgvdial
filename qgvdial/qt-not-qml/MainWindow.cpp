@@ -115,6 +115,7 @@ createAppObject(int argc, char *argv[])
 MainWindow::MainWindow(QObject *parent)
 : IMainWindow(parent)
 , d(new MainWindowPrivate)
+, m_webView(NULL)
 , m_appIcon(":/qgv.png")
 , m_systrayIcon(NULL)
 , m_ignoreCbInboxChange(false)
@@ -344,6 +345,31 @@ MainWindow::onUserLogoutDone()
 }//MainWindow::onUserLogoutDone
 
 void
+MainWindow::uiOpenBrowser(const QUrl &url)
+{
+    if (m_webView) {
+        m_webView->deleteLater();
+    }
+
+    m_webView = new QWebView(NULL);
+    if (NULL == m_webView) {
+        return;
+    }
+
+    m_webView->load(url);
+    m_webView->show();
+}//MainWindow::uiOpenBrowser
+
+void
+MainWindow::uiCloseBrowser()
+{
+    if (m_webView) {
+        m_webView->deleteLater();
+    }
+    m_webView = NULL;
+}//MainWindow::uiCloseBrowser
+
+void
 MainWindow::uiRequestTFALoginDetails(void *ctx)
 {
     QString strPin = QInputDialog::getText(d,
@@ -371,22 +397,6 @@ MainWindow::uiSetUserPass(bool editable)
 
     d->ui->loginButton->setText (editable ? "Login" : "Logout");
 }//MainWindow::uiSetUserPass
-
-void
-MainWindow::uiRequestApplicationPassword()
-{
-    bool ok;
-    QString strAppPw =
-    QInputDialog::getText (d,
-                           "Application specific password",
-                           "Enter password for contacts",
-                           QLineEdit::Password,
-                           "",
-                           &ok);
-    if (ok) {
-        onUiGotApplicationPassword(strAppPw);
-    }
-}//MainWindow::uiRequestApplicationPassword
 
 void
 MainWindow::uiLoginDone(int status, const QString &errStr)

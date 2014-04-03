@@ -81,6 +81,11 @@ public:
     int localPort();
     void setLocalPort(int value);
 
+    /// Client email hint. Used to simplify Google's OAuth
+    Q_PROPERTY(QString clientEmailHint READ clientEmailHint WRITE setClientEmailHint NOTIFY clientEmailHintChanged)
+    QString clientEmailHint();
+    void setClientEmailHint(const QString &email);
+
 public:
     /// Constructor.
     /// @param  parent  Parent object.
@@ -138,6 +143,7 @@ signals:
     void tokenUrlChanged();
     void refreshTokenUrlChanged();
     void localPortChanged();
+    void clientEmailHintChanged();
 
 protected slots:
     /// Handle verification response.
@@ -187,6 +193,7 @@ protected:
     GrantFlow grantFlow_;
     O2AbstractStore *store_;
     QVariantMap extraTokens_;
+    QString clientEmailHint_;
 };
 
 #endif // O2_H

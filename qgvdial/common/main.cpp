@@ -88,7 +88,7 @@ myMessageOutput(QtMsgType type, const char *msg)
                      .arg(msg);
 
     // Ignore some log messages.
-    for (quint16 i = 0; i < COUNT_OF(ignoreMsgs); i++) {
+    for (size_t i = 0; i < COUNT_OF(ignoreMsgs); i++) {
         if (strLog.contains(ignoreMsgs[i])) {
             return;
         }

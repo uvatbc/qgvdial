@@ -46,7 +46,8 @@ public:
     void setMandatoryLocalPicsFlag(bool value);
     bool getMandatoryLocalPicsFlag();
 
-    bool login(const QString &user, const QString &pass);
+    bool login(const QString &user);
+    void logout();
 
     bool getContactInfoFromLink(ContactInfo &cinfo);
     bool getContactInfoFromNumber(QString num, ContactInfo &cinfo);
@@ -67,6 +68,9 @@ protected:
     void startNextPhoto();
 
 protected slots:
+    void onOpenBrowser(const QUrl &url);
+    void onCloseBrowser();
+
     void loginCompleted();
     void onPresentCaptcha(AsyncTaskToken *task, const QString &captchaUrl);
     void onOneContact(ContactInfo cinfo);

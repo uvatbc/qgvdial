@@ -21,13 +21,66 @@ Contact: yuvraaj@gmail.com
 
 #include "GContactsApi.h"
 #include "ContactsParser.h"
+#include "o2.h"
 
 #define USE_JSON_FEED 0
 
 GContactsApi::GContactsApi(QObject *parent)
 : QObject(parent)
+, m_loginTask(NULL)
+, m_o2(new O2(this))
 {
+    m_o2->setGrantFlow (O2::GrantFlowAuthorizationCode);
+    m_o2->setScope ("https://www.google.com/m8/feeds");
+    m_o2->setTokenUrl ("https://accounts.google.com/o/oauth2/token");
+    m_o2->setRefreshTokenUrl ("https://accounts.google.com/o/oauth2/token");
+    m_o2->setRequestUrl ("https://accounts.google.com/o/oauth2/auth");
+
+    connect(m_o2, SIGNAL(linkingFailed()), this, SLOT(onLinkingFailed()));
+    connect(m_o2, SIGNAL(linkingSucceeded()), this, SLOT(onLinkingSucceeded()));
+    connect(m_o2, SIGNAL(openBrowser(QUrl)), this, SIGNAL(openBrowser(QUrl)));
+    connect(m_o2, SIGNAL(closeBrowser()), this, SIGNAL(closeBrowser()));
+
+    QFile f(":/goog_client_secret.json");
+    if (!f.open (QFile::ReadOnly)) {
+        Q_WARN("Failed to open :/goog_client_secret.json");
+        return;
+    }
+
+    do {
+        QByteArray baData = f.readAll ();
+        QString temp = QString("var o = %1;").arg(QString(baData));
+        QScriptEngine e;
+
+        e.evaluate (temp);
+        if (e.hasUncaughtException ()) {
+            Q_WARN("Failed to assign object from client secret");
+            break;
+        }
+
+        temp = e.evaluate ("o.installed.client_id").toString ();
+        if (e.hasUncaughtException ()) {
+            Q_WARN("Couldn't get client_id");
+            break;
+        }
+        m_o2->setClientId (temp);
+
+        temp = e.evaluate ("o.installed.client_secret").toString ();
+        if (e.hasUncaughtException ()) {
+            Q_WARN("Couldn't get client_secret");
+            break;
+        }
+        m_o2->setClientSecret (temp);
+    } while (0);
+
+    f.close ();
 }//GContactsApi::GContactsApi
+
+void
+GContactsApi::initStore(O2AbstractStore *s)
+{
+    m_o2->setStore (s);
+}//GContactsApi::initStore
 
 bool
 GContactsApi::doGet(QUrl url, void *ctx, QObject *obj, const char *method)
@@ -39,10 +92,10 @@ GContactsApi::doGet(QUrl url, void *ctx, QObject *obj, const char *method)
 
     QNetworkRequest req(url);
 
-    QByteArray byAuth = QString("GoogleLogin auth=%1")
+    QByteArray byAuth = QString("Bearer %1")
                                 .arg(m_GoogleAuthToken).toLatin1 ();
     req.setRawHeader ("Authorization", byAuth);
-    req.setRawHeader("User-Agent", UA_IPHONE4);
+    req.setRawHeader ("Gdata-version", "3.0");
 
     QNetworkReply *reply = nwMgr.get(req);
     if (!reply) {
@@ -57,7 +110,7 @@ GContactsApi::doGet(QUrl url, void *ctx, QObject *obj, const char *method)
         return false;
     }
 
-    tracker->setAutoRedirect (NULL, UA_IPHONE4, true);
+    tracker->setAutoRedirect (NULL, true);
     task->apiCtx = tracker;
 
     bool rv =
@@ -95,7 +148,7 @@ GContactsApi::doPost(QUrl url, QByteArray postData, const char *contentType,
         return false;
     }
 
-    tracker->setAutoRedirect (NULL, UA_IPHONE4, true);
+    tracker->setAutoRedirect (NULL, true);
     task->apiCtx = tracker;
 
     bool rv = connect(tracker,
@@ -111,105 +164,76 @@ GContactsApi::login(AsyncTaskToken *task)
 {
     if (!task) {
         Q_WARN("NULL token");
-        return false;
+        return (false);
     }
 
-    if (!task->inParams.contains ("user") ||
-        !task->inParams.contains ("pass")) {
+    if (!task->inParams.contains ("user"))
+    {
         Q_WARN("User or pass not provided");
-        return false;
+        task->status = ATTS_INVALID_PARAMS;
+        task->emitCompleted ();
+        return (true);
     }
 
-    QUrl url(GV_CLIENTLOGIN);
-    return (startLogin (task, url));
+    if (m_loginTask) {
+        Q_WARN("Login is in progress.");
+        task->status = ATTS_IN_PROGRESS;
+        task->emitCompleted ();
+        return (true);
+    }
+    m_loginTask = task;
+
+    m_o2->setClientEmailHint (task->inParams["user"].toString());
+    m_o2->link ();
+
+    return (true);
 }//GContactsApi::login
 
-bool
-GContactsApi::startLogin(AsyncTaskToken *task, QUrl url)
-{
-    QVariantMap m;
-    m["accountType"] = "GOOGLE";
-    m["Email"]       = task->inParams["user"].toString();
-    m["Passwd"]      = task->inParams["pass"].toString();
-    m["service"]     = "cp"; // name for contacts service
-    m["source"]      = "MyCompany-qgvdial-ver01";
-    NwHelpers::appendQueryItems (url, m);
-
-    QByteArray content = NwHelpers::createPostContent (url);
-
-    bool rv = doPost(url, content,
-                     "application/x-www-form-urlencoded",
-                     task, this,
-                   SLOT(onLoginResponse(bool,QByteArray,QNetworkReply*,void*)));
-    Q_ASSERT(rv);
-
-    return (rv);
-}//GContactsApi::startLogin
-
 void
-GContactsApi::onLoginResponse(bool success, const QByteArray &response,
-                              QNetworkReply * /*reply*/, void *ctx)
+GContactsApi::onLinkingFailed()
 {
-    AsyncTaskToken *task = (AsyncTaskToken *) ctx;
-    QString strReply = response;
-    QString strCaptchaToken, strCaptchaUrl;
+    Q_WARN("Contacts linking failed!");
 
     m_GoogleAuthToken.clear ();
-    do {
-        if (!success) {
-            task->status = ATTS_NW_ERROR;
-            break;
-        }
+    m_user.clear ();
 
-        QStringList arrParsed = strReply.split ('\n');
-        foreach (QString strPair, arrParsed) {
-            QStringList arrPair = strPair.split ('=');
-            if (arrPair[0] == "Auth") {
-                m_GoogleAuthToken = arrPair[1];
-            } else if (arrPair[0] == "CaptchaToken") {
-                strCaptchaToken = arrPair[1];
-            } else if (arrPair[0] == "CaptchaUrl") {
-                strCaptchaUrl = arrPair[1];
-            }
-        }
-
-        if (!strCaptchaUrl.isEmpty ()) {
-            strCaptchaUrl = "http://www.google.com/accounts/"
-                          + strCaptchaUrl;
-
-            emit presentCaptcha(task, strCaptchaUrl);
-            task = NULL;
-            break;
-        }
-
-        if (!isLoggedIn ()) {
-            Q_WARN("Failed to login!!");
-            task->status = ATTS_LOGIN_FAILURE;
-            break;
-        }
-
-        m_user = task->inParams["user"].toString();
-        m_pass = task->inParams["pass"].toString();
-
-        task->status = ATTS_SUCCESS;
-
-        Q_DEBUG("Login success");
-    } while (0);
-
-    if (!isLoggedIn ()) {
-        m_pass.clear ();
+    if (NULL == m_loginTask) {
+        Q_WARN("NULL login task");
+        return;
     }
 
-    if (task) {
-        task->emitCompleted ();
+    m_loginTask->status = ATTS_LOGIN_FAILURE;
+    m_loginTask->emitCompleted ();
+    m_loginTask = NULL;
+}//GContactsApi::onLinkingFailed
+
+void
+GContactsApi::onLinkingSucceeded()
+{
+    m_GoogleAuthToken = m_o2->token ();
+
+    if (NULL == m_loginTask) {
+        Q_WARN("NULL login task");
+        return;
     }
-}//GContactsApi::onLoginResponse
+
+    if (m_loginTask->outParams.contains ("_begin_refresh")) {
+        m_loginTask->status = ATTS_SUCCESS;
+        m_loginTask->emitCompleted ();
+        m_loginTask = NULL;
+        return;
+    }
+
+    bool val = true;
+    m_loginTask->outParams["_begin_refresh"] = val;
+    m_user = m_loginTask->inParams["user"].toString ();
+    m_o2->refresh ();
+}//GContactsApi::onLinkingSucceeded
 
 bool
 GContactsApi::logout(AsyncTaskToken *task)
 {
     m_user.clear ();
-    m_pass.clear ();
     m_GoogleAuthToken.clear ();
 
     task->status = ATTS_SUCCESS;
@@ -233,7 +257,7 @@ GContactsApi::getContacts(AsyncTaskToken *task)
         updatedMin = task->inParams["updatedMin"].toDateTime ();
     }
 
-    QString temp = QString ("http://www.google.com/m8/feeds/contacts/%1/full")
+    QString temp = QString ("https://www.google.com/m8/feeds/contacts/%1/full")
                             .arg (m_user);
     QUrl url(temp);
     QVariantMap m;

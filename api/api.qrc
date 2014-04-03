@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="goog_client_secret.json">../../client_secret_284024172505-2go4p60orvjs7hdmcqpbblh4pr5thu79.apps.googleusercontent.com.json</file>
+    </qresource>
+</RCC>

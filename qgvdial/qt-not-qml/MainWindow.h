@@ -27,6 +27,7 @@ Contact: yuvraaj@gmail.com
 
 class MainWindowPrivate;
 class QSystemTrayIcon;
+class QWebView;
 
 class MainWindow : public IMainWindow
 {
@@ -58,10 +59,12 @@ protected:
     void uiRequestLoginDetails();
     void uiRequestTFALoginDetails(void *ctx);
     void uiSetUserPass(bool editable);
-    void uiRequestApplicationPassword();
 
     void uiLoginDone(int status, const QString &errStr);
     void onUserLogoutDone();
+
+    void uiOpenBrowser(const QUrl &url);
+    void uiCloseBrowser();
 
     void uiRefreshContacts(ContactsModel *model, QString query);
     void uiRefreshInbox();
@@ -111,6 +114,8 @@ protected slots:
 
 private:
     MainWindowPrivate *d;
+
+    QWebView        *m_webView;
 
     QIcon            m_appIcon;
     QSystemTrayIcon *m_systrayIcon;

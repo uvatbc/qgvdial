@@ -150,6 +150,9 @@ void O2::link() {
     parameters.append(qMakePair(QString(O2_OAUTH2_REDIRECT_URI), redirectUri_));
     // parameters.append(qMakePair(QString(OAUTH2_REDIRECT_URI), QString(QUrl::toPercentEncoding(redirectUri_))));
     parameters.append(qMakePair(QString(O2_OAUTH2_SCOPE), scope_));
+    if (!clientEmailHint_.isEmpty ()) {
+        parameters.append(qMakePair(QString(O2_OAUTH2_CLIENT_EMAIL_HINT), clientEmailHint_));
+    }
 
     // Show authentication URL with a web browser
     QUrl url(requestUrl_);
@@ -383,4 +386,15 @@ void O2::onRefreshError(QNetworkReply::NetworkError error) {
     emit linkingFailed();
     emit linkedChanged();
     emit refreshFinished(error);
+}
+
+QString O2::clientEmailHint()
+{
+    return clientEmailHint_;
+}
+
+void O2::setClientEmailHint(const QString &email)
+{
+    clientEmailHint_ = email;
+    emit clientEmailHintChanged ();
 }

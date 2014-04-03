@@ -2,7 +2,7 @@ TARGET=qgvdial
 
 greaterThan(QT_MAJOR_VERSION, 4) {
 message(Qt version $$QT_MAJOR_VERSION)
-QT *= widgets core gui
+QT *= widgets core gui webkit webkitwidgets
 }
 
 # Add files and directories to ship with the application

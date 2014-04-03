@@ -36,6 +36,9 @@ const char O2_OAUTH2_SCOPE[] = "scope";
 const char O2_OAUTH2_CODE[] = "code";
 const char O2_OAUTH2_TOKEN[] = "token";
 const char O2_OAUTH2_GRANT_TYPE[] = "grant_type";
+// Google OAuth 2 Request Parameters
+const char O2_OAUTH2_CLIENT_EMAIL_HINT[] = "login_hint";
+
 // OAuth 2 Response Parameters
 const char O2_OAUTH2_ACCESS_TOKEN[] = "access_token";
 const char O2_OAUTH2_REFRESH_TOKEN[] = "refresh_token";

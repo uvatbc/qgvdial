@@ -165,9 +165,6 @@ IMainWindow::resumeTFAAuth(void *ctx, int pin, bool useAlt)
         Q_CRIT("Context mismatch!!");
     }
 
-    Q_DEBUG("TFA required. User provided TFA PIN");
-    db.setTFAFlag (true);
-
     if (useAlt) {
         gvApi.resumeTFAAltLogin (m_loginTask);
     } else {
@@ -189,23 +186,9 @@ IMainWindow::loginCompleted()
             Q_DEBUG("Login successful");
 
             db.putUserPass (m_user, m_pass);
-            if (db.getTFAFlag ()) {
-                if (db.getAppPass (strAppPw)) {
-                    Q_DEBUG("We had the application password... Use it!");
-                    onUiGotApplicationPassword (strAppPw);
-                } else {
-                    Q_DEBUG("We need the application password because of TFA. "
-                            "Ask the user for it");
-                    // There was no app password stored, ask for it
-                    uiRequestApplicationPassword();
-                }
-            } else {
-                // Assume that the GV password is the contacts password.
-                // If this is not true then the login will fail and the
-                // application password will be requested.
-                Q_DEBUG("Using GV password as contacts password");
-                onUiGotApplicationPassword (m_pass);
-            }
+
+            // Begin contacts login
+            oContacts.login (m_user);
 
             QDateTime after;
             db.getLatestInboxEntry (after);
@@ -241,13 +224,13 @@ IMainWindow::loginCompleted()
             uiSetUserPass (true);
             uiRequestLoginDetails();
             db.clearCookies ();
-            db.clearTFAFlag ();
+            oContacts.logout ();
         } else if (ATTS_SETUP_REQUIRED == task->status) {
             Q_WARN("GVApi has determined that user setup is required");
             uiSetUserPass (true);
             uiRequestLoginDetails();
             db.clearCookies ();
-            db.clearTFAFlag ();
+            oContacts.logout ();
 
             uiShowMessageBox ("Your Google Voice account is not set up. Please "
                               "access Google Voice from a desktop or laptop "
@@ -261,7 +244,7 @@ IMainWindow::loginCompleted()
             uiSetUserPass(true);
             uiRequestLoginDetails();
             db.clearCookies ();
-            db.clearTFAFlag ();
+            oContacts.logout ();
         }
     } while (0);
 
@@ -269,13 +252,6 @@ IMainWindow::loginCompleted()
     uiLoginDone (task->status, task->errorString);
     task->deleteLater ();
 }//IMainWindow::loginCompleted
-
-void
-IMainWindow::onUiGotApplicationPassword(const QString &appPw)
-{
-    // Begin contacts login
-    oContacts.login (m_user, appPw);
-}//IMainWindow::onUiGotApplicationPassword
 
 void
 IMainWindow::onUserLogoutRequest()

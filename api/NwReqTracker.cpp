@@ -175,10 +175,27 @@ NwReqTracker::onReplyFinished()
         }
 #endif
 
+        QList<QByteArray> rawHeaderList = origReply->request().rawHeaderList();
         QNetworkRequest req(urlMoved);
 
-        // Redirected request has the same UA as the original request
-        req.setRawHeader("User-Agent", uaString);
+        // Pick up all the raw headers that matter from the original request
+        const char *ignoreList[] = {"Cookie", "Referer", "Content-Type",
+                                    "Content-Length"};
+        foreach (QByteArray header, rawHeaderList) {
+            bool ignore = false;
+            for (size_t i = 0; i < COUNT_OF(ignoreList); i++) {
+                QString h = QString(header);
+                if (h.compare(ignoreList[i], Qt::CaseInsensitive) == 0) {
+                    ignore = true;
+                    break;
+                }
+            }
+            if (ignore) {
+                continue;
+            }
+            req.setRawHeader(header, origReply->request().rawHeader(header));
+        }
+
         // The referer field is the location that redirected us
         req.setRawHeader ("Referer", origReply->url().toString().toLatin1());
         // Set cookies based on the URL
@@ -297,11 +314,9 @@ NwReqTracker::onXferProgress(qint64 bytesReceived, qint64 bytesTotal)
 }//NwReqTracker::onXferProgress
 
 void
-NwReqTracker::setAutoRedirect(QNetworkCookieJar *j, const QByteArray &ua,
-                              bool set)
+NwReqTracker::setAutoRedirect(QNetworkCookieJar *j, bool set)
 {
     jar = j;
-    uaString = ua;
     autoRedirect = set;
 }//NwReqTracker::setAutoRedirect
 

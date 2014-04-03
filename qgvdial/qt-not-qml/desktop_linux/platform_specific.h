@@ -29,6 +29,7 @@ Contact: yuvraaj@gmail.com
 
 #if QT_VERSION >= 0x050000
 #include <QtWidgets>
+#include <QtWebKitWidgets/QWebView>
 #define PHONON_ENABLED 0
 #else
 #define PHONON_ENABLED 1

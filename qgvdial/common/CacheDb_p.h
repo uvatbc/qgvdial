@@ -51,9 +51,6 @@ protected:
 #define GV_S_VAR_PIN            "gvpin"
 #define GV_S_VAR_PIN_ENABLE     "gvpin_enable"
 
-#define GV_S_VAR_TFA            "two_factor"
-#define GV_S_VAR_CPASS          "c_password"
-
 #define GV_S_VAR_CFREQ          "contacts_frequency"
 #define GV_S_VAR_IFREQ          "inbox_frequency"
 
@@ -93,7 +90,9 @@ protected:
 // Registered numbers table changed to get more fields
 //#define GV_S_VALUE_DB_VER   "2013-04-15 16:49:28"
 // Brand new qgvdial
-#define GV_S_VALUE_DB_VER   "2013-10-18 12:11:26"
+//#define GV_S_VALUE_DB_VER   "2013-10-18 12:11:26"
+// Use OAuth2 for contacts
+#define GV_S_VALUE_DB_VER   "2014-01-02 18:10:40"
 ////////////////////////////////////////////////////////////////////////////////
 // Started using versioning for the settings
 //#define GV_SETTINGS_VER     "2011-05-13 16:33:50"
@@ -108,7 +107,9 @@ protected:
 // Brand new qgvdial
 //#define GV_SETTINGS_VER     "2013-07-26 08:53:58"
 // OSDCipher change
-#define GV_SETTINGS_VER     "2013-12-13 00:55:52"
+//#define GV_SETTINGS_VER     "2013-12-13 00:55:52"
+// Use OAuth2 for contacts
+#define GV_SETTINGS_VER     "2014-01-02 18:10:40"
 ////////////////////////////// GV Contacts table ///////////////////////////////
 #define GV_CONTACTS_TABLE   "gvcontacts"
 #define GV_C_ID             "id"

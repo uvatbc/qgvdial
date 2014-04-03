@@ -23,4 +23,6 @@ HEADERS  += $$PWD/api_common.h \
 
 QT *= network xml xmlpatterns script
 
+RESOURCES += $$PWD/api.qrc
+
 include($$PWD/o2/o2.pri)

@@ -164,10 +164,10 @@ protected:
     void beginLogin(QString user, QString pass);
     virtual void uiLoginDone(int status, const QString &errStr) = 0;
 
-    virtual void uiRequestApplicationPassword() = 0;
-    void onUiGotApplicationPassword(const QString &appPw);
-
     virtual void onUserLogoutDone() = 0;
+
+    virtual void uiOpenBrowser(const QUrl &url) = 0;
+    virtual void uiCloseBrowser() = 0;
 
     virtual void uiRefreshContacts(ContactsModel *model, QString query) = 0;
     virtual void uiRefreshInbox() = 0;

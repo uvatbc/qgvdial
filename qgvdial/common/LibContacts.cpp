@@ -37,10 +37,14 @@ LibContacts::LibContacts(IMainWindow *parent)
 {
     Q_ASSERT(NULL != parent);
 
-    connect (&api, SIGNAL(presentCaptcha(AsyncTaskToken*,QString)),
-             this, SLOT(onPresentCaptcha(AsyncTaskToken*,QString)));
-    connect (&api, SIGNAL(oneContact(ContactInfo)),
-             this, SLOT(onOneContact(ContactInfo)));
+    connect(&api, SIGNAL(presentCaptcha(AsyncTaskToken*,QString)),
+            this, SLOT(onPresentCaptcha(AsyncTaskToken*,QString)));
+    connect(&api, SIGNAL(oneContact(ContactInfo)),
+            this, SLOT(onOneContact(ContactInfo)));
+    connect(&api, SIGNAL(openBrowser(QUrl)),
+            this, SLOT(onOpenBrowser(QUrl)));
+    connect(&api, SIGNAL(closeBrowser()),
+            this, SLOT(onCloseBrowser()));
 
     m_gotPhotoTimer.setSingleShot (true);
     m_gotPhotoTimer.setInterval (GOT_PHOTO_TIMEOUT);
@@ -53,7 +57,7 @@ LibContacts::LibContacts(IMainWindow *parent)
 }//LibContacts::LibContacts
 
 bool
-LibContacts::login(const QString &user, const QString &pass)
+LibContacts::login(const QString &user)
 {
     AsyncTaskToken *token = new AsyncTaskToken(this);
     if (!token) {
@@ -67,11 +71,37 @@ LibContacts::login(const QString &user, const QString &pass)
             this, SLOT(loginCompleted()));
 
     token->inParams["user"] = user;
-    token->inParams["pass"] = pass;
     api.login (token);
 
     return (true);
 }//LibContacts::login
+
+void
+LibContacts::logout()
+{
+    AsyncTaskToken *task = new AsyncTaskToken(this);
+    if (!task) {
+        Q_WARN("Failed to allocate token");
+        return;
+    }
+
+    connect(task, SIGNAL(completed()), task, SLOT(deleteLater()));
+    api.logout (task);
+}//LibContacts::logout
+
+void
+LibContacts::onOpenBrowser(const QUrl &url)
+{
+    IMainWindow *win = (IMainWindow *) this->parent ();
+    win->uiOpenBrowser (url);
+}//LibContacts::onOpenBrowser
+
+void
+LibContacts::onCloseBrowser()
+{
+    IMainWindow *win = (IMainWindow *) this->parent ();
+    win->uiCloseBrowser ();
+}//LibContacts::onCloseBrowser
 
 void
 LibContacts::loginCompleted()
@@ -81,15 +111,13 @@ LibContacts::loginCompleted()
 
     if (ATTS_SUCCESS == task->status) {
         Q_DEBUG("Contacts login successful");
-        win->db.setAppPass (task->inParams["pass"].toString());
-
         QDateTime after;
         win->db.getLatestContact (after);
         refresh (after);
     } else {
-        Q_WARN("Contacts login failed. Ask user for contacts password");
-        win->db.clearAppPass ();
-        win->uiRequestApplicationPassword ();
+        Q_WARN("Contacts login failed.");
+        win->uiShowMessageBox ("Contacts login has failed.\n"
+                               "Please restart the application");
     }
 
     task->deleteLater ();

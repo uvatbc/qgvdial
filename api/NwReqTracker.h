@@ -38,7 +38,7 @@ public:
     void abort();
     void setTimeout(quint32 timeout);
 
-    void setAutoRedirect(QNetworkCookieJar *j, const QByteArray &ua, bool set);
+    void setAutoRedirect(QNetworkCookieJar *j, bool set);
 
     inline bool isAborted() { return aborted; }
     inline bool isTimedOut() { return timedOut; }
@@ -81,7 +81,6 @@ protected:
 
     bool            autoRedirect;
     QNetworkCookieJar *jar;
-    QByteArray      uaString;
     QNetworkAccessManager &nwMgr;
 };
 

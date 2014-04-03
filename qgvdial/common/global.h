@@ -30,8 +30,6 @@ Contact: yuvraaj@gmail.com
 #define APPLICATION_NAME "qgvdial"
 #define ABOUT_URL "http://www.yuvraaj.net/qgvdial/about.html"
 
-#define COUNT_OF(x) ((sizeof(x)/sizeof(0[x])) / ((size_t)(!(sizeof(x) % sizeof(0[x])))))
-
 struct ProxyInfo {
     bool enableProxy;
     bool useSystemProxy;

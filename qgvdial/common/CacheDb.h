@@ -51,14 +51,6 @@ public:
     bool loadCookies(QList<QNetworkCookie> &cookies);
     bool clearCookies();
 
-    void setTFAFlag(bool set);
-    bool getTFAFlag();
-    void clearTFAFlag();
-
-    bool getAppPass(QString &strPass);
-    bool setAppPass(const QString &strPass);
-    void clearAppPass();
-
     bool putTempFile(const QString &strLink, const QString &strPath);
     bool getTempFile(const QString &strLink, QString &strPath) const;
     bool clearTempFileByLink(const QString &strLink, bool deleteFile);

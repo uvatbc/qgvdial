@@ -32,11 +32,15 @@ enum GContactPhotoType {
     GCPT_JPEG   //  = 3
 };
 
+class O2;
+class O2AbstractStore;
 class GContactsApi : public QObject
 {
     Q_OBJECT
 public:
     explicit GContactsApi(QObject *parent = 0);
+
+    void initStore(O2AbstractStore *s);
 
     bool login(AsyncTaskToken *task);
     inline bool isLoggedIn() { return !m_GoogleAuthToken.isEmpty (); }
@@ -46,6 +50,9 @@ public:
     bool getPhotoFromLink(AsyncTaskToken *task);
 
 signals:
+    void openBrowser(const QUrl &url);
+    void closeBrowser();
+
     void presentCaptcha(AsyncTaskToken *task, const QString &captchaUrl);
     void oneContact(ContactInfo cinfo);
 
@@ -54,11 +61,10 @@ private:
     bool doPost(QUrl url, QByteArray postData, const char *contentType,
                 void *ctx, QObject *receiver, const char *method);
 
-    bool startLogin(AsyncTaskToken *task, QUrl url);
-
 private slots:
-    void onLoginResponse(bool success, const QByteArray &response,
-                         QNetworkReply *reply, void *ctx);
+    void onLinkingFailed();
+    void onLinkingSucceeded();
+
     void onGotContactsFeed(bool success, const QByteArray &response,
                            QNetworkReply *reply, void *ctx);
     void onGotOneContact(ContactInfo cinfo);
@@ -73,11 +79,14 @@ private:
     QNetworkAccessManager nwMgr;
 
     //! User name and password (may be application specific)
-    QString m_user, m_pass;
+    QString m_user;
 
     //! The authentication string returned by the contacts API.
     // Not empty = logged in.
     QString m_GoogleAuthToken;
+
+    AsyncTaskToken *m_loginTask;
+    O2             *m_o2;
 };
 
 #endif // GCONTACTSAPI_H
