@@ -24,6 +24,7 @@ Contact: yuvraaj@gmail.com
 #include "IMainWindow.h"
 #include "ContactsModel.h"
 #include "ContactNumbersModel.h"
+#include "O2ContactsStore.h"
 
 #define GOT_PHOTO_TIMEOUT (3 * 1000)  // 3 seconds
 
@@ -55,6 +56,13 @@ LibContacts::LibContacts(IMainWindow *parent)
     connect(&m_updateTimer, SIGNAL(timeout()),
             this, SLOT(refreshLatest()));
 }//LibContacts::LibContacts
+
+void
+LibContacts::init()
+{
+    IMainWindow *win = (IMainWindow *) this->parent ();
+    api.initStore (win->db.createContactsStore ());
+}//LibContacts::init
 
 bool
 LibContacts::login(const QString &user)

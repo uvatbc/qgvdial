@@ -66,6 +66,7 @@ IMainWindow::onInitDone()
 
     do {
         db.init (Lib::ref().getDbDir());
+        oContacts.init ();
 
         QList<QNetworkCookie> cookies;
         if (db.loadCookies (cookies)) {
@@ -507,7 +508,6 @@ IMainWindow::endLongTask()
 void
 IMainWindow::onTaskTimerTimeout()
 {
-    ++m_taskInfo.seconds;
     if (++m_taskInfo.seconds < 3) {
         m_taskTimer.start ();
         return;

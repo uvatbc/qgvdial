@@ -46,6 +46,8 @@ public:
     void setMandatoryLocalPicsFlag(bool value);
     bool getMandatoryLocalPicsFlag();
 
+    void init();
+
     bool login(const QString &user);
     void logout();
 
