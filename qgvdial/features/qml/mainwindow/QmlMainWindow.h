@@ -46,7 +46,6 @@ protected slots:
 
     void onLoginButtonClicked();
     void onTfaPinDlg(bool accepted);
-    void onAppPwDlg(bool accepted);
 
     void onSigProxyChanges(bool enable, bool useSystemProxy, QString server,
                            int port, bool authRequired, QString user,
@@ -83,7 +82,9 @@ protected:
     void uiRequestLoginDetails();
     void uiRequestTFALoginDetails(void *ctx);
     void uiSetUserPass(bool editable);
-    void uiRequestApplicationPassword();
+
+    void uiOpenBrowser(const QUrl &url);
+    void uiCloseBrowser();
 
     void uiLoginDone(int status, const QString &errStr);
     void onUserLogoutDone();
@@ -118,7 +119,6 @@ protected:
     QObject *tfaPinDlg;
     QObject *textUsername;
     QObject *textPassword;
-    QObject *appPwDlg;
     QObject *contactsPage;
     QObject *inboxList;
     QObject *inboxSelector;

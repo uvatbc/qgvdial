@@ -41,9 +41,6 @@ PageStackWindow {
     function pushTfaDlg() {
         appWindow.pageStack.push(tfaPinDlg);
     }
-    function pushAppPwDlg() {
-        appWindow.pageStack.push(appPwDlg);
-    }
     function showMsgBox(msg) {
         msgBox.message = msg;
         appWindow.pageStack.push(msgBox);
@@ -118,13 +115,6 @@ PageStackWindow {
         objectName: "TFAPinDialog"
         onDone: { appWindow.popPageStack(); }
     }//TFA Dialog
-
-    AppPwPage {
-        id: appPwDlg
-        tools: commonTools
-        objectName: "AppPwDialog"
-        onDone: { appWindow.popPageStack(); }
-    }
 
     RegNumberSelector {
         id: regNumberSelector

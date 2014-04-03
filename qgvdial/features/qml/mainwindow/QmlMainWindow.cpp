@@ -95,7 +95,6 @@ QmlMainWindow::QmlMainWindow(QObject *parent)
 , tfaPinDlg(NULL)
 , textUsername(NULL)
 , textPassword(NULL)
-, appPwDlg(NULL)
 , contactsPage(NULL)
 , inboxList(NULL)
 , inboxSelector(NULL)
@@ -319,12 +318,6 @@ QmlMainWindow::initQmlObjects()
         }
         connect(inboxSelector, SIGNAL(selectionChanged(QString)),
                 this, SLOT(onInboxSelectionChanged(QString)));
-
-        appPwDlg = getQMLObject ("AppPwDialog");
-        if (NULL == appPwDlg) {
-            break;
-        }
-        connect(appPwDlg, SIGNAL(done(bool)), this, SLOT(onAppPwDlg(bool)));
 
         proxySettingsPage = getQMLObject ("ProxySettingsPage");
         if (NULL == proxySettingsPage) {
@@ -566,19 +559,17 @@ QmlMainWindow::uiSetUserPass(bool editable)
 }//QmlMainWindow::uiSetUserPass
 
 void
-QmlMainWindow::uiRequestApplicationPassword()
+QmlMainWindow::uiOpenBrowser(const QUrl &url)
 {
-    QMetaObject::invokeMethod (mainPageStack, "pushAppPwDlg");
-}//QmlMainWindow::uiRequestApplicationPassword
+    QMetaObject::invokeMethod (mainPageStack, "showWebPage",
+                               Q_ARG(QVariant, QVariant(url)));
+}//QmlMainWindow::uiOpenBrowser
 
 void
-QmlMainWindow::onAppPwDlg(bool accepted)
+QmlMainWindow::uiCloseBrowser()
 {
-    if (accepted) {
-        QString appPw = appPwDlg->property("appPw").toString();
-        oContacts.login (m_user, appPw);
-    }
-}//QmlMainWindow::onAppPwDlg
+    QMetaObject::invokeMethod (mainPageStack, "hideWebPage");
+}//QmlMainWindow::uiCloseBrowser
 
 void
 QmlMainWindow::uiLoginDone(int status, const QString &errStr)

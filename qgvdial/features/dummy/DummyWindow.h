@@ -41,8 +41,10 @@ protected:
     virtual void uiRequestLoginDetails();
     virtual void uiRequestTFALoginDetails(void *ctx);
     virtual void uiSetUserPass(bool editable);
-    virtual void uiRequestApplicationPassword();
     virtual void uiLoginDone(int status, const QString &errStr);
+
+    virtual void uiOpenBrowser(const QUrl &url);
+    virtual void uiCloseBrowser();
 
     virtual void onUserLogoutDone();
 

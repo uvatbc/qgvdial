@@ -97,10 +97,16 @@ DummyMainWindow::onUserLogoutDone()
 }//DummyMainWindow::onUserLogoutDone
 
 void
-DummyMainWindow::uiRequestApplicationPassword()
+DummyMainWindow::uiOpenBrowser(const QUrl & /*url*/)
 {
     Q_ASSERT(0 == "Not implemented");
-}//DummyMainWindow::uiRequestApplicationPassword()
+}//DummyMainWindow::uiOpenBrowser()
+
+void
+DummyMainWindow::uiCloseBrowser()
+{
+    Q_ASSERT(0 == "Not implemented");
+}//DummyMainWindow::uiCloseBrowser()
 
 void
 DummyMainWindow::uiRefreshContacts(ContactsModel *, QString)

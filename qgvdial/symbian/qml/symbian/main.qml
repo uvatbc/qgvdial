@@ -38,9 +38,6 @@ PageStackWindow {
     function pushTfaDlg() {
         pageStack.push(tfaPinDlg);
     }
-    function pushAppPwDlg() {
-        pageStack.push(appPwDlg);
-    }
     function showMsgBox(msg) {
         msgBox.message = msg;
         pageStack.push(msgBox);
@@ -80,6 +77,15 @@ PageStackWindow {
         smsPage.smsText      = text;
         pageStack.push(smsPage);
     }
+    function showWebPage(url) {
+        webPage.loadUrl(url);
+        pageStack.push(webPage);
+    }
+    function hideWebPage() {
+        if (pageStack.top() === webPage) {
+            pageStack.pop();
+        }
+    }
 
     property bool _inboxDetailsShown: false
 
@@ -90,12 +96,6 @@ PageStackWindow {
         objectName: "TFAPinDialog"
         onDone: { appWindow.pageStack.pop(); }
     }//TFA Dialog
-
-    AppPwPage {
-        id: appPwDlg
-        objectName: "AppPwDialog"
-        onDone: { appWindow.pageStack.pop(); }
-    }
 
     RegNumberSelector {
         id: regNumberSelector
@@ -142,6 +142,11 @@ PageStackWindow {
         id: smsPage
         objectName: "SmsPage"
         onDone: { appWindow.pageStack.pop(); }
+    }
+
+    WebPage {
+        id: webPage
+        objectName: "WebPage"
     }
 
     StatusBanner {
