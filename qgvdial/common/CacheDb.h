@@ -29,6 +29,7 @@ class ContactsModel;
 class InboxModel;
 
 class CacheDbPrivate;
+class O2ContactsStore;
 class CacheDb : public QObject
 {
     Q_OBJECT
@@ -39,6 +40,8 @@ public:
 
     bool init(const QString &dbDir);
     void deinit();
+
+    O2ContactsStore *createContactsStore();
 
     void setQuickAndDirty(bool beDirty = true);
 

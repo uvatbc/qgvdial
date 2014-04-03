@@ -27,6 +27,8 @@ Contact: yuvraaj@gmail.com
 #include "ContactsModel.h"
 #include "InboxModel.h"
 
+#include "O2ContactsStore.h"
+
 CacheDb::CacheDb(QObject *parent /* = NULL*/)
 : QObject (parent)
 {
@@ -117,6 +119,13 @@ CacheDb::deinit()
 {
     CacheDbPrivate::deref ();
 }//CacheDb::deinit
+
+O2ContactsStore *
+CacheDb::createContactsStore()
+{
+    CacheDbPrivate &p = CacheDbPrivate::ref ();
+    return new O2ContactsStore(p.settings, this);
+}//CacheDb::createContactsStore
 
 void
 CacheDb::setQuickAndDirty(bool beDirty /* = true*/)
