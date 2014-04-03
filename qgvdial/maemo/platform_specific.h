@@ -23,7 +23,7 @@ Contact: yuvraaj@gmail.com
 #define PLATFORMSPECIFIC_H
 
 #include <QtGui>
-#include "QtDeclarative"
+#include <QtDeclarative>
 
 #define UNKNOWN_CONTACT_QRC_PATH    "qrc:/unknown_contact.png"
 #define USE_SINGLE_APPLICATION      1

@@ -11,11 +11,9 @@ OBJECTS_DIR = obj
 # Additional import path used to resolve QML modules in Creators code model
 QML_IMPORT_PATH =
 
-QT *= maemo5
+QT *= maemo5 webkit phonon
 CONFIG += mobility
 MOBILITY +=
-
-QT *= phonon
 
 SOURCES  += MainWindow.cpp \
             MaemoPhoneFactory.cpp

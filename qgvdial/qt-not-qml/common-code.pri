@@ -1,8 +1,11 @@
 TARGET=qgvdial
 
+# Common to Qt4 and Qt5:
+QT *= core gui webkit
+# Only for Qt5:
 greaterThan(QT_MAJOR_VERSION, 4) {
 message(Qt version $$QT_MAJOR_VERSION)
-QT *= widgets core gui webkit webkitwidgets
+QT *= widgets webkitwidgets
 }
 
 # Add files and directories to ship with the application

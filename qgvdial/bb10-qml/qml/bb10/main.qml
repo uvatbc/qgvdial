@@ -38,6 +38,14 @@ PageStackWindow {
     signal sigRefreshContactsFull
     signal sigRefreshInboxFull
 
+    function popPageStack() {
+        if (appWindow.pageStack.depth > 1) {
+            appWindow.pageStack.pop();
+        } else {
+            console.debug("No popping dammit!");
+        }
+    }
+
     function pushTfaDlg() {
         appWindow.pageStack.push(tfaPinDlg);
     }
@@ -84,12 +92,12 @@ PageStackWindow {
         smsPage.smsText      = text;
         appWindow.pageStack.push(smsPage);
     }
-    function popPageStack() {
-        if (appWindow.pageStack.depth > 1) {
-            appWindow.pageStack.pop();
-        } else {
-            console.debug("No popping dammit!");
-        }
+    function showWebPage(url) {
+        webPage.loadUrl(url);
+        pageStack.push(webPage);
+    }
+    function hideWebPage() {
+        popPageStack();
     }
 
     property bool _inboxDetailsShown: false
@@ -166,6 +174,11 @@ PageStackWindow {
         tools: commonTools
         objectName: "SmsPage"
         onDone: { appWindow.popPageStack(); }
+    }
+
+    WebPage {
+        id: webPage
+        objectName: "WebPage"
     }
 
     StatusBanner {

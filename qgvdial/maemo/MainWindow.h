@@ -28,6 +28,7 @@ Contact: yuvraaj@gmail.com
 #include "IMainWindow.h"
 
 class QmlApplicationViewer;
+class QWebView;
 class MainWindow : public IMainWindow
 {
     Q_OBJECT
@@ -81,7 +82,9 @@ protected:
     void uiRequestLoginDetails();
     void uiRequestTFALoginDetails(void *ctx);
     void uiSetUserPass(bool editable);
-    void uiRequestApplicationPassword();
+
+    void uiOpenBrowser(const QUrl &url);
+    void uiCloseBrowser();
 
     void uiLoginDone(int status, const QString &errStr);
     void onUserLogoutDone();
@@ -131,6 +134,8 @@ private:
     QObject *optInboxUpdate;
     QObject *edContactsUpdateFreq;
     QObject *edInboxUpdateFreq;
+
+    QWebView *m_webView;
 
     bool     m_inboxDetailsShown;
 };

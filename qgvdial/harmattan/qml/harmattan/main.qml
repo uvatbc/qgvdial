@@ -83,6 +83,13 @@ PageStackWindow {
         pageStack.push(smsPage);
         smsPage.flickToEnd();
     }
+    function showWebPage(url) {
+        webPage.loadUrl(url);
+        pageStack.push(webPage);
+    }
+    function hideWebPage() {
+        pageStack.pop();
+    }
 
     initialPage: Page {
         tools: commonTools
@@ -216,6 +223,11 @@ PageStackWindow {
         id: smsPage
         objectName: "SmsPage"
         onDone: { appWindow.pageStack.pop(); }
+    }
+
+    WebPage {
+        id: webPage
+        objectName: "WebPage"
     }
 
     StatusBanner {

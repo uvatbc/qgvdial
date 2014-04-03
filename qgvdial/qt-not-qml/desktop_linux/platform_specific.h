@@ -32,6 +32,7 @@ Contact: yuvraaj@gmail.com
 #include <QtWebKitWidgets/QWebView>
 #define PHONON_ENABLED 0
 #else
+#include <QtWebKit/QtWebKit>
 #define PHONON_ENABLED 1
 #endif
 

@@ -19,18 +19,20 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#ifndef PLATFORMSPECIFIC_H
-#define PLATFORMSPECIFIC_H
+import QtQuick 1.1
+import com.nokia.meego 1.1
+import QtWebKit 1.0
 
-#include <QtGui>
-#include <QtWebKit/QtWebKit>
+Page {
+    id: container
+    tools: commonTools
 
-#define UNKNOWN_CONTACT_QRC_PATH ":/unknown_contact.png"
+    function loadUrl(url) {
+        webView.url = url;
+    }
 
-#define PHONON_ENABLED 1
-
-#define setRoleNames(_a) do { ; } while (0)
-#define beginResetModel() do { ; } while (0)
-#define endResetModel() reset()
-
-#endif // PLATFORMSPECIFIC_H
+    WebView {
+        id: webView
+        anchors.fill: parent
+    }
+}

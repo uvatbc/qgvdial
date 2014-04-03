@@ -29,6 +29,8 @@ Contact: yuvraaj@gmail.com
 #include "GVNumModel.h"
 #include "ContactNumbersModel.h"
 
+#include <QtWebKit/QWebView>
+
 #ifdef Q_WS_MAEMO_5
 #include <QMaemo5InformationBox>
 #endif
@@ -85,6 +87,7 @@ MainWindow::MainWindow(QObject *parent)
 , optInboxUpdate(NULL)
 , edContactsUpdateFreq(NULL)
 , edInboxUpdateFreq(NULL)
+, m_webView(NULL)
 , m_inboxDetailsShown(false)
 {
     ((QtSingleApplication*)qApp)->setActivationWindow(m_view);
@@ -500,17 +503,26 @@ MainWindow::uiSetUserPass(bool editable)
 }//MainWindow::uiSetUserPass
 
 void
-MainWindow::uiRequestApplicationPassword()
+MainWindow::uiOpenBrowser(const QUrl &url)
 {
-    bool ok;
-    QString strAppPw =
-    QInputDialog::getText (m_view, "Application specific password",
-                           "Enter password for contacts", QLineEdit::Password,
-                           "", &ok);
-    if (ok) {
-        onUiGotApplicationPassword(strAppPw);
+    uiCloseBrowser ();
+    m_webView = new QWebView(NULL);
+    if (NULL == m_webView) {
+        Q_WARN("Failed to create webview!");
+        return;
     }
-}//MainWindow::uiRequestApplicationPassword
+    m_webView->load (url);
+    m_webView->show ();
+}//MainWindow::uiCloseBrowser
+
+void
+MainWindow::uiCloseBrowser()
+{
+    if (m_webView) {
+        m_webView->deleteLater();
+        m_webView = NULL;
+    }
+}//MainWindow::uiCloseBrowser
 
 void
 MainWindow::uiLoginDone(int status, const QString &errStr)

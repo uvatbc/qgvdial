@@ -20,7 +20,7 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "MainWindow.h"
-#include "qmlapplicationviewer.h"
+#include "CQmlViewer.h"
 
 #include <QGLWidget>
 #include <QGLFormat>
@@ -87,5 +87,5 @@ MainWindow::init()
     //m_view->setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
     //m_view->setOrientation(QmlApplicationViewer::ScreenOrientationLockPortrait);
     //m_view->setOrientation(QmlApplicationViewer::ScreenOrientationLockLandscape);
-	
+
 }//MainWindow::init

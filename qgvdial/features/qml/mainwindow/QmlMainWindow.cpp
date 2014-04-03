@@ -73,7 +73,7 @@ createSingleAppObject(int &argc, char **argv)
 QApplication *
 createNormalAppObject(int &argc, char **argv)
 {
-    Q_ASSERT(USE_SINGLE_APPLICATION);
+    Q_ASSERT(!USE_SINGLE_APPLICATION);
     QApplication *app = createApplication(argc, argv);
     if (NULL == app) {
         Q_WARN("Failed to create QApplication object");

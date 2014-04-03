@@ -82,9 +82,7 @@ PageStackWindow {
         pageStack.push(webPage);
     }
     function hideWebPage() {
-        if (pageStack.top() === webPage) {
-            pageStack.pop();
-        }
+        pageStack.pop();
     }
 
     property bool _inboxDetailsShown: false
