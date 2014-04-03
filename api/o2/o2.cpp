@@ -360,12 +360,21 @@ void O2::onRefreshFinished() {
     trace() << "O2::onRefreshFinished: Error" << (int)refreshReply->error() << refreshReply->errorString();
     if (refreshReply->error() == QNetworkReply::NoError) {
         QByteArray reply = refreshReply->readAll();
-        QScriptValue value;
+        QScriptValue value, oneVal;
         QScriptEngine engine;
         value = engine.evaluate("(" + QString(reply) + ")");
-        setToken(value.property(O2_OAUTH2_ACCESS_TOKEN).toString());
-        setExpires(QDateTime::currentMSecsSinceEpoch() / 1000 + value.property(O2_OAUTH2_EXPIRES_IN).toInteger());
-        setRefreshToken(value.property(O2_OAUTH2_REFRESH_TOKEN).toString());
+        oneVal = value.property(O2_OAUTH2_ACCESS_TOKEN);
+        if (oneVal.isValid ()) {
+            setToken(oneVal.toString());
+        }
+        oneVal = value.property(O2_OAUTH2_EXPIRES_IN);
+        if (oneVal.isValid ()) {
+            setExpires(QDateTime::currentMSecsSinceEpoch() / 1000 + oneVal.toInteger());
+        }
+        oneVal = value.property(O2_OAUTH2_REFRESH_TOKEN);
+        if (oneVal.isValid ()) {
+            setRefreshToken(oneVal.toString());
+        }
         timedReplies_.remove(refreshReply);
         emit linkingSucceeded();
         emit tokenChanged();

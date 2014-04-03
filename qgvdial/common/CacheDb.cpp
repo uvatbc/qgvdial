@@ -427,12 +427,15 @@ CacheDb::putTempFile(const QString &strLink, const QString &strPath)
     clearTempFileByLink (strLink, true);
 
     QString strCTime = QDateTime::currentDateTime().toString (Qt::ISODate);
+
+    bool rv =
     query.exec (QString("INSERT INTO " GV_TEMP_TABLE " "
                         "("GV_TT_CTIME","GV_TT_LINK","GV_TT_PATH") VALUES "
                         "('%1','%2','%3')")
                         .arg(strCTime).arg(scrubLink).arg(scrubPath));
+    Q_ASSERT(rv);
 
-    return (true);
+    return (rv);
 }//CacheDb::putTempFile
 
 bool

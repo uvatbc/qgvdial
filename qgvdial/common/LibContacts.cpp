@@ -309,10 +309,13 @@ LibContacts::onGotPhoto()
     QString id   = task->inParams["id"].toString();
     QString href = task->inParams["href"].toString();
 
+    bool restartTimer = false;
+
     do {
         if (ATTS_SUCCESS != task->status) {
             Q_WARN(QString("Failed to get photo for ID %1").arg (id));
             win->db.putTempFile (href, UNKNOWN_CONTACT_QRC_PATH);
+            restartTimer = true;
             break;
         }
 
@@ -344,13 +347,15 @@ LibContacts::onGotPhoto()
         tempFile.write (task->outParams["data"].toByteArray());
 
         win->db.putTempFile (href, tempFile.fileName ());
-
-        // Restart the timer only if we have successfully saved the data.
-        m_gotPhotoTimer.stop ();
-        m_gotPhotoTimer.start ();
+        restartTimer = true;
     } while(0);
 
     task->deleteLater ();
+
+    if (restartTimer) {
+        m_gotPhotoTimer.stop ();
+        m_gotPhotoTimer.start ();
+    }
 
     startNextPhoto ();
 }//LibContacts::onGotPhoto
