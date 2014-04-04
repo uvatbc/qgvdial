@@ -58,12 +58,12 @@ open my $qgvcipfile, '<', "../cipher_qgvdial";
 my $cipher = <$qgvcipfile>;
 close $qgvcipfile;
 chomp $cipher;
-$cmd = "perl version.pl __THIS_IS_MY_EXTREMELY_LONG_KEY_ \"$cipher\" qgvdial-$qver";
+$cmd = "perl qgvdial-$qver/build-files/version.pl __THIS_IS_MY_EXTREMELY_LONG_KEY_ \"$cipher\" qgvdial-$qver";
 print "$cmd\n";
 system($cmd);
 
 # Copy the client secret file to the api directory
-$cmd = "powershell cp ../client_secret_284024172505-2go4p60orvjs7hdmcqpbblh4pr5thu79.apps.googleusercontent.com.json $basedir/api";
+$cmd = "powershell cp ../client_secret_284024172505-2go4p60orvjs7hdmcqpbblh4pr5thu79.apps.googleusercontent.com.json qgvdial-$qver/api";
 print "$cmd\n";
 system($cmd);
 
