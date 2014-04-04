@@ -83,8 +83,8 @@ protected:
     void uiRequestTFALoginDetails(void *ctx);
     void uiSetUserPass(bool editable);
 
-    void uiOpenBrowser(const QUrl &url);
-    void uiCloseBrowser();
+    virtual void uiOpenBrowser(const QUrl &url);
+    virtual void uiCloseBrowser();
 
     void uiLoginDone(int status, const QString &errStr);
     void onUserLogoutDone();

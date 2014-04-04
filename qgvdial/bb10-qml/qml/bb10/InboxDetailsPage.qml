@@ -60,6 +60,8 @@ Page {
         }
         width: parent.width
 
+        clip: true
+
         contentWidth: width
         contentHeight: mainColumn.height
 

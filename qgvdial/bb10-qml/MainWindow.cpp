@@ -89,3 +89,15 @@ MainWindow::init()
     //m_view->setOrientation(QmlApplicationViewer::ScreenOrientationLockLandscape);
 
 }//MainWindow::init
+
+void
+MainWindow::uiOpenBrowser(const QUrl &url)
+{
+    QDesktopServices::openUrl(url);
+}//MainWindow::uiOpenBrowser
+
+void
+MainWindow::uiCloseBrowser()
+{
+}//MainWindow::uiCloseBrowser
+

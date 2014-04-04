@@ -92,6 +92,7 @@ PageStackWindow {
         smsPage.smsText      = text;
         appWindow.pageStack.push(smsPage);
     }
+    /*
     function showWebPage(url) {
         webPage.loadUrl(url);
         pageStack.push(webPage);
@@ -99,6 +100,7 @@ PageStackWindow {
     function hideWebPage() {
         popPageStack();
     }
+    */
 
     property bool _inboxDetailsShown: false
 
@@ -176,10 +178,12 @@ PageStackWindow {
         onDone: { appWindow.popPageStack(); }
     }
 
+    /*
     WebPage {
         id: webPage
         objectName: "WebPage"
     }
+    */
 
     StatusBanner {
         id: statusBanner

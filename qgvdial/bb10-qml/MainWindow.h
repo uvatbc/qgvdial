@@ -30,6 +30,9 @@ class MainWindow : public QmlMainWindow
 public:
     explicit MainWindow(QObject *parent = 0);
     void init();
+
+    void uiOpenBrowser(const QUrl &url);
+    void uiCloseBrowser();
 };
 
 QApplication *
