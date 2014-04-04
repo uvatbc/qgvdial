@@ -68,6 +68,7 @@ public slots:
 protected:
     ContactsModel *createModel(const QString &query = QString());
     void startNextPhoto();
+    bool getOnePhoto(QString contactId, QString photoUrl);
 
 protected slots:
     void onOpenBrowser(const QUrl &url);
@@ -89,6 +90,7 @@ protected:
     bool        m_enableTimerUpdate;
 
     PhotoLinkList m_noPhotos;
+    bool        m_isDownloadingPhoto;
 
 public:
     ContactsModel       *m_contactsModel;

@@ -81,7 +81,8 @@ ContactsModel::getPic(const QModelIndex &index, bool isQML) const
             // If it isn't QML, the pic has to be made local
         }
 
-        if (localPath.isEmpty() || !QFileInfo(localPath).exists()) {
+        if (localPath.isEmpty() ||
+           ((localPath != UNKNOWN_CONTACT_QRC_PATH) && !QFileInfo(localPath).exists())) {
             // Local path is empty and image path is not empty.
             QString contactId =
                     QSqlQueryModel::data(index.sibling(index.row(), 0),
@@ -113,7 +114,7 @@ ContactsModel::data(const QModelIndex &index, int role) const
 {
     QVariant retVar;
 
-#if 1
+#if 0
     QString name = QSqlQueryModel::data(index.sibling(index.row(), 1),
                                         Qt::EditRole).toString ();
     if (name.contains("saroj", Qt::CaseInsensitive)) {

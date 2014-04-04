@@ -98,16 +98,16 @@ CacheDb::cleanup_dangling_temp_ids()
         }
     }
 
+    quint64 del = 0;
     // One entry for all empty paths
     arrPaths += "";
     for (int i = 0; i < arrPaths.length() ; i++) {
-        QString strPath = arrPaths[i];
-        strPath.replace ("'", "''");
-        query.exec(QString("DELETE FROM " GV_TEMP_TABLE " WHERE "
-                    GV_TT_PATH "='%1'").arg(strPath));
+        del += clearTempFileByFile (arrPaths[i]);
     }
+    Q_DEBUG(QString("Deleted %1 entries from the temp link table")
+                .arg(del));
 
-    quint32 del = clearTempFileByFile (UNKNOWN_CONTACT_QRC_PATH);
+    del = clearTempFileByFile (UNKNOWN_CONTACT_QRC_PATH);
     if (0 != del) {
         Q_DEBUG(QString("Deleted %1 links all pointing to the unknown qrc path")
                 .arg (del));

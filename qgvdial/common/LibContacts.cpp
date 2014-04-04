@@ -31,6 +31,7 @@ Contact: yuvraaj@gmail.com
 LibContacts::LibContacts(IMainWindow *parent)
 : QObject(parent)
 , m_enableTimerUpdate(false)
+, m_isDownloadingPhoto(false)
 , m_contactsModel(NULL)
 , m_searchedContactsModel(NULL)
 , m_contactPhonesModel(NULL)
@@ -266,27 +267,37 @@ LibContacts::createModel(const QString &query)
 void
 LibContacts::startNextPhoto()
 {
-    if (!m_noPhotos.isEmpty ()) {
-        PhotoLink l = m_noPhotos.takeFirst ();
-        onNoContactPhoto (l.id, l.href);
-    } else {
-        IMainWindow *win = (IMainWindow *) this->parent ();
-        win->uiShowStatusMessage ("Contact photos fetched", SHOW_3SEC);
+    if (m_isDownloadingPhoto) {
+        return;
     }
+
+    bool rv = false;
+    do {
+        if (m_noPhotos.isEmpty()) {
+            IMainWindow *win = (IMainWindow *) this->parent ();
+            win->uiShowStatusMessage ("Contact photos fetched", SHOW_3SEC);
+            break;
+        }
+
+        PhotoLink l = m_noPhotos.takeFirst ();
+        rv = getOnePhoto (l.id, l.href);
+    } while(!rv);
+
+    m_isDownloadingPhoto = rv;
 }//LibContacts::startNextPhoto
 
-void
-LibContacts::onNoContactPhoto(QString contactId, QString photoUrl)
+bool
+LibContacts::getOnePhoto(QString contactId, QString photoUrl)
 {
     if (photoUrl.isEmpty ()) {
         Q_WARN("Empty photo URL");
-        return;
+        return false;
     }
 
     AsyncTaskToken *task = new AsyncTaskToken(this);
     if (NULL == task) {
         Q_WARN("Failed to allocate task to download photo");
-        return;
+        return false;
     }
 
     task->inParams["id"] = contactId;
@@ -296,9 +307,23 @@ LibContacts::onNoContactPhoto(QString contactId, QString photoUrl)
     if (!api.getPhotoFromLink (task)) {
         Q_WARN("Unable to get photo");
         delete task;
+        return false;
     }
 
+    // Dont want the timer running when I start downloading. When the download
+    // completes (success or failure), then I want to start it.
     m_gotPhotoTimer.stop ();
+    return true;
+}//LibContacts::getOnePhoto
+
+void
+LibContacts::onNoContactPhoto(QString contactId, QString photoUrl)
+{
+    PhotoLink l;
+    l.id = contactId;
+    l.href = photoUrl;
+    m_noPhotos.append (l);
+    startNextPhoto ();
 }//LibContacts::onNoContactPhoto
 
 void
@@ -357,6 +382,7 @@ LibContacts::onGotPhoto()
         m_gotPhotoTimer.start ();
     }
 
+    m_isDownloadingPhoto = false;
     startNextPhoto ();
 }//LibContacts::onGotPhoto
 
