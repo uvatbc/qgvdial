@@ -55,6 +55,11 @@ system($cmd);
 
 # NO Cipher replacement for Maemo: The source is publicly available.
 
+# Copy the client secret file to the api directory :(
+$cmd = "cd $basedir/api ; cp ../../client_secret_284024172505-2go4p60orvjs7hdmcqpbblh4pr5thu79.apps.googleusercontent.com.json .";
+print "$cmd\n";
+system($cmd);
+
 # Do everything upto the preparation of the debian directory. Code is still not compiled.
 $cmd = "cd $basedir && echo y | dh_make -n --createorig --single -e yuvraaj\@gmail.com -c lgpl2";
 print "$cmd\n";

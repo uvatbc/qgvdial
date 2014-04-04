@@ -46,6 +46,11 @@ $cmd = "perl version.pl __THIS_IS_MY_EXTREMELY_LONG_KEY_ '$cipher' $basedir";
 print "$cmd\n";
 system($cmd);
 
+# Copy the client secret file to the api directory
+$cmd = "cd $basedir/api ; cp ../../client_secret_284024172505-2go4p60orvjs7hdmcqpbblh4pr5thu79.apps.googleusercontent.com.json .";
+print "$cmd\n";
+system($cmd);
+
 # Prepare the bar-descriptor
 $cmd = "cd $basedir/qgvdial/bb10-qml ; mv bar-descriptor-deploy.xml bar-descriptor.xml";
 print "$cmd\n";
