@@ -11,6 +11,8 @@ class CQmlViewer : public QmlApplicationViewer
 public:
     CQmlViewer();
 
+    QDeclarativeContext *rootContext() const;
+
 signals:
     void viewerStatusChanged(bool ready);
 

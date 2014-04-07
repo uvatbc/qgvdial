@@ -1,4 +1,5 @@
 #include "CQmlViewer.h"
+#include <QtDeclarative>
 
 CQmlViewer *
 createQmlViewer()
@@ -27,3 +28,9 @@ CQmlViewer::onDeclStatusChanged(QDeclarativeView::Status status)
     Q_WARN(QString("status = %1").arg (status));
     emit viewerStatusChanged (false);
 }//CQmlViewer::onDeclStatusChanged
+
+QDeclarativeContext *
+CQmlViewer::rootContext() const
+{
+    return this->engine()->rootContext();
+}//CQmlViewer::rootContext

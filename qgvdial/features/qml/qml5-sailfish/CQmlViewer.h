@@ -2,6 +2,14 @@
 #define _CQMLVIEWER_
 
 #include "global.h"
+#include <QtQuick>
+
+class QmlApplicationViewer {
+public:
+    enum ScreenOrientation {
+        ScreenOrientationAuto
+    };
+};
 
 class CQmlViewer : public QObject
 {
@@ -9,6 +17,14 @@ class CQmlViewer : public QObject
 
 public:
     CQmlViewer();
+
+    // Stupid hacks to shut up the warnings
+    inline void setMainQmlFile(const QString & /*qmlFile*/) {}
+    inline void setOrientation(QmlApplicationViewer::ScreenOrientation /*o*/) {}
+    inline void show() { m_view->show(); }
+    inline void showExpanded() { show(); }
+    inline QQuickItem *rootObject();
+    inline QQmlContext *rootContext() const;
 
 signals:
     void viewerStatusChanged(bool ready);
@@ -19,6 +35,8 @@ private slots:
 private:
     QQuickView *m_view;
 };
+
+CQmlViewer *createQmlViewer();
 
 #endif//_CQMLVIEWER_
 

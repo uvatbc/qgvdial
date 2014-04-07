@@ -39,6 +39,7 @@ Contact: yuvraaj@gmail.com
 #include "GVNumModel.h"
 #include "ContactNumbersModel.h"
 
+#ifndef QGV_NO_DEFAULT_APP_OBJECTS
 QApplication *
 createSingleAppObject(int &argc, char **argv)
 {
@@ -84,6 +85,7 @@ createNormalAppObject(int &argc, char **argv)
 
     return app;
 }//createNormalAppObject
+#endif //QGV_NO_DEFAULT_APP_OBJECTS
 
 QmlMainWindow::QmlMainWindow(QObject *parent)
 : IMainWindow(parent)
@@ -236,7 +238,7 @@ QmlMainWindow::log(QDateTime /*dt*/, int /*level*/, const QString & /*strLog*/)
 }//QmlMainWindow::log
 
 void
-QmlMainWindow::onViewerStatusChanged(bool ready)
+QmlMainWindow::onViewerStatusChanged(bool /*ready*/)
 {
     if (!initQmlObjects ()) {
         exit(-1);
@@ -572,7 +574,7 @@ QmlMainWindow::uiCloseBrowser()
 }//QmlMainWindow::uiCloseBrowser
 
 void
-QmlMainWindow::uiLoginDone(int status, const QString &errStr)
+QmlMainWindow::uiLoginDone(int status, const QString & /*errStr*/)
 {
     if (ATTS_SUCCESS == status) {
         return;
@@ -584,8 +586,7 @@ QmlMainWindow::uiRefreshContacts(ContactsModel *model, QString query)
 {
     Q_ASSERT(NULL != model);
 
-    m_view->engine()->rootContext()
-                    ->setContextProperty("g_ContactsModel", model);
+    m_view->rootContext()->setContextProperty("g_ContactsModel", model);
     QMetaObject::invokeMethod (contactsPage, "setMyModel",
                                Q_ARG(QVariant, QVariant(query)));
 }//QmlMainWindow::uiRefreshContacts
@@ -593,9 +594,8 @@ QmlMainWindow::uiRefreshContacts(ContactsModel *model, QString query)
 void
 QmlMainWindow::uiRefreshInbox()
 {
-    m_view->engine()->rootContext()
-                    ->setContextProperty("g_InboxModel",
-                                         oInbox.m_inboxModel);
+    m_view->rootContext()->setContextProperty("g_InboxModel",
+                                              oInbox.m_inboxModel);
     QMetaObject::invokeMethod (inboxList, "setMyModel");
 }//QmlMainWindow::uiRefreshInbox
 
@@ -609,8 +609,8 @@ QmlMainWindow::uiSetSelelctedInbox(const QString &selection)
 void
 QmlMainWindow::uiSetNewRegNumbersModel()
 {
-    m_view->engine()->rootContext()->setContextProperty("g_RegNumberModel",
-                                                        oPhones.m_numModel);
+    m_view->rootContext()->setContextProperty("g_RegNumberModel",
+                                              oPhones.m_numModel);
     QMetaObject::invokeMethod (regNumberSelector, "setMyModel");
 }//QmlMainWindow::uiSetNewRegNumbersModel
 
@@ -636,9 +636,8 @@ QmlMainWindow::uiRefreshNumbers()
 void
 QmlMainWindow::uiSetNewContactDetailsModel()
 {
-    m_view->engine()->rootContext()
-                    ->setContextProperty("g_ContactPhonesModel",
-                                         oContacts.m_contactPhonesModel);
+    m_view->rootContext() ->setContextProperty("g_ContactPhonesModel",
+                                               oContacts.m_contactPhonesModel);
 }//QmlMainWindow::uiSetNewContactDetailsModel
 
 void
@@ -707,8 +706,7 @@ QmlMainWindow::onInboxSelectionChanged(QString sel)
 void
 QmlMainWindow::uiGetCIDetails(GVRegisteredNumber &num, GVNumModel *model)
 {
-    m_view->engine()->rootContext()
-                    ->setContextProperty("g_CiPhonesModel", model);
+    m_view->rootContext()->setContextProperty("g_CiPhonesModel", model);
 
     QMetaObject::invokeMethod (mainPageStack, "pushCiSelector",
                                Q_ARG (QVariant, QVariant(num.id)));

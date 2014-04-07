@@ -1,4 +1,5 @@
 #include "CQmlViewer.h"
+#include <sailfishapp.h>
 
 CQmlViewer *
 createQmlViewer()
@@ -28,3 +29,15 @@ CQmlViewer::onDeclStatusChanged(QQuickView::Status status)
     Q_WARN(QString("status = %1").arg (status));
     emit viewerStatusChanged (false);
 }//CQmlViewer::onDeclStatusChanged
+
+QQuickItem *
+CQmlViewer::rootObject()
+{
+    return m_view->rootObject();
+}//CQmlViewer::rootObject
+
+QQmlContext *
+CQmlViewer::rootContext() const
+{
+    return m_view->rootContext ();
+}//CQmlViewer::rootContext

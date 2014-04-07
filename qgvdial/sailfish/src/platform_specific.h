@@ -27,8 +27,11 @@ Contact: yuvraaj@gmail.com
 #endif
 
 #define UNKNOWN_CONTACT_QRC_PATH    "qrc:/unknown_contact.png"
-#define MAIN_QML_PATH               "qml/qgvdial.qml"
+#define MAIN_QML_PATH               "qgvdial.qml"
+
 #define USE_SINGLE_APPLICATION      0
 #define PHONON_ENABLED              0
+
+#define QGV_NO_DEFAULT_APP_OBJECTS
 
 #endif // PLATFORMSPECIFIC_H
