@@ -61,6 +61,7 @@ public:
     bool getInbox(AsyncTaskToken *token);
     bool callOut(AsyncTaskToken *token);
     bool callBack(AsyncTaskToken *token);
+    bool cancelDialBack(AsyncTaskToken *token);
     bool sendSms(AsyncTaskToken *token);
     bool getVoicemail(AsyncTaskToken *token);
     bool markInboxEntryAsRead(AsyncTaskToken *token);
@@ -113,6 +114,8 @@ private slots:
                     QNetworkReply *reply, void *ctx);
     void onCallout(bool success, const QByteArray &response,
                    QNetworkReply *reply, void *ctx);
+    void onCancelDialBack(bool success, const QByteArray &response,
+                          QNetworkReply *reply, void *ctx);
 
     // Send sms
     void onSendSms(bool success, const QByteArray &response,

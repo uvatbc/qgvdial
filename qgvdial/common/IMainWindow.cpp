@@ -356,6 +356,13 @@ IMainWindow::onGvCallTaskDone()
         return;
     }
 
+    if (ATTS_IN_PROGRESS == task->status) {
+        uiShowMessageBox ("A dial back call is in progress. If you did not "
+                          "want to dial back please change the dial settings "
+                          "from the qgvdial call tab");
+        return;
+    }
+
     if (ATTS_SUCCESS != task->status) {
         Q_WARN(QString("Failed to initiate call to %1 using id %2. status = %3")
                .arg(dest, id).arg(task->status));

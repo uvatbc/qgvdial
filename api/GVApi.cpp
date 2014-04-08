@@ -2195,12 +2195,25 @@ GVApi::onCallback(bool success, const QByteArray &response, QNetworkReply *,
         strTemp = QString("var obj = %1; obj.ok;").arg(strTemp);
         strTemp = scriptEngine.evaluate (strTemp).toString ();
         if (scriptEngine.hasUncaughtException ()) {
-            Q_WARN("Failed to parse call out response: ") << strReply;
+            Q_WARN("Failed to parse call back response: ") << strReply;
             Q_WARN("Error is: ") << strTemp;
             break;
         }
 
         if (strTemp != "true") {
+            quint32 code = scriptEngine.evaluate ("obj.data.code").toInt32 ();
+            if (scriptEngine.hasUncaughtException ()) {
+                Q_WARN("Failed to parse call back code: ") << strReply;
+                break;
+            }
+
+            if (1 == code) {
+                Q_WARN("Cannot start a new dial back call while there is one "
+                       "in progress.");
+                token->status = ATTS_IN_PROGRESS;
+                break;
+            }
+
             Q_WARN(QString("Failed to call back! response ok=%1. response='%2'")
                    .arg(strTemp).arg(QString(response)));
             break;
@@ -2222,6 +2235,103 @@ GVApi::onCallback(bool success, const QByteArray &response, QNetworkReply *,
         }
     }
 }//GVApi::onCallback
+
+bool
+GVApi::cancelDialBack(AsyncTaskToken *token)
+{
+    Q_ASSERT(token);
+    if (!token) {
+        return false;
+    }
+
+    if (!loggedIn) {
+        token->status = ATTS_NOT_LOGGED_IN;
+        token->emitCompleted ();
+        return true;
+    }
+
+    if (rnr_se.isEmpty ()) {
+        token->status = ATTS_AC_NOT_CONFIGURED;
+        token->emitCompleted ();
+        return true;
+    }
+
+    QUrl url(GV_HTTPS "/call/cancel");
+    QUrl urlContent(GV_HTTPS "/call/cancel");
+    QVariantMap m;
+    m["outgoingNumber"]   = "";
+    m["forwardingNumber"] = "";
+    m["cancelType"]       = "C2C";
+    m["_rnr_se"]          = rnr_se;
+
+    NwHelpers::appendQueryItems (urlContent, m);
+    QString strContent = NwHelpers::fullyEncodedQuery (urlContent);
+
+    Q_DEBUG(QString("Call back request content = %1").arg(strContent));
+
+    bool rv =
+    doPostForm(url, strContent.toLatin1 (), token, this,
+               SLOT(onCallback(bool,const QByteArray&,QNetworkReply*,void*)));
+    Q_ASSERT(rv);
+
+    return (rv);
+}//GVApi::cancelDialBack
+
+void
+GVApi::onCancelDialBack(bool success, const QByteArray &response,
+                        QNetworkReply *reply, void *ctx)
+{
+    AsyncTaskToken *token = (AsyncTaskToken *)ctx;
+    QString strReply = response;
+
+    do {
+        if (!success) {
+            Q_WARN("Failed to cancel dial back");
+            token->status = ATTS_NW_ERROR;
+            break;
+        }
+        success = false;
+
+#if 0
+        Q_DEBUG(strReply);
+#endif
+
+        QString strTemp = strReply.mid (strReply.indexOf (",\n"));
+        if (strTemp.startsWith (',')) {
+            strTemp = strTemp.mid (strTemp.indexOf ('{'));
+        }
+
+        strTemp = QString("var obj = %1; obj.ok;").arg(strTemp);
+        strTemp = scriptEngine.evaluate (strTemp).toString ();
+        if (scriptEngine.hasUncaughtException ()) {
+            Q_WARN("Failed to parse cancel dial back response: ") << strReply;
+            Q_WARN("Error is: ") << strTemp;
+            break;
+        }
+
+        if (strTemp != "true") {
+            Q_WARN(QString("Failed to cancel dial back! response ok=%1. "
+                           "response='%2'")
+                   .arg(strTemp).arg(QString(response)));
+            break;
+        }
+
+        token->status = ATTS_SUCCESS;
+        token->emitCompleted ();
+        token = NULL;
+
+        success = true;
+    } while (0);
+
+    if (!success) {
+        if (token) {
+            if (token->status == ATTS_SUCCESS) {
+                token->status = ATTS_FAILURE;
+            }
+            token->emitCompleted ();
+        }
+    }
+}//GVApi::onCancelDialBack
 
 bool
 GVApi::sendSms(AsyncTaskToken *token)
