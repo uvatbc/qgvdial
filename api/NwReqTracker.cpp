@@ -484,7 +484,7 @@ NwHelpers::appendQueryItems(QUrl &url, const QVariantMap &m)
 }//NwHelpers::appendQueryItems
 
 QString
-NwHelpers::fullyEncodedString(const QUrl &url)
+NwHelpers::fullyEncodedUrl(const QUrl &url)
 {
     QString rv;
 
@@ -498,7 +498,21 @@ NwHelpers::fullyEncodedString(const QUrl &url)
 #endif
 
     return rv;
-}//NwHelpers::fullyEncodedString
+}//NwHelpers::fullyEncodedUrl
+
+QString
+NwHelpers::fullyEncodedQuery(const QUrl &url)
+{
+    QString rv;
+
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+    rv = url.query (QUrl::FullyEncoded);
+#else
+    rv = url.encodedQuery ();
+#endif
+
+    return rv;
+}//NwHelpers::fullyEncodedQuery
 
 QByteArray
 NwHelpers::createPostContent(QVariantMap m, QStringList ignoreKeys)

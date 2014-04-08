@@ -2145,15 +2145,20 @@ GVApi::callBack(AsyncTaskToken *token)
     QString strContent, strTemp;
     QUrl url(GV_HTTPS "/call/connect");
 
-    strContent = QString("outgoingNumber=%1&forwardingNumber=%2&phoneType=%3")
-                    .arg (token->inParams["destination"].toString())
-                    .arg (token->inParams["source"].toString())
-                    .arg (token->inParams["sourceType"].toString());
+    QUrl urlContent(GV_HTTPS "/call/connect");
+    QVariantMap m;
+    int zero = 0;
+    m["outgoingNumber"]   = token->inParams["destination"].toString();
+    m["forwardingNumber"] = token->inParams["source"].toString();
+    m["phoneType"]        = token->inParams["sourceType"].toString();
+    m["subscriberNumber"] = token->inParams["strSelfNumber"].toString();
+    m["remember"]         = zero;
+    m["_rnr_se"]          = rnr_se;
 
-    strContent += QString("&subscriberNumber=%1&remember=1&_rnr_se=%2")
-                    .arg (strSelfNumber, rnr_se);
+    NwHelpers::appendQueryItems (urlContent, m);
+    strContent = NwHelpers::fullyEncodedQuery (urlContent);
 
-    Q_DEBUG(QString("Call back request = %1").arg(strContent));
+    Q_DEBUG(QString("Call back request content = %1").arg(strContent));
 
     bool rv =
     doPostForm(url, strContent.toLatin1 (), token, this,
@@ -2249,7 +2254,7 @@ GVApi::sendSms(AsyncTaskToken *token)
     m["v"]   = "13";
     m["txt"] = token->inParams["text"].toString();
     NwHelpers::appendQueryItems (url, m);
-    url = QUrl(NwHelpers::fullyEncodedString (url));
+    url = QUrl(NwHelpers::fullyEncodedUrl (url));
 
     return doSendSms (url, token);
 }//GVApi::sendSms
