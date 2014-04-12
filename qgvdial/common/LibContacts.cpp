@@ -31,7 +31,8 @@ Contact: yuvraaj@gmail.com
 LibContacts::LibContacts(IMainWindow *parent)
 : QObject(parent)
 , m_enableTimerUpdate(false)
-, m_isDownloadingPhoto(false)
+, m_photoMutex(QMutex::Recursive)
+, m_simutaneousPhotoDownloads(0)
 , m_contactsModel(NULL)
 , m_searchedContactsModel(NULL)
 , m_contactPhonesModel(NULL)
@@ -208,6 +209,8 @@ LibContacts::onOneContact(ContactInfo cinfo)
             PhotoLink l;
             l.id = cinfo.strId;
             l.href = cinfo.hrefPhoto;
+
+            QMutexLocker locker(&m_photoMutex);
             m_noPhotos.append (l);
         }
     }
@@ -267,7 +270,9 @@ LibContacts::createModel(const QString &query)
 void
 LibContacts::startNextPhoto()
 {
-    if (m_isDownloadingPhoto) {
+    QMutexLocker locker(&m_photoMutex);
+
+    if (m_simutaneousPhotoDownloads > 5) {
         return;
     }
 
@@ -283,7 +288,7 @@ LibContacts::startNextPhoto()
         rv = getOnePhoto (l.id, l.href);
     } while(!rv);
 
-    m_isDownloadingPhoto = rv;
+    m_simutaneousPhotoDownloads += (rv ? 1 : 0);
 }//LibContacts::startNextPhoto
 
 bool
@@ -322,6 +327,8 @@ LibContacts::onNoContactPhoto(QString contactId, QString photoUrl)
     PhotoLink l;
     l.id = contactId;
     l.href = photoUrl;
+
+    QMutexLocker locker(&m_photoMutex);
     m_noPhotos.append (l);
     startNextPhoto ();
 }//LibContacts::onNoContactPhoto
@@ -382,7 +389,8 @@ LibContacts::onGotPhoto()
         m_gotPhotoTimer.start ();
     }
 
-    m_isDownloadingPhoto = false;
+    QMutexLocker locker(&m_photoMutex);
+    m_simutaneousPhotoDownloads--;
     startNextPhoto ();
 }//LibContacts::onGotPhoto
 

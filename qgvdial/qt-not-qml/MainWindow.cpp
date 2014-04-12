@@ -356,6 +356,26 @@ MainWindow::uiOpenBrowser(const QUrl &url)
         return;
     }
 
+    do {
+        QWebPage *page = m_webView->page();
+        if (NULL == page) {
+            break;
+        }
+        QNetworkAccessManager *qnam = page->networkAccessManager ();
+        if (NULL == qnam) {
+            break;
+        }
+
+        CookieJar *jar = new CookieJar;
+        if (NULL == jar) {
+            break;
+        }
+
+        QList<QNetworkCookie> allCookies = gvApi.getAllCookies ();
+        jar->setNewCookies (allCookies);
+        qnam->setCookieJar (jar);
+    } while (0);
+
     m_webView->load(url);
     m_webView->show();
 }//MainWindow::uiOpenBrowser

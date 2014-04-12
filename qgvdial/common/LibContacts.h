@@ -89,8 +89,9 @@ protected:
     QTimer      m_updateTimer;
     bool        m_enableTimerUpdate;
 
+    QMutex      m_photoMutex;
     PhotoLinkList m_noPhotos;
-    bool        m_isDownloadingPhoto;
+    quint32     m_simutaneousPhotoDownloads;
 
 public:
     ContactsModel       *m_contactsModel;
