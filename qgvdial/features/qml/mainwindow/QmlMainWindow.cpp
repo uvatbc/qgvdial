@@ -186,51 +186,6 @@ QmlMainWindow::getQMLObject(const char *pageName)
     return (pObj);
 }//QmlMainWindow::getQMLObject
 
-bool
-QmlMainWindow::connectToChangeNotify(QObject *item, const QString &propName,
-                                  QObject *receiver, const char *slotName)
-{
-    bool rv = false;
-    do {
-        const QMetaObject *metaObject = item->metaObject ();
-        if (NULL == metaObject) {
-            Q_WARN("NULL metaObject");
-            break;
-        }
-
-        QMetaProperty metaProp;
-        for (int i = 0; i < metaObject->propertyCount (); i++) {
-            metaProp = metaObject->property (i);
-            if (metaProp.name () == propName) {
-                rv = true;
-                break;
-            }
-        }
-
-        if (!rv) {
-            Q_WARN(QString("Couldn't find property named %1").arg(propName));
-            break;
-        }
-        rv = false;
-
-        if (!metaProp.hasNotifySignal ()) {
-            Q_WARN(QString("Property %1 does not have a notify signal")
-                   .arg(propName));
-            break;
-        }
-
-        QString signalName = QString("2%1")
-                                .arg(metaProp.notifySignal().signature());
-
-        Q_DEBUG(QString("Connect %1 to %2").arg(signalName).arg(slotName));
-
-        rv =
-        connect(item, signalName.toLatin1().constData(), receiver, slotName);
-    } while(0);
-
-    return (rv);
-}//QmlMainWindow::connectToChangeNotify
-
 void
 QmlMainWindow::log(QDateTime /*dt*/, int /*level*/, const QString & /*strLog*/)
 {
@@ -425,15 +380,19 @@ QmlMainWindow::initQmlObjects()
         if (NULL == edContactsUpdateFreq) {
             break;
         }
-        connectToChangeNotify(edContactsUpdateFreq, "text",
-                              this, SLOT(onEdContactsUpdateTextChanged()));
+        m_view->connectToChangeNotify(edContactsUpdateFreq,
+                                      "text",
+                                      this,
+                                      SLOT(onEdContactsUpdateTextChanged()));
 
         edInboxUpdateFreq = getQMLObject ("EdInboxUpdateFreq");
         if (NULL == edInboxUpdateFreq) {
             break;
         }
-        connectToChangeNotify(edInboxUpdateFreq, "text",
-                              this, SLOT(onEdInboxUpdateTextChanged()));
+        m_view->connectToChangeNotify(edInboxUpdateFreq,
+                                      "text",
+                                      this,
+                                      SLOT(onEdInboxUpdateTextChanged()));
 
         onInitDone();
         rv = true;

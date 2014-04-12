@@ -73,8 +73,6 @@ protected slots:
 
 protected:
     QObject *getQMLObject(const char *pageName);
-    bool connectToChangeNotify(QObject *item, const QString &propName,
-                               QObject *receiver, const char *slotName);
 
     bool initQmlObjects();
 
