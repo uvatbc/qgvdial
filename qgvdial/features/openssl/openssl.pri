@@ -9,10 +9,11 @@ win32 {
 symbian {
     LIBS += -llibssl -llibcrypto
 } else {
-# For all Linux variants, and blackberry: add openssl
+# For all other Linux variants and blackberry: add openssl
     LIBS += -lssl -lcrypto
 } }
 
 contains(DEFINES,OPENSSL_STATIC) {
 INCLUDEPATH += $$PWD/include
+LIBS += -L$$PWD/lib
 }
