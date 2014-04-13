@@ -24,6 +24,8 @@ OTHER_FILES  += qml/cover/CoverPage.qml \
                 qml/pages/SecondPage.qml \
                 qml/qgvdial.qml
 
+QT *= multimedia
+
 include(../common/common.pri)
 include(../features/openssl/openssl-sailfish.pri)
 include(../features/dirs/linux/linux-dirs.pri)
