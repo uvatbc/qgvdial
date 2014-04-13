@@ -40,6 +40,7 @@ LIBS += -letel3rdparty
 
 include(../common/common.pri)
 include(../features/openssl/openssl.pri)
+include(../features/openssl/openssl-symbian.pri)
 include(../features/dirs/linux/linux-dirs.pri)
 include(../features/qml/qml4/qmlviewer.pri)
 include(../features/qml/mainwindow/qml-mainwindow.pri)

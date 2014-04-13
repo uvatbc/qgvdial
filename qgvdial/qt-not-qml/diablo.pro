@@ -1,5 +1,6 @@
 include(./common-code.pri)
 include(../features/dirs/linux/linux-dirs.pri)
+include(../features/openssl/openssl-lin.pri)
 include(../features/osver/nokia/diablo/osv-diablo.pri)
 
 DEFINES += OS_DIABLO

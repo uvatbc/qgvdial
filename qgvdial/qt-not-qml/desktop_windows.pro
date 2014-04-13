@@ -1,5 +1,6 @@
 include(common-code.pri)
 include(../features/osver/desktop/windows/osv-windows.pri)
+include(../features/openssl/openssl-win.pri)
 
 # Surprisingly enough, this works just perfectly in Windows
 include(../features/dirs/linux/linux-dirs.pri)

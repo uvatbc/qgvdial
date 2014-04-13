@@ -35,7 +35,7 @@ LIBS += -lbbsystem
 }
 
 include(../common/common.pri)
-include(../features/openssl/openssl.pri)
+include(../features/openssl/openssl-lin.pri)
 include(../features/dirs/bb10/bb10-dirs.pri)
 include(../features/qml/qml4/qmlviewer.pri)
 include(../features/qml/mainwindow/qml-mainwindow.pri)
