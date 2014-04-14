@@ -35,7 +35,6 @@ HEADERS  += platform_specific.h \
             SymbianPhoneFactory.h
 
 include(../common/common.pri)
-include(../features/openssl/openssl.pri)
 include(../features/openssl/openssl-lin.pri)
 include(../features/dirs/linux/linux-dirs.pri)
 include(../features/dummy/dummy.pri)
