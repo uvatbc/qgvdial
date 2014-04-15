@@ -281,6 +281,8 @@ LibContacts::startNextPhoto()
         if (m_noPhotos.isEmpty()) {
             IMainWindow *win = (IMainWindow *) this->parent ();
             win->uiShowStatusMessage ("Contact photos fetched", SHOW_3SEC);
+            m_gotPhotoTimer.stop ();
+            m_gotPhotoTimer.start ();
             break;
         }
 
@@ -289,6 +291,10 @@ LibContacts::startNextPhoto()
     } while(!rv);
 
     m_simutaneousPhotoDownloads += (rv ? 1 : 0);
+
+    if (0 == m_simutaneousPhotoDownloads) {
+        Q_ASSERT(m_noPhotos.isEmpty ());
+    }
 }//LibContacts::startNextPhoto
 
 bool
@@ -341,13 +347,10 @@ LibContacts::onGotPhoto()
     QString id   = task->inParams["id"].toString();
     QString href = task->inParams["href"].toString();
 
-    bool restartTimer = false;
-
     do {
         if (ATTS_SUCCESS != task->status) {
             Q_WARN(QString("Failed to get photo for ID %1").arg (id));
             win->db.putTempFile (href, UNKNOWN_CONTACT_QRC_PATH);
-            restartTimer = true;
             break;
         }
 
@@ -379,15 +382,9 @@ LibContacts::onGotPhoto()
         tempFile.write (task->outParams["data"].toByteArray());
 
         win->db.putTempFile (href, tempFile.fileName ());
-        restartTimer = true;
     } while(0);
 
     task->deleteLater ();
-
-    if (restartTimer) {
-        m_gotPhotoTimer.stop ();
-        m_gotPhotoTimer.start ();
-    }
 
     QMutexLocker locker(&m_photoMutex);
     m_simutaneousPhotoDownloads--;
@@ -406,6 +403,8 @@ LibContacts::refreshModel()
         Q_ASSERT(!m_searchQuery.isEmpty ());
         win->db.refreshContactsModel (m_searchedContactsModel, m_searchQuery);
     }
+
+    Q_DEBUG("Contacts model refreshed");
 }//LibContacts::refreshModel
 
 bool
