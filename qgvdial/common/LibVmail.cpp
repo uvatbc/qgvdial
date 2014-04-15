@@ -79,7 +79,10 @@ LibVmail::fetchVmail(const QString &id)
                             + "qgv_XXXXXX.vmail.mp3";
         QTemporaryFile tempFile (strTemplate);
         if (!tempFile.open ()) {
-            Q_WARN("Failed to get a temp file name");
+            Q_WARN(QString("Failed to get a file name for the vmail with "
+                           "template %1. Error: code = %2, string = '%3'")
+                   .arg(strTemplate).arg(tempFile.error())
+                   .arg(tempFile.errorString()));
             break;
         }
         QString strTemp = QFileInfo(tempFile.fileName()).absoluteFilePath();

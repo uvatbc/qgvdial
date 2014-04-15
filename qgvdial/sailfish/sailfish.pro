@@ -11,9 +11,13 @@ TARGET = qgvdial
 CONFIG += sailfishapp
 
 INCLUDEPATH += src
+
 HEADERS  += src/platform_specific.h \
-            src/MainWindow.h
-SOURCES  += src/MainWindow.cpp
+            src/MainWindow.h \
+            src/SailfishPhoneFactory.h
+
+SOURCES  += src/MainWindow.cpp \
+            src/SailfishPhoneFactory.cpp
 
 OTHER_FILES  += rpm/sailfish.spec \
                 rpm/sailfish.yaml \
@@ -33,3 +37,10 @@ include(../features/dbus_api/dbus_api.pri)
 include(../features/qml/qml5-sailfish/qmlviewer.pri)
 include(../features/qml/mainwindow/qml-mainwindow.pri)
 include(../features/cookie-cutter/osdependent/cc-osdependent.pri)
+include(../features/osver/sailfish/osv-sailfish.pri)
+
+simulator {
+include(../features/tp/linux/tp.pri)
+} else {
+include(../features/tp/maemo/tp.pri)
+}
