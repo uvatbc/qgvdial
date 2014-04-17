@@ -31,7 +31,7 @@ OTHER_FILES  += qml/cover/CoverPage.qml \
 QT *= multimedia
 
 include(../common/common.pri)
-include(../features/openssl/openssl-sailfish.pri)
+include(../features/openssl/openssl-lin.pri)
 include(../features/dirs/linux/linux-dirs.pri)
 include(../features/dbus_api/dbus_api.pri)
 include(../features/qml/qml5-sailfish/qmlviewer.pri)
@@ -39,8 +39,4 @@ include(../features/qml/mainwindow/qml-mainwindow.pri)
 include(../features/cookie-cutter/osdependent/cc-osdependent.pri)
 include(../features/osver/sailfish/osv-sailfish.pri)
 
-simulator {
 include(../features/tp/linux/tp.pri)
-} else {
-include(../features/tp/maemo/tp.pri)
-}
