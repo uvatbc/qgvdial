@@ -69,6 +69,25 @@ LibGvPhones::onGotRegisteredPhone (const GVRegisteredNumber &info)
     m_numModel->m_dialBack += info;
 }//LibGvPhones::onGotRegisteredPhone
 
+QString
+LibGvPhones::chooseDefaultNumber()
+{
+    // Return first available dialout method
+    if (m_numModel->m_dialOut.size () > 0) {
+        return m_numModel->m_dialOut[0].id;
+    }
+
+    // No dialouts. Select first dialback that is *NOT* an email address.
+    for (int i = 0; i < m_numModel->m_dialBack.size (); i++) {
+        if (!m_numModel->m_dialBack[i].number.contains ('@')) {
+            return m_numModel->m_dialBack[i].id;
+        }
+    }
+
+    // Giving up. Return whatever.
+    return m_numModel->m_dialBack[0].id;
+}//LibGvPhones::chooseDefaultNumber
+
 void
 LibGvPhones::onGotPhones()
 {
@@ -90,9 +109,8 @@ LibGvPhones::onGotPhones()
             return;
         }
 
-        // Either id not found, or nothing saved: In this case, the default
-        // starting dialout value is the first phone.
-        id = m_numModel->m_dialBack[0].id;
+        // Either id not found, or nothing saved: Use default
+        id = chooseDefaultNumber ();
     } while(0);
     m_numModel->m_selectedId = id;
 
@@ -267,13 +285,15 @@ LibGvPhones::onAllAccountsIdentified()
         m_numModel->m_dialOut += num;
     }
 
-    if (win->db.getSelectedPhone (id)) {
-        bool dialBack;
-        int index;
+    if (!win->db.getSelectedPhone (id)) {
+        id = chooseDefaultNumber ();
+    }
 
-        if (m_numModel->findById (id, dialBack, index)) {
-            m_numModel->m_selectedId = id;
-        }
+    bool dialBack;
+    int index;
+
+    if (m_numModel->findById (id, dialBack, index)) {
+        m_numModel->m_selectedId = id;
     }
 
     m_numModel->informViewsOfNewData ();

@@ -177,7 +177,6 @@ IMainWindow::resumeTFAAuth(void *ctx, int pin, bool useAlt)
 void
 IMainWindow::loginCompleted()
 {
-    QString strAppPw;
     AsyncTaskToken *task = (AsyncTaskToken *) QObject::sender ();
     Q_ASSERT(m_loginTask == task);
     m_loginTask = NULL;

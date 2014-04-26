@@ -945,7 +945,7 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
 void
 GVApi::lookForLoginErrorMessage(const QString &resp, AsyncTaskToken *task)
 {
-    QString span;
+    QString span, errSpan;
     do {
         span = parseDomElement (resp, "span", "id", "errormsg_0_Passwd");
         if (span.isEmpty ()) {
@@ -959,6 +959,7 @@ GVApi::lookForLoginErrorMessage(const QString &resp, AsyncTaskToken *task)
                    .arg(span));
             break;
         }
+        errSpan = span;
 
         span = span.mid(pos+1);
         pos = span.indexOf ('<');
@@ -970,18 +971,69 @@ GVApi::lookForLoginErrorMessage(const QString &resp, AsyncTaskToken *task)
 
         span = span.mid (0, pos).trimmed ();
 
-        if (span.isEmpty ()) {
-            Q_WARN("Empty span text :(");
+        if (!span.isEmpty ()) {
+            Q_WARN(QString("Google login failure reported: '%1'").arg(span));
+            task->errorString = span;
             break;
         }
 
-        Q_WARN(QString("Google login failure reported: '%1'").arg(span));
+        Q_WARN("Empty span text. Checking for span in span");
 
-        task->errorString = span;
+        // <span> ... <span color="red">Error text</span></span>
+
+        pos = errSpan.lastIndexOf ('<');
+        if (-1 == pos) {
+            Q_WARN(QString("Huh? : '%1'").arg(errSpan));
+            break;
+        }
+
+        span = errSpan.mid(0, pos-1);
+
+        pos = span.indexOf ('>');
+        if (-1 == pos) {
+            Q_WARN(QString("Huh? : '%1'").arg(errSpan));
+            break;
+        }
+
+        span = span.mid(pos + 1);
+        span = parseDomElement (span, "span", "color", "red");
+        if (span.isEmpty ()) {
+            Q_WARN("Didn't find red error text");
+            break;
+        }
+
+        pos = span.indexOf ('>');
+        if (-1 == pos) {
+            Q_WARN(QString("Couldn't parse start of text from red span '%1'")
+                   .arg(span));
+            break;
+        }
+        errSpan = span;
+
+        span = span.mid(pos+1);
+        pos = span.indexOf ('<');
+        if (-1 == pos) {
+            Q_WARN(QString("Couldn't parse end of text from red span '%1'")
+                   .arg(span));
+            break;
+        }
+
+        span = span.mid (0, pos).trimmed ();
+
+        if (!span.isEmpty ()) {
+            Q_WARN(QString("Google login failure reported: '%1'").arg(span));
+            task->errorString = span;
+        }
+
+        // The else block outside will display the warning
+        //Q_WARN("Couldn't figure out why Google denied login :(");
     } while (0);
+
     if (task->errorString.isEmpty()) {
         task->errorString = tr("The username or password you entered "
                                "is incorrect.");
+    } else {
+        Q_WARN("Couldn't figure out why Google denied login :(");
     }
 }//GVApi::lookForLoginErrorMessage
 

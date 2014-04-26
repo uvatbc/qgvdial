@@ -64,6 +64,8 @@ private:
     bool ensurePhoneAccountFactory();
     void clearAllAccounts();
 
+    QString chooseDefaultNumber();
+
 public:
     GVNumModel *m_numModel;
     GVNumModel *m_ciModel;

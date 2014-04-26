@@ -168,7 +168,7 @@ LibInbox::onRefreshDone()
 
     do {
         if (ATTS_SUCCESS != task->status) {
-            Q_WARN(QString("Failed to get inbox page")
+            Q_WARN(QString("Failed to get inbox page #%1")
                    .arg(task->inParams["page"].toInt()));
         }
 
