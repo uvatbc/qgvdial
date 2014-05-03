@@ -19,6 +19,8 @@ HEADERS  += src/platform_specific.h \
 SOURCES  += src/MainWindow.cpp \
             src/SailfishPhoneFactory.cpp
 
+RESOURCES += sailfish.qrc
+
 OTHER_FILES  += rpm/sailfish.spec \
                 rpm/sailfish.yaml \
                 qgvdial.desktop

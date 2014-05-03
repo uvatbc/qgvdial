@@ -1030,10 +1030,10 @@ GVApi::lookForLoginErrorMessage(const QString &resp, AsyncTaskToken *task)
     } while (0);
 
     if (task->errorString.isEmpty()) {
+        Q_WARN("Couldn't figure out why Google denied login :(");
+
         task->errorString = tr("The username or password you entered "
                                "is incorrect.");
-    } else {
-        Q_WARN("Couldn't figure out why Google denied login :(");
     }
 }//GVApi::lookForLoginErrorMessage
 
@@ -2257,6 +2257,15 @@ GVApi::onCallback(bool success, const QByteArray &response, QNetworkReply *,
             if (scriptEngine.hasUncaughtException ()) {
                 Q_WARN("Failed to parse call back code: ") << strReply;
                 break;
+            }
+
+            QString errMsg = scriptEngine.evaluate ("obj.error").toString ();
+            if (scriptEngine.hasUncaughtException ()) {
+                Q_WARN("Failed to parse error: ") << strReply;
+            }
+
+            if (!errMsg.isEmpty ()) {
+                token->errorString = errMsg;
             }
 
             if (1 == code) {

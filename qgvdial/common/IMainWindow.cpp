@@ -363,10 +363,17 @@ IMainWindow::onGvCallTaskDone()
     }
 
     if (ATTS_SUCCESS != task->status) {
-        Q_WARN(QString("Failed to initiate call to %1 using id %2. status = %3")
-               .arg(dest, id).arg(task->status));
-        uiShowStatusMessage (QString("Failed to initiate call. Error = %1")
-                             .arg(task->status), SHOW_10SEC);
+        Q_WARN(QString("Failed to initiate call to %1 using id %2. "
+                       "status = %3. Error reported by GV: '%4'")
+               .arg(dest, id).arg(task->status)).arg(task->errorString);
+
+        if (task->errorString.isEmpty ()) {
+            uiShowStatusMessage (QString("Failed to initiate call. Error = %1")
+                                 .arg(task->status), SHOW_10SEC);
+        } else {
+            uiShowStatusMessage (QString("Google Voice error: '%1'.")
+                                 .arg(task->errorString), SHOW_10SEC);
+        }
         return;
     }
 
