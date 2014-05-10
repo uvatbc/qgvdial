@@ -28,7 +28,18 @@ OTHER_FILES  += rpm/sailfish.spec \
 OTHER_FILES  += qml/cover/CoverPage.qml \
                 qml/pages/FirstPage.qml \
                 qml/pages/SecondPage.qml \
-                qml/qgvdial.qml
+                qml/qgvdial.qml \
+                qml/pages/DialPage.qml \
+                qml/pages/ContactsPage.qml \
+                qml/pages/RefreshButton.qml \
+                qml/pages/InboxPage.qml \
+                qml/pages/InboxDetailsPage.qml \
+                qml/pages/SettingsPage.qml \
+                qml/pages/ExpandView.qml \
+                qml/pages/LoginDetails.qml \
+                qml/pages/Proxy.qml \
+                qml/pages/Updates.qml \
+                qml/pages/EtCetera.qml
 
 QT *= multimedia
 

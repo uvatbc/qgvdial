@@ -82,7 +82,7 @@ myMessageOutput(QtMsgType type, const char *msg)
     }
 
     QDateTime dt = QDateTime::currentDateTime ();
-    QString strLog = QString("%1 : %2 : %3")
+    QString strLog = QString("%1 : [%2] : %3")
                      .arg(dt.toString ("yyyy-MM-dd hh:mm:ss.zzz"))
                      .arg(level)
                      .arg(msg);
