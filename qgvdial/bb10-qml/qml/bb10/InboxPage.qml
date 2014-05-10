@@ -53,7 +53,7 @@ Page {
         signal selectionChanged(string sel)
         function setSelection(sel) {
             var i;
-            for (i = 0; inboxSelector.model.count; i = i + 1) {
+            for (i = 0; i < inboxSelector.model.count; i = i + 1) {
                 if (inboxSelector.model.get(i).name.toUpperCase() == sel.toUpperCase()) {
                     selectedIndex = i;
                     break;
