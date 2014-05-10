@@ -21,7 +21,7 @@ SOURCES  += src/MainWindow.cpp \
 
 RESOURCES += sailfish.qrc
 
-OTHER_FILES  += rpm/sailfish.spec \
+OTHER_FILES  += rpm/qgvdial.spec \
                 rpm/sailfish.yaml \
                 qgvdial.desktop
 
