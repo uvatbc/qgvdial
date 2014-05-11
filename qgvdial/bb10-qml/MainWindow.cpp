@@ -25,6 +25,8 @@ Contact: yuvraaj@gmail.com
 #include <QGLWidget>
 #include <QGLFormat>
 
+#define MAIN_QML_PATH "app/native/qml/bb10/main.qml"
+
 QApplication *
 createAppObject(int &argc, char **argv)
 {
@@ -101,3 +103,8 @@ MainWindow::uiCloseBrowser()
 {
 }//MainWindow::uiCloseBrowser
 
+QString
+MainWindow::getMainQmlPath()
+{
+    return MAIN_QML_PATH;
+}//MainWindow::getMainQmlPath

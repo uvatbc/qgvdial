@@ -39,6 +39,10 @@ Contact: yuvraaj@gmail.com
 #include "GVNumModel.h"
 #include "ContactNumbersModel.h"
 
+#ifdef MAIN_QML_PATH
+#error Undefine this shit
+#endif
+
 #ifndef QGV_NO_DEFAULT_APP_OBJECTS
 QApplication *
 createSingleAppObject(int &argc, char **argv)
@@ -143,7 +147,7 @@ QmlMainWindow::init()
         return;
     }
 
-    m_view->setMainQmlFile(QLatin1String(MAIN_QML_PATH));
+    m_view->setMainQmlFile(getMainQmlPath());
     m_view->setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
     m_view->showExpanded();
 

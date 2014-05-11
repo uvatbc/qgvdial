@@ -33,6 +33,9 @@ public:
 
     void uiOpenBrowser(const QUrl &url);
     void uiCloseBrowser();
+
+protected:
+    QString getMainQmlPath();
 };
 
 QApplication *

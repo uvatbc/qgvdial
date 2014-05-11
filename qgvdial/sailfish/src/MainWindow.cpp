@@ -11,3 +11,9 @@ MainWindow::MainWindow(QObject *parent)
 : QmlMainWindow(parent)
 {
 }//MainWindow::MainWindow
+
+QString
+MainWindow::getMainQmlPath()
+{
+    return SailfishApp::pathTo("qml/qgvdial.qml").toLocalFile();
+}//MainWindow::getMainQmlPath

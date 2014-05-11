@@ -167,8 +167,7 @@ GContactsApi::login(AsyncTaskToken *task)
         return (false);
     }
 
-    if (!task->inParams.contains ("user"))
-    {
+    if (!task->inParams.contains ("user")) {
         Q_WARN("User or pass not provided");
         task->status = ATTS_INVALID_PARAMS;
         task->emitCompleted ();
@@ -238,6 +237,8 @@ GContactsApi::logout(AsyncTaskToken *task)
 
     task->status = ATTS_SUCCESS;
     task->emitCompleted ();
+
+    Q_ASSERT(NULL == m_loginTask);
 
     return true;
 }//GContactsApi::logout

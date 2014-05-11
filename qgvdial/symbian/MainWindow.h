@@ -29,11 +29,9 @@ class MainWindow : public QmlMainWindow
     Q_OBJECT
 public:
     explicit MainWindow(QObject *parent = 0);
-    
-signals:
-    
-public slots:
-    
+
+protected:
+    QString getMainQmlPath();
 };
 
 QApplication *

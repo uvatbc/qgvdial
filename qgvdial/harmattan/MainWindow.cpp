@@ -22,6 +22,8 @@ Contact: yuvraaj@gmail.com
 #include "MainWindow.h"
 #include "qmlapplicationviewer.h"
 
+#define MAIN_QML_PATH "qml/harmattan/main.qml"
+
 QApplication *
 createAppObject(int &argc, char **argv)
 {
@@ -33,3 +35,9 @@ MainWindow::MainWindow(QObject *parent)
 : QmlMainWindow(parent)
 {
 }//MainWindow::MainWindow
+
+QString
+MainWindow::getMainQmlPath()
+{
+    return MAIN_QML_PATH;
+}//MainWindow::getMainQmlPath

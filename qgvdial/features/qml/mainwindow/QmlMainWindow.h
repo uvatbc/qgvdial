@@ -76,6 +76,8 @@ protected:
 
     bool initQmlObjects();
 
+    virtual QString getMainQmlPath() = 0;
+
     void uiUpdateProxySettings(const ProxyInfo &info);
     void uiRequestLoginDetails();
     void uiRequestTFALoginDetails(void *ctx);

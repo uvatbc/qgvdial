@@ -25,7 +25,6 @@ Contact: yuvraaj@gmail.com
 #include <QtDeclarative>
 
 #define UNKNOWN_CONTACT_QRC_PATH    "qrc:/unknown_contact.png"
-#define MAIN_QML_PATH               "qml/harmattan/main.qml"
 #define USE_SINGLE_APPLICATION      1
 #define PHONON_ENABLED              1
 
