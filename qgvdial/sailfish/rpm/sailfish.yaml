@@ -19,7 +19,6 @@ PkgConfigBR:
 - Qt5Script
 Requires:
 - sailfishsilica-qt5 >= 0.10.9
-- Qt5Script
 Files:
 -
 - '%{_datadir}/icons/hicolor/86x86/apps'
