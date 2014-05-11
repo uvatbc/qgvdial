@@ -35,39 +35,112 @@ import Sailfish.Silica 1.0
 Page {
     id: page
 
+    property real onePageHeight: page.height - btnRow.height
+    property real onePageWidth: page.width
+
     // To enable PullDownMenu, place our content in a SilicaFlickable
     SilicaFlickable {
-        anchors.fill: parent
+        id: pageList
+        objectName: "MainTabGroup"
 
-        // PullDownMenu and PushUpMenu must be declared in SilicaFlickable, SilicaListView or SilicaGridView
-        PullDownMenu {
-            MenuItem {
-                text: "Show Page 2"
-                onClicked: pageStack.push(Qt.resolvedUrl("SecondPage.qml"))
-            }
+        function setTab(index) {
+            pageList.contentX = index * (page.onePageWidth);
         }
 
-        // Tell SilicaFlickable the height of its content.
-        contentHeight: column.height
+        anchors {
+            top: parent.top
+            bottom: btnRow.top
+        }
+        width: page.width
+        contentWidth: pageListRow.width
+        contentHeight: pageListRow.height
 
-        // Place our content in a Column.  The PageHeader is always placed at the top
-        // of the page, followed by our content.
-        Column {
-            id: column
+        clip: true
+        interactive: false
 
-            width: page.width
-            spacing: Theme.paddingLarge
-            PageHeader {
-                title: "UI Template"
+        Behavior on contentX {
+            NumberAnimation { duration: 300 }
+        }
+
+        Row {
+            id: pageListRow
+
+            height: page.onePageHeight
+
+            anchors {
+                top: parent.top
+                left: parent.left
             }
-            Label {
-                x: Theme.paddingLarge
-                text: "Hello Sailors"
-                color: Theme.secondaryHighlightColor
-                font.pixelSize: Theme.fontSizeExtraLarge
+
+            DialPage {
+                id: dialTab
+                objectName: "DialPage"
+
+                width: page.onePageWidth
+                height: page.onePageHeight
+
+                //onRegNumBtnClicked: { appWindow.pageStack.push(regNumberSelector); }
+            }
+
+            ContactsPage {
+                id: contactsPage
+                objectName: "ContactsPage"
+
+                width: page.onePageWidth
+                height: page.onePageHeight
+            }
+
+            InboxPage {
+                id: inboxPage
+
+                width: page.onePageWidth
+                height: page.onePageHeight
+            }
+
+            SettingsPage {
+                id: settingsPage
+                objectName: "SettingsPage"
+
+                width: page.onePageWidth
+                height: page.onePageHeight
+            }
+        }//Item
+    }//SilicaFlickable
+
+    Row {
+        id: btnRow
+        anchors.bottom: parent.bottom
+        width: parent.width
+
+        Button {
+            text: "Dial"
+            width: parent.width / 4
+            onClicked: {
+                pageList.setTab(0);
             }
         }
-    }
-}
+        Button {
+            text: "Contacts"
+            width: parent.width / 4
+            onClicked: {
+                pageList.setTab(1);
+            }
+        }
+        Button {
+            text: "Inbox"
+            width: parent.width / 4
+            onClicked: {
+                pageList.setTab(2);
+            }
+        }
+        Button {
+            text: "Settings"
+            width: parent.width / 4
+            onClicked: {
+                pageList.setTab(3);
+            }
+        }//Button
+    }//Row
+}//Page
 
 

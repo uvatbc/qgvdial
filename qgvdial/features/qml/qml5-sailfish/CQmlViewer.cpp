@@ -29,8 +29,13 @@ createQmlViewer()
 }
 
 CQmlViewer::CQmlViewer()
-: m_view(SailfishApp::createView())
+: m_view(NULL)
 {
+    m_view = SailfishApp::createView();
+    if (NULL == m_view) {
+        Q_WARN("Failed to create view");
+    }
+
     connect(m_view, SIGNAL(statusChanged(QQuickView::Status)),
             this, SLOT(onDeclStatusChanged(QQuickView::Status)));
 }//CQmlViewer::CQmlViewer
@@ -94,4 +99,4 @@ CQmlViewer::connectToChangeNotify(QObject *item, const QString &propName,
     } while(0);
 
     return (rv);
-}//QmlMainWindow::connectToChangeNotify
+}//CQmlViewer::connectToChangeNotify

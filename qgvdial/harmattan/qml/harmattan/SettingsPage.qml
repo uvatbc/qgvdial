@@ -26,8 +26,6 @@ Page {
     id: container
     tools: commonTools
 
-    objectName: "SettingsPage"
-
     signal sigLinkActivated(string strLink)
 
     signal sigMosquittoChanges(bool bEnable, string host, int port, string topic)

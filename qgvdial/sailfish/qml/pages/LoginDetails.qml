@@ -130,7 +130,14 @@ Item {
 
     Button {
         id: btnLogin
-        objectName: "LoginButton"
+
+        Item {
+            // Hopeless hack
+            id: proxyBtnLogin
+            objectName: "LoginButton"
+            visible: false
+            signal clicked
+        }
 
         anchors {
             horizontalCenter: parent.horizontalCenter
@@ -141,6 +148,9 @@ Item {
 
         text: "Login"
 
-        onClicked: { container.forceActiveFocus(); }
+        onClicked: {
+            container.forceActiveFocus();
+            proxyBtnLogin.clicked();
+        }
     }//Button (login/logout)
 }//Item (container)

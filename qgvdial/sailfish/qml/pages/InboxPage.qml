@@ -74,7 +74,7 @@ Item {
         width: parent.width
     }
 
-    ListView {
+    SilicaListView {
         id: inboxList
         objectName: "InboxList"
 
@@ -185,5 +185,5 @@ Item {
                 onPressAndHold: { container.setNumberToDial(number); }
             }
         }// delegate Rectangle
-    }//ListView
+    }//SilicaListView
 }//Page

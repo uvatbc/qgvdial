@@ -39,7 +39,15 @@ OTHER_FILES  += qml/cover/CoverPage.qml \
                 qml/pages/LoginDetails.qml \
                 qml/pages/Proxy.qml \
                 qml/pages/Updates.qml \
-                qml/pages/EtCetera.qml
+                qml/pages/EtCetera.qml \
+                qml/pages/TfaPinPage.qml \
+                qml/pages/RegNumberSelector.qml \
+                qml/pages/ContactDetailsPage.qml \
+                qml/pages/MessageBox.qml \
+                qml/pages/CiPhoneSelectionPage.qml \
+                qml/pages/SmsPage.qml \
+                qml/pages/WebPage.qml \
+                qml/pages/StatusBanner.qml
 
 QT *= multimedia
 

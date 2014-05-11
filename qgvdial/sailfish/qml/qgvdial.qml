@@ -34,8 +34,137 @@ import "pages"
 
 ApplicationWindow
 {
+    id: appWindow
+    objectName: "MainPageStack"
+
+    signal sigShowContact(string cId)
+
+    signal sigRefreshContacts
+    signal sigRefreshInbox
+
+    signal sigRefreshContactsFull
+    signal sigRefreshInboxFull
+
+    function pushTfaDlg() {
+        pageStack.push(tfaPinDlg);
+    }
+    function showMsgBox(msg) {
+        msgBox.message = msg;
+        pageStack.push(msgBox);
+    }
+    function showContactDetails(imgSource, name) {
+        contactDetails.imageSource = imgSource;
+        contactDetails.name = name;
+        if (contactDetails.phonesModel == null) {
+            contactDetails.phonesModel = g_ContactPhonesModel;
+        }
+        pageStack.push(contactDetails);
+    }
+    function showInboxDetails(imgSource, name, number, note, smsText, phType,
+                              isVmail, cId, iId) {
+        inboxDetails.imageSource = imgSource;
+        inboxDetails.name        = name;
+        inboxDetails.number      = number;
+        inboxDetails.note        = note;
+        inboxDetails.smsText     = smsText;
+        inboxDetails.phType      = phType;
+        inboxDetails.isVmail     = isVmail;
+        inboxDetails.cId         = cId;
+        inboxDetails.iId         = iId;
+        inboxDetails.vmailPosition = 0;
+        pageStack.push(inboxDetails);
+    }
+    function pushCiSelector(ciId) {
+        ciPhoneSelector.ciId = ciId;
+        ciPhoneSelector.phonesModel = g_CiPhonesModel;
+        pageStack.push(ciPhoneSelector);
+    }
+    function showSmsPage(imgSource, name, dest, conversation, text) {
+        smsPage.imageSource  = imgSource;
+        smsPage.name         = name;
+        smsPage.dest         = dest;
+        smsPage.conversation = conversation;
+        smsPage.smsText      = text;
+        pageStack.push(smsPage);
+        smsPage.flickToEnd();
+    }
+    function showWebPage(url) {
+        webPage.loadUrl(url);
+        pageStack.push(webPage);
+    }
+    function hideWebPage() {
+        pageStack.pop();
+    }
+
     initialPage: Component { FirstPage { } }
     cover: Qt.resolvedUrl("cover/CoverPage.qml")
+
+    TfaPinPage {
+        id: tfaPinDlg
+        objectName: "TFAPinDialog"
+        onDone: { appWindow.pageStack.pop(); }
+    }//TFA Dialog
+
+    RegNumberSelector {
+        id: regNumberSelector
+        objectName: "RegNumberSelector"
+
+        onSelected: { appWindow.pageStack.pop(); }
+    }
+
+    ContactDetailsPage {
+        id: contactDetails
+        onDone: { appWindow.pageStack.pop(); }
+        onSetNumberToDial: {
+            dialTab.setNumberInDisp(number);
+            tabgroup.setTab(0);
+        }
+    }
+
+    InboxDetailsPage {
+        id: inboxDetails
+        objectName: "InboxDetails"
+
+        onDone: { appWindow.pageStack.pop(); }
+        onSetNumberToDial: {
+            dialTab.setNumberInDisp(number);
+            tabgroup.setTab(0);
+        }
+
+        onSigShowContact: { appWindow.sigShowContact(cId); }
+    }
+
+    MessageBox {
+        id: msgBox
+        onDone: { appWindow.pageStack.pop(); }
+    }
+
+    CiPhoneSelectionPage {
+        id: ciPhoneSelector
+        objectName: "CiPhoneSelectionPage"
+        onDone: { appWindow.pageStack.pop(); }
+    }
+
+    SmsPage {
+        id: smsPage
+        objectName: "SmsPage"
+        onDone: { appWindow.pageStack.pop(); }
+    }
+
+    WebPage {
+        id: webPage
+        objectName: "WebPage"
+    }
+
+    StatusBanner {
+        id: statusBanner
+        objectName: "StatusBanner"
+
+        anchors {
+            bottom: parent.bottom
+            //bottomMargin: commonTools.height + 5
+        }
+    }
 }
 
 

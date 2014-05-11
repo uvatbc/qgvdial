@@ -204,6 +204,19 @@ QmlMainWindow::onViewerStatusChanged(bool /*ready*/)
     }
 }//QmlMainWindow::onViewerStatusChanged
 
+void
+QmlMainWindow::dumpMetaMethods(QObject *obj)
+{
+    const QMetaObject* metaObject = obj->metaObject();
+    for(int i = metaObject->methodOffset(); i < metaObject->methodCount(); ++i) {
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+        Q_DEBUG(QString::fromLatin1(metaObject->method(i).methodSignature()));
+#else
+        Q_DEBUG(QString::fromLatin1(metaObject->method(i).signature()));
+#endif
+    }
+}//QmlMainWindow::dumpMetaMethods
+
 bool
 QmlMainWindow::initQmlObjects()
 {

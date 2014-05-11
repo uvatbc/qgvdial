@@ -43,12 +43,21 @@ Item {
 
             TextSwitch {
                 id: optContactsUpdate
-                objectName: "OptContactsUpdate"
+
                 text: "Update contacts"
                 anchors {
                     verticalCenter: parent.verticalCenter
                     left: parent.left
                 }
+
+                Item {
+                    id: proxyOptContactsUpdate
+                    objectName: "OptContactsUpdate"
+                    visible: false
+                    signal clicked
+                    property alias checked: optContactsUpdate.checked
+                }
+                onClicked: { proxyOptContactsUpdate.clicked(); }
             }//TextSwitch
             TextField {
                 id: edContactsUpdateFreq
@@ -70,12 +79,20 @@ Item {
 
             TextSwitch {
                 id: optInboxUpdate
-                objectName: "OptInboxUpdate"
                 text: "Update inbox"
                 anchors {
                     verticalCenter: parent.verticalCenter
                     left: parent.left
                 }
+
+                Item {
+                    id: proxyOptInboxUpdate
+                    objectName: "OptInboxUpdate"
+                    visible: false
+                    signal clicked
+                    property alias checked: optInboxUpdate.checked
+                }
+                onClicked: { proxyOptInboxUpdate.clicked(); }
             }//TextSwitch
             TextField {
                 id: edInboxUpdateFreq

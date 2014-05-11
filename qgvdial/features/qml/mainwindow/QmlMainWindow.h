@@ -73,6 +73,7 @@ protected slots:
 
 protected:
     QObject *getQMLObject(const char *pageName);
+    void dumpMetaMethods(QObject *obj);
 
     bool initQmlObjects();
 

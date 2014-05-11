@@ -39,8 +39,11 @@ class CQmlViewer : public QObject
 public:
     CQmlViewer();
 
-    // Stupid hacks to shut up the warnings
-    inline void setMainQmlFile(const QString & /*qmlFile*/) {}
+    inline void setMainQmlFile(const QString &qmlFile) {
+        m_view->setSource(QUrl::fromLocalFile(qmlFile));
+    }
+
+    // Stupid hack to shut up the warnings
     inline void setOrientation(QmlApplicationViewer::ScreenOrientation /*o*/) {}
 
     // Stub off these show functions.

@@ -24,7 +24,6 @@ import Sailfish.Silica 1.0
 
 Item {
     id: container
-    objectName: "SettingsPage"
 
     signal sigLinkActivated(string strLink)
 
@@ -54,7 +53,7 @@ Item {
         color: "black"
     }
 
-    Flickable {
+    SilicaFlickable {
         // Cannot use childrenRect.height because it causes a binding loop
         contentHeight: (expandLoginDetails.height + 1 +
                         expandProxySettings.height + 1 +
@@ -142,5 +141,5 @@ Item {
                 width: parent.width
             }
         }//ExpandView (Et Cetera)
-    }//Flickable
+    }//SilicaFlickable
 }//Page (SettingsPage)

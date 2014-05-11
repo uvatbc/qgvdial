@@ -137,6 +137,7 @@ PageStackWindow {
             }
             SettingsPage {
                 id: settingsTab
+                objectName: "SettingsPage"
                 toolbarHeight: appWindow.platformToolBarHeight
             }
         }//TabGroup
