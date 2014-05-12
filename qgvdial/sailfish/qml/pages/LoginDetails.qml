@@ -137,6 +137,7 @@ Item {
             objectName: "LoginButton"
             visible: false
             signal clicked
+            property alias text: btnLogin.text
         }
 
         anchors {

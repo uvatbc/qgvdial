@@ -102,18 +102,6 @@ Item {
         state = (Screen.height > Screen.width) ? "portrait" : "landscape";
     }
 
-    onStateChanged: {
-        console.debug("New state : " + state);
-    }
-
-    onWidthChanged: {
-        console.debug("Width : " + width);
-    }
-
-    onHeightChanged: {
-        console.debug("Height : " + height);
-    }
-
     state: (Screen.height > Screen.width) ? "portrait" : "landscape"
     states: [
         State {
