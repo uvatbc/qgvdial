@@ -48,11 +48,6 @@ Item {
     }//Timer for delayed setting of contentY so that when you click on an
     // ExpandView, it gets into focus. Especially important for the logs
 
-    Rectangle {
-        anchors.fill: parent
-        color: "black"
-    }
-
     SilicaFlickable {
         // Cannot use childrenRect.height because it causes a binding loop
         contentHeight: (expandLoginDetails.height + 1 +
@@ -81,6 +76,7 @@ Item {
             LoginDetails {
                 id: loginDetails
                 width: parent.width - 1
+                visible: parent.isExpanded
             }
         }//ExpandView (login/logout)
 
@@ -100,6 +96,7 @@ Item {
             Proxy {
                 id: proxySettings
                 width: parent.width
+                visible: parent.isExpanded
             }
         }//ExpandView (proxy)
 
@@ -119,6 +116,7 @@ Item {
             Updates {
                 id: updateSettings
                 width: parent.width
+                visible: parent.isExpanded
             }
         }//ExpandView (updates)
 
@@ -139,6 +137,7 @@ Item {
                 id: etCetera
                 objectName: "EtCetera"
                 width: parent.width
+                visible: parent.isExpanded
             }
         }//ExpandView (Et Cetera)
     }//SilicaFlickable

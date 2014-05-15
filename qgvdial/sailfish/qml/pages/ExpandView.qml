@@ -33,7 +33,7 @@ Rectangle {
     signal clicked
     signal pressAndHold
 
-    color: "black"
+    color: "transparent"
     border.color: "dimgray"
     height: textRow.height
 

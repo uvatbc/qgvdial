@@ -111,6 +111,7 @@ Item {
 
             width: parent.width - lblPass.width - (parent.spacing * 2)
             echoMode: TextInput.Password
+            inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhSensitiveData
 
             placeholderText: "Password"
         }//TextField

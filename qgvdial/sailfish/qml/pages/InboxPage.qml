@@ -106,7 +106,7 @@ Item {
         delegate: Rectangle {
             id: listDelegate
 
-            color: "#202020"
+            color: "transparent"
             border.color: is_read ? "darkslategray" : "yellow"
             radius: 2
 

@@ -118,6 +118,7 @@ Item {
                 placeholderText: "Proxy server"
                 KeyNavigation.tab: textUserProxyPort
                 KeyNavigation.backtab: (bEnableProxy && !bSystemProxy && bProxyUserPass ? textUserProxyPass : textUserProxyPort)
+                inputMethodHints: Qt.ImhNoAutoUppercase
             }//TextField (proxy host)
         }// Row (user proxy host)
 
@@ -151,6 +152,7 @@ Item {
                 validator: IntValidator { bottom: 0; top: 65535 }
                 KeyNavigation.tab: (bEnableProxy && !bSystemProxy && bProxyUserPass ? textUserProxyUser : textUserProxyHost)
                 KeyNavigation.backtab: textUserProxyHost
+                inputMethodHints: Qt.ImhDigitsOnly
             }//TextField (proxy port)
         }// Row (user proxy port)
 
@@ -198,6 +200,7 @@ Item {
                 placeholderText: "Proxy user"
                 KeyNavigation.tab: textUserProxyPass
                 KeyNavigation.backtab: textUserProxyPort
+                inputMethodHints: Qt.ImhNoAutoUppercase
             }//TextField (proxy user)
         }// Row (user proxy user name)
 
@@ -231,6 +234,7 @@ Item {
                 echoMode: TextInput.Password
                 KeyNavigation.tab: textUserProxyHost
                 KeyNavigation.backtab: textUserProxyUser
+                inputMethodHints: Qt.ImhNoAutoUppercase
             }//TextField (proxy password)
         }// Row (user proxy password)
 

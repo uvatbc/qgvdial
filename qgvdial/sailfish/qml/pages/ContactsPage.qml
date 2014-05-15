@@ -54,7 +54,7 @@ Item {
         width: parent.width
     }
 
-    ListView {
+    SilicaListView {
         id: contactsList
 
         anchors {
@@ -66,7 +66,7 @@ Item {
 
         header: RefreshButton {
             isHeader: true
-            width: parent.width
+            width: contactsList.width
             contentY: contactsList.contentY
             onVisibleChanged: {
                 bgRefreshBtn.visible = !visible;
@@ -79,8 +79,8 @@ Item {
         delegate: Rectangle {
             id: listDelegate
 
-            color: "#202020"
-            border.color: "darkslategray"
+            color: "transparent"
+            //border.color: "darkslategray"
 
             width:  (contactsList.width - border.width)
             height: contactImage.height + 4
