@@ -45,6 +45,8 @@ ApplicationWindow
     signal sigRefreshContactsFull
     signal sigRefreshInboxFull
 
+    signal setNumberInDisp(string number)
+
     function pushTfaDlg() {
         pageStack.push(tfaPinDlg);
     }
@@ -96,7 +98,15 @@ ApplicationWindow
         pageStack.pop();
     }
 
-    initialPage: Component { FirstPage { } }
+    initialPage: Component {
+        FirstPage {
+            onSigRefreshContacts: { appWindow.sigRefreshContacts(); }
+            onSigRefreshContactsFull: { appWindow.sigRefreshContactsFull(); }
+            onSigRefreshInbox: { appWindow.sigRefreshInbox(); }
+            onSigRefreshInboxFull: { appWindow.sigRefreshInboxFull(); }
+            onRegNumBtnClicked: { appWindow.pageStack.push(regNumberSelector); }
+        }
+    }
     cover: Qt.resolvedUrl("cover/CoverPage.qml")
 
     TfaPinPage {
@@ -115,10 +125,7 @@ ApplicationWindow
     ContactDetailsPage {
         id: contactDetails
         onDone: { appWindow.pageStack.pop(); }
-        onSetNumberToDial: {
-            dialTab.setNumberInDisp(number);
-            tabgroup.setTab(0);
-        }
+        onSetNumberToDial: { appWindow.setNumberInDisp(number); }
     }
 
     InboxDetailsPage {
@@ -126,10 +133,7 @@ ApplicationWindow
         objectName: "InboxDetails"
 
         onDone: { appWindow.pageStack.pop(); }
-        onSetNumberToDial: {
-            dialTab.setNumberInDisp(number);
-            tabgroup.setTab(0);
-        }
+        onSetNumberToDial: { appWindow.setNumberInDisp(number); }
 
         onSigShowContact: { appWindow.sigShowContact(cId); }
     }

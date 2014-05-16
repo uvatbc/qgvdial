@@ -71,7 +71,7 @@ Page {
 
             delegate: Item {
                 height: lblNumber.height + 10
-                width: parent.width
+                width: detailsView.width
 
                 Rectangle {
                     id: hitRectNumber

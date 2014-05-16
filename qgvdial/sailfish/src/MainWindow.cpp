@@ -17,3 +17,20 @@ MainWindow::getMainQmlPath()
 {
     return SailfishApp::pathTo("qml/qgvdial.qml").toLocalFile();
 }//MainWindow::getMainQmlPath
+
+void
+MainWindow::initDerivedQmlObjects()
+{
+    connect(mainPageStack, SIGNAL(setNumberInDisp(QString)),
+            this, SLOT(setNumberInDisp(QString)));
+}//MainWindow::initDerivedQmlObjects
+
+void
+MainWindow::setNumberInDisp(const QString &number)
+{
+    QMetaObject::invokeMethod(dialPage, "setNumberInDisp",
+                              Q_ARG(QVariant, QVariant(number)));
+    int iTab = 0;
+    QMetaObject::invokeMethod(mainTabGroup, "setTab",
+                              Q_ARG(QVariant, QVariant(iTab)));
+}//MainWindow::setNumberInDisp

@@ -6,11 +6,16 @@
 class MainWindow : public QmlMainWindow
 {
     Q_OBJECT
+
 public:
     explicit MainWindow(QObject *parent = 0);
 
 protected:
     QString getMainQmlPath();
+    void initDerivedQmlObjects();
+
+protected slots:
+    void setNumberInDisp(const QString &number);
 };
 
 QCoreApplication *

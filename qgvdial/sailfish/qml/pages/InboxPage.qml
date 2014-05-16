@@ -66,14 +66,6 @@ Item {
         }
     }
 
-    RefreshButton {
-        id: bgRefreshBtn
-        anchors {
-            top: inboxSelector.bottom
-        }
-        width: parent.width
-    }
-
     SilicaListView {
         id: inboxList
         objectName: "InboxList"
@@ -91,16 +83,15 @@ Item {
         width: parent.width
         clip: true
 
-        header: RefreshButton {
-            isHeader: true
-            width: parent.width
-            contentY: inboxList.contentY
-            onVisibleChanged: {
-                bgRefreshBtn.visible = !visible;
+        PullDownMenu {
+            MenuItem {
+                text: "Refresh"
+                onClicked: { container.sigRefreshInbox(); }
             }
-
-            onClicked: { container.sigRefreshInbox(); }
-            onPressAndHold: { container.sigRefreshInboxFull(); }
+            MenuItem {
+                text: "Full Refresh"
+                onClicked: { container.sigRefreshInboxFull(); }
+            }
         }
 
         delegate: Rectangle {

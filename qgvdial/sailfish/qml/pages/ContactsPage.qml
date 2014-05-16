@@ -48,12 +48,6 @@ Item {
         onTextChanged: { container.searchContact(searchField.text); }
     }
 
-    RefreshButton {
-        id: bgRefreshBtn
-        anchors.top: searchField.bottom
-        width: parent.width
-    }
-
     SilicaListView {
         id: contactsList
 
@@ -64,23 +58,21 @@ Item {
         width: parent.width
         clip: true
 
-        header: RefreshButton {
-            isHeader: true
-            width: contactsList.width
-            contentY: contactsList.contentY
-            onVisibleChanged: {
-                bgRefreshBtn.visible = !visible;
+        PullDownMenu {
+            MenuItem {
+                text: "Refresh"
+                onClicked: { container.sigRefreshContacts(); }
             }
-
-            onClicked: { container.sigRefreshContacts(); }
-            onPressAndHold: { container.sigRefreshContactsFull(); }
+            MenuItem {
+                text: "Full Refresh"
+                onClicked: { container.sigRefreshContactsFull(); }
+            }
         }
 
         delegate: Rectangle {
             id: listDelegate
 
             color: "transparent"
-            //border.color: "darkslategray"
 
             width:  (contactsList.width - border.width)
             height: contactImage.height + 4

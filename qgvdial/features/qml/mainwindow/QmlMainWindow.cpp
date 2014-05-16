@@ -411,6 +411,8 @@ QmlMainWindow::initQmlObjects()
                                       this,
                                       SLOT(onEdInboxUpdateTextChanged()));
 
+        initDerivedQmlObjects();
+
         onInitDone();
         rv = true;
     } while(0);

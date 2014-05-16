@@ -76,6 +76,7 @@ protected:
     void dumpMetaMethods(QObject *obj);
 
     bool initQmlObjects();
+    virtual void initDerivedQmlObjects() {}
 
     virtual QString getMainQmlPath() = 0;
 
