@@ -33,6 +33,7 @@ LibContacts::LibContacts(IMainWindow *parent)
 , m_enableTimerUpdate(false)
 , m_photoMutex(QMutex::Recursive)
 , m_simutaneousPhotoDownloads(0)
+, m_isFirstRefresh(true)
 , m_contactsModel(NULL)
 , m_searchedContactsModel(NULL)
 , m_contactPhonesModel(NULL)
@@ -159,10 +160,6 @@ LibContacts::refresh(QDateTime after /* = QDateTime()*/)
     task->inParams["showDeleted"] = bval;
     task->inParams["updatedMin"] = after;
 
-    if ((bval = api.getContacts(task))) {
-        win->db.setQuickAndDirty (true);
-    }
-
     if (!after.isValid ()) {
         // This is a full refresh, so clear out the stale links
         quint32 del = win->db.clearTempFileByFile (UNKNOWN_CONTACT_QRC_PATH);
@@ -170,6 +167,12 @@ LibContacts::refresh(QDateTime after /* = QDateTime()*/)
             Q_DEBUG(QString("Deleted %1 links all pointing to the unknown qrc "
                             "path") .arg (del));
         }
+    }
+
+    win->db.setQuickAndDirty (true);
+    bval = api.getContacts(task);
+    if (!bval) {
+        win->db.setQuickAndDirty (false);
     }
 
     return (bval);
@@ -217,6 +220,34 @@ LibContacts::onOneContact(ContactInfo cinfo)
 }//LibContacts::onOneContact
 
 void
+LibContacts::afterFirstRefresh()
+{
+    if (!m_isFirstRefresh) return;
+    m_isFirstRefresh = false;
+
+    QString contactId, photoUrl, localPath;
+    int count = 0;
+    int rowCount = m_contactsModel->rowCount ();
+    for (int i = 0; i  < rowCount; i++) {
+        QSqlRecord rec = m_contactsModel->record (i);
+        contactId = rec.field(0).value().toString();
+        photoUrl  = rec.field(2).value().toString();
+        localPath = rec.field(3).value().toString();
+
+        if (localPath.isEmpty() ||
+            ((localPath != UNKNOWN_CONTACT_QRC_PATH) &&
+              !QFileInfo(localPath).exists()))
+        {
+            // Local path is empty and image path is not empty.
+            onNoContactPhoto (contactId, photoUrl);
+            count++;
+        }
+    }
+
+    Q_DEBUG(QString("Pre-fetched %1 NULL photo links").arg (count));
+}//LibContacts::afterFirstRefresh
+
+void
 LibContacts::onContactsFetched()
 {
     AsyncTaskToken *task = (AsyncTaskToken *) QObject::sender ();
@@ -227,6 +258,8 @@ LibContacts::onContactsFetched()
 
     if (ATTS_SUCCESS != task->status) {
         Q_WARN("Failed to update contacts");
+
+        startNextPhoto ();
     } else {
         Q_DEBUG("Contacts updated.");
 
@@ -245,17 +278,18 @@ LibContacts::onContactsFetched()
         } else {
             m_contactsModel = oldModel;
         }
-    }
 
-    startNextPhoto ();
+        afterFirstRefresh ();
+
+        startNextPhoto ();
+        win->uiShowStatusMessage ("Contacts fetched", SHOW_3SEC);
+    }
 
     if (m_enableTimerUpdate && (m_updateTimer.interval () >= 60)) {
         m_updateTimer.stop ();
         m_updateTimer.start ();
         Q_DEBUG("Restarting update timer");
     }
-
-    win->uiShowStatusMessage ("Contacts fetched", SHOW_3SEC);
 }//LibContacts::onContactsFetched
 
 ContactsModel *

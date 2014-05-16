@@ -70,6 +70,8 @@ protected:
     void startNextPhoto();
     bool getOnePhoto(QString contactId, QString photoUrl);
 
+    void afterFirstRefresh();
+
 protected slots:
     void onOpenBrowser(const QUrl &url);
     void onCloseBrowser();
@@ -92,6 +94,8 @@ protected:
     QMutex      m_photoMutex;
     PhotoLinkList m_noPhotos;
     quint32     m_simutaneousPhotoDownloads;
+
+    bool        m_isFirstRefresh;
 
 public:
     ContactsModel       *m_contactsModel;

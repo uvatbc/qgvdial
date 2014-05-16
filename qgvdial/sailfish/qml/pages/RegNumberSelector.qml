@@ -37,9 +37,23 @@ Page {
         }
     }
 
+    Label {
+        id: title
+        text: "Select dial method"
+
+        anchors {
+            top: parent.top
+            horizontalCenter: parent.horizontalCenter
+        }
+    }
+
     SilicaListView {
         id: regNumList
-        anchors.fill: parent
+
+        anchors {
+            top: title.bottom
+            horizontalCenter: parent.horizontalCenter
+        }
 
         delegate: Label {
             width: regNumList.width
