@@ -39,7 +39,8 @@ Page {
 
     Label {
         id: title
-        text: "Select dial method"
+        text: "Dial method"
+        font.pixelSize: 50
 
         anchors {
             top: parent.top
@@ -52,7 +53,7 @@ Page {
 
         anchors {
             top: title.bottom
-            horizontalCenter: parent.horizontalCenter
+            left: parent.left
         }
 
         delegate: Label {
