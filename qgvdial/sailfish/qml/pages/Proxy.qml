@@ -85,6 +85,7 @@ Item {
             }
 
             opacity: (bEnableProxy? 1 : 0)
+            visible: (opacity == 1.0)
 
             text: "Use system proxy settings"
         }// TextSwitch (proxySystem)
@@ -104,6 +105,7 @@ Item {
             spacing: 2
 
             opacity: (bEnableProxy && !bSystemProxy ? 1 : 0)
+            visible: (opacity == 1.0)
 
             Label {
                 id: lblHost
@@ -137,6 +139,7 @@ Item {
             spacing: 2
 
             opacity: (bEnableProxy && !bSystemProxy ? 1 : 0)
+            visible: (opacity == 1.0)
 
             Label {
                 id: lblPort
@@ -167,6 +170,7 @@ Item {
             }
 
             opacity: (bEnableProxy && !bSystemProxy ? 1 : 0)
+            visible: (opacity == 1.0)
 
             text: "Requires user and pass"
         }// TextSwitch (proxyUserPassRequired)
@@ -186,6 +190,7 @@ Item {
             spacing: 2
 
             opacity: (bEnableProxy && !bSystemProxy && bProxyUserPass ? 1 : 0)
+            visible: (opacity == 1.0)
 
             Label {
                 id: lblProxyUser
@@ -219,6 +224,7 @@ Item {
             spacing: 2
 
             opacity: (bEnableProxy && !bSystemProxy && bProxyUserPass ? 1 : 0)
+            visible: (opacity == 1.0)
 
             Label {
                 id: lblProxyPass
@@ -244,6 +250,7 @@ Item {
 
             Button {
                 text: "Revert"
+                width: parent.width / 2
                 onClicked: {
                     container.sigRevertChanges(false);
                     container.forceActiveFocus();
@@ -251,7 +258,7 @@ Item {
             }
             Button {
                 text: "Submit"
-
+                width: parent.width / 2
                 onClicked: {
                     container.sigProxyChanges (bEnableProxy,
                                                bSystemProxy,

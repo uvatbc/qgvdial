@@ -37,18 +37,18 @@ Page {
             text: "Enter the two-factor authentication PIN"
             font.pixelSize: 40
             anchors.horizontalCenter: parent.horizontalCenter
+            width: parent.width * 0.8
             horizontalAlignment: Text.AlignHCenter
+            wrapMode: Text.WordWrap
         }
 
         TextField {
             id: textTfaPin
             placeholderText: "PIN"
             anchors.horizontalCenter: parent.horizontalCenter
-            width: 400
-            validator: IntValidator {
-                bottom: 0
-                top: 999999
-            }
+            width: parent.width * 0.8
+            validator: IntValidator { bottom: 0; top: 999999 }
+            inputMethodHints: Qt.ImhDigitsOnly
         }
 
         Row {

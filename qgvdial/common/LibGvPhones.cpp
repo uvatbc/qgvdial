@@ -84,8 +84,12 @@ LibGvPhones::chooseDefaultNumber()
         }
     }
 
-    // Giving up. Return whatever.
-    return m_numModel->m_dialBack[0].id;
+    if (m_numModel->m_dialBack.size ()) {
+        // Giving up. Return whatever.
+        return m_numModel->m_dialBack[0].id;
+    }
+
+    return QString();
 }//LibGvPhones::chooseDefaultNumber
 
 void

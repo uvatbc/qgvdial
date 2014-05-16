@@ -60,6 +60,7 @@ Item {
             objectName: "TextUsername"
 
             width: parent.width - lblEmail.width - (parent.spacing * 2)
+            visible: (opacity == 1.0)
 
             placeholderText: "example@gmail.com"
             inputMethodHints: Qt.ImhPreferLowercase | Qt.ImhNoPredictiveText
@@ -68,8 +69,10 @@ Item {
         Label {
             id: lblUsername
             anchors.verticalCenter: parent.verticalCenter
-            opacity: (1 - textUsername.opacity)
             text: container.username
+
+            opacity: (1 - textUsername.opacity)
+            visible: (opacity == 1.0)
 
             MouseArea {
                 anchors.fill: parent
@@ -112,6 +115,7 @@ Item {
             width: parent.width - lblPass.width - (parent.spacing * 2)
             echoMode: TextInput.Password
             inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhSensitiveData
+            visible: (opacity == 1.0)
 
             placeholderText: "Password"
         }//TextField
@@ -119,8 +123,10 @@ Item {
         Label {
             id: lblPassword
             anchors.verticalCenter: parent.verticalCenter
-            opacity: (1 - textPassword.opacity)
             text: Array(container.password.length+1).join("*")
+
+            opacity: (1 - textPassword.opacity)
+            visible: (opacity == 1.0)
 
             MouseArea {
                 anchors.fill: parent

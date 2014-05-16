@@ -77,7 +77,7 @@ Page {
                 objectName: "DialPage"
 
                 width: page.onePageWidth
-                height: page.onePageHeight
+                height: pageListRow.height
 
                 onRegNumBtnClicked: { page.regNumBtnClicked(); }
             }
@@ -87,7 +87,7 @@ Page {
                 objectName: "ContactsPage"
 
                 width: page.onePageWidth
-                height: page.onePageHeight
+                height: pageListRow.height
 
                 onSigRefreshContacts: { page.sigRefreshContacts(); }
                 onSigRefreshContactsFull: { page.sigRefreshContactsFull(); }
@@ -97,7 +97,7 @@ Page {
                 id: inboxPage
 
                 width: page.onePageWidth
-                height: page.onePageHeight
+                height: pageListRow.height
 
                 onSigRefreshInbox: { page.sigRefreshInbox(); }
                 onSigRefreshInboxFull: { page.sigRefreshInboxFull(); }
@@ -108,7 +108,7 @@ Page {
                 objectName: "SettingsPage"
 
                 width: page.onePageWidth
-                height: page.onePageHeight
+                height: pageListRow.height
             }
         }//Item
     }//SilicaFlickable

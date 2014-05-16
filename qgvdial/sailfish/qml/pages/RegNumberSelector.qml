@@ -37,15 +37,9 @@ Page {
         }
     }
 
-    Label {
+    PageHeader {
         id: title
-        text: "Dial method"
-        font.pixelSize: 50
-
-        anchors {
-            top: parent.top
-            horizontalCenter: parent.horizontalCenter
-        }
+        title: "Dial method"
     }
 
     SilicaListView {
@@ -53,7 +47,9 @@ Page {
 
         anchors {
             top: title.bottom
+            bottom: parent.bottom
             left: parent.left
+            right: parent.right
         }
 
         delegate: Label {
@@ -63,9 +59,9 @@ Page {
 
             MouseArea {
                 anchors.fill: parent
-                onClicked: container.selected(id);
-                onPressAndHold: container.modify(id);
+                onClicked:      { container.selected(id); }
+                onPressAndHold: { container.modify(id);   }
             }
         }
     }//SilicaListView
-}
+}//Page
