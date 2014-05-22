@@ -116,7 +116,7 @@ print "$cmd\n";
 system("$cmd");
 
 my $basessh = "ssh -p 2222 -i ~/bin/SailfishOS/vmshare/ssh/private_keys/engine/mersdk mersdk\@localhost";
-my $merbasedir = "/home/mersdk/share/code/exports/sailfish/qgvdial/qgvdial-$qver";
+my $merbasedir = "/home/mersdk/share/exports/sailfish/qgvdial/qgvdial-$qver";
 
 $cmd = "$basessh 'cd $merbasedir/qgvdial/sailfish ; mb2 -t SailfishOS-armv7hl qmake sailfish.pro ; mb2 -t SailfishOS-armv7hl make -j2 ; mb2 -t SailfishOS-armv7hl rpm'";
 print "$cmd\n";
