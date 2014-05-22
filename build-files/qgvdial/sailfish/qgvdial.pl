@@ -37,7 +37,7 @@ chomp $basedir;
 $basedir = "$basedir/qgvdial-$qver";
 
 # Delete any previous checkout directories
-system("rm -rf qgvdial-* qgvtp-* qgvdial_* qgvtp_*");
+system("rm -rf qgvdial-* qgvtp-* qgvdial_* qgvtp_* *rpm");
 
 $cmd = "svn export $repo $basedir";
 print "$cmd\n";
@@ -128,6 +128,21 @@ if ($was_on == 0) {
     print "$cmd\n";
     system("$cmd");
 }
+
+# Find the rpm
+$cmd = "find . | grep RPMS | grep rpm\$ | grep -v debug";
+print "$cmd\n";
+$cmd = `$cmd`;
+chomp $cmd; chomp $cmd;
+
+if ($cmd =~ /qgvdial-$qver.armv7hl.rpm/) {
+    print("Successfully built!\n");
+} else {
+    print "Failed to create rpm. Die.\n";
+    die;
+}
+
+system("cp $cmd ./qgvdial-$qver.sailfishos.armv7hl.rpm");
 
 exit(0);
 
