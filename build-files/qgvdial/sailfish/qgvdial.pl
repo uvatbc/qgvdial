@@ -108,7 +108,7 @@ while ($count > 0) {
 
 # Wait for 10 seconds even after it is on...
 print "Waiting for 10 more seconds\n";
-system("sleep 60");
+system("sleep 10");
 
 # Create the dbus interface
 $cmd = "cd $basedir/qgvdial/features/dbus_api/gen/ ; ./create_ifaces.sh";
