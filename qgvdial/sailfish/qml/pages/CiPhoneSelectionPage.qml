@@ -31,37 +31,33 @@ Page {
     property string ciId: "Replace this ID"
     property alias phonesModel: numbersView.model
 
-    Column {
-        anchors.fill: parent
-        spacing: 5
+    PageHeader {
+        id: title
+        title: "Please select a number for:\n" + container.ciId
+    }
 
-        Label {
-            id: lblTitle
-            font.pixelSize: 30
-            wrapMode: Text.WrapAnywhere
-            width: parent.width
-            text: "Please select a number for:\n" + container.ciId
+    SilicaListView {
+        id: numbersView
+
+        anchors {
+            top: title.bottom
+            bottom: parent.bottom
+            left: parent.left
+            right: parent.right
         }
 
-        SilicaListView {
-            id: numbersView
+        delegate: Label {
+            width: numbersView.width
+            text: name + "\n(" + number + ")"
+            font.pixelSize: 25
 
-            width: parent.width
-            height: parent.height - lblTitle.height - parent.spacing
-
-            delegate: Label {
-                width: numbersView.width
-                text: name + "\n(" + number + ")"
-                font.pixelSize: 25
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        container.setCiNumber(container.ciId, number);
-                        container.done(true);
-                    }
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    container.setCiNumber(container.ciId, number);
+                    container.done(true);
                 }
-            }//delegate
-        }//SilicaListView
-    }//Column
+            }
+        }//delegate
+    }//SilicaListView
 }//TFA Dialog

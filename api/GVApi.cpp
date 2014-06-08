@@ -1931,7 +1931,8 @@ GVApi::parseDomElement(const QString &domStr,
     while (true) {
         pos = findDomElement (domStr, element, pos, isStart);
         if (-1 == pos) {
-            return "";
+            Q_WARN("Nothing found");
+            return QString();
         }
 
         startingPos = pos;
@@ -1943,7 +1944,8 @@ GVApi::parseDomElement(const QString &domStr,
 
         pos = domStr.indexOf ('>', pos);
         if (-1 == pos) {
-            return "";
+            Q_WARN("No close brace for node start tag?");
+            return QString();
         }
 
         nodeDef = domStr.mid (startingPos, pos - startingPos + 1);
@@ -1971,6 +1973,7 @@ GVApi::parseDomElement(const QString &domStr,
     while (true) {
         pos = findDomElement (domStr, element, pos + element.length(), isStart);
         if (-1 == pos) {
+            Q_WARN("No end to node?");
             break;
         }
 

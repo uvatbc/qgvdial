@@ -24,5 +24,5 @@ Contact: yuvraaj@gmail.com
 QString
 OsVer::_getOsDetails()
 {
-    return "Nokia Harmattan";
+    return "SailfishOS";
 }//OsVer::_getOsDetails

@@ -55,5 +55,10 @@ Item {
             width: container.width / 3
             onClicked: { container.reallyQuit(); }
         }//Button (really quit)
+
+        TextArea {
+            anchors.horizontalCenter: parent.horizontalCenter
+            text: "__QGVDIAL_VERSION__"
+        }
     }//Column of everything
 }//Page (container)
