@@ -27,6 +27,10 @@ Contact: yuvraaj@gmail.com
 
 #include "IMainWindow.h"
 
+#ifdef DBUS_API
+#include "DBusApi.h"
+#endif
+
 class QmlApplicationViewer;
 class QWebView;
 class MainWindow : public IMainWindow
@@ -138,6 +142,20 @@ private:
     QWebView *m_webView;
 
     bool     m_inboxDetailsShown;
+
+#ifdef DBUS_API
+protected:
+    bool initDBus();
+
+protected slots:
+    void onSigShow();
+
+protected:
+    QGVDBusCallApi      apiCall;
+    QGVDBusTextApi      apiText;
+    QGVDBusSettingsApi  apiSettings;
+    QGVDBusUiApi        apiUi;
+#endif
 };
 
 QApplication *

@@ -25,6 +25,10 @@ Contact: yuvraaj@gmail.com
 #include "global.h"
 #include "IMainWindow.h"
 
+#ifdef DBUS_API
+#include "DBusApi.h"
+#endif
+
 class MainWindowPrivate;
 class QSystemTrayIcon;
 class QWebView;
@@ -121,6 +125,18 @@ private:
     QSystemTrayIcon *m_systrayIcon;
 
     bool m_ignoreCbInboxChange;
+
+#ifdef DBUS_API
+protected slots:
+    bool initDBus();
+    void onSigShow();
+
+protected:
+    QGVDBusCallApi      apiCall;
+    QGVDBusTextApi      apiText;
+    QGVDBusSettingsApi  apiSettings;
+    QGVDBusUiApi        apiUi;
+#endif
 
     friend class VmailDialog;
 };

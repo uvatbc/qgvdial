@@ -252,3 +252,9 @@ QGVDBusUiApi::Refresh()
 {
     emit sigRefresh();
 }//QGVDBusUiApi::Refresh
+
+void
+QGVDBusUiApi::Show()
+{
+    emit sigShow();
+}//QGVDBusUiApi::Show

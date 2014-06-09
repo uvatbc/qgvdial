@@ -7,6 +7,8 @@ HEADERS  += $$PWD/gen/api_adapter.h  \
 SOURCES  += $$PWD/gen/api_adapter.cpp \
             $$PWD/DBusApi.cpp
 
+DEFINES += DBUS_API
+
 maemo5 | contains(MEEGO_EDITION,harmattan) {
 dbus_services.source = $$PWD/service_files/optified/qgvdial.Call.service \
                        $$PWD/service_files/optified/qgvdial.Text.service \

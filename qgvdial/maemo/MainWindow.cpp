@@ -35,6 +35,10 @@ Contact: yuvraaj@gmail.com
 #include <QMaemo5InformationBox>
 #endif
 
+#ifdef DBUS_API
+#include <QtDBus>
+#endif
+
 #ifndef UNKNOWN_CONTACT_QRC_PATH
 #error Must define the unknown contact QRC path
 #endif
@@ -89,6 +93,12 @@ MainWindow::MainWindow(QObject *parent)
 , edInboxUpdateFreq(NULL)
 , m_webView(NULL)
 , m_inboxDetailsShown(false)
+#ifdef DBUS_API
+, apiCall(this)
+, apiText(this)
+, apiSettings(this)
+, apiUi(this)
+#endif
 {
     ((QtSingleApplication*)qApp)->setActivationWindow(m_view);
 }//MainWindow::MainWindow
@@ -97,6 +107,14 @@ void
 MainWindow::init()
 {
     IMainWindow::init ();
+
+#ifdef DBUS_API
+    if (!initDBus ()) {
+        qApp->quit ();
+        exit(-1);
+        return;
+    }
+#endif
 
     bool rv =
     connect(m_view, SIGNAL(statusChanged(QDeclarativeView::Status)),
@@ -111,6 +129,54 @@ MainWindow::init()
     rv = connect(qApp, SIGNAL(messageReceived(QString)),
                  this, SLOT(messageReceived(QString)));
 }//MainWindow::init
+
+#ifdef DBUS_API
+bool
+MainWindow::initDBus()
+{
+    QDBusConnection sessionBus = QDBusConnection::sessionBus ();
+    if (!sessionBus.registerService ("org.QGVDial.APIServer")) {
+        QDBusMessage msg =
+        QDBusMessage::createMethodCall ("org.QGVDial.APIServer",
+                                        "/org/QGVDial/UIServer",
+                                        "org.QGVDial.UIServer",
+                                        "Show");
+        sessionBus.send (msg);
+
+        Q_WARN("Failed to register Dbus Settings server. Aborting!");
+        return false;
+    }
+
+    if (!apiCall.registerObject ()) {
+        Q_WARN("Failed to register Dbus Call API. Aborting!");
+        return false;
+    }
+    if (!apiText.registerObject ()) {
+        Q_WARN("Failed to register Dbus Text API. Aborting!");
+        return false;
+    }
+    if (!apiSettings.registerObject ()) {
+        Q_WARN("Failed to register Dbus Settings API. Aborting!");
+        return false;
+    }
+    if (!apiUi.registerObject ()) {
+        Q_WARN("Failed to register Dbus UI API. Aborting!");
+        return false;
+    }
+
+    Q_DEBUG("DBus API registered!");
+
+    connect(&apiUi, SIGNAL(sigShow()), this, SLOT(onSigShow()));
+
+    return true;
+}//MainWindow::initDBus
+
+void
+MainWindow::onSigShow()
+{
+    m_view->show();
+}//MainWindow::onSigShow
+#endif
 
 MainWindow::~MainWindow()
 {

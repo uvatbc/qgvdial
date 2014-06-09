@@ -102,6 +102,7 @@ signals:
     void sigOpenContacts();
     void sigQuit();
     void sigRefresh();
+    void sigShow();
 
 /////////////////////////////// DBus connections ///////////////////////////////
 public: // PROPERTIES
@@ -110,6 +111,7 @@ public Q_SLOTS: // METHODS
     void OpenInbox();
     void Quit();
     void Refresh();
+    void Show();
 Q_SIGNALS: // SIGNALS
 };
 

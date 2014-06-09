@@ -24,6 +24,10 @@ Contact: yuvraaj@gmail.com
 
 #include "IMainWindow.h"
 
+#ifdef DBUS_API
+#include "DBusApi.h"
+#endif
+
 class CQmlViewer;
 class QmlMainWindow : public IMainWindow
 {
@@ -141,6 +145,20 @@ protected:
     void    *loginCtx;
 
     bool     m_inboxDetailsShown;
+
+#ifdef DBUS_API
+protected:
+    bool initDBus();
+
+protected slots:
+    void onSigShow();
+
+protected:
+    QGVDBusCallApi      apiCall;
+    QGVDBusTextApi      apiText;
+    QGVDBusSettingsApi  apiSettings;
+    QGVDBusUiApi        apiUi;
+#endif
 };
 
 QApplication *

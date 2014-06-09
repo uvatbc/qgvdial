@@ -119,6 +119,12 @@ MainWindow::MainWindow(QObject *parent)
 , m_appIcon(":/qgv.png")
 , m_systrayIcon(NULL)
 , m_ignoreCbInboxChange(false)
+#ifdef DBUS_API
+, apiCall(this)
+, apiText(this)
+, apiSettings(this)
+, apiUi(this)
+#endif
 {
 }//MainWindow::MainWindow
 
@@ -134,12 +140,20 @@ MainWindow::init()
 {
     IMainWindow::init ();
 
+#ifdef DBUS_API
+    if (!initDBus()) {
+        qApp->quit();
+        exit(-1);
+        return;
+    }
+#endif
+
 #ifndef Q_OS_BLACKBERRY
     bool rv = connect(qApp, SIGNAL(messageReceived(QString)),
                       this, SLOT(messageReceived(QString)));
     if (!rv) {
         Q_WARN("Failed to connect to message received signal");
-        qApp->quit ();
+        qApp->quit();
         exit(-1);
         return;
     }
@@ -948,3 +962,51 @@ MainWindow::uiSetInboxUpdateFrequency(quint32 mins)
 {
     d->ui->sbInboxFreq->setValue (mins);
 }//MainWindow::uiSetInboxUpdateFrequency
+
+#ifdef DBUS_API
+bool
+MainWindow::initDBus()
+{
+    QDBusConnection sessionBus = QDBusConnection::sessionBus ();
+    if (!sessionBus.registerService ("org.QGVDial.APIServer")) {
+        QDBusMessage msg =
+        QDBusMessage::createMethodCall ("org.QGVDial.APIServer",
+                                        "/org/QGVDial/UIServer",
+                                        "org.QGVDial.UIServer",
+                                        "Show");
+        sessionBus.send (msg);
+
+        Q_WARN("Failed to register Dbus Settings server. Aborting!");
+        return false;
+    }
+
+    if (!apiCall.registerObject ()) {
+        Q_WARN("Failed to register Dbus Call API. Aborting!");
+        return false;
+    }
+    if (!apiText.registerObject ()) {
+        Q_WARN("Failed to register Dbus Text API. Aborting!");
+        return false;
+    }
+    if (!apiSettings.registerObject ()) {
+        Q_WARN("Failed to register Dbus Settings API. Aborting!");
+        return false;
+    }
+    if (!apiUi.registerObject ()) {
+        Q_WARN("Failed to register Dbus UI API. Aborting!");
+        return false;
+    }
+
+    Q_DEBUG("DBus API registered!");
+
+    connect(&apiUi, SIGNAL(sigShow()), this, SLOT(onSigShow()));
+
+    return true;
+}//MainWindow::initDBus
+
+void
+MainWindow::onSigShow()
+{
+    d->show ();
+}//MainWindow::onSigShow
+#endif
