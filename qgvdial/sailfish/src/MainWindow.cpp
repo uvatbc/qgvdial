@@ -4,7 +4,9 @@
 QCoreApplication *
 createAppObject(int &argc, char **argv)
 {
-    return SailfishApp::application (argc, argv);
+    QGuiApplication *app = SailfishApp::application (argc, argv);
+    app->setQuitOnLastWindowClosed(false);
+    return app;
 }//createAppObject
 
 MainWindow::MainWindow(QObject *parent)
