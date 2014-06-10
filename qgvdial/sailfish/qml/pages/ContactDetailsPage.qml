@@ -36,10 +36,15 @@ Page {
         anchors.fill: parent
         spacing: 5
 
+        PageHeader {
+            title: "Contact details"
+        }
+
         Row {
             id: titleRow
             width: parent.width
-            height: contactImage.height
+            height: contactImage.height > contactName.height ?
+                        contactImage.height : contactName.height
 
             Image {
                 id: contactImage
@@ -53,6 +58,7 @@ Page {
                 font.pixelSize: 70
                 smooth: true
                 width: parent.width - contactImage.width - parent.spacing
+                wrapMode: TextEdit.WordWrap
             }
         }
 

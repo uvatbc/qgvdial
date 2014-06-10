@@ -57,9 +57,11 @@ Item {
         }//Button (really quit)
 
         TextArea {
-            height: 40
-            anchors.horizontalCenter: parent.horizontalCenter
-            text: "__QGVDIAL_VERSION__"
+            width: container.width
+            horizontalAlignment: TextEdit.AlignHCenter
+            readOnly: true
+
+            text: "Version __QGVDIAL_VERSION__"
         }
     }//Column of everything
 }//Page (container)

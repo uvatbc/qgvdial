@@ -33,14 +33,29 @@ Page {
 
     PageHeader {
         id: title
-        title: "Please select a number for:\n" + container.ciId
+        title: "Select number"
+    }
+
+    TextArea {
+        id: txtMsg
+
+        text: "Please select a number for:\n" + container.ciId
+        width: container.width * 7 / 8
+        horizontalAlignment: TextEdit.AlignHCenter
+        readOnly: true
+        wrapMode: TextEdit.Wrap
+
+        anchors {
+            top: title.bottom
+            left: parent.left
+        }
     }
 
     SilicaListView {
         id: numbersView
 
         anchors {
-            top: title.bottom
+            top: txtMsg.bottom
             bottom: parent.bottom
             left: parent.left
             right: parent.right
@@ -49,7 +64,6 @@ Page {
         delegate: Label {
             width: numbersView.width
             text: name + "\n(" + number + ")"
-            font.pixelSize: 25
 
             MouseArea {
                 anchors.fill: parent

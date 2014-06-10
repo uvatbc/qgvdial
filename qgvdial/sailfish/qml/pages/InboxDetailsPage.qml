@@ -71,6 +71,10 @@ Page {
             spacing: 20
             width: parent.width
 
+            PageHeader {
+                title: "Entry details"
+            }
+
             Item {
                 width: parent.width
                 height: 200
@@ -97,6 +101,7 @@ Page {
                         font.pixelSize: 70
                         smooth: true
                         width: parent.width - contactImage.width - parent.spacing
+                        wrapMode: TextEdit.WordWrap
                     }
                 }//Row: Contact image and name
 
