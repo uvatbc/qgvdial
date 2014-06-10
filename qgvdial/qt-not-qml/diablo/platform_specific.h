@@ -24,6 +24,7 @@ Contact: yuvraaj@gmail.com
 
 #include <QtGui>
 #include <QtWebKit/QtWebKit>
+#include <QtDBus>
 
 #define UNKNOWN_CONTACT_QRC_PATH ":/unknown_contact.png"
 

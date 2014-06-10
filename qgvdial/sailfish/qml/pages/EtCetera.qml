@@ -57,6 +57,7 @@ Item {
         }//Button (really quit)
 
         TextArea {
+            height: 40
             anchors.horizontalCenter: parent.horizontalCenter
             text: "__QGVDIAL_VERSION__"
         }

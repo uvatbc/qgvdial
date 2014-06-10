@@ -187,14 +187,15 @@ QmlMainWindow::initDBus()
 {
     QDBusConnection sessionBus = QDBusConnection::sessionBus ();
     if (!sessionBus.registerService ("org.QGVDial.APIServer")) {
+        Q_WARN("Failed to register Dbus Settings server in this instance... "
+               "Attempting to show the other instance");
+
         QDBusMessage msg =
         QDBusMessage::createMethodCall ("org.QGVDial.APIServer",
                                         "/org/QGVDial/UIServer",
                                         "org.QGVDial.UIServer",
                                         "Show");
         sessionBus.send (msg);
-
-        Q_WARN("Failed to register Dbus Settings server. Aborting!");
         return false;
     }
 
@@ -225,6 +226,7 @@ QmlMainWindow::initDBus()
 void
 QmlMainWindow::onSigShow()
 {
+    Q_DEBUG("DBus API: Show!");
     m_view->show();
 }//QmlMainWindow::onSigShow
 #endif
