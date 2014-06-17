@@ -1492,6 +1492,9 @@ GVApi::onGetPhones(bool success, const QByteArray &response, QNetworkReply *,
                            (strPName == "weekendAllDay") ||
                            (strPName == "weekendTimes") ||
                            (strPName == "redirectToVoicemail") ||
+                           (strPName == "sharingGroupId") ||
+                           (strPName == "visibility") ||
+                           (strPName == "lastVerificationDate") ||
                            (strPName == "enabledForOthers")) {
                 } else {
                     if (emitLog) {

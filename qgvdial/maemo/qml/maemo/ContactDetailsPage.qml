@@ -98,6 +98,7 @@ Rectangle {
                     enableBorder: false
                     color: "transparent"
                     horizontalAlignment: Text.AlignRight
+                    readOnly: true
 
                     anchors {
                         right: parent.right
