@@ -42,9 +42,10 @@ PageStackWindow {
         msgBox.message = msg;
         pageStack.push(msgBox);
     }
-    function showContactDetails(imgSource, name) {
+    function showContactDetails(imgSource, name, notes) {
         contactDetails.imageSource = imgSource;
         contactDetails.name = name;
+        contactDetails.notes = notes;
         if (contactDetails.phonesModel == null) {
             contactDetails.phonesModel = g_ContactPhonesModel;
         }

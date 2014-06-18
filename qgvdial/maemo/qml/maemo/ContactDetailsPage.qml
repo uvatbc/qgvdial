@@ -30,93 +30,130 @@ Rectangle {
     property alias imageSource: contactImage.source
     property alias name: contactName.text
     property alias phonesModel: detailsView.model
+    property alias notes: lblNotes.text
+    property int modelCount
 
     color: "black"
     visible: false
     opacity: visible ? 1 : 0
     Behavior on opacity { PropertyAnimation { duration: 250 } }
 
-    Column {
+    Flickable {
         anchors.fill: parent
-        spacing: 5
 
-        Row {
-            id: titleRow
-            width: parent.width
-            height: contactImage.height
+        contentWidth: mainColumn.width
+        contentHeight: mainColumn.height
+        clip: true
 
-            Image {
-                id: contactImage
-                fillMode: Image.PreserveAspectFit
-                height: 100
-                width: 100
-            }
-            TextOneLine {
-                id: contactName
-                anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: 30
-                width: parent.width - contactImage.width - parent.spacing
-                enableBorder: false
-                color: "transparent"
-            }
-        }
-
-        ListView {
-            id: detailsView
+        Column {
+            id: mainColumn
 
             width: parent.width
-            height: parent.height - titleRow.height - parent.spacing
+            height: titleRow.height + lblNotes.height + detailsView.height
 
-            delegate: Item {
-                width: detailsView.width
-                height: lblNumber.height + 4
+            spacing: 5
 
-                Rectangle {
-                    id: hitRectNumber
-                    anchors.fill: parent
-                    color: "orange"
-                    opacity: 0
-                }
+            Row {
+                id: titleRow
+                width: parent.width
+                height: contactImage.height > contactName.height ? contactImage.height : contactName.height
 
-                TextOneLine {
-                    id: lblType
-                    text: type
-                    enableBorder: false
-                    color: "transparent"
+                Image {
+                    id: contactImage
+                    fillMode: Image.PreserveAspectFit
+                    height: 100
                     width: 100
-
-                    anchors {
-                        left: parent.left
-                        verticalCenter: parent.verticalCenter
-                    }
                 }
-
                 TextOneLine {
-                    id: lblNumber
-                    text: number
-                    width: parent.width - lblType.width - 5
+                    id: contactName
+                    anchors.verticalCenter: parent.verticalCenter
+                    font.pixelSize: 30
+                    width: parent.width - contactImage.width - parent.spacing
                     enableBorder: false
                     color: "transparent"
-                    horizontalAlignment: Text.AlignRight
                     readOnly: true
-
-                    anchors {
-                        right: parent.right
-                        verticalCenter: parent.verticalCenter
-                    }
                 }
+            }
 
-                MouseArea {
-                    anchors.fill: parent
-                    onPressed: { hitRectNumber.opacity = 1.0; }
-                    onReleased: { hitRectNumber.opacity = 0.0; }
-                    onPressAndHold: {
-                        hitRectNumber.opacity = 0.0;
-                        container.setNumberToDial(number);
-                        container.done(true);
+            TextMultiLine {
+                id: lblNotes
+                anchors.horizontalCenter: parent.horizontalCenter
+                smooth: true
+                wrapMode: TextEdit.Wrap
+                readOnly: true
+                width: parent.width - 40
+            }
+
+            TextOneLine {
+                id: lblInvisible
+                visible: false
+                opacity: 0
+                font.pixelSize: 25
+                readOnly: true
+            }
+
+            ListView {
+                id: detailsView
+
+                width: parent.width - 10
+                height: lblInvisible.height * modelCount
+
+                anchors.horizontalCenter: parent.horizontalCenter
+                interactive: false
+
+                delegate: Item {
+                    width: detailsView.width
+                    height: lblNumber.height + 4
+
+                    Rectangle {
+                        id: hitRectNumber
+                        anchors.fill: parent
+                        color: "orange"
+                        opacity: 0
+                        visible: false
                     }
-                }
-            }//delegate
-        }//ListView
-    }//Column
+
+                    TextOneLine {
+                        id: lblType
+                        text: type
+                        enableBorder: false
+                        color: "transparent"
+                        width: 100
+                        readOnly: true
+
+                        anchors {
+                            left: parent.left
+                            verticalCenter: parent.verticalCenter
+                        }
+                    }
+
+                    TextOneLine {
+                        id: lblNumber
+                        text: number
+                        width: parent.width - lblType.width - 5
+                        enableBorder: false
+                        color: "transparent"
+                        horizontalAlignment: Text.AlignRight
+                        readOnly: true
+
+                        anchors {
+                            right: parent.right
+                            verticalCenter: parent.verticalCenter
+                        }
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onPressed: { hitRectNumber.opacity = 1.0; }
+                        onReleased: { hitRectNumber.opacity = 0.0; }
+                        onPressAndHold: {
+                            hitRectNumber.opacity = 0.0;
+                            container.setNumberToDial(number);
+                            container.done(true);
+                        }
+                    }
+                }//delegate
+            }//ListView
+        }//Column
+    }//Flickable
 }//Contact details Rectangle

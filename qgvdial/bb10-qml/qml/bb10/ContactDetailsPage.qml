@@ -31,84 +31,110 @@ Page {
     property alias imageSource: contactImage.source
     property alias name: contactName.text
     property alias phonesModel: detailsView.model
+    property alias notes: lblNotes.text
 
-    Column {
+    Flickable {
         anchors.fill: parent
-        spacing: 5
 
-        Row {
-            id: titleRow
+        contentWidth: mainColumn.width
+        contentHeight: mainColumn.height
+        clip: true
+
+        Column {
+            id: mainColumn
+
             width: parent.width
-            height: contactImage.height
+            height: titleRow.height + lblNotes.height + detailsView.height
 
-            Image {
-                id: contactImage
-                fillMode: Image.PreserveAspectFit
-                height: 200
-                width: 200
-            }
-            Label {
-                id: contactName
-                anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: 70
-                smooth: true
-                width: parent.width - contactImage.width - parent.spacing
-            }
-        }
+            spacing: 5
 
-        ListView {
-            id: detailsView
-
-            width: parent.width - 40
-            height: parent.height - titleRow.height - parent.spacing
-
-            anchors {
-                left: parent.left
-                leftMargin: 20
-                right: parent.right
-                rightMargin: 20
-            }
-
-            delegate: Item {
-                height: lblNumber.height + 10
+            Row {
+                id: titleRow
                 width: parent.width
+                height: contactImage.height
 
-                Rectangle {
-                    id: hitRectNumber
-                    anchors.fill: parent
-                    color: "orange"
-                    opacity: 0
+                Image {
+                    id: contactImage
+                    fillMode: Image.PreserveAspectFit
+                    height: 200
+                    width: 200
                 }
+                Label {
+                    id: contactName
+                    anchors.verticalCenter: parent.verticalCenter
+                    font.pixelSize: 70
+                    smooth: true
+                    width: parent.width - contactImage.width - parent.spacing
+                }
+            }//row: contact image and name
 
-                Row {
+            TextArea {
+                id: lblNotes
+                anchors.horizontalCenter: parent.horizontalCenter
+                smooth: true
+                wrapMode: TextEdit.Wrap
+                readOnly: true
+                width: parent.width - 40
+                platformInverted: true
+            }
+
+            Label {
+                id: lblInvisible
+                visible: false
+                opacity: 0
+                font.pixelSize: 50
+            }
+
+            ListView {
+                id: detailsView
+
+                width: parent.width - 40
+                height: lblInvisible.height * detailsView.model.count
+
+                anchors.horizontalCenter: parent.horizontalCenter
+                interactive: false
+
+                delegate: Item {
+                    height: lblNumber.height + 10
                     width: parent.width
 
-                    Label {
-                        id: lblType
-                        text: type
-                        font.pixelSize: 50
+                    Rectangle {
+                        id: hitRectNumber
+                        anchors.fill: parent
+                        color: "orange"
+                        opacity: 0
                     }
 
-                    Label {
-                        id: lblNumber
-                        text: number
-                        width: parent.width - lblType.width - parent.spacing
-                        horizontalAlignment: Text.AlignRight
-                        font.pixelSize: 50
-                    }
-                }//Row: type (work/home/mobile) and number
+                    Row {
+                        width: parent.width
 
-                MouseArea {
-                    anchors.fill: parent
-                    onPressed: { hitRectNumber.opacity = 1.0; }
-                    onReleased: { hitRectNumber.opacity = 0.0; }
-                    onPressAndHold: {
-                        hitRectNumber.opacity = 0.0;
-                        container.setNumberToDial(number);
-                        container.done(true);
+                        Label {
+                            id: lblType
+                            text: type
+                            font.pixelSize: lblInvisible.font.pixelSize
+                        }
+
+                        Label {
+                            id: lblNumber
+                            text: number
+                            width: parent.width - lblType.width - parent.spacing
+                            horizontalAlignment: Text.AlignRight
+                            font.pixelSize: lblInvisible.font.pixelSize
+                        }
+                    }//Row: type (work/home/mobile) and number
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onPressed: { hitRectNumber.opacity = 1.0; }
+                        onReleased: { hitRectNumber.opacity = 0.0; }
+                        onPressAndHold: {
+                            hitRectNumber.opacity = 0.0;
+                            container.setNumberToDial(number);
+                            container.done(true);
+                        }
                     }
-                }
-            }//delegate
-        }//ListView
-    }//Column
+                }//delegate
+            }//ListView
+        }//Column
+    }//Flickable
 }//Contact details page

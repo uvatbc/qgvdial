@@ -64,12 +64,12 @@ Rectangle {
         imgClose.state = "back";
     }
 
-    function showContactDetails(imgSource, name) {
+    function showContactDetails(imgSource, name, notes) {
         contactDetails.imageSource = imgSource;
         contactDetails.name = name;
-        if (contactDetails.phonesModel == null) {
-            contactDetails.phonesModel = g_ContactPhonesModel;
-        }
+        contactDetails.notes = notes;
+        contactDetails.phonesModel = g_ContactPhonesModel;
+        contactDetails.modelCount = g_ContactPhonesModel.count;
         contactDetails.visible = true;
         imgClose.state = "back";
     }

@@ -674,8 +674,9 @@ void
 MainWindow::uiShowContactDetails(const ContactInfo &cinfo)
 {
     QMetaObject::invokeMethod (tabbedUI, "showContactDetails",
-                               Q_ARG (QVariant, QVariant(cinfo.strPhotoPath)),
-                               Q_ARG (QVariant, QVariant(cinfo.strTitle)));
+                               Q_ARG(QVariant, QVariant(cinfo.strPhotoPath)),
+                               Q_ARG(QVariant, QVariant(cinfo.strTitle)),
+                               Q_ARG(QVariant, QVariant(cinfo.strNotes)));
 }//MainWindow::uiShowContactDetails
 
 void

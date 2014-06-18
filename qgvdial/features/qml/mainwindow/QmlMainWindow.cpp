@@ -690,8 +690,9 @@ void
 QmlMainWindow::uiShowContactDetails(const ContactInfo &cinfo)
 {
     QMetaObject::invokeMethod (mainPageStack, "showContactDetails",
-                               Q_ARG (QVariant, QVariant(cinfo.strPhotoPath)),
-                               Q_ARG (QVariant, QVariant(cinfo.strTitle)));
+                               Q_ARG(QVariant, QVariant(cinfo.strPhotoPath)),
+                               Q_ARG(QVariant, QVariant(cinfo.strTitle)),
+                               Q_ARG(QVariant, QVariant(cinfo.strNotes)));
 }//QmlMainWindow::uiShowContactDetails
 
 void

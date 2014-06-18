@@ -53,7 +53,7 @@ PageStackWindow {
         msgBox.message = msg;
         appWindow.pageStack.push(msgBox);
     }
-    function showContactDetails(imgSource, name) {
+    function showContactDetails(imgSource, name, notes) {
         contactDetails.imageSource = imgSource;
         contactDetails.name = name;
         if (contactDetails.phonesModel == null) {
