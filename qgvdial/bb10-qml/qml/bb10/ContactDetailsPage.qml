@@ -43,7 +43,7 @@ Page {
         Column {
             id: mainColumn
 
-            width: parent.width
+            width: container.width
             height: titleRow.height + lblNotes.height + detailsView.height
 
             spacing: 5
@@ -68,14 +68,12 @@ Page {
                 }
             }//row: contact image and name
 
-            TextArea {
+            Label {
                 id: lblNotes
                 anchors.horizontalCenter: parent.horizontalCenter
                 smooth: true
                 wrapMode: TextEdit.Wrap
-                readOnly: true
                 width: parent.width - 40
-                platformInverted: true
             }
 
             Label {
