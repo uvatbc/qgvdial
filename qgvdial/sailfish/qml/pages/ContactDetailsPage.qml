@@ -34,8 +34,17 @@ Page {
     property alias notes: lblNotes.text
     property int modelCount
 
+    PageHeader {
+        id: pageHeader
+        title: "Contact details"
+    }
+
     SilicaFlickable {
-        anchors.fill: parent
+        anchors {
+            top: pageHeader.bottom
+            bottom: container.bottom
+        }
+        width: container.width
 
         contentWidth: mainColumn.width
         contentHeight: mainColumn.height
@@ -44,15 +53,10 @@ Page {
         Column {
             id: mainColumn
 
-            width: parent.width
-            height: pageHeader.height + titleRow.height + lblNotes.height + detailsView.height
+            width: container.width
+            height: titleRow.height + lblNotes.height + detailsView.height
 
             spacing: 5
-
-            PageHeader {
-                id: pageHeader
-                title: "Contact details"
-            }
 
             Row {
                 id: titleRow
