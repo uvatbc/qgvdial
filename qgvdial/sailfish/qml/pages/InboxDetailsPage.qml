@@ -52,9 +52,14 @@ Page {
     property real vmailDuration
     property real vmailPosition
 
+    PageHeader {
+        id: pageHeader
+        title: "Entry details"
+    }
+
     Flickable {
         anchors {
-            top: parent.top
+            top: pageHeader.bottom
             left: parent.left
             bottom: btnRow.top
         }
@@ -70,10 +75,6 @@ Page {
 
             spacing: 20
             width: parent.width
-
-            PageHeader {
-                title: "Entry details"
-            }
 
             Item {
                 width: parent.width

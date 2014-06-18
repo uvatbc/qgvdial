@@ -39,10 +39,11 @@ Page {
         title: "Contact details"
     }
 
-    SilicaFlickable {
+    Flickable {
         anchors {
             top: pageHeader.bottom
             bottom: container.bottom
+            left: container.left
         }
         width: container.width
 
