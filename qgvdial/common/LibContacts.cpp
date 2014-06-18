@@ -304,7 +304,12 @@ LibContacts::createModel(const QString &query)
 void
 LibContacts::startNextPhoto()
 {
+    IMainWindow *win = (IMainWindow *) this->parent ();
     QMutexLocker locker(&m_photoMutex);
+
+    int c = m_noPhotos.count() + m_simutaneousPhotoDownloads;
+    win->uiShowStatusMessage (QString("%1 contact photo%2 to be fetched")
+                              .arg(c).arg(c == 1 ? "" : "s"), SHOW_3SEC);
 
     if (m_simutaneousPhotoDownloads > 5) {
         return;
@@ -313,7 +318,6 @@ LibContacts::startNextPhoto()
     bool rv = false;
     do {
         if (m_noPhotos.isEmpty()) {
-            IMainWindow *win = (IMainWindow *) this->parent ();
             win->uiShowStatusMessage ("Contact photos fetched", SHOW_3SEC);
             m_gotPhotoTimer.stop ();
             m_gotPhotoTimer.start ();

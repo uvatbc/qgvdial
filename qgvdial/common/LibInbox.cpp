@@ -180,18 +180,22 @@ LibInbox::onRefreshDone()
         QString type = task->inParams["type"].toString();
         QDateTime after = task->inParams["after"].toDateTime();
 
+        QString msg;
         if (type == "trash") {
             if (page > 2) {
                 task->status = ATTS_SUCCESS;
                 break;
             }
+            msg = QString("Retrieved trash page %1").arg(page);
         } else {
             if ((page > 30) || overflow) {
                 type = "trash";
                 page = 0;  // So that it becomes 1 on ++
                 after = QDateTime(); // Because we don't want a limit
             }
+            msg = QString("Retrieved inbox page %1").arg(page);
         }
+        win->uiShowStatusMessage (msg, SHOW_3SEC);
 
         page++;
 
