@@ -56,11 +56,9 @@ Item {
             onClicked: { container.reallyQuit(); }
         }//Button (really quit)
 
-        TextArea {
+        Label {
             width: container.width
             horizontalAlignment: TextEdit.AlignHCenter
-            readOnly: true
-
             text: "Version __QGVDIAL_VERSION__"
         }
     }//Column of everything

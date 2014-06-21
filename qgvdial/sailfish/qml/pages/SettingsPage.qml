@@ -48,7 +48,7 @@ Item {
     }//Timer for delayed setting of contentY so that when you click on an
     // ExpandView, it gets into focus. Especially important for the logs
 
-    SilicaFlickable {
+    Flickable {
         // Cannot use childrenRect.height because it causes a binding loop
         contentHeight: (expandLoginDetails.height + 1 +
                         expandProxySettings.height + 1 +
@@ -140,5 +140,5 @@ Item {
                 visible: parent.isExpanded
             }
         }//ExpandView (Et Cetera)
-    }//SilicaFlickable
+    }//Flickable
 }//Page (SettingsPage)

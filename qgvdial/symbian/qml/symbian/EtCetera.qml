@@ -55,5 +55,11 @@ Item {
             onClicked: { container.reallyQuit(); }
             width: 150
         }//Button (really quit)
+
+        Label {
+            width: container.width
+            horizontalAlignment: TextEdit.AlignHCenter
+            text: "Version __QGVDIAL_VERSION__"
+        }
     }//Column of everything
 }//Page (container)
