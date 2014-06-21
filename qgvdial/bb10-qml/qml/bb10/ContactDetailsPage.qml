@@ -32,6 +32,7 @@ Page {
     property alias name: contactName.text
     property alias phonesModel: detailsView.model
     property alias notes: lblNotes.text
+    property int modelCount
 
     Flickable {
         anchors.fill: parent
@@ -87,7 +88,7 @@ Page {
                 id: detailsView
 
                 width: parent.width - 40
-                height: lblInvisible.height * detailsView.model.count
+                height: lblInvisible.height * modelCount
 
                 anchors.horizontalCenter: parent.horizontalCenter
                 interactive: false

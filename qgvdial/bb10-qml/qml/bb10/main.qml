@@ -60,6 +60,7 @@ PageStackWindow {
         if (contactDetails.phonesModel == null) {
             contactDetails.phonesModel = g_ContactPhonesModel;
         }
+        contactDetails.modelCount = g_ContactPhonesModel.count;
         appWindow.pageStack.push(contactDetails);
     }
     function showInboxDetails(imgSource, name, number, note, smsText, phType,
