@@ -14,12 +14,6 @@ QML_IMPORT_PATH = ./imports
 CONFIG *= mobility
 MOBILITY *= multimedia
 
-# Speed up launching on MeeGo/Harmattan when using applauncherd daemon
-#CONFIG += qdeclarative-boostable
-
-# Add dependency to Symbian components
-# CONFIG += qt-components
-
 SOURCES  += BB10PhoneFactory.cpp \
             MainWindow.cpp
 HEADERS  += platform_specific.h \
@@ -37,14 +31,19 @@ LIBS += -lbbsystem
 include(../common/common.pri)
 include(../features/openssl/openssl-lin.pri)
 include(../features/dirs/bb10/bb10-dirs.pri)
-include(../features/qml/qml4/qmlviewer.pri)
-include(../features/qml/mainwindow/qml-mainwindow.pri)
 include(../features/cookie-cutter/osdependent/cc-osdependent.pri)
 include(../features/osver/bb10/osv-bb10.pri)
 include(../features/mqlib/mqlib.pri)
 
+greaterThan(QT_MAJOR_VERSION, 4) {
+include(../features/qml/qml5/qmlviewer.pri)
+} else {
+include(../features/qml/qml4/qmlviewer.pri)
 # Please do not modify the following two lines. Required for deployment.
 include(qmlapplicationviewer/qmlapplicationviewer.pri)
+}
+include(../features/qml/mainwindow/qml-mainwindow.pri)
+
 qtcAddDeployment()
 
 OTHER_FILES += \

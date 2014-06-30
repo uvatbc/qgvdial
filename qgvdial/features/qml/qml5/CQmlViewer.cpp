@@ -20,18 +20,17 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "CQmlViewer.h"
-#include <sailfishapp.h>
 
 CQmlViewer *
 createQmlViewer()
 {
     return new CQmlViewer;
-}
+}//createQmlViewer
 
 CQmlViewer::CQmlViewer()
 : m_view(NULL)
 {
-    m_view = SailfishApp::createView();
+    m_view = createQQuickView();
     if (NULL == m_view) {
         Q_WARN("Failed to create view");
     }

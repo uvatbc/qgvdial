@@ -63,7 +63,7 @@ Item {
             visible: (opacity == 1.0)
 
             placeholderText: "example@gmail.com"
-            inputMethodHints: Qt.ImhPreferLowercase | Qt.ImhNoPredictiveText
+            inputMethodHints: Qt.ImhEmailCharactersOnly
         }//TextField
 
         Label {

@@ -68,6 +68,7 @@ private:
 };
 
 CQmlViewer *createQmlViewer();
+QQuickView *createQQuickView();
 
 #endif//_CQMLVIEWER_
 
