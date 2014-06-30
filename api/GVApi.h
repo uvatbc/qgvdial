@@ -177,6 +177,23 @@ private:
     int findDomElement(const QString &domStr, const QString &element, int pos,
                        bool &isNewStart);
 
+    // QT4 / QT5 JSON handlers
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+    bool onGetPhonesQt5(AsyncTaskToken *token, const QString &json);
+#else
+    bool onGetPhonesQt4(AsyncTaskToken *token, const QString &json);
+#endif
+
+    void inline
+    warnAndLog(const QString &msg, const QString &json)
+    {
+        Q_WARN(msg);
+        if (emitLog) {
+            Q_DEBUG("JSON Data from GV:") << json;
+        }
+    }
+
+
 private:
     bool emitLog;
 
@@ -190,8 +207,6 @@ private:
     QVariantMap hiddenLoginFields;
 
     bool dbgAlwaysFailDialing;
-
-    QScriptEngine scriptEngine;
 };
 
 #endif // GVAPI_H

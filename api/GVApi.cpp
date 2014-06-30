@@ -32,7 +32,6 @@ GVApi::GVApi(bool bEmitLog, QObject *parent)
 , nwMgr(NULL)
 , jar(new CookieJar(NULL))
 , dbgAlwaysFailDialing (false)
-, scriptEngine (this)
 {
     resetNwMgr ();
     nwMgr->setCookieJar (jar);
@@ -1329,45 +1328,132 @@ GVApi::getPhones(AsyncTaskToken *token)
     return rv;
 }//GVApi::getPhones
 
-void
-GVApi::onGetPhones(bool success, const QByteArray &response, QNetworkReply *,
-                   void *ctx)
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+bool
+GVApi::onGetPhonesQt5(AsyncTaskToken *token, const QString &json)
 {
-    AsyncTaskToken *token = (AsyncTaskToken *)ctx;
-    QString strReply = response;
+    bool success = false;
+    QJsonDocument doc;
+    QJsonParseError parseError;
+    QScriptEngine scriptEngine;
+
+    QString strTemp;
 
     do {
-        if (!success) {
-            token->status = ATTS_NW_ERROR;
-            break;
-        }
-        success = false;
-
-        QXmlInputSource inputSource;
-        QXmlSimpleReader simpleReader;
-        inputSource.setData (strReply);
-        HtmlFieldParser xmlHandler;
-        xmlHandler.setEmitLog (emitLog);
-
-        simpleReader.setContentHandler (&xmlHandler);
-        simpleReader.setErrorHandler (&xmlHandler);
-        simpleReader.parse (&inputSource, false);
-
-        if (!xmlHandler.elems.contains ("json") ||
-            !xmlHandler.elems.contains ("html")) {
-            Q_WARN("Couldn't parse either the JSON or the HTML");
+        doc = QJsonDocument::fromJson (json.toUtf8(), &parseError);
+        if (QJsonParseError::NoError != parseError.error) {
+            strTemp = QString ("Could not parse JSON : %1")
+                        .arg (parseError.errorString ());
+            warnAndLog (strTemp, json);
             break;
         }
 
+        if (!doc.isObject ()) {
+            warnAndLog ("JSON was not an object", json);
+            break;
+        }
+        QJsonObject jTop = doc.object();
+        if (!jTop.contains ("settings")) {
+            warnAndLog ("Top level JSON object did not have settings", json);
+            break;
+        }
+        if (!jTop.value("settings").isObject()) {
+            warnAndLog ("Settings value is not a JSON object", json);
+            break;
+        }
+
+        QJsonObject jSettings = jTop.value("settings").toObject();
+
+        if (!jSettings.contains ("primaryDid")) {
+            warnAndLog ("Settings did not have primaryDid", json);
+            break;
+        }
+        strSelfNumber = jSettings.value("primaryDid").toString();
+        token->outParams["self_number"] = strSelfNumber;
+
+        if ("CLIENT_ONLY" == strSelfNumber) {
+            Q_WARN("This account has not been configured. No phone calls possible.");
+        }
+
+        if (!jTop.contains ("phones")) {
+            warnAndLog ("Settings did not have \"phones\"", json);
+            break;
+        }
+        if (!jTop.value("phones").isObject ()) {
+            warnAndLog ("Settings \"phones\" is not an object", json);
+            break;
+        }
+        QJsonObject jPhones = jTop.value("phones").toObject ();
+        if (emitLog) {
+            Q_DEBUG("phone count =") << jPhones.count();
+        }
+
+        QJsonObject::iterator it;
+        for (it = jPhones.begin (); it != jPhones.end (); ++it) {
+            if (!it.value().isObject()) {
+                warnAndLog (QString("Settings \"phones\"[%1] is not an object")
+                            .arg(it.key ()), json);
+                continue;
+            }
+
+            GVRegisteredNumber regNumber;
+            QJsonObject p = it.value().toObject ();
+            if (!p.contains ("id")) {
+                warnAndLog (QString("[%1] has no \"id\"").arg(it.key()), json);
+                continue;
+            }
+            // I don't want to know the type of ID - which is double it seems
+            regNumber.id = p.value("id").toVariant().toString ();
+            regNumber.name = p.value("name").toString ();
+            regNumber.number = p.value("phoneNumber").toString ();
+            // I don't want to know the type of type - which is double it seems
+            regNumber.chType = p.value("type").toVariant().toString()[0].toLatin1();
+            regNumber.verified = p.value("verified").toBool();
+            regNumber.smsEnabled = p.value("smsEnabled").toBool();
+            regNumber.telephonyVerified = p.value("telephonyVerified").toBool();
+            regNumber.active = p.value("active").toBool();
+            regNumber.inVerification = p.value("inVerification").toBool();
+            regNumber.reverifyNeeded = p.value("reverifyNeeded").toBool();
+            regNumber.forwardingCountry = p.value("forwardingCountry").toString ();
+            regNumber.displayUnverifyScheduledDateTime = p.value("displayUnverifyScheduledDateTime").toString ();
+
+            if (emitLog) {
+                Q_DEBUG(QString("Name = %1, number = %2, type = %3")
+                        .arg (regNumber.name, regNumber.number)
+                        .arg (QString(regNumber.chType)));
+            }
+
+            regNumber.dialBack = true;
+            emit registeredPhone (regNumber);
+        }
+
+        token->status = ATTS_SUCCESS;
+        token->emitCompleted ();;
+        token = NULL;
+
+        success = true;
+    } while (0);
+
+    return success;
+}//GVApi::onGetPhonesQt5
+
+#else
+bool
+GVApi::onGetPhonesQt4(AsyncTaskToken *token, const QString &json)
+{
+    bool success = false;
+    QScriptEngine scriptEngine;
+
+    do {
         QString strTemp;
-        strTemp = "var o = " + xmlHandler.elems["json"].toString();
+        strTemp = "var o = " + json;
         scriptEngine.evaluate (strTemp);
         if (scriptEngine.hasUncaughtException ()) {
             strTemp = QString ("Could not assign json to obj : %1")
-                      .arg (scriptEngine.uncaughtException().toString());
+                    .arg (scriptEngine.uncaughtException().toString());
             Q_WARN(strTemp);
             if (emitLog) {
-                Q_DEBUG("Data from GV:") << strReply;
+                Q_DEBUG("JSON Data from GV:") << json;
             }
             break;
         }
@@ -1376,10 +1462,10 @@ GVApi::onGetPhones(bool success, const QByteArray &response, QNetworkReply *,
         scriptEngine.evaluate("o[\"settings\"][\"primaryDid\"]").toString();
         if (scriptEngine.hasUncaughtException ()) {
             strTemp = QString ("Could not parse primaryDid from obj : %1")
-                      .arg (scriptEngine.uncaughtException().toString());
+                    .arg (scriptEngine.uncaughtException().toString());
             Q_WARN(strTemp);
             if (emitLog) {
-                Q_DEBUG("Data from GV:") << strReply;
+                Q_DEBUG("JSON Data from GV:") << json;
             }
             break;
         }
@@ -1398,10 +1484,10 @@ GVApi::onGetPhones(bool success, const QByteArray &response, QNetworkReply *,
         scriptEngine.evaluate (strTemp);
         if (scriptEngine.hasUncaughtException ()) {
             strTemp = QString ("Uncaught exception executing script : %1")
-                      .arg (scriptEngine.uncaughtException().toString());
+                    .arg (scriptEngine.uncaughtException().toString());
             Q_WARN(strTemp);
             if (emitLog) {
-                Q_DEBUG("Data from GV:") << strReply;
+                Q_DEBUG("JSON Data from GV:") << json;
             }
             break;
         }
@@ -1413,40 +1499,40 @@ GVApi::onGetPhones(bool success, const QByteArray &response, QNetworkReply *,
 
         for (qint32 i = 0; i < nPhoneCount; i++) {
             strTemp = QString(
-                    "phoneParams = []; "
-                    "for (var params in o[\"phones\"][phoneList[%1]]) { "
-                    "    phoneParams.push(params); "
-                    "}").arg(i);
+                        "phoneParams = []; "
+                        "for (var params in o[\"phones\"][phoneList[%1]]) { "
+                        "    phoneParams.push(params); "
+                        "}").arg(i);
             scriptEngine.evaluate (strTemp);
             if (scriptEngine.hasUncaughtException ()) {
                 strTemp = QString ("Uncaught exception in phone loop: %1")
-                          .arg (scriptEngine.uncaughtException().toString());
+                        .arg (scriptEngine.uncaughtException().toString());
                 Q_WARN(strTemp);
                 if (emitLog) {
-                    Q_DEBUG("Data from GV:") << strReply;
+                    Q_DEBUG("JSON Data from GV:") << json;
                 }
                 break;
             }
 
             qint32 nParams =
-            scriptEngine.evaluate ("phoneParams.length;").toInt32 ();
+                    scriptEngine.evaluate ("phoneParams.length;").toInt32 ();
 
             GVRegisteredNumber regNumber;
             for (qint32 j = 0; j < nParams; j++) {
                 strTemp = QString("phoneParams[%1];").arg (j);
                 QString strPName = scriptEngine.evaluate (strTemp).toString ();
                 strTemp = QString(
-                          "o[\"phones\"][phoneList[%1]][phoneParams[%2]];")
-                            .arg (i)
-                            .arg (j);
+                            "o[\"phones\"][phoneList[%1]][phoneParams[%2]];")
+                        .arg (i)
+                        .arg (j);
                 QString strVal = scriptEngine.evaluate (strTemp).toString ();
                 if (scriptEngine.hasUncaughtException ()) {
                     strTemp =
-                    QString ("Uncaught exception in phone params loop: %1")
+                            QString ("Uncaught exception in phone params loop: %1")
                             .arg (scriptEngine.uncaughtException().toString());
                     Q_WARN(strTemp);
                     if (emitLog) {
-                        Q_DEBUG("Data from GV:") << strReply;
+                        Q_DEBUG("JSON Data from GV:") << json;
                     }
                     break;
                 }
@@ -1499,7 +1585,7 @@ GVApi::onGetPhones(bool success, const QByteArray &response, QNetworkReply *,
                 } else {
                     if (emitLog) {
                         Q_DEBUG(QString ("param = %1. value = %2")
-                                    .arg (strPName).arg (strVal));
+                                .arg (strPName).arg (strVal));
                     }
                 }
             }
@@ -1519,6 +1605,48 @@ GVApi::onGetPhones(bool success, const QByteArray &response, QNetworkReply *,
         token = NULL;
 
         success = true;
+    } while (0);
+
+    return success;
+}//GVApi::onGetPhonesQt4
+#endif
+
+void
+GVApi::onGetPhones(bool success, const QByteArray &response, QNetworkReply *,
+                   void *ctx)
+{
+    AsyncTaskToken *token = (AsyncTaskToken *)ctx;
+    QString strReply = response;
+    QScriptEngine scriptEngine;
+
+    do {
+        if (!success) {
+            token->status = ATTS_NW_ERROR;
+            break;
+        }
+        success = false;
+
+        QXmlInputSource inputSource;
+        QXmlSimpleReader simpleReader;
+        inputSource.setData (strReply);
+        HtmlFieldParser xmlHandler;
+        xmlHandler.setEmitLog (emitLog);
+
+        simpleReader.setContentHandler (&xmlHandler);
+        simpleReader.setErrorHandler (&xmlHandler);
+        simpleReader.parse (&inputSource, false);
+
+        if (!xmlHandler.elems.contains ("json") ||
+            !xmlHandler.elems.contains ("html")) {
+            Q_WARN("Couldn't parse either the JSON or the HTML");
+            break;
+        }
+
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+        success = onGetPhonesQt5 (token, xmlHandler.elems["json"].toString());
+#else
+        success = onGetPhonesQt4 (token, xmlHandler.elems["json"].toString());
+#endif
     } while (0);
 
     if (!success) {
@@ -1648,6 +1776,7 @@ GVApi::parseInboxJson(AsyncTaskToken *token, const QString &strJson,
                       const QString &strHtml, qint32 &msgCount)
 {
     bool rv = false;
+    QScriptEngine scriptEngine;
 
     QString strFixedHtml = "<html>" + strHtml + "</html>";
     strFixedHtml.replace ("&", "&amp;");
@@ -2114,6 +2243,7 @@ GVApi::onCallout(bool success, const QByteArray &response, QNetworkReply *reply,
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QString strReply = response;
+    QScriptEngine scriptEngine;
 
     do {
         if (!success) {
@@ -2232,6 +2362,7 @@ GVApi::onCallback(bool success, const QByteArray &response, QNetworkReply *,
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QString strReply = response;
+    QScriptEngine scriptEngine;
 
     do {
         if (!success) {
@@ -2346,10 +2477,11 @@ GVApi::cancelDialBack(AsyncTaskToken *token)
 
 void
 GVApi::onCancelDialBack(bool success, const QByteArray &response,
-                        QNetworkReply *reply, void *ctx)
+                        QNetworkReply * /*reply*/, void *ctx)
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QString strReply = response;
+    QScriptEngine scriptEngine;
 
     do {
         if (!success) {
@@ -2467,6 +2599,7 @@ GVApi::onSendSms(bool success, const QByteArray &response, QNetworkReply *,
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QString strReply = response;
+    QScriptEngine scriptEngine;
 
     do {
         if (!success) {
@@ -2639,6 +2772,7 @@ GVApi::onMarkAsRead(bool success, const QByteArray &response, QNetworkReply *,
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QString strReply = response;
+    QScriptEngine scriptEngine;
 
     do {
         if (!success) {
@@ -2734,6 +2868,7 @@ GVApi::onEntryDeleted(bool success, const QByteArray &response, QNetworkReply *,
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QString strReply = response;
+    QScriptEngine scriptEngine;
 
     do {
         if (!success) {
@@ -2810,6 +2945,7 @@ GVApi::onCheckRecentInbox(bool success, const QByteArray &response,
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QString strReply = response;
+    QScriptEngine scriptEngine;
 
     do {
         if (!success) {

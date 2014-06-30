@@ -35,16 +35,16 @@ include(../features/cookie-cutter/osdependent/cc-osdependent.pri)
 include(../features/osver/bb10/osv-bb10.pri)
 include(../features/mqlib/mqlib.pri)
 
+include(../features/qml/mainwindow/qml-mainwindow.pri)
 greaterThan(QT_MAJOR_VERSION, 4) {
 include(../features/qml/qml5/qmlviewer.pri)
+QT -= script
 } else {
 include(../features/qml/qml4/qmlviewer.pri)
 # Please do not modify the following two lines. Required for deployment.
 include(qmlapplicationviewer/qmlapplicationviewer.pri)
-}
-include(../features/qml/mainwindow/qml-mainwindow.pri)
-
 qtcAddDeployment()
+}
 
 OTHER_FILES += \
     bar-descriptor.xml

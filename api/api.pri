@@ -21,7 +21,13 @@ HEADERS  += $$PWD/api_common.h \
             $$PWD/ContactsXmlHandler.h \
             $$PWD/HtmlFieldParser.h
 
-QT *= network xml xmlpatterns script
+QT *= network xml xmlpatterns
+greaterThan(QT_MAJOR_VERSION, 4) {
+message(Qt5 doesnt need QtScript!)
+QT *= script
+} else {
+QT *= script
+}
 
 RESOURCES += $$PWD/api.qrc
 

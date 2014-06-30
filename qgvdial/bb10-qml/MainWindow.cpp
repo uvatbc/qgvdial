@@ -41,6 +41,15 @@ createAppObject(int &argc, char **argv)
     return createNormalAppObject (argc, argv);
 }//createAppObject
 
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+
+QQuickView *
+createQQuickView()
+{
+    return SailfishApp::createView();
+}//createQQuickView
+
+#endif
 
 MainWindow::MainWindow(QObject *parent)
 : QmlMainWindow(parent)
