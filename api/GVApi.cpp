@@ -1878,18 +1878,18 @@ GVApi::parseInboxJsonQtX(AsyncTaskToken *token, const QString &json,
             inboxEntry.bStar = p.value("star").toBool ();
 
             QJsonArray jLabels = p.value("labels").toArray();
-            if (jLabels.contains ("placed")) {
+            if (jLabels.contains (QString("placed"))) {
                 inboxEntry.Type = GVIE_Placed;
-            } else if (jLabels.contains ("received")) {
+            } else if (jLabels.contains (QString("received"))) {
                 inboxEntry.Type = GVIE_Received;
-            } else if (jLabels.contains ("missed")) {
+            } else if (jLabels.contains (QString("missed"))) {
                 inboxEntry.Type = GVIE_Missed;
-            } else if (jLabels.contains ("voicemail")) {
+            } else if (jLabels.contains (QString("voicemail"))) {
                 inboxEntry.Type = GVIE_Voicemail;
-            } else if (jLabels.contains ("sms")) {
+            } else if (jLabels.contains (QString("sms"))) {
                 inboxEntry.Type = GVIE_TextMessage;
             }
-            if (jLabels.contains ("trash")) {
+            if (jLabels.contains (QString("trash"))) {
                 inboxEntry.bTrash = true;
             }
 
