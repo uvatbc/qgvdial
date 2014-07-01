@@ -2524,13 +2524,100 @@ GVApi::callBack(AsyncTaskToken *token)
     return (rv);
 }//GVApi::callBack
 
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+bool
+GVApi::onCallbackX(const QString &json, quint32 &code, QString &errMsg)
+{
+    QJsonParseError pE;
+    QJsonDocument doc = QJsonDocument::fromJson (json.toUtf8 (), &pE);
+
+    if (QJsonParseError::NoError != pE.error) {
+        warnAndLog ("Failed to parse JSON", json);
+        return false;
+    }
+
+    if (!doc.isObject ()) {
+        warnAndLog ("JSON is not object", json);
+        return false;
+    }
+    QJsonObject jObj = doc.object ();
+
+    if (!jObj.contains ("ok")) {
+        warnAndLog ("ok not found", json);
+        return false;
+    }
+    if (!jObj.value("ok").isBool ()) {
+        warnAndLog ("ok is not a bool", json);
+        return false;
+    }
+    if (jObj.value("ok").toBool ()) {
+        errMsg.clear ();
+        code = 0;
+        return true;
+    }
+
+    if (!jObj.contains ("data")) {
+        warnAndLog ("data not found", json);
+        return false;
+    }
+    if (!jObj.value("data").isObject ()) {
+        warnAndLog ("data is not an object", json);
+        return false;
+    }
+    jObj = jObj.value("data").toObject();
+
+    if (!jObj.contains ("code")) {
+        warnAndLog ("code not found", json);
+    } else {
+        code = jObj.value ("code").toVariant ().toInt ();
+    }
+
+    if (!jObj.contains ("error")) {
+        warnAndLog ("error not found", json);
+    } else {
+        errMsg = jObj.value ("error").toString ();
+    }
+
+    return false;
+}//GVApi::onCallbackX
+#else
+bool
+GVApi::onCallbackX(const QString &json, quint32 &code, QString &errMsg)
+{
+    QScriptEngine scriptEngine;
+
+    QString strTemp = QString("var obj = %1; obj.ok;").arg(json);
+    strTemp = scriptEngine.evaluate (strTemp).toString ();
+    if (scriptEngine.hasUncaughtException ()) {
+        Q_WARN("Failed to parse call back JSON: ") << json;
+        return false;
+    }
+
+    if (strTemp != "true") {
+        code = scriptEngine.evaluate ("obj.data.code").toInt32 ();
+        if (scriptEngine.hasUncaughtException ()) {
+            Q_WARN("Failed to parse call back JSON: ") << json;
+            return false;
+        }
+
+        errMsg = scriptEngine.evaluate ("obj.error").toString ();
+        if (scriptEngine.hasUncaughtException ()) {
+            Q_WARN("Failed to parse error code from JSON: ") << json;
+        }
+
+        return false;
+    }
+
+    return true;
+}//GVApi::onCallbackX
+#endif
+
 void
 GVApi::onCallback(bool success, const QByteArray &response, QNetworkReply *,
                   void *ctx)
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QString strReply = response;
-    QScriptEngine scriptEngine;
 
     do {
         if (!success) {
@@ -2549,26 +2636,10 @@ GVApi::onCallback(bool success, const QByteArray &response, QNetworkReply *,
             strTemp = strTemp.mid (strTemp.indexOf ('{'));
         }
 
-        strTemp = QString("var obj = %1; obj.ok;").arg(strTemp);
-        strTemp = scriptEngine.evaluate (strTemp).toString ();
-        if (scriptEngine.hasUncaughtException ()) {
-            Q_WARN("Failed to parse call back response: ") << strReply;
-            Q_WARN("Error is: ") << strTemp;
-            break;
-        }
+        quint32 code;
+        QString errMsg;
 
-        if (strTemp != "true") {
-            quint32 code = scriptEngine.evaluate ("obj.data.code").toInt32 ();
-            if (scriptEngine.hasUncaughtException ()) {
-                Q_WARN("Failed to parse call back code: ") << strReply;
-                break;
-            }
-
-            QString errMsg = scriptEngine.evaluate ("obj.error").toString ();
-            if (scriptEngine.hasUncaughtException ()) {
-                Q_WARN("Failed to parse error: ") << strReply;
-            }
-
+        if (!onCallbackX (strTemp, code, errMsg)) {
             if (!errMsg.isEmpty ()) {
                 token->errorString = errMsg;
             }
@@ -2580,8 +2651,8 @@ GVApi::onCallback(bool success, const QByteArray &response, QNetworkReply *,
                 break;
             }
 
-            Q_WARN(QString("Failed to call back! response ok=%1. response='%2'")
-                   .arg(strTemp).arg(QString(response)));
+            Q_WARN(QString("Failed to call back! JSON='%1'. errMsg='%2'")
+                   .arg(strTemp).arg(QString(errMsg)));
             break;
         }
 

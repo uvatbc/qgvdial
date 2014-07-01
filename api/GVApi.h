@@ -187,6 +187,7 @@ private:
                                     const QString &strHtml);
 
     bool onCalloutX(const QString &json, QString &accessNumber);
+    bool onCallbackX(const QString &json, quint32 &code, QString &errMsg);
 
     void inline
     warnAndLog(const QString &msg, const QString &json)
