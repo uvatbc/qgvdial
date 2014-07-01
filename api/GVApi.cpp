@@ -1330,12 +1330,11 @@ GVApi::getPhones(AsyncTaskToken *token)
 
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 bool
-GVApi::onGetPhonesQt5(AsyncTaskToken *token, const QString &json)
+GVApi::onGetPhonesQtX(AsyncTaskToken *token, const QString &json)
 {
     bool success = false;
     QJsonDocument doc;
     QJsonParseError parseError;
-    QScriptEngine scriptEngine;
 
     QString strTemp;
 
@@ -1396,12 +1395,13 @@ GVApi::onGetPhonesQt5(AsyncTaskToken *token, const QString &json)
                 continue;
             }
 
-            GVRegisteredNumber regNumber;
             QJsonObject p = it.value().toObject ();
             if (!p.contains ("id")) {
                 warnAndLog (QString("[%1] has no \"id\"").arg(it.key()), json);
                 continue;
             }
+
+            GVRegisteredNumber regNumber;
             // I don't want to know the type of ID - which is double it seems
             regNumber.id = p.value("id").toVariant().toString ();
             regNumber.name = p.value("name").toString ();
@@ -1435,11 +1435,11 @@ GVApi::onGetPhonesQt5(AsyncTaskToken *token, const QString &json)
     } while (0);
 
     return success;
-}//GVApi::onGetPhonesQt5
+}//GVApi::onGetPhonesQtX
 
 #else
 bool
-GVApi::onGetPhonesQt4(AsyncTaskToken *token, const QString &json)
+GVApi::onGetPhonesQtX(AsyncTaskToken *token, const QString &json)
 {
     bool success = false;
     QScriptEngine scriptEngine;
@@ -1608,7 +1608,7 @@ GVApi::onGetPhonesQt4(AsyncTaskToken *token, const QString &json)
     } while (0);
 
     return success;
-}//GVApi::onGetPhonesQt4
+}//GVApi::onGetPhonesQtX
 #endif
 
 void
@@ -1617,7 +1617,6 @@ GVApi::onGetPhones(bool success, const QByteArray &response, QNetworkReply *,
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QString strReply = response;
-    QScriptEngine scriptEngine;
 
     do {
         if (!success) {
@@ -1642,11 +1641,7 @@ GVApi::onGetPhones(bool success, const QByteArray &response, QNetworkReply *,
             break;
         }
 
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-        success = onGetPhonesQt5 (token, xmlHandler.elems["json"].toString());
-#else
-        success = onGetPhonesQt4 (token, xmlHandler.elems["json"].toString());
-#endif
+        success = onGetPhonesQtX (token, xmlHandler.elems["json"].toString());
     } while (0);
 
     if (!success) {
@@ -1771,29 +1766,161 @@ GVApi::onGetInbox(bool success, const QByteArray &response, QNetworkReply *,
     }
 }//GVApi::onGetInbox
 
+void
+GVApi::validateAndMatchInboxEntry(GVInboxEntry &inboxEntry,
+                                  AsyncTaskToken *token,
+                                  const QString &strHtml)
+{
+    if (inboxEntry.id.isEmpty()) {
+        Q_WARN ("Invalid ID");
+        return;
+    }
+    if (inboxEntry.strPhoneNumber.isEmpty()) {
+        Q_WARN ("Invalid Phone number");
+        inboxEntry.strPhoneNumber = "Unknown";
+    }
+    if (inboxEntry.strDisplayNumber.isEmpty()) {
+        inboxEntry.strDisplayNumber = "Unknown";
+    }
+    if (!inboxEntry.startTime.isValid ()) {
+        Q_WARN ("Invalid start time");
+        return;
+    }
+
+    // Pick up the text from the parsed HTML
+    if ((GVIE_TextMessage == inboxEntry.Type) ||
+        (GVIE_Voicemail   == inboxEntry.Type))
+    {
+        QString msgDiv = parseDomElement (strHtml, "div", "id",
+                                          inboxEntry.id);
+        if (msgDiv.isEmpty ()) {
+            return;
+        }
+
+        QString msgDispDiv =
+                parseDomElement (msgDiv, "div", "class",
+                                 "gc-message-message-display");
+        if (msgDispDiv.isEmpty ()) {
+            return;
+        }
+
+        if (!parseMessageDiv (msgDispDiv, inboxEntry)) {
+            return;
+        }
+    }
+
+    // emit the inbox element
+    emit oneInboxEntry (token, inboxEntry);
+}//GVApi::validateAndMatchInboxEntry()
+
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+
 bool
-GVApi::parseInboxJson(AsyncTaskToken *token, const QString &strJson,
-                      const QString &strHtml, qint32 &msgCount)
+GVApi::parseInboxJsonQtX(AsyncTaskToken *token, const QString &json,
+                         const QString &strHtml, qint32 &msgCount)
+{
+    bool rv = false;
+    QJsonParseError parserError;
+    QJsonDocument doc;
+
+    do {
+        doc = QJsonDocument::fromJson (json.toUtf8 (), &parserError);
+        if (QJsonParseError::NoError != parserError.error) {
+            warnAndLog ("Failed to parse JSON", json);
+            break;
+        }
+
+        if (!doc.isObject ()) {
+            warnAndLog ("JSON was not an object", json);
+            break;
+        }
+        QJsonObject jTop = doc.object();
+
+        if (!jTop.contains ("messages")) {
+            warnAndLog ("Top level JSON object did not have messages", json);
+            break;
+        }
+        if (!jTop.value("messages").isObject()) {
+            warnAndLog ("Settings value is not a JSON object", json);
+            break;
+        }
+
+        QJsonObject jMessages = jTop.value("messages").toObject();
+        msgCount = jMessages.count ();
+
+        QJsonObject::iterator it;
+        for (it = jMessages.begin (); it != jMessages.end (); ++it) {
+            if (!it.value().isObject()) {
+                warnAndLog (QString("Messages[%1] is not an object")
+                            .arg(it.key ()), json);
+                continue;
+            }
+
+            QJsonObject p = it.value().toObject ();
+            if (!p.contains ("id")) {
+                warnAndLog (QString("[%1] has no \"id\"").arg(it.key()), json);
+                continue;
+            }
+
+            GVInboxEntry inboxEntry;
+            inboxEntry.id = p.value("id").toString ();
+            inboxEntry.strPhoneNumber = p.value("phoneNumber").toString ();
+            inboxEntry.strDisplayNumber = p.value("displayNumber").toString ();
+
+            quint64 iVal = p.value("startTime").toString().toLongLong() / 1000;
+            if (iVal) {
+                inboxEntry.startTime = QDateTime::fromTime_t (iVal);
+            }
+
+            inboxEntry.bRead = p.value("isRead").toBool ();
+            inboxEntry.bSpam = p.value("isSpam").toBool ();
+            inboxEntry.bTrash = p.value("isTrash").toBool ();
+            inboxEntry.bStar = p.value("star").toBool ();
+
+            QJsonArray jLabels = p.value("labels").toArray();
+            if (jLabels.contains ("placed")) {
+                inboxEntry.Type = GVIE_Placed;
+            } else if (jLabels.contains ("received")) {
+                inboxEntry.Type = GVIE_Received;
+            } else if (jLabels.contains ("missed")) {
+                inboxEntry.Type = GVIE_Missed;
+            } else if (jLabels.contains ("voicemail")) {
+                inboxEntry.Type = GVIE_Voicemail;
+            } else if (jLabels.contains ("sms")) {
+                inboxEntry.Type = GVIE_TextMessage;
+            }
+            if (jLabels.contains ("trash")) {
+                inboxEntry.bTrash = true;
+            }
+
+            inboxEntry.strNote = p.value("note").toString();
+            inboxEntry.strText = p.value("messageText").toString();
+            if (p.contains ("hasMp3")) {
+                inboxEntry.vmailFormat = GVIVFMT_Mp3;
+            }
+            if (p.contains ("hasOgg")) {
+                inboxEntry.vmailFormat = GVIVFMT_Ogg;
+            }
+
+            inboxEntry.vmailDuration = p.value("duration").toDouble();
+
+            validateAndMatchInboxEntry (inboxEntry, token, strHtml);
+        }
+
+        rv = true;
+    } while (0);
+
+    return (rv);
+}//GVApi::parseInboxJsonQtX
+
+#else
+
+bool
+GVApi::parseInboxJsonQtX(AsyncTaskToken *token, const QString &strJson,
+                         const QString &strHtml, qint32 &msgCount)
 {
     bool rv = false;
     QScriptEngine scriptEngine;
-
-    QString strFixedHtml = "<html>" + strHtml + "</html>";
-    strFixedHtml.replace ("&", "&amp;");
-
-#if 0
-    QFile fTemp1("inbox-html.html");
-    fTemp1.open (QFile::ReadWrite);
-    fTemp1.write (strFixedHtml.toLatin1());
-    fTemp1.close ();
-#endif
-
-#if 0
-    QFile fTemp2("inbox-json.json");
-    fTemp2.open (QFile::ReadWrite);
-    fTemp2.write (strJson.toLatin1());
-    fTemp2.close ();
-#endif
 
     do {
         QString strTemp;
@@ -1909,52 +2036,39 @@ GVApi::parseInboxJson(AsyncTaskToken *token, const QString &strJson,
                 }
             }
 
-            if (inboxEntry.id.isEmpty()) {
-                Q_WARN ("Invalid ID");
-                continue;
-            }
-            if (inboxEntry.strPhoneNumber.isEmpty()) {
-                Q_WARN ("Invalid Phone number");
-                inboxEntry.strPhoneNumber = "Unknown";
-            }
-            if (inboxEntry.strDisplayNumber.isEmpty()) {
-                inboxEntry.strDisplayNumber = "Unknown";
-            }
-            if (!inboxEntry.startTime.isValid ()) {
-                Q_WARN ("Invalid start time");
-                continue;
-            }
-
-            // Pick up the text from the parsed HTML
-            if ((GVIE_TextMessage == inboxEntry.Type) ||
-                (GVIE_Voicemail   == inboxEntry.Type))
-            {
-                QString msgDiv = parseDomElement (strHtml, "div", "id",
-                                                  inboxEntry.id);
-                if (msgDiv.isEmpty ()) {
-                    continue;
-                }
-
-                QString msgDispDiv =
-                        parseDomElement (msgDiv, "div", "class",
-                                         "gc-message-message-display");
-                if (msgDispDiv.isEmpty ()) {
-                    continue;
-                }
-
-                if (!parseMessageDiv (msgDispDiv, inboxEntry)) {
-                    continue;
-                }
-            }
-
-            // emit the inbox element
-            emit oneInboxEntry (token, inboxEntry);
+            validateAndMatchInboxEntry (inboxEntry, token, strHtml);
         }
 
         rv = true;
     } while (0);
 
     return (rv);
+}//GVApi::parseInboxJsonQtX
+
+#endif
+
+bool
+GVApi::parseInboxJson(AsyncTaskToken *token, const QString &strJson,
+                      const QString &strHtml, qint32 &msgCount)
+{
+    QString strFixedHtml = "<html>" + strHtml + "</html>";
+    strFixedHtml.replace ("&", "&amp;");
+
+#if 0
+    QFile fTemp1("inbox-html.html");
+    fTemp1.open (QFile::ReadWrite);
+    fTemp1.write (strFixedHtml.toLatin1());
+    fTemp1.close ();
+#endif
+
+#if 0
+    QFile fTemp2("inbox-json.json");
+    fTemp2.open (QFile::ReadWrite);
+    fTemp2.write (strJson.toLatin1());
+    fTemp2.close ();
+#endif
+
+    return parseInboxJsonQtX (token, strJson, strFixedHtml, msgCount);
 }//GVApi::parseInboxJson
 
 static inline void
@@ -2237,13 +2351,71 @@ GVApi::callOut(AsyncTaskToken *token)
     return rv;
 }//GVApi::callOut
 
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+
+bool
+GVApi::onCalloutX(const QString &json, QString &accessNumber)
+{
+    QJsonParseError parseError;
+    QJsonDocument doc = QJsonDocument::fromJson (json.toUtf8 (), &parseError);
+    if (QJsonParseError::NoError != parseError.error) {
+        warnAndLog ("Failed to parse JSON", json);
+        return false;
+    }
+
+    if (!doc.isObject ()) {
+        warnAndLog ("JSON is not object", json);
+        return false;
+    }
+    QJsonObject jObj = doc.object ();
+
+    if (!jObj.contains ("call_through_response")) {
+        warnAndLog ("call_through_response not found", json);
+        return false;
+    }
+    if (!jObj.value("call_through_response").isObject ()) {
+        warnAndLog ("call_through_response is not an object", json);
+        return false;
+    }
+    jObj = jObj.value("call_through_response").toObject();
+
+    if (!jObj.contains ("access_number")) {
+        warnAndLog ("access_number not found", json);
+        return false;
+    }
+    if (!jObj.value("access_number").isString ()) {
+        warnAndLog ("access_number is not a string", json);
+        return false;
+    }
+
+    accessNumber = jObj.value("access_number").toString();
+    return true;
+}//GVApi::onCalloutX
+
+#else
+
+bool
+GVApi::onCalloutX(const QString &json, QString &accessNumber)
+{
+    QScriptEngine scriptEngine;
+    accessNumber = QString("var obj = %1; "
+                           "obj.call_through_response.access_number;")
+                        .arg(json);
+    accessNumber = scriptEngine.evaluate (accessNumber).toString ();
+    if (scriptEngine.hasUncaughtException ()) {
+        return false;
+    }
+    return true;
+}//GVApi::onCalloutX
+
+#endif
+
 void
 GVApi::onCallout(bool success, const QByteArray &response, QNetworkReply *reply,
                  void *ctx)
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QString strReply = response;
-    QScriptEngine scriptEngine;
 
     do {
         if (!success) {
@@ -2266,17 +2438,13 @@ GVApi::onCallout(bool success, const QByteArray &response, QNetworkReply *reply,
         Q_DEBUG(strTemp);
 #endif
 
-        strTemp = QString("var obj = %1; "
-                          "obj.call_through_response.access_number;")
-                          .arg(strTemp);
-        strTemp = scriptEngine.evaluate (strTemp).toString ();
-        if (scriptEngine.hasUncaughtException ()) {
+        QString accessNumber;
+        if (!onCalloutX (strTemp, accessNumber)) {
             Q_WARN("Failed to parse call out response: ") << strReply;
-            Q_WARN("Error is: ") << strTemp;
             break;
         }
 
-        token->outParams["access_number"] = strTemp;
+        token->outParams["access_number"] = accessNumber;
 
         token->status = ATTS_SUCCESS;
         token->emitCompleted ();

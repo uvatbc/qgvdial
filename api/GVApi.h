@@ -178,11 +178,15 @@ private:
                        bool &isNewStart);
 
     // QT4 / QT5 JSON handlers
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-    bool onGetPhonesQt5(AsyncTaskToken *token, const QString &json);
-#else
-    bool onGetPhonesQt4(AsyncTaskToken *token, const QString &json);
-#endif
+    bool onGetPhonesQtX(AsyncTaskToken *token, const QString &json);
+    bool parseInboxJsonQtX(AsyncTaskToken *token, const QString &strJson,
+                           const QString &strHtml, qint32 &msgCount);
+
+    void validateAndMatchInboxEntry(GVInboxEntry &inboxEntry,
+                                    AsyncTaskToken *token,
+                                    const QString &strHtml);
+
+    bool onCalloutX(const QString &json, QString &accessNumber);
 
     void inline
     warnAndLog(const QString &msg, const QString &json)

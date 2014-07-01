@@ -304,7 +304,7 @@ struct ContactInfo
 
     //! Array of phones for this contact
     PhoneInfoArray  arrPhones;
-    // Which number is selected
+    //! Which number is selected
     int             selected;
 
     //! Array of email addresses for this contact
