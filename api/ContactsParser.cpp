@@ -83,6 +83,183 @@ ContactsParser::doXmlWork ()
     }
 }//ContactsParser::doXmlWork
 
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+void
+ContactsParser::doJsonWork ()
+{
+#if QGC_MEASURE_TIME
+    QDateTime startTime = QDateTime::currentDateTime ();
+#endif
+
+    QString json = QString(byData);
+    QJsonParseError pE;
+    QJsonDocument doc = QJsonDocument::fromJson (json.toUtf8 (), &pE);
+    quint32 total = 0;
+
+    do {
+        if (QJsonParseError::NoError != pE.error) {
+            Q_WARN(QString("Failed to parse JSON").arg(json));
+            break;
+        }
+
+        if (!doc.isObject ()) {
+            Q_WARN(QString("JSON is not object").arg(json));
+            break;
+        }
+        QJsonObject jTop = doc.object ();
+
+        if (!jTop.contains ("feed") || !jTop.value("feed").isObject ()) {
+            Q_WARN(QString("feed is not an object: %1").arg(json));
+            break;
+        }
+        QJsonObject jFeed = jTop.value("feed").toObject ();
+
+        if (!jFeed.contains ("entry")) {
+            Q_WARN("No entries found");
+            break;
+        }
+        if (!jFeed.value("entry").isArray ()) {
+            Q_WARN(QString("entry is not an array: %1").arg(json));
+            break;
+        }
+        QJsonArray jEntries = jFeed.value("entry").toArray ();
+
+        total = jEntries.size ();
+        ContactInfo ci;
+
+        QJsonArray::iterator it;
+        for (it = jEntries.begin(); it != jEntries.end(); ++it) {
+            if (!(*it).isObject ()) {
+                Q_WARN(QString("entry is not an object: %1").arg(json));
+                continue;
+            }
+
+            QJsonObject e = (*it).toObject();
+            if (!e.contains("id") || !e.value("id").isObject ()) {
+                Q_WARN(QString("entry id is not an object: %1").arg(json));
+                continue;
+            }
+
+            QJsonObject tmp = e.value("id").toObject ();
+            if (!tmp.contains("$t") || !tmp.value("$t").isString ()) {
+                Q_WARN(QString("entry id.$t is not a string: %1").arg(json));
+                continue;
+            }
+
+            ci.init ();
+            ci.strId = tmp.value ("$t").toString ();
+
+            if (!e.contains("title") || !e.value("title").isObject ()) {
+                Q_WARN(QString("entry title is not an object: %1").arg(json));
+                continue;
+            }
+
+            tmp = e.value("title").toObject ();
+            if (!tmp.contains("$t") || !tmp.value("$t").isString ()) {
+                Q_WARN(QString("entry title.$t is not a string: %1").arg(json));
+                continue;
+            }
+            ci.strTitle = tmp.value ("$t").toString ();
+
+            if (e.contains ("gd$phoneNumber") &&
+                e.value("gd$phoneNumber").isArray ())
+            {
+                QJsonArray jPArray = e.value("gd$phoneNumber").toArray ();
+
+                PhoneInfo pi;
+                QJsonArray::iterator pit;
+                int max = jPArray.count ();
+                pit = jPArray.begin ();
+                for (int i = 0; i < max; i++, pit++) {
+                    if (!(*pit).isObject ()) {
+                        Q_WARN(QString("phone is not an object: %1").arg(json));
+                        continue;
+                    }
+
+                    QJsonObject p = (*pit).toObject();
+                    if (!p.contains("$t") || !p.value("$t").isString ()) {
+                        Q_WARN(QString("phone is not a string: %1").arg(json));
+                        continue;
+                    }
+
+                    pi.init ();
+                    pi.strNumber = p.value ("$t").toString ();
+
+                    QString rStr = p.value ("rel").toString ();
+                    if (rStr.contains ("mobile")) {
+                        pi.Type = PType_Mobile;
+                    } else if (rStr.contains ("home")) {
+                        pi.Type = PType_Home;
+                    } else if (rStr.contains ("work")) {
+                        pi.Type = PType_Work;
+                    } else if (rStr.contains ("pager")) {
+                        pi.Type = PType_Pager;
+                    } else {
+                        pi.Type = PType_Other;
+                    }
+                    ci.arrPhones += pi;
+                }
+            }
+
+            if (e.contains ("gd$email") &&
+                e.value("gd$email").isArray ())
+            {
+                QJsonArray jArray = e.value("gd$email").toArray ();
+
+                EmailInfo ei;
+                QJsonArray::iterator eit;
+                int max = jArray.count ();
+                eit = jArray.begin ();
+                for (int i = 0; i < max; i++, eit++) {
+                    if (!(*eit).isObject ()) {
+                        Q_WARN(QString("email is not an object: %1").arg(json));
+                        continue;
+                    }
+
+                    QJsonObject p = (*eit).toObject();
+                    if (!p.contains("address") ||
+                        !p.value("address").isString ())
+                    {
+                        Q_WARN(QString("Email is not valid: %1").arg(json));
+                        continue;
+                    }
+
+                    ei.init ();
+                    ei.address = p.value ("address").toString ();
+
+                    if (p.contains("primary")) {
+                        if (p.value ("primary").isBool ()) {
+                            ei.primary = p.value ("primary").toBool ();
+                        } else if (p.value ("primary").isString ()) {
+                            ei.primary = p.value("primary").toString()=="true";
+                        }
+                    }
+
+                    QString rStr = p.value ("rel").toString ();
+                    if (rStr.contains ("home")) {
+                        ei.type = EType_Home;
+                    } else if (rStr.contains ("work")) {
+                        ei.type = EType_Work;
+                    } else {
+                        ei.type = EType_Other;
+                    }
+                    ci.arrEmails += ei;
+                }
+            }
+
+            emit gotOneContact (ci);
+        }
+    } while (0);
+
+#if QGC_MEASURE_TIME
+    QDateTime endTime = QDateTime::currentDateTime ();
+    Q_DEBUG(QString("JSON parse took %1 msec")
+            .arg(endTime.toMSecsSinceEpoch() - startTime.toMSecsSinceEpoch()));
+#endif
+
+    emit done(m_task, true, total, total);
+}//ContactsParser::doJsonWork
+#else
 void
 ContactsParser::doJsonWork ()
 {
@@ -236,6 +413,7 @@ ContactsParser::doJsonWork ()
 
     emit done(m_task, true, total, total);
 }//ContactsParser::doJsonWork
+#endif
 
 ContactsParser::~ContactsParser()
 {

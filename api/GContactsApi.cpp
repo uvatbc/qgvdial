@@ -23,7 +23,11 @@ Contact: yuvraaj@gmail.com
 #include "ContactsParser.h"
 #include "o2.h"
 
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+#define USE_JSON_FEED 1
+#else
 #define USE_JSON_FEED 0
+#endif
 
 void inline
 warnAndLog(const QString &msg, const QString &json)
