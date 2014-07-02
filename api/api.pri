@@ -22,10 +22,7 @@ HEADERS  += $$PWD/api_common.h \
             $$PWD/HtmlFieldParser.h
 
 QT *= network xml xmlpatterns
-greaterThan(QT_MAJOR_VERSION, 4) {
-message(Qt5 doesnt need QtScript!)
-QT *= script
-} else {
+lessThan(QT_MAJOR_VERSION, 5) {
 QT *= script
 }
 

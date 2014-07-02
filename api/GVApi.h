@@ -189,6 +189,9 @@ private:
     bool onCalloutX(const QString &json, QString &accessNumber);
     bool onCallbackX(const QString &json, quint32 &code, QString &errMsg);
     bool checkJsonForOk(const QString &json);
+    bool onSendSmsX(const QString &json);
+    bool onCheckRecentInboxX(const QString &json, quint32 &totalSize,
+                             QDateTime &serverLatest);
 
     void inline
     warnAndLog(const QString &msg, const QString &json)

@@ -1436,7 +1436,6 @@ GVApi::onGetPhonesQtX(AsyncTaskToken *token, const QString &json)
 
     return success;
 }//GVApi::onGetPhonesQtX
-
 #else
 bool
 GVApi::onGetPhonesQtX(AsyncTaskToken *token, const QString &json)
@@ -1912,9 +1911,7 @@ GVApi::parseInboxJsonQtX(AsyncTaskToken *token, const QString &json,
 
     return (rv);
 }//GVApi::parseInboxJsonQtX
-
 #else
-
 bool
 GVApi::parseInboxJsonQtX(AsyncTaskToken *token, const QString &strJson,
                          const QString &strHtml, qint32 &msgCount)
@@ -2391,9 +2388,7 @@ GVApi::onCalloutX(const QString &json, QString &accessNumber)
     accessNumber = jObj.value("access_number").toString();
     return true;
 }//GVApi::onCalloutX
-
 #else
-
 bool
 GVApi::onCalloutX(const QString &json, QString &accessNumber)
 {
@@ -2869,13 +2864,78 @@ GVApi::doSendSms(QUrl url, AsyncTaskToken *token)
     return (rv);
 }//GVApi::doSendSms
 
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+bool
+GVApi::onSendSmsX(const QString &json)
+{
+    QJsonParseError pE;
+    QJsonDocument doc = QJsonDocument::fromJson (json.toUtf8 (), &pE);
+
+    if (QJsonParseError::NoError != pE.error) {
+        warnAndLog ("Failed to parse JSON", json);
+        return false;
+    }
+
+    if (!doc.isObject ()) {
+        warnAndLog ("JSON is not object", json);
+        return false;
+    }
+    QJsonObject jObj = doc.object ();
+
+    if (!jObj.contains ("send_sms_response")) {
+        warnAndLog ("send_sms_response not found", json);
+        return false;
+    }
+    QString response = jObj.value("send_sms_response").toVariant().toString();
+    if (response != "0") {
+        Q_WARN(QString("Failed to send text! response JSON = %1").arg(json));
+        return false;
+    }
+
+    if (!jObj.contains ("rnr_xsrf_token")) {
+        warnAndLog ("rnr_xsrf_token not found", json);
+    } else {
+        rnr_se = jObj.value("rnr_xsrf_token").toVariant().toString();
+    }
+
+    return true;
+}//GVApi::onSendSmsX
+#else
+bool
+GVApi::onSendSmsX(const QString &json)
+{
+    QScriptEngine scriptEngine;
+    QString strTemp = QString("var o = %1; o.send_sms_response;").arg(json);
+    strTemp = scriptEngine.evaluate (strTemp).toString ();
+    if (scriptEngine.hasUncaughtException ()) {
+        Q_WARN(QString("Failed to parse send SMS response JSON: %1").arg(json));
+        return false;
+    }
+
+    if (strTemp != "0") {
+        Q_WARN(QString("Failed to send text! response JSON = %1").arg(json));
+        return false;
+    }
+
+    // SMS response also contains the new rnr_se token
+    strTemp = scriptEngine.evaluate ("o.rnr_xsrf_token;").toString ();
+    if (scriptEngine.hasUncaughtException ()) {
+        Q_WARN(QString("Failed to parse rnr_se frrom JSON: %1").arg(json));
+    }
+    if ((strTemp != "undefined") && (!strTemp.isEmpty())) {
+        rnr_se = strTemp;
+    }
+
+    return true;
+}//GVApi::onSendSmsX
+#endif
+
 void
 GVApi::onSendSms(bool success, const QByteArray &response, QNetworkReply *,
                  void *ctx)
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QString strReply = response;
-    QScriptEngine scriptEngine;
 
     do {
         if (!success) {
@@ -2889,32 +2949,13 @@ GVApi::onSendSms(bool success, const QByteArray &response, QNetworkReply *,
         Q_DEBUG(strReply);
 #endif
 
-        QString strTemp = strReply.mid (strReply.indexOf (",\n"));
-        if (strTemp.startsWith (',')) {
-            strTemp = strTemp.mid (strTemp.indexOf ('{'));
+        QString json = strReply.mid (strReply.indexOf (",\n"));
+        if (json.startsWith (',')) {
+            json = json.mid (json.indexOf ('{'));
         }
 
-        strTemp = QString("var o = %1; o.send_sms_response;").arg(strTemp);
-        strTemp = scriptEngine.evaluate (strTemp).toString ();
-        if (scriptEngine.hasUncaughtException ()) {
-            Q_WARN("Failed to parse call out response: ") << strReply;
-            Q_WARN("Error is: ") << strTemp;
+        if (!onSendSmsX (json)) {
             break;
-        }
-
-        if (strTemp != "0") {
-            Q_WARN("Failed to send text! response status= ") << strTemp;
-            break;
-        }
-
-        // SMS response also contains the new rnr_se token
-        strTemp = scriptEngine.evaluate ("o.rnr_xsrf_token;").toString ();
-        if (scriptEngine.hasUncaughtException ()) {
-            Q_WARN("Failed to parse rnr_se: ") << strReply;
-            Q_WARN("Error is: ") << strTemp;
-        }
-        if ((strTemp != "undefined") && (!strTemp.isEmpty())) {
-            rnr_se = strTemp;
         }
 
         token->status = ATTS_SUCCESS;
@@ -3197,13 +3238,136 @@ GVApi::checkRecentInbox(AsyncTaskToken *token)
     return rv;
 }//GVApi::checkRecentInbox
 
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+bool
+GVApi::onCheckRecentInboxX(const QString &json, quint32 &totalSize,
+                           QDateTime &serverLatest)
+{
+    bool rv = false;
+    QJsonParseError parserError;
+    QJsonDocument doc;
+
+    do {
+        doc = QJsonDocument::fromJson (json.toUtf8 (), &parserError);
+        if (QJsonParseError::NoError != parserError.error) {
+            warnAndLog ("Failed to parse JSON", json);
+            break;
+        }
+
+        if (!doc.isObject ()) {
+            warnAndLog ("JSON was not an object", json);
+            break;
+        }
+        QJsonObject jTop = doc.object();
+
+        if (!jTop.contains ("messages")) {
+            warnAndLog ("Top level JSON object did not have messages", json);
+            break;
+        }
+        if (!jTop.value("messages").isObject()) {
+            warnAndLog ("Settings value is not a JSON object", json);
+            break;
+        }
+
+        QJsonObject jMessages = jTop.value("messages").toObject();
+        quint32 msgCount = jMessages.count ();
+
+        if (0 != msgCount) {
+            QJsonObject::iterator it = jMessages.begin ();
+            if (!it.value().isObject()) {
+                warnAndLog (QString("Messages[%1] is not an object")
+                            .arg(it.key ()), json);
+                break;
+            }
+            QJsonObject p = it.value().toObject ();
+            quint64 iVal = p.value("startTime").toString().toLongLong() / 1000;
+            if (iVal) {
+                serverLatest = QDateTime::fromTime_t (iVal);
+            }
+        } else {
+            serverLatest = QDateTime();
+        }
+
+        if (!jTop.contains ("totalSize")) {
+            warnAndLog ("Top level JSON object did not have messages", json);
+            break;
+        }
+        totalSize = jTop.value("totalSize").toVariant().toString().toUInt(&rv);
+    } while (0);
+
+    return (rv);
+}//GVApi::onCheckRecentInboxX
+#else
+bool
+GVApi::onCheckRecentInboxX(const QString &json, quint32 &totalSize,
+                           QDateTime &serverLatest)
+{
+    QScriptEngine scriptEngine;
+
+    scriptEngine.evaluate ("var obj = " + json);
+    if (scriptEngine.hasUncaughtException ()) {
+        Q_WARN("Failed to parse JSON. error =")
+           << scriptEngine.uncaughtException().toString ()
+           << "JSON =" << json;
+        return false;
+    }
+
+    QString strTemp;
+    strTemp = "var msgList = []; "
+              "for (var msgId in obj[\"messages\"]) { "
+              "    msgList.push(msgId); "
+              "} "
+              "msgList.length;";
+    quint32 msgCount = scriptEngine.evaluate(strTemp).toInt32 ();
+    if (scriptEngine.hasUncaughtException ()) {
+        Q_WARN("Uncaught exception executing script :")
+            << scriptEngine.uncaughtException().toString()
+            << "JSON =" << json;
+        return false;
+    }
+
+    if (msgCount != 0) {
+        strTemp = "var msgParams = obj[\"messages\"][msgList[0]];"
+                  "msgParams[\"startTime\"]";
+        strTemp = scriptEngine.evaluate(strTemp).toString();
+        if (scriptEngine.hasUncaughtException ()) {
+            Q_WARN("Uncaught exception executing script :")
+                << scriptEngine.uncaughtException().toString()
+                << "JSON =" << json;
+            return false;
+        }
+
+        bool ok;
+        quint64 iVal = strTemp.toULongLong (&ok) / 1000;
+        if (!ok) {
+            Q_WARN("Failed to get a start time.");
+            return false;
+        }
+
+        serverLatest = QDateTime::fromTime_t (iVal);
+    } else {
+        //Q_DEBUG("Empty list");
+        serverLatest = QDateTime();
+    }
+
+    totalSize = scriptEngine.evaluate("obj[\"totalSize\"]").toInt32 ();
+    if (scriptEngine.hasUncaughtException ()) {
+        Q_WARN("Uncaught exception executing script :")
+            << scriptEngine.uncaughtException().toString()
+            << "JSON =" << json;
+        return false;
+    }
+
+    return true;
+}//GVApi::onCheckRecentInboxX
+#endif
+
 void
 GVApi::onCheckRecentInbox(bool success, const QByteArray &response,
                           QNetworkReply *, void *ctx)
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QString strReply = response;
-    QScriptEngine scriptEngine;
 
     do {
         if (!success) {
@@ -3233,60 +3397,11 @@ GVApi::onCheckRecentInbox(bool success, const QByteArray &response,
             break;
         }
 
-        QString strTemp, strJson;
-        strJson = xmlHandler.elems["json"].toString();
-        strTemp = "var obj = " + strJson;
-        scriptEngine.evaluate (strTemp);
-        if (scriptEngine.hasUncaughtException ()) {
-            Q_WARN("Failed to assign json to obj. error =")
-               << scriptEngine.uncaughtException().toString ()
-               << "JSON =" << strJson;
-            break;
-        }
-
-        strTemp = "var msgList = []; "
-                  "for (var msgId in obj[\"messages\"]) { "
-                  "    msgList.push(msgId); "
-                  "} "
-                  "msgList.length;";
-        quint32 msgCount = scriptEngine.evaluate(strTemp).toInt32 ();
-        if (scriptEngine.hasUncaughtException ()) {
-            Q_WARN("Uncaught exception executing script :")
-                << scriptEngine.uncaughtException().toString()
-                << "JSON =" << strJson;
-            break;
-        }
-
-        QDateTime serverLatest;
-        if (msgCount != 0) {
-            strTemp = "var msgParams = obj[\"messages\"][msgList[0]];"
-                      "msgParams[\"startTime\"]";
-            strTemp = scriptEngine.evaluate(strTemp).toString();
-            if (scriptEngine.hasUncaughtException ()) {
-                Q_WARN("Uncaught exception executing script :")
-                    << scriptEngine.uncaughtException().toString()
-                    << "JSON =" << strJson;
-                break;
-            }
-
-            quint64 iVal = strTemp.toULongLong (&success) / 1000;
-            if (!success) {
-                Q_WARN("Failed to get a start time.");
-                break;
-            }
-
-            serverLatest = QDateTime::fromTime_t (iVal);
-        } else {
-            //Q_DEBUG("Empty list");
-            serverLatest = QDateTime();
-        }
-
         quint32 totalSize;
-        totalSize = scriptEngine.evaluate("obj[\"totalSize\"]").toInt32 ();
-        if (scriptEngine.hasUncaughtException ()) {
-            Q_WARN("Uncaught exception executing script :")
-                << scriptEngine.uncaughtException().toString()
-                << "JSON =" << strJson;
+        QDateTime serverLatest;
+        if (!onCheckRecentInboxX(xmlHandler.elems["json"].toString(),
+                                 totalSize, serverLatest))
+        {
             break;
         }
 
