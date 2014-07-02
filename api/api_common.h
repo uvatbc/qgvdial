@@ -25,7 +25,10 @@ Contact: yuvraaj@gmail.com
 #include <QtCore>
 #include <QtNetwork>
 #include <QtXml>
+
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
 #include <QtScript>
+#endif
 
 #include "AsyncTaskToken.h"
 #include "NwReqTracker.h"
