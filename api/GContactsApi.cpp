@@ -25,6 +25,85 @@ Contact: yuvraaj@gmail.com
 
 #define USE_JSON_FEED 0
 
+void inline
+warnAndLog(const QString &msg, const QString &json)
+{
+    Q_WARN(msg);
+    Q_DEBUG("JSON Data from GV:") << json;
+}
+
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+bool
+GContactsApi::getClientSecret(const QString &json, QString &clientID,
+                              QString &clientSecret)
+{
+    QJsonParseError pE;
+    QJsonDocument doc = QJsonDocument::fromJson (json.toUtf8 (), &pE);
+
+    if (QJsonParseError::NoError != pE.error) {
+        warnAndLog ("Failed to parse JSON", json);
+        return false;
+    }
+
+    if (!doc.isObject ()) {
+        warnAndLog ("JSON is not object", json);
+        return false;
+    }
+    QJsonObject jObj = doc.object ();
+
+    if (!jObj.contains ("installed")) {
+        warnAndLog ("installed not found", json);
+        return false;
+    }
+    if (!jObj.value("installed").isObject ()) {
+        warnAndLog ("installed is not an object", json);
+        return false;
+    }
+    jObj = jObj.value("installed").toObject ();
+
+    if (!jObj.contains ("client_id")) {
+        warnAndLog ("Couldn't get client_id", json);
+        return false;
+    }
+    clientID = jObj.value("client_id").toString ();
+
+    if (!jObj.contains ("client_secret")) {
+        warnAndLog ("Couldn't get client_secret", json);
+        return false;
+    }
+    clientSecret = jObj.value("client_secret").toString ();
+
+    return true;
+}//GContactsApi::getClientSecret
+#else
+bool
+GContactsApi::getClientSecret(const QString &json, QString &clientID,
+                              QString &clientSecret)
+{
+    QScriptEngine e;
+
+    e.evaluate (QString("var o = %1;").arg(json));
+    if (e.hasUncaughtException ()) {
+        Q_WARN("Failed to assign object from client secret");
+        return false;
+    }
+
+    clientID = e.evaluate ("o.installed.client_id").toString ();
+    if (e.hasUncaughtException ()) {
+        Q_WARN("Couldn't get client_id");
+        return false;
+    }
+
+    clientSecret = e.evaluate ("o.installed.client_secret").toString ();
+    if (e.hasUncaughtException ()) {
+        Q_WARN("Couldn't get client_secret");
+        return false;
+    }
+
+    return true;
+}//GContactsApi::getClientSecret
+#endif
+
 GContactsApi::GContactsApi(QObject *parent)
 : QObject(parent)
 , m_loginTask(NULL)
@@ -49,28 +128,14 @@ GContactsApi::GContactsApi(QObject *parent)
 
     do {
         QByteArray baData = f.readAll ();
-        QString temp = QString("var o = %1;").arg(QString(baData));
-        QScriptEngine e;
 
-        e.evaluate (temp);
-        if (e.hasUncaughtException ()) {
-            Q_WARN("Failed to assign object from client secret");
+        QString clientID, clientSecret;
+        if (!getClientSecret(QString(baData), clientID, clientSecret)) {
+            Q_WARN("Failed to get client ID and/or secret");
             break;
         }
-
-        temp = e.evaluate ("o.installed.client_id").toString ();
-        if (e.hasUncaughtException ()) {
-            Q_WARN("Couldn't get client_id");
-            break;
-        }
-        m_o2->setClientId (temp);
-
-        temp = e.evaluate ("o.installed.client_secret").toString ();
-        if (e.hasUncaughtException ()) {
-            Q_WARN("Couldn't get client_secret");
-            break;
-        }
-        m_o2->setClientSecret (temp);
+        m_o2->setClientId (clientID);
+        m_o2->setClientSecret (clientSecret);
     } while (0);
 
     f.close ();

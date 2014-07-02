@@ -202,7 +202,6 @@ private:
         }
     }
 
-
 private:
     bool emitLog;
 

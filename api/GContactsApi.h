@@ -60,6 +60,8 @@ private:
     bool doGet(QUrl url, void *ctx, QObject *obj, const char *method);
     bool doPost(QUrl url, QByteArray postData, const char *contentType,
                 void *ctx, QObject *receiver, const char *method);
+    bool getClientSecret(const QString &json, QString &clientID,
+                         QString &clientSecret);
 
 private slots:
     void onLinkingFailed();
