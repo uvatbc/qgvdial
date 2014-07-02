@@ -24,12 +24,15 @@ Contact: yuvraaj@gmail.com
 
 #include "global.h"
 #include "IPhoneAccount.h"
+
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
 #include <bb/system/phone/Phone>
+#endif
 
 class BBPhoneAccount: public IPhoneAccount
 {
     Q_OBJECT
-    
+
 private:
     BBPhoneAccount(QObject *parent = 0);
 
@@ -38,13 +41,15 @@ public:
 
     QString id ();
     QString name ();
-    
+
     bool initiateCall(AsyncTaskToken *task);
 
     QString getNumber();
 
 private:
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
     bb::system::phone::Phone m_phone;
+#endif
 
     friend class BB10PhoneFactory;
 };
