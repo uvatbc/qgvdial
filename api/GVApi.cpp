@@ -2714,13 +2714,60 @@ GVApi::cancelDialBack(AsyncTaskToken *token)
     return (rv);
 }//GVApi::cancelDialBack
 
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+bool
+GVApi::checkJsonForOk(const QString &json)
+{
+    QJsonParseError pE;
+    QJsonDocument doc = QJsonDocument::fromJson (json.toUtf8 (), &pE);
+
+    if (QJsonParseError::NoError != pE.error) {
+        warnAndLog ("Failed to parse JSON", json);
+        return false;
+    }
+
+    if (!doc.isObject ()) {
+        warnAndLog ("JSON is not object", json);
+        return false;
+    }
+    QJsonObject jObj = doc.object ();
+
+    if (!jObj.contains ("ok")) {
+        warnAndLog ("ok not found", json);
+        return false;
+    }
+    if (!jObj.value("ok").isBool ()) {
+        warnAndLog ("ok is not a bool", json);
+        return false;
+    }
+
+    return jObj.value("ok").toBool ();
+}//GVApi::checkJsonForOk
+#else
+bool
+GVApi::checkJsonForOk(const QString &json)
+{
+    QScriptEngine scriptEngine;
+    QString strTemp = QString("var obj = %1; obj.ok;").arg(json);
+    strTemp = scriptEngine.evaluate (strTemp).toString ();
+    if (scriptEngine.hasUncaughtException ()) {
+        Q_WARN("Failed to parse JSON: ") << json;
+        return false;
+    }
+
+    if (strTemp != "true") {
+        return false;
+    }
+    return true;
+}//GVApi::checkJsonForOk
+#endif
+
 void
 GVApi::onCancelDialBack(bool success, const QByteArray &response,
                         QNetworkReply * /*reply*/, void *ctx)
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QString strReply = response;
-    QScriptEngine scriptEngine;
 
     do {
         if (!success) {
@@ -2739,18 +2786,8 @@ GVApi::onCancelDialBack(bool success, const QByteArray &response,
             strTemp = strTemp.mid (strTemp.indexOf ('{'));
         }
 
-        strTemp = QString("var obj = %1; obj.ok;").arg(strTemp);
-        strTemp = scriptEngine.evaluate (strTemp).toString ();
-        if (scriptEngine.hasUncaughtException ()) {
-            Q_WARN("Failed to parse cancel dial back response: ") << strReply;
-            Q_WARN("Error is: ") << strTemp;
-            break;
-        }
-
-        if (strTemp != "true") {
-            Q_WARN(QString("Failed to cancel dial back! response ok=%1. "
-                           "response='%2'")
-                   .arg(strTemp).arg(QString(response)));
+        if (!checkJsonForOk(strTemp)) {
+            Q_WARN(QString("Failed to cancel dialback! JSON=%1.").arg(strTemp));
             break;
         }
 
@@ -3011,7 +3048,6 @@ GVApi::onMarkAsRead(bool success, const QByteArray &response, QNetworkReply *,
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QString strReply = response;
-    QScriptEngine scriptEngine;
 
     do {
         if (!success) {
@@ -3030,16 +3066,8 @@ GVApi::onMarkAsRead(bool success, const QByteArray &response, QNetworkReply *,
             strTemp = strTemp.mid (strTemp.indexOf ('{'));
         }
 
-        strTemp = QString("var obj = %1; obj.ok;").arg(strTemp);
-        strTemp = scriptEngine.evaluate (strTemp).toString ();
-        if (scriptEngine.hasUncaughtException ()) {
-            Q_WARN(QString("Failed to parse response: %1").arg(strReply));
-            Q_WARN(QString("Error is: %1").arg(strTemp));
-            break;
-        }
-
-        if (strTemp != "true") {
-            Q_WARN("Failed to mark read! response ok= ") << strTemp;
+        if (!checkJsonForOk (strTemp)) {
+            Q_WARN("Failed to mark read! JSON = ") << strTemp;
             break;
         }
 
@@ -3107,7 +3135,6 @@ GVApi::onEntryDeleted(bool success, const QByteArray &response, QNetworkReply *,
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QString strReply = response;
-    QScriptEngine scriptEngine;
 
     do {
         if (!success) {
@@ -3126,15 +3153,7 @@ GVApi::onEntryDeleted(bool success, const QByteArray &response, QNetworkReply *,
             strTemp = strTemp.mid (strTemp.indexOf ('{'));
         }
 
-        strTemp = QString("var obj = %1; obj.ok;").arg(strTemp);
-        strTemp = scriptEngine.evaluate (strTemp).toString ();
-        if (scriptEngine.hasUncaughtException ()) {
-            Q_WARN(QString("Failed to parse response: %1").arg(strReply));
-            Q_WARN(QString("Error is: %1").arg(strTemp));
-            break;
-        }
-
-        if (strTemp != "true") {
+        if (!checkJsonForOk (strTemp)) {
             Q_WARN(QString("Failed to delete! response ok = %1").arg(strTemp));
             break;
         }
