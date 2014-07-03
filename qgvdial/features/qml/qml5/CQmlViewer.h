@@ -23,7 +23,7 @@ Contact: yuvraaj@gmail.com
 #define _CQMLVIEWER_
 
 #include "global.h"
-#include <QtQuick>
+#include <QtQuick/QtQuick>
 
 class QmlApplicationViewer {
 public:

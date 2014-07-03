@@ -24,6 +24,8 @@ Contact: yuvraaj@gmail.com
 
 #if QT_VERSION < QT_VERSION_CHECK(5,0,0)
 #include <QtDeclarative>
+#else
+//#include <QtQuick/QtQuick>
 #endif
 
 #define UNKNOWN_CONTACT_QRC_PATH    "qrc:/unknown_contact.png"

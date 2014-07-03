@@ -24,11 +24,15 @@ Contact: yuvraaj@gmail.com
 #if QT_VERSION < QT_VERSION_CHECK(5,0,0)
 #include <bb/system/phone/Line>
 #include <bb/system/phone/LineType>
+#else
+#include <QDesktopServices>
 #endif
 
 BBPhoneAccount::BBPhoneAccount(QObject *parent)
 : IPhoneAccount(parent)
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
 , m_phone(this)
+#endif
 {
 }//BBPhoneAccount::BBPhoneAccount
 

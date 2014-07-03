@@ -46,7 +46,7 @@ createAppObject(int &argc, char **argv)
 QQuickView *
 createQQuickView()
 {
-    return SailfishApp::createView();
+    return new QQuickView();
 }//createQQuickView
 
 #endif
