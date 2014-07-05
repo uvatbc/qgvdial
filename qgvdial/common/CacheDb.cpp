@@ -1050,7 +1050,7 @@ CacheDb::getInboxEntryById (GVInboxEntry &hEvent)
     QSqlQuery query(p.db);
     query.setForwardOnly (true);
 
-    bool ok;
+    bool ok = false;
     quint32 flags;
     QString scrubId = hEvent.id;
     scrubId.replace ("'", "''");
