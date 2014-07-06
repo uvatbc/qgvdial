@@ -156,11 +156,11 @@ ContactsParser::doJsonWork ()
             ci.init ();
             ci.strId = tmpObj.value ("$t").toString ();
 
+            // Title (MUST HAVE)
             if (!e.contains("title") || !e.value("title").isObject ()) {
                 Q_WARN(QString("entry title is not an object: %1").arg(json));
                 continue;
             }
-
             tmpObj = e.value("title").toObject ();
             if (!tmpObj.contains("$t") || !tmpObj.value("$t").isString ()) {
                 Q_WARN(QString("entry title.$t is not a string: %1").arg(json));
@@ -168,12 +168,22 @@ ContactsParser::doJsonWork ()
             }
             ci.strTitle = tmpObj.value ("$t").toString ();
 
+            // Date when this entry was updated
             tmpObj = e.value("updated").toObject ();
             if (tmpObj.contains("$t") && tmpObj.value("$t").isString ()) {
                 QString tmpS = tmpObj.value("$t").toString ();
                 ci.dtUpdate = QDateTime::fromString (tmpS, Qt::ISODate);
             }
 
+            // Notes
+            if (e.contains ("content") && e.value("content").isObject ()) {
+                tmpObj = e.value("content").toObject ();
+                if (tmpObj.contains("$t") && tmpObj.value("$t").isString ()) {
+                    ci.strNotes = tmpObj.value("$t").toString ();
+                }
+            }
+
+            // All phone numbers
             if (e.contains ("gd$phoneNumber") &&
                 e.value("gd$phoneNumber").isArray ())
             {
@@ -214,6 +224,7 @@ ContactsParser::doJsonWork ()
                 }
             }
 
+            // All email addresses
             if (e.contains ("gd$email") &&
                 e.value("gd$email").isArray ())
             {
@@ -260,6 +271,52 @@ ContactsParser::doJsonWork ()
                 }
             }
 
+            // All postal addresses
+            if (e.contains ("gd$structuredPostalAddress") &&
+                e.value("gd$structuredPostalAddress").isArray ())
+            {
+                QJsonArray jPArray = e.value("gd$structuredPostalAddress")
+                                      .toArray ();
+
+                PostalInfo pi;
+                QJsonArray::iterator pit;
+                int max = jPArray.count ();
+                pit = jPArray.begin ();
+                for (int i = 0; i < max; i++, pit++) {
+                    if (!(*pit).isObject ()) {
+                        Q_WARN(QString("addr is not an object: %1").arg(json));
+                        continue;
+                    }
+
+                    QJsonObject p = (*pit).toObject();
+                    if (!p.contains("gd$formattedAddress") ||
+                        !p.value("gd$formattedAddress").isObject ())
+                    {
+                        continue;
+                    }
+                    tmpObj = p.value("gd$formattedAddress").toObject ();
+
+                    pi.init ();
+                    pi.address = tmpObj.value("$t").toString ();
+                    if (pi.address.isEmpty ()) {
+                        continue;
+                    }
+
+                    QString rStr = p.value ("rel").toString ();
+                    if (rStr.contains ("home")) {
+                        pi.type = PAType_Home;
+                    } else if (rStr.contains ("work")) {
+                        pi.type = PAType_Work;
+                    } else if (rStr.contains ("other")) {
+                        pi.type = PAType_Other;
+                    } else {
+                        pi.type = PAType_Unknown;
+                    }
+                    ci.arrPostal += pi;
+                }
+            }
+
+            // Contact photo
             if (e.contains ("link") && e.value("link").isArray ()) {
                 QJsonArray jArray = e.value("link").toArray ();
 
@@ -298,6 +355,7 @@ ContactsParser::doJsonWork ()
                     break;
                 }
             }
+
             emit gotOneContact (ci);
         }
     } while (0);
