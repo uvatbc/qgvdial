@@ -96,6 +96,13 @@ ContactsParser::doJsonWork ()
     QJsonDocument doc = QJsonDocument::fromJson (json.toUtf8 (), &pE);
     quint32 total = 0;
 
+#if 0
+    QFile f("contacts.json");
+    f.open (QFile::ReadWrite);
+    f.write (json.toUtf8 ());
+    f.close ();
+#endif
+
     do {
         if (QJsonParseError::NoError != pE.error) {
             Q_WARN(QString("Failed to parse JSON").arg(json));
@@ -140,26 +147,32 @@ ContactsParser::doJsonWork ()
                 continue;
             }
 
-            QJsonObject tmp = e.value("id").toObject ();
-            if (!tmp.contains("$t") || !tmp.value("$t").isString ()) {
+            QJsonObject tmpObj = e.value("id").toObject ();
+            if (!tmpObj.contains("$t") || !tmpObj.value("$t").isString ()) {
                 Q_WARN(QString("entry id.$t is not a string: %1").arg(json));
                 continue;
             }
 
             ci.init ();
-            ci.strId = tmp.value ("$t").toString ();
+            ci.strId = tmpObj.value ("$t").toString ();
 
             if (!e.contains("title") || !e.value("title").isObject ()) {
                 Q_WARN(QString("entry title is not an object: %1").arg(json));
                 continue;
             }
 
-            tmp = e.value("title").toObject ();
-            if (!tmp.contains("$t") || !tmp.value("$t").isString ()) {
+            tmpObj = e.value("title").toObject ();
+            if (!tmpObj.contains("$t") || !tmpObj.value("$t").isString ()) {
                 Q_WARN(QString("entry title.$t is not a string: %1").arg(json));
                 continue;
             }
-            ci.strTitle = tmp.value ("$t").toString ();
+            ci.strTitle = tmpObj.value ("$t").toString ();
+
+            tmpObj = e.value("updated").toObject ();
+            if (tmpObj.contains("$t") && tmpObj.value("$t").isString ()) {
+                QString tmpS = tmpObj.value("$t").toString ();
+                ci.dtUpdate = QDateTime::fromString (tmpS, Qt::ISODate);
+            }
 
             if (e.contains ("gd$phoneNumber") &&
                 e.value("gd$phoneNumber").isArray ())
@@ -247,6 +260,44 @@ ContactsParser::doJsonWork ()
                 }
             }
 
+            if (e.contains ("link") && e.value("link").isArray ()) {
+                QJsonArray jArray = e.value("link").toArray ();
+
+                QJsonArray::iterator lit;
+                int max = jArray.count ();
+                lit = jArray.begin ();
+                for (int i = 0; i < max; i++, lit++) {
+                    if (!(*lit).isObject ()) {
+                        Q_WARN(QString("link item is not an object: %1")
+                               .arg(json));
+                        continue;
+                    }
+
+                    QJsonObject l = (*lit).toObject();
+                    if (!l.contains("type") || !l.value("type").isString()) {
+                        Q_WARN("link item has no valid type");
+                        continue;
+                    }
+                    if (!l.value("type").toString().contains("image")) {
+                        // Ignore links that are not images
+                        continue;
+                    }
+
+                    if (!l.contains("href") || !l.value("href").isString()) {
+                        Q_WARN("link item has no valid href");
+                        continue;
+                    }
+
+                    ci.hrefPhoto = l.value("href").toString();
+                    if (ci.hrefPhoto.isEmpty ()) {
+                        Q_WARN("Empty href");
+                        continue;
+                    }
+
+                    // Got what I wanted. Get out of this loop.
+                    break;
+                }
+            }
             emit gotOneContact (ci);
         }
     } while (0);
