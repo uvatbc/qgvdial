@@ -1,4 +1,8 @@
-QT += network script
+QT *= network
+lessThan(QT_MAJOR_VERSION, 5) {
+QT *= script
+}
+
 INCLUDEPATH += $$PWD
 SOURCES += \
     $$PWD/o1.cpp \

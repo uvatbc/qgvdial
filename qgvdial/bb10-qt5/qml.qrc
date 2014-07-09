@@ -1,5 +1,27 @@
 <RCC>
     <qresource prefix="/">
         <file alias="main.qml">qml/main.qml</file>
+        <file alias="CiPhoneSelectionPage.qml">qml/CiPhoneSelectionPage.qml</file>
+        <file alias="ContactDetailsPage.qml">qml/ContactDetailsPage.qml</file>
+        <file alias="ContactsPage.qml">qml/ContactsPage.qml</file>
+        <file alias="DialPage.qml">qml/DialPage.qml</file>
+        <file alias="DigitButton.qml">qml/DigitButton.qml</file>
+        <file alias="EtCetera.qml">qml/EtCetera.qml</file>
+        <file alias="ExpandView.qml">qml/ExpandView.qml</file>
+        <file alias="InboxDetailsPage.qml">qml/InboxDetailsPage.qml</file>
+        <file alias="InboxPage.qml">qml/InboxPage.qml</file>
+        <file alias="Keypad.qml">qml/Keypad.qml</file>
+        <file alias="LoginDetails.qml">qml/LoginDetails.qml</file>
+        <file alias="MainPage.qml">qml/MainPage.qml</file>
+        <file alias="MessageBox.qml">qml/MessageBox.qml</file>
+        <file alias="MyButton.qml">qml/MyButton.qml</file>
+        <file alias="Proxy.qml">qml/Proxy.qml</file>
+        <file alias="RefreshButton.qml">qml/RefreshButton.qml</file>
+        <file alias="RegNumberSelector.qml">qml/RegNumberSelector.qml</file>
+        <file alias="SettingsPage.qml">qml/SettingsPage.qml</file>
+        <file alias="SmsPage.qml">qml/SmsPage.qml</file>
+        <file alias="StatusBanner.qml">qml/StatusBanner.qml</file>
+        <file alias="TfaPinPage.qml">qml/TfaPinPage.qml</file>
+        <file alias="Updates.qml">qml/Updates.qml</file>
     </qresource>
 </RCC>
