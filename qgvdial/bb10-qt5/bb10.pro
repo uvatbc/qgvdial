@@ -19,6 +19,9 @@ OTHER_FILES += \
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH = qml
 
+INCLUDEPATH += qt4/inc
+LIBS += -L../qt4 -lbbphone
+
 include(../common/common.pri)
 include(../features/openssl/openssl-lin.pri)
 include(../features/dirs/bb10/bb10-dirs.pri)

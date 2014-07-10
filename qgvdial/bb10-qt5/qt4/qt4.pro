@@ -10,12 +10,13 @@ SOURCES  += BB10PhoneFactory.cpp \
             BBPhoneAccount.cpp \
             BBPhoneAccountPrivate.cpp
 
-HEADERS  += BB10PhoneFactory.h \
-            BBPhoneAccount.h \ \
+HEADERS  += inc/BB10PhoneFactory.h \
+            inc/BBPhoneAccount.h \ \
             BBPhoneAccountPrivate.h \
             qt4_global.h \
             platform_specific.h
 
+INCLUDEPATH += inc
 LIBS += -lbbsystem
 
 MOC_DIR = moc

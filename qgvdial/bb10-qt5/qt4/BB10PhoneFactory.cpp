@@ -28,7 +28,7 @@ Contact: yuvraaj@gmail.com
 #include "IPhoneAccount.h"
 #endif
 
-IPhoneAccountFactory *
+QT4SHARED_EXPORT IPhoneAccountFactory *
 createPhoneAccountFactory(QObject *parent)
 {
     return (new BB10PhoneFactory(parent));

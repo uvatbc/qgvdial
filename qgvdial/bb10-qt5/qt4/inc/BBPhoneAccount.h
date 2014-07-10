@@ -25,7 +25,7 @@ Contact: yuvraaj@gmail.com
 #include "global.h"
 #include "IPhoneAccount.h"
 
-#include "qt4_global.h"
+#include "bb10_qt4_global.h"
 
 class BBPhoneAccountPrivate;
 class QT4SHARED_EXPORT BBPhoneAccount: public IPhoneAccount

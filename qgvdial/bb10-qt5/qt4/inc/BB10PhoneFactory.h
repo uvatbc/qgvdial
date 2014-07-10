@@ -25,7 +25,7 @@ Contact: yuvraaj@gmail.com
 #include <QObject>
 #include "IPhoneAccountFactory.h"
 
-#include "qt4_global.h"
+#include "bb10_qt4_global.h"
 
 class QT4SHARED_EXPORT BB10PhoneFactory : public IPhoneAccountFactory
 {
