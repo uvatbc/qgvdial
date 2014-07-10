@@ -20,19 +20,41 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "BBPhoneAccount.h"
-#include "BBPhoneAccountPrivate.h"
 
-#include <bb/system/phone/Line>
-#include <bb/system/phone/LineType>
+#include <dlfcn.h>
+#include "bb10_qt4_global.h"
 
 BBPhoneAccount::BBPhoneAccount(QObject *parent)
 : IPhoneAccount(parent)
-, m_d(new BBPhoneAccountPrivate(this))
+, m_hBBPhone(NULL)
+, m_phoneCtx(NULL)
 {
+    if (NULL == m_hBBPhone) {
+        m_hBBPhone = dlopen ("libbbphone.so", RTLD_NOW);
+        if (NULL == m_hBBPhone) {
+            Q_WARN("Failed to load BB Phone Qt4 library");
+            return;
+        }
+    }
+
+    typedef void *(*CreateCtxFn)();
+    CreateCtxFn fn = (CreateCtxFn) dlsym(m_hBBPhone,
+                                         "createPhoneContext");
+    m_phoneCtx = fn();
 }//BBPhoneAccount::BBPhoneAccount
 
 BBPhoneAccount::~BBPhoneAccount()
 {
+    if (NULL != m_phoneCtx) {
+        typedef void (*DeleteCtxFn)(void *ctx);
+        DeleteCtxFn fn = (DeleteCtxFn) dlsym(m_hBBPhone,
+                                             "deletePhoneContext");
+        fn(m_phoneCtx);
+    }
+    if (NULL != m_hBBPhone) {
+        dlclose (m_hBBPhone);
+        m_hBBPhone = NULL;
+    }
 }//BBPhoneAccount::~BBPhoneAccount
 
 QString
@@ -57,8 +79,19 @@ BBPhoneAccount::initiateCall(AsyncTaskToken *task)
         return true;
     }
 
+    if (NULL == m_phoneCtx) {
+        Q_WARN("BB phone library is not initialized");
+        task->status = ATTS_FAILURE;
+        task->emitCompleted();
+        return true;
+    }
+
     QString dest = task->inParams["destination"].toString();
-    m_d->m_phone.initiateCellularCall(dest);
+
+    typedef void (*InitiateCallFn)(void *ctx, const char *dest);
+    InitiateCallFn fn = (InitiateCallFn) dlsym(m_hBBPhone,
+                                               "initiateCellularCall");
+    fn(m_phoneCtx, dest.toLatin1().constData());
     Q_DEBUG(QString("Call initiated to dest: %1").arg(dest));
 
     //TODO: Do this in the slot for the completion of the phone call
@@ -70,12 +103,17 @@ BBPhoneAccount::initiateCall(AsyncTaskToken *task)
 QString
 BBPhoneAccount::getNumber()
 {
-    QMap <QString, bb::system::phone::Line> l = m_d->m_phone.lines();
-    foreach (QString key, l.keys()) {
-        if (l[key].type() == bb::system::phone::LineType::Cellular) {
-            return l[key].address();
-        }
+    if (NULL == m_phoneCtx) {
+        Q_WARN("BB phone library is not initialized");
+        return QString();
     }
 
-    return "";
+    typedef const char *(*GetNumFn)(void *ctx);
+    GetNumFn fn = (GetNumFn) dlsym(m_hBBPhone, "getNumber");
+    const char *bbrv = fn(m_phoneCtx);
+
+    QString rv;
+    rv += bbrv;
+
+    return rv;
 }//BBPhoneAccount::getNumber
