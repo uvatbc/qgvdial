@@ -19,39 +19,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#ifndef BBPHONEACCOUNT_H_
-#define BBPHONEACCOUNT_H_
+#ifndef PLATFORMSPECIFIC_H
+#define PLATFORMSPECIFIC_H
 
-#include "global.h"
-#include "IPhoneAccount.h"
+#include <QtCore>
 
-#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
-#include <bb/system/phone/Phone>
-#endif
+#define UNKNOWN_CONTACT_QRC_PATH    "qrc:/unknown_contact.png"
+#define USE_SINGLE_APPLICATION      0
+#define PHONON_ENABLED              0
 
-class BBPhoneAccount: public IPhoneAccount
-{
-    Q_OBJECT
+#define QGV_NO_DEFAULT_APP_OBJECTS
 
-private:
-    BBPhoneAccount(QObject *parent = 0);
-
-public:
-    ~BBPhoneAccount();
-
-    QString id ();
-    QString name ();
-
-    bool initiateCall(AsyncTaskToken *task);
-
-    QString getNumber();
-
-private:
-#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
-    bb::system::phone::Phone m_phone;
-#endif
-
-    friend class BB10PhoneFactory;
-};
-
-#endif /* BBPHONEACCOUNT_H_ */
+#endif // PLATFORMSPECIFIC_H

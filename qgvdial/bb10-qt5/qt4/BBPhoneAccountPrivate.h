@@ -19,19 +19,19 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#ifndef BB10PHONEFACTORY_H
-#define BB10PHONEFACTORY_H
+#ifndef BBPHONEACCOUNTPRIVATE_H_
+#define BBPHONEACCOUNTPRIVATE_H_
 
-#include <QObject>
-#include "IPhoneAccountFactory.h"
-
-class BB10PhoneFactory : public IPhoneAccountFactory
+#include <bb/system/phone/Phone>
+class BBPhoneAccountPrivate: public QObject
 {
-    Q_OBJECT
 public:
-    explicit BB10PhoneFactory(QObject *parent = 0);
+    BBPhoneAccountPrivate(QObject *parent = NULL);
 
-    bool identifyAll(AsyncTaskToken *task);
+private:
+    bb::system::phone::Phone m_phone;
+
+    friend class BBPhoneAccount;
 };
 
-#endif // BB10PHONEFACTORY_H
+#endif /* BBPHONEACCOUNTPRIVATE_H_ */

@@ -1,4 +1,4 @@
-INCLUDEPATH += $$PWD
+INCLUDEPATH *= $$PWD
 PRECOMPILED_HEADER = $$PWD/global.h
 QT *= sql
 
@@ -21,8 +21,6 @@ SOURCES  += $$PWD/main.cpp \
             $$PWD/LibContacts.cpp \
             $$PWD/LibInbox.cpp \
             $$PWD/LibGvPhones.cpp \
-            $$PWD/IPhoneAccount.cpp \
-            $$PWD/IPhoneAccountFactory.cpp \
             $$PWD/IObserverFactory.cpp \
             $$PWD/GVNumModel.cpp \
             $$PWD/LogUploader.cpp \
@@ -41,8 +39,6 @@ HEADERS  += $$PWD/global.h \
             $$PWD/LibContacts.h \
             $$PWD/LibInbox.h \
             $$PWD/LibGvPhones.h \
-            $$PWD/IPhoneAccount.h \
-            $$PWD/IPhoneAccountFactory.h \
             $$PWD/IObserverFactory.h \
             $$PWD/IObserver.h \
             $$PWD/GVNumModel.h \
@@ -50,4 +46,5 @@ HEADERS  += $$PWD/global.h \
             $$PWD/LibVmail.h \
             $$PWD/O2ContactsStore.h
 
+include($$PWD/phone-account.pri)
 include($$PWD/../../api/api.pri)

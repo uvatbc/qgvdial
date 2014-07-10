@@ -20,19 +20,14 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "BBPhoneAccount.h"
+#include "BBPhoneAccountPrivate.h"
 
-#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
 #include <bb/system/phone/Line>
 #include <bb/system/phone/LineType>
-#else
-#include <QDesktopServices>
-#endif
 
 BBPhoneAccount::BBPhoneAccount(QObject *parent)
 : IPhoneAccount(parent)
-#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
-, m_phone(this)
-#endif
+, m_d(new BBPhoneAccountPrivate(this))
 {
 }//BBPhoneAccount::BBPhoneAccount
 
@@ -63,11 +58,7 @@ BBPhoneAccount::initiateCall(AsyncTaskToken *task)
     }
 
     QString dest = task->inParams["destination"].toString();
-#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
-    m_phone.initiateCellularCall(dest);
-#else
-    QDesktopServices::openUrl (QString("tel:%1").arg (dest));
-#endif
+    m_d->m_phone.initiateCellularCall(dest);
     Q_DEBUG(QString("Call initiated to dest: %1").arg(dest));
 
     //TODO: Do this in the slot for the completion of the phone call
@@ -79,14 +70,12 @@ BBPhoneAccount::initiateCall(AsyncTaskToken *task)
 QString
 BBPhoneAccount::getNumber()
 {
-#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
-    QMap <QString, bb::system::phone::Line> l = m_phone.lines();
+    QMap <QString, bb::system::phone::Line> l = m_d->m_phone.lines();
     foreach (QString key, l.keys()) {
         if (l[key].type() == bb::system::phone::LineType::Cellular) {
             return l[key].address();
         }
     }
-#endif
 
     return "";
 }//BBPhoneAccount::getNumber

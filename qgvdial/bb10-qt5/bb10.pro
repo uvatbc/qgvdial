@@ -4,20 +4,11 @@ TARGET = qgvdial
 MOC_DIR = moc
 OBJECTS_DIR = obj
 
-QT += qml quick widgets
+QT += qml quick widgets multimedia
 
-SOURCES  += BB10PhoneFactory.cpp \
-            MainWindow.cpp
+SOURCES  += MainWindow.cpp
 HEADERS  += platform_specific.h \
-            BB10PhoneFactory.h \
             MainWindow.h
-
-# So that I can open this project in the Qt SDK and have it compile correctly:
-!simulator {
-SOURCES  += BBPhoneAccount.cpp
-HEADERS  += BBPhoneAccount.h
-LIBS += -lbbsystem
-}
 
 RESOURCES += qml.qrc \
              bb10.qrc
