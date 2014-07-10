@@ -20,7 +20,6 @@ OTHER_FILES += \
 QML_IMPORT_PATH = qml
 
 INCLUDEPATH += qt4/inc
-LIBS += -L../qt4 -lbbphone
 
 include(../common/common.pri)
 include(../features/openssl/openssl-lin.pri)

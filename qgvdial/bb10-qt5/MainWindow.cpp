@@ -25,7 +25,11 @@ Contact: yuvraaj@gmail.com
 #include <QGLWidget>
 #include <QGLFormat>
 
-#define MAIN_QML_PATH "app/native/qml/bb10/main.qml"
+#include <dlfcn.h>
+
+#define MAIN_QML_PATH "app/native/qml/main.qml"
+
+void *hBBPhone = NULL;
 
 QCoreApplication *
 createAppObject(int &argc, char **argv)
@@ -33,15 +37,29 @@ createAppObject(int &argc, char **argv)
     return new QGuiApplication(argc, argv);
 }//createAppObject
 
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-
 QQuickView *
 createQQuickView()
 {
-    return new QQuickView();
+    return new QQuickView;
 }//createQQuickView
 
-#endif
+IPhoneAccountFactory *
+createPhoneAccountFactory(QObject *parent)
+{
+    if (NULL == hBBPhone) {
+        hBBPhone = dlopen ("libbbphone.so", RTLD_NOW);
+        if (NULL == hBBPhone) {
+            Q_WARN("Failed to load BB Phone Qt4 library");
+            return NULL;
+        }
+    }
+
+    typedef IPhoneAccountFactory *(*BBFactoryFn)(QObject *parent);
+    BBFactoryFn fn = (BBFactoryFn) dlsym(hBBPhone,
+                                         "createBBPhoneAccountFactory");
+
+    return (fn(NULL));
+}//createPhoneAccountFactory
 
 MainWindow::MainWindow(QObject *parent)
 : QmlMainWindow(parent)

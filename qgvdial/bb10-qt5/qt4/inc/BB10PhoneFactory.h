@@ -36,4 +36,7 @@ public:
     bool identifyAll(AsyncTaskToken *task);
 };
 
+QT4SHARED_EXPORT IPhoneAccountFactory *
+createBBPhoneAccountFactory(QObject *parent);
+
 #endif // BB10PHONEFACTORY_H
