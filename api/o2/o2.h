@@ -177,6 +177,9 @@ protected:
     /// Set extra tokens found in OAuth response
     void setExtraTokens(QVariantMap extraTokens);
 
+    /// Convert a JSON response into a QVariantMap
+    QVariantMap parseJSONToQVmap(const QByteArray &response);
+
 protected:
     QString clientId_;
     QString clientSecret_;
