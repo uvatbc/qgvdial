@@ -430,8 +430,8 @@ CacheDb::putTempFile(const QString &strLink, const QString &strPath)
 
     bool rv =
     query.exec (QString("INSERT INTO " GV_TEMP_TABLE " "
-                        "("GV_TT_CTIME","GV_TT_LINK","GV_TT_PATH") VALUES "
-                        "('%1','%2','%3')")
+                        "(" GV_TT_CTIME "," GV_TT_LINK "," GV_TT_PATH ") "
+                        "VALUES ('%1','%2','%3')")
                         .arg(strCTime).arg(scrubLink).arg(scrubPath));
     Q_ASSERT(rv);
 
@@ -544,14 +544,15 @@ CacheDb::refreshContactsModel (ContactsModel *modelContacts,
 
     //  0,    1,       2,         3
     // id, name, piclink, localpath
-    QString strQ = "SELECT c."GV_C_ID       ","
-                          "c."GV_C_NAME     ","
-                          "c."GV_C_PICLINK  ","
-                          "t."GV_TT_PATH    " ";
+    QString strQ = "SELECT c." GV_C_ID       ","
+                          "c." GV_C_NAME     ","
+                          "c." GV_C_PICLINK  ","
+                          "t." GV_TT_PATH    " ";
     QString strQ1 = "SELECT COUNT(*) ";
 
-    QString strRem = "FROM "GV_CONTACTS_TABLE" c LEFT JOIN "GV_TEMP_TABLE" t "
-                     "ON c."GV_C_PICLINK"=t."GV_TT_LINK;
+    QString strRem = "FROM " GV_CONTACTS_TABLE " c "
+                     "LEFT JOIN " GV_TEMP_TABLE " t "
+                     "ON c." GV_C_PICLINK "=t." GV_TT_LINK;
     if (!query.isEmpty ()) {
         strRem += QString(" WHERE c." GV_C_NAME " LIKE '%%%1%%'")
                     .arg (scrubQuery);
@@ -559,9 +560,9 @@ CacheDb::refreshContactsModel (ContactsModel *modelContacts,
     strQ  += strRem + " ORDER BY c." GV_C_NAME ";";
     strQ1 += strRem + ";";
 
-    QString strQ2 = "SELECT COUNT(*) FROM "GV_CONTACTS_TABLE;
+    QString strQ2 = "SELECT COUNT(*) FROM " GV_CONTACTS_TABLE;
     if (!query.isEmpty ()) {
-        strQ2 += QString(" WHERE "GV_C_NAME" LIKE '%%%1%%'").arg (scrubQuery);
+        strQ2 += QString(" WHERE " GV_C_NAME " LIKE '%%%1%%'").arg (scrubQuery);
     }
     strQ2 += ";";
 

@@ -32,4 +32,6 @@ Contact: yuvraaj@gmail.com
 #define USE_SINGLE_APPLICATION      0
 #define PHONON_ENABLED              0
 
+#define QGV_NO_DEFAULT_APP_OBJECTS
+
 #endif // PLATFORMSPECIFIC_H

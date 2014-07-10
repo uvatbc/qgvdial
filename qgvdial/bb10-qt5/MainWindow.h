@@ -38,7 +38,7 @@ protected:
     QString getMainQmlPath();
 };
 
-QApplication *
+QCoreApplication *
 createAppObject(int &argc, char **argv);
 
 #endif // MAINWINDOW_H

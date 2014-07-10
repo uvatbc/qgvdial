@@ -27,18 +27,10 @@ Contact: yuvraaj@gmail.com
 
 #define MAIN_QML_PATH "app/native/qml/bb10/main.qml"
 
-QApplication *
+QCoreApplication *
 createAppObject(int &argc, char **argv)
 {
-#define DRAG_DIST 16
-    int startDragDistance = QApplication::startDragDistance ();
-    if (DRAG_DIST != startDragDistance) {
-        Q_DEBUG(QString("Original startDragDistance = %1")
-                .arg (startDragDistance));
-        QApplication::setStartDragDistance (DRAG_DIST);
-    }
-
-    return createNormalAppObject (argc, argv);
+    return new QGuiApplication(argc, argv);
 }//createAppObject
 
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
@@ -59,6 +51,7 @@ MainWindow::MainWindow(QObject *parent)
 void
 MainWindow::init()
 {
+    /*
     qreal val;
     int width = QApplication::desktop()->screenGeometry().size().width();
     if (width == 720) {
@@ -98,7 +91,7 @@ MainWindow::init()
     //m_view->setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
     //m_view->setOrientation(QmlApplicationViewer::ScreenOrientationLockPortrait);
     //m_view->setOrientation(QmlApplicationViewer::ScreenOrientationLockLandscape);
-
+    */
 }//MainWindow::init
 
 void
