@@ -6,9 +6,16 @@ OBJECTS_DIR = obj
 
 QT += qml quick widgets multimedia
 
-SOURCES  += MainWindow.cpp
+SOURCES  += MainWindow.cpp \
+            BB10PhoneFactory.cpp \
+            BBPhoneAccount.cpp \
+            BBPhoneAccountPrivate.cpp
+
 HEADERS  += platform_specific.h \
-            MainWindow.h
+            MainWindow.h \
+            BB10PhoneFactory.h \
+            BBPhoneAccount.h \ \
+            BBPhoneAccountPrivate.h \
 
 RESOURCES += qml.qrc \
              bb10.qrc

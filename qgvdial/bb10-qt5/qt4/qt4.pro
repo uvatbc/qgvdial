@@ -6,24 +6,15 @@ TEMPLATE = lib
 
 DEFINES += QT4_LIBRARY
 
-SOURCES  += BB10PhoneFactory.cpp \
-            BBPhoneAccount.cpp \
-            BBPhoneAccountPrivate.cpp
+SOURCES  += BB10PhoneFunctions.cpp
 
-HEADERS  += inc/BB10PhoneFactory.h \
-            inc/BBPhoneAccount.h \ \
-            BBPhoneAccountPrivate.h \
-            qt4_global.h \
-            platform_specific.h
+HEADERS  += inc/bb10_qt4_global.h
 
 INCLUDEPATH += inc
 LIBS += -lbbsystem
 
 MOC_DIR = moc
 OBJECTS_DIR = obj
-
-include(../../common/phone-account.pri)
-include(../../../api/api.pri)
 
 unix {
     target.path = /usr/lib

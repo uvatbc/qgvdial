@@ -19,15 +19,25 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#ifndef PLATFORMSPECIFIC_H
-#define PLATFORMSPECIFIC_H
+#ifndef BB10PHONEFACTORY_H
+#define BB10PHONEFACTORY_H
 
-#include <QtCore>
+#include <QObject>
+#include "IPhoneAccountFactory.h"
 
-#define UNKNOWN_CONTACT_QRC_PATH    "qrc:/unknown_contact.png"
-#define USE_SINGLE_APPLICATION      0
-#define PHONON_ENABLED              0
+#include "bb10_qt4_global.h"
 
-#define QGV_NO_DEFAULT_APP_OBJECTS
+class QT4SHARED_EXPORT BB10PhoneFactory : public IPhoneAccountFactory
+{
+    Q_OBJECT
+public:
+    explicit BB10PhoneFactory(QObject *parent = 0);
+    ~BB10PhoneFactory();
 
-#endif // PLATFORMSPECIFIC_H
+    bool identifyAll(AsyncTaskToken *task);
+
+private:
+    void *m_hBBPhone;
+};
+
+#endif // BB10PHONEFACTORY_H
