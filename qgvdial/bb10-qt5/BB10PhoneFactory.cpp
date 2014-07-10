@@ -28,31 +28,13 @@ Contact: yuvraaj@gmail.com
 #include "IPhoneAccount.h"
 #endif
 
-#include <dlfcn.h>
-
 BB10PhoneFactory::BB10PhoneFactory(QObject *parent)
 : IPhoneAccountFactory(parent)
-, m_hBBPhone(NULL)
 {
-    if (NULL == m_hBBPhone) {
-        m_hBBPhone = dlopen ("libbbphone.so", RTLD_NOW);
-        if (NULL == m_hBBPhone) {
-            Q_WARN("Failed to load BB Phone Qt4 library");
-            return;
-        }
-    }
-
-    typedef IPhoneAccountFactory *(*BBFactoryFn)(QObject *parent);
-    BBFactoryFn fn = (BBFactoryFn) dlsym(m_hBBPhone,
-                                         "createBBPhoneAccountFactory");
 }//BB10PhoneFactory::BB10PhoneFactory
 
 BB10PhoneFactory::~BB10PhoneFactory()
 {
-    if (NULL != m_hBBPhone) {
-        dlclose (m_hBBPhone);
-        m_hBBPhone = NULL;
-    }
 }//BB10PhoneFactory::~BB10PhoneFactory
 
 bool
@@ -63,7 +45,6 @@ BB10PhoneFactory::identifyAll(AsyncTaskToken *task)
     }
     m_accounts.clear();
 
-#ifndef Q_WS_SIMULATOR
     BBPhoneAccount *acct = new BBPhoneAccount(this);
     if (NULL == acct) {
         task->status = ATTS_FAILURE;
@@ -79,9 +60,5 @@ BB10PhoneFactory::identifyAll(AsyncTaskToken *task)
             p->linkCiToNumber(acct->id(), num);
         }
     }
-#else
-    task->status = ATTS_SUCCESS;
-    task->emitCompleted ();
-#endif
     return (true);
 }//BB10PhoneFactory::identifyAll

@@ -19,53 +19,59 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#include "BB10PhoneFactory.h"
-#include "LibGvPhones.h"
-
 #ifndef Q_WS_SIMULATOR
-#include "BBPhoneAccount.h"
-#else
-#include "IPhoneAccount.h"
+#include <bb/system/phone/Phone>
+#include <bb/system/phone/Line>
+#include <bb/system/phone/LineType>
 #endif
 
-IPhoneAccountFactory *
-createBBPhoneAccountFactory(QObject *parent)
+#include "bb10_qt4_global.h"
+
+struct PhoneContext
 {
-    return (new BB10PhoneFactory(parent));
-}//createBBPhoneAccountFactory
+public:
+    PhoneContext() { }
+    ~PhoneContext() { }
 
-BB10PhoneFactory::BB10PhoneFactory(QObject *parent)
-: IPhoneAccountFactory(parent)
+public:
+    bb::system::phone::Phone m_phone;
+    QString m_number;
+};
+
+void * QT4SHARED_EXPORT
+createPhoneContext()
 {
-}//BB10PhoneFactory::BB10PhoneFactory
+    PhoneContext *p = new PhoneContext;
 
-bool
-BB10PhoneFactory::identifyAll(AsyncTaskToken *task)
-{
-    foreach (QString key, m_accounts.keys()) {
-        m_accounts[key]->deleteLater();
-    }
-    m_accounts.clear();
-
-#ifndef Q_WS_SIMULATOR
-    BBPhoneAccount *acct = new BBPhoneAccount(this);
-    if (NULL == acct) {
-        task->status = ATTS_FAILURE;
-        task->emitCompleted ();
-    } else {
-        m_accounts[acct->id()] = acct;
-        task->status = ATTS_SUCCESS;
-        task->emitCompleted ();
-
-        QString num = acct->getNumber();
-        if (!num.isEmpty()) {
-            LibGvPhones *p = (LibGvPhones *) parent();
-            p->linkCiToNumber(acct->id(), num);
+    QMap <QString, bb::system::phone::Line> l = p->m_phone.lines();
+    foreach (QString key, l.keys()) {
+        if (l[key].type() == bb::system::phone::LineType::Cellular) {
+            p->m_number = l[key].address();
+            break;
         }
     }
-#else
-    task->status = ATTS_SUCCESS;
-    task->emitCompleted ();
-#endif
-    return (true);
-}//BB10PhoneFactory::identifyAll
+
+    return p;
+}
+
+void QT4SHARED_EXPORT
+deletePhoneContext(void *ctx)
+{
+    PhoneContext *p = (PhoneContext *) ctx;
+    delete p;
+}
+
+const char * QT4SHARED_EXPORT
+getNumber(void *ctx)
+{
+    PhoneContext *p = (PhoneContext *) ctx;
+    return p->m_number.toLatin1().constData ();
+}
+
+int QT4SHARED_EXPORT
+initiateCellularCall(void *ctx, const char *dest)
+{
+    PhoneContext *p = (PhoneContext *) ctx;
+    p->m_phone.initiateCellularCall (QString(dest));
+    return 0;
+}

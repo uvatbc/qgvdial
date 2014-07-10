@@ -25,10 +25,7 @@ Contact: yuvraaj@gmail.com
 #include "global.h"
 #include "IPhoneAccount.h"
 
-#include "bb10_qt4_global.h"
-
-class BBPhoneAccountPrivate;
-class QT4SHARED_EXPORT BBPhoneAccount: public IPhoneAccount
+class BBPhoneAccount: public IPhoneAccount
 {
     Q_OBJECT
 
@@ -46,7 +43,8 @@ public:
     QString getNumber();
 
 private:
-    BBPhoneAccountPrivate *m_d;
+    void *m_hBBPhone;
+    void *m_phoneCtx;
 
     friend class BB10PhoneFactory;
 };

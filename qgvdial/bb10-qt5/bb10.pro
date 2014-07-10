@@ -8,14 +8,12 @@ QT += qml quick widgets multimedia
 
 SOURCES  += MainWindow.cpp \
             BB10PhoneFactory.cpp \
-            BBPhoneAccount.cpp \
-            BBPhoneAccountPrivate.cpp
+            BBPhoneAccount.cpp
 
 HEADERS  += platform_specific.h \
             MainWindow.h \
             BB10PhoneFactory.h \
-            BBPhoneAccount.h \ \
-            BBPhoneAccountPrivate.h \
+            BBPhoneAccount.h
 
 RESOURCES += qml.qrc \
              bb10.qrc

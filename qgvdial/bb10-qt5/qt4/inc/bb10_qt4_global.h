@@ -30,4 +30,14 @@ Contact: yuvraaj@gmail.com
 #  define QT4SHARED_EXPORT Q_DECL_IMPORT
 #endif
 
+void * QT4SHARED_EXPORT
+createPhoneContext();
+void QT4SHARED_EXPORT
+deletePhoneContext(void *ctx);
+
+const char * QT4SHARED_EXPORT
+getNumber(void *ctx);
+int QT4SHARED_EXPORT
+initiateCellularCall(void *ctx, const char *dest);
+
 #endif // QT4_GLOBAL_H

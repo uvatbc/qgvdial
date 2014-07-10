@@ -35,9 +35,6 @@ public:
     ~BB10PhoneFactory();
 
     bool identifyAll(AsyncTaskToken *task);
-
-private:
-    void *m_hBBPhone;
 };
 
 #endif // BB10PHONEFACTORY_H
