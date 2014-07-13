@@ -51,9 +51,8 @@ Item {
             }
         }
 
-        ButtonRow {
+        Row {
             anchors.horizontalCenter: parent.horizontalCenter
-            exclusive: false
             spacing: 5
 
             Button {

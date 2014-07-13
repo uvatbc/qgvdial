@@ -26,7 +26,7 @@ Contact: yuvraaj@gmail.com
 #include <QGLWidget>
 #include <QGLFormat>
 
-#define MAIN_QML_PATH "app/native/qml/main.qml"
+#define MAIN_QML_PATH "qrc:/main.qml"
 
 QCoreApplication *
 createAppObject(int &argc, char **argv)
@@ -54,6 +54,7 @@ MainWindow::MainWindow(QObject *parent)
 void
 MainWindow::init()
 {
+    QmlMainWindow::init ();
     /*
     qreal val;
     int width = QApplication::desktop()->screenGeometry().size().width();

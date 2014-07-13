@@ -22,9 +22,8 @@ Contact: yuvraaj@gmail.com
 import QtQuick 2.2
 import QtQuick.Controls 1.1
 
-Item {
+Tab {
     id: container
-    tools: commonTools
     anchors.fill: parent
 
     objectName: "SettingsPage"
@@ -146,4 +145,4 @@ Item {
             }
         }//ExpandView (Et Cetera)
     }//Flickable
-}//Item (SettingsPage)
+}//Tab (SettingsPage)

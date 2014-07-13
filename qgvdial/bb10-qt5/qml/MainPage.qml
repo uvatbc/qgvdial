@@ -24,7 +24,8 @@ import QtQuick.Controls 1.1
 
 Item {
     id: container
-    tools: mainTools
+
+    property Item pageStack
 
     signal regNumBtnClicked
 
@@ -48,45 +49,34 @@ Item {
         right: parent.right
     }
 
-    TabGroup {
+    TabView {
         id: tabgroup
         objectName: "MainTabGroup"
-        currentTab: dialTab
-
+        currentIndex: 0
         anchors.fill: parent
 
         function setTab(index) {
-            if (0 === index) {
-                currentTab = dialTab;
-            } else if (1 === index) {
-                currentTab = contactsTab;
-            } else if (2 === index) {
-                currentTab = inboxTab;
-            } else if (3 === index) {
-                currentTab = settingsTab;
+            if (index <0 || index > 3) {
+                console.warn("Index out of bounds for TabView.setTab");
+                return;
             }
+
+            currentIndex = index;
         }
 
         DialPage {
             id: dialTab
             objectName: "DialPage"
-            pageStack: container.pageStack
-            tools: container.tools
             onRegNumBtnClicked: { container.regNumBtnClicked(); }
         }
         ContactsPage {
             id: contactsTab
             objectName: "ContactsPage"
-            pageStack: container.pageStack
-            tools: container.tools
             onSigRefreshContacts: { container.sigRefreshContacts(); }
             onSigRefreshContactsFull: { container.sigRefreshContactsFull(); }
         }
         InboxPage {
             id: inboxTab
-            pageStack: container.pageStack
-            tools: container.tools
-
             onSetNumberToDial: {
                 dialTab.setNumberInDisp(number);
                 tabgroup.setTab(0);
@@ -97,37 +87,6 @@ Item {
         }
         SettingsPage {
             id: settingsTab
-            pageStack: container.pageStack
-            tools: container.tools
         }
-    }//TabGroup
-
-    ToolBar {
-        id: mainTools
-
-        anchors.bottom: parent.bottom
-        visible: true
-
-        tools: ToolBarLayout {
-            ButtonRow {
-                visible: (container.pageStack.depth == 1)
-                TabButton {
-                    iconSource: "qrc:/dialpad.svg"
-                    tab: dialTab
-                }
-                TabButton {
-                    iconSource: "qrc:/people.svg"
-                    tab: contactsTab
-                }
-                TabButton {
-                    iconSource: "qrc:/history.svg"
-                    tab: inboxTab
-                }
-                TabButton {
-                    iconSource: "qrc:/settings.svg"
-                    tab: settingsTab
-                }
-            }
-        }//ToolBarLayout
-    }//ToolBar
+    }//TabView
 }

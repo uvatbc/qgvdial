@@ -22,9 +22,8 @@ Contact: yuvraaj@gmail.com
 import QtQuick 2.2
 import QtQuick.Controls 1.1
 
-Item {
+Tab {
     id: container
-    tools: commonTools
     anchors.fill: parent
 
     property bool isSearchResults: false
@@ -202,4 +201,4 @@ Item {
             }
         }// delegate Rectangle
     }//ListView
-}//Page
+}//Tab

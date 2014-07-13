@@ -226,7 +226,7 @@ Item {
         }//Column
     }//Flickable
 
-    ButtonRow {
+    Row {
         id: btnRow
         anchors {
             bottom: parent.bottom
@@ -234,7 +234,6 @@ Item {
             horizontalCenter: parent.horizontalCenter
         }
         spacing: 5
-        exclusive: false
 
         width: (btnReply.visible ? parent.width * 8 / 10
                                  : parent.width * 4 / 10)

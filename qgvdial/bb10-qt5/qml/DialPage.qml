@@ -22,7 +22,7 @@ Contact: yuvraaj@gmail.com
 import QtQuick 2.2
 import QtQuick.Controls 1.1
 
-Item {
+Tab {
     id: container
     anchors.fill: parent
 
@@ -88,9 +88,9 @@ Item {
                 }
             }
 
-            onPlatformPressAndHold: {
-                numberField.text = "";
-            }
+            //onPlatformPressAndHold: {
+            //    numberField.text = "";
+            //}
         }
     }//TextField
 
@@ -108,11 +108,11 @@ Item {
         onSigHaptic: container.sigHaptic();
     }//Keypad
 
-    ButtonRow {
+    Row {
         id: btnRow
 
         spacing: 5
-        exclusive: false
+        //exclusive: false
 
         Button {
             text: "Text"
@@ -211,4 +211,4 @@ Item {
             }
         }//State
     ]//states
-}//Item
+}//Tab

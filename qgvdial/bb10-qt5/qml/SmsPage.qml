@@ -73,10 +73,9 @@ Item {
             width: parent.width
         }
 
-        ButtonRow {
+        Row {
             anchors.horizontalCenter: parent.horizontalCenter
             width: parent.width * 8 / 10
-            exclusive: false
             spacing: 5
 
             Button {

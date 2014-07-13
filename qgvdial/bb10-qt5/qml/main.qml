@@ -116,14 +116,12 @@ ApplicationWindow {
 
     TfaPinPage {
         id: tfaPinDlg
-        tools: commonTools
         objectName: "TFAPinDialog"
         onDone: { appWindow.popPageStack(); }
     }//TFA Dialog
 
     RegNumberSelector {
         id: regNumberSelector
-        tools: commonTools
         objectName: "RegNumberSelector"
 
         onSelected: { appWindow.popPageStack(); }
@@ -131,7 +129,6 @@ ApplicationWindow {
 
     ContactDetailsPage {
         id: contactDetails
-        tools: commonTools
         onDone: { appWindow.popPageStack(); }
         onSetNumberToDial: {
             mainPage.setNumberInDisp(number);
@@ -141,7 +138,6 @@ ApplicationWindow {
 
     InboxDetailsPage {
         id: inboxDetails
-        tools: commonTools
         objectName: "InboxDetails"
 
         onDone: { appWindow.popPageStack(); }
@@ -155,20 +151,17 @@ ApplicationWindow {
 
     MessageBox {
         id: msgBox
-        tools: commonTools
         onDone: { appWindow.popPageStack(); }
     }
 
     CiPhoneSelectionPage {
         id: ciPhoneSelector
-        tools: commonTools
         objectName: "CiPhoneSelectionPage"
         onDone: { appWindow.popPageStack(); }
     }
 
     SmsPage {
         id: smsPage
-        tools: commonTools
         objectName: "SmsPage"
         onDone: { appWindow.popPageStack(); }
     }
@@ -192,7 +185,9 @@ ApplicationWindow {
 
     MainPage {
         id: mainPage
-        // Has its own tools.
+
+        pageStack: appWindow.pageStack
+
         onRegNumBtnClicked: { appWindow.pageStack.push(regNumberSelector); }
 
         onSigRefreshContacts: { appWindow.sigRefreshContacts(); }
@@ -201,13 +196,10 @@ ApplicationWindow {
         onSigRefreshInboxFull: { appWindow.sigRefreshInboxFull(); }
     }
 
-    ToolBar {
+    toolBar: ToolBar {
         id: commonTools
 
-        anchors.bottom: parent.bottom
-        visible: true
-
-        tools: ToolBarLayout {
+        Row {
             ToolButton {
                 iconSource: "toolbar-back";
                 onClicked: {
@@ -222,6 +214,22 @@ ApplicationWindow {
                     }
                 }
             }
-        }//ToolBarLayout
+            ToolButton {
+                iconSource: "qrc:/dialpad.svg"
+                onClicked: { mainPage.setTab(0); }
+            }
+            ToolButton {
+                iconSource: "qrc:/people.svg"
+                onClicked: { mainPage.setTab(1); }
+            }
+            ToolButton {
+                iconSource: "qrc:/history.svg"
+                onClicked: { mainPage.setTab(2); }
+            }
+            ToolButton {
+                iconSource: "qrc:/settings.svg"
+                onClicked: { mainPage.setTab(3); }
+            }
+        }//Row
     }//ToolBar (commonTools)
 }

@@ -40,7 +40,7 @@ public:
     CQmlViewer();
 
     inline void setMainQmlFile(const QString &qmlFile) {
-        m_view->setSource(QUrl::fromLocalFile(qmlFile));
+        m_view->setSource(QUrl(qmlFile));
     }
 
     // Stupid hack to shut up the warnings
