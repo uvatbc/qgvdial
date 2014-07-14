@@ -22,7 +22,7 @@ Contact: yuvraaj@gmail.com
 import QtQuick 2.2
 import QtQuick.Controls 1.1
 
-Tab {
+Item {
     id: container
     anchors.fill: parent
 
@@ -78,7 +78,7 @@ Tab {
             }
 
             visible: numberField.text.length != 0 ? true : false
-            platformInverted: true
+            //platformInverted: true
 
             onClicked: {
                 if (numberField.selectedText.length == 0) {
@@ -211,4 +211,4 @@ Tab {
             }
         }//State
     ]//states
-}//Tab
+}//Item

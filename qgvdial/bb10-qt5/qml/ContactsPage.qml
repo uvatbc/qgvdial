@@ -22,7 +22,7 @@ Contact: yuvraaj@gmail.com
 import QtQuick 2.2
 import QtQuick.Controls 1.1
 
-Tab {
+Item {
     id: container
     anchors.fill: parent
 
@@ -188,4 +188,4 @@ Tab {
             }
         }// delegate Rectangle
     }// ListView (contacts list)
-}//Tab
+}//Item

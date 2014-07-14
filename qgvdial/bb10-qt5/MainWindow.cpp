@@ -34,12 +34,6 @@ createAppObject(int &argc, char **argv)
     return new QGuiApplication(argc, argv);
 }//createAppObject
 
-QQuickView *
-createQQuickView()
-{
-    return new QQuickView;
-}//createQQuickView
-
 IPhoneAccountFactory *
 createPhoneAccountFactory(QObject *parent)
 {
@@ -55,6 +49,14 @@ void
 MainWindow::init()
 {
     QmlMainWindow::init ();
+
+    qreal val;
+    val = 0.8;
+    m_view->engine().rootContext()->setContextProperty("g_keypadScaleFactor1",
+                                                       val);
+    m_view->engine().rootContext()->setContextProperty("g_keypadScaleFactor2",
+                                                       val);
+
     /*
     qreal val;
     int width = QApplication::desktop()->screenGeometry().size().width();

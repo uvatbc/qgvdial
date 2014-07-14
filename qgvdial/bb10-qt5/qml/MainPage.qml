@@ -25,7 +25,7 @@ import QtQuick.Controls 1.1
 Item {
     id: container
 
-    property Item pageStack
+    property variant pageStack
 
     signal regNumBtnClicked
 

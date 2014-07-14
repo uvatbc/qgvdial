@@ -9,12 +9,6 @@ createAppObject(int &argc, char **argv)
     return app;
 }//createAppObject
 
-QQuickView *
-createQQuickView()
-{
-    return SailfishApp::createView();
-}//createQQuickView
-
 MainWindow::MainWindow(QObject *parent)
 : QmlMainWindow(parent)
 {

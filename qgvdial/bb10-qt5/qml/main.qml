@@ -47,8 +47,8 @@ ApplicationWindow {
     signal sigRefreshInboxFull
 
     function popPageStack() {
-        if (appWindow.pageStack.depth > 1) {
-            appWindow.pageStack.pop();
+        if (pageStack.depth > 1) {
+            pageStack.pop();
         } else {
             console.debug("No popping dammit!");
         }

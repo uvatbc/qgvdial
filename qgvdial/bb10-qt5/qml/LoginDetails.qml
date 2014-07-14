@@ -119,7 +119,7 @@ Item {
             id: lblPassword
             anchors.verticalCenter: parent.verticalCenter
             opacity: (1 - textPassword.opacity)
-            text: Array(container.password.length+1).join("*")
+            text: { new Array(container.password.length+1).join("*"); }
 
             MouseArea {
                 anchors.fill: parent

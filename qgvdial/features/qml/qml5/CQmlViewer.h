@@ -39,20 +39,22 @@ class CQmlViewer : public QObject
 public:
     CQmlViewer();
 
-    inline void setMainQmlFile(const QString &qmlFile) {
-        m_view->setSource(QUrl(qmlFile));
+    inline void setMainQmlFile(QUrl qmlUrl) {
+        m_engine.load (qmlUrl);
     }
 
     // Stupid hack to shut up the warnings
     inline void setOrientation(QmlApplicationViewer::ScreenOrientation /*o*/) {}
 
     // Stub off these show functions.
-    inline void show() { m_view->show(); }
+    inline void show() { }
     inline void showExpanded() { show(); }
 
     // Root object and context need to be provided
-    inline QQuickItem *rootObject() { return m_view->rootObject(); }
-    inline QQmlContext *rootContext() const { return m_view->rootContext (); }
+    inline QObject *rootObject() { return m_engine.rootObjects()[0]; }
+    inline QQmlContext *rootContext() const { return m_engine.rootContext(); }
+
+    inline QQmlApplicationEngine &engine() { return m_engine; }
 
     bool connectToChangeNotify(QObject *item, const QString &propName,
                                QObject *receiver, const char *slotName);
@@ -61,14 +63,13 @@ signals:
     void viewerStatusChanged(bool ready);
 
 private slots:
-    void onDeclStatusChanged(QQuickView::Status status);
+    void onObjectCreated(QObject *object, const QUrl &url);
 
 private:
-    QQuickView *m_view;
+    QQmlApplicationEngine m_engine;
 };
 
 CQmlViewer *createQmlViewer();
-QQuickView *createQQuickView();
 
 #endif//_CQMLVIEWER_
 

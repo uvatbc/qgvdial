@@ -234,8 +234,7 @@ Item {
             }//TextField (proxy password)
         }// Row (user proxy password)
 
-        ButtonRow {
-            exclusive: false
+        Row {
             anchors.horizontalCenter: parent.horizontalCenter
             width: parent.width * 7/10
 

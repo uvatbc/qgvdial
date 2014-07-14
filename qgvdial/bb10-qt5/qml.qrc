@@ -18,6 +18,7 @@
         <file alias="Proxy.qml">qml/Proxy.qml</file>
         <file alias="RefreshButton.qml">qml/RefreshButton.qml</file>
         <file alias="RegNumberSelector.qml">qml/RegNumberSelector.qml</file>
+        <file alias="SelectionDialog.qml">qml/SelectionDialog.qml</file>
         <file alias="SettingsPage.qml">qml/SettingsPage.qml</file>
         <file alias="SmsPage.qml">qml/SmsPage.qml</file>
         <file alias="StatusBanner.qml">qml/StatusBanner.qml</file>

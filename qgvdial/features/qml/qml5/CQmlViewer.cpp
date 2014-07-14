@@ -28,32 +28,17 @@ createQmlViewer()
 }//createQmlViewer
 
 CQmlViewer::CQmlViewer()
-: m_view(NULL)
+: m_engine(this)
 {
-    m_view = createQQuickView();
-    if (NULL == m_view) {
-        Q_WARN("Failed to create view");
-    }
-
-    connect(m_view, SIGNAL(statusChanged(QQuickView::Status)),
-            this, SLOT(onDeclStatusChanged(QQuickView::Status)));
+    connect(&m_engine, SIGNAL(objectCreated(QObject*,QUrl)),
+            this, SLOT(onObjectCreated(QObject*,QUrl)));
 }//CQmlViewer::CQmlViewer
 
 void
-CQmlViewer::onDeclStatusChanged(QQuickView::Status status)
+CQmlViewer::onObjectCreated(QObject *object, const QUrl & /*url*/)
 {
-    if (QQuickView::Ready == status) {
-        emit viewerStatusChanged (true);
-        return;
-    }
-
-    if (QQuickView::Error != status) {
-        return;
-    }
-
-    Q_WARN(QString("status = %1").arg (status));
-    emit viewerStatusChanged (false);
-}//CQmlViewer::onDeclStatusChanged
+    emit viewerStatusChanged (NULL != object);
+}//CQmlViewer::onObjectCreated
 
 bool
 CQmlViewer::connectToChangeNotify(QObject *item, const QString &propName,
