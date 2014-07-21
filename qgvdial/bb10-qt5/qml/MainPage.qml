@@ -43,11 +43,16 @@ Item {
         tabView.setTab(number);
     }
 
+    /*
     anchors {
         top: parent.top
         left: parent.left
         right: parent.right
     }
+    */
+
+    onHeightChanged: { console.debug("MainPage h = " + height); }
+    onWidthChanged: { console.debug("MainPage w = " + width); }
 
     TabView {
         id: tabView

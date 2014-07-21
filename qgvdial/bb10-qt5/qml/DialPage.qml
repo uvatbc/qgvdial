@@ -69,7 +69,7 @@ Item {
         readOnly: true
 
         ToolButton {
-            iconSource: "toolbar-back"
+            iconName: "toolbar-back"
 
             anchors {
                 verticalCenter: parent.verticalCenter

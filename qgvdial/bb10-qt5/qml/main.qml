@@ -21,24 +21,14 @@ Contact: yuvraaj@gmail.com
 
 import QtQuick 2.2
 import QtQuick.Controls 1.1
+import QtQuick.Layouts 1.0
 
 ApplicationWindow {
     id: appWindow
     objectName: "MainPageStack"
 
     visible: true
-    /*
-    width: 640
-    height: 480
-    */
     title: qsTr("qgvdial")
-
-    StackView {
-        id: pageStack
-        anchors.fill: parent
-
-        initialItem: mainPage
-    }
 
     signal sigShowContact(string cId)
 
@@ -116,94 +106,112 @@ ApplicationWindow {
 
     property bool _inboxDetailsShown: false
 
-    TfaPinPage {
-        id: tfaPinDlg
-        objectName: "TFAPinDialog"
-        onDone: { appWindow.popPageStack(); }
-    }//TFA Dialog
-
-    RegNumberSelector {
-        id: regNumberSelector
-        objectName: "RegNumberSelector"
-
-        onSelected: { appWindow.popPageStack(); }
-    }
-
-    ContactDetailsPage {
-        id: contactDetails
-        onDone: { appWindow.popPageStack(); }
-        onSetNumberToDial: {
-            mainPage.setNumberInDisp(number);
-            mainPage.setTab(0);
-        }
-    }
-
-    InboxDetailsPage {
-        id: inboxDetails
-        objectName: "InboxDetails"
-
-        onDone: { appWindow.popPageStack(); }
-        onSetNumberToDial: {
-            mainPage.setNumberInDisp(number);
-            mainPage.setTab(0);
-        }
-
-        onSigShowContact: appWindow.sigShowContact(cId);
-    }
-
-    MessageBox {
-        id: msgBox
-        onDone: { appWindow.popPageStack(); }
-    }
-
-    CiPhoneSelectionPage {
-        id: ciPhoneSelector
-        objectName: "CiPhoneSelectionPage"
-        onDone: { appWindow.popPageStack(); }
-    }
-
-    SmsPage {
-        id: smsPage
-        objectName: "SmsPage"
-        onDone: { appWindow.popPageStack(); }
-    }
-
-    /*
-    WebPage {
-        id: webPage
-        objectName: "WebPage"
-    }
-    */
-
-    StatusBanner {
-        id: statusBanner
-        objectName: "StatusBanner"
+    StackView {
+        id: pageStack
 
         anchors {
-            bottom: parent.bottom
-            bottomMargin: 110 //commonTools.height + 5
+            top: parent.top
+            left: parent.left
+            right: parent.right
         }
-    }
+        height: parent.height - toolBar.height
 
-    MainPage {
-        id: mainPage
+        onHeightChanged: { console.debug("pageStack h = " + height); }
+        onWidthChanged: { console.debug("pageStack w = " + width); }
 
-        pageStack: appWindow.pageStack
+        initialItem: mainPage
 
-        onRegNumBtnClicked: { appWindow.pageStack.push(regNumberSelector); }
+        TfaPinPage {
+            id: tfaPinDlg
+            objectName: "TFAPinDialog"
+            onDone: { appWindow.popPageStack(); }
+        }//TFA Dialog
 
-        onSigRefreshContacts: { appWindow.sigRefreshContacts(); }
-        onSigRefreshContactsFull: { appWindow.sigRefreshContactsFull(); }
-        onSigRefreshInbox: { appWindow.sigRefreshInbox(); }
-        onSigRefreshInboxFull: { appWindow.sigRefreshInboxFull(); }
-    }
+        RegNumberSelector {
+            id: regNumberSelector
+            objectName: "RegNumberSelector"
+
+            onSelected: { appWindow.popPageStack(); }
+        }
+
+        ContactDetailsPage {
+            id: contactDetails
+            onDone: { appWindow.popPageStack(); }
+            onSetNumberToDial: {
+                mainPage.setNumberInDisp(number);
+                mainPage.setTab(0);
+            }
+        }
+
+        InboxDetailsPage {
+            id: inboxDetails
+            objectName: "InboxDetails"
+
+            onDone: { appWindow.popPageStack(); }
+            onSetNumberToDial: {
+                mainPage.setNumberInDisp(number);
+                mainPage.setTab(0);
+            }
+
+            onSigShowContact: appWindow.sigShowContact(cId);
+        }
+
+        MessageBox {
+            id: msgBox
+            onDone: { appWindow.popPageStack(); }
+        }
+
+        CiPhoneSelectionPage {
+            id: ciPhoneSelector
+            objectName: "CiPhoneSelectionPage"
+            onDone: { appWindow.popPageStack(); }
+        }
+
+        SmsPage {
+            id: smsPage
+            objectName: "SmsPage"
+            onDone: { appWindow.popPageStack(); }
+        }
+
+        /*
+        WebPage {
+            id: webPage
+            objectName: "WebPage"
+        }
+        */
+
+        StatusBanner {
+            id: statusBanner
+            objectName: "StatusBanner"
+
+            anchors {
+                bottom: parent.bottom
+                bottomMargin: 110 //commonTools.height + 5
+            }
+        }
+
+        MainPage {
+            id: mainPage
+
+            pageStack: appWindow.pageStack
+
+            onRegNumBtnClicked: { appWindow.pageStack.push(regNumberSelector); }
+
+            onSigRefreshContacts: { appWindow.sigRefreshContacts(); }
+            onSigRefreshContactsFull: { appWindow.sigRefreshContactsFull(); }
+            onSigRefreshInbox: { appWindow.sigRefreshInbox(); }
+            onSigRefreshInboxFull: { appWindow.sigRefreshInboxFull(); }
+        }
+    }//StackView
 
     toolBar: ToolBar {
         id: commonTools
 
-        Row {
+        RowLayout {
+            anchors.fill: parent
+
             ToolButton {
-                iconSource: "toolbar-back";
+                iconName: "toolbar-back"
                 onClicked: {
                     if (appWindow.pageStack.depth > 1) {
                         appWindow.popPageStack();
