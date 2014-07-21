@@ -21,10 +21,10 @@ Contact: yuvraaj@gmail.com
 
 import QtQuick 2.2
 import QtQuick.Controls 1.1
+import QtQuick.Window 2.1
 
 Item {
     id: container
-    anchors.fill: parent
 
     signal sigHaptic
     signal regNumBtnClicked
@@ -128,7 +128,7 @@ Item {
         }
     }//ButtonRow: Text & Call
 
-    state: (screen.currentOrientation == Screen.Portrait) ? "portrait" : "landscape"
+    state: ((Screen.orientation == Qt.PortraitOrientation) || (Screen.orientation == Qt.InvertedPortraitOrientation)) ? "portrait" : "landscape"
     states: [
         State {
             name: "portrait"

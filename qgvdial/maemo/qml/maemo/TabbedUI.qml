@@ -59,7 +59,7 @@ Rectangle {
         tabsModel.children[tabIndex].state = "Visible";
     }
 
-    function showRegNumSeletor() {
+    function showRegNumSelector() {
         regNumberSelector.visible = true;
         imgClose.state = "back";
     }

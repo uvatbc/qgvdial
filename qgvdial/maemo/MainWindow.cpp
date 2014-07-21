@@ -659,7 +659,7 @@ MainWindow::uiRefreshNumbers()
 void
 MainWindow::onUserClickedRegNumBtn()
 {
-    QMetaObject::invokeMethod (tabbedUI, "showRegNumSeletor");
+    QMetaObject::invokeMethod (tabbedUI, "showRegNumSelector");
 }//MainWindow::onUserClickedRegNumBtn
 
 void

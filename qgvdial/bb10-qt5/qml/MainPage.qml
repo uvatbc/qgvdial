@@ -40,7 +40,7 @@ Item {
     }
 
     function setTab(number) {
-        tabgroup.setTab(number);
+        tabView.setTab(number);
     }
 
     anchors {
@@ -50,13 +50,13 @@ Item {
     }
 
     TabView {
-        id: tabgroup
+        id: tabView
         objectName: "MainTabGroup"
         currentIndex: 0
         anchors.fill: parent
 
         function setTab(index) {
-            if (index <0 || index > 3) {
+            if (index < 0 || index > 3) {
                 console.warn("Index out of bounds for TabView.setTab");
                 return;
             }
@@ -64,29 +64,56 @@ Item {
             currentIndex = index;
         }
 
-        DialPage {
-            id: dialTab
-            objectName: "DialPage"
-            onRegNumBtnClicked: { container.regNumBtnClicked(); }
+        /*
+        Component.onCompleted: {
+            tabView.addTab("Dial",     dialTab);
+            tabView.addTab("Contacts", contactsTab);
+            tabView.addTab("Inbox",    inboxTab);
+            tabView.addTab("Settings", settingsTab);
+
+            tabView.setTab(3);
+        }
+        */
+
+        Tab {
+            active: true
+            Rectangle {
+                anchors.fill: parent
+                color: "orange"
+            }
+        }
+
+        Tab {
+            active: true
+            DialPage {
+                id: dialTab
+                objectName: "DialPage"
+                anchors.fill: parent
+                onRegNumBtnClicked: { container.regNumBtnClicked(); }
+                visible: false
+            }
         }
         ContactsPage {
             id: contactsTab
             objectName: "ContactsPage"
             onSigRefreshContacts: { container.sigRefreshContacts(); }
             onSigRefreshContactsFull: { container.sigRefreshContactsFull(); }
+            visible: false
         }
         InboxPage {
             id: inboxTab
             onSetNumberToDial: {
                 dialTab.setNumberInDisp(number);
-                tabgroup.setTab(0);
+                tabView.setTab(0);
             }
 
             onSigRefreshInbox: { container.sigRefreshInbox(); }
             onSigRefreshInboxFull: { container.sigRefreshInboxFull(); }
+            visible: false
         }
         SettingsPage {
             id: settingsTab
+            visible: false
         }
     }//TabView
 }
