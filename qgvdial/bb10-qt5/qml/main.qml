@@ -47,11 +47,11 @@ ApplicationWindow {
     }
 
     function pushTfaDlg() {
-        appWindow.pageStack.push(tfaPinDlg);
+        pageStack.push(tfaPinDlg);
     }
     function showMsgBox(msg) {
         msgBox.message = msg;
-        appWindow.pageStack.push(msgBox);
+        pageStack.push(msgBox);
     }
     function showContactDetails(imgSource, name, notes) {
         contactDetails.imageSource = imgSource;
@@ -61,7 +61,7 @@ ApplicationWindow {
             contactDetails.phonesModel = g_ContactPhonesModel;
         }
         contactDetails.modelCount = g_ContactPhonesModel.count;
-        appWindow.pageStack.push(contactDetails);
+        pageStack.push(contactDetails);
     }
     function showInboxDetails(imgSource, name, number, note, smsText, phType,
                               isVmail, cId, iId) {
@@ -78,13 +78,13 @@ ApplicationWindow {
         inboxDetails.showPlayBtn = true;
         inboxDetails.fetchingEmail = true;
         inboxDetails.vmailPosition = 0;
-        appWindow.pageStack.push(inboxDetails);
+        pageStack.push(inboxDetails);
         appWindow._inboxDetailsShown = true;
     }
     function pushCiSelector(ciId) {
         ciPhoneSelector.ciId = ciId;
         ciPhoneSelector.phonesModel = g_CiPhonesModel;
-        appWindow.pageStack.push(ciPhoneSelector);
+        pageStack.push(ciPhoneSelector);
     }
     function showSmsPage(imgSource, name, dest, conversation, text) {
         smsPage.imageSource  = imgSource;
@@ -92,7 +92,7 @@ ApplicationWindow {
         smsPage.dest         = dest;
         smsPage.conversation = conversation;
         smsPage.smsText      = text;
-        appWindow.pageStack.push(smsPage);
+        pageStack.push(smsPage);
     }
     /*
     function showWebPage(url) {
@@ -109,17 +109,12 @@ ApplicationWindow {
     StackView {
         id: pageStack
 
-        anchors {
-            top: parent.top
-            left: parent.left
-            right: parent.right
-        }
-        height: parent.height - toolBar.height
-
-        onHeightChanged: { console.debug("pageStack h = " + height); }
-        onWidthChanged: { console.debug("pageStack w = " + width); }
+        anchors.fill: parent
 
         initialItem: mainPage
+        onCurrentItemChanged: {
+            commonTools.visible = (currentItem === mainPage);
+        }
 
         TfaPinPage {
             id: tfaPinDlg
@@ -195,7 +190,7 @@ ApplicationWindow {
 
             pageStack: appWindow.pageStack
 
-            onRegNumBtnClicked: { appWindow.pageStack.push(regNumberSelector); }
+            onRegNumBtnClicked: { pageStack.push(regNumberSelector); }
 
             onSigRefreshContacts: { appWindow.sigRefreshContacts(); }
             onSigRefreshContactsFull: { appWindow.sigRefreshContactsFull(); }
@@ -213,7 +208,7 @@ ApplicationWindow {
             ToolButton {
                 iconName: "toolbar-back"
                 onClicked: {
-                    if (appWindow.pageStack.depth > 1) {
+                    if (pageStack.depth > 1) {
                         appWindow.popPageStack();
                         if (appWindow._inboxDetailsShown) {
                             appWindow._inboxDetailsShown = false;
@@ -223,22 +218,6 @@ ApplicationWindow {
                         console.debug("Quit!");
                     }
                 }
-            }
-            ToolButton {
-                iconSource: "qrc:/dialpad.svg"
-                onClicked: { mainPage.setTab(0); }
-            }
-            ToolButton {
-                iconSource: "qrc:/people.svg"
-                onClicked: { mainPage.setTab(1); }
-            }
-            ToolButton {
-                iconSource: "qrc:/history.svg"
-                onClicked: { mainPage.setTab(2); }
-            }
-            ToolButton {
-                iconSource: "qrc:/settings.svg"
-                onClicked: { mainPage.setTab(3); }
             }
         }//Row
     }//ToolBar (commonTools)

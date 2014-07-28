@@ -43,22 +43,13 @@ Item {
         tabView.setTab(number);
     }
 
-    /*
-    anchors {
-        top: parent.top
-        left: parent.left
-        right: parent.right
-    }
-    */
-
-    onHeightChanged: { console.debug("MainPage h = " + height); }
-    onWidthChanged: { console.debug("MainPage w = " + width); }
-
     TabView {
         id: tabView
         objectName: "MainTabGroup"
+
         currentIndex: 0
         anchors.fill: parent
+        tabPosition: Qt.BottomEdge
 
         function setTab(index) {
             if (index < 0 || index > 3) {
@@ -69,56 +60,46 @@ Item {
             currentIndex = index;
         }
 
-        /*
-        Component.onCompleted: {
-            tabView.addTab("Dial",     dialTab);
-            tabView.addTab("Contacts", contactsTab);
-            tabView.addTab("Inbox",    inboxTab);
-            tabView.addTab("Settings", settingsTab);
-
-            tabView.setTab(3);
-        }
-        */
-
         Tab {
             active: true
-            Rectangle {
-                anchors.fill: parent
-                color: "orange"
-            }
-        }
-
-        Tab {
-            active: true
+            title: "Dial"
             DialPage {
                 id: dialTab
                 objectName: "DialPage"
                 anchors.fill: parent
                 onRegNumBtnClicked: { container.regNumBtnClicked(); }
-                visible: false
             }
         }
-        ContactsPage {
-            id: contactsTab
-            objectName: "ContactsPage"
-            onSigRefreshContacts: { container.sigRefreshContacts(); }
-            onSigRefreshContactsFull: { container.sigRefreshContactsFull(); }
-            visible: false
-        }
-        InboxPage {
-            id: inboxTab
-            onSetNumberToDial: {
-                dialTab.setNumberInDisp(number);
-                tabView.setTab(0);
+        Tab {
+            active: true
+            title: "Contacts"
+            ContactsPage {
+                id: contactsTab
+                objectName: "ContactsPage"
+                onSigRefreshContacts: { container.sigRefreshContacts(); }
+                onSigRefreshContactsFull: { container.sigRefreshContactsFull(); }
             }
+        }
+        Tab {
+            active: true
+            title: "Inbox"
+            InboxPage {
+                id: inboxTab
+                onSetNumberToDial: {
+                    dialTab.setNumberInDisp(number);
+                    tabView.setTab(0);
+                }
 
-            onSigRefreshInbox: { container.sigRefreshInbox(); }
-            onSigRefreshInboxFull: { container.sigRefreshInboxFull(); }
-            visible: false
+                onSigRefreshInbox: { container.sigRefreshInbox(); }
+                onSigRefreshInboxFull: { container.sigRefreshInboxFull(); }
+            }
         }
-        SettingsPage {
-            id: settingsTab
-            visible: false
+        Tab {
+            active: true
+            title: "Settings"
+            SettingsPage {
+                id: settingsTab
+            }
         }
     }//TabView
 }

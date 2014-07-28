@@ -57,41 +57,16 @@ Item {
 
         inputMethodHints: Qt.ImhDialableCharactersOnly
         placeholderText: "Enter number here"
+        font.pointSize: 20
 
         // Same anchors for landscape and portrait
         anchors {
             top: btnSelectedNumber.bottom
             topMargin: 5
-            left: container.left
+            //left: parent.left
         }
 
-        font.pointSize: 100
         readOnly: true
-
-        ToolButton {
-            iconName: "toolbar-back"
-
-            anchors {
-                verticalCenter: parent.verticalCenter
-                right: parent.right
-                rightMargin: 4
-            }
-
-            visible: numberField.text.length != 0 ? true : false
-            //platformInverted: true
-
-            onClicked: {
-                if (numberField.selectedText.length == 0) {
-                    numberField.text = numberField.text.slice(0, numberField.text.length - 1);
-                } else {
-                    numberField.cut();
-                }
-            }
-
-            //onPlatformPressAndHold: {
-            //    numberField.text = "";
-            //}
-        }
     }//TextField
 
     Keypad {
@@ -110,9 +85,7 @@ Item {
 
     Row {
         id: btnRow
-
         spacing: 5
-        //exclusive: false
 
         Button {
             text: "Text"
@@ -169,7 +142,7 @@ Item {
                 target: btnRow
                 width: container.width - _spacing;
             }
-        },// State
+        },//State (portrait)
         State {
             name: "landscape"
 
@@ -209,6 +182,6 @@ Item {
                 target: btnRow
                 width: (container.width / 2) - _spacing;
             }
-        }//State
+        }//State (landscape)
     ]//states
 }//Item
