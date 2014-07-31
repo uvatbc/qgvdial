@@ -118,6 +118,7 @@ ApplicationWindow {
 
         TfaPinPage {
             id: tfaPinDlg
+            anchors.fill: parent
             objectName: "TFAPinDialog"
             onDone: { appWindow.popPageStack(); }
         }//TFA Dialog
@@ -188,7 +189,7 @@ ApplicationWindow {
         MainPage {
             id: mainPage
 
-            pageStack: appWindow.pageStack
+            pageStack: parent
 
             onRegNumBtnClicked: { pageStack.push(regNumberSelector); }
 

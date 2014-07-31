@@ -949,7 +949,11 @@ GVApi::lookForLoginErrorMessage(const QString &resp, AsyncTaskToken *task)
         span = parseDomElement (resp, "span", "id", "errormsg_0_Passwd");
         if (span.isEmpty ()) {
             Q_WARN("Didn't find errormsg_0_Passwd");
-            break;
+            span = parseDomElement (resp, "span", "id", "errormsg_0_Email");
+            if (span.isEmpty ()) {
+                Q_WARN("Didn't find errormsg_0_Email");
+                break;
+            }
         }
 
         int pos = span.indexOf ('>');

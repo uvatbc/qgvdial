@@ -64,6 +64,8 @@ Item {
 
             placeholderText: "example@gmail.com"
             inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhPreferLowercase | Qt.ImhNoPredictiveText
+
+            onAccepted: btnLogin.clicked();
         }//TextField
 
         Label {
@@ -116,6 +118,8 @@ Item {
             visible: (opacity == 1)
 
             placeholderText: "Password"
+
+            onAccepted: btnLogin.clicked();
         }//TextField
 
         Label {

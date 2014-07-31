@@ -49,6 +49,8 @@ Item {
                 bottom: 0
                 top: 999999
             }
+
+            onAccepted: btnSubmit.clicked();
         }
 
         Row {
@@ -61,6 +63,7 @@ Item {
                 onClicked: { container.done(false); }
             }
             Button {
+                id: btnSubmit
                 text: "Submit"
                 width: 200
                 onClicked: { container.done(true); }
