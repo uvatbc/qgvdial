@@ -30,6 +30,7 @@ Rectangle {
     property alias model: regNumList.model
     signal selected(string id);
     signal modify(string id);
+    signal cancel
 
     function setMyModel() {
         if (container.model == null) {
@@ -37,20 +38,33 @@ Rectangle {
         }
     }
 
-    ListView {
-        id: regNumList
+    Column {
         anchors.fill: parent
+        spacing: 2
 
-        delegate: Label {
-            width: regNumList.width
-            text: name + "\n(" + number + ")"
-            font.pixelSize: 50
+        ListView {
+            id: regNumList
+            width: parent.width
+            height: parent.height - btnCancel.height - parent.spacing
 
-            MouseArea {
-                anchors.fill: parent
-                onClicked: container.selected(id);
-                onPressAndHold: container.modify(id);
-            }
+            delegate: Label {
+                width: regNumList.width
+                text: name + "\n(" + number + ")"
+                font.pixelSize: 50
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: container.selected(id);
+                    onPressAndHold: container.modify(id);
+                }
+            }//Delegate
+        }//ListView
+
+        Button {
+            id: btnCancel
+            anchors.horizontalCenter: parent.horizontalCenter
+            text: "Cancel"
+            onClicked: { container.cancel(); }
         }
-    }
-}
+    }//Column
+}//Rectangle

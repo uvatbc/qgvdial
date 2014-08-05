@@ -118,6 +118,7 @@ ApplicationWindow {
         objectName: "RegNumberSelector"
 
         onSelected: { appWindow.popPageStack(); }
+        onCancel: { appWindow.popPageStack(); }
     }
 
     ContactDetailsPage {

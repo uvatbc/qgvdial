@@ -33,6 +33,14 @@ Rectangle {
     property real delHeight: 40
 
     signal done(bool accepted)
+    function open() {
+        console.debug("Open Inbox selection dialog");
+        visible = true;
+    }
+    onDone: {
+        console.debug("Close Inbox selection dialog");
+        visible = false;
+    }
 
     visible: false
     color: "black"
@@ -40,20 +48,16 @@ Rectangle {
     ListView {
         id: listView
 
-        anchors {
-            top: parent.top
-            topMargin: 10
-            bottom: parent.bottom
-            horizontalCenter: parent.horizontalCenter
-        }
+        anchors.centerIn: parent
 
         clip: true
         spacing: 2
         width: container.delWidth + 10
+        height: listView.model.count * delHeight;
 
         delegate: Rectangle {
-            width: container.delWidth + 2
-            height: container.delHeight + 2
+            width: container.delWidth - 2
+            height: container.delHeight - 2
 
             color: "transparent"
             border.color: name.toUpperCase() === container.selected.toUpperCase() ? "orange" : "transparent"

@@ -42,43 +42,7 @@ Item {
         width: parent.width - 10
 
         text: inboxSelector.model.get(inboxSelector.selectedIndex).name
-        onClicked: inboxSelector.open();
-    }
-
-    SelectionDialog {
-        id: inboxSelector
-        objectName: "InboxSelector"
-
-        signal selectionChanged(string sel)
-        function setSelection(sel) {
-            var i;
-            for (i = 0; i < inboxSelector.model.count; i = i + 1) {
-                if (inboxSelector.model.get(i).name.toUpperCase() == sel.toUpperCase()) {
-                    selectedIndex = i;
-                    break;
-                }
-            }
-        }
-
-        anchors {
-            top: parent.top
-        }
-        width: parent.width
-
-        selectedIndex: 0
-        onSelectedIndexChanged: {
-            var sel = model.get(selectedIndex).name;
-            inboxSelector.selectionChanged(sel);
-        }
-
-        model: ListModel {
-            ListElement { name: "All" }
-            ListElement { name: "Placed" }
-            ListElement { name: "Missed" }
-            ListElement { name: "Received" }
-            ListElement { name: "Voicemail" }
-            ListElement { name: "SMS" }
-        }
+        onClicked: { inboxSelector.open(); }
     }
 
     RefreshButton {
@@ -201,4 +165,37 @@ Item {
             }
         }// delegate Rectangle
     }//ListView
+
+    SelectionDialog {
+        id: inboxSelector
+        objectName: "InboxSelector"
+
+        signal selectionChanged(string sel)
+        function setSelection(sel) {
+            var i;
+            for (i = 0; i < inboxSelector.model.count; i = i + 1) {
+                if (inboxSelector.model.get(i).name.toUpperCase() == sel.toUpperCase()) {
+                    selectedIndex = i;
+                    break;
+                }
+            }
+        }
+
+        anchors.fill: parent
+
+        selectedIndex: 0
+        onSelectedIndexChanged: {
+            var sel = model.get(selectedIndex).name;
+            inboxSelector.selectionChanged(sel);
+        }
+
+        model: ListModel {
+            ListElement { name: "All" }
+            ListElement { name: "Placed" }
+            ListElement { name: "Missed" }
+            ListElement { name: "Received" }
+            ListElement { name: "Voicemail" }
+            ListElement { name: "SMS" }
+        }
+    }
 }//Item

@@ -107,7 +107,7 @@ Item {
                     searchField.text = "";
                     container.searchContact("");
                 }
-                searchField.closeSoftwareInputPanel();
+                //searchField.closeSoftwareInputPanel();
                 contactsList.forceActiveFocus();
             }
         }
