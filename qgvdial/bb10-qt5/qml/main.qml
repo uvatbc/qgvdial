@@ -106,100 +106,103 @@ ApplicationWindow {
 
     property bool _inboxDetailsShown: false
 
+    TfaPinPage {
+        id: tfaPinDlg
+        anchors.fill: parent
+        objectName: "TFAPinDialog"
+        onDone: { appWindow.popPageStack(); }
+    }//TFA Dialog
+
+    RegNumberSelector {
+        id: regNumberSelector
+        objectName: "RegNumberSelector"
+
+        onSelected: { appWindow.popPageStack(); }
+    }
+
+    ContactDetailsPage {
+        id: contactDetails
+        onDone: { appWindow.popPageStack(); }
+        onSetNumberToDial: {
+            mainPage.setNumberInDisp(number);
+            mainPage.setTab(0);
+        }
+    }
+
+    InboxDetailsPage {
+        id: inboxDetails
+        objectName: "InboxDetails"
+
+        onDone: { appWindow.popPageStack(); }
+        onSetNumberToDial: {
+            mainPage.setNumberInDisp(number);
+            mainPage.setTab(0);
+        }
+
+        onSigShowContact: appWindow.sigShowContact(cId);
+    }
+
+    MessageBox {
+        id: msgBox
+        onDone: { appWindow.popPageStack(); }
+    }
+
+    CiPhoneSelectionPage {
+        id: ciPhoneSelector
+        objectName: "CiPhoneSelectionPage"
+        onDone: { appWindow.popPageStack(); }
+    }
+
+    SmsPage {
+        id: smsPage
+        objectName: "SmsPage"
+        onDone: { appWindow.popPageStack(); }
+    }
+
+/*
+    WebPage {
+        id: webPage
+        objectName: "WebPage"
+    }
+*/
+
+    StatusBanner {
+        id: statusBanner
+        objectName: "StatusBanner"
+
+        anchors {
+            bottom: parent.bottom
+            bottomMargin: 110 //commonTools.height + 5
+        }
+    }
+
+    MainPage {
+        id: mainPage
+
+        pageStack: parent
+
+        onRegNumBtnClicked: { pageStack.push(regNumberSelector); }
+
+        onSigRefreshContacts: { appWindow.sigRefreshContacts(); }
+        onSigRefreshContactsFull: { appWindow.sigRefreshContactsFull(); }
+        onSigRefreshInbox: { appWindow.sigRefreshInbox(); }
+        onSigRefreshInboxFull: { appWindow.sigRefreshInboxFull(); }
+    }
+
     StackView {
         id: pageStack
 
         anchors.fill: parent
 
         initialItem: mainPage
+        /*
         onCurrentItemChanged: {
             commonTools.visible = (currentItem === mainPage);
         }
-
-        TfaPinPage {
-            id: tfaPinDlg
-            anchors.fill: parent
-            objectName: "TFAPinDialog"
-            onDone: { appWindow.popPageStack(); }
-        }//TFA Dialog
-
-        RegNumberSelector {
-            id: regNumberSelector
-            objectName: "RegNumberSelector"
-
-            onSelected: { appWindow.popPageStack(); }
-        }
-
-        ContactDetailsPage {
-            id: contactDetails
-            onDone: { appWindow.popPageStack(); }
-            onSetNumberToDial: {
-                mainPage.setNumberInDisp(number);
-                mainPage.setTab(0);
-            }
-        }
-
-        InboxDetailsPage {
-            id: inboxDetails
-            objectName: "InboxDetails"
-
-            onDone: { appWindow.popPageStack(); }
-            onSetNumberToDial: {
-                mainPage.setNumberInDisp(number);
-                mainPage.setTab(0);
-            }
-
-            onSigShowContact: appWindow.sigShowContact(cId);
-        }
-
-        MessageBox {
-            id: msgBox
-            onDone: { appWindow.popPageStack(); }
-        }
-
-        CiPhoneSelectionPage {
-            id: ciPhoneSelector
-            objectName: "CiPhoneSelectionPage"
-            onDone: { appWindow.popPageStack(); }
-        }
-
-        SmsPage {
-            id: smsPage
-            objectName: "SmsPage"
-            onDone: { appWindow.popPageStack(); }
-        }
-
-        /*
-        WebPage {
-            id: webPage
-            objectName: "WebPage"
-        }
         */
-
-        StatusBanner {
-            id: statusBanner
-            objectName: "StatusBanner"
-
-            anchors {
-                bottom: parent.bottom
-                bottomMargin: 110 //commonTools.height + 5
-            }
-        }
-
-        MainPage {
-            id: mainPage
-
-            pageStack: parent
-
-            onRegNumBtnClicked: { pageStack.push(regNumberSelector); }
-
-            onSigRefreshContacts: { appWindow.sigRefreshContacts(); }
-            onSigRefreshContactsFull: { appWindow.sigRefreshContactsFull(); }
-            onSigRefreshInbox: { appWindow.sigRefreshInbox(); }
-            onSigRefreshInboxFull: { appWindow.sigRefreshInboxFull(); }
-        }
     }//StackView
 
+/*
     toolBar: ToolBar {
         id: commonTools
 
@@ -222,4 +225,5 @@ ApplicationWindow {
             }
         }//Row
     }//ToolBar (commonTools)
+*/
 }

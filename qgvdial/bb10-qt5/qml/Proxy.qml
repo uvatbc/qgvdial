@@ -84,7 +84,8 @@ Item {
                 rightMargin: 10
             }
 
-            opacity: (bEnableProxy? 1 : 0)
+            visible: bEnableProxy
+            opacity: (visible ? 1 : 0)
 
             text: "Use system proxy settings"
         }// CheckBox (proxySystem)
@@ -103,7 +104,8 @@ Item {
 
             spacing: 2
 
-            opacity: (bEnableProxy && !bSystemProxy ? 1 : 0)
+            visible: bEnableProxy && !bSystemProxy
+            opacity: (visible ? 1 : 0)
 
             Label {
                 id: lblHost
@@ -116,6 +118,7 @@ Item {
                 width: parent.width - lblHost.width
                 anchors.verticalCenter: parent.verticalCenter
                 placeholderText: "Proxy server"
+                inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhPreferLowercase | Qt.ImhNoPredictiveText
                 KeyNavigation.tab: textUserProxyPort
                 KeyNavigation.backtab: (bEnableProxy && !bSystemProxy && bProxyUserPass ? textUserProxyPass : textUserProxyPort)
             }//TextField (proxy host)
@@ -135,7 +138,8 @@ Item {
 
             spacing: 2
 
-            opacity: (bEnableProxy && !bSystemProxy ? 1 : 0)
+            visible: bEnableProxy && !bSystemProxy
+            opacity: (visible ? 1 : 0)
 
             Label {
                 id: lblPort
@@ -149,6 +153,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 placeholderText: "Proxy port"
                 validator: IntValidator { bottom: 0; top: 65535 }
+                inputMethodHints: Qt.ImhDigitsOnly | Qt.ImhPreferNumbers
                 KeyNavigation.tab: (bEnableProxy && !bSystemProxy && bProxyUserPass ? textUserProxyUser : textUserProxyHost)
                 KeyNavigation.backtab: textUserProxyHost
             }//TextField (proxy port)
@@ -164,7 +169,8 @@ Item {
                 rightMargin: 10
             }
 
-            opacity: (bEnableProxy && !bSystemProxy ? 1 : 0)
+            visible: bEnableProxy && !bSystemProxy
+            opacity: (visible ? 1 : 0)
 
             text: "Requires user and pass"
         }// CheckBox (proxyUserPassRequired)
@@ -183,7 +189,8 @@ Item {
 
             spacing: 2
 
-            opacity: (bEnableProxy && !bSystemProxy && bProxyUserPass ? 1 : 0)
+            visible: bEnableProxy && !bSystemProxy && bProxyUserPass
+            opacity: (visible ? 1 : 0)
 
             Label {
                 id: lblProxyUser
@@ -196,6 +203,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 width: parent.width - lblProxyUser.width
                 placeholderText: "Proxy user"
+                inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhPreferLowercase | Qt.ImhNoPredictiveText
                 KeyNavigation.tab: textUserProxyPass
                 KeyNavigation.backtab: textUserProxyPort
             }//TextField (proxy user)
@@ -215,7 +223,8 @@ Item {
 
             spacing: 2
 
-            opacity: (bEnableProxy && !bSystemProxy && bProxyUserPass ? 1 : 0)
+            visible: bEnableProxy && !bSystemProxy && bProxyUserPass
+            opacity: (visible ? 1 : 0)
 
             Label {
                 id: lblProxyPass
@@ -229,6 +238,7 @@ Item {
                 width: parent.width - lblProxyPass.width
                 placeholderText: "Proxy password"
                 echoMode: TextInput.Password
+                inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhPreferLowercase | Qt.ImhNoPredictiveText
                 KeyNavigation.tab: textUserProxyHost
                 KeyNavigation.backtab: textUserProxyUser
             }//TextField (proxy password)

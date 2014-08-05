@@ -22,10 +22,10 @@ Contact: yuvraaj@gmail.com
 import QtQuick 2.2
 import QtQuick.Controls 1.1
 
-Item {
+Rectangle {
     id: container
 
-    anchors.fill: parent
+    color: "black"
 
     property alias model: regNumList.model
     signal selected(string id);

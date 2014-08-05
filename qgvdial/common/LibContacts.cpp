@@ -26,7 +26,7 @@ Contact: yuvraaj@gmail.com
 #include "ContactNumbersModel.h"
 #include "O2ContactsStore.h"
 
-#define GOT_PHOTO_TIMEOUT (3 * 1000)  // 3 seconds
+#define GOT_PHOTO_TIMEOUT (1 * 1000)  // 1 second
 
 LibContacts::LibContacts(IMainWindow *parent)
 : QObject(parent)
