@@ -87,13 +87,24 @@ Item {
         id: btnRow
         spacing: 5
 
+        width: btnText.width + btnCall.width + spacing
+
+        function showSize() {
+            console.debug("h = " + btnRow.height + ", w = " + btnRow.width);
+        }
+
+        onHeightChanged: showSize();
+        onWidthChanged: showSize();
+
         Button {
+            id: btnText
             text: "Text"
             height: 100
             enabled: (numberField.text.length != 0)
             onClicked: container.sigText(numberField.text);
         }
         Button {
+            id: btnCall
             text: "Call"
             height: 100
             enabled: (numberField.text.length != 0)
@@ -138,10 +149,6 @@ Item {
                     horizontalCenter: container.horizontalCenter
                 }
             }
-            PropertyChanges {
-                target: btnRow
-                width: container.width - _spacing;
-            }
         },//State (portrait)
         State {
             name: "landscape"
@@ -177,10 +184,6 @@ Item {
                     top: keypad.bottom
                     horizontalCenter: keypad.horizontalCenter
                 }
-            }
-            PropertyChanges {
-                target: btnRow
-                width: (container.width / 2) - _spacing;
             }
         }//State (landscape)
     ]//states

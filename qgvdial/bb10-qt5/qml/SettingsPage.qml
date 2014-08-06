@@ -75,7 +75,7 @@ Item {
                 top: parent.top
                 left: parent.left
             }
-            width: parent.width
+            width: parent.width - 1
 
             mainTitle: "Login details"
             content: loginDetails
@@ -94,7 +94,7 @@ Item {
                 left: parent.left
                 topMargin: 1
             }
-            width: parent.width
+            width: parent.width - 1
 
             mainTitle: "Proxy"
             content: proxySettings
@@ -113,7 +113,7 @@ Item {
                 left: parent.left
                 topMargin: 1
             }
-            width: parent.width
+            width: parent.width - 1
 
             mainTitle: "Auto refresh"
             content: updateSettings
@@ -132,7 +132,7 @@ Item {
                 left: parent.left
                 topMargin: 1
             }
-            width: parent.width
+            width: parent.width - 1
 
             mainTitle: "Et Cetera"
             content: etCetera

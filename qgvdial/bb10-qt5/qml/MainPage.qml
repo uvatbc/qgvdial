@@ -62,7 +62,15 @@ Rectangle {
             currentIndex = index;
         }
 
+        Component.onCompleted: {
+            insertTab(0, "Dial", tab1);
+            insertTab(1, "Contacts", tab2);
+            insertTab(2, "Inbox", tab3);
+            insertTab(3, "Settings", tab4);
+        }
+
         Tab {
+            id: tab1
             active: true
             title: "Dial"
             DialPage {
@@ -73,6 +81,7 @@ Rectangle {
             }
         }
         Tab {
+            id: tab2
             active: true
             title: "Contacts"
             ContactsPage {
@@ -83,6 +92,7 @@ Rectangle {
             }
         }
         Tab {
+            id: tab3
             active: true
             title: "Inbox"
             InboxPage {
@@ -97,6 +107,7 @@ Rectangle {
             }
         }
         Tab {
+            id: tab4
             active: true
             title: "Settings"
             SettingsPage {
