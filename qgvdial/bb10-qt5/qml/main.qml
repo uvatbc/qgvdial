@@ -108,7 +108,6 @@ ApplicationWindow {
 
     TfaPinPage {
         id: tfaPinDlg
-        anchors.fill: parent
         objectName: "TFAPinDialog"
         onDone: { appWindow.popPageStack(); }
     }//TFA Dialog
@@ -167,16 +166,6 @@ ApplicationWindow {
     }
 */
 
-    StatusBanner {
-        id: statusBanner
-        objectName: "StatusBanner"
-
-        anchors {
-            bottom: parent.bottom
-            bottomMargin: 110 //commonTools.height + 5
-        }
-    }
-
     MainPage {
         id: mainPage
 
@@ -193,38 +182,63 @@ ApplicationWindow {
     StackView {
         id: pageStack
 
-        anchors.fill: parent
+        anchors {
+            top: parent.top
+            left: parent.left
+            right: parent.right
+            bottom: backButtonBar.visible ? backButtonBar.top : parent.bottom;
+        }
 
         initialItem: mainPage
-        /*
         onCurrentItemChanged: {
-            commonTools.visible = (currentItem === mainPage);
-        }
-        */
-    }//StackView
-
-/*
-    toolBar: ToolBar {
-        id: commonTools
-
-        RowLayout {
-            anchors.fill: parent
-
-            ToolButton {
-                iconName: "toolbar-back"
-                onClicked: {
-                    if (pageStack.depth > 1) {
-                        appWindow.popPageStack();
-                        if (appWindow._inboxDetailsShown) {
-                            appWindow._inboxDetailsShown = false;
-                            inboxDetails.done(false);
-                        }
-                    } else {
-                        console.debug("Quit!");
-                    }
+            for (var i = 0; i < pageStack.depth; i++) {
+                var item = pageStack.get(i, true);
+                if (item && item != pageStack.currentItem) {
+                    item.visible = false;
                 }
             }
-        }//Row
-    }//ToolBar (commonTools)
-*/
+            if (pageStack.currentItem) {
+                pageStack.currentItem.visible = true;
+            }
+        }
+    }//StackView
+
+    Rectangle {
+        id: backButtonBar
+        width: parent.width
+        height: 100
+
+        anchors {
+            left: parent.left
+            bottom: parent.bottom
+        }
+
+        color: "black"
+        visible: (pageStack.depth > 1)
+
+        Image {
+            source: "qrc:/navigation_previous_item.png"
+            height: backButtonBar.height - 2
+            width: height
+            anchors {
+                left: parent.left
+                verticalCenter: parent.verticalCenter
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: { popPageStack(); }
+            }
+        }
+    }
+
+    StatusBanner {
+        id: statusBanner
+        objectName: "StatusBanner"
+
+        anchors {
+            bottom: parent.bottom
+            bottomMargin: 110 //commonTools.height + 5
+        }
+    }
 }

@@ -22,7 +22,7 @@ Contact: yuvraaj@gmail.com
 import QtQuick 2.2
 import QtQuick.Controls 1.1
 
-Item {
+Rectangle {
     id: container
 
     signal done(bool accepted)
@@ -32,6 +32,9 @@ Item {
     property string dest
     property alias conversation: lblConversation.text
     property alias smsText: txtSmsText.text
+
+    color: "black"
+    visible: false
 
     Column {
         anchors.fill: parent

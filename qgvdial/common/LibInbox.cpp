@@ -268,6 +268,11 @@ LibInbox::getEventInfo(GVInboxEntry &event, ContactInfo &cinfo, QString &type)
 bool
 LibInbox::onUserSelect(QString selection)
 {
+    if (NULL == m_inboxModel) {
+        Q_WARN("Attempted to select inbox type when model is NULL");
+        return false;
+    }
+
     if (!m_inboxModel->refresh (selection)) {
         Q_WARN(QString("Invalid selection \"%1\"").arg ((selection)));
         return false;

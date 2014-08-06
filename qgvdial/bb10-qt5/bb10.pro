@@ -5,7 +5,7 @@ MOC_DIR = moc
 OBJECTS_DIR = obj
 
 QT += qml quick widgets multimedia
-QTPLUGIN += qsvg
+QTPLUGIN += qsvg qjpeg
 
 SOURCES  += MainWindow.cpp \
             BB10PhoneFactory.cpp \

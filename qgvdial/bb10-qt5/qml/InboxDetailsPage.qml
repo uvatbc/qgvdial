@@ -22,7 +22,7 @@ Contact: yuvraaj@gmail.com
 import QtQuick 2.2
 import QtQuick.Controls 1.1
 
-Item {
+Rectangle {
     id: container
 
     signal done(bool accepted)
@@ -51,6 +51,9 @@ Item {
     property bool fetchingEmail: true
     property real vmailDuration
     property real vmailPosition
+
+    color: "black"
+    visible: false
 
     Flickable {
         anchors {

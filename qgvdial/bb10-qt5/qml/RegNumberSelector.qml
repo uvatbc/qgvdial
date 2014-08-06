@@ -26,6 +26,7 @@ Rectangle {
     id: container
 
     color: "black"
+    visible: false
 
     property alias model: regNumList.model
     signal selected(string id);

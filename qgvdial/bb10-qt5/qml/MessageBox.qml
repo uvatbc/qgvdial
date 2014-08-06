@@ -22,11 +22,14 @@ Contact: yuvraaj@gmail.com
 import QtQuick 2.2
 import QtQuick.Controls 1.1
 
-Item {
+Rectangle {
     id: container
 
     property string message
     signal done
+
+    color: "black"
+    visible: false
 
     Column {
         anchors.centerIn: parent

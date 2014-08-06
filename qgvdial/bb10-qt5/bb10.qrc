@@ -25,5 +25,6 @@
         <file alias="button_black_stop.png">../../icons/button_black_stop.png</file>
 
         <file alias="left_arrow.png">../../icons/left_arrow.png</file>
+        <file alias="navigation_previous_item.png">../../icons/navigation_previous_item.png</file>
     </qresource>
 </RCC>
