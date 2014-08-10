@@ -250,6 +250,7 @@ Rectangle {
             onClicked: {
                 container.replySms(container.iId);
             }
+            style: MyButtonStyle {}
         }
         Button {
             text: "Delete"
@@ -261,6 +262,7 @@ Rectangle {
                 container.deleteEntry(container.iId);
                 container.done(true);
             }
+            style: MyButtonStyle {}
         }
     }//ButtonRow
 }//Page

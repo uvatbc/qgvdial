@@ -246,7 +246,7 @@ Item {
 
         Row {
             anchors.horizontalCenter: parent.horizontalCenter
-            width: parent.width * 7/10
+            //width: parent.width * 7/10
 
             Button {
                 text: "Revert"
@@ -254,10 +254,10 @@ Item {
                     container.sigRevertChanges(false);
                     container.forceActiveFocus();
                 }
+                style: MyButtonStyle {}
             }
             Button {
                 text: "Submit"
-
                 onClicked: {
                     container.sigProxyChanges (bEnableProxy,
                                                bSystemProxy,
@@ -268,6 +268,7 @@ Item {
                                                textUserProxyPass.text);
                     container.forceActiveFocus();
                 }
+                style: MyButtonStyle {}
             }
         }
     }// Column

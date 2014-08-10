@@ -26,5 +26,12 @@
 
         <file alias="left_arrow.png">../../icons/left_arrow.png</file>
         <file alias="navigation_previous_item.png">../../icons/navigation_previous_item.png</file>
+
+        <file alias="assets/tabview/segmentedcontrol_selected.png">assets/tabview/segmentedcontrol_selected.png</file>
+        <file alias="assets/tabview/segmentedcontrol_bg.png">assets/tabview/segmentedcontrol_bg.png</file>
+
+        <file alias="assets/button/colt/dark/core_button_disabled.png">assets/button/colt/dark/core_button_disabled.png</file>
+        <file alias="assets/button/colt/dark/core_button_inactive.png">assets/button/colt/dark/core_button_inactive.png</file>
+        <file alias="assets/button/colt/dark/core_button_pressed.png">assets/button/colt/dark/core_button_pressed.png</file>
     </qresource>
 </RCC>

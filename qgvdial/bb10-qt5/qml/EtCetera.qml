@@ -40,6 +40,7 @@ Item {
             text: "About"
             width: container.width / 3
             onClicked: { container.sigAbout(); }
+            style: MyButtonStyle {}
         }//Button (login/logout)
 
         Button {
@@ -47,6 +48,7 @@ Item {
             text: "Send logs"
             width: container.width / 3
             onClicked: { container.sendLogs(); }
+            style: MyButtonStyle {}
         }//Button (login/logout)
 
         Button {
@@ -54,6 +56,7 @@ Item {
             text: "Really quit"
             width: container.width / 3
             onClicked: { container.reallyQuit(); }
+            style: MyButtonStyle {}
         }//Button (really quit)
 
         Label {

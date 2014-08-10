@@ -31,4 +31,32 @@
   <icon>
      <image>qgvdial.png</image>
   </icon>
+  
+  <asset path="../../../../external/qt5/qt5_bb10/x86/lib/libQt5Core.so.5">runtime/qt/lib/libQt5Core.so.5</asset>
+  <asset path="../../../../external/qt5/qt5_bb10/x86/lib/libQt5Concurrent.so.5">runtime/qt/lib/libQt5Concurrent.so.5</asset>
+  <asset path="../../../../external/qt5/qt5_bb10/x86/lib/libQt5Gui.so.5">runtime/qt/lib/libQt5Gui.so.5</asset>
+  <asset path="../../../../external/qt5/qt5_bb10/x86/lib/libQt5Multimedia.so.5">runtime/qt/lib/libQt5Multimedia.so.5</asset>
+  <asset path="../../../../external/qt5/qt5_bb10/x86/lib/libQt5MultimediaQuick_p.so.5">runtime/qt/lib/libQt5MultimediaQuick_p.so.5</asset>
+  <asset path="../../../../external/qt5/qt5_bb10/x86/lib/libQt5MultimediaWidgets.so.5">runtime/qt/lib/libQt5MultimediaWidgets.so.5</asset>
+  <asset path="../../../../external/qt5/qt5_bb10/x86/lib/libQt5Network.so.5">runtime/qt/lib/libQt5Network.so.5</asset>
+  <asset path="../../../../external/qt5/qt5_bb10/x86/lib/libQt5OpenGL.so.5">runtime/qt/lib/libQt5OpenGL.so.5</asset>
+  <asset path="../../../../external/qt5/qt5_bb10/x86/lib/libQt5Qml.so.5">runtime/qt/lib/libQt5Qml.so.5</asset>
+  <asset path="../../../../external/qt5/qt5_bb10/x86/lib/libQt5Quick.so.5">runtime/qt/lib/libQt5Quick.so.5</asset>
+  <asset path="../../../../external/qt5/qt5_bb10/x86/lib/libQt5Sql.so.5">runtime/qt/lib/libQt5Sql.so.5</asset>
+  <asset path="../../../../external/qt5/qt5_bb10/x86/lib/libQt5Widgets.so.5">runtime/qt/lib/libQt5Widgets.so.5</asset>
+  <asset path="../../../../external/qt5/qt5_bb10/x86/lib/libQt5Xml.so.5">runtime/qt/lib/libQt5Xml.so.5</asset>
+  <asset path="../../../../external/qt5/qt5_bb10/x86/lib/libQt5XmlPatterns.so.5">runtime/qt/lib/libQt5XmlPatterns.so.5</asset>
+  
+  <asset path="../../../../external/qt5/qt5_bb10/x86/plugins/bearer">runtime/qt/plugins/bearer</asset>
+  <asset path="../../../../external/qt5/qt5_bb10/x86/plugins/imageformats">runtime/qt/plugins/imageformats</asset>
+  <asset path="../../../../external/qt5/qt5_bb10/x86/plugins/mediaservice">runtime/qt/plugins/mediaservice</asset>
+  <asset path="../../../../external/qt5/qt5_bb10/x86/plugins/platforms">runtime/qt/plugins/platforms</asset>
+  <asset path="../../../../external/qt5/qt5_bb10/x86/plugins/sqldrivers">runtime/qt/plugins/sqldrivers</asset>
+  
+  <asset path="../../../../external/qt5/qt5_bb10/x86/qml/Qt">runtime/qt/qml/Qt</asset>
+  <asset path="../../../../external/qt5/qt5_bb10/x86/qml/QtAudioEngine">runtime/qt/qml/QtAudioEngine</asset>
+  <asset path="../../../../external/qt5/qt5_bb10/x86/qml/QtMultimedia">runtime/qt/qml/QtMultimedia</asset>
+  <asset path="../../../../external/qt5/qt5_bb10/x86/qml/QtQml">runtime/qt/qml/QtQml</asset>
+  <asset path="../../../../external/qt5/qt5_bb10/x86/qml/QtQuick">runtime/qt/qml/QtQuick</asset>
+  <asset path="../../../../external/qt5/qt5_bb10/x86/qml/QtQuick.2">runtime/qt/qml/QtQuick.2</asset>
 </qnx>

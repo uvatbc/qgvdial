@@ -150,5 +150,7 @@ Item {
         text: "Login"
 
         onClicked: { container.forceActiveFocus(); }
+
+        style: MyButtonStyle {}
     }//Button (login/logout)
 }//Item (container)

@@ -31,6 +31,7 @@ Contact: yuvraaj@gmail.com
 QCoreApplication *
 createAppObject(int &argc, char **argv)
 {
+    //qputenv("QT_QUICK_CONTROLS_STYLE", "Base");
     return new QGuiApplication(argc, argv);
 }//createAppObject
 

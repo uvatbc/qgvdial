@@ -39,33 +39,20 @@ Rectangle {
         }
     }
 
-    Column {
+    ListView {
+        id: regNumList
         anchors.fill: parent
-        spacing: 2
 
-        ListView {
-            id: regNumList
-            width: parent.width
-            height: parent.height - btnCancel.height - parent.spacing
+        delegate: Label {
+            width: regNumList.width
+            text: name + "\n(" + number + ")"
+            font.pixelSize: 50
 
-            delegate: Label {
-                width: regNumList.width
-                text: name + "\n(" + number + ")"
-                font.pixelSize: 50
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: container.selected(id);
-                    onPressAndHold: container.modify(id);
-                }
-            }//Delegate
-        }//ListView
-
-        Button {
-            id: btnCancel
-            anchors.horizontalCenter: parent.horizontalCenter
-            text: "Cancel"
-            onClicked: { container.cancel(); }
-        }
-    }//Column
+            MouseArea {
+                anchors.fill: parent
+                onClicked: container.selected(id);
+                onPressAndHold: container.modify(id);
+            }
+        }//Delegate
+    }//ListView
 }//Rectangle

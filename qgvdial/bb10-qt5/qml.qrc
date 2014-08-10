@@ -24,5 +24,8 @@
         <file alias="StatusBanner.qml">qml/StatusBanner.qml</file>
         <file alias="TfaPinPage.qml">qml/TfaPinPage.qml</file>
         <file alias="Updates.qml">qml/Updates.qml</file>
+
+        <file alias="MyTabViewStyle.qml">qml/styles/MyTabViewStyle.qml</file>
+        <file alias="MyButtonStyle.qml">qml/styles/MyButtonStyle.qml</file>
     </qresource>
 </RCC>

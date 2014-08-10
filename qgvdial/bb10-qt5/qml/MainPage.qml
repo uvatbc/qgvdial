@@ -21,6 +21,7 @@ Contact: yuvraaj@gmail.com
 
 import QtQuick 2.2
 import QtQuick.Controls 1.1
+import QtQuick.Controls.Styles 1.2
 
 Rectangle {
     id: container
@@ -60,13 +61,6 @@ Rectangle {
             }
 
             currentIndex = index;
-        }
-
-        Component.onCompleted: {
-            insertTab(0, "Dial", tab1);
-            insertTab(1, "Contacts", tab2);
-            insertTab(2, "Inbox", tab3);
-            insertTab(3, "Settings", tab4);
         }
 
         Tab {
@@ -114,5 +108,7 @@ Rectangle {
                 id: settingsTab
             }
         }
+
+        style: MyTabViewStyle { }
     }//TabView
 }

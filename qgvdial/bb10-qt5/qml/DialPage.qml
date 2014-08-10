@@ -89,26 +89,21 @@ Item {
 
         width: btnText.width + btnCall.width + spacing
 
-        function showSize() {
-            console.debug("h = " + btnRow.height + ", w = " + btnRow.width);
-        }
-
-        onHeightChanged: showSize();
-        onWidthChanged: showSize();
-
         Button {
             id: btnText
             text: "Text"
-            height: 100
+            height: 90
             enabled: (numberField.text.length != 0)
             onClicked: container.sigText(numberField.text);
+            style: MyButtonStyle {}
         }
         Button {
             id: btnCall
             text: "Call"
-            height: 100
+            height: 90
             enabled: (numberField.text.length != 0)
             onClicked: container.sigCall(numberField.text);
+            style: MyButtonStyle {}
         }
     }//ButtonRow: Text & Call
 
