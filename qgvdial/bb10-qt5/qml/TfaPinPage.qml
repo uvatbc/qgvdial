@@ -64,12 +64,14 @@ Rectangle {
                 text: "Cancel"
                 width: 200
                 onClicked: { container.done(false); }
+                stlye: MyButtonStyle {}
             }
             Button {
                 id: btnSubmit
                 text: "Submit"
                 width: 200
                 onClicked: { container.done(true); }
+                stlye: MyButtonStyle {}
             }//Button
         }//ButtonRow
     }//Column
