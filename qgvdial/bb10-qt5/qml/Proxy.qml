@@ -254,7 +254,6 @@ Item {
                     container.sigRevertChanges(false);
                     container.forceActiveFocus();
                 }
-                style: MyButtonStyle {}
             }
             Button {
                 text: "Submit"
@@ -268,7 +267,6 @@ Item {
                                                textUserProxyPass.text);
                     container.forceActiveFocus();
                 }
-                style: MyButtonStyle {}
             }
         }
     }// Column

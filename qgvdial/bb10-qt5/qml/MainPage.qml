@@ -21,7 +21,7 @@ Contact: yuvraaj@gmail.com
 
 import QtQuick 2.2
 import QtQuick.Controls 1.1
-import QtQuick.Controls.Styles 1.2
+import QtQuick.Controls.Styles 1.0
 
 Rectangle {
     id: container

@@ -88,22 +88,19 @@ Item {
         spacing: 5
 
         width: btnText.width + btnCall.width + spacing
+        height: btnText.height
 
         Button {
             id: btnText
             text: "Text"
-            height: 90
             enabled: (numberField.text.length != 0)
             onClicked: container.sigText(numberField.text);
-            style: MyButtonStyle {}
         }
         Button {
             id: btnCall
             text: "Call"
-            height: 90
             enabled: (numberField.text.length != 0)
             onClicked: container.sigCall(numberField.text);
-            style: MyButtonStyle {}
         }
     }//ButtonRow: Text & Call
 
@@ -121,7 +118,7 @@ Item {
             PropertyChanges {
                 target: numberField
                 width: container.width
-                height: container.height - (btnSelectedNumber.height + keypad.height + btnRow.height + 5)
+                height: container.height - (btnSelectedNumber.height + keypad.height + btnRow.height + 10)
             }
             /// target: keypad
             AnchorChanges {
@@ -133,7 +130,7 @@ Item {
             }
             PropertyChanges {
                 target: keypad
-                width: container.width - 8
+                width: container.width - 4
                 height: container.height * 7/18
             }
             /// target: btnRow

@@ -21,14 +21,14 @@ Contact: yuvraaj@gmail.com
 
 import QtQuick 2.2
 import QtQuick.Controls 1.1
-import QtQuick.Controls.Styles 1.2
+import QtQuick.Controls.Styles 1.0
 
 TabViewStyle {
     frameOverlap: 2
     tab: Rectangle {
         color: "transparent"
         implicitWidth: control.count ? styleData.availableWidth / control.count : 0
-        implicitHeight: 70
+        implicitHeight: 100
         radius: 2
 
         BorderImage {

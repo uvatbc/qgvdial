@@ -36,13 +36,29 @@ Style {
                                                                :"assets/button/colt/dark/core_button_inactive.png"
                                       : "assets/button/colt/dark/core_button_disabled.png"
         }
-        Text {
-            anchors.centerIn: parent
-            id: buttonText
-            text: control.text
-            font.pixelSize: 35
-            color: __syspal.text
 
+        Image {
+            id: buttonIcon
+            anchors {
+                left: parent.left
+            }
+            height: parent.height * 7/10;
+            width: height
+            visible: control.iconSource ? true : false;
+        }
+
+        Item {
+            height: parent.height
+            width: parent.width - (buttonIcon.visible ? buttonIcon.width : 0)
+            anchors.left: buttonIcon.visible ? buttonIcon.right : parent.left
+
+            Text {
+                anchors.centerIn: parent
+                id: buttonText
+                text: control.text
+                font.pixelSize: 35
+                color: __syspal.text
+            }
         }
     }
 }
