@@ -23,6 +23,7 @@
   <!-- <permission>_sys_run_headless</permission> -->
 
   <asset path="qgvdial">qgvdial</asset>
+  <asset path="qt4/libbbphone.so.1.0.0">libbbphone.so</asset>
   <asset path="qt4srv/qt4srv">qt4srv</asset>
   <env var="LD_LIBRARY_PATH" value="app/native/runtime/qt/lib:/accounts/devuser/qt/lib:/usr/lib/qt4/lib/:$LD_LIBRARY_PATH"/>
   <env var="QT_PLUGIN_PATH" value="app/native/runtime/qt/plugins:/accounts/devuser/qt/plugins:$QT_PLUGIN_PATH"/>

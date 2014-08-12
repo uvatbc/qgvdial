@@ -25,8 +25,12 @@ Contact: yuvraaj@gmail.com
 #include "global.h"
 #include "IPhoneAccount.h"
 
+#define USE_PROCESS 1
+
+#if USE_PROCESS
 #include <QtCore>
 #include <QtNetwork>
+#endif
 
 class BBPhoneAccount: public IPhoneAccount
 {
@@ -46,12 +50,18 @@ public:
     QString getNumber();
 
 private slots:
+#if USE_PROCESS
     void onProcessStarted();
-
     void onGetNumber();
+#endif
 
 private:
+#if USE_PROCESS
     QLocalSocket *m_sock;
+#else
+    void *m_hBBPhone;
+    void *m_phoneCtx;
+#endif
 
     QString m_number;
 

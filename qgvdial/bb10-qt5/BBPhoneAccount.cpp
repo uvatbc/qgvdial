@@ -21,27 +21,81 @@ Contact: yuvraaj@gmail.com
 
 #include "BBPhoneAccount.h"
 
+#if !USE_PROCESS
+#include <dlfcn.h>
+#endif
+
 BBPhoneAccount::BBPhoneAccount(QObject *parent)
 : IPhoneAccount(parent)
+#if USE_PROCESS
 , m_sock(NULL)
+#else
+, m_hBBPhone(NULL)
+, m_phoneCtx(NULL)
+#endif
 {
+#if USE_PROCESS
     QFileInfo fi("app/native/qt4srv");
     if (!QProcess::startDetached (fi.absoluteFilePath ())) {
         Q_WARN("Failed to start process");
     } else {
         QTimer::singleShot (1000, this, SLOT(onProcessStarted()));
     }
+#else
+    if (NULL == m_hBBPhone) {
+        QFileInfo fi("app/native/libbbphone.so");
+        m_hBBPhone = dlopen (fi.absoluteFilePath().toLatin1().constData(),
+                             RTLD_NOW);
+        if (NULL == m_hBBPhone) {
+            Q_WARN("Failed to load BB Phone Qt4 library");
+            return;
+        }
+    }
+    Q_DEBUG("bbphone lib opened");
+
+    typedef void *(*CreateCtxFn)();
+    CreateCtxFn fn = (CreateCtxFn) dlsym(m_hBBPhone,
+                                         "createPhoneContext");
+    if (NULL == fn) {
+        Q_WARN("Failed to get createPhoneContext");
+        return;
+    }
+    Q_DEBUG("Got createPhoneContext");
+
+    m_phoneCtx = fn();
+    if (NULL == m_phoneCtx) {
+        Q_WARN("Get NULL from createPhoneContext");
+    }
+#endif
 }//BBPhoneAccount::BBPhoneAccount
 
 BBPhoneAccount::~BBPhoneAccount()
 {
+#if USE_PROCESS
     if (NULL != m_sock) {
         m_sock->write("quit");
         m_sock->waitForBytesWritten (1000);
         delete m_sock;
     }
+#else
+    if (NULL != m_phoneCtx) {
+        typedef void (*DeleteCtxFn)(void *ctx);
+        DeleteCtxFn fn = (DeleteCtxFn) dlsym(m_hBBPhone,
+                                             "deletePhoneContext");
+        if (NULL == fn) {
+            Q_WARN("Failed to get deletePhoneContext");
+        } else {
+            fn(m_phoneCtx);
+        }
+    }
+    if (NULL != m_hBBPhone) {
+        dlclose (m_hBBPhone);
+        m_hBBPhone = NULL;
+    }
+#endif
 }//BBPhoneAccount::~BBPhoneAccount
 
+#if USE_PROCESS
 void
 BBPhoneAccount::onProcessStarted()
 {
@@ -72,10 +126,14 @@ void
 BBPhoneAccount::onGetNumber()
 {
     disconnect(m_sock, SIGNAL(readyRead()), this, SLOT(onGetNumber()));
-    m_number = m_sock->readAll ();
 
-    Q_DEBUG(QString("Got numnber %1").arg (m_number));
+    QByteArray ba = m_sock->readAll ();
+    m_number = ba;
+
+    Q_DEBUG(QString("Got number \"%1\". Length of ba = %2").arg (m_number)
+            .arg(ba.length()));
 }//BBPhoneAccount::onGetNumber
+#endif
 
 QString
 BBPhoneAccount::id()
@@ -98,7 +156,9 @@ BBPhoneAccount::initiateCall(AsyncTaskToken *task)
         task->emitCompleted();
         return true;
     }
+    QString dest = task->inParams["destination"].toString();
 
+#if USE_PROCESS
     if (NULL == m_sock) {
         Q_WARN("BB phone library is not initialized");
         task->status = ATTS_FAILURE;
@@ -106,10 +166,23 @@ BBPhoneAccount::initiateCall(AsyncTaskToken *task)
         return true;
     }
 
-    QString dest = task->inParams["destination"].toString();
-
     dest = "initiateCellularCall" + dest;
     m_sock->write(dest.toLatin1 ());
+#else
+    typedef void (*InitiateCallFn)(void *ctx, const char *dest);
+    InitiateCallFn fn = (InitiateCallFn) dlsym(m_hBBPhone,
+                                               "initiateCellularCall");
+    if (NULL == fn) {
+        Q_WARN("Failed to get initiateCellularCall");
+        task->status = ATTS_FAILURE;
+        task->emitCompleted();
+        return true;
+    } else {
+        fn(m_phoneCtx, dest.toLatin1().constData());
+    }
+#endif
+
+    Q_DEBUG(QString("Call initiated to dest: %1").arg(dest));
 
     //TODO: Do this in the slot for the completion of the phone call
     task->status = ATTS_SUCCESS;
@@ -120,5 +193,21 @@ BBPhoneAccount::initiateCall(AsyncTaskToken *task)
 QString
 BBPhoneAccount::getNumber()
 {
+#if USE_PROCESS
     return m_number;
+#else
+    if (NULL == m_phoneCtx) {
+        Q_WARN("BB phone library is not initialized");
+        return QString();
+    }
+
+    typedef const char *(*GetNumFn)(void *ctx);
+    GetNumFn fn = (GetNumFn) dlsym(m_hBBPhone, "getNumber");
+    const char *bbrv = fn(m_phoneCtx);
+
+    QString rv;
+    rv += bbrv;
+
+    return rv;
+#endif
 }//BBPhoneAccount::getNumber
