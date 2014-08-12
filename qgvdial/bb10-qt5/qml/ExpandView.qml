@@ -27,7 +27,7 @@ Rectangle {
 
     property string mainTitle: "Main title"
     property bool isExpanded: false
-    property variant content
+    property Item content
     property variant yTimer
 
     signal clicked
@@ -40,6 +40,7 @@ Rectangle {
     Component.onCompleted: {
         if (content !== undefined) {
             content.opacity = 0;
+            content.visible = false;
             content.y += textRow.height;
         }
     }
@@ -123,14 +124,9 @@ Rectangle {
                 target: container
                 height: textRow.height + content.height + 2
             }
-            PropertyChanges {
-                target: content
-                opacity: 1
-            }
-            PropertyChanges {
-                target: arrowRotation
-                angle: 90
-            }
+            PropertyChanges { target: content; opacity: 1 }
+            PropertyChanges { target: content; visible: true }
+            PropertyChanges { target: arrowRotation; angle: 90 }
         }
     ]//states
 

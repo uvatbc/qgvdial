@@ -75,6 +75,7 @@ Item {
             width: parent.width - searchButton.width - parent.spacing - 5
             onTextChanged: { container.searchContact(searchField.text); }
             anchors.verticalCenter: parent.verticalCenter
+            focus: false
         }
 
         Button {

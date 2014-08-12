@@ -58,12 +58,11 @@ private slots:
 private:
 #if USE_PROCESS
     QLocalSocket *m_sock;
+    QString m_number;
 #else
     void *m_hBBPhone;
     void *m_phoneCtx;
 #endif
-
-    QString m_number;
 
     friend class BB10PhoneFactory;
 };
