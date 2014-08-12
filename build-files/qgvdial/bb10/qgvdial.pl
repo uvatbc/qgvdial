@@ -3,7 +3,7 @@ if ($#ARGV != 1) {
     die;
 }
 
-my $makejobs=32;
+my $makejobs=2;
 my $repo = "https://qgvdial.googlecode.com/svn/trunk";
 my $cmd;
 
