@@ -1,41 +1,65 @@
-<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <qnx xmlns="http://www.qnx.com/schemas/application/1.0">
-    <id>net.yuvraaj.qgvdial</id>
-    <name>qgvdial</name>
-    <versionNumber>__QGVDIAL_VERSION__</versionNumber>
-    <description>Google Voice client for BB10</description>
-    <initialWindow>
-        <autoOrients>true</autoOrients>
-        <systemChrome>none</systemChrome>
-        <transparent>false</transparent>
-    </initialWindow>
-    <author>Yuvraaj Kelkar</author>
-    <copyright>LGPL v2</copyright>
-    <env value="app/native/imports:/usr/lib/qt4/imports" var="QML_IMPORT_PATH"/>
-    <env value="app/native/plugins:/usr/lib/qt4/plugins" var="QT_PLUGIN_PATH"/>
-    <env value="app/native/lib:/usr/lib/qt4/lib/" var="LD_LIBRARY_PATH"/>
-    <arg>-style</arg>
-    <arg>qnxlight</arg>
-    <action system="true">run_native</action>
+  <id>net.yuvraaj.qgvdial</id>
+  <filename>qgvdial</filename>
+  <name>qgvdial</name>
+  <versionNumber>__QGVDIAL_VERSION__</versionNumber>
+  <buildId>1</buildId>
+  <description>Google Voice client for BB10</description>
+  <copyright>LGPL v2 (2009-2014)</copyright>
+  <initialWindow>
+    <autoOrients>true</autoOrients>
+    <systemChrome>none</systemChrome>
+    <transparent>false</transparent>
+  </initialWindow>
+  <author>Yuvraaj Kelkar</author>
 
-    <!-- ColoredItems should point to the project binary, path can be relative -->
-    <asset path="qgvdial" type="Qnx/Elf" entry="true">qgvdial</asset>
+  <permission system="true">run_native</permission>
+  <permission>access_internet</permission>
+  <permission>access_phone</permission>
+  <permission>control_phone</permission>
+  <permission>run_when_backgrounded</permission>
+  <permission>access_shared</permission>
+  <!-- <permission>_sys_run_headless</permission> -->
 
-    <!-- Request permission to execute native code.  Required for native applications. -->
-    <permission system="true">run_native</permission>
-    <permission>access_internet</permission>
-    <permission>access_phone</permission>
-    <permission>control_phone</permission>
-    <permission>run_when_backgrounded</permission>
-    <permission>access_shared</permission>
+  <asset path="qgvdial">qgvdial</asset>
+  <!-- <asset path="qt4/libbbphone.so.1.0.0">libbbphone.so</asset> -->
+  <asset path="qt4srv/qt4srv">qt4srv</asset>
+  <env var="LD_LIBRARY_PATH" value="app/native/runtime/qt/lib:/accounts/devuser/qt/lib:/usr/lib/qt4/lib/:$LD_LIBRARY_PATH"/>
+  <env var="QT_PLUGIN_PATH" value="app/native/runtime/qt/plugins:/accounts/devuser/qt/plugins:$QT_PLUGIN_PATH"/>
+  <env var="QML2_IMPORT_PATH" value="app/native/runtime/qt/qml:/accounts/devuser/qt/qml:$QML2_IMPORT_PATH"/>
+  <action system="true">run_native</action>
     
-    <asset path="../../icons/qgv.png">qgvdial.png</asset>
-    <icon>
-       <image>qgvdial.png</image>
-    </icon>
-
-    <asset path="qml/">qml</asset>
-    <asset path="imports/">imports</asset>
-    <env var="QML_IMPORT_PATH" value="app/native/imports" />
-    <!-- <env var="QBB_USE_OPENGL" value="1"/> -->
+  <asset path="../../icons/qgv.png">qgvdial.png</asset>
+  <icon>
+     <image>qgvdial.png</image>
+  </icon>
+  
+  <asset path="__QT5_BB10__/lib/libQt5Core.so.5">runtime/qt/lib/libQt5Core.so.5</asset>
+  <asset path="__QT5_BB10__/lib/libQt5Concurrent.so.5">runtime/qt/lib/libQt5Concurrent.so.5</asset>
+  <asset path="__QT5_BB10__/lib/libQt5Gui.so.5">runtime/qt/lib/libQt5Gui.so.5</asset>
+  <asset path="__QT5_BB10__/lib/libQt5Multimedia.so.5">runtime/qt/lib/libQt5Multimedia.so.5</asset>
+  <asset path="__QT5_BB10__/lib/libQt5MultimediaQuick_p.so.5">runtime/qt/lib/libQt5MultimediaQuick_p.so.5</asset>
+  <asset path="__QT5_BB10__/lib/libQt5MultimediaWidgets.so.5">runtime/qt/lib/libQt5MultimediaWidgets.so.5</asset>
+  <asset path="__QT5_BB10__/lib/libQt5Network.so.5">runtime/qt/lib/libQt5Network.so.5</asset>
+  <asset path="__QT5_BB10__/lib/libQt5OpenGL.so.5">runtime/qt/lib/libQt5OpenGL.so.5</asset>
+  <asset path="__QT5_BB10__/lib/libQt5Qml.so.5">runtime/qt/lib/libQt5Qml.so.5</asset>
+  <asset path="__QT5_BB10__/lib/libQt5Quick.so.5">runtime/qt/lib/libQt5Quick.so.5</asset>
+  <asset path="__QT5_BB10__/lib/libQt5Sql.so.5">runtime/qt/lib/libQt5Sql.so.5</asset>
+  <asset path="__QT5_BB10__/lib/libQt5Widgets.so.5">runtime/qt/lib/libQt5Widgets.so.5</asset>
+  <asset path="__QT5_BB10__/lib/libQt5Xml.so.5">runtime/qt/lib/libQt5Xml.so.5</asset>
+  <asset path="__QT5_BB10__/lib/libQt5XmlPatterns.so.5">runtime/qt/lib/libQt5XmlPatterns.so.5</asset>
+  
+  <asset path="__QT5_BB10__/plugins/bearer">runtime/qt/plugins/bearer</asset>
+  <asset path="__QT5_BB10__/plugins/imageformats">runtime/qt/plugins/imageformats</asset>
+  <asset path="__QT5_BB10__/plugins/mediaservice">runtime/qt/plugins/mediaservice</asset>
+  <asset path="__QT5_BB10__/plugins/platforms">runtime/qt/plugins/platforms</asset>
+  <!-- <asset path="__QT5_BB10__/plugins/sqldrivers">runtime/qt/plugins/sqldrivers</asset> -->
+  
+  <asset path="__QT5_BB10__/qml/Qt">runtime/qt/qml/Qt</asset>
+  <asset path="__QT5_BB10__/qml/QtAudioEngine">runtime/qt/qml/QtAudioEngine</asset>
+  <asset path="__QT5_BB10__/qml/QtMultimedia">runtime/qt/qml/QtMultimedia</asset>
+  <asset path="__QT5_BB10__/qml/QtQml">runtime/qt/qml/QtQml</asset>
+  <asset path="__QT5_BB10__/qml/QtQuick">runtime/qt/qml/QtQuick</asset>
+  <asset path="__QT5_BB10__/qml/QtQuick.2">runtime/qt/qml/QtQuick.2</asset>
 </qnx>
