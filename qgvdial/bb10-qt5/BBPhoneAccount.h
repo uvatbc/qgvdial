@@ -25,6 +25,9 @@ Contact: yuvraaj@gmail.com
 #include "global.h"
 #include "IPhoneAccount.h"
 
+#include <QtCore>
+#include <QtNetwork>
+
 class BBPhoneAccount: public IPhoneAccount
 {
     Q_OBJECT
@@ -42,9 +45,15 @@ public:
 
     QString getNumber();
 
+private slots:
+    void onProcessStarted();
+
+    void onGetNumber();
+
 private:
-    void *m_hBBPhone;
-    void *m_phoneCtx;
+    QLocalSocket *m_sock;
+
+    QString m_number;
 
     friend class BB10PhoneFactory;
 };

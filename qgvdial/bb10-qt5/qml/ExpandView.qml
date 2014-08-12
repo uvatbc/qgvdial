@@ -139,14 +139,17 @@ Rectangle {
             PropertyAnimation {
                 target: container; property: "height"
                 easing.type: Easing.InOutCubic
+                duration: 100
             }
             PropertyAnimation {
                 target: content; property: "opacity"
                 easing.type: Easing.InOutCubic
+                duration: 100
             }
             PropertyAnimation {
                 target: arrowRotation; property: "angle"
                 easing.type: Easing.InOutCubic
+                duration: 100
             }
         }
     ]//transitions

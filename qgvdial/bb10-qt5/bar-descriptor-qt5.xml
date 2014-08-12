@@ -20,10 +20,11 @@
   <permission>control_phone</permission>
   <permission>run_when_backgrounded</permission>
   <permission>access_shared</permission>
+  <!-- <permission>_sys_run_headless</permission> -->
 
   <asset path="qgvdial">qgvdial</asset>
-  <asset path="qt4/libbbphone.so.1.0.0">libbbphone.so</asset>
-  <env var="LD_LIBRARY_PATH" value="app/native/runtime/qt/lib:/accounts/devuser/qt/lib:$LD_LIBRARY_PATH"/>
+  <asset path="qt4srv/qt4srv">qt4srv</asset>
+  <env var="LD_LIBRARY_PATH" value="app/native/runtime/qt/lib:/accounts/devuser/qt/lib:/usr/lib/qt4/lib/:$LD_LIBRARY_PATH"/>
   <env var="QT_PLUGIN_PATH" value="app/native/runtime/qt/plugins:/accounts/devuser/qt/plugins:$QT_PLUGIN_PATH"/>
   <env var="QML2_IMPORT_PATH" value="app/native/runtime/qt/qml:/accounts/devuser/qt/qml:$QML2_IMPORT_PATH"/>
   <action system="true">run_native</action>

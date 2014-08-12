@@ -21,41 +21,61 @@ Contact: yuvraaj@gmail.com
 
 #include "BBPhoneAccount.h"
 
-#include <dlfcn.h>
-#include "bb10_qt4_global.h"
-
 BBPhoneAccount::BBPhoneAccount(QObject *parent)
 : IPhoneAccount(parent)
-, m_hBBPhone(NULL)
-, m_phoneCtx(NULL)
+, m_sock(NULL)
 {
-    if (NULL == m_hBBPhone) {
-        m_hBBPhone = dlopen ("libbbphone.so", RTLD_NOW);
-        if (NULL == m_hBBPhone) {
-            Q_WARN("Failed to load BB Phone Qt4 library");
-            return;
-        }
+    QFileInfo fi("app/native/qt4srv");
+    if (!QProcess::startDetached (fi.absoluteFilePath ())) {
+        Q_WARN("Failed to start process");
+    } else {
+        QTimer::singleShot (1000, this, SLOT(onProcessStarted()));
     }
-
-    typedef void *(*CreateCtxFn)();
-    CreateCtxFn fn = (CreateCtxFn) dlsym(m_hBBPhone,
-                                         "createPhoneContext");
-    m_phoneCtx = fn();
 }//BBPhoneAccount::BBPhoneAccount
 
 BBPhoneAccount::~BBPhoneAccount()
 {
-    if (NULL != m_phoneCtx) {
-        typedef void (*DeleteCtxFn)(void *ctx);
-        DeleteCtxFn fn = (DeleteCtxFn) dlsym(m_hBBPhone,
-                                             "deletePhoneContext");
-        fn(m_phoneCtx);
-    }
-    if (NULL != m_hBBPhone) {
-        dlclose (m_hBBPhone);
-        m_hBBPhone = NULL;
+    if (NULL != m_sock) {
+        m_sock->write("quit");
+        m_sock->waitForBytesWritten (1000);
+        delete m_sock;
     }
 }//BBPhoneAccount::~BBPhoneAccount
+
+void
+BBPhoneAccount::onProcessStarted()
+{
+    Q_DEBUG("Process started!");
+
+    m_sock = new QLocalSocket(this);
+    if (NULL == m_sock) {
+        Q_WARN("Failed to allocate local socket");
+        return;
+    }
+
+    m_sock->connectToServer ("qgvdial");
+    if (!m_sock->waitForConnected (500)) {
+        Q_WARN("Waiting for a second to connect to server");
+        QTimer::singleShot (1000, this, SLOT(onProcessStarted()));
+        delete m_sock;
+        m_sock = NULL;
+        return;
+    }
+
+    Q_DEBUG("Socket connected");
+
+    connect(m_sock, SIGNAL(readyRead()), this, SLOT(onGetNumber()));
+    m_sock->write("getNumber");
+}//BBPhoneAccount::onProcessStarted
+
+void
+BBPhoneAccount::onGetNumber()
+{
+    disconnect(m_sock, SIGNAL(readyRead()), this, SLOT(onGetNumber()));
+    m_number = m_sock->readAll ();
+
+    Q_DEBUG(QString("Got numnber %1").arg (m_number));
+}//BBPhoneAccount::onGetNumber
 
 QString
 BBPhoneAccount::id()
@@ -79,7 +99,7 @@ BBPhoneAccount::initiateCall(AsyncTaskToken *task)
         return true;
     }
 
-    if (NULL == m_phoneCtx) {
+    if (NULL == m_sock) {
         Q_WARN("BB phone library is not initialized");
         task->status = ATTS_FAILURE;
         task->emitCompleted();
@@ -88,11 +108,8 @@ BBPhoneAccount::initiateCall(AsyncTaskToken *task)
 
     QString dest = task->inParams["destination"].toString();
 
-    typedef void (*InitiateCallFn)(void *ctx, const char *dest);
-    InitiateCallFn fn = (InitiateCallFn) dlsym(m_hBBPhone,
-                                               "initiateCellularCall");
-    fn(m_phoneCtx, dest.toLatin1().constData());
-    Q_DEBUG(QString("Call initiated to dest: %1").arg(dest));
+    dest = "initiateCellularCall" + dest;
+    m_sock->write(dest.toLatin1 ());
 
     //TODO: Do this in the slot for the completion of the phone call
     task->status = ATTS_SUCCESS;
@@ -103,17 +120,5 @@ BBPhoneAccount::initiateCall(AsyncTaskToken *task)
 QString
 BBPhoneAccount::getNumber()
 {
-    if (NULL == m_phoneCtx) {
-        Q_WARN("BB phone library is not initialized");
-        return QString();
-    }
-
-    typedef const char *(*GetNumFn)(void *ctx);
-    GetNumFn fn = (GetNumFn) dlsym(m_hBBPhone, "getNumber");
-    const char *bbrv = fn(m_phoneCtx);
-
-    QString rv;
-    rv += bbrv;
-
-    return rv;
+    return m_number;
 }//BBPhoneAccount::getNumber

@@ -38,10 +38,12 @@ public:
     QString m_number;
 };
 
-void * QT4SHARED_EXPORT
+extern "C" void * QT4SHARED_EXPORT
 createPhoneContext()
 {
+    qDebug() << "About to create PhoneContext" << endl;
     PhoneContext *p = new PhoneContext;
+    qDebug() << "Created PhoneContext!" << endl;
 
     QMap <QString, bb::system::phone::Line> l = p->m_phone.lines();
     foreach (QString key, l.keys()) {
@@ -54,21 +56,21 @@ createPhoneContext()
     return p;
 }
 
-void QT4SHARED_EXPORT
+extern "C" void QT4SHARED_EXPORT
 deletePhoneContext(void *ctx)
 {
     PhoneContext *p = (PhoneContext *) ctx;
     delete p;
 }
 
-const char * QT4SHARED_EXPORT
+extern "C" const char * QT4SHARED_EXPORT
 getNumber(void *ctx)
 {
     PhoneContext *p = (PhoneContext *) ctx;
     return p->m_number.toLatin1().constData ();
 }
 
-int QT4SHARED_EXPORT
+extern "C" int QT4SHARED_EXPORT
 initiateCellularCall(void *ctx, const char *dest)
 {
     PhoneContext *p = (PhoneContext *) ctx;

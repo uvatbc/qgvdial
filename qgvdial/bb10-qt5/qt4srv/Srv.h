@@ -19,20 +19,38 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#ifndef BB10PHONEFACTORY_H
-#define BB10PHONEFACTORY_H
+#ifndef _SRV_H_INCLUDED_
+#define _SRV_H_INCLUDED_
 
-#include <QObject>
-#include "IPhoneAccountFactory.h"
+#include <QtCore>
+#include <QtNetwork>
 
-class BB10PhoneFactory : public IPhoneAccountFactory
+#ifndef Q_WS_SIMULATOR
+#include <bb/system/phone/Phone>
+#include <bb/system/phone/Line>
+#include <bb/system/phone/LineType>
+#endif
+
+class MainObject : public QObject
 {
-    Q_OBJECT
-public:
-    explicit BB10PhoneFactory(QObject *parent = 0);
-    ~BB10PhoneFactory();
+   Q_OBJECT
 
-    bool identifyAll(AsyncTaskToken *task);
+public:
+   MainObject(QObject *parent = NULL);
+
+public slots:
+   void onNewConnection();
+
+private slots:
+   void onStateChanged(QLocalSocket::LocalSocketState socketState);
+   void onReadyRead();
+
+private:
+
+#ifndef Q_WS_SIMULATOR
+   bb::system::phone::Phone m_phone;
+#endif
 };
 
-#endif // BB10PHONEFACTORY_H
+#endif//_SRV_H_INCLUDED_
+

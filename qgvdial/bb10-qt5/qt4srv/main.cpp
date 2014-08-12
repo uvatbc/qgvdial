@@ -19,20 +19,22 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#ifndef BB10PHONEFACTORY_H
-#define BB10PHONEFACTORY_H
+#include "Srv.h"
 
-#include <QObject>
-#include "IPhoneAccountFactory.h"
-
-class BB10PhoneFactory : public IPhoneAccountFactory
+Q_DECL_EXPORT int
+main(int argc, char *argv[])
 {
-    Q_OBJECT
-public:
-    explicit BB10PhoneFactory(QObject *parent = 0);
-    ~BB10PhoneFactory();
+   QCoreApplication app(argc, argv);
+   MainObject o;
+   QLocalServer s;
 
-    bool identifyAll(AsyncTaskToken *task);
-};
+   if (!s.listen ("qgvdial")) {
+       qWarning ("Server is already listening");
+       return -1;
+   }
 
-#endif // BB10PHONEFACTORY_H
+   QObject::connect(&s, SIGNAL(newConnection()), &o, SLOT(onNewConnection()));
+
+   return app.exec();
+}//main
+

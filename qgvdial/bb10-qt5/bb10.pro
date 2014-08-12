@@ -22,10 +22,8 @@ RESOURCES += qml.qrc \
 OTHER_FILES += \
     bar-descriptor.xml
 
-# Additional import path used to resolve QML modules in Qt Creator's code model
+# Additional import path used to resolve QML modules in Qt Creators code model
 QML_IMPORT_PATH = qml
-
-INCLUDEPATH += qt4/inc
 
 include(../common/common.pri)
 include(../features/openssl/openssl-lin.pri)
