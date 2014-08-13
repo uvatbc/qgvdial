@@ -59,10 +59,10 @@ MainWindow::init()
 
     qreal val;
     val = 0.8;
-    m_view->engine().rootContext()->setContextProperty("g_keypadScaleFactor1",
-                                                       val);
-    m_view->engine().rootContext()->setContextProperty("g_keypadScaleFactor2",
-                                                       val);
+    m_view->engine()->rootContext()->setContextProperty("g_keypadScaleFactor1",
+                                                        val);
+    m_view->engine()->rootContext()->setContextProperty("g_keypadScaleFactor2",
+                                                        val);
 
     QmlMainWindow::init ();
 

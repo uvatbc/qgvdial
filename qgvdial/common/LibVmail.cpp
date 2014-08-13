@@ -24,7 +24,7 @@ Contact: yuvraaj@gmail.com
 #include "Lib.h"
 
 #if PHONON_ENABLED
-    #ifdef OS_DIABLO
+    #if defined(OS_DIABLO) && !defined(QT_WS_SIMULATOR)
         #include <Phonon/AudioOutput>
         #include <Phonon/AudioOutputDevice>
     #else

@@ -45,6 +45,8 @@ private slots:
    void onStateChanged(QLocalSocket::LocalSocketState socketState);
    void onReadyRead();
 
+   void onCallCommandResponseReceived(const bb::system::phone::CallCommandResponse &commandResponse);
+
 private:
    QLocalServer m_srv;
 

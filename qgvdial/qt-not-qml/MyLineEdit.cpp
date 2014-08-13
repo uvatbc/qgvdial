@@ -31,7 +31,7 @@ MyLineEdit::MyLineEdit(QWidget *parent)
  * This property and its accessors were introduced in Qt 4.7
  * Diablo runs 4.6
  * Create a dummy function so that I can continue to use the QLineEdit class
- * without having to more trickery.
+ * without resorting to more trickery.
  */
 void
 MyLineEdit::setPlaceholderText (const QString &)

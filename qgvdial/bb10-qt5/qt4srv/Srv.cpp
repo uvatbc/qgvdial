@@ -25,6 +25,11 @@ MainObject::MainObject(QObject *parent)
 : QObject(parent)
 , m_srv(this)
 {
+    connect(&m_phone,
+            SIGNAL(onCallCommandResponseReceived(bb::system::phone::CallCommandResponse)),
+            this,
+            SLOT(onCallCommandResponseReceived(bb::system::phone::CallCommandResponse)));
+
     int count = 0;
     while (!m_srv.listen ("qgvdial") && (++count < 5)) {
         qWarning ("Server is already listening");
@@ -137,3 +142,12 @@ MainObject::saveMessage(const QString &msg)
     m_msgs.append(QString("%1: %2").arg (dt.toString (Qt::ISODate), msg));
     qDebug() << msg;
 }//MainObject::saveMessage
+
+void
+MainObject::onCallCommandResponseReceived(const bb::system::phone::CallCommandResponse &commandResponse)
+{
+    QString err = commandResponse.error();
+    if (!err.isEmpty()) {
+        saveMessage(err);
+    }
+}//MainObject::onCallCommandResponseReceived

@@ -33,15 +33,15 @@ Contact: yuvraaj@gmail.com
 #endif
 
 #if PHONON_ENABLED
-   #ifdef OS_DIABLO
-      #include <Phonon/MediaObject>
-   #else
-      #include <phonon/MediaObject>
-   #endif
+    #if defined(OS_DIABLO) && !defined(QT_WS_SIMULATOR)
+        #include <Phonon/MediaObject>
+    #else
+        #include <phonon/MediaObject>
+    #endif
 #elif QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-   #include <QtMultimedia/QtMultimedia>
+    #include <QtMultimedia/QtMultimedia>
 #else
-   #include <QtMultimediaKit/QMediaPlayer>
+    #include <QtMultimediaKit/QMediaPlayer>
 #endif
 
 enum LVPlayerState {

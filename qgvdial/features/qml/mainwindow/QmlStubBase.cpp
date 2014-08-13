@@ -1,5 +1,27 @@
+/*
+qgvdial is a cross platform Google Voice Dialer
+Copyright (C) 2009-2014  Yuvraaj Kelkar
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
+Contact: yuvraaj@gmail.com
+*/
+
 #include "QmlStubBase.h"
 #include "QmlMainWindow.h"
+#include "CQmlViewer.h"
 
 QmlStubBase::QmlStubBase(QObject *parent)
 : QObject(parent)
@@ -12,6 +34,9 @@ QmlStubBase::findChild(QString name)
     QmlMainWindow *parent = (QmlMainWindow *) this->parent();
     if (NULL != parent) {
         return parent->getQMLObject(name.toLatin1().constData());
+    } else {
+        Q_WARN("No parent!");
+        return NULL;
     }
 
     if (parent->mainPageStack->objectName () == name) {
@@ -64,3 +89,16 @@ QmlStubBase::findChild(QString name)
 
     return NULL;
 }//QmlStubBase::findChild
+
+void
+QmlStubBase::closeVkb()
+{
+    QmlMainWindow *parent = (QmlMainWindow *) this->parent();
+    if (NULL == parent) {
+        Q_WARN("No parent!");
+        return;
+    }
+
+    QEvent event(QEvent::FocusOut);
+    qApp->sendEvent(parent->m_view->rootObject(), &event);
+}//QmlStubBase::closeVkb

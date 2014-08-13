@@ -111,6 +111,7 @@ FocusScope {
                 //contactsList.forceActiveFocus();
 
                 container.forceActiveFocus();
+                g_qmlstub.closeVkb();
             }
         }
     }//Search row: text and button
@@ -186,7 +187,10 @@ FocusScope {
 
             MouseArea {
                 anchors.fill: parent
-                onClicked: { container.contactClicked(id); }
+                onClicked: {
+                    container.contactClicked(id);
+                    g_qmlstub.closeVkb();
+                }
             }
         }// delegate Rectangle
     }// ListView (contacts list)

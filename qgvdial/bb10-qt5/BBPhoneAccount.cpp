@@ -20,6 +20,7 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "BBPhoneAccount.h"
+#include <QDesktopServices>
 
 #if !USE_PROCESS
 #include <dlfcn.h>
@@ -189,8 +190,10 @@ BBPhoneAccount::initiateCall(AsyncTaskToken *task)
         return true;
     }
 
-    dest = "initiateCellularCall" + dest;
-    m_sock->write(dest.toLatin1 ());
+    //dest = "initiateCellularCall" + dest;
+    //m_sock->write(dest.toLatin1 ());
+
+    QDesktopServices::openUrl(QUrl("tel:" + dest));
 #else
     typedef void (*InitiateCallFn)(void *ctx, const char *dest);
     InitiateCallFn fn = (InitiateCallFn) dlsym(m_hBBPhone,

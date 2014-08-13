@@ -54,7 +54,7 @@ public:
     inline QObject *rootObject() { return m_engine.rootObjects()[0]; }
     inline QQmlContext *rootContext() const { return m_engine.rootContext(); }
 
-    inline QQmlApplicationEngine &engine() { return m_engine; }
+    inline QQmlApplicationEngine *engine() { return &m_engine; }
 
     bool connectToChangeNotify(QObject *item, const QString &propName,
                                QObject *receiver, const char *slotName);

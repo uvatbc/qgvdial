@@ -7,6 +7,10 @@ include(../features/dbus_api/dbus_api.pri)
 DEFINES += OS_DIABLO
 QT *= phonon
 
+simulator {
+DEFINES+=QT_WS_SIMULATOR
+}
+
 INCLUDEPATH += diablo
 SOURCES  += diablo/DiabloPhoneFactory.cpp
 HEADERS  += diablo/platform_specific.h \

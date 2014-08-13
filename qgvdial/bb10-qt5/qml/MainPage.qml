@@ -97,7 +97,7 @@ Rectangle {
             InboxPage {
                 id: inboxTab
                 onSetNumberToDial: {
-                    dialTab.setNumberInDisp(number);
+                    container.setNumberInDisp(number);
                     tabView.setTab(0);
                 }
 
