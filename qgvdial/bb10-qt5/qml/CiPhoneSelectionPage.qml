@@ -55,7 +55,7 @@ Rectangle {
             delegate: Label {
                 width: numbersView.width
                 text: name + "\n(" + number + ")"
-                font.pixelSize: 25
+                font.pixelSize: 50
 
                 MouseArea {
                     anchors.fill: parent

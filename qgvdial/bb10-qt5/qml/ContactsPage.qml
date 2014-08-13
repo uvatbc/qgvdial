@@ -22,7 +22,7 @@ Contact: yuvraaj@gmail.com
 import QtQuick 2.2
 import QtQuick.Controls 1.1
 
-Item {
+FocusScope {
     id: container
     anchors.fill: parent
 
@@ -75,7 +75,6 @@ Item {
             width: parent.width - searchButton.width - parent.spacing - 5
             onTextChanged: { container.searchContact(searchField.text); }
             anchors.verticalCenter: parent.verticalCenter
-            focus: false
         }
 
         Button {
@@ -109,7 +108,9 @@ Item {
                     container.searchContact("");
                 }
                 //searchField.closeSoftwareInputPanel();
-                contactsList.forceActiveFocus();
+                //contactsList.forceActiveFocus();
+
+                container.forceActiveFocus();
             }
         }
     }//Search row: text and button
@@ -134,7 +135,7 @@ Item {
 
         header: RefreshButton {
             isHeader: true
-            width: parent.width
+            width: contactsList.width
             contentY: contactsList.contentY
             onVisibleChanged: {
                 bgRefreshBtn.visible = !visible;

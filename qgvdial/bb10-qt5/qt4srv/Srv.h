@@ -37,15 +37,18 @@ class MainObject : public QObject
 
 public:
    MainObject(QObject *parent = NULL);
-
-public slots:
-   void onNewConnection();
+   ~MainObject();
 
 private slots:
+   void onNewConnection();
+   void saveMessage(const QString &msg);
    void onStateChanged(QLocalSocket::LocalSocketState socketState);
    void onReadyRead();
 
 private:
+   QLocalServer m_srv;
+
+   QStringList m_msgs;
 
 #ifndef Q_WS_SIMULATOR
    bb::system::phone::Phone m_phone;

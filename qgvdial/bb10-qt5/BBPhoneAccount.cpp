@@ -41,6 +41,11 @@ BBPhoneAccount::BBPhoneAccount(QObject *parent)
     } else {
         QTimer::singleShot (1000, this, SLOT(onProcessStarted()));
     }
+
+    m_TimerLogMessage.setSingleShot (true);
+    m_TimerLogMessage.setInterval (1000);
+    connect(&m_TimerLogMessage, SIGNAL(timeout()),
+            this, SLOT(onLogMessagesTimer()));
 #else
     if (NULL == m_hBBPhone) {
         QFileInfo fi("app/native/libbbphone.so");
@@ -108,7 +113,7 @@ BBPhoneAccount::onProcessStarted()
     }
 
     m_sock->connectToServer ("qgvdial");
-    if (!m_sock->waitForConnected (500)) {
+    if (!m_sock->waitForConnected (1000)) {
         Q_WARN("Waiting for a second to connect to server");
         QTimer::singleShot (1000, this, SLOT(onProcessStarted()));
         delete m_sock;
@@ -120,6 +125,8 @@ BBPhoneAccount::onProcessStarted()
 
     connect(m_sock, SIGNAL(readyRead()), this, SLOT(onGetNumber()));
     m_sock->write("getNumber");
+
+    m_TimerLogMessage.start ();
 }//BBPhoneAccount::onProcessStarted
 
 void
@@ -133,6 +140,22 @@ BBPhoneAccount::onGetNumber()
     Q_DEBUG(QString("Got number \"%1\". Length of ba = %2").arg (m_number)
             .arg(ba.length()));
 }//BBPhoneAccount::onGetNumber
+
+void
+BBPhoneAccount::onLogMessagesTimer()
+{
+    m_sock->write("getDebugMessages");
+    m_sock->waitForReadyRead ();
+
+    QString msgs = m_sock->readAll ();
+
+    if (msgs.length ()) {
+        Q_DEBUG(msgs);
+    }
+
+    m_TimerLogMessage.start ();
+}//BBPhoneAccount::onLogMessagesTimer
+
 #endif
 
 QString

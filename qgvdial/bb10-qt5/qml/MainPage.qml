@@ -39,7 +39,12 @@ Rectangle {
     signal sigRefreshInboxFull
 
     function setNumberInDisp(number) {
-        dialTab.setNumberInDisp(number);
+        var dPage = g_qmlstub.findChild("DialPage");
+        if (dPage) {
+            dPage.setNumberInDisp(number);
+        } else {
+            console.log("Did not find DialPage");
+        }
     }
 
     function setTab(number) {

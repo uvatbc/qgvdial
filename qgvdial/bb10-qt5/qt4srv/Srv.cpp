@@ -23,21 +23,50 @@ Contact: yuvraaj@gmail.com
 
 MainObject::MainObject(QObject *parent)
 : QObject(parent)
+, m_srv(this)
 {
+    int count = 0;
+    while (!m_srv.listen ("qgvdial") && (++count < 5)) {
+        qWarning ("Server is already listening");
+
+        QLocalSocket sock;
+        sock.connectToServer ("qgvdial");
+        sock.waitForConnected (10*1000);
+        sock.write ("quit");
+        qDebug ("Wrote quit");
+        sock.waitForBytesWritten (10 * 1000);
+
+        m_srv.removeServer ("qgvdial");
+    }
+
+    if (count >= 5) {
+        qDebug ("Self quit");
+        qApp->quit ();
+        exit(-1);
+        return;
+    }
+
+    QObject::connect(&m_srv, SIGNAL(newConnection()),
+                     this, SLOT(onNewConnection()));
 }//MainObject::MainObject
+
+MainObject::~MainObject()
+{
+    m_srv.close ();
+    m_srv.removeServer ("qgvdial");
+}//MainObject::~MainObject
 
 void
 MainObject::onNewConnection()
 {
-    QLocalServer *s = (QLocalServer *) QObject::sender ();
     QLocalSocket *c;
 
-    while ((c = s->nextPendingConnection ())) {
+    while ((c = m_srv.nextPendingConnection ())) {
         connect(c, SIGNAL(stateChanged(QLocalSocket::LocalSocketState)),
                 this, SLOT(onStateChanged(QLocalSocket::LocalSocketState)));
         connect(c, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
 
-        qDebug("SRV: Got one connection!!");
+        saveMessage("SRV: Got one connection!!");
     }
 }//MainObject::onNewConnection
 
@@ -47,7 +76,7 @@ MainObject::onStateChanged(QLocalSocket::LocalSocketState socketState)
     QLocalSocket *c = (QLocalSocket *) QObject::sender ();
     if (QLocalSocket::ClosingState == socketState) {
         c->deleteLater ();
-        qDebug("SRV: Clearing out one connection!!");
+        saveMessage("SRV: Clearing out one connection!!");
     }
 }//MainObject::onStateChanged
 
@@ -58,15 +87,13 @@ MainObject::onReadyRead()
     QByteArray data = c->readAll ();
 
     if (data.startsWith ("quit")) {
-        qDebug("SRV: Quitting now!");
+        saveMessage("SRV: Quitting now!");
         qApp->quit ();
         exit (0);
         return;
     }
 
     if (data.startsWith ("getNumber")) {
-        qDebug("SRV: getNumber!");
-
         QString number;
 #ifndef Q_WS_SIMULATOR
         QMap <QString, bb::system::phone::Line> l = m_phone.lines();
@@ -77,16 +104,36 @@ MainObject::onReadyRead()
             }
         }
 #endif
+
         c->write(number.toLatin1().constData(), number.length()+1);
+
+        saveMessage(QString("SRV: getNumber: Returning \"%1\"").arg(number));
         return;
     }
 
     if (data.startsWith ("initiateCellularCall")) {
-        qDebug("SRV: initiateCellularCall!");
+        QString dest = data.mid(sizeof("initiateCellularCall") - 1);
+        QString msg = QString("SRV: initiateCellularCall: %1").arg(dest);
 
-        data = data.mid(sizeof("initiateCellularCall") - 1);
-
-        m_phone.initiateCellularCall (QString(data));
+        m_phone.initiateCellularCall (dest);
+        saveMessage(msg);
         return;
     }
+
+    if (data.startsWith ("getDebugMessages")) {
+        QString msgs = m_msgs.join ("\n");
+        c->write(msgs.toLatin1().constData(), msgs.length()+1);
+        m_msgs.clear ();
+        return;
+    }
+
+    saveMessage (QString("Invalid data: \"%1\"").arg (QString(data)));
 }//MainObject::onReadyRead
+
+void
+MainObject::saveMessage(const QString &msg)
+{
+    QDateTime dt = QDateTime::currentDateTime ();
+    m_msgs.append(QString("%1: %2").arg (dt.toString (Qt::ISODate), msg));
+    qDebug() << msg;
+}//MainObject::saveMessage

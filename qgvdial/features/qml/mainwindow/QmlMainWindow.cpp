@@ -38,6 +38,7 @@ Contact: yuvraaj@gmail.com
 #include "InboxModel.h"
 #include "GVNumModel.h"
 #include "ContactNumbersModel.h"
+#include "QmlStubBase.h"
 
 #ifdef DBUS_API
 #include <QtDBus>
@@ -121,6 +122,7 @@ QmlMainWindow::QmlMainWindow(QObject *parent)
 , optInboxUpdate(NULL)
 , edContactsUpdateFreq(NULL)
 , edInboxUpdateFreq(NULL)
+, m_qmlStub(NULL)
 #ifdef DBUS_API
 , apiCall(this)
 , apiText(this)
@@ -146,6 +148,13 @@ QmlMainWindow::init()
 #endif
 
     IMainWindow::init ();
+
+    if (NULL == m_qmlStub) {
+        m_qmlStub = new QmlStubBase(this);
+    } else {
+        m_qmlStub->setParent(this);
+    }
+    m_view->engine().rootContext()->setContextProperty("g_qmlstub", m_qmlStub);
 
 #ifdef DBUS_API
     if (!initDBus ()) {
@@ -689,11 +698,26 @@ QmlMainWindow::uiSetNewContactDetailsModel()
 void
 QmlMainWindow::uiShowContactDetails(const ContactInfo &cinfo)
 {
+    QString photoPath = correctedPhotoUrlPath (cinfo.strPhotoPath);
+
     QMetaObject::invokeMethod (mainPageStack, "showContactDetails",
-                               Q_ARG(QVariant, QVariant(cinfo.strPhotoPath)),
+                               Q_ARG(QVariant, QVariant(photoPath)),
                                Q_ARG(QVariant, QVariant(cinfo.strTitle)),
                                Q_ARG(QVariant, QVariant(cinfo.strNotes)));
 }//QmlMainWindow::uiShowContactDetails
+
+QString
+QmlMainWindow::correctedPhotoUrlPath(QString path)
+{
+    QString photoPath;
+    if (path.startsWith ("qrc:") || path.startsWith (":/")) {
+        photoPath = path;
+    } else {
+        photoPath = QUrl::fromLocalFile(path).toString();
+    }
+
+    return photoPath;
+}//QmlMainWindow::correctedPhotoUrlPath
 
 void
 QmlMainWindow::onInboxClicked(QString id)
@@ -714,8 +738,10 @@ QmlMainWindow::onInboxClicked(QString id)
 
     bool isVmail = (event.Type == GVIE_Voicemail);
 
+    QString photoPath = correctedPhotoUrlPath (cinfo.strPhotoPath);
+
     QMetaObject::invokeMethod(mainPageStack, "showInboxDetails",
-                              Q_ARG(QVariant,QVariant(cinfo.strPhotoPath)),
+                              Q_ARG(QVariant,QVariant(photoPath)),
                               Q_ARG(QVariant,QVariant(event.strDisplayNumber)),
                               Q_ARG(QVariant,QVariant(event.strPhoneNumber)),
                               Q_ARG(QVariant,QVariant(event.strNote)),
@@ -783,8 +809,10 @@ QmlMainWindow::onUserTextBtnClicked(QString dest)
         cinfo.strTitle = dest;
     }
 
+    QString photoPath = correctedPhotoUrlPath (cinfo.strPhotoPath);
+
     QMetaObject::invokeMethod (mainPageStack, "showSmsPage",
-                               Q_ARG (QVariant, QVariant(cinfo.strPhotoPath)),
+                               Q_ARG (QVariant, QVariant(photoPath)),
                                Q_ARG (QVariant, QVariant(cinfo.strTitle)),
                                Q_ARG (QVariant, QVariant(dest)),
                                Q_ARG (QVariant, QVariant(QString())),
@@ -799,8 +827,10 @@ QmlMainWindow::uiFailedToSendMessage(const QString &dest, const QString &text)
         cinfo.strTitle = dest;
     }
 
+    QString photoPath = correctedPhotoUrlPath (cinfo.strPhotoPath);
+
     QMetaObject::invokeMethod (mainPageStack, "showSmsPage",
-                               Q_ARG (QVariant, QVariant(cinfo.strPhotoPath)),
+                               Q_ARG (QVariant, QVariant(photoPath)),
                                Q_ARG (QVariant, QVariant(cinfo.strTitle)),
                                Q_ARG (QVariant, QVariant(dest)),
                                Q_ARG (QVariant, QVariant(QString())),
@@ -834,8 +864,10 @@ QmlMainWindow::onUserReplyToInboxEntry(QString id)
         return;
     }
 
+    QString photoPath = correctedPhotoUrlPath (cinfo.strPhotoPath);
+
     QMetaObject::invokeMethod (mainPageStack, "showSmsPage",
-                               Q_ARG (QVariant, QVariant(cinfo.strPhotoPath)),
+                               Q_ARG (QVariant, QVariant(photoPath)),
                                Q_ARG (QVariant, QVariant(cinfo.strTitle)),
                                Q_ARG (QVariant, QVariant(event.strPhoneNumber)),
                                Q_ARG (QVariant, QVariant(event.strText)),

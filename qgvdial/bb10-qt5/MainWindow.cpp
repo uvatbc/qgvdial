@@ -23,10 +23,13 @@ Contact: yuvraaj@gmail.com
 #include "CQmlViewer.h"
 #include "BB10PhoneFactory.h"
 
+/*
 #include <QGLWidget>
 #include <QGLFormat>
+*/
 
 #define MAIN_QML_PATH "qrc:/main.qml"
+extern QStringList g_arrLogFiles;
 
 QCoreApplication *
 createAppObject(int &argc, char **argv)
@@ -49,6 +52,11 @@ MainWindow::MainWindow(QObject *parent)
 void
 MainWindow::init()
 {
+    QString qt4srvLog = QDir::currentPath() + "/logs/qt4srv.txt";
+    if (QFileInfo(qt4srvLog).exists ()) {
+        g_arrLogFiles.append(qt4srvLog);
+    }
+
     qreal val;
     val = 0.8;
     m_view->engine().rootContext()->setContextProperty("g_keypadScaleFactor1",

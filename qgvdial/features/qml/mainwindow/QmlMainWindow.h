@@ -29,6 +29,7 @@ Contact: yuvraaj@gmail.com
 #endif
 
 class CQmlViewer;
+class QmlStubBase;
 class QmlMainWindow : public IMainWindow
 {
     Q_OBJECT
@@ -115,6 +116,8 @@ protected:
     void uiEnableInboxUpdateFrequency(bool enable);
     void uiSetInboxUpdateFrequency(quint32 mins);
 
+    QString correctedPhotoUrlPath(QString path);
+
 protected:
     CQmlViewer *m_view;
 
@@ -141,6 +144,9 @@ protected:
     QObject *optInboxUpdate;
     QObject *edContactsUpdateFreq;
     QObject *edInboxUpdateFreq;
+
+    friend class QmlStubBase;
+    QmlStubBase *m_qmlStub;
 
     void    *loginCtx;
 

@@ -95,7 +95,12 @@ ContactsModel::getPic(const QModelIndex &index, bool isQML) const
 
         if (isQML) {
             // Local path is mandatory, and I *do* have it:
-            retVar = localPath;
+            if (localPath.startsWith ("qrc:/") || localPath.startsWith (":/")) {
+                retVar = localPath;
+            } else {
+                retVar = QUrl::fromLocalFile (localPath).toString ();
+            }
+
         } else {
 #if !defined(Q_OS_BLACKBERRY)
             QPixmap pixmap(localPath);

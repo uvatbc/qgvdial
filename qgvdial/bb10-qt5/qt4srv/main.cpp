@@ -21,20 +21,79 @@ Contact: yuvraaj@gmail.com
 
 #include "Srv.h"
 
+#include <iostream>
+using namespace std;
+
+QFile fLogfile;       //! Logfile
+int   logCounter = 0; //! Number of log entries since the last log flush
+#define LOG_FLUSH_LEVEL 0
+
+void
+myMessageOutput(QtMsgType type, const char *msg)
+{
+    int level = -1;
+    switch (type) {
+    case QtDebugMsg:
+        level = 3;
+        break;
+    case QtWarningMsg:
+        level = 2;
+        break;
+    case QtCriticalMsg:
+        level = 1;
+        break;
+    case QtFatalMsg:
+        level = 0;
+        break;
+    }
+
+    QDateTime dt = QDateTime::currentDateTime ();
+    QString strLog = QString("%1 : [%2] : %3")
+                     .arg(dt.toString ("yyyy-MM-dd hh:mm:ss.zzz"))
+                     .arg(level)
+                     .arg(msg);
+
+    // Send to standard output.
+    // I'm not using endl here because endl causes flushes
+    cout << strLog.toLatin1().constData() << "\n";
+
+    strLog += '\n';
+    if (fLogfile.isOpen ()) {
+        // Append it to the file
+        fLogfile.write(strLog.toLatin1 ());
+
+        ++logCounter;
+        if (logCounter > LOG_FLUSH_LEVEL) {
+            fLogfile.flush ();
+            cout.flush();
+        }
+    }
+
+    if (QtFatalMsg == type) {
+        abort();
+    }
+}//myMessageOutput
+
+void
+initLogs()
+{
+    QString strLogfile = QDir::currentPath() + "/logs/qt4srv.log";
+
+    fLogfile.setFileName (strLogfile);
+    fLogfile.open (QIODevice::ReadWrite | QIODevice::Truncate);
+
+    qInstallMsgHandler(myMessageOutput);
+}//initLogs
+
 Q_DECL_EXPORT int
 main(int argc, char *argv[])
 {
    QCoreApplication app(argc, argv);
    MainObject o;
-   QLocalServer s;
 
-   if (!s.listen ("qgvdial")) {
-       qWarning ("Server is already listening");
-       return -1;
-   }
+   initLogs ();
 
-   QObject::connect(&s, SIGNAL(newConnection()), &o, SLOT(onNewConnection()));
-
-   return app.exec();
+   int rv = app.exec();
+   return rv;
 }//main
 
