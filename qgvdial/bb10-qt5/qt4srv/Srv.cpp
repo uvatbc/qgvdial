@@ -37,6 +37,21 @@ MainObject::MainObject(QObject *parent)
         QLocalSocket sock;
         sock.connectToServer ("qgvdial");
         sock.waitForConnected (10*1000);
+
+        sock.write("ping");
+        qDebug("Wrote ping");
+        sock.waitForBytesWritten (10 * 1000);
+        if (sock.waitForReadyRead (10 * 1000)) {
+            QByteArray resp = sock.readAll ();
+            qDebug() << QString("Ping response = \"%1\"").arg(QString(resp));
+            if (resp.startsWith ("pong")) {
+                qDebug("Pong! time to leave");
+                qApp->quit ();
+                exit(0);
+                return;
+            }
+        }
+
         sock.write ("quit");
         qDebug ("Wrote quit");
         sock.waitForBytesWritten (10 * 1000);
@@ -129,6 +144,11 @@ MainObject::onReadyRead()
         QString msgs = m_msgs.join ("\n");
         c->write(msgs.toLatin1().constData(), msgs.length()+1);
         m_msgs.clear ();
+        return;
+    }
+
+    if (data.startsWith ("ping")) {
+        c->write ("pong");
         return;
     }
 

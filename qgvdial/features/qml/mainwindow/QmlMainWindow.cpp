@@ -154,7 +154,7 @@ QmlMainWindow::init()
     } else {
         m_qmlStub->setParent(this);
     }
-    m_view->engine()->rootContext()->setContextProperty("g_qmlstub", m_qmlStub);
+    m_view->rootContext()->setContextProperty("g_qmlstub", m_qmlStub);
 
 #ifdef DBUS_API
     if (!initDBus ()) {
