@@ -36,6 +36,10 @@ Rectangle {
     color: "black"
     visible: false
 
+    onDone: {
+        g_qmlstub.closeVkb();
+    }
+
     Column {
         anchors.fill: parent
         spacing: 5
@@ -64,11 +68,21 @@ Rectangle {
             text: "Conversation so far:"
             width: parent.width
             visible: (lblConversation.text.length != 0)
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: { g_qmlstub.closeVkb(); }
+            }
         }
 
         Label {
             id: lblConversation
             width: parent.width
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: { g_qmlstub.closeVkb(); }
+            }
         }
 
         TextArea {

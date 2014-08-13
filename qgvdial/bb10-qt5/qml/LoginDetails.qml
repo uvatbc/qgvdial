@@ -51,7 +51,7 @@ Item {
 
             MouseArea {
                 anchors.fill: parent
-                onClicked: { container.forceActiveFocus(); }
+                onClicked: { g_qmlstub.closeVkb(); }
             }
         }//Label ("Email:")
 
@@ -77,7 +77,7 @@ Item {
 
             MouseArea {
                 anchors.fill: parent
-                onClicked: { container.forceActiveFocus(); }
+                onClicked: { g_qmlstub.closeVkb(); }
             }
         }//Label (username)
     }//Row (username)
@@ -105,7 +105,7 @@ Item {
 
             MouseArea {
                 anchors.fill: parent
-                onClicked: { container.forceActiveFocus(); }
+                onClicked: { g_qmlstub.closeVkb(); }
             }
         }//Label ("Password:")
 
@@ -131,7 +131,7 @@ Item {
 
             MouseArea {
                 anchors.fill: parent
-                onClicked: { container.forceActiveFocus(); }
+                onClicked: { g_qmlstub.closeVkb(); }
             }
         }//Label (password)
     }//Row (password)
@@ -149,6 +149,6 @@ Item {
 
         text: "Login"
 
-        onClicked: { container.forceActiveFocus(); }
+        onClicked: { g_qmlstub.closeVkb(); }
     }//Button (login/logout)
 }//Item (container)

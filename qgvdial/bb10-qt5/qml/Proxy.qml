@@ -252,7 +252,7 @@ Item {
                 text: "Revert"
                 onClicked: {
                     container.sigRevertChanges(false);
-                    container.forceActiveFocus();
+                    g_qmlstub.closeVkb();
                 }
             }
             Button {
@@ -265,7 +265,7 @@ Item {
                                                bProxyUserPass,
                                                textUserProxyUser.text,
                                                textUserProxyPass.text);
-                    container.forceActiveFocus();
+                    g_qmlstub.closeVkb();
                 }
             }
         }

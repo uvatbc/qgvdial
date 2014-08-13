@@ -36,90 +36,20 @@ FocusScope {
     function setMyModel(searchTerm) {
         contactsList.model = g_ContactsModel;
         container.prevSearchTerm = searchTerm;
-        _updateSearchBtnIcon();
     }
 
-    function _updateSearchBtnIcon() {
-        if (container.prevSearchTerm.length == 0) {
-            searchButton.iconForSearch = true;
-            if (searchField.text.length == 0) {
-                searchButton.enabled = false;
-            } else {
-                searchButton.enabled = true;
-            }
-        } else {
-            searchButton.enabled = true;
-            if (searchField.text.length == 0) {
-                searchButton.iconForSearch = false;
-            } else {
-                if (container.prevSearchTerm == searchField.text) {
-                    searchButton.iconForSearch = false;
-                } else {
-                    searchButton.iconForSearch = true;
-                }
-            }
-        }
-    }
-
-    Row {
-        id: searchRow
-        anchors {
-            top: parent.top
-        }
+    TextField {
+        id: searchField
+        placeholderText: "Search"
         width: parent.width
-        spacing: 5
-
-        TextField {
-            id: searchField
-            placeholderText: "Search"
-            width: parent.width - searchButton.width - parent.spacing - 5
-            onTextChanged: { container.searchContact(searchField.text); }
-            anchors.verticalCenter: parent.verticalCenter
-        }
-
-        Button {
-            id: searchButton
-            width: 100
-            anchors.verticalCenter: parent.verticalCenter
-
-            property bool iconForSearch: true
-
-            Component.onCompleted: { searchButton.state = "Search" }
-            onIconForSearchChanged: {
-                searchButton.state = iconForSearch ? "Search" : "Close"
-            }
-
-            states: [
-                State {
-                    name: "Search"
-                    PropertyChanges { target: searchButton; iconSource: "qrc:/search.png"}
-                },
-                State {
-                    name: "Close"
-                    PropertyChanges { target: searchButton; iconSource: "qrc:/close.png"}
-                }
-            ]
-
-            onClicked: {
-                if (searchButton.iconForSearch) {
-                    container.searchContact(searchField.text);
-                } else {
-                    searchField.text = "";
-                    container.searchContact("");
-                }
-                //searchField.closeSoftwareInputPanel();
-                //contactsList.forceActiveFocus();
-
-                container.forceActiveFocus();
-                g_qmlstub.closeVkb();
-            }
-        }
-    }//Search row: text and button
+        onTextChanged: { container.searchContact(searchField.text); }
+        anchors.top: parent.top
+    }
 
     RefreshButton {
         id: bgRefreshBtn
         anchors {
-            top: searchRow.bottom
+            top: searchField.bottom
         }
         width: parent.width
     }
@@ -127,8 +57,10 @@ FocusScope {
     ListView {
         id: contactsList
 
+        focus: true
+
         anchors {
-            top: searchRow.bottom
+            top: searchField.bottom
             bottom: parent.bottom
         }
         width: parent.width

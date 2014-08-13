@@ -35,7 +35,9 @@ QCoreApplication *
 createAppObject(int &argc, char **argv)
 {
     //qputenv("QT_QUICK_CONTROLS_STYLE", "Base");
-    return new QGuiApplication(argc, argv);
+    QGuiApplication *app = new QGuiApplication(argc, argv);
+    //app->setQuitOnLastWindowClosed(false);
+    return app;
 }//createAppObject
 
 IPhoneAccountFactory *

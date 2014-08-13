@@ -53,7 +53,8 @@ Rectangle {
 
         if (isExpanded) yTimer.setY = y;
 
-        container.forceActiveFocus();
+        //container.forceActiveFocus();
+        g_qmlstub.closeVkb();
     }
 
     Row {
