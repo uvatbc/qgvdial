@@ -5,22 +5,19 @@ MOC_DIR = moc
 OBJECTS_DIR = obj
 
 QT += qml quick widgets multimedia
-QTPLUGIN += qsvg qjpeg
+#QTPLUGIN += qsvg qjpeg
 
 SOURCES  += MainWindow.cpp \
-            BB10PhoneFactory.cpp \
-            BBPhoneAccount.cpp
+            IosPhoneFactory.cpp \
+            IosPhoneAccount.cpp
 
 HEADERS  += platform_specific.h \
             MainWindow.h \
-            BB10PhoneFactory.h \
-            BBPhoneAccount.h
+            IosPhoneFactory.h \
+            IosPhoneAccount.h
 
 RESOURCES += qml.qrc \
-             bb10.qrc
-
-OTHER_FILES += \
-    bar-descriptor.xml
+             ios.qrc
 
 # Additional import path used to resolve QML modules in Qt Creators code model
 QML_IMPORT_PATH = qml

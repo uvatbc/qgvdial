@@ -21,7 +21,7 @@ Contact: yuvraaj@gmail.com
 
 #include "MainWindow.h"
 #include "CQmlViewer.h"
-#include "BB10PhoneFactory.h"
+#include "IosPhoneFactory.h"
 
 /*
 #include <QGLWidget>
@@ -38,14 +38,14 @@ createAppObject(int &argc, char **argv)
     QGuiApplication *app = new QGuiApplication(argc, argv);
 
     // This doesnt seem to work...
-    app->setQuitOnLastWindowClosed(false);
+    //app->setQuitOnLastWindowClosed(false);
     return app;
 }//createAppObject
 
 IPhoneAccountFactory *
 createPhoneAccountFactory(QObject *parent)
 {
-    return (new BB10PhoneFactory(parent));
+    return (new IosPhoneFactory(parent));
 }//createPhoneAccountFactory
 
 MainWindow::MainWindow(QObject *parent)
