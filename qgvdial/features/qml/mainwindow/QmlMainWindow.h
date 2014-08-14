@@ -40,10 +40,11 @@ public:
     virtual void init();
     void log(QDateTime dt, int level, const QString &strLog);
 
+public slots:
+    void messageReceived(const QString &msg);
+
 protected slots:
     void onViewerStatusChanged(bool ready);
-
-    void messageReceived(const QString &msg);
 
     void uiShowStatusMessage(const QString &msg, quint64 millisec);
     void uiClearStatusMessage();

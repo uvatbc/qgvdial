@@ -54,6 +54,9 @@ private slots:
     void onProcessStarted();
     void onGetNumber();
     void onLogMessagesTimer();
+    
+    void recheckProcess();
+    bool pingPong();
 #endif
 
 private:
@@ -61,6 +64,7 @@ private:
     QLocalSocket *m_sock;
     QString m_number;
     QTimer m_TimerLogMessage;
+    
 #else
     void *m_hBBPhone;
     void *m_phoneCtx;

@@ -36,7 +36,7 @@ createAppObject(int &argc, char **argv)
 {
     //qputenv("QT_QUICK_CONTROLS_STYLE", "Base");
     QGuiApplication *app = new QGuiApplication(argc, argv);
-    //app->setQuitOnLastWindowClosed(false);
+    app->setQuitOnLastWindowClosed(false);
     return app;
 }//createAppObject
 

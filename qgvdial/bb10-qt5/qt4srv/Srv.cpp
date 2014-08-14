@@ -24,6 +24,7 @@ Contact: yuvraaj@gmail.com
 MainObject::MainObject(QObject *parent)
 : QObject(parent)
 , m_srv(this)
+, m_single(NULL)
 {
     connect(&m_phone,
             SIGNAL(onCallCommandResponseReceived(bb::system::phone::CallCommandResponse)),
@@ -82,6 +83,10 @@ MainObject::onNewConnection()
     QLocalSocket *c;
 
     while ((c = m_srv.nextPendingConnection ())) {
+        if (NULL == m_single)  {
+            m_single = c;
+        }
+        
         connect(c, SIGNAL(stateChanged(QLocalSocket::LocalSocketState)),
                 this, SLOT(onStateChanged(QLocalSocket::LocalSocketState)));
         connect(c, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
@@ -96,7 +101,13 @@ MainObject::onStateChanged(QLocalSocket::LocalSocketState socketState)
     QLocalSocket *c = (QLocalSocket *) QObject::sender ();
     if (QLocalSocket::ClosingState == socketState) {
         c->deleteLater ();
-        saveMessage("SRV: Clearing out one connection!!");
+        
+        if (c == m_single) {
+            m_single = NULL;
+            saveMessage("SRV: Clearing out main connection!!");
+        } else {
+            saveMessage("SRV: Clearing out one connection!!");
+        }
     }
 }//MainObject::onStateChanged
 
@@ -148,7 +159,15 @@ MainObject::onReadyRead()
     }
 
     if (data.startsWith ("ping")) {
-        c->write ("pong");
+        QByteArray msg = "pong";
+        if (c == m_single) {
+            msg += "first";
+            if (m_wakeupFirst) {
+                msg += "wakeup";
+            }
+        }
+        
+        c->write (msg);
         return;
     }
 

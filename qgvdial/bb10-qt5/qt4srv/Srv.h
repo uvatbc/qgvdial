@@ -49,8 +49,10 @@ private slots:
 
 private:
    QLocalServer m_srv;
-
    QStringList m_msgs;
+   QLocalSocket *m_single;
+   
+   bool m_wakeupFirst;
 
 #ifndef Q_WS_SIMULATOR
    bb::system::phone::Phone m_phone;

@@ -22,6 +22,10 @@ Contact: yuvraaj@gmail.com
 #include "BBPhoneAccount.h"
 #include <QDesktopServices>
 
+#include "BB10PhoneFactory.h"
+#include "LibGvPhones.h"
+#include "MainWindow.h"
+
 #if !USE_PROCESS
 #include <dlfcn.h>
 #endif
@@ -124,6 +128,10 @@ BBPhoneAccount::onProcessStarted()
 
     Q_DEBUG("Socket connected");
 
+    if (!pingPong()) {
+        return;
+    }
+
     connect(m_sock, SIGNAL(readyRead()), this, SLOT(onGetNumber()));
     m_sock->write("getNumber");
 
@@ -143,13 +151,83 @@ BBPhoneAccount::onGetNumber()
 }//BBPhoneAccount::onGetNumber
 
 void
+BBPhoneAccount::recheckProcess()
+{
+    if (NULL == m_sock) {
+        Q_WARN("NULL socket");
+        return;
+    }
+
+    m_sock->write("ping");
+    m_sock->waitForBytesWritten();
+    if (!m_sock->waitForReadyRead ()) {
+        // Start the process again
+        m_sock->write("quit");
+        m_sock->waitForBytesWritten();
+        m_sock->deleteLater();
+        m_sock = NULL;
+
+        QFileInfo fi("app/native/qt4srv");
+        if (!QProcess::startDetached (fi.absoluteFilePath ())) {
+            Q_WARN("Failed to start process");
+        } else {
+            QTimer::singleShot (1000, this, SLOT(onProcessStarted()));
+        }
+    } else {
+        if (m_sock->readAll().startsWith("pong")) {
+            m_TimerLogMessage.start ();
+        }
+    }
+}//BBPhoneAccount::recheckProcess
+
+bool
+BBPhoneAccount::pingPong()
+{
+    m_sock->write("ping");
+    m_sock->waitForBytesWritten();
+    if (!m_sock->waitForReadyRead()) {
+        recheckProcess();
+        return false;
+    }
+
+    QByteArray pong = m_sock->readAll();
+    if (!pong.startsWith("pong")) {
+        recheckProcess();
+        return false;
+    }
+    if (!pong.contains("first")) {
+        Q_DEBUG("We're the second instance!");
+
+        delete m_sock;
+        m_sock = NULL;
+
+        qApp->quit();
+        return false;
+    }
+    if (pong.contains("wakeup")) {
+        // Wake up! : Hackity hack!
+        BB10PhoneFactory *f = (BB10PhoneFactory *) this->parent ();
+        LibGvPhones *gvp = (LibGvPhones *) f->parent ();
+        MainWindow *win = (MainWindow *) gvp->parent ();
+
+        win->messageReceived ("show");
+    }
+
+    return true;
+}//BBPhoneAccount::pingPong
+
+void
 BBPhoneAccount::onLogMessagesTimer()
 {
     m_sock->write("getDebugMessages");
-    m_sock->waitForReadyRead ();
+    m_sock->waitForBytesWritten();
+
+    if (!m_sock->waitForReadyRead ()) {
+        recheckProcess();
+        return;
+    }
 
     QString msgs = m_sock->readAll ();
-
     if (msgs.length ()) {
         Q_DEBUG(msgs);
     }
