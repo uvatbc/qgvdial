@@ -148,6 +148,8 @@ BBPhoneAccount::onGetNumber()
 
     Q_DEBUG(QString("Got number \"%1\". Length of ba = %2").arg (m_number)
             .arg(ba.length()));
+
+    emit numberReady();
 }//BBPhoneAccount::onGetNumber
 
 void

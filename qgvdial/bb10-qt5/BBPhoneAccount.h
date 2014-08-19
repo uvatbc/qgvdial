@@ -49,12 +49,15 @@ public:
 
     QString getNumber();
 
+signals:
+    void numberReady();
+
 private slots:
 #if USE_PROCESS
     void onProcessStarted();
     void onGetNumber();
     void onLogMessagesTimer();
-    
+
     void recheckProcess();
     bool pingPong();
 #endif
@@ -64,7 +67,7 @@ private:
     QLocalSocket *m_sock;
     QString m_number;
     QTimer m_TimerLogMessage;
-    
+
 #else
     void *m_hBBPhone;
     void *m_phoneCtx;

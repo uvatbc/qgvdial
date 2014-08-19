@@ -33,6 +33,9 @@ public:
     ~BB10PhoneFactory();
 
     bool identifyAll(AsyncTaskToken *task);
+
+private slots:
+    void onBBNumberReady();
 };
 
 #endif // BB10PHONEFACTORY_H

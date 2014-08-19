@@ -50,15 +50,23 @@ BB10PhoneFactory::identifyAll(AsyncTaskToken *task)
         task->status = ATTS_FAILURE;
         task->emitCompleted ();
     } else {
+        connect(acct, SIGNAL(numberReady()), this, SLOT(onBBNumberReady()));
+
         m_accounts[acct->id()] = acct;
         task->status = ATTS_SUCCESS;
         task->emitCompleted ();
-
-        QString num = acct->getNumber();
-        if (!num.isEmpty()) {
-            LibGvPhones *p = (LibGvPhones *) parent();
-            p->linkCiToNumber(acct->id(), num);
-        }
     }
     return (true);
 }//BB10PhoneFactory::identifyAll
+
+void
+BB10PhoneFactory::onBBNumberReady()
+{
+    BBPhoneAccount *acct = (BBPhoneAccount *) QObject::sender();
+
+    QString num = acct->getNumber();
+    if (!num.isEmpty()) {
+        LibGvPhones *p = (LibGvPhones *) parent();
+        p->linkCiToNumber(acct->id(), num);
+    }
+}//BB10PhoneFactory::onBBNumberReady
