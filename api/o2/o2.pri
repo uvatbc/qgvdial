@@ -16,8 +16,6 @@ SOURCES += \
 
 HEADERS += \
     $$PWD/o1.h \
-    $$PWD/o1dropbox.h \
-    $$PWD/o1flickr.h \
     $$PWD/o1requestor.h \
     $$PWD/o2.h \
     $$PWD/o2reply.h \
@@ -29,6 +27,8 @@ HEADERS += \
     $$PWD/o2settingsstore.h
 
 #SOURCES  += $$PWD/o2facebook.cpp \
+#            $$PWD/o1dropbox.h \
+#            $$PWD/o1flickr.h \
 #            $$PWD/o2gft.h \
 #            $$PWD/o2skydrive.cpp \
 #            $$PWD/oxtwitter.cpp
