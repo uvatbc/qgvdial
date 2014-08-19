@@ -48,12 +48,14 @@ Rectangle {
             placeholderText: "PIN"
             anchors.horizontalCenter: parent.horizontalCenter
             width: 400
+
+            inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhDigitsOnly | Qt.ImhDialableCharactersOnly
             validator: IntValidator {
                 bottom: 0
                 top: 999999
             }
 
-            onAccepted: btnSubmit.clicked();
+            onAccepted: { btnSubmit.clicked(); }
         }
 
         Row {

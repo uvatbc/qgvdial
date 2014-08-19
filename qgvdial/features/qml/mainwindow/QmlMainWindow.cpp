@@ -591,6 +591,10 @@ void
 QmlMainWindow::onTfaPinDlg(bool accepted)
 {
     QString strPin = tfaPinDlg->property("textPin").toString();
+    if (strPin.isEmpty()) {
+        Q_WARN("pin is empty");
+    }
+
     int pin = strPin.toInt();
 
     if (accepted) {

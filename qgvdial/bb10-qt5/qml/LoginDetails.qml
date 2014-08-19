@@ -63,7 +63,7 @@ Item {
             visible: (opacity == 1)
 
             placeholderText: "example@gmail.com"
-            inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhPreferLowercase | Qt.ImhNoPredictiveText
+            inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhPreferLowercase | Qt.ImhNoPredictiveText | Qt.ImhEmailCharactersOnly
 
             onAccepted: btnLogin.clicked();
         }//TextField
