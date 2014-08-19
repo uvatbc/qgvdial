@@ -69,6 +69,7 @@ Rectangle {
 
                 text: name
                 color: "white"
+                font.pixelSize: 60
 
                 onPaintedWidthChanged: {
                     if (paintedWidth + 10 > container.delWidth) {

@@ -40,7 +40,7 @@ Rectangle {
 
         Label {
             id: lblTitle
-            font.pixelSize: 30
+            font.pixelSize: 50
             wrapMode: Text.WrapAnywhere
             width: parent.width
             text: "Please select a number for:\n" + container.ciId
@@ -55,7 +55,7 @@ Rectangle {
             delegate: Label {
                 width: numbersView.width
                 text: name + "\n(" + number + ")"
-                font.pixelSize: 50
+                font.pixelSize: 60
 
                 MouseArea {
                     anchors.fill: parent
