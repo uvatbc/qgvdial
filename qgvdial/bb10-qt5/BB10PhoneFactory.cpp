@@ -68,5 +68,9 @@ BB10PhoneFactory::onBBNumberReady()
     if (!num.isEmpty()) {
         LibGvPhones *p = (LibGvPhones *) parent();
         p->linkCiToNumber(acct->id(), num);
+
+        Q_DEBUG(QString("Number was ready: %1").arg(num));
+    } else {
+        Q_WARN("Empty number!!");
     }
 }//BB10PhoneFactory::onBBNumberReady

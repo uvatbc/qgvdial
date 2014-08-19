@@ -56,6 +56,7 @@ Item {
                 visible: optContactsUpdate.checked
                 width: 200
                 validator: IntValidator { bottom: 1; top: 1440 }
+                inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhDigitsOnly | Qt.ImhDialableCharactersOnly
                 anchors {
                     verticalCenter: parent.verticalCenter
                     right: parent.right
@@ -83,6 +84,7 @@ Item {
                 visible: optInboxUpdate.checked
                 width: 200
                 validator: IntValidator { bottom: 1; top: 1440 }
+                inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhDigitsOnly | Qt.ImhDialableCharactersOnly
                 anchors {
                     verticalCenter: parent.verticalCenter
                     right: parent.right
