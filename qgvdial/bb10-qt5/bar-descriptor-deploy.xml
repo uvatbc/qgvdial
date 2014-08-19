@@ -4,7 +4,7 @@
   <filename>qgvdial</filename>
   <name>qgvdial</name>
   <versionNumber>__QGVDIAL_VERSION__</versionNumber>
-  <buildId>2</buildId>
+  <!-- <buildId>2</buildId> -->
   <description>Google Voice client for BB10</description>
   <copyright>LGPL v2 (2009-2014)</copyright>
   <initialWindow>

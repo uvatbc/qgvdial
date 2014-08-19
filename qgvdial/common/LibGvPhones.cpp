@@ -315,6 +315,7 @@ LibGvPhones::linkCiToNumber(QString ciId, QString strNumber)
             m_numModel->m_dialOut[i].number = strNumber;
             win->db.setCINumber (ciId, strNumber);
             m_numModel->informViewsOfNewData ();
+            win->uiRefreshNumbers ();
             rv = true;
             break;
         }
