@@ -149,6 +149,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 placeholderText: "Proxy port"
                 validator: IntValidator { bottom: 0; top: 65535 }
+                inputMethodHints: Qt.ImhDialableCharactersOnly
                 KeyNavigation.tab: (bEnableProxy && !bSystemProxy && bProxyUserPass ? textUserProxyUser : textUserProxyHost)
                 KeyNavigation.backtab: textUserProxyHost
             }//TextField (proxy port)

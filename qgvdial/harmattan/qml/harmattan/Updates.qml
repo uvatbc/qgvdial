@@ -55,6 +55,7 @@ Item {
                 objectName: "EdContactsUpdateFreq"
                 visible: optContactsUpdate.checked
                 validator: IntValidator { bottom: 1; top: 1440 }
+                inputMethodHints: Qt.ImhDialableCharactersOnly
                 anchors {
                     verticalCenter: parent.verticalCenter
                     right: parent.right
@@ -82,6 +83,7 @@ Item {
                 objectName: "EdInboxUpdateFreq"
                 visible: optInboxUpdate.checked
                 validator: IntValidator { bottom: 1; top: 1440 }
+                inputMethodHints: Qt.ImhDialableCharactersOnly
                 anchors {
                     verticalCenter: parent.verticalCenter
                     right: parent.right
