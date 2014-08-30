@@ -29,9 +29,6 @@ Item {
     signal sigHaptic
     signal regNumBtnClicked
 
-    signal sigCall(string num)
-    signal sigText(string num)
-
     function setNumberInDisp(number) {
         numberField.text = number;
     }
@@ -94,13 +91,13 @@ Item {
             id: btnText
             text: "Text"
             enabled: (numberField.text.length != 0)
-            onClicked: container.sigText(numberField.text);
+            onClicked: { g_mainwindow.onUserTextBtnClicked(numberField.text); }
         }
         Button {
             id: btnCall
             text: "Call"
             enabled: (numberField.text.length != 0)
-            onClicked: container.sigCall(numberField.text);
+            onClicked: { g_mainwindow.onUserCall(numberField.text); }
         }
     }//ButtonRow: Text & Call
 

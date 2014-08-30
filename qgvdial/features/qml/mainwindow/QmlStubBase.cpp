@@ -69,8 +69,6 @@ QmlStubBase::findChild(QString name)
         return parent->ciSelector;
     } else if (parent->statusBanner->objectName () == name) {
         return parent->statusBanner;
-    } else if (parent->dialPage->objectName () == name) {
-        return parent->dialPage;
     } else if (parent->smsPage->objectName () == name) {
         return parent->smsPage;
     } else if (parent->inboxDetails->objectName () == name) {

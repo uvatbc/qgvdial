@@ -114,7 +114,6 @@ QmlMainWindow::QmlMainWindow(QObject *parent)
 , regNumberSelector(NULL)
 , ciSelector(NULL)
 , statusBanner(NULL)
-, dialPage(NULL)
 , smsPage(NULL)
 , inboxDetails(NULL)
 , etCetera(NULL)
@@ -155,6 +154,7 @@ QmlMainWindow::init()
         m_qmlStub->setParent(this);
     }
     m_view->rootContext()->setContextProperty("g_qmlstub", m_qmlStub);
+    m_view->rootContext()->setContextProperty("g_mainwindow", this);
 
 #ifdef DBUS_API
     if (!initDBus ()) {
@@ -328,14 +328,11 @@ QmlMainWindow::initQmlObjects()
         if (NULL == loginButton) {
             break;
         }
-        connect(loginButton, SIGNAL(clicked()),
-                this, SLOT(onLoginButtonClicked()));
 
         tfaPinDlg = getQMLObject ("TFAPinDialog");
         if (NULL == tfaPinDlg) {
             break;
         }
-        connect(tfaPinDlg, SIGNAL(done(bool)), this, SLOT(onTfaPinDlg(bool)));
 
         textUsername = getQMLObject ("TextUsername");
         if (NULL == textUsername) {
@@ -406,15 +403,6 @@ QmlMainWindow::initQmlObjects()
         if (NULL == statusBanner) {
             break;
         }
-
-        dialPage = getQMLObject ("DialPage");
-        if (NULL == dialPage) {
-            break;
-        }
-        connect(dialPage, SIGNAL(sigCall(QString)),
-                this, SLOT(onUserCall(QString)));
-        connect(dialPage, SIGNAL(sigText(QString)),
-                this, SLOT(onUserTextBtnClicked(QString)));
 
         smsPage = getQMLObject ("SmsPage");
         if (NULL == smsPage) {

@@ -82,7 +82,6 @@ MainWindow::MainWindow(QObject *parent)
 , selectedNumberButton(NULL)
 , regNumberSelector(NULL)
 , ciSelector(NULL)
-, dialPage(NULL)
 , statusBanner(NULL)
 , inboxDetails(NULL)
 , smsPage(NULL)
@@ -292,8 +291,6 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
         if (NULL == loginButton) {
             break;
         }
-        connect(loginButton, SIGNAL(clicked()),
-                this, SLOT(onLoginButtonClicked()));
 
         textUsername = getQMLObject ("TextUsername");
         if (NULL == textUsername) {
@@ -371,15 +368,6 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
         }
         connect(ciSelector, SIGNAL(setCiNumber(QString,QString)),
                 &oPhones, SLOT(linkCiToNumber(QString,QString)));
-
-        dialPage = getQMLObject ("DialPage");
-        if (NULL == dialPage) {
-            break;
-        }
-        connect(dialPage, SIGNAL(sigCall(QString)),
-                this, SLOT(onUserCall(QString)));
-        //connect(dialPage, SIGNAL(sigText(QString)),
-        //        this, SLOT(onUserText(QString)));
 
         statusBanner = getQMLObject ("StatusBanner");
         if (NULL == statusBanner) {

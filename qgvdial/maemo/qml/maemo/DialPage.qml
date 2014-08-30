@@ -26,7 +26,6 @@ Rectangle {
     objectName: "DialPage"
 
     signal sigHaptic
-    signal sigCall(string dest)
     signal sigText(string dest)
 
     property real toolbarHeight: 50
@@ -77,14 +76,14 @@ Rectangle {
             height: 80
             font.pixelSize: 35
             width: parent.btnWidth
-            onClicked: { container.sigText(numberField.text); }
+            onClicked: { g_mainwindow.onUserTextBtnClicked(numberField.text); }
         }
         Button {
             text: "Call"
             height: 80
             font.pixelSize: 35
             width: parent.btnWidth
-            onClicked: { container.sigCall(numberField.text); }
+            onClicked: { g_mainwindow.onUserCall(numberField.text); }
         }
     }//Row
 

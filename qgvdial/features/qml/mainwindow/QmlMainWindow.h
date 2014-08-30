@@ -50,8 +50,8 @@ protected slots:
     void uiClearStatusMessage();
     void uiShowMessageBox(const QString &msg);
 
-    void onLoginButtonClicked();
-    void onTfaPinDlg(bool accepted);
+    Q_INVOKABLE void onLoginButtonClicked();
+    Q_INVOKABLE void onTfaPinDlg(bool accepted);
 
     void onSigProxyChanges(bool enable, bool useSystemProxy, QString server,
                            int port, bool authRequired, QString user,
@@ -60,7 +60,7 @@ protected slots:
     void onInboxClicked(QString id);
     void onInboxSelectionChanged(QString sel);
 
-    void onUserTextBtnClicked(QString dest);
+    Q_INVOKABLE void onUserTextBtnClicked(QString dest);
     void onUserSmsTextDone(bool ok);
 
     void onUserReplyToInboxEntry(QString id);
@@ -137,7 +137,6 @@ protected:
     QObject *regNumberSelector;
     QObject *ciSelector;
     QObject *statusBanner;
-    QObject *dialPage;
     QObject *smsPage;
     QObject *inboxDetails;
     QObject *etCetera;

@@ -136,6 +136,7 @@ Item {
         text: "Login"
 
         onClicked: {
+            g_mainwindow.onLoginButtonClicked();
             //textUsername.closeSoftwareInputPanel();
             //textPassword.closeSoftwareInputPanel();
         }

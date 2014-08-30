@@ -120,5 +120,7 @@ Item {
         width: 150
 
         text: "Login"
+
+        onClicked: { g_mainwindow.onLoginButtonClicked(); }
     }//Button (login/logout)
 }//Item (container)

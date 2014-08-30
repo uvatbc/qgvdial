@@ -128,7 +128,7 @@ public:
     virtual void init() = 0;
 
 public slots:
-    void onUserCall(QString number);
+    Q_INVOKABLE void onUserCall(QString number);
     void onUserSendSMS (QStringList arrNumbers, QString strText);
 
     QStringList getTextsByContact(const QString &strContact);

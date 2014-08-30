@@ -51,7 +51,7 @@ protected slots:
     void uiClearStatusMessage();
     void uiShowMessageBox(const QString &msg);
 
-    void onLoginButtonClicked();
+    Q_INVOKABLE void onLoginButtonClicked();
 
     void onSigProxyChanges(bool enable, bool useSystemProxy, QString server,
                            int port, bool authRequired, QString user,
@@ -129,7 +129,6 @@ private:
     QObject *selectedNumberButton;
     QObject *regNumberSelector;
     QObject *ciSelector;
-    QObject *dialPage;
     QObject *statusBanner;
     QObject *inboxDetails;
     QObject *smsPage;
