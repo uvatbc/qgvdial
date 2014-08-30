@@ -59,7 +59,7 @@ Contact: yuvraaj@gmail.com
  * Login credentials NOT saved:
  * onInitDone() -> uiRequestLoginDetails() -> beginLogin()
  *    [ -> uiRequestTFALoginDetails() -> resumeTFAAuth() ]
- *      -> uiLoginCompleted(...)
+ *      -> uiLoginDone(...)
  *
  * -> onInitDone(): If the credentials are NOT saved in the cache, then I need
  *      to go ask the user for it. This varies based on the UI and thus must be
@@ -78,9 +78,9 @@ Contact: yuvraaj@gmail.com
  *      text message with the pin, then there is the option of asking Google
  *      Voice to provide the pin with an automated voice call. To do this, DC
  *      must call resumeTFAAuth(ctx, pin, true).
- * -> uiLoginCompleted(): At the end of the login process, the BC will invoke
- *      this function - with either a success status or an error with a
- *      non-empty error string.
+ * -> uiLoginDone(): At the end of the login process, the BC will invoke this
+ *      function - with either a success status or an error with a non-empty
+ *      error string.
  * -> uiSetUserPass(): This is called by the BC when it needs the DC up
  *      correctly update the user name and password and the nature of the fields
  *      (editable or not) and therefore also provide a hint to the DC about
@@ -89,7 +89,7 @@ Contact: yuvraaj@gmail.com
  *==============================================================================
  *
  * Login credentials saved:
- * Usually: onInitDone() -> uiLoginCompleted(...)
+ * Usually: onInitDone() -> uiLoginDone(...)
  * Sometimes the api may invoke the TFA functions - depends on when Google
  * thinks it is necessary.
  *

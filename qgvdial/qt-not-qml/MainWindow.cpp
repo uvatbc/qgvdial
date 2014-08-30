@@ -296,6 +296,11 @@ MainWindow::init()
     d->ui->actionFind->setEnabled (false);
     d->ui->tabWidget->setCurrentIndex (0);
 
+    // Before the user logs in, all other tabs ought to be disabled.
+    d->ui->dialTab->setEnabled (false);
+    d->ui->contactsTab->setEnabled (false);
+    d->ui->inboxTab->setEnabled (false);
+
     // Fake an event in the event loop
     QTimer::singleShot (1, this, SLOT(onInitDone()));
 }//MainWindow::init
@@ -437,6 +442,11 @@ MainWindow::uiLoginDone(int status, const QString &errStr)
 {
     do {
         if (ATTS_SUCCESS == status) {
+            // Enable tabs on successful login
+            d->ui->dialTab->setEnabled (true);
+            d->ui->contactsTab->setEnabled (true);
+            d->ui->inboxTab->setEnabled (true);
+
             d->ui->statusBar->showMessage ("Login successful", SHOW_5SEC);
             break;
         }
