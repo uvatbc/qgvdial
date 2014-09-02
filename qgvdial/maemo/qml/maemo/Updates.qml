@@ -52,6 +52,7 @@ Item {
                     left: parent.left
                 }
                 pointSize: mainColumn.internalPointSize
+                onClicked: { g_mainwindow.onOptContactsUpdateClicked(); }
             }//QGVRadioButton
             TextOneLine {
                 id: edContactsUpdateFreq
@@ -65,6 +66,7 @@ Item {
                 font.pointSize: mainColumn.internalPointSize
                 width: 150
                 placeholderText: "Minutes"
+                onTextChanged: { g_mainwindow.onEdContactsUpdateTextChanged(text); }
             }//TextOneLine
         }
 
@@ -82,6 +84,7 @@ Item {
                     left: parent.left
                 }
                 pointSize: mainColumn.internalPointSize
+                onClicked: { g_mainwindow.onOptContactsUpdateClicked(); }
             }//QGVRadioButton
             TextOneLine {
                 id: edInboxUpdateFreq
@@ -95,6 +98,7 @@ Item {
                 font.pointSize: mainColumn.internalPointSize
                 width: 150
                 placeholderText: "Minutes"
+                onTextChanged: { g_mainwindow.onEdInboxUpdateTextChanged(text); }
             }//TextField
         }
     }// Column

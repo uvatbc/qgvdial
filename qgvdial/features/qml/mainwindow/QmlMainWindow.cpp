@@ -456,33 +456,21 @@ QmlMainWindow::initQmlObjects()
         if (NULL == optContactsUpdate) {
             break;
         }
-        connect(optContactsUpdate, SIGNAL(clicked()),
-                this, SLOT(onOptContactsUpdateClicked()));
 
         optInboxUpdate = getQMLObject ("OptInboxUpdate");
         if (NULL == optInboxUpdate) {
             break;
         }
-        connect(optInboxUpdate, SIGNAL(clicked()),
-                this, SLOT(onOptInboxUpdateClicked()));
 
         edContactsUpdateFreq = getQMLObject ("EdContactsUpdateFreq");
         if (NULL == edContactsUpdateFreq) {
             break;
         }
-        m_view->connectToChangeNotify(edContactsUpdateFreq,
-                                      "text",
-                                      this,
-                                      SLOT(onEdContactsUpdateTextChanged()));
 
         edInboxUpdateFreq = getQMLObject ("EdInboxUpdateFreq");
         if (NULL == edInboxUpdateFreq) {
             break;
         }
-        m_view->connectToChangeNotify(edInboxUpdateFreq,
-                                      "text",
-                                      this,
-                                      SLOT(onEdInboxUpdateTextChanged()));
 
         initDerivedQmlObjects();
 
@@ -974,9 +962,9 @@ QmlMainWindow::onOptInboxUpdateClicked(bool updateDb /*= true*/)
 }//QmlMainWindow::onOptInboxUpdateClicked
 
 void
-QmlMainWindow::onEdContactsUpdateTextChanged()
+QmlMainWindow::onEdContactsUpdateTextChanged(const QString &text)
 {
-    quint32 mins = edContactsUpdateFreq->property ("text").toInt ();
+    quint32 mins = text.toInt ();
     if (0 == mins) {
         Q_WARN("Ignoring zero minute contact update frequency");
         return;
@@ -986,9 +974,9 @@ QmlMainWindow::onEdContactsUpdateTextChanged()
 }//QmlMainWindow::onEdContactsUpdateTextChanged
 
 void
-QmlMainWindow::onEdInboxUpdateTextChanged()
+QmlMainWindow::onEdInboxUpdateTextChanged(const QString &text)
 {
-    quint32 mins = edInboxUpdateFreq->property ("text").toInt ();
+    quint32 mins = text.toInt ();
     if (0 == mins) {
         Q_WARN("Ignoring zero minute inbox update frequency");
         return;

@@ -33,8 +33,6 @@ public:
     CQmlViewer();
 
     QDeclarativeContext *rootContext() const;
-    bool connectToChangeNotify(QObject *item, const QString &propName,
-                               QObject *receiver, const char *slotName);
 
 signals:
     void viewerStatusChanged(bool ready);

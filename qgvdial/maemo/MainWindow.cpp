@@ -219,51 +219,6 @@ MainWindow::getQMLObject(const char *pageName)
     return (pObj);
 }//MainWindow::getQMLObject
 
-bool
-MainWindow::connectToChangeNotify(QObject *item, const QString &propName,
-                                  QObject *receiver, const char *slotName)
-{
-    bool rv = false;
-    do {
-        const QMetaObject *metaObject = item->metaObject ();
-        if (NULL == metaObject) {
-            Q_WARN("NULL metaObject");
-            break;
-        }
-
-        QMetaProperty metaProp;
-        for (int i = 0; i < metaObject->propertyCount (); i++) {
-            metaProp = metaObject->property (i);
-            if (metaProp.name () == propName) {
-                rv = true;
-                break;
-            }
-        }
-
-        if (!rv) {
-            Q_WARN(QString("Couldn't find property named %1").arg(propName));
-            break;
-        }
-        rv = false;
-
-        if (!metaProp.hasNotifySignal ()) {
-            Q_WARN(QString("Property %1 does not have a notify signal")
-                   .arg(propName));
-            break;
-        }
-
-        QString signalName = QString("2%1")
-                                .arg(metaProp.notifySignal().signature());
-
-        Q_DEBUG(QString("Connect %1 to %2").arg(signalName).arg(slotName));
-
-        rv =
-        connect(item, signalName.toLatin1().constData(), receiver, slotName);
-    } while(0);
-
-    return (rv);
-}//MainWindow::connectToChangeNotify
-
 void
 MainWindow::log(QDateTime /*dt*/, int /*level*/, const QString & /*strLog*/)
 {
@@ -424,29 +379,21 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
         if (NULL == optContactsUpdate) {
             break;
         }
-        connect(optContactsUpdate, SIGNAL(clicked()),
-                this, SLOT(onOptContactsUpdateClicked()));
 
         optInboxUpdate = getQMLObject ("OptInboxUpdate");
         if (NULL == optInboxUpdate) {
             break;
         }
-        connect(optInboxUpdate, SIGNAL(clicked()),
-                this, SLOT(onOptInboxUpdateClicked()));
 
         edContactsUpdateFreq = getQMLObject ("EdContactsUpdateFreq");
         if (NULL == edContactsUpdateFreq) {
             break;
         }
-        connectToChangeNotify(edContactsUpdateFreq, "text",
-                              this, SLOT(onEdContactsUpdateTextChanged()));
 
         edInboxUpdateFreq = getQMLObject ("EdInboxUpdateFreq");
         if (NULL == edInboxUpdateFreq) {
             break;
         }
-        connectToChangeNotify(edInboxUpdateFreq, "text",
-                              this, SLOT(onEdInboxUpdateTextChanged()));
 
         onInitDone();
         return;
@@ -915,9 +862,9 @@ MainWindow::onOptInboxUpdateClicked(bool updateDb /*= true*/)
 }//MainWindow::onOptInboxUpdateClicked
 
 void
-MainWindow::onEdContactsUpdateTextChanged()
+MainWindow::onEdContactsUpdateTextChanged(const QString &text)
 {
-    quint32 mins = edContactsUpdateFreq->property ("text").toInt ();
+    quint32 mins = text.toInt ();
     if (0 == mins) {
         Q_WARN("Ignoring zero minute contact update frequency");
         return;
@@ -927,9 +874,9 @@ MainWindow::onEdContactsUpdateTextChanged()
 }//MainWindow::onEdContactsUpdateTextChanged
 
 void
-MainWindow::onEdInboxUpdateTextChanged()
+MainWindow::onEdInboxUpdateTextChanged(const QString &text)
 {
-    quint32 mins = edInboxUpdateFreq->property ("text").toInt ();
+    quint32 mins = text.toInt ();
     if (0 == mins) {
         Q_WARN("Ignoring zero minute inbox update frequency");
         return;

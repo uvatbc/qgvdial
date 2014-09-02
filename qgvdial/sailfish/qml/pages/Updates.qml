@@ -43,6 +43,7 @@ Item {
 
             TextSwitch {
                 id: optContactsUpdate
+                objectName: "OptContactsUpdate"
 
                 text: "Update contacts"
                 anchors {
@@ -50,14 +51,7 @@ Item {
                     left: parent.left
                 }
 
-                Item {
-                    id: proxyOptContactsUpdate
-                    objectName: "OptContactsUpdate"
-                    visible: false
-                    signal clicked
-                    property alias checked: optContactsUpdate.checked
-                }
-                onClicked: { proxyOptContactsUpdate.clicked(); }
+                onClicked: { g_mainwindow.onOptContactsUpdateClicked(); }
             }//TextSwitch
             TextField {
                 id: edContactsUpdateFreq
@@ -71,6 +65,7 @@ Item {
                     right: parent.right
                 }
                 placeholderText: "Minutes"
+                onTextChanged: { g_mainwindow.onEdContactsUpdateTextChanged(text); }
             }//TextField
         }//Item
 
@@ -80,20 +75,15 @@ Item {
 
             TextSwitch {
                 id: optInboxUpdate
+                objectName: "OptInboxUpdate"
+
                 text: "Update inbox"
                 anchors {
                     verticalCenter: parent.verticalCenter
                     left: parent.left
                 }
 
-                Item {
-                    id: proxyOptInboxUpdate
-                    objectName: "OptInboxUpdate"
-                    visible: false
-                    signal clicked
-                    property alias checked: optInboxUpdate.checked
-                }
-                onClicked: { proxyOptInboxUpdate.clicked(); }
+                onClicked: { g_mainwindow.onOptInboxUpdateClicked(); }
             }//TextSwitch
             TextField {
                 id: edInboxUpdateFreq
@@ -107,6 +97,7 @@ Item {
                     right: parent.right
                 }
                 placeholderText: "Minutes"
+                onTextChanged: { g_mainwindow.onEdInboxUpdateTextChanged(text); }
             }//TextField
         }//Item
     }// Column

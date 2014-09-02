@@ -49,6 +49,7 @@ Item {
                     verticalCenter: parent.verticalCenter
                     left: parent.left
                 }
+                onClicked: { g_mainwindow.onOptContactsUpdateClicked(); }
             }//CheckBox
             TextField {
                 id: edContactsUpdateFreq
@@ -62,6 +63,8 @@ Item {
                 }
                 placeholderText: "Minutes"
                 width: 200
+
+                onTextChanged: { g_mainwindow.onEdContactsUpdateTextChanged(text); }
             }//TextField
         }
 
@@ -77,6 +80,7 @@ Item {
                     verticalCenter: parent.verticalCenter
                     left: parent.left
                 }
+                onClicked: { g_mainwindow.onOptInboxUpdateClicked(); }
             }//CheckBox
             TextField {
                 id: edInboxUpdateFreq
@@ -90,6 +94,7 @@ Item {
                 }
                 placeholderText: "Minutes"
                 width: 200
+                onTextChanged: { g_mainwindow.onEdInboxUpdateTextChanged(text); }
             }//TextField
         }
     }// Column

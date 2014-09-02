@@ -71,16 +71,14 @@ protected slots:
     void onVmailDurationChanged(quint64 duration);
     void onVmailCurrentPositionChanged(quint64 position, quint64 duration);
 
-    void onOptContactsUpdateClicked(bool updateDb = true);
-    void onOptInboxUpdateClicked(bool updateDb = true);
+    Q_INVOKABLE void onOptContactsUpdateClicked(bool updateDb = true);
+    Q_INVOKABLE void onOptInboxUpdateClicked(bool updateDb = true);
 
-    void onEdContactsUpdateTextChanged();
-    void onEdInboxUpdateTextChanged();
+    Q_INVOKABLE void onEdContactsUpdateTextChanged(const QString &text);
+    Q_INVOKABLE void onEdInboxUpdateTextChanged(const QString &text);
 
 protected:
     QObject *getQMLObject(const char *pageName);
-    bool connectToChangeNotify(QObject *item, const QString &propName,
-                               QObject *receiver, const char *slotName);
 
     void uiUpdateProxySettings(const ProxyInfo &info);
     void uiRequestLoginDetails();
