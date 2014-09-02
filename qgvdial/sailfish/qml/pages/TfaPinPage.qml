@@ -28,6 +28,8 @@ Page {
     property alias textPin: textTfaPin.text
     signal done(bool accepted)
 
+    onDone: { g_mainwindow.onTfaPinDlg(accepted); }
+
     Column {
         anchors.centerIn: parent
         width: parent.width

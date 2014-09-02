@@ -153,8 +153,13 @@ QmlMainWindow::init()
     } else {
         m_qmlStub->setParent(this);
     }
+    /*
+     * Look at the Q_INVOKABLE functions in the header and use them in QML.
+     */
     m_view->rootContext()->setContextProperty("g_qmlstub", m_qmlStub);
     m_view->rootContext()->setContextProperty("g_mainwindow", this);
+    m_view->rootContext()->setContextProperty("g_inbox", &oInbox);
+    m_view->rootContext()->setContextProperty("g_contacts", &oContacts);
 
 #ifdef DBUS_API
     if (!initDBus ()) {
@@ -319,6 +324,11 @@ QmlMainWindow::initQmlObjects()
             break;
         }
 
+        rv = true;
+        QMetaObject::invokeMethod(mainTabGroup, "setTabsEnable",
+                                  Q_ARG(QVariant, QVariant(rv)));
+        rv = false;
+
         loginExpand = getQMLObject ("ExpandLoginDetails");
         if (NULL == loginExpand) {
             break;
@@ -415,8 +425,6 @@ QmlMainWindow::initQmlObjects()
         if (NULL == inboxDetails) {
             break;
         }
-        connect(inboxDetails, SIGNAL(deleteEntry(QString)),
-                &oInbox, SLOT(deleteEntry(QString)));
         connect(inboxDetails, SIGNAL(replySms(QString)),
                 this, SLOT(onUserReplyToInboxEntry(QString)));
         connect(inboxDetails, SIGNAL(play()), &oVmail, SLOT(play()));
@@ -624,6 +632,9 @@ void
 QmlMainWindow::uiLoginDone(int status, const QString & /*errStr*/)
 {
     if (ATTS_SUCCESS == status) {
+        bool val = false;
+        QMetaObject::invokeMethod(mainTabGroup, "setTabsEnable",
+                                  Q_ARG(QVariant, QVariant(val)));
         return;
     }
 }//QmlMainWindow::uiLoginDone

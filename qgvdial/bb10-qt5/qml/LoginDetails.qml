@@ -149,6 +149,9 @@ Item {
 
         text: "Login"
 
-        onClicked: { g_qmlstub.closeVkb(); }
+        onClicked: {
+            g_qmlstub.closeVkb();
+            g_mainwindow.onLoginButtonClicked();
+        }
     }//Button (login/logout)
 }//Item (container)

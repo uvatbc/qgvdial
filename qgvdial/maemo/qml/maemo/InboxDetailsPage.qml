@@ -27,7 +27,6 @@ Rectangle {
     signal done(bool accepted)
     signal setNumberToDial(string number)
     signal sigOpenContact(string cId)
-    signal deleteEntry(string iId)
     signal replySms(string iId)
 
     signal play
@@ -277,7 +276,7 @@ Rectangle {
                                      : parent.width)
 
             onClicked: {
-                container.deleteEntry(container.iId);
+                g_inbox.deleteEntry(container.iId);
                 container.done(true);
             }
         }

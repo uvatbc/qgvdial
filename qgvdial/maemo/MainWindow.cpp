@@ -120,6 +120,16 @@ MainWindow::init()
             this, SLOT(declStatusChanged(QDeclarativeView::Status)));
     Q_ASSERT(rv); Q_UNUSED(rv);
 
+    /*
+     * Look at the Q_INVOKABLE functions in the header and use them in QML.
+     */
+    m_view->engine()->rootContext()
+                    ->setContextProperty("g_mainwindow", this);
+    m_view->engine()->rootContext()
+                    ->setContextProperty("g_inbox", &oInbox);
+    m_view->engine()->rootContext()
+                    ->setContextProperty("g_contacts", &oContacts);
+
     m_view->setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
     m_view->setMainQmlFile(QLatin1String("qml/maemo/main.qml"));
     m_view->showExpanded();
@@ -378,8 +388,6 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
         if (NULL == inboxDetails) {
             break;
         }
-        connect(inboxDetails, SIGNAL(deleteEntry(QString)),
-                &oInbox, SLOT(deleteEntry(QString)));
         connect(inboxDetails, SIGNAL(replySms(QString)),
                 this, SLOT(onUserReplyToInboxEntry(QString)));
         connect(inboxDetails, SIGNAL(play()), &oVmail, SLOT(play()));
@@ -531,7 +539,6 @@ MainWindow::onUserLogoutDone()
 void
 MainWindow::uiRequestTFALoginDetails(void *ctx)
 {
-    //TODO: Make sure this looks good
     QString strPin = QInputDialog::getText(m_view, tr("Enter PIN"),
                                            tr("Two factor authentication"));
 

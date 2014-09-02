@@ -68,6 +68,13 @@ Rectangle {
             currentIndex = index;
         }
 
+        function setTabsEnable(onlySettings) {
+            var i;
+            for (i = 0; i < 3; i++) {
+                tabView.getTab(i).enabled = onlySettings ? false : true;
+            }
+        }
+
         Tab {
             id: tab1
             active: true

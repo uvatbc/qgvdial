@@ -44,8 +44,8 @@ public slots:
     bool refreshLatest();
     bool refreshFull();
 
-    bool markEntryAsRead(const QString &id);
-    bool deleteEntry(const QString &id);
+    Q_INVOKABLE bool markEntryAsRead(const QString &id);
+    Q_INVOKABLE bool deleteEntry(const QString &id);
 
     void enableUpdateFrequency(bool enable);
     void setUpdateFrequency(quint32 mins);

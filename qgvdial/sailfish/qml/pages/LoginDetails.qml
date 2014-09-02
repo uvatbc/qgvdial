@@ -138,14 +138,7 @@ Item {
     Button {
         id: btnLogin
 
-        Item {
-            // Hopeless hack
-            id: proxyBtnLogin
-            objectName: "LoginButton"
-            visible: false
-            signal clicked
-            property alias text: btnLogin.text
-        }
+        objectName: "LoginButton"
 
         anchors {
             horizontalCenter: parent.horizontalCenter
@@ -158,7 +151,7 @@ Item {
 
         onClicked: {
             container.forceActiveFocus();
-            proxyBtnLogin.clicked();
+            g_mainwindow.onLoginButtonClicked();
         }
     }//Button (login/logout)
 }//Item (container)

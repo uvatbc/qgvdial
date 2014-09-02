@@ -29,7 +29,6 @@ Page {
     signal done(bool accepted)
     signal setNumberToDial(string number)
     signal sigShowContact(string cId)
-    signal deleteEntry(string iId)
     signal replySms(string iId)
 
     signal play
@@ -252,7 +251,7 @@ Page {
                                      : parent.width)
 
             onClicked: {
-                container.deleteEntry(container.iId);
+                g_inbox.deleteEntry(container.iId);
                 container.done(true);
             }
         }

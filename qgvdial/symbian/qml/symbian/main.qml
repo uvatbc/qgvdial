@@ -187,6 +187,11 @@ PageStackWindow {
                 }
             }
 
+            function setTabsEnable(onlySettings) {
+                dialTab.enabled = contactsTab.enabled = inboxTab.enabled
+                                = onlySettings ? false : true;
+            }
+
             DialPage {
                 id: dialTab
                 objectName: "DialPage"

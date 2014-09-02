@@ -28,9 +28,6 @@ Item {
     signal sigHaptic
     signal regNumBtnClicked
 
-    signal sigCall(string num)
-    signal sigText(string num)
-
     function setNumberInDisp(number) {
         numberField.text = number;
     }
@@ -88,15 +85,15 @@ Item {
             text: "Text"
             height: 100
             enabled: (numberField.text.length != 0)
-            onClicked: container.sigText(numberField.text);
+            onClicked: { g_mainwindow.onUserTextBtnClicked(numberField.text); }
         }
         Button {
             text: "Call"
             height: 100
             enabled: (numberField.text.length != 0)
-            onClicked: container.sigCall(numberField.text);
+            onClicked: { g_mainwindow.onUserCall(numberField.text); }
         }
-    }//Buttonrow
+    }//Buttonrow (Text and Call)
 
     Component.onCompleted: {
         state = (Screen.height > Screen.width) ? "portrait" : "landscape";

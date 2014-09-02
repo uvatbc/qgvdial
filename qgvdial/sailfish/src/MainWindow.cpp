@@ -30,6 +30,8 @@ MainWindow::initDerivedQmlObjects()
 void
 MainWindow::setNumberInDisp(const QString &number)
 {
+    QObject *dialPage = getQMLObject ("DialPage");
+
     QMetaObject::invokeMethod(dialPage, "setNumberInDisp",
                               Q_ARG(QVariant, QVariant(number)));
     int iTab = 0;

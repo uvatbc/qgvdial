@@ -135,10 +135,6 @@ Item {
 
         text: "Login"
 
-        onClicked: {
-            g_mainwindow.onLoginButtonClicked();
-            //textUsername.closeSoftwareInputPanel();
-            //textPassword.closeSoftwareInputPanel();
-        }
+        onClicked: { g_mainwindow.onLoginButtonClicked(); }
     }//Button (login/logout)
 }//Item (container)

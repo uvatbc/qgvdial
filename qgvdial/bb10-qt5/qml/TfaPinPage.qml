@@ -28,6 +28,10 @@ Rectangle {
     property alias textPin: textTfaPin.text
     signal done(bool accepted)
 
+    onDone: {
+        g_mainwindow.onTfaPinDlg(accepted);
+    }
+
     color: "black"
     visible: false
 
