@@ -169,11 +169,11 @@ bool
 GVNumModel::getSelectedNumber(GVRegisteredNumber &num)
 {
     if (!findById (m_selectedId, num)) {
-        if (m_dialBack.count () == 0) {
+        if (m_dialBack.count () != 0) {
+            num = m_dialBack[0];
+        } else {
             return (false);
         }
-
-        num = m_dialBack[0];
     }
 
     return (true);

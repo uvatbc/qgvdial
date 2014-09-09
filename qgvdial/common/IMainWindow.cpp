@@ -292,14 +292,18 @@ IMainWindow::onUserProxyRevert()
 void
 IMainWindow::onUserCall(QString number)
 {
-    GVRegisteredNumber num;
-    if (!oPhones.m_numModel->getSelectedNumber (num)) {
-        Q_WARN("Couldn't get number to dial with; failed to make call.");
+    if (number.isEmpty ()) {
+        Q_WARN("Cannot dial empty number.");
         return;
     }
 
-    if (number.isEmpty ()) {
-        Q_WARN("Cannot dial empty number.");
+    GVRegisteredNumber num;
+    if (!oPhones.m_numModel->getSelectedNumber (num)) {
+        Q_WARN("Couldn't get number to dial with; failed to make call.");
+
+        // Roundabout way to show the CI selection UI:
+        oPhones.onUserSelectPhone(num.id);
+
         return;
     }
 
