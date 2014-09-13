@@ -840,23 +840,22 @@ MainWindow::uiShowStatusMessage(const QString &msg, quint64 millisec)
     m.message = msg;
     m.milli = millisec;
     m_logMessages.append (m);
-    if (m_logMessages.count () > 10) {
-        m_logMessages.takeFirst ();
-    }
 }//MainWindow::uiShowStatusMessage
 
 void
 MainWindow::onLogMessagesTimer()
 {
     QMutexLocker l(&m_logMessageMutex);
+    quint32 next = 2000;
 
     if (m_logMessages.count ()) {
         LogMessage m = m_logMessages.takeLast ();
         d->ui->statusBar->showMessage (m.message, m.milli);
         m_logMessages.clear ();
+        next = 100;
     }
 
-    m_logMessageTimer.start (200);
+    m_logMessageTimer.start (next);
 }//MainWindow::onLogMessagesTimer
 
 void
