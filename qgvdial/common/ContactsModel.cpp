@@ -24,9 +24,8 @@
 #define PIXMAP_SCALED_W 25
 #define PIXMAP_SCALED_H 25
 
-ContactsModel::ContactsModel(bool bLocalPic, QObject *parent)
+ContactsModel::ContactsModel(QObject *parent)
 : QSqlQueryModel(parent)
-, mandatoryLocalPic(bLocalPic)
 , modelContacts(NULL)
 {
 #if QT_VERSION < QT_VERSION_CHECK(5,0,0)
@@ -71,14 +70,6 @@ ContactsModel::getPic(const QModelIndex &index, bool isQML) const
             }
 
             break;
-        }
-
-        if (!mandatoryLocalPic) {
-            if (isQML) {
-                retVar = photoUrl;
-                break;
-            }
-            // If it isn't QML, the pic has to be made local
         }
 
         if (localPath.isEmpty() ||

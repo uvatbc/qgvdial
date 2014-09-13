@@ -303,7 +303,6 @@ IMainWindow::onUserCall(QString number)
 
         // Roundabout way to show the CI selection UI:
         oPhones.onUserSelectPhone(num.id);
-
         return;
     }
 

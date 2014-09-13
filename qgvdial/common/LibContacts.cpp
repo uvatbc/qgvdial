@@ -37,7 +37,6 @@ LibContacts::LibContacts(IMainWindow *parent)
 , m_contactsModel(NULL)
 , m_searchedContactsModel(NULL)
 , m_contactPhonesModel(NULL)
-, m_mandatoryLocalPics(true) // True because QML is not GV authenticated
 {
     Q_ASSERT(NULL != parent);
 
@@ -235,8 +234,7 @@ LibContacts::afterFirstRefresh()
         localPath = rec.field(3).value().toString();
 
         if (localPath.isEmpty() ||
-            ((localPath != UNKNOWN_CONTACT_QRC_PATH) &&
-              !QFileInfo(localPath).exists()))
+            ((localPath != UNKNOWN_CONTACT_QRC_PATH) && !QFileInfo(localPath).exists()))
         {
             // Local path is empty and image path is not empty.
             onNoContactPhoto (contactId, photoUrl);
@@ -266,10 +264,8 @@ LibContacts::onContactsFetched()
         ContactsModel *oldModel = m_contactsModel;
         m_contactsModel = this->createModel ();
         if (NULL != m_contactsModel) {
-            if (m_mandatoryLocalPics) {
-                connect(m_contactsModel,SIGNAL(noContactPhoto(QString,QString)),
-                        this, SLOT(onNoContactPhoto(QString,QString)));
-            }
+            connect(m_contactsModel,SIGNAL(noContactPhoto(QString,QString)),
+                    this, SLOT(onNoContactPhoto(QString,QString)));
 
             win->uiRefreshContacts (m_contactsModel, QString());
             if (NULL != oldModel) {
@@ -296,7 +292,7 @@ ContactsModel *
 LibContacts::createModel(const QString &query)
 {
     IMainWindow *win = (IMainWindow *) this->parent ();
-    ContactsModel *model = new ContactsModel(m_mandatoryLocalPics, this);
+    ContactsModel *model = new ContactsModel(this);
     win->db.refreshContactsModel (model, query);
     return (model);
 }//LibContacts::createModel
@@ -524,10 +520,8 @@ LibContacts::searchContacts(const QString &query)
                 return false;
             }
 
-            if (m_mandatoryLocalPics) {
-                connect(m_contactsModel,SIGNAL(noContactPhoto(QString,QString)),
-                        this, SLOT(onNoContactPhoto(QString,QString)));
-            }
+            connect(m_contactsModel,SIGNAL(noContactPhoto(QString,QString)),
+                    this, SLOT(onNoContactPhoto(QString,QString)));
         }
 
         win->uiRefreshContacts (m_contactsModel, QString());
@@ -549,11 +543,8 @@ LibContacts::searchContacts(const QString &query)
     m_searchQuery = query;
     connect(m_searchedContactsModel, SIGNAL(noContactPhoto(QString,QString)),
             this, SLOT(onNoContactPhoto(QString,QString)));
-
-    if (m_mandatoryLocalPics) {
-        connect(m_contactsModel, SIGNAL(noContactPhoto(QString,QString)),
-                this, SLOT(onNoContactPhoto(QString,QString)));
-    }
+    connect(m_contactsModel, SIGNAL(noContactPhoto(QString,QString)),
+            this, SLOT(onNoContactPhoto(QString,QString)));
 
     win->uiRefreshContacts(m_searchedContactsModel, query);
 

@@ -33,6 +33,11 @@ class MainWindowPrivate;
 class QSystemTrayIcon;
 class QWebView;
 
+struct LogMessage {
+    QString message;
+    quint64 milli;
+};
+
 class MainWindow : public IMainWindow
 {
     Q_OBJECT
@@ -116,6 +121,8 @@ protected slots:
     void onSbContactsFreqChanged(int val);
     void onSbInboxFreqChanged(int val);
 
+    void onLogMessagesTimer();
+
 private:
     MainWindowPrivate *d;
 
@@ -125,6 +132,10 @@ private:
     QSystemTrayIcon *m_systrayIcon;
 
     bool m_ignoreCbInboxChange;
+
+    QMutex      m_logMessageMutex;
+    QVector <LogMessage> m_logMessages;
+    QTimer      m_logMessageTimer;
 
 #ifdef DBUS_API
 protected slots:

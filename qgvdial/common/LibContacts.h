@@ -104,7 +104,6 @@ public:
     ContactsModel       *m_searchedContactsModel;
 
     ContactNumbersModel *m_contactPhonesModel;
-    bool                 m_mandatoryLocalPics;
 };
 
 #endif // LIBCONTACTS_H
