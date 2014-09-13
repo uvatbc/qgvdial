@@ -87,6 +87,16 @@ InboxModel::data (const QModelIndex &index, int role) const
                 column = -1;
             }
             break;
+        case Qt::FontRole:
+            var = QSqlQueryModel::data (index.sibling(index.row (), 5), //flags
+                                        Qt::EditRole);
+            if (!(var.toInt () & INBOX_ENTRY_READ_MASK)) {
+                QFont f;
+                f.setBold(true);
+                var = f;
+                return (var);
+            }
+            break;
         }
 
         // Pick up the data from the base class
