@@ -85,6 +85,7 @@ Item {
 
                 onClicked: { g_mainwindow.onOptInboxUpdateClicked(); }
             }//TextSwitch
+
             TextField {
                 id: edInboxUpdateFreq
                 objectName: "EdInboxUpdateFreq"
