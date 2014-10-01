@@ -316,6 +316,8 @@ LibInbox::onInboxEntryMarkedAsRead()
 
         m_modelRefreshTimer.stop ();
         m_modelRefreshTimer.start ();
+
+        Q_DEBUG(QString("Read: %1").arg(id));
     } else {
         Q_WARN("Failed to mark inbox entry as read");
     }
@@ -355,6 +357,8 @@ LibInbox::onInboxEntryDeleted()
 
         m_modelRefreshTimer.stop ();
         m_modelRefreshTimer.start ();
+
+        Q_DEBUG(QString("Deleted: id=%1").arg(id));
     } else {
         Q_WARN("Failed to delete inbox entry");
     }
