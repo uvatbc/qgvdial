@@ -420,7 +420,6 @@ InboxModel::markAsRead (const QString &msgId)
     if (bExists) {
         quint32 rowToMark;
         bool found = searchById (hEvent.id, rowToMark);
-        //db.markAsRead (msgId);
         if (found) {
             db.markAsRead (msgId);
             QModelIndex foundIndex = index(rowToMark, 5);

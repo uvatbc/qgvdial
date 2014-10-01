@@ -1,6 +1,6 @@
 qgvdial (__QGVDIAL_VERSION__) unstable; urgency=low
 
-  * Parse out login error message
-  * Prevent blank username
+  * Q_INVOKABLEs
+  * Fixed QML
 
  -- Yuvraaj <yuvraaj@gmail.com>  __CHANGELOG_DATETIME__ -0700

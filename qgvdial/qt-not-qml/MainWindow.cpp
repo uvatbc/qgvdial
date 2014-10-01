@@ -849,7 +849,7 @@ MainWindow::onLogMessagesTimer()
     quint32 next = 2000;
 
     if (m_logMessages.count ()) {
-        LogMessage m = m_logMessages.takeLast ();
+        LogMessage m = m_logMessages.last ();
         d->ui->statusBar->showMessage (m.message, m.milli);
         m_logMessages.clear ();
         next = 100;

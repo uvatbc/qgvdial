@@ -62,7 +62,6 @@ Item {
             placeholderText: "example@gmail.com"
 
             KeyNavigation.tab: textPassword
-            onAccepted: btnLogin.doClick();
         }//QGVTextInput
 
         Text {
@@ -109,7 +108,7 @@ Item {
             placeholderText: "Password"
 
             KeyNavigation.tab: textUsername
-            onAccepted: btnLogin.clicked();
+            onAccepted: { btnLogin.clicked(); }
         }//QGVTextInput
 
         Text {
