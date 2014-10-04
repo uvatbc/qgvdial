@@ -117,7 +117,7 @@ LogUploader::sendLogs()
         }
 
         QUrl url(LOGS_SERVER "/tracker/postLogs");
-        
+
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
         QUrlQuery urlQ;
         urlQ.addQueryItem ("email", win->m_user.toLatin1());
@@ -152,7 +152,7 @@ LogUploader::sendLogs()
 
     if (!ok) {
         win->endLongTask ();
-        win->uiShowStatusMessage ("Failed to upload logs!", SHOW_5SEC);
+        win->showStatusMessage ("Failed to upload logs!", SHOW_5SEC);
     }
 }//LogUploader::sendLogs
 
@@ -172,11 +172,11 @@ LogUploader::onLogPosted(bool success, const QByteArray & /*response*/,
 
     if (success) {
         Q_DEBUG("Logs uploaded");
-        win->uiShowStatusMessage (tr("Logs uploaded!"), SHOW_3SEC);
+        win->showStatusMessage (tr("Logs uploaded!"), SHOW_3SEC);
     } else {
         QString strR = reply->readAll ();
         Q_WARN(QString("Failed to post the logs. Response = %1").arg(strR));
-        win->uiShowStatusMessage (tr("Failed to upload the logs!"), SHOW_5SEC);
+        win->showStatusMessage (tr("Failed to upload the logs!"), SHOW_5SEC);
     }
 }//LogUploader::onLogPosted
 

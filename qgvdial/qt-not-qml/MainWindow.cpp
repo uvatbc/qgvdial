@@ -119,7 +119,6 @@ MainWindow::MainWindow(QObject *parent)
 , m_appIcon(":/qgv.png")
 , m_systrayIcon(NULL)
 , m_ignoreCbInboxChange(false)
-, m_logMessageMutex(QMutex::Recursive)
 #ifdef DBUS_API
 , apiCall(this)
 , apiText(this)
@@ -304,11 +303,6 @@ MainWindow::init()
 
     // Fake an event in the event loop
     QTimer::singleShot (1, this, SLOT(onInitDone()));
-
-    connect(&m_logMessageTimer, SIGNAL(timeout()),
-            this, SLOT(onLogMessagesTimer()));
-    m_logMessageTimer.setSingleShot (true);
-    m_logMessageTimer.start (10);
 }//MainWindow::init
 
 void
@@ -835,35 +829,12 @@ MainWindow::onCbNumDoModify(int index)
 void
 MainWindow::uiShowStatusMessage(const QString &msg, quint64 millisec)
 {
-    QMutexLocker l(&m_logMessageMutex);
-    LogMessage m;
-    m.message = msg;
-    m.milli = millisec;
-    m_logMessages.append (m);
+    d->ui->statusBar->showMessage (msg, millisec);
 }//MainWindow::uiShowStatusMessage
-
-void
-MainWindow::onLogMessagesTimer()
-{
-    QMutexLocker l(&m_logMessageMutex);
-    quint32 next = 2000;
-
-    if (m_logMessages.count ()) {
-        LogMessage m = m_logMessages.last ();
-        d->ui->statusBar->showMessage (m.message, m.milli);
-        m_logMessages.clear ();
-        next = 100;
-    }
-
-    m_logMessageTimer.start (next);
-}//MainWindow::onLogMessagesTimer
 
 void
 MainWindow::uiClearStatusMessage()
 {
-    QMutexLocker l(&m_logMessageMutex);
-    m_logMessages.clear ();
-
     d->ui->statusBar->clearMessage ();
 }//MainWindow::uiClearStatusMessage
 

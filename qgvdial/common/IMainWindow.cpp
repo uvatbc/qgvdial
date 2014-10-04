@@ -34,6 +34,7 @@ IMainWindow::IMainWindow(QObject *parent)
 , oLogUploader(this)
 , oVmail(this)
 , m_loginTask(NULL)
+, m_logMessageMutex(QMutex::Recursive)
 {
     qRegisterMetaType<ContactInfo>("ContactInfo");
     connect(&gvApi, SIGNAL(twoStepAuthentication(AsyncTaskToken*)),
@@ -42,6 +43,11 @@ IMainWindow::IMainWindow(QObject *parent)
     m_taskTimer.setSingleShot (true);
     m_taskTimer.setInterval (1 * 1000); // 1 second
     connect (&m_taskTimer, SIGNAL(timeout()), this, SLOT(onTaskTimerTimeout()));
+
+    connect(&m_logMessageTimer, SIGNAL(timeout()),
+            this, SLOT(onLogMessagesTimer()));
+    m_logMessageTimer.setSingleShot (true);
+    m_logMessageTimer.start (10);
 }//IMainWindow::IMainWindow
 
 void
@@ -107,7 +113,7 @@ IMainWindow::beginLogin(QString user, QString pass)
         user = user.trimmed();
         if (user.isEmpty ()) {
             Q_WARN("Empty user name");
-            uiShowStatusMessage ("Cannot login: Username is empty", SHOW_10SEC);
+            showStatusMessage ("Cannot login: Username is empty", SHOW_10SEC);
             break;
         }
 
@@ -353,7 +359,7 @@ IMainWindow::onGvCallTaskDone()
     if (ATTS_NOT_LOGGED_IN == task->status) {
         Q_WARN(QString("Failed to initiate call to %1 using id %2 because a "
                        "re-login is required.").arg(dest, id));
-        uiShowStatusMessage ("Re-login required", SHOW_10SEC);
+        showStatusMessage ("Re-login required", SHOW_10SEC);
         beginLogin (m_user, m_pass);
         return;
     }
@@ -371,10 +377,10 @@ IMainWindow::onGvCallTaskDone()
                .arg(dest, id).arg(task->status)).arg(task->errorString);
 
         if (task->errorString.isEmpty ()) {
-            uiShowStatusMessage (QString("Failed to initiate call. Error = %1")
+            showStatusMessage (QString("Failed to initiate call. Error = %1")
                                  .arg(task->status), SHOW_10SEC);
         } else {
-            uiShowStatusMessage (QString("Google Voice error: '%1'.")
+            showStatusMessage (QString("Google Voice error: '%1'.")
                                  .arg(task->errorString), SHOW_10SEC);
         }
         return;
@@ -386,16 +392,16 @@ IMainWindow::onGvCallTaskDone()
         if (!oPhones.dialOut (id, accessNumber)) {
             Q_WARN(QString("Dialout failed for access number %1 to call %2")
                    .arg(accessNumber, dest));
-            uiShowStatusMessage("Failed to initiate dial out call.",SHOW_10SEC);
+            showStatusMessage("Failed to initiate dial out call.",SHOW_10SEC);
         } else {
             Q_DEBUG(QString("Dialed access number %1 to call %2")
                     .arg(accessNumber, dest));
-            uiShowStatusMessage ("Dial out successful", SHOW_3SEC);
+            showStatusMessage ("Dial out successful", SHOW_3SEC);
         }
     } else {
         Q_DEBUG(QString("Callback initiated to id %1 to dest %2")
                 .arg(id, dest));
-        uiShowStatusMessage ("Dial back successful", SHOW_3SEC);
+        showStatusMessage ("Dial back successful", SHOW_3SEC);
     }
 }//IMainWindow::onGvCallTaskDone
 
@@ -457,20 +463,20 @@ IMainWindow::onGvTextTaskDone()
         if (ATTS_NOT_LOGGED_IN == task->status) {
             Q_WARN(QString("Failed to send text to %1 because a re-login is "
                            "required.").arg(dest));
-            uiShowStatusMessage ("Re-login required", SHOW_10SEC);
+            showStatusMessage ("Re-login required", SHOW_10SEC);
             beginLogin (m_user, m_pass);
         } else {
             QString msg = QString("Failed to send text. status = %1")
                     .arg(task->status);
             Q_WARN(msg);
-            uiShowStatusMessage (msg, SHOW_10SEC);
+            showStatusMessage (msg, SHOW_10SEC);
         }
 
         uiFailedToSendMessage (dest, text);
     } else {
         Q_DEBUG(QString("Successfully sent text to %1")
                 .arg(task->inParams["destination"].toString()));
-        uiShowStatusMessage ("Text sent", SHOW_3SEC);
+        showStatusMessage ("Text sent", SHOW_3SEC);
     }
 }//IMainWindow::onGvTextTaskDone
 
@@ -511,15 +517,49 @@ IMainWindow::startLongTask(LongTaskType newType)
         break;
     }
 
-    uiShowStatusMessage (msg, SHOW_INF);
+    showStatusMessage (msg, SHOW_INF);
 }//IMainWindow::startLongTask
 
 void
 IMainWindow::endLongTask()
 {
     m_taskTimer.stop ();
-    uiClearStatusMessage ();
+    clearStatusMessage ();
 }//IMainWindow::endLongTask
+
+void
+IMainWindow::showStatusMessage(const QString &msg, quint64 millisec)
+{
+    QMutexLocker l(&m_logMessageMutex);
+    LogMessage m;
+    m.message = msg;
+    m.milli = millisec;
+    m_logMessages.append (m);
+}//IMainWindow::showStatusMessage
+
+void
+IMainWindow::clearStatusMessage()
+{
+    QMutexLocker l(&m_logMessageMutex);
+    m_logMessages.clear ();
+    uiClearStatusMessage ();
+}//IMainWindow::clearStatusMessage
+
+void
+IMainWindow::onLogMessagesTimer()
+{
+    QMutexLocker l(&m_logMessageMutex);
+    quint32 next = 2000;
+
+    if (m_logMessages.count ()) {
+        LogMessage m = m_logMessages.last ();
+        m_logMessages.clear ();
+        uiShowStatusMessage (m.message, m.milli);
+        next = 100;
+    }
+
+    m_logMessageTimer.start (next);
+}//IMainWindow::onLogMessagesTimer
 
 void
 IMainWindow::onTaskTimerTimeout()
@@ -546,7 +586,7 @@ IMainWindow::onTaskTimerTimeout()
     default:
         break;
     }
-    uiShowStatusMessage (msg, SHOW_3SEC);
+    showStatusMessage (msg, SHOW_3SEC);
     m_taskTimer.start ();
 }//IMainWindow::onTaskTimerTimeout
 

@@ -114,6 +114,11 @@ enum LongTaskType {
 #define SHOW_10SEC  (10 * 1000)
 #define SHOW_INF    0
 
+struct LogMessage {
+    QString message;
+    quint64 milli;
+};
+
 struct LongTaskInfo
 {
     LongTaskType type;
@@ -153,6 +158,7 @@ private slots:
     void onGvTextTaskDone();
 
     void onTaskTimerTimeout();
+    void onLogMessagesTimer();
 
 protected:
     virtual void log(QDateTime dt, int level, const QString &strLog) = 0;
@@ -188,8 +194,11 @@ protected:
     void startLongTask(LongTaskType newType);
     void endLongTask();
 
+    void showStatusMessage(const QString &msg, quint64 millisec);
+    void clearStatusMessage();
     virtual void uiShowStatusMessage(const QString &msg, quint64 millisec) = 0;
     virtual void uiClearStatusMessage() = 0;
+
     virtual void uiShowMessageBox(const QString &msg) = 0;
 
     virtual void uiFailedToSendMessage(const QString &destination,
@@ -217,6 +226,10 @@ protected:
 
     QTimer  m_taskTimer;
     LongTaskInfo m_taskInfo;
+
+    QMutex      m_logMessageMutex;
+    QVector <LogMessage> m_logMessages;
+    QTimer      m_logMessageTimer;
 
     friend class LibContacts;
     friend class LibInbox;

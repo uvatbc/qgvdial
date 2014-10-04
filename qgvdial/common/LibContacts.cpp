@@ -186,7 +186,7 @@ LibContacts::refreshLatest()
         return (false);
     }
 
-    win->uiShowStatusMessage ("Starting contacts refresh", SHOW_3SEC);
+    win->showStatusMessage ("Starting contacts refresh", SHOW_3SEC);
     return (refresh (latest));
 }//LibContacts::refreshLatest
 
@@ -194,7 +194,7 @@ bool
 LibContacts::refreshFull()
 {
     IMainWindow *win = (IMainWindow *) this->parent ();
-    win->uiShowStatusMessage ("Starting FULL contacts refresh", SHOW_3SEC);
+    win->showStatusMessage ("Starting FULL contacts refresh", SHOW_3SEC);
     return refresh();
 }//LibContacts::refreshFull
 
@@ -278,7 +278,7 @@ LibContacts::onContactsFetched()
         afterFirstRefresh ();
 
         startNextPhoto ();
-        win->uiShowStatusMessage ("Contacts fetched", SHOW_3SEC);
+        win->showStatusMessage ("Contacts fetched", SHOW_3SEC);
     }
 
     if (m_enableTimerUpdate && (m_updateTimer.interval () >= 60)) {
@@ -304,7 +304,7 @@ LibContacts::startNextPhoto()
     QMutexLocker locker(&m_photoMutex);
 
     int c = m_noPhotos.count() + m_simutaneousPhotoDownloads;
-    win->uiShowStatusMessage (QString("%1 contact photo%2 to be fetched")
+    win->showStatusMessage (QString("%1 contact photo%2 to be fetched")
                               .arg(c).arg(c == 1 ? "" : "s"), SHOW_3SEC);
 
     if (m_simutaneousPhotoDownloads > 5) {
@@ -314,7 +314,7 @@ LibContacts::startNextPhoto()
     bool rv = false;
     do {
         if (m_noPhotos.isEmpty()) {
-            win->uiShowStatusMessage ("Contact photos fetched", SHOW_3SEC);
+            win->showStatusMessage ("Contact photos fetched", SHOW_3SEC);
             m_gotPhotoTimer.stop ();
             m_gotPhotoTimer.start ();
             break;

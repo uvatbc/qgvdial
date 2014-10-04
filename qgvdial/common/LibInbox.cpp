@@ -77,7 +77,7 @@ LibInbox::refreshLatest(QString type)
 
     if (win->db.getLatestInboxEntry (latest)) {
         IMainWindow *win = (IMainWindow *) this->parent ();
-        win->uiShowStatusMessage ("Starting inbox refresh", SHOW_3SEC);
+        win->showStatusMessage ("Starting inbox refresh", SHOW_3SEC);
         rv = this->refresh (type, latest);
     }
 
@@ -94,7 +94,7 @@ bool
 LibInbox::refreshFull()
 {
     IMainWindow *win = (IMainWindow *) this->parent ();
-    win->uiShowStatusMessage ("Starting FULL inbox refresh", SHOW_3SEC);
+    win->showStatusMessage ("Starting FULL inbox refresh", SHOW_3SEC);
     return refresh();
 }//LibInbox::refreshFull
 
@@ -195,7 +195,7 @@ LibInbox::onRefreshDone()
             }
             msg = QString("Retrieved inbox page %1").arg(page);
         }
-        win->uiShowStatusMessage (msg, SHOW_3SEC);
+        win->showStatusMessage (msg, SHOW_3SEC);
 
         page++;
 
@@ -219,7 +219,7 @@ LibInbox::onRefreshDone()
                 m_inboxModel = oldModel;
             }
 
-            win->uiShowStatusMessage ("Inbox fetched", SHOW_3SEC);
+            win->showStatusMessage ("Inbox fetched", SHOW_3SEC);
         }
         task->deleteLater ();
 

@@ -719,7 +719,7 @@ QmlMainWindow::onInboxClicked(QString id)
 
     event.id = id;
     if (!oInbox.getEventInfo (event, cinfo, type)) {
-        uiShowStatusMessage ("Can't fetch inbox event", SHOW_3SEC);
+        showStatusMessage ("Can't fetch inbox event", SHOW_3SEC);
         return;
     }
 
@@ -753,7 +753,7 @@ QmlMainWindow::onInboxClicked(QString id)
     } else {
         if (!oVmail.fetchVmail (event.id)) {
             Q_WARN("Failed to fetch voice mail");
-            uiShowStatusMessage ("Unable to fetch voicemail", SHOW_3SEC);
+            showStatusMessage ("Unable to fetch voicemail", SHOW_3SEC);
         }
 
         Q_ASSERT(isVmail); // Reuse this "true" value
@@ -882,12 +882,12 @@ QmlMainWindow::onVmailFetched(const QString & /*id*/, const QString &localPath,
     }
 
     if (!ok) {
-        uiShowStatusMessage ("Unable to fetch voicemail", SHOW_3SEC);
+        showStatusMessage ("Unable to fetch voicemail", SHOW_3SEC);
         return;
     }
 
     if (!oVmail.loadVmail (localPath)) {
-        uiShowStatusMessage ("Unable to load voicemail", SHOW_3SEC);
+        showStatusMessage ("Unable to load voicemail", SHOW_3SEC);
         return;
     }
 
