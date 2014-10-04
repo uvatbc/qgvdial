@@ -8,7 +8,7 @@ License: LICENSE
 Sources:
 - '%{name}-%{version}.tar.bz2'
 Description: |
-  Short description of my SailfishOS Application
+  Native Google Voice client for SailfishOS
 Configure: none
 Builder: qtc5
 PkgConfigBR:
@@ -16,7 +16,6 @@ PkgConfigBR:
 - Qt5Core
 - Qt5Qml
 - Qt5Quick
-- Qt5Script
 Requires:
 - sailfishsilica-qt5 >= 0.10.9
 Files:

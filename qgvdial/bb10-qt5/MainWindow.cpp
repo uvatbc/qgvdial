@@ -62,19 +62,17 @@ MainWindow::init()
     }
 
     qreal val;
-    val = 0.8;
-    m_view->engine()->rootContext()->setContextProperty("g_keypadScaleFactor1",
-                                                        val);
-    m_view->engine()->rootContext()->setContextProperty("g_keypadScaleFactor2",
-                                                        val);
-
-    QmlMainWindow::init ();
-
-    /*
-    qreal val;
-    int width = QApplication::desktop()->screenGeometry().size().width();
+    int width = QGuiApplication::primaryScreen()->size().width();
     if (width == 720) {
-        Q_DEBUG("Its a Q1!");
+        Q_DEBUG("Its a Q10!");
+        val = 0.7;
+        m_view->engine()->rootContext()
+                    ->setContextProperty("g_keypadScaleFactor1", val);
+        val = 0.8;
+        m_view->engine()->rootContext()
+                    ->setContextProperty("g_keypadScaleFactor2", val);
+    } else if (width == 1440) {
+        Q_DEBUG("Its a Passport!");
         val = 0.7;
         m_view->engine()->rootContext()
                     ->setContextProperty("g_keypadScaleFactor1", val);
@@ -90,27 +88,6 @@ MainWindow::init()
     }
 
     QmlMainWindow::init ();
-
-    // GL viewport increases performance on blackberry
-    QGLFormat format = QGLFormat::defaultFormat();
-    format.setSampleBuffers(false);
-    QGLWidget *glWidget = new QGLWidget(format);
-    glWidget->setAutoFillBackground(false);
-
-    m_view->setViewport(glWidget);
-
-    // More gfx performance
-    m_view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
-    m_view->setAttribute(Qt::WA_OpaquePaintEvent);
-    m_view->setAttribute(Qt::WA_NoSystemBackground);
-    m_view->viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
-    m_view->viewport()->setAttribute(Qt::WA_NoSystemBackground);
-
-    // None of these seem to have any effect
-    //m_view->setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
-    //m_view->setOrientation(QmlApplicationViewer::ScreenOrientationLockPortrait);
-    //m_view->setOrientation(QmlApplicationViewer::ScreenOrientationLockLandscape);
-    */
 }//MainWindow::init
 
 void

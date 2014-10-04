@@ -73,8 +73,8 @@ Item {
             anchors {
                 right: parent.right
                 bottom: parent.bottom
-                rightMargin: 2
-                bottomMargin: 2
+                rightMargin: 5
+                bottomMargin: 5
             }
             font.pixelSize: g_keypadScaleFactor2 * btn.mainPixelSize / 3
         }// Text
