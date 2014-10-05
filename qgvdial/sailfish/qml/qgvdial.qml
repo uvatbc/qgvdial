@@ -89,7 +89,8 @@ ApplicationWindow {
         smsPage.conversation = conversation;
         smsPage.smsText      = text;
         pageStack.push(smsPage);
-        smsPage.flickToEnd();
+        //TODO: No flick available. Maybe something else?
+        //smsPage.flickToEnd();
     }
     function showWebPage(url) {
         webPage.loadUrl(url);
