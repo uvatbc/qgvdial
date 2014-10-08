@@ -61,6 +61,7 @@ MainWindow::init()
         g_arrLogFiles.append(qt4srvLog);
     }
 
+    bool isSquare = true;
     qreal val;
     int width = QGuiApplication::primaryScreen()->size().width();
     if (width == 720) {
@@ -85,7 +86,11 @@ MainWindow::init()
                     ->setContextProperty("g_keypadScaleFactor1", val);
         m_view->engine()->rootContext()
                     ->setContextProperty("g_keypadScaleFactor2", val);
+
+        isSquare = false;
     }
+
+    m_view->engine()->rootContext()->setContextProperty("g_isSquare", isSquare);
 
     QmlMainWindow::init ();
 }//MainWindow::init

@@ -101,7 +101,7 @@ Item {
         }
     }//ButtonRow: Text & Call
 
-    state: ((Screen.orientation == Qt.PortraitOrientation) || (Screen.orientation == Qt.InvertedPortraitOrientation)) ? "portrait" : "landscape"
+    state: ((g_isSquare) || (Screen.orientation == Qt.PortraitOrientation) || (Screen.orientation == Qt.InvertedPortraitOrientation)) ? "portrait" : "landscape"
     states: [
         State {
             name: "portrait"
