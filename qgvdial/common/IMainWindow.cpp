@@ -535,6 +535,10 @@ IMainWindow::showStatusMessage(const QString &msg, quint64 millisec)
     m.message = msg;
     m.milli = millisec;
     m_logMessages.append (m);
+
+    if (!m_logMessageTimer.isActive ()) {
+        m_logMessageTimer.start (100);
+    }
 }//IMainWindow::showStatusMessage
 
 void
@@ -542,6 +546,7 @@ IMainWindow::clearStatusMessage()
 {
     QMutexLocker l(&m_logMessageMutex);
     m_logMessages.clear ();
+    m_logMessageTimer.stop();
     uiClearStatusMessage ();
 }//IMainWindow::clearStatusMessage
 
@@ -549,16 +554,14 @@ void
 IMainWindow::onLogMessagesTimer()
 {
     QMutexLocker l(&m_logMessageMutex);
-    quint32 next = 2000;
 
     if (m_logMessages.count ()) {
         LogMessage m = m_logMessages.last ();
         m_logMessages.clear ();
         uiShowStatusMessage (m.message, m.milli);
-        next = 100;
-    }
 
-    m_logMessageTimer.start (next);
+        m_logMessageTimer.start (100);
+    }
 }//IMainWindow::onLogMessagesTimer
 
 void
