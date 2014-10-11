@@ -1026,6 +1026,17 @@ GVApi::lookForLoginErrorMessage(const QString &resp, AsyncTaskToken *task)
         if (!span.isEmpty ()) {
             Q_WARN(QString("Google login failure reported: '%1'").arg(span));
             task->errorString = span;
+            break;
+        }
+
+        // One last attempt at figuring out the response:
+        if (resp.contains ("smsauth-interstitial-heading") &&
+            resp.contains ("smsauth-interstitial-reviewsettings"))
+        {
+            Q_WARN("Two factor authentication settings review page!");
+            task->errorString = tr("Please use your mobile browser to login to "
+                                   "Google Voice this one time. Thanks.");
+            break;
         }
 
         // The else block outside will display the warning
