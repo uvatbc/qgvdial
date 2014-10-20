@@ -3,11 +3,14 @@ TARGET = qgvdial
 
 QT += qml quick widgets multimedia
 
+INCLUDEPATH *= $$PWD
+
 SOURCES  += MainWindow.cpp \
+            WP8PhoneFactory.cpp
 
 HEADERS  += platform_specific.h \
             MainWindow.h \
-
+            WP8PhoneFactory.h
 
 RESOURCES += qml.qrc
 
@@ -19,7 +22,7 @@ include(../common/common.pri)
 #include(../features/dirs/bb10/bb10-dirs.pri)
 include(../features/cookie-cutter/osdependent/cc-osdependent.pri)
 #include(../features/osver/bb10/osv-bb10.pri)
-include(../features/mqlib/mqlib.pri)
+#include(../features/mqlib/mqlib.pri)
 include(../features/qml/mainwindow/qml-mainwindow.pri)
 include(../features/qml/qml5/qmlviewer.pri)
 

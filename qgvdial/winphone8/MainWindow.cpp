@@ -21,12 +21,7 @@ Contact: yuvraaj@gmail.com
 
 #include "MainWindow.h"
 #include "CQmlViewer.h"
-#include "BB10PhoneFactory.h"
-
-/*
-#include <QGLWidget>
-#include <QGLFormat>
-*/
+#include "WP8PhoneFactory.h"
 
 #define MAIN_QML_PATH "qrc:/main.qml"
 extern QStringList g_arrLogFiles;
@@ -45,7 +40,7 @@ createAppObject(int &argc, char **argv)
 IPhoneAccountFactory *
 createPhoneAccountFactory(QObject *parent)
 {
-    return (new BB10PhoneFactory(parent));
+    return (new WP8PhoneFactory(parent));
 }//createPhoneAccountFactory
 
 MainWindow::MainWindow(QObject *parent)
