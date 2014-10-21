@@ -30,7 +30,8 @@ OsdDirs::confirmDir(const char *subdir)
         QDir(rv).mkdir (subdir);
     }
 
-    rv += QDir::separator() + subdir;
+    rv += QDir::separator();
+    rv += subdir;
     return (rv);
 }//OsdDirs::confirmDir
 
