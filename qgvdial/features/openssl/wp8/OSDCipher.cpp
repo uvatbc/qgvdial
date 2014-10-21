@@ -28,5 +28,13 @@ Contact: yuvraaj@gmail.com
 bool
 OsdCipher::_cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt)
 {
+    // Do I reeealy need to encrypt anything when the app is entirely sandboxed?
+
+    if (bEncrypt) {
+        byOut = byIn.toBase64();
+    } else {
+        byOut = QByteArray::fromBase64(byIn);
+    }
+
     return (true);
 }//OsdCipher::cipher
