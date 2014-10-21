@@ -19,30 +19,40 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#include "WP8PhoneFactory.h"
-#include "LibGvPhones.h"
+import QtQuick 2.2
+import QtQuick.Controls 1.1
 
-#include "IPhoneAccount.h"
+Rectangle {
+    id: container
 
-WP8PhoneFactory::WP8PhoneFactory(QObject *parent)
-: IPhoneAccountFactory(parent)
-{
-}//WP8PhoneFactory::WP8PhoneFactory
+    color: "black"
+    visible: false
 
-WP8PhoneFactory::~WP8PhoneFactory()
-{
-}//WP8PhoneFactory::~WP8PhoneFactory
+    property alias model: regNumList.model
+    signal selected(string id);
+    signal modify(string id);
+    signal cancel
 
-bool
-WP8PhoneFactory::identifyAll(AsyncTaskToken *task)
-{
-
-    foreach (QString key, m_accounts.keys()) {
-        m_accounts[key]->deleteLater();
+    function setMyModel() {
+        if (container.model == null) {
+            container.model = g_RegNumberModel;
+        }
     }
-    m_accounts.clear();
 
-	task->emitCompleted();
+    ListView {
+        id: regNumList
+        anchors.fill: parent
 
-    return (true);
-}//WP8PhoneFactory::identifyAll
+        delegate: Label {
+            width: regNumList.width
+            text: name + "\n(" + number + ")"
+            font.pixelSize: 50
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: container.selected(id);
+                onPressAndHold: container.modify(id);
+            }
+        }//Delegate
+    }//ListView
+}//Rectangle
