@@ -60,7 +60,7 @@ NwReqTracker::init(QNetworkReply *r, void *c, bool bEmitlog, bool autoDel)
     rv = connect (reply, SIGNAL(uploadProgress(qint64,qint64)),
                   this , SLOT(onReplyProgress(qint64,qint64)));
     Q_ASSERT(rv);
-#ifndef Q_OS_IOS
+#ifndef QT_NO_SSL
     rv = connect (reply, SIGNAL(sslErrors(QList<QSslError>)),
                   this , SLOT(onReplySslErrors(QList<QSslError>)));
     Q_ASSERT(rv);
@@ -92,7 +92,7 @@ NwReqTracker::disconnectReply()
     rv = disconnect (reply, SIGNAL(uploadProgress(qint64,qint64)),
                      this , SLOT(onReplyProgress(qint64,qint64)));
     Q_ASSERT(rv);
-#ifndef Q_OS_IOS
+#ifndef QT_NO_SSL
     rv = disconnect (reply, SIGNAL(sslErrors(QList<QSslError>)),
                      this , SLOT(onReplySslErrors(QList<QSslError>)));
     Q_ASSERT(rv);
@@ -270,7 +270,7 @@ NwReqTracker::abort()
     }
 }//NwReqTracker::abort
 
-#ifndef Q_OS_IOS
+#ifndef QT_NO_SSL
 void
 NwReqTracker::onReplySslErrors(const QList<QSslError> &errors)
 {

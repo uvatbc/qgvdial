@@ -22,6 +22,8 @@ Contact: yuvraaj@gmail.com
 #include "WP8PhoneFactory.h"
 #include "LibGvPhones.h"
 
+#include "IPhoneAccount.h"
+
 WP8PhoneFactory::WP8PhoneFactory(QObject *parent)
 : IPhoneAccountFactory(parent)
 {

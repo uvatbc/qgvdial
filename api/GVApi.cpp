@@ -40,6 +40,9 @@ GVApi::GVApi(bool bEmitLog, QObject *parent)
 bool
 GVApi::getSystemProxies (QNetworkProxy &http, QNetworkProxy &https)
 {
+#ifdef QT_NO_NETWORKPROXY
+    return (false);
+#else
     bool httpDone, httpsDone;
 
     httpDone = httpsDone = false;
@@ -143,6 +146,7 @@ GVApi::getSystemProxies (QNetworkProxy &http, QNetworkProxy &https)
     } while (0);
 
     return (true);
+#endif
 }//GVApi::getSystemProxies
 
 void
@@ -342,6 +346,9 @@ GVApi::setProxySettings (bool bEnable,
                          bool bRequiresAuth,
                          const QString &user, const QString &pass)
 {
+#ifdef QT_NO_NETWORKPROXY
+    return (false);
+#else
     QNetworkProxy proxySettings;
     do {
         if (!bEnable) {
@@ -376,6 +383,7 @@ GVApi::setProxySettings (bool bEnable,
     QNetworkProxy::setApplicationProxy (proxySettings);
 
     return (true);
+#endif
 }//GVApi::setProxySettings
 
 QList<QNetworkCookie>

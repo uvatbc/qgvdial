@@ -63,7 +63,7 @@ protected slots:
     void onReplyProgress(qint64 bytesReceived, qint64 bytesTotal);
     void onTimedOut();
 
-#ifndef Q_OS_IOS
+#ifndef QT_NO_SSL
     void onReplySslErrors (const QList<QSslError> &errors);
 #endif
     void onReplyError(QNetworkReply::NetworkError code);
