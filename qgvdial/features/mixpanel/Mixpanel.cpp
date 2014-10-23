@@ -25,7 +25,7 @@ Contact: yuvraaj@gmail.com
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 #include <QJsonDocument>
 #else
-#include <QtScriptEngine>
+#include <QtScript>
 #endif
 
 #define MIXPANEL_TRACK_API "http://api.mixpanel.com/track/"
@@ -121,6 +121,60 @@ MixPanel::doPost(QUrl url,
     return (tracker);
 }//MixPanel::doPost
 
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
+// With thanks from: http://www.prashanthudupa.com/2011/12/20/simple-json-parser-serializer-in-qt/
+QScriptValue
+s_CreateValue(QScriptEngine& engine, const QVariant& value)
+{
+    if(value.type() == QVariant::Map) {
+        QScriptValue obj = engine.newObject();
+
+        QVariantMap map = value.toMap();
+        QVariantMap::const_iterator it = map.begin();
+        QVariantMap::const_iterator end = map.end();
+        while(it != end)
+        {
+            obj.setProperty( it.key(), ::s_CreateValue(engine, it.value()) );
+            ++it;
+        }
+
+        return obj;
+    }
+
+    if(value.type() == QVariant::List) {
+        QVariantList list = value.toList();
+        QScriptValue array = engine.newArray(list.length());
+        for(int i=0; i<list.count(); i++)
+            array.setProperty(i, ::s_CreateValue(engine, list.at(i)));
+
+        return array;
+    }
+
+    switch(value.type()) {
+    case QVariant::String:
+        return QScriptValue(value.toString());
+    case QVariant::Int:
+        return QScriptValue(value.toInt());
+    case QVariant::UInt:
+        return QScriptValue(value.toUInt());
+    case QVariant::Bool:
+        return QScriptValue(value.toBool());
+    case QVariant::ByteArray:
+        return QScriptValue(QLatin1String(value.toByteArray()));
+    case QVariant::Double:
+        return QScriptValue((qsreal)value.toDouble());
+    default:
+        break;
+    }
+
+    if(value.isNull()) {
+        return QScriptValue(QScriptValue::NullValue);
+    }
+
+    return engine.newVariant(value);
+}
+#endif
+
 void
 MixPanel::batchSend()
 {
@@ -160,12 +214,32 @@ MixPanel::batchSend()
         QJsonDocument doc = QJsonDocument::fromVariant(eventList);
 #if 0
         json = doc.toJson();
-        Q_DEBUG(QString(json));
 #else
         json = doc.toJson(QJsonDocument::Compact);
 #endif
 #else
         QScriptEngine eng;
+        const QString script =
+                "function parse_json(string) { "
+                    "return JSON.parse(string);"
+                "}\n"
+                "function serialize_json(object) { "
+                    "return JSON.stringify(object);"
+                "}";
+        QScriptValue result = eng.evaluate(script);
+        QScriptValue parseFn;
+        QScriptValue serializeFn;
+
+        parseFn = eng.globalObject().property("parse_json");
+        serializeFn = eng.globalObject().property("serialize_json");
+
+        QScriptValue arg = s_CreateValue (eng, eventList);
+        result = serializeFn.call(QScriptValue(), QScriptValueList() << arg);
+        json = result.toString ().toLatin1 ();
+#endif
+
+#if 0
+        Q_DEBUG(QString(json));
 #endif
 
         json = "data=" + json.toBase64();
