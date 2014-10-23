@@ -30,6 +30,8 @@ struct MixPanelEvent
     QString     event;
     QString     distinct_id;
     QVariantMap properties;
+
+    MixPanelEvent() { time = QDateTime::currentDateTime(); }
 };
 typedef QList<MixPanelEvent> MixPanelEventList;
 
@@ -37,14 +39,14 @@ class MixPanel : public QObject
 {
     Q_OBJECT
 public:
-    MixPanel();
+    MixPanel(QObject *parent = NULL);
     virtual ~MixPanel();
 
     void setToken(const QString &token);
 
     void addEvent(const MixPanelEvent &event);
     void addEvent(const QString &distinct_id, const QString &event,
-                  QVariantMap props);
+                  QVariantMap props = QVariantMap());
 
     void flushEvents();
 

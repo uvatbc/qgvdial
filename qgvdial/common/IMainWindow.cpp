@@ -35,6 +35,7 @@ IMainWindow::IMainWindow(QObject *parent)
 , oVmail(this)
 , m_loginTask(NULL)
 , m_logMessageMutex(QMutex::Recursive)
+, m_mixPanel(this)
 {
     qRegisterMetaType<ContactInfo>("ContactInfo");
     connect(&gvApi, SIGNAL(twoStepAuthentication(AsyncTaskToken*)),
@@ -59,6 +60,8 @@ IMainWindow::init()
 void
 IMainWindow::onQuit()
 {
+    m_mixPanel.flushEvents();
+
     QList<QNetworkCookie> cookies = gvApi.getAllCookies ();
     db.saveCookies (cookies);
 
@@ -73,6 +76,7 @@ IMainWindow::onInitDone()
     do {
         db.init (Lib::ref().getDbDir());
         oContacts.init ();
+        m_mixPanel.setToken(MIXPANEL_TOKEN);
 
         QList<QNetworkCookie> cookies;
         if (db.loadCookies (cookies)) {
@@ -187,9 +191,15 @@ IMainWindow::loginCompleted()
     Q_ASSERT(m_loginTask == task);
     m_loginTask = NULL;
 
+    MixPanelEvent mEvent;
+    mEvent.distinct_id = m_user;
+
     do {
         if (ATTS_SUCCESS == task->status) {
             Q_DEBUG("Login successful");
+
+            mEvent.event = "Login";
+            m_mixPanel.addEvent(mEvent);
 
             db.putUserPass (m_user, m_pass);
 
@@ -221,9 +231,14 @@ IMainWindow::loginCompleted()
             }
         } else if (ATTS_NW_ERROR == task->status) {
             Q_WARN("Login failed because of network error");
+
             task->errorString = "Network error. Try again later.";
             uiSetUserPass (true);
             uiRequestLoginDetails();
+
+            mEvent.event = "Login failed";
+            mEvent.properties["error"] = task->errorString;
+            m_mixPanel.addEvent(mEvent);
         } else if (ATTS_USER_CANCEL == task->status) {
             Q_WARN("User canceled login");
             task->errorString = "User canceled login";
@@ -231,6 +246,10 @@ IMainWindow::loginCompleted()
             uiRequestLoginDetails();
             db.clearCookies ();
             oContacts.logout ();
+
+            mEvent.event = "Login failed";
+            mEvent.properties["error"] = task->errorString;
+            m_mixPanel.addEvent(mEvent);
         } else if (ATTS_SETUP_REQUIRED == task->status) {
             Q_WARN("GVApi has determined that user setup is required");
             uiSetUserPass (true);
@@ -241,6 +260,10 @@ IMainWindow::loginCompleted()
             uiShowMessageBox ("Your Google Voice account is not set up. Please "
                               "access Google Voice from a desktop or laptop "
                               "computer to setup your account");
+
+            mEvent.event = "Login failed";
+            mEvent.properties["error"] = task->errorString;
+            m_mixPanel.addEvent(mEvent);
         } else {
             task->errorString = QString("Login failed: %1")
                                     .arg(task->errorString);
@@ -251,6 +274,10 @@ IMainWindow::loginCompleted()
             uiRequestLoginDetails();
             db.clearCookies ();
             oContacts.logout ();
+
+            mEvent.event = "Login failed";
+            mEvent.properties["error"] = task->errorString;
+            m_mixPanel.addEvent(mEvent);
         }
     } while (0);
 
@@ -271,7 +298,9 @@ IMainWindow::onUserLogoutRequest()
 void
 IMainWindow::onLogoutDone()
 {
-    AsyncTaskToken *task = (AsyncTaskToken *) QObject::sender ();
+    m_mixPanel.addEvent(m_user, "Logout");
+
+    AsyncTaskToken *task = (AsyncTaskToken *)QObject::sender();
     uiSetUserPass (true);
     onUserLogoutDone();
     task->deleteLater ();
@@ -300,12 +329,14 @@ IMainWindow::onUserCall(QString number)
 {
     if (number.isEmpty ()) {
         Q_WARN("Cannot dial empty number.");
+        m_mixPanel.addEvent(m_user, "Error: Call empty number");
         return;
     }
 
     GVRegisteredNumber num;
     if (!oPhones.m_numModel->getSelectedNumber (num)) {
         Q_WARN("Couldn't get number to dial with; failed to make call.");
+        m_mixPanel.addEvent(m_user, "Error: Dial method not selected");
 
         // Roundabout way to show the CI selection UI:
         oPhones.onUserSelectPhone(num.id);
@@ -316,6 +347,7 @@ IMainWindow::onUserCall(QString number)
         // Roundabout way to show the CI selection UI:
         oPhones.onUserSelectPhone(num.id);
         // Cannot be certain that this completed in time, so just leave.
+        m_mixPanel.addEvent(m_user, "Error: Dialout method unconfigured");
         return;
     }
 
@@ -348,6 +380,10 @@ IMainWindow::onUserCall(QString number)
 void
 IMainWindow::onGvCallTaskDone()
 {
+    MixPanelEvent mixEvent;
+    mixEvent.distinct_id = m_user;
+    mixEvent.event = "Dial error";
+
     endLongTask ();
 
     AsyncTaskToken *task = (AsyncTaskToken *) QObject::sender();
@@ -361,6 +397,9 @@ IMainWindow::onGvCallTaskDone()
                        "re-login is required.").arg(dest, id));
         showStatusMessage ("Re-login required", SHOW_10SEC);
         beginLogin (m_user, m_pass);
+
+        mixEvent.properties["Error"] = "Re-login required";
+        m_mixPanel.addEvent(mixEvent);
         return;
     }
 
@@ -368,6 +407,9 @@ IMainWindow::onGvCallTaskDone()
         uiShowMessageBox ("A dial back call is in progress. If you did not "
                           "want to dial back please change the dial settings "
                           "from the qgvdial call tab");
+
+        mixEvent.properties["Error"] = "Call in progress";
+        m_mixPanel.addEvent(mixEvent);
         return;
     }
 
@@ -376,13 +418,18 @@ IMainWindow::onGvCallTaskDone()
                        "status = %3. Error reported by GV: '%4'")
                .arg(dest, id).arg(task->status)).arg(task->errorString);
 
-        if (task->errorString.isEmpty ()) {
-            showStatusMessage (QString("Failed to initiate call. Error = %1")
-                                 .arg(task->status), SHOW_10SEC);
+        QString msg;
+        if (task->errorString.isEmpty()) {
+            msg = QString("Failed to initiate call. Error = %1")
+                    .arg(task->status);
         } else {
-            showStatusMessage (QString("Google Voice error: '%1'.")
-                                 .arg(task->errorString), SHOW_10SEC);
+            msg = QString("Google Voice error: '%1'.")
+                    .arg(task->errorString);
         }
+        showStatusMessage(msg, SHOW_10SEC);
+
+        mixEvent.properties["Error"] = msg;
+        m_mixPanel.addEvent(mixEvent);
         return;
     }
 
@@ -398,11 +445,16 @@ IMainWindow::onGvCallTaskDone()
                     .arg(accessNumber, dest));
             showStatusMessage ("Dial out successful", SHOW_3SEC);
         }
+
+        mixEvent.event = "Dial out";
     } else {
         Q_DEBUG(QString("Callback initiated to id %1 to dest %2")
                 .arg(id, dest));
         showStatusMessage ("Dial back successful", SHOW_3SEC);
+        mixEvent.event = "Dial back";
     }
+
+    m_mixPanel.addEvent(mixEvent);
 }//IMainWindow::onGvCallTaskDone
 
 void
@@ -473,10 +525,14 @@ IMainWindow::onGvTextTaskDone()
         }
 
         uiFailedToSendMessage (dest, text);
+
+        m_mixPanel.addEvent(m_user, "SMS failed");
     } else {
         Q_DEBUG(QString("Successfully sent text to %1")
                 .arg(task->inParams["destination"].toString()));
         showStatusMessage ("Text sent", SHOW_3SEC);
+
+        m_mixPanel.addEvent(m_user, "SMS sent");
     }
 }//IMainWindow::onGvTextTaskDone
 

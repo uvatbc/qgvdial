@@ -31,6 +31,7 @@ Contact: yuvraaj@gmail.com
 #include "LibGvPhones.h"
 #include "LogUploader.h"
 #include "LibVmail.h"
+#include "Mixpanel.h"
 
 /*==============================================================================
  *
@@ -230,6 +231,8 @@ protected:
     QMutex      m_logMessageMutex;
     QVector <LogMessage> m_logMessages;
     QTimer      m_logMessageTimer;
+
+    MixPanel    m_mixPanel;
 
     friend class LibContacts;
     friend class LibInbox;

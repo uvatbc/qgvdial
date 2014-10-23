@@ -19,12 +19,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-import QtQuick 2.2
-import QtQuick.Controls 1.1
-import QtQuick.Layouts 1.0
+import QtQuick 2.3
+import QtQuick.Controls 1.2
 
 ApplicationWindow {
     id: appWindow
+/*
     objectName: "MainPageStack"
 
     visible: true
@@ -94,15 +94,6 @@ ApplicationWindow {
         smsPage.smsText      = text;
         pageStack.push(smsPage);
     }
-    /*
-    function showWebPage(url) {
-        webPage.loadUrl(url);
-        pageStack.push(webPage);
-    }
-    function hideWebPage() {
-        popPageStack();
-    }
-    */
 
     property bool _inboxDetailsShown: false
 
@@ -158,13 +149,6 @@ ApplicationWindow {
         objectName: "SmsPage"
         onDone: { appWindow.popPageStack(); }
     }
-
-/*
-    WebPage {
-        id: webPage
-        objectName: "WebPage"
-    }
-*/
 
     MainPage {
         id: mainPage
@@ -241,4 +225,5 @@ ApplicationWindow {
             bottomMargin: 110 //commonTools.height + 5
         }
     }
+*/
 }

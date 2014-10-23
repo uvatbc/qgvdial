@@ -20,6 +20,7 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "Mixpanel.h"
+#include "Lib.h"
 
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 #include <QJsonDocument>
@@ -27,9 +28,12 @@ Contact: yuvraaj@gmail.com
 #include <QtScriptEngine>
 #endif
 
-#define MAX_BATCH_SIZE 50
+#define MIXPANEL_TRACK_API "http://api.mixpanel.com/track/"
+#define MIXPANEL_BATCH_SIZE     50
+#define MIXPANEL_MAX_BATCH_SIZE 50
 
-MixPanel::MixPanel()
+MixPanel::MixPanel(QObject *parent)
+: QObject(parent)
 {
 }//MixPanel::MixPanel
 
@@ -41,6 +45,18 @@ void
 MixPanel::setToken(const QString &token)
 {
     m_token = token;
+
+#ifdef MIXPANEL_TOKEN_INVALID
+    Lib &lib = Lib::ref();
+    QString tokenPath = lib.getDbDir() + QDir::separator () + "mixpanel.token";
+    if (QFileInfo(tokenPath).exists ()) {
+        QFile tf(tokenPath);
+        if (tf.open (QIODevice::ReadOnly)) {
+            QString data = tf.readLine();
+            m_token = data.trimmed();
+        }
+    }
+#endif
 }//MixPanel::setToken
 
 void
@@ -48,14 +64,14 @@ MixPanel::addEvent(const MixPanelEvent &event)
 {
     m_eventList.append(event);
 
-    if (m_eventList.count() >= MAX_BATCH_SIZE) {
+    if (m_eventList.count() >= MIXPANEL_BATCH_SIZE) {
         batchSend();
     }
 }//MixPanel::addEvent
 
 void
 MixPanel::addEvent(const QString &distinct_id, const QString &event,
-                   QVariantMap props)
+                   QVariantMap props /* = QVariantMap() */)
 {
     MixPanelEvent newEvent;
 
@@ -113,7 +129,9 @@ MixPanel::batchSend()
     while (m_eventList.count ()) {
         QVariantList eventList;
         int i;
-        for (i = 0; (!m_eventList.isEmpty() && (i < MAX_BATCH_SIZE)); i++) {
+        for (i = 0; (!m_eventList.isEmpty() && (i < MIXPANEL_MAX_BATCH_SIZE));
+             i++)
+        {
             MixPanelEvent mixEvent = m_eventList.takeFirst();
             revertMixList.append(mixEvent);
 
@@ -123,7 +141,7 @@ MixPanel::batchSend()
                 quint64 sec = mixEvent.time.toMSecsSinceEpoch() / 1000;
                 mixEvent.properties["time"] = sec;
             }
-            if (mixEvent.distinct_id.isEmpty()) {
+            if (!mixEvent.distinct_id.isEmpty()) {
                 mixEvent.properties["distinct_id"] = mixEvent.distinct_id;
             }
 
@@ -135,22 +153,29 @@ MixPanel::batchSend()
             eventList.append(varEvent);
         }
 
+        Q_ASSERT(i != 0);
+
         QByteArray json;
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
         QJsonDocument doc = QJsonDocument::fromVariant(eventList);
+#if 1
         json = doc.toJson();
+        Q_DEBUG(QString(json));
+#else
+        json = doc.toJson(QJsonDocument::Compact);
+#endif
 #else
         QScriptEngine eng;
 #endif
 
-        json = json.toBase64();
+        json = "data=" + json.toBase64();
 
         AsyncTaskToken *task = new AsyncTaskToken(this);
         if (NULL == task) {
             break;
         }
 
-        NwReqTracker *tracker = doPost(QUrl("http://api.mixpanel.com/track/"),
+        NwReqTracker *tracker = doPost(QUrl(MIXPANEL_TRACK_API),
                                        json,
                                        POST_FORM,
                                        UA_IPHONE4,
@@ -159,8 +184,12 @@ MixPanel::batchSend()
             delete task;
             break;
         }
+        connect(tracker,
+                SIGNAL(sigDone(bool,const QByteArray&,QNetworkReply*,void*)),
+                this,
+                SLOT(onBatchSendDone(bool,const QByteArray&,QNetworkReply*,void*)));
 
-        revertMixList.empty();
+        revertMixList.clear();
     }
 
     while (!revertMixList.isEmpty()) {
@@ -172,9 +201,16 @@ void
 MixPanel::onBatchSendDone(bool success, const QByteArray &response,
                           QNetworkReply *reply, void *ctx)
 {
+    AsyncTaskToken *token = (AsyncTaskToken *)ctx;
+    token->deleteLater();
+
     if (!success) {
         Q_WARN("Failed to batch send events!!");
         return;
+    }
+
+    if (response == "0") {
+        Q_WARN("Failed to send info to mixpanel");
     }
 }//MixPanel::onBatchSendDone
 
