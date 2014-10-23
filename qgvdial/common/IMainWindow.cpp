@@ -193,6 +193,7 @@ IMainWindow::loginCompleted()
 
     MixPanelEvent mEvent;
     mEvent.distinct_id = m_user;
+    mEvent.properties["os"] = Lib::ref().getOsDetails();
 
     do {
         if (ATTS_SUCCESS == task->status) {

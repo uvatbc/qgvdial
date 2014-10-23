@@ -158,7 +158,7 @@ MixPanel::batchSend()
         QByteArray json;
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
         QJsonDocument doc = QJsonDocument::fromVariant(eventList);
-#if 1
+#if 0
         json = doc.toJson();
         Q_DEBUG(QString(json));
 #else
