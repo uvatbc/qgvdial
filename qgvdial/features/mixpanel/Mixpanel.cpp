@@ -273,7 +273,7 @@ MixPanel::batchSend()
 
 void
 MixPanel::onBatchSendDone(bool success, const QByteArray &response,
-                          QNetworkReply *reply, void *ctx)
+                          QNetworkReply * /*reply*/, void *ctx)
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     token->deleteLater();
@@ -285,6 +285,8 @@ MixPanel::onBatchSendDone(bool success, const QByteArray &response,
 
     if (response == "0") {
         Q_WARN("Failed to send info to mixpanel");
+    } else {
+        Q_WARN("Info sent to mixpanel");
     }
 }//MixPanel::onBatchSendDone
 
