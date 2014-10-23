@@ -366,7 +366,7 @@ GContactsApi::getContacts(AsyncTaskToken *task)
 
 void
 GContactsApi::onGotContactsFeed(bool success, const QByteArray &response,
-                                QNetworkReply * /*reply*/, void *ctx)
+                                QNetworkReply *reply, void *ctx)
 {
     AsyncTaskToken *task = (AsyncTaskToken *) ctx;
 
@@ -374,6 +374,27 @@ GContactsApi::onGotContactsFeed(bool success, const QByteArray &response,
         if (!success) {
             Q_WARN("Failed to get contacts feed");
             task->status = ATTS_NW_ERROR;
+
+            if (QNetworkReply::AuthenticationRequiredError == reply->error ()) {
+                // Begin relink, but this refresh is dead.
+                AsyncTaskToken *relink = new AsyncTaskToken(this);
+                if (!relink) {
+                    Q_WARN("Failed to allocate relink task");
+                    break;
+                }
+
+                Q_DEBUG("Relinking contacts OAuth");
+
+                connect(relink, SIGNAL(completed()),
+                        relink, SLOT(deleteLater()));
+
+                relink->inParams["user"] = m_user;
+                if (!this->login (relink)) {
+                    Q_WARN("Failed to even begin relink process!");
+                    delete relink;
+                }
+            }
+
             break;
         }
 

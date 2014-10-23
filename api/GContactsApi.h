@@ -80,7 +80,7 @@ private:
     //! The network manager for contacts API
     QNetworkAccessManager nwMgr;
 
-    //! User name and password (may be application specific)
+    //! User name
     QString m_user;
 
     //! The authentication string returned by the contacts API.
