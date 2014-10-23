@@ -55,6 +55,18 @@ system($cmd);
 
 # NO Cipher replacement for Maemo: The source is publicly available.
 
+# Mixpanel replacement
+open my $mixpanel_token_file, '<', "mixpanel.token";
+my $mixpanel_token = <$mixpanel_token_file>;
+close $mixpanel_token_file;
+chomp $mixpanel_token;
+$cmd = "perl version.pl __MY_MIXPANEL_TOKEN__ '$mixpanel_token' $basedir";
+print "$cmd\n";
+system($cmd);
+$cmd = "perl version.pl MIXPANEL_TOKEN_INVALID MIXPANEL_TOKEN_VALID $basedir";
+print "$cmd\n";
+system($cmd);
+
 # Copy the client secret file to the api directory :(
 $cmd = "cd $basedir/api ; cp ../../client_secret_284024172505-2go4p60orvjs7hdmcqpbblh4pr5thu79.apps.googleusercontent.com.json .";
 print "$cmd\n";
