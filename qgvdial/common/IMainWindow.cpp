@@ -193,7 +193,9 @@ IMainWindow::loginCompleted()
 
     MixPanelEvent mEvent;
     mEvent.distinct_id = m_user;
+    mEvent.distinct_id = mEvent.distinct_id.toLower ();
     mEvent.properties["os"] = Lib::ref().getOsDetails();
+    mEvent.properties["version"] = "__QGVDIAL_VERSION__";
 
     do {
         if (ATTS_SUCCESS == task->status) {
