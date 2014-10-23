@@ -22,6 +22,8 @@ Contact: yuvraaj@gmail.com
 #ifndef _MIXPANEL_H_
 #define _MIXPANEL_H_
 
+#include "global.h"
+
 struct MixPanelEvent
 {
     QDateTime   time;
