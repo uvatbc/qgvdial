@@ -5,6 +5,7 @@ include(../features/openssl/openssl-lin.pri)
 include(../features/tp/linux/tp.pri)
 include(../features/osver/desktop/linux/osv-linux.pri)
 include(../features/dbus_api/dbus_api.pri)
+include(../features/mixpanel/mixpanel.pri)
 
 INCLUDEPATH += desktop_linux
 SOURCES  += desktop_linux/PhoneFactory.cpp
