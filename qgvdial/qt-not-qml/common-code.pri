@@ -60,6 +60,7 @@ RESOURCES += $$PWD/qtnotqml.qrc
 
 include($$PWD/../common/common.pri)
 include($$PWD/../features/mqlib/mqlib.pri)
+include($$PWD/../features/mixpanel/mixpanel.pri)
 
 !blackberry {
     include($$PWD/../features/qtsingleapplication/qtsingleapplication.pri)

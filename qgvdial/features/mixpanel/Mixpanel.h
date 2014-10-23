@@ -21,4 +21,49 @@ Contact: yuvraaj@gmail.com
 
 #ifndef _MIXPANEL_H_
 #define _MIXPANEL_H_
+
+struct MixPanelEvent
+{
+    QDateTime   time;
+    QString     event;
+    QString     distinct_id;
+    QVariantMap properties;
+};
+typedef QList<MixPanelEvent> MixPanelEventList;
+
+class MixPanel : public QObject
+{
+    Q_OBJECT
+public:
+    MixPanel();
+    virtual ~MixPanel();
+
+    void setToken(const QString &token);
+
+    void addEvent(const MixPanelEvent &event);
+    void addEvent(const QString &distinct_id, const QString &event,
+                  QVariantMap props);
+
+    void flushEvents();
+
+private:
+    void batchSend();
+
+    NwReqTracker * doPost(QUrl url,
+                          QByteArray postData,
+                          const char *contentType,
+                          const char *ua,
+                          AsyncTaskToken *token);
+
+private slots:
+    void onBatchSendDone(bool success, const QByteArray &response,
+                         QNetworkReply *reply, void *ctx);
+
+private:
+    QNetworkAccessManager m_nwMgr;
+
+    QString             m_token;
+    MixPanelEventList   m_eventList;
+};
+
 #endif//_MIXPANEL_H_
