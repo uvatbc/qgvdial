@@ -90,10 +90,23 @@ PageStackWindow {
         pageStack.push(webPage);
     }
     function hideWebPage() {
-        pageStack.pop();
+        popPageStackTop();
     }
 
-    initialPage: Page {
+    function popPageStackTop() {
+        console.debug("pageStack.depth = " + pageStack.depth);
+
+        if (pageStack.depth > 1) {
+            pageStack.pop();
+        } else {
+            console.debug("No popping dammit!");
+        }
+    }
+
+    initialPage: topPage
+
+    Page {
+        id: topPage
         tools: commonTools
 
         TabGroup {
@@ -156,7 +169,7 @@ PageStackWindow {
             ToolIcon {
                 iconId: "toolbar-back";
                 visible: appWindow.pageStack.depth > 1
-                onClicked: { appWindow.pageStack.pop(); }
+                onClicked: { appWindow.popPageStackTop(); }
             }
 
             ButtonRow {
@@ -184,19 +197,19 @@ PageStackWindow {
     TfaPinPage {
         id: tfaPinDlg
         objectName: "TFAPinDialog"
-        onDone: { appWindow.pageStack.pop(); }
+        onDone: { appWindow.popPageStackTop(); }
     }//TFA Dialog
 
     RegNumberSelector {
         id: regNumberSelector
         objectName: "RegNumberSelector"
 
-        onSelected: { appWindow.pageStack.pop(); }
+        onSelected: { appWindow.popPageStackTop(); }
     }
 
     ContactDetailsPage {
         id: contactDetails
-        onDone: { appWindow.pageStack.pop(); }
+        onDone: { appWindow.popPageStackTop(); }
         onSetNumberToDial: {
             dialTab.setNumberInDisp(number);
             tabgroup.setTab(0);
@@ -207,7 +220,7 @@ PageStackWindow {
         id: inboxDetails
         objectName: "InboxDetails"
 
-        onDone: { appWindow.pageStack.pop(); }
+        onDone: { appWindow.popPageStackTop(); }
         onSetNumberToDial: {
             dialTab.setNumberInDisp(number);
             tabgroup.setTab(0);
@@ -218,19 +231,24 @@ PageStackWindow {
 
     MessageBox {
         id: msgBox
-        onDone: { appWindow.pageStack.pop(); }
+        onDone: { appWindow.popPageStackTop(); }
     }
 
     CiPhoneSelectionPage {
         id: ciPhoneSelector
         objectName: "CiPhoneSelectionPage"
-        onDone: { appWindow.pageStack.pop(); }
+        onDone: {
+            // This page pop stack spoils everything!
+            //appWindow.popPageStackTop();
+            appWindow.pageStack.clear();
+            pageStack.push(topPage);
+        }
     }
 
     SmsPage {
         id: smsPage
         objectName: "SmsPage"
-        onDone: { appWindow.pageStack.pop(); }
+        onDone: { appWindow.popPageStackTop(); }
     }
 
     WebPage {
