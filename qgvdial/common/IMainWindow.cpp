@@ -49,6 +49,11 @@ IMainWindow::IMainWindow(QObject *parent)
             this, SLOT(onLogMessagesTimer()));
     m_logMessageTimer.setSingleShot (true);
     m_logMessageTimer.start (10);
+
+    m_mixpanelTimer.setSingleShot (true);
+    connect(&m_mixpanelTimer, SIGNAL(timeout()),
+            &m_mixPanel, SLOT(flushEvents()));
+    connect(&m_mixPanel, SIGNAL(eventAdded()), this, SLOT(onMixEventAdded()));
 }//IMainWindow::IMainWindow
 
 void
@@ -658,3 +663,10 @@ IMainWindow::onUserAboutBtnClicked()
     QUrl url(ABOUT_URL);
     QDesktopServices::openUrl (url);
 }//IMainWindow::onUserAboutBtnClicked
+
+void
+IMainWindow::onMixEventAdded()
+{
+    m_mixpanelTimer.stop ();
+    m_mixpanelTimer.start (15 * 1000);
+}//IMainWindow::onMixEventAdded

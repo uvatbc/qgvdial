@@ -48,7 +48,11 @@ public:
     void addEvent(const QString &distinct_id, const QString &event,
                   QVariantMap props = QVariantMap());
 
+public slots:
     void flushEvents();
+
+signals:
+    void eventAdded();
 
 private:
     void batchSend();

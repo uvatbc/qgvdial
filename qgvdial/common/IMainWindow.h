@@ -161,6 +161,8 @@ private slots:
     void onTaskTimerTimeout();
     void onLogMessagesTimer();
 
+    void onMixEventAdded();
+
 protected:
     virtual void log(QDateTime dt, int level, const QString &strLog) = 0;
 
@@ -233,6 +235,7 @@ protected:
     QTimer      m_logMessageTimer;
 
     MixPanel    m_mixPanel;
+    QTimer      m_mixpanelTimer;
 
     friend class LibContacts;
     friend class LibInbox;

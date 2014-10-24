@@ -63,6 +63,7 @@ void
 MixPanel::addEvent(const MixPanelEvent &event)
 {
     m_eventList.append(event);
+    emit eventAdded ();
 
     if (m_eventList.count() >= MIXPANEL_BATCH_SIZE) {
         batchSend();
