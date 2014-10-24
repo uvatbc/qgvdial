@@ -65,9 +65,6 @@ chomp $mixpanel_token;
 $cmd = "perl version.pl __MY_MIXPANEL_TOKEN__ '$mixpanel_token' $basedir";
 print "$cmd\n";
 system($cmd);
-$cmd = "perl version.pl MIXPANEL_TOKEN_INVALID MIXPANEL_TOKEN_VALID $basedir";
-print "$cmd\n";
-system($cmd);
 
 # Compile it!
 $cmd = "cd qgvdial-$qver/qgvdial/qt-not-qml/desktop_windows & qmake ../desktop_windows.pro & nmake -nologo release";

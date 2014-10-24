@@ -1,6 +1,5 @@
 qgvdial (__QGVDIAL_VERSION__) unstable; urgency=low
 
-  * Q_INVOKABLEs
-  * Fixed QML
+  * Mixpanel integration and UI fixes
 
  -- Yuvraaj <yuvraaj@gmail.com>  __CHANGELOG_DATETIME__ -0700

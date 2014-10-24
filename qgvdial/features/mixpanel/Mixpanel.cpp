@@ -29,8 +29,8 @@ Contact: yuvraaj@gmail.com
 #endif
 
 #define MIXPANEL_TRACK_API "http://api.mixpanel.com/track/"
-#define MIXPANEL_BATCH_SIZE     50
-#define MIXPANEL_MAX_BATCH_SIZE 50
+#define MP_BATCH_SIZE     50
+#define MP_MAX_BATCH_SIZE 50
 
 MixPanel::MixPanel(QObject *parent)
 : QObject(parent)
@@ -46,17 +46,17 @@ MixPanel::setToken(const QString &token)
 {
     m_token = token;
 
-#ifdef MIXPANEL_TOKEN_INVALID
-    Lib &lib = Lib::ref();
-    QString tokenPath = lib.getDbDir() + QDir::separator () + "mixpanel.token";
-    if (QFileInfo(tokenPath).exists ()) {
-        QFile tf(tokenPath);
-        if (tf.open (QIODevice::ReadOnly)) {
-            QString data = tf.readLine();
-            m_token = data.trimmed();
+    if (QString(MIXPANEL_TOKEN).startsWith ("__")) {
+        QString tokenPath = Lib::ref().getDbDir() + QDir::separator ()
+                          + "mixpanel.token";
+        if (QFileInfo(tokenPath).exists ()) {
+            QFile tf(tokenPath);
+            if (tf.open (QIODevice::ReadOnly)) {
+                QString data = tf.readLine();
+                m_token = data.trimmed();
+            }
         }
     }
-#endif
 }//MixPanel::setToken
 
 void
@@ -65,7 +65,7 @@ MixPanel::addEvent(const MixPanelEvent &event)
     m_eventList.append(event);
     emit eventAdded ();
 
-    if (m_eventList.count() >= MIXPANEL_BATCH_SIZE) {
+    if (m_eventList.count() >= MP_BATCH_SIZE) {
         batchSend();
     }
 }//MixPanel::addEvent
@@ -184,9 +184,7 @@ MixPanel::batchSend()
     while (m_eventList.count ()) {
         QVariantList eventList;
         int i;
-        for (i = 0; (!m_eventList.isEmpty() && (i < MIXPANEL_MAX_BATCH_SIZE));
-             i++)
-        {
+        for (i = 0; (!m_eventList.isEmpty() && (i < MP_MAX_BATCH_SIZE)); i++) {
             MixPanelEvent mixEvent = m_eventList.takeFirst();
             revertMixList.append(mixEvent);
 
