@@ -262,6 +262,8 @@ MixPanel::batchSend()
                 this,
                 SLOT(onBatchSendDone(bool,const QByteArray&,QNetworkReply*,void*)));
 
+        task->callerCtx = new MixPanelEventList(revertMixList);
+
         revertMixList.clear();
     }
 
@@ -274,18 +276,38 @@ void
 MixPanel::onBatchSendDone(bool success, const QByteArray &response,
                           QNetworkReply * /*reply*/, void *ctx)
 {
-    AsyncTaskToken *token = (AsyncTaskToken *)ctx;
-    token->deleteLater();
+    AsyncTaskToken *task = (AsyncTaskToken *)ctx;
+    task->deleteLater();
 
-    if (!success) {
-        Q_WARN("Failed to batch send events!!");
-        return;
-    }
+    MixPanelEventList *mlist = (MixPanelEventList *) task->callerCtx;
 
-    if (response == "0") {
-        Q_WARN("Failed to send info to mixpanel");
-    } else {
-        Q_WARN("Info sent to mixpanel");
+    do {
+        if (!success) {
+            Q_WARN("Failed to batch send events!!");
+            break;
+        }
+
+        if (response == "0") {
+            Q_WARN("Failed to send info to mixpanel");
+        } else {
+            Q_WARN("Info sent to mixpanel");
+            break;
+        }
+
+        // Reinsert the data that was supposed to be sent
+        if (NULL == mlist) {
+            break;
+        }
+
+        while (!mlist->isEmpty ()) {
+            m_eventList.push_front(mlist->takeLast ());
+        }
+
+        QTimer::singleShot (10 * 1000, this, SLOT(flushEvents()));
+    } while (0);
+
+    if (NULL != mlist) {
+        delete mlist;
     }
 }//MixPanel::onBatchSendDone
 
