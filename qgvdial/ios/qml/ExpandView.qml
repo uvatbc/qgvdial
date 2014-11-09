@@ -97,9 +97,10 @@ Rectangle {
             width: parent.width - imgArrow.width - parent.spacing
             anchors.verticalCenter: parent.verticalCenter
 
-            font.pixelSize: 65
+            //font.pixelSize: 65
+            color: "white"
             smooth: true
-        }//QGVLabel (text)
+        }//Label (text)
     }//Row (arrow and text)
 
     Rectangle {
