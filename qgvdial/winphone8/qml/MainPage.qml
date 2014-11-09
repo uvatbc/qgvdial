@@ -121,6 +121,6 @@ Rectangle {
             }
         }
 
-        style: MyTabViewStyle { }
+        //style: MyTabViewStyle { }
     }//TabView
 }

@@ -5,7 +5,6 @@ MOC_DIR = moc
 OBJECTS_DIR = obj
 
 QT += qml quick widgets multimedia
-#QTPLUGIN += qsvg qjpeg
 
 SOURCES  += MainWindow.cpp \
             IosPhoneFactory.cpp \
@@ -23,7 +22,7 @@ RESOURCES += qml.qrc \
 QML_IMPORT_PATH = qml
 
 include(../common/common.pri)
-include(../features/openssl/openssl-lin.pri)
+include(../features/openssl/ios/ios-cipher.pri)
 include(../features/dirs/bb10/bb10-dirs.pri)
 include(../features/cookie-cutter/osdependent/cc-osdependent.pri)
 include(../features/osver/bb10/osv-bb10.pri)
