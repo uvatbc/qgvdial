@@ -23,7 +23,7 @@ QML_IMPORT_PATH = qml
 
 include(../common/common.pri)
 include(../features/openssl/ios/ios-cipher.pri)
-include(../features/dirs/bb10/bb10-dirs.pri)
+include(../features/dirs/ios/ios-dirs.pri)
 include(../features/cookie-cutter/osdependent/cc-osdependent.pri)
 include(../features/osver/bb10/osv-bb10.pri)
 #include(../features/mqlib/mqlib.pri)

@@ -1,0 +1,4 @@
+INCLUDEPATH += $$PWD
+
+SOURCES  += $$PWD/OSDDirs.cpp
+HEADERS  += $$PWD/OSDDirs.h

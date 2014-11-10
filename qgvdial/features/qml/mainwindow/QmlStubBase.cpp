@@ -39,6 +39,7 @@ QmlStubBase::findChild(QString name)
         return NULL;
     }
 
+/*
     if (parent->mainPageStack->objectName () == name) {
         return parent->mainPageStack;
     } else if (parent->mainTabGroup->objectName () == name) {
@@ -86,6 +87,7 @@ QmlStubBase::findChild(QString name)
     }
 
     return NULL;
+*/
 }//QmlStubBase::findChild
 
 void

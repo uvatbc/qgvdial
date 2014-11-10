@@ -71,7 +71,7 @@ Rectangle {
 
         Image {
             id: imgArrow
-            source: "qrc:/play.svg"
+            source: "qrc:/play.png"
 
             height: parent.height - 4
             width: height

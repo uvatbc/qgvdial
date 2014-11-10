@@ -44,7 +44,7 @@ CacheDbPrivate::ref() {
         cdbp_singleton->db = QSqlDatabase::addDatabase(DB_DRIVER);
         cdbp_singleton->db.setDatabaseName (path);
         if (!cdbp_singleton->db.open ()) {
-            Q_CRIT("Failed to create database object");
+            Q_CRIT(QString("Failed to create database object '%1'").arg(path));
             exit(1);
         }
 
@@ -52,7 +52,7 @@ CacheDbPrivate::ref() {
         cdbp_singleton->settings = new QSettings(path, QSettings::IniFormat,
                                                  cdbp_singleton);
         if (NULL == cdbp_singleton->settings) {
-            Q_CRIT("Failed to create settings object");
+            Q_CRIT(QString("Failed to create settings object '%1'").arg(path));
             exit(1);
         }
     }
