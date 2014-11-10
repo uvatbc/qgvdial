@@ -178,6 +178,8 @@ VmailDialog::onVmailFetched(const QString &, const QString &path, bool ok)
     ui->lblFetching->hide ();
     ui->wPlayerButtons->show ();
     ui->progressBar->show ();
+
+    win->oVmail.play ();
 }//VmailDialog::onVmailFetched
 
 void
