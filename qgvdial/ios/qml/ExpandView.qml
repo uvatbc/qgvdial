@@ -66,7 +66,7 @@ Rectangle {
             leftMargin: 3
         }
         width: parent.width
-        height: 80
+        height: 40
         spacing: 2
 
         Image {
