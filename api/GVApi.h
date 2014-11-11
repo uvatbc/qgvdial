@@ -139,6 +139,8 @@ private slots:
 private:
     bool getSystemProxies (QNetworkProxy &http, QNetworkProxy &https);
 
+    bool doGet(QUrl url, AsyncTaskToken *token, const char *ua,
+               QObject *receiver, const char *method);
     bool doGet(QUrl url, AsyncTaskToken *token, QObject *receiver,
                const char *method);
     bool doGet(const QString &strUrl, AsyncTaskToken *token, QObject *receiver,

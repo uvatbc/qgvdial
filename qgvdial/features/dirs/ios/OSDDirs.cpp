@@ -32,6 +32,21 @@ OsdDirs::getLibraryPath()
 }//OsdDirs::getLibraryPath
 
 QString
+OsdDirs::ensureLibPath(const char *dir)
+{
+    QString rv = getLibraryPath();
+    QString path = rv + "/" + dir;
+    if (!QFileInfo(path).exists()) {
+        QDir(rv).mkdir (dir);
+        Q_DEBUG(QString("Created dir '%1'").arg(path));
+    } else {
+        Q_DEBUG(QString("Returning dir '%1'").arg(path));
+    }
+
+    return path;
+}//OsdDirs::ensureLibPath
+
+QString
 OsdDirs::_getTempDir()
 {
     return QStandardPaths::writableLocation(QStandardPaths::TempLocation);
@@ -40,23 +55,13 @@ OsdDirs::_getTempDir()
 QString
 OsdDirs::_getDbDir()
 {
-    QString rv = getLibraryPath();
-    if (!QFileInfo(rv + "/data").exists()) {
-        QDir(rv).mkdir ("data");
-    }
-
-    return rv + "/data";
+    return ensureLibPath("data");
 }//OsdDirs::_getDbDir
 
 QString
 OsdDirs::_getLogsDir()
 {
-    QString rv = getLibraryPath();
-    if (!QFileInfo(rv + "/data").exists()) {
-        QDir(rv).mkdir ("data");
-    }
-
-    return rv + "/data";
+    return ensureLibPath("data");
 }//OsdDirs::_getLogsDir
 
 QString

@@ -33,6 +33,7 @@ public:
 
 private:
     QString getLibraryPath();
+    QString ensureLibPath(const char *dir);
 };
 
 #endif//OSDDIRS_H

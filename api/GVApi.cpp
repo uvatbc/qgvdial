@@ -30,11 +30,10 @@ GVApi::GVApi(bool bEmitLog, QObject *parent)
 , emitLog(bEmitLog)
 , loggedIn(false)
 , nwMgr(NULL)
-, jar(new CookieJar(NULL))
+, jar(NULL)
 , dbgAlwaysFailDialing (false)
 {
     resetNwMgr ();
-    nwMgr->setCookieJar (jar);
 }//GVApi::GVApi
 
 bool
@@ -217,15 +216,15 @@ GVApi::beautify_number (QString &strNumber)
 }//GVApi::beautify_number
 
 bool
-GVApi::doGet(QUrl url, AsyncTaskToken *token, QObject *receiver,
-             const char *method)
+GVApi::doGet(QUrl url, AsyncTaskToken *token, const char *ua,
+             QObject *receiver, const char *method)
 {
     if (!token) {
         return false;
     }
 
     QNetworkRequest req(url);
-    req.setRawHeader("User-Agent", UA_IPHONE4);
+    req.setRawHeader("User-Agent", ua);
 
     NwReqTracker::setCookies (jar, req);
 
@@ -259,6 +258,13 @@ GVApi::doGet(QUrl url, AsyncTaskToken *token, QObject *receiver,
     Q_ASSERT(rv);
 
     return rv;
+}//GVApi::doGet
+
+bool
+GVApi::doGet(QUrl url, AsyncTaskToken *token, QObject *receiver,
+             const char *method)
+{
+    return doGet(url, token, UA_IPHONE4, receiver, method);
 }//GVApi::doGet
 
 bool
@@ -544,7 +550,7 @@ GVApi::onLogin1(bool success, const QByteArray &response, QNetworkReply *reply,
         lastVal = NwHelpers::getLastQueryItemValue (oldUrl, "followup");
         if (lastVal.length () != 0) {
             NwHelpers::appendQueryItem (url, "followup", lastVal);
-        }
+        }	
 
         success = postLogin (url, token);
     } while (0);
@@ -663,11 +669,6 @@ GVApi::postLogin(QUrl url, AsyncTaskToken *token)
         }
     }
 
-    if (!found) {
-        Q_WARN("Invalid cookies. Login failed.");
-        return false;
-    }
-
     // HTTPS POST the user credentials along with the cookie values as post data
 
     QVariantMap allLoginFields;
@@ -686,6 +687,10 @@ GVApi::postLogin(QUrl url, AsyncTaskToken *token)
         allLoginFields["passive"] = "true";
     }
     if (!allLoginFields.contains ("GALX")) {
+        if (!found) {
+            Q_WARN("Invalid cookies. Login failed.");
+            return false;
+        }
         allLoginFields["GALX"] = galx.value ();
     }
 
@@ -3502,4 +3507,6 @@ GVApi::resetNwMgr()
     }
 
     nwMgr = new QNetworkAccessManager(this);
+    jar = new CookieJar(NULL);
+    nwMgr->setCookieJar(jar);
 }//GVApi::resetNwMgr
