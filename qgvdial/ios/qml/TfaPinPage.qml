@@ -28,6 +28,10 @@ Rectangle {
     property alias textPin: textTfaPin.text
     signal done(bool accepted)
 
+    onDone: {
+        g_mainwindow.onTfaPinDlg(accepted);
+    }
+
     color: "black"
     visible: false
 
@@ -47,7 +51,7 @@ Rectangle {
             id: textTfaPin
             placeholderText: "PIN"
             anchors.horizontalCenter: parent.horizontalCenter
-            width: 400
+            width: 200
             validator: IntValidator {
                 bottom: 0
                 top: 999999

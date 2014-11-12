@@ -224,7 +224,13 @@ GVApi::doGet(QUrl url, AsyncTaskToken *token, const char *ua,
     }
 
     QNetworkRequest req(url);
-    req.setRawHeader("User-Agent", ua);
+    if (NULL != ua) {
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+        req.setHeader(QNetworkRequest::UserAgentHeader, ua);
+#else
+        req.setRawHeader("User-Agent", ua);
+#endif
+    }
 
     NwReqTracker::setCookies (jar, req);
 
@@ -284,7 +290,13 @@ GVApi::doPost(QUrl url, QByteArray postData, const char *contentType,
     }
 
     QNetworkRequest req(url);
-    req.setRawHeader("User-Agent", ua);
+    if (NULL != ua) {
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+        req.setHeader(QNetworkRequest::UserAgentHeader, ua);
+#else
+        req.setRawHeader("User-Agent", ua);
+#endif
+    }
     req.setHeader (QNetworkRequest::ContentTypeHeader, contentType);
 
     NwReqTracker::setCookies (jar, req);
@@ -805,6 +817,7 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
     QString strResponse = response;
     bool accountConfigured = true;
     bool accountReviewRequested = false;
+    bool tfaRequired = false;
 
     QUrl replyUrl = reply->url ();
     QString strReplyUrl = replyUrl.toString();
@@ -825,9 +838,14 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
             break;
         }
 
+        if (strReplyUrl.contains ("SmsAuth") ||
+            strReplyUrl.contains ("SecondFactor") ||
+            strResponse.contains ("gaia_secondfactorform")) {
+            tfaRequired = true;
+        }
+
         // Check to see if 2 factor auth is expected or rquired.
-        if (!strReplyUrl.contains ("SmsAuth") &&
-            !strReplyUrl.contains ("SecondFactor")) {
+        if (!tfaRequired) {
             foreach (QNetworkCookie cookie, jar->getAllCookies ()) {
                 if (cookie.name() == "gvx") {
                     loggedIn = true;
@@ -1068,7 +1086,7 @@ bool
 GVApi::resumeTFALogin(AsyncTaskToken *token)
 {
     QNetworkCookie galx;
-    bool foundgalx = false;
+    QByteArray byGalx;
     bool rv = false;
 
     do {
@@ -1086,13 +1104,18 @@ GVApi::resumeTFALogin(AsyncTaskToken *token)
 
         foreach (galx, jar->getAllCookies ()) {
             if (galx.name () == "GALX") {
-                foundgalx = true;
+                byGalx = galx.value ();
             }
         }
 
-        if (!foundgalx) {
-            Q_WARN("Required 2 step auth but didn't find GALX");
-            break;
+        if (0 == byGalx.length ()) {
+            Q_WARN("GALX not found in cookie list");
+            if (!hiddenLoginFields.contains("GALX")) {
+                Q_WARN("Hidden login fields didn't have GALX either");
+                qDebug() << hiddenLoginFields;
+            } else {
+                byGalx = hiddenLoginFields["GALX"].toByteArray ();
+            }
         }
 
         QUrl twoFactorUrl = QUrl::fromPercentEncoding(formAction.toLatin1 ());
@@ -1101,7 +1124,9 @@ GVApi::resumeTFALogin(AsyncTaskToken *token)
         m["smsUserPin"]       = smsUserPin;
         m["smsVerifyPin"]     = "Verify";
         m["PersistentCookie"] = "yes";
-        m["GALX"]             = galx.value();
+        if (0 != byGalx.length()) {
+            m["GALX"]         = byGalx;
+        }
         NwHelpers::appendQVMap (m, hiddenLoginFields);
 
         QByteArray content = NwHelpers::createPostContent (m);
@@ -1186,7 +1211,7 @@ GVApi::getRnr(AsyncTaskToken *token)
 {
     Q_DEBUG("User authenticated, now looking for RNR.");
 
-    bool rv = doGet(GV_HTTPS_M "/i/all", token, this,
+    bool rv = doGet(QUrl(GV_HTTPS_M "/i/all"), token, this,
                     SLOT(onGotRnr(bool,const QByteArray&,QNetworkReply*,void*)));
     Q_ASSERT(rv);
 
