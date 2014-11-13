@@ -306,12 +306,17 @@ IMainWindow::onUserLogoutRequest()
 void
 IMainWindow::onLogoutDone()
 {
-    m_mixPanel.addEvent(m_user, "Logout");
-
     AsyncTaskToken *task = (AsyncTaskToken *)QObject::sender();
+
+    if (task->status != ATTS_SUCCESS) {
+        m_mixPanel.addEvent(m_user, "Logout failed");
+    } else {
+        m_mixPanel.addEvent(m_user, "Logout");
+    }
+
     uiSetUserPass (true);
     onUserLogoutDone();
-    task->deleteLater ();
+    task->deleteLater();
 }//IMainWindow::onLogoutDone
 
 void

@@ -474,7 +474,6 @@ GVApi::login(AsyncTaskToken *token)
     }
 
     QUrl url(GV_HTTP);
-
     bool rv =
     doGet(url, token, this,
           SLOT(onLogin1(bool,const QByteArray&,QNetworkReply*,void*)));
@@ -668,7 +667,7 @@ gonext:
 }//GVApi::parseHiddenLoginFields
 
 bool
-GVApi::postLogin(QUrl url, AsyncTaskToken *token)
+GVApi::postLogin(QUrl url, AsyncTaskToken *task)
 {
     QNetworkCookie galx;
     bool found = false;
@@ -689,11 +688,11 @@ GVApi::postLogin(QUrl url, AsyncTaskToken *token)
         allLoginFields[key] = hiddenLoginFields[key];
     }
 
-    allLoginFields["Email"] = token->inParams["user"];
-    allLoginFields["Passwd"] = token->inParams["pass"];
-    allLoginFields["PersistentCookie"] = "yes";
-    allLoginFields["signIn"] = "Sign+in";
-    allLoginFields["service"] = "grandcentral";
+    allLoginFields["Email"]             = task->inParams["user"];
+    allLoginFields["Passwd"]            = task->inParams["pass"];
+    allLoginFields["PersistentCookie"]  = "yes";
+    allLoginFields["signIn"]            = "Sign+in";
+    allLoginFields["service"]           = "grandcentral";
 
     if (!allLoginFields.contains ("passive")) {
         allLoginFields["passive"] = "true";
@@ -705,6 +704,7 @@ GVApi::postLogin(QUrl url, AsyncTaskToken *token)
         }
         allLoginFields["GALX"] = galx.value ();
     }
+    task->inParams["GALX"] = allLoginFields["GALX"];
 
     keys = allLoginFields.keys();
 
@@ -712,7 +712,7 @@ GVApi::postLogin(QUrl url, AsyncTaskToken *token)
             NwHelpers::createPostContent (allLoginFields, QStringList("dsh"));
 
     found =
-    doPostForm(url, content, token, this,
+    doPostForm(url, content, task, this,
                SLOT(onLogin2(bool,const QByteArray&,QNetworkReply*,void*)));
     Q_ASSERT(found);
 
@@ -838,20 +838,33 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
             break;
         }
 
-        if (strReplyUrl.contains ("SmsAuth") ||
-            strReplyUrl.contains ("SecondFactor") ||
-            strResponse.contains ("gaia_secondfactorform")) {
+#ifdef Q_OS_IOS
+        if (strResponse.contains("gaia_secondfactorform")) {
             tfaRequired = true;
         }
+#else
+        if (strReplyUrl.contains("SmsAuth") ||
+            strReplyUrl.contains("SecondFactor")) {
+            tfaRequired = true;
+        }
+#endif // Q_OS_IOS
 
         // Check to see if 2 factor auth is expected or rquired.
         if (!tfaRequired) {
-            foreach (QNetworkCookie cookie, jar->getAllCookies ()) {
+#ifdef Q_OS_IOS
+            QString user = task->inParams["user"].toString();
+            if (strResponse.contains(user, Qt::CaseInsensitive) &&
+                strResponse.contains("/voice/m/manifest")) {    // Shitty
+                loggedIn = true;
+            }
+#else
+            foreach(QNetworkCookie cookie, jar->getAllCookies()) {
                 if (cookie.name() == "gvx") {
                     loggedIn = true;
                     break;
                 }
             }
+#endif
 
             // If "gvx" was found, then we're logged in.
             if (!loggedIn) {
@@ -1083,20 +1096,20 @@ GVApi::lookForLoginErrorMessage(const QString &resp, AsyncTaskToken *task)
 }//GVApi::lookForLoginErrorMessage
 
 bool
-GVApi::resumeTFALogin(AsyncTaskToken *token)
+GVApi::resumeTFALogin(AsyncTaskToken *task)
 {
     QNetworkCookie galx;
     QByteArray byGalx;
     bool rv = false;
 
     do {
-        QString smsUserPin = token->inParams["user_pin"].toString();
+        QString smsUserPin = task->inParams["user_pin"].toString();
         if (smsUserPin.isEmpty ()) {
             Q_WARN("User didn't enter 2-step auth pin");
             break;
         }
 
-        QString formAction = token->inParams["tfaAction"].toString();
+        QString formAction = task->inParams["tfaAction"].toString();
         if (formAction.isEmpty ()) {
             Q_CRIT("Two factor auth cannot continue without the form action");
             break;
@@ -1110,11 +1123,17 @@ GVApi::resumeTFALogin(AsyncTaskToken *token)
 
         if (0 == byGalx.length ()) {
             Q_WARN("GALX not found in cookie list");
-            if (!hiddenLoginFields.contains("GALX")) {
+            if (hiddenLoginFields.contains("GALX")) {
+                byGalx = hiddenLoginFields["GALX"].toByteArray();
+            } else {
                 Q_WARN("Hidden login fields didn't have GALX either");
                 qDebug() << hiddenLoginFields;
-            } else {
-                byGalx = hiddenLoginFields["GALX"].toByteArray ();
+
+                if (task->inParams.contains("GALX")) {
+                    byGalx = task->inParams["GALX"].toByteArray();
+                } else {
+                    Q_WARN("Even the task didn't have GALX!");
+                }
             }
         }
 
@@ -1131,7 +1150,7 @@ GVApi::resumeTFALogin(AsyncTaskToken *token)
 
         QByteArray content = NwHelpers::createPostContent (m);
 
-        rv = doPostForm(twoFactorUrl, content, token, this,
+        rv = doPostForm(twoFactorUrl, content, task, this,
                         SLOT(onLogin2(bool,QByteArray,QNetworkReply*,void*)));
         Q_ASSERT(rv);
     } while (0);
@@ -1139,12 +1158,12 @@ GVApi::resumeTFALogin(AsyncTaskToken *token)
     if (!rv) {
         Q_WARN("Two factor authentication failed.");
 
-        if (token->errorString.isEmpty()) {
-            token->errorString = tr("The username or password you entered "
+        if (task->errorString.isEmpty()) {
+            task->errorString = tr("The username or password you entered "
                                     "is incorrect.");
         }
-        token->status = ATTS_LOGIN_FAILURE;
-        token->emitCompleted ();
+        task->status = ATTS_LOGIN_FAILURE;
+        task->emitCompleted ();
     }
 
     return (true);
@@ -1207,11 +1226,11 @@ GVApi::onTFAAltLoginResp(bool success, const QByteArray &response,
 }//GVApi::onTFAAltLoginResp
 
 bool
-GVApi::getRnr(AsyncTaskToken *token)
+GVApi::getRnr(AsyncTaskToken *task)
 {
     Q_DEBUG("User authenticated, now looking for RNR.");
 
-    bool rv = doGet(QUrl(GV_HTTPS_M "/i/all"), token, this,
+    bool rv = doGet(QUrl(GV_HTTPS_M "/i/all"), task, this,
                     SLOT(onGotRnr(bool,const QByteArray&,QNetworkReply*,void*)));
     Q_ASSERT(rv);
 
@@ -1222,24 +1241,24 @@ void
 GVApi::onGotRnr(bool success, const QByteArray &response, QNetworkReply *reply,
                 void *ctx)
 {
-    AsyncTaskToken *token = (AsyncTaskToken *)ctx;
+    AsyncTaskToken *task = (AsyncTaskToken *)ctx;
     QString strResponse = response;
     QString strReplyUrl = reply->url().toString();
 
     do {
         if (!success) {
-            token->status = ATTS_NW_ERROR;
+            task->status = ATTS_NW_ERROR;
             break;
         }
 
         success = false;
         int pos = strResponse.indexOf ("_rnr_se");
         if (pos == -1) {
-            if (token->outParams["attempts"].toInt() != 0) {
+            if (task->outParams["attempts"].toInt() != 0) {
                 Q_WARN("Too many attempts at relogin");
 
                 if (strReplyUrl.contains("setupMobile", Qt::CaseInsensitive)) {
-                    token->status = ATTS_SETUP_REQUIRED;
+                    task->status = ATTS_SETUP_REQUIRED;
                 }
                 break;
             }
@@ -1254,7 +1273,7 @@ GVApi::onGotRnr(bool success, const QByteArray &response, QNetworkReply *reply,
                 break;
             }
 
-            internalLogoutTask->callerCtx = token;
+            internalLogoutTask->callerCtx = task;
 
             success =
             connect(internalLogoutTask, SIGNAL(completed()),
@@ -1268,7 +1287,7 @@ GVApi::onGotRnr(bool success, const QByteArray &response, QNetworkReply *reply,
             }
 
             int attempts = 1;
-            token->outParams["attempts"] = attempts;
+            task->outParams["attempts"] = attempts;
 
             success = true;
             break;
@@ -1288,10 +1307,10 @@ GVApi::onGotRnr(bool success, const QByteArray &response, QNetworkReply *reply,
 
         rnr_se = rx.cap (1);
 
-        token->outParams["rnr_se"] = rnr_se;
-        token->status = ATTS_SUCCESS;
-        token->emitCompleted ();
-        token = NULL;
+        task->outParams["rnr_se"] = rnr_se;
+        task->status = ATTS_SUCCESS;
+        task->emitCompleted ();
+        task = NULL;
 
         success = true;
     } while (0);
@@ -1302,11 +1321,11 @@ GVApi::onGotRnr(bool success, const QByteArray &response, QNetworkReply *reply,
                         .arg(strReplyUrl, strResponse);
         Q_WARN(msg);
 
-        if (token) {
-            if (token->status == ATTS_SUCCESS) {
-                token->status = ATTS_LOGIN_FAILURE;
+        if (task) {
+            if (task->status == ATTS_SUCCESS) {
+                task->status = ATTS_LOGIN_FAILURE;
             }
-            token->emitCompleted ();
+            task->emitCompleted ();
         }
     }
 }//GVApi::onGotRnr
@@ -1349,13 +1368,20 @@ GVApi::logout(AsyncTaskToken *token)
 }//GVApi::logout
 
 void
-GVApi::onLogout(bool /*success*/, const QByteArray & /*response*/,
+GVApi::onLogout(bool success, const QByteArray & /*response*/,
                 QNetworkReply * /*reply*/, void *ctx)
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     loggedIn = false;
 
-    token->status = ATTS_SUCCESS;
+    if (!success) {
+        Q_WARN("Logout failed!");
+        token->status = ATTS_FAILURE;
+    }
+    else {
+        token->status = ATTS_SUCCESS;
+    }
+
     token->emitCompleted ();
 }//GVApi::onLogout
 

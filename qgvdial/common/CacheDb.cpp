@@ -61,6 +61,7 @@ CacheDb::init(const QString &dbDir)
         p.settings->clear ();
         p.settings->setValue (GV_S_VAR_VER, GV_SETTINGS_VER);
     }
+    bBlowAway = true;
     if (bBlowAway) {
         if (!blowAwayCache ()) {
             Q_WARN("Failed to blow away cache");
