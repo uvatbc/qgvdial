@@ -156,6 +156,8 @@ private:
     bool doPostText(QUrl url, QByteArray postData, AsyncTaskToken *token,
                     QObject *receiver, const char *method);
 
+    void updateLoggedInFlag(AsyncTaskToken *task, const QString &strResponse);
+
     // Login and two factor
     bool postLogin(QUrl url, AsyncTaskToken *token);
     bool parseHiddenLoginFields(const QString &strResponse, QVariantMap &ret);
@@ -207,7 +209,7 @@ private:
 private:
     bool emitLog;
 
-    bool loggedIn;
+    bool m_loggedIn;
     QString rnr_se;
     //! The users Google Voice number
     QString strSelfNumber;

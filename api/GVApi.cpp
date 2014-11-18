@@ -28,7 +28,7 @@ Contact: yuvraaj@gmail.com
 GVApi::GVApi(bool bEmitLog, QObject *parent)
 : QObject(parent)
 , emitLog(bEmitLog)
-, loggedIn(false)
+, m_loggedIn(false)
 , nwMgr(NULL)
 , jar(NULL)
 , dbgAlwaysFailDialing (false)
@@ -460,7 +460,7 @@ GVApi::login(AsyncTaskToken *token)
         return false;
     }
 
-    if (loggedIn) {
+    if (m_loggedIn) {
         if (rnr_se.isEmpty ()) {
             Q_WARN("User was already logged in, but there is no rnr_se!");
         } else if (emitLog) {
@@ -482,6 +482,27 @@ GVApi::login(AsyncTaskToken *token)
     return rv;
 }//GVApi::login
 
+void
+GVApi::updateLoggedInFlag(AsyncTaskToken *task, const QString &strResponse)
+{
+    m_loggedIn = false;
+
+#ifdef Q_OS_IOS
+    QString user = task->inParams["user"].toString();
+    if (strResponse.contains(user, Qt::CaseInsensitive) &&
+        strResponse.contains("/voice/m/manifest")) {    // Shitty
+        m_loggedIn = true;
+    }
+#else
+    foreach(QNetworkCookie cookie, jar->getAllCookies()) {
+        if (cookie.name() == "gvx") {
+            m_loggedIn = true;
+            break;
+        }
+    }
+#endif
+}//GVApi::updateLoggedInFlag
+
 /*
  * Parse out the login form out of the Service Login page.
  * "Fill up" the form and post it with postLogin.
@@ -499,16 +520,10 @@ GVApi::onLogin1(bool success, const QByteArray &response, QNetworkReply *reply,
             break;
         }
 
-        // We may have completed login already. Check for cookie "gvx"
-        foreach (QNetworkCookie cookie, jar->getAllCookies ()) {
-            if (cookie.name () == "gvx") {
-                loggedIn = true;
-                break;
-            }
-        }
+        // We may have completed login already. Lets find out:
+        updateLoggedInFlag (token, strResponse);
 
-        // If "gvx" was found, then we're logged in.
-        if (loggedIn) {
+        if (m_loggedIn) {
             success = getRnr (token);
             break;
         }
@@ -851,23 +866,8 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
 
         // Check to see if 2 factor auth is expected or rquired.
         if (!tfaRequired) {
-#ifdef Q_OS_IOS
-            QString user = task->inParams["user"].toString();
-            if (strResponse.contains(user, Qt::CaseInsensitive) &&
-                strResponse.contains("/voice/m/manifest")) {    // Shitty
-                loggedIn = true;
-            }
-#else
-            foreach(QNetworkCookie cookie, jar->getAllCookies()) {
-                if (cookie.name() == "gvx") {
-                    loggedIn = true;
-                    break;
-                }
-            }
-#endif
-
-            // If "gvx" was found, then we're logged in.
-            if (!loggedIn) {
+            updateLoggedInFlag (task, strResponse);
+            if (!m_loggedIn) {
                 success = false;
 
                 // Dump out cookie names
@@ -1354,7 +1354,7 @@ GVApi::logout(AsyncTaskToken *token)
         return false;
     }
 
-    if (!loggedIn) {
+    if (!m_loggedIn) {
         token->status = ATTS_NOT_LOGGED_IN;
         token->emitCompleted ();
         return true;
@@ -1372,7 +1372,7 @@ GVApi::onLogout(bool success, const QByteArray & /*response*/,
                 QNetworkReply * /*reply*/, void *ctx)
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
-    loggedIn = false;
+    m_loggedIn = false;
 
     if (!success) {
         Q_WARN("Logout failed!");
@@ -1393,7 +1393,7 @@ GVApi::getPhones(AsyncTaskToken *token)
         return false;
     }
 
-    if (!loggedIn) {
+    if (!m_loggedIn) {
         token->status = ATTS_NOT_LOGGED_IN;
         token->emitCompleted ();
         return true;
@@ -1749,7 +1749,7 @@ GVApi::getInbox(AsyncTaskToken *token)
         return true;
     }
 
-    if (!loggedIn) {
+    if (!m_loggedIn) {
         token->status = ATTS_NOT_LOGGED_IN;
         token->emitCompleted ();
         return true;
@@ -2384,7 +2384,7 @@ GVApi::callOut(AsyncTaskToken *token)
         return true;
     }
 
-    if (!loggedIn) {
+    if (!m_loggedIn) {
         token->status = ATTS_NOT_LOGGED_IN;
         token->emitCompleted ();
         return true;
@@ -2560,7 +2560,7 @@ GVApi::callBack(AsyncTaskToken *token)
         return true;
     }
 
-    if (!loggedIn) {
+    if (!m_loggedIn) {
         token->status = ATTS_NOT_LOGGED_IN;
         token->emitCompleted ();
         return true;
@@ -2755,7 +2755,7 @@ GVApi::cancelDialBack(AsyncTaskToken *token)
         return false;
     }
 
-    if (!loggedIn) {
+    if (!m_loggedIn) {
         token->status = ATTS_NOT_LOGGED_IN;
         token->emitCompleted ();
         return true;
@@ -2899,7 +2899,7 @@ GVApi::sendSms(AsyncTaskToken *token)
         return true;
     }
 
-    if (!loggedIn) {
+    if (!m_loggedIn) {
         token->status = ATTS_NOT_LOGGED_IN;
         token->emitCompleted ();
         return true;
@@ -3071,7 +3071,7 @@ GVApi::getVoicemail(AsyncTaskToken *token)
         return true;
     }
 
-    if (!loggedIn) {
+    if (!m_loggedIn) {
         token->status = ATTS_NOT_LOGGED_IN;
         token->emitCompleted ();
         return true;
@@ -3143,7 +3143,7 @@ GVApi::markInboxEntryAsRead(AsyncTaskToken *token)
         return true;
     }
 
-    if (!loggedIn) {
+    if (!m_loggedIn) {
         token->status = ATTS_NOT_LOGGED_IN;
         token->emitCompleted ();
         return true;
@@ -3229,7 +3229,7 @@ GVApi::deleteInboxEntry(AsyncTaskToken *token)
         return true;
     }
 
-    if (!loggedIn) {
+    if (!m_loggedIn) {
         token->status = ATTS_NOT_LOGGED_IN;
         token->emitCompleted ();
         return true;
@@ -3303,7 +3303,7 @@ GVApi::checkRecentInbox(AsyncTaskToken *token)
         return false;
     }
 
-    if (!loggedIn) {
+    if (!m_loggedIn) {
         token->status = ATTS_NOT_LOGGED_IN;
         token->emitCompleted ();
         return true;
