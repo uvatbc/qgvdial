@@ -90,7 +90,7 @@ Item {
             radius: 2
 
             width: inboxList.width - border.width
-            height: 100
+            height: 50
 
             property real margins: 1
 
@@ -103,8 +103,8 @@ Item {
                     verticalCenter: parent.verticalCenter
                 }
 
-                width: 70
-                height: width
+                height: parent.height * 75 / 100
+                width: height
                 fillMode: Image.PreserveAspectFit
                 smooth: true
 
@@ -135,8 +135,9 @@ Item {
 
                 clip: true
                 text: name
+                color: "white"
 
-                font.pixelSize: 45
+                //font.pixelSize: 40
                 smooth: true
             }//Label (name)
 
@@ -153,7 +154,7 @@ Item {
 
                 text: time
 
-                font.pixelSize: 25
+                font.pixelSize: entryName.font.pixelSize / 2
                 smooth: true
             }//Label (entry time)
 

@@ -34,12 +34,6 @@ Rectangle {
 
     color: "black"
     visible: false
-    
-    Label {
-        id: sizingLabel
-        visible: false
-        text: "0000"
-    }
 
     Column {
         anchors.centerIn: parent
@@ -57,7 +51,7 @@ Rectangle {
             id: textTfaPin
             placeholderText: "PIN"
             anchors.horizontalCenter: parent.horizontalCenter
-            width: sizingLabel.width * 110 / 100
+            width: parent.width * 2 / 3
 
             inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhDigitsOnly | Qt.ImhDialableCharactersOnly
             validator: IntValidator {
@@ -68,21 +62,11 @@ Rectangle {
             onAccepted: { btnSubmit.clicked(); }
         }
 
-        Row {
-            anchors.horizontalCenter: parent.horizontalCenter
-            spacing: 5
-
-            Button {
-                text: "Cancel"
-                width: (parent.width - spacing) / 2
-                onClicked: { container.done(false); }
-            }
-            Button {
-                id: btnSubmit
-                text: "Submit"
-                width: (parent.width - spacing) / 2
-                onClicked: { container.done(true); }
-            }//Button
-        }//ButtonRow
+        Button {
+            id: btnSubmit
+            text: "Submit"
+            width: (parent.width - parent.spacing) / 2
+            onClicked: { container.done(true); }
+        }//Button
     }//Column
 }//TFA Dialog

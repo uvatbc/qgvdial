@@ -74,13 +74,13 @@ Rectangle {
 
             Button {
                 text: "Cancel"
-                width: (parent.width - spacing) / 2
+                width: (parent.width - parent.spacing) / 2
                 onClicked: { container.done(false); }
             }
             Button {
                 id: btnSubmit
                 text: "Submit"
-                width: (parent.width - spacing) / 2
+                width: (parent.width - parent.spacing) / 2
                 onClicked: { container.done(true); }
             }//Button
         }//ButtonRow

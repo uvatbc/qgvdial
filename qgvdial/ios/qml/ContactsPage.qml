@@ -101,7 +101,7 @@ FocusScope {
                     id: contactImage
                     anchors.verticalCenter: parent.verticalCenter
 
-                    height: 100
+                    height: 40
                     width: height
 
                     source: imagePath ? imagePath : "qrc:/unknown_contact.png"
@@ -112,8 +112,9 @@ FocusScope {
                     anchors.verticalCenter: parent.verticalCenter
                     text: name
 
-                    font.pixelSize: 45
+                    //font.pixelSize: 25
                     smooth: true
+                    color: "white"
                 }//Label (contact name)
             }//Row (image and contact name)
 
