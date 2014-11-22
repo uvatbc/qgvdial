@@ -210,15 +210,15 @@ private:
     bool emitLog;
 
     bool m_loggedIn;
-    QString rnr_se;
+    QString m_rnr_se;
     //! The users Google Voice number
-    QString strSelfNumber;
+    QString m_strSelfNumber;
 
-    QNetworkAccessManager *nwMgr;
-    CookieJar *jar;
-    QVariantMap hiddenLoginFields;
+    QNetworkAccessManager *m_nwMgr;
+    CookieJar *m_jar;
+    QVariantMap m_hiddenLoginFields;
 
-    bool dbgAlwaysFailDialing;
+    bool m_dbgAlwaysFailDialing;
 };
 
 #endif // GVAPI_H

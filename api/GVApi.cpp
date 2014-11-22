@@ -29,9 +29,9 @@ GVApi::GVApi(bool bEmitLog, QObject *parent)
 : QObject(parent)
 , emitLog(bEmitLog)
 , m_loggedIn(false)
-, nwMgr(NULL)
-, jar(NULL)
-, dbgAlwaysFailDialing (false)
+, m_nwMgr(NULL)
+, m_jar(NULL)
+, m_dbgAlwaysFailDialing (false)
 {
     resetNwMgr ();
 }//GVApi::GVApi
@@ -232,9 +232,9 @@ GVApi::doGet(QUrl url, AsyncTaskToken *token, const char *ua,
 #endif
     }
 
-    NwReqTracker::setCookies (jar, req);
+    NwReqTracker::setCookies (m_jar, req);
 
-    QNetworkReply *reply = nwMgr->get(req);
+    QNetworkReply *reply = m_nwMgr->get(req);
     if (reply == NULL) {
         return false;
     }
@@ -243,7 +243,7 @@ GVApi::doGet(QUrl url, AsyncTaskToken *token, const char *ua,
     NwReqTracker::dumpRequestInfo (req);
 #endif
 
-    NwReqTracker *tracker = new NwReqTracker(reply, *nwMgr, token,
+    NwReqTracker *tracker = new NwReqTracker(reply, *m_nwMgr, token,
                                         NW_REPLY_TIMEOUT, emitLog, true, this);
     if (tracker == NULL) {
         reply->abort ();
@@ -251,7 +251,7 @@ GVApi::doGet(QUrl url, AsyncTaskToken *token, const char *ua,
         return false;
     }
 
-    tracker->setAutoRedirect (jar, true);
+    tracker->setAutoRedirect (m_jar, true);
     token->apiCtx = tracker;
     token->status = ATTS_SUCCESS;
 
@@ -299,9 +299,9 @@ GVApi::doPost(QUrl url, QByteArray postData, const char *contentType,
     }
     req.setHeader (QNetworkRequest::ContentTypeHeader, contentType);
 
-    NwReqTracker::setCookies (jar, req);
+    NwReqTracker::setCookies (m_jar, req);
 
-    QNetworkReply *reply = nwMgr->post(req, postData);
+    QNetworkReply *reply = m_nwMgr->post(req, postData);
     if (!reply) {
         return false;
     }
@@ -311,14 +311,14 @@ GVApi::doPost(QUrl url, QByteArray postData, const char *contentType,
 #endif
 
     NwReqTracker *tracker =
-    new NwReqTracker(reply, *nwMgr, token, NW_REPLY_TIMEOUT, emitLog, this);
+    new NwReqTracker(reply, *m_nwMgr, token, NW_REPLY_TIMEOUT, emitLog, this);
     if (!tracker) {
         reply->abort ();
         reply->deleteLater ();
         return false;
     }
 
-    tracker->setAutoRedirect (jar, true);
+    tracker->setAutoRedirect (m_jar, true);
     token->apiCtx = tracker;
     token->status = ATTS_SUCCESS;
 
@@ -407,19 +407,19 @@ GVApi::setProxySettings (bool bEnable,
 QList<QNetworkCookie>
 GVApi::getAllCookies()
 {
-    return jar->getAllCookies ();
+    return m_jar->getAllCookies ();
 }//GVApi::getAllCookies
 
 void
 GVApi::setAllCookies(QList<QNetworkCookie> cookies)
 {
-    jar->setNewCookies (cookies);
+    m_jar->setNewCookies (cookies);
 }//GVApi::setAllCookies
 
 QString
 GVApi::getSelfNumber()
 {
-    return strSelfNumber;
+    return m_strSelfNumber;
 }//GVApi::getSelfNumber
 
 void
@@ -461,13 +461,13 @@ GVApi::login(AsyncTaskToken *token)
     }
 
     if (m_loggedIn) {
-        if (rnr_se.isEmpty ()) {
+        if (m_rnr_se.isEmpty ()) {
             Q_WARN("User was already logged in, but there is no rnr_se!");
         } else if (emitLog) {
             Q_DEBUG("User was already logged in...");
         }
 
-        token->outParams["rnr_se"] = rnr_se;
+        token->outParams["rnr_se"] = m_rnr_se;
         token->status = ATTS_SUCCESS;
         token->emitCompleted ();
         return true;
@@ -494,7 +494,9 @@ GVApi::updateLoggedInFlag(AsyncTaskToken *task, const QString &strResponse)
         m_loggedIn = true;
     }
 #else
-    foreach(QNetworkCookie cookie, jar->getAllCookies()) {
+    Q_UNUSED(task); Q_UNUSED(strResponse);
+
+    foreach(QNetworkCookie cookie, m_jar->getAllCookies()) {
         if (cookie.name() == "gvx") {
             m_loggedIn = true;
             break;
@@ -528,8 +530,8 @@ GVApi::onLogin1(bool success, const QByteArray &response, QNetworkReply *reply,
             break;
         }
 
-        hiddenLoginFields.clear ();
-        if (!parseHiddenLoginFields (strResponse, hiddenLoginFields)) {
+        m_hiddenLoginFields.clear ();
+        if (!parseHiddenLoginFields (strResponse, m_hiddenLoginFields)) {
             Q_WARN("Failed to parse hidden fields");
             success = false;
             break;
@@ -576,14 +578,14 @@ GVApi::onLogin1(bool success, const QByteArray &response, QNetworkReply *reply,
         lastVal = NwHelpers::getLastQueryItemValue (oldUrl, "followup");
         if (lastVal.length () != 0) {
             NwHelpers::appendQueryItem (url, "followup", lastVal);
-        }	
+        }
 
         success = postLogin (url, token);
     } while (0);
 
     if (!success) {
         Q_WARN(QString("Login failed: %1. Hidden fields : ").arg(strResponse))
-                << hiddenLoginFields;
+                << m_hiddenLoginFields;
 
         if (token->status == ATTS_SUCCESS) {
             token->status = ATTS_LOGIN_FAILURE;
@@ -687,7 +689,7 @@ GVApi::postLogin(QUrl url, AsyncTaskToken *task)
     QNetworkCookie galx;
     bool found = false;
 
-    foreach (QNetworkCookie cookie, jar->getAllCookies ()) {
+    foreach (QNetworkCookie cookie, m_jar->getAllCookies ()) {
         if (cookie.name () == "GALX") {
             galx = cookie;
             found = true;
@@ -698,9 +700,9 @@ GVApi::postLogin(QUrl url, AsyncTaskToken *task)
     // HTTPS POST the user credentials along with the cookie values as post data
 
     QVariantMap allLoginFields;
-    QStringList keys = hiddenLoginFields.keys();
+    QStringList keys = m_hiddenLoginFields.keys();
     foreach (QString key, keys) {
-        allLoginFields[key] = hiddenLoginFields[key];
+        allLoginFields[key] = m_hiddenLoginFields[key];
     }
 
     allLoginFields["Email"]             = task->inParams["user"];
@@ -884,7 +886,7 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
                 msg += cookieNames.join ("\n");
 #else
                 msg = "Cookie names: ";
-                foreach (QNetworkCookie cookie, jar->getAllCookies ()) {
+                foreach (QNetworkCookie cookie, m_jar->getAllCookies ()) {
                     cookieNames += cookie.name();
                 }
                 msg += cookieNames.join (", ");
@@ -903,8 +905,8 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
         }
 
         // 2 factor auth is required.
-        hiddenLoginFields.clear ();
-        if (!parseHiddenLoginFields (strResponse, hiddenLoginFields)) {
+        m_hiddenLoginFields.clear ();
+        if (!parseHiddenLoginFields (strResponse, m_hiddenLoginFields)) {
             Q_WARN("Failed to parse hidden fields");
             success = false;
             break;
@@ -955,7 +957,7 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
     if (!success) {
         if (task->status == ATTS_NW_ERROR) {
         } else if (accountConfigured) {
-            Q_WARN("Login failed.") << strResponse << hiddenLoginFields;
+            Q_WARN("Login failed.") << strResponse << m_hiddenLoginFields;
 
             lookForLoginErrorMessage (strResponse, task);
 
@@ -976,8 +978,8 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
             task->status = ATTS_AC_NOT_CONFIGURED;
         }
 
-        if (jar) {
-            jar->clearAllCookies ();
+        if (m_jar) {
+            m_jar->clearAllCookies ();
         }
 
         // In all cases, emit completed
@@ -1115,7 +1117,7 @@ GVApi::resumeTFALogin(AsyncTaskToken *task)
             break;
         }
 
-        foreach (galx, jar->getAllCookies ()) {
+        foreach (galx, m_jar->getAllCookies ()) {
             if (galx.name () == "GALX") {
                 byGalx = galx.value ();
             }
@@ -1123,11 +1125,11 @@ GVApi::resumeTFALogin(AsyncTaskToken *task)
 
         if (0 == byGalx.length ()) {
             Q_WARN("GALX not found in cookie list");
-            if (hiddenLoginFields.contains("GALX")) {
-                byGalx = hiddenLoginFields["GALX"].toByteArray();
+            if (m_hiddenLoginFields.contains("GALX")) {
+                byGalx = m_hiddenLoginFields["GALX"].toByteArray();
             } else {
                 Q_WARN("Hidden login fields didn't have GALX either");
-                qDebug() << hiddenLoginFields;
+                qDebug() << m_hiddenLoginFields;
 
                 if (task->inParams.contains("GALX")) {
                     byGalx = task->inParams["GALX"].toByteArray();
@@ -1146,7 +1148,7 @@ GVApi::resumeTFALogin(AsyncTaskToken *task)
         if (0 != byGalx.length()) {
             m["GALX"]         = byGalx;
         }
-        NwHelpers::appendQVMap (m, hiddenLoginFields);
+        NwHelpers::appendQVMap (m, m_hiddenLoginFields);
 
         QByteArray content = NwHelpers::createPostContent (m);
 
@@ -1305,9 +1307,9 @@ GVApi::onGotRnr(bool success, const QByteArray &response, QNetworkReply *reply,
             break;
         }
 
-        rnr_se = rx.cap (1);
+        m_rnr_se = rx.cap (1);
 
-        task->outParams["rnr_se"] = rnr_se;
+        task->outParams["rnr_se"] = m_rnr_se;
         task->status = ATTS_SUCCESS;
         task->emitCompleted ();
         task = NULL;
@@ -1338,9 +1340,9 @@ GVApi::internalLogoutForReLogin()
 
     // User is logged out. Make sure all associated cookies are also thrown out
     // before I re-start login process.
-    if (jar) {
+    if (m_jar) {
         QList<QNetworkCookie> cookies;
-        jar->setNewCookies (cookies);
+        m_jar->setNewCookies (cookies);
     }
     login (origToken);
     token->deleteLater ();
@@ -1446,10 +1448,10 @@ GVApi::onGetPhonesQtX(AsyncTaskToken *token, const QString &json)
             warnAndLog ("Settings did not have primaryDid", json);
             break;
         }
-        strSelfNumber = jSettings.value("primaryDid").toString();
-        token->outParams["self_number"] = strSelfNumber;
+        m_strSelfNumber = jSettings.value("primaryDid").toString();
+        token->outParams["self_number"] = m_strSelfNumber;
 
-        if ("CLIENT_ONLY" == strSelfNumber) {
+        if ("CLIENT_ONLY" == m_strSelfNumber) {
             Q_WARN("This account has not been configured. No phone calls possible.");
         }
 
@@ -2369,7 +2371,7 @@ GVApi::callOut(AsyncTaskToken *token)
         return false;
     }
 
-    if (dbgAlwaysFailDialing) {
+    if (m_dbgAlwaysFailDialing) {
         Q_WARN("Fail call out for testing purposes!");
         token->status = ATTS_FAILURE;
         token->emitCompleted ();
@@ -2406,7 +2408,7 @@ GVApi::callOut(AsyncTaskToken *token)
     }
 
     QByteArray content;
-    QList<QNetworkCookie> allCookies = jar->getAllCookies ();
+    QList<QNetworkCookie> allCookies = m_jar->getAllCookies ();
     foreach (QNetworkCookie cookie, allCookies) {
         if (cookie.name () == "gvx") {
             content = "{\"gvx\":\"" + cookie.value() + "\"}";
@@ -2545,7 +2547,7 @@ GVApi::callBack(AsyncTaskToken *token)
         return false;
     }
 
-    if (dbgAlwaysFailDialing) {
+    if (m_dbgAlwaysFailDialing) {
         Q_WARN("Fail call back for testing purposes!");
         token->status = ATTS_FAILURE;
         token->emitCompleted ();
@@ -2566,7 +2568,7 @@ GVApi::callBack(AsyncTaskToken *token)
         return true;
     }
 
-    if (rnr_se.isEmpty ()) {
+    if (m_rnr_se.isEmpty ()) {
         token->status = ATTS_AC_NOT_CONFIGURED;
         token->emitCompleted ();
         return true;
@@ -2583,7 +2585,7 @@ GVApi::callBack(AsyncTaskToken *token)
     m["phoneType"]        = token->inParams["sourceType"].toString();
     m["subscriberNumber"] = token->inParams["strSelfNumber"].toString();
     m["remember"]         = zero;
-    m["_rnr_se"]          = rnr_se;
+    m["_rnr_se"]          = m_rnr_se;
 
     NwHelpers::appendQueryItems (urlContent, m);
     strContent = NwHelpers::fullyEncodedQuery (urlContent);
@@ -2761,7 +2763,7 @@ GVApi::cancelDialBack(AsyncTaskToken *token)
         return true;
     }
 
-    if (rnr_se.isEmpty ()) {
+    if (m_rnr_se.isEmpty ()) {
         token->status = ATTS_AC_NOT_CONFIGURED;
         token->emitCompleted ();
         return true;
@@ -2773,7 +2775,7 @@ GVApi::cancelDialBack(AsyncTaskToken *token)
     m["outgoingNumber"]   = "";
     m["forwardingNumber"] = "";
     m["cancelType"]       = "C2C";
-    m["_rnr_se"]          = rnr_se;
+    m["_rnr_se"]          = m_rnr_se;
 
     NwHelpers::appendQueryItems (urlContent, m);
     QString strContent = NwHelpers::fullyEncodedQuery (urlContent);
@@ -2922,7 +2924,7 @@ bool
 GVApi::doSendSms(QUrl url, AsyncTaskToken *token)
 {
     QByteArray content;
-    QList<QNetworkCookie> allCookies = jar->getAllCookies ();
+    QList<QNetworkCookie> allCookies = m_jar->getAllCookies ();
     foreach (QNetworkCookie cookie, allCookies) {
         if (cookie.name () == "gvx") {
             content = "{\"gvx\":\"" + cookie.value() + "\"}";
@@ -2974,7 +2976,7 @@ GVApi::onSendSmsX(const QString &json)
     if (!jObj.contains ("rnr_xsrf_token")) {
         warnAndLog ("rnr_xsrf_token not found", json);
     } else {
-        rnr_se = jObj.value("rnr_xsrf_token").toVariant().toString();
+        m_rnr_se = jObj.value("rnr_xsrf_token").toVariant().toString();
     }
 
     return true;
@@ -3151,7 +3153,7 @@ GVApi::markInboxEntryAsRead(AsyncTaskToken *token)
 
     // This method call needs to also be added as content data
     QString strContent = QString("messages=%1&read=1&_rnr_se=%2")
-                            .arg(token->inParams["id"].toString(), rnr_se);
+                            .arg(token->inParams["id"].toString(), m_rnr_se);
 
     QUrl url(GV_HTTPS "/b/0/inbox/mark");
     bool rv =
@@ -3211,7 +3213,7 @@ GVApi::onMarkAsRead(bool success, const QByteArray &response, QNetworkReply *,
 void
 GVApi::dbg_alwaysFailDialing(bool set /* = true*/)
 {
-    dbgAlwaysFailDialing = set;
+    m_dbgAlwaysFailDialing = set;
 }//GVApi::dbg_alwaysFailDialing
 
 bool
@@ -3237,7 +3239,7 @@ GVApi::deleteInboxEntry(AsyncTaskToken *token)
 
     // This method call needs to also be added as content data
     QString strContent = QString("messages=%1&trash=1&_rnr_se=%2")
-                            .arg(token->inParams["id"].toString(), rnr_se);
+                            .arg(token->inParams["id"].toString(), m_rnr_se);
 
 //    QUrl url(GV_HTTPS "/b/0/inbox/deleteMessages");
     QUrl url(GV_HTTPS "/inbox/deleteMessages");
@@ -3552,12 +3554,12 @@ GVApi::resetNwMgr()
         Q_DEBUG("Changing network manager");
     }
 
-    if (NULL != nwMgr) {
-        nwMgr->deleteLater ();
-        nwMgr = NULL;
+    if (NULL != m_nwMgr) {
+        m_nwMgr->deleteLater ();
+        m_nwMgr = NULL;
     }
 
-    nwMgr = new QNetworkAccessManager(this);
-    jar = new CookieJar(NULL);
-    nwMgr->setCookieJar(jar);
+    m_nwMgr = new QNetworkAccessManager(this);
+    m_jar = new CookieJar(NULL);
+    m_nwMgr->setCookieJar(m_jar);
 }//GVApi::resetNwMgr
