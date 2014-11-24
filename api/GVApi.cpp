@@ -1538,7 +1538,7 @@ GVApi::onGetPhonesQtX(AsyncTaskToken *token, const QString &json)
             break;
         }
 
-        strSelfNumber =
+        m_strSelfNumber =
         scriptEngine.evaluate("o[\"settings\"][\"primaryDid\"]").toString();
         if (scriptEngine.hasUncaughtException ()) {
             strTemp = QString ("Could not parse primaryDid from obj : %1")
@@ -1550,9 +1550,9 @@ GVApi::onGetPhonesQtX(AsyncTaskToken *token, const QString &json)
             break;
         }
 
-        token->outParams["self_number"] = strSelfNumber;
+        token->outParams["self_number"] = m_strSelfNumber;
 
-        if ("CLIENT_ONLY" == strSelfNumber) {
+        if ("CLIENT_ONLY" == m_strSelfNumber) {
             Q_WARN("This account has not been configured. No phone calls possible.");
         }
 
@@ -3004,7 +3004,7 @@ GVApi::onSendSmsX(const QString &json)
         Q_WARN(QString("Failed to parse rnr_se frrom JSON: %1").arg(json));
     }
     if ((strTemp != "undefined") && (!strTemp.isEmpty())) {
-        rnr_se = strTemp;
+        m_rnr_se = strTemp;
     }
 
     return true;
