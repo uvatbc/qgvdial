@@ -34,10 +34,11 @@ chomp $basedir;
 $basedir = "$basedir/qgvdial-$qver";
 
 # Delete any previous checkout directories
-system("rm -rf qgvdial-* qgvtp-* qgvdial_* qgvtp_*");
+system("rm -rf qgvdial-* qgvtp-* qgvdial_* qgvtp_* version.pl");
 
 $cmd = "ssh uv\@userver \"cd ~/harmattan/export/qgvdial ; svn export $repo qgvdial-$qver\"";
 system($cmd);
+system("cp $basedir/build-files/version.pl .");
 
 # Append the version to the pro file
 open(PRO_FILE, ">>$basedir/qgvdial/harmattan/harmattan.pro") || die "Cannot open pro file";

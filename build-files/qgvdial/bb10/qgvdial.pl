@@ -27,16 +27,17 @@ $svnver = $1;
 # Create the version suffix
 $qver = "$qver.$svnver";
 
-# Get the full path of the base diretory
+# Get the full path of the base directory
 my $basedir = `pwd`;
 chomp $basedir;
 $basedir = "$basedir/qgvdial-$qver";
 
 # Delete any previous checkout directories
-system("rm -rf tmp.sh qgvdial-* qgvtp-* qgvdial_* qgvtp_* qgvdial*.bar");
+system("rm -rf tmp.sh qgvdial-* qgvtp-* qgvdial_* qgvtp_* qgvdial*.bar version.pl");
 
 $cmd = "svn export $repo qgvdial-$qver";
 system($cmd);
+system("cp $basedir/build-files/version.pl .");
 
 # Version replacement
 $cmd = "perl version.pl __QGVDIAL_VERSION__ $qver $basedir";

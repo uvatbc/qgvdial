@@ -28,15 +28,16 @@ $svnver = $1;
 # Create the version suffix
 $qver = "$qver.$svnver";
 
-# Get the full path of the base diretory
+# Get the full path of the base directory
 my $basedir = `pwd`;
 chomp $basedir;
 $basedir = "$basedir/qgvdial-$qver";
 
 # Delete any previous checkout directories
-system("rm -rf qgvdial-* qgvtp-* qgvdial_* qgvtp_*");
+system("rm -rf qgvdial-* qgvtp-* qgvdial_* qgvtp_* version.pl");
 
 system("svn export $repo $basedir");
+system("cp $basedir/build-files/version.pl .");
 
 # Append the version to the pro file
 open(PRO_FILE, ">>$basedir/qgvdial/maemo/maemo.pro") || die "Cannot open pro file";

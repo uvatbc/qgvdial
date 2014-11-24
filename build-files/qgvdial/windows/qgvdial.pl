@@ -62,7 +62,7 @@ open my $mixpanel_token_file, '<', "../mixpanel.token";
 my $mixpanel_token = <$mixpanel_token_file>;
 close $mixpanel_token_file;
 chomp $mixpanel_token;
-$cmd = "perl version.pl __MY_MIXPANEL_TOKEN__ '$mixpanel_token' $basedir";
+$cmd = "cd qgvdial-$qver & perl build-files/version.pl __MY_MIXPANEL_TOKEN__ '$mixpanel_token' $basedir";
 print "$cmd\n";
 system($cmd);
 
