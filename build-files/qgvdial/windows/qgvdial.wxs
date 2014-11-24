@@ -85,14 +85,14 @@
             <Component Id="libGLESv2.dll" Guid="66F18195-A4CD-4AB2-95C6-643D58FF6D36">
                 <File Id="libGLESv2.dll" Source="__QTDIR__\bin\libGLESv2.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
-            <Component Id="icuin51.dll" Guid="BEB57FA1-456B-4F1D-B29C-756755684E61">
-                <File Id="icuin51.dll" Source="__QTDIR__\bin\icuin51.dll" KeyPath="yes" Checksum="yes"/>
+            <Component Id="icuin52.dll" Guid="BEB57FA1-456B-4F1D-B29C-756755684E61">
+                <File Id="icuin52.dll" Source="__QTDIR__\bin\icuin52.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
-            <Component Id="icuuc51.dll" Guid="46B23389-419C-48E1-98BD-567A72148635">
-                <File Id="icuuc51.dll" Source="__QTDIR__\bin\icuuc51.dll" KeyPath="yes" Checksum="yes"/>
+            <Component Id="icuuc52.dll" Guid="46B23389-419C-48E1-98BD-567A72148635">
+                <File Id="icuuc52.dll" Source="__QTDIR__\bin\icuuc52.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
-            <Component Id="icudt51.dll" Guid="EEC290F1-90A4-4839-955A-35A7A57665EA">
-                <File Id="icudt51.dll" Source="__QTDIR__\bin\icudt51.dll" KeyPath="yes" Checksum="yes"/>
+            <Component Id="icudt52.dll" Guid="EEC290F1-90A4-4839-955A-35A7A57665EA">
+                <File Id="icudt52.dll" Source="__QTDIR__\bin\icudt52.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
             <Component Id="libEGL.dll" Guid="6764CFD3-3079-4CBA-A066-A362D0658E97">
                 <File Id="libEGL.dll" Source="__QTDIR__\bin\libEGL.dll" KeyPath="yes" Checksum="yes"/>
@@ -178,9 +178,9 @@
             <ComponentRef Id="Qt5XmlPatterns.dll" />
             <ComponentRef Id="Qt5Multimedia.dll" />
             <ComponentRef Id="libGLESv2.dll" />
-            <ComponentRef Id="icuin51.dll" />
-            <ComponentRef Id="icuuc51.dll" />
-            <ComponentRef Id="icudt51.dll" />
+            <ComponentRef Id="icuin52.dll" />
+            <ComponentRef Id="icuuc52.dll" />
+            <ComponentRef Id="icudt52.dll" />
             <ComponentRef Id="libEGL.dll" />
             <ComponentRef Id="qgenericbearer.dll" />
             <ComponentRef Id="qnativewifibearer.dll" />
