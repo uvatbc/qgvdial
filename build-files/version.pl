@@ -92,7 +92,7 @@ sub action_on_entry
     if (-f $file)
     {
         $_ = $file;
-        if ( (m/.cpp$/i) || (m/.c$/i) || (m/.h$/i) || (m/.rc$/i) || (m/.iss$/i) || (m/.txt$/i) || (m/.desktop$/i) || (m/.qml$/i) || (m/.wxs$/i) || (m/.pro$/i) || (m/.desktop$/i) || (m/.xml$/i) || (m/.yaml$/i) )
+        if ( (m/.cpp$/i) || (m/.c$/i) || (m/.h$/i) || (m/.rc$/i) || (m/.iss$/i) || (m/.txt$/i) || (m/.desktop$/i) || (m/.qml$/i) || (m/.wxs$/i) || (m/.pro$/i) || (m/.desktop$/i) || (m/.xml$/i) || (m/.yaml$/i) || (m/.ui$/i) )
         {
             my $subst = "s/$srcsubst/$qver/g";
             my $cmd = "perl -pi.bak -l -e \"$subst\" $file";
