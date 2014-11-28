@@ -1,4 +1,4 @@
-	/*
+    /*
 qgvdial is a cross platform Google Voice Dialer
 Copyright (C) 2009-2014  Yuvraaj Kelkar
 
@@ -271,6 +271,17 @@ IMainWindow::loginCompleted()
 
             mEvent.event = "Login failed";
             mEvent.properties["error"] = task->errorString;
+            m_mixPanel.addEvent(mEvent);
+        } else if (ATTS_LOGIN_FAIL_SHOWURL == task->status) {
+            Q_WARN("GVApi has determined that user has to review TFA settings");
+            uiSetUserPass (true);
+            uiRequestLoginDetails();
+
+            QUrl showUrl = task->outParams["showURL"].toString();
+            uiOpenBrowser (showUrl);
+
+            mEvent.event = "Login failed";
+            mEvent.properties["error"] = "TFA review required";
             m_mixPanel.addEvent(mEvent);
         } else {
             task->errorString = QString("Login failed: %1")

@@ -833,7 +833,6 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
     AsyncTaskToken *task = (AsyncTaskToken *)ctx;
     QString strResponse = response;
     bool accountConfigured = true;
-    bool accountReviewRequested = false;
     bool tfaRequired = false;
 
     QUrl replyUrl = reply->url ();
@@ -959,14 +958,8 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
         } else if (accountConfigured) {
             Q_WARN("Login failed.") << strResponse << m_hiddenLoginFields;
 
-            lookForLoginErrorMessage (strResponse, task);
-
             task->status = ATTS_LOGIN_FAILURE;
-        }
-        else if (accountReviewRequested) {
-            task->errorString = "User login failed: Account recovery "
-                                 "requested by Google";
-            task->status = ATTS_LOGIN_FAIL_SHOWURL;
+            lookForLoginErrorMessage (strResponse, task);
         } else {
             Q_WARN("Login failed because user account was not configured.");
 
@@ -998,6 +991,18 @@ GVApi::lookForLoginErrorMessage(const QString &resp, AsyncTaskToken *task)
             span = parseDomElement (resp, "span", "id", "errormsg_0_Email");
             if (span.isEmpty ()) {
                 Q_WARN("Didn't find errormsg_0_Email");
+
+                span = parseDomElement (resp, "div", "class",
+                                        "smsauth-interstitial-reviewsettings");
+                if (span.isEmpty ()) {
+                    Q_WARN("Didn't find smsauth-interstitial-reviewsettings");
+                } else {
+                    Q_WARN("TFA settings review is required!");
+                    task->errorString = "User needs to review 2-factor "
+                                        "settings.";
+                    task->status = ATTS_LOGIN_FAIL_SHOWURL;
+                    task->outParams["showURL"] = GV_HTTPS_M;
+                }
                 break;
             }
         }
