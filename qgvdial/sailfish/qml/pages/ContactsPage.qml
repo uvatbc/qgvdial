@@ -75,23 +75,24 @@ Item {
             color: "transparent"
 
             width:  (contactsList.width - border.width)
-            height: contactImage.height + 4
+            height: 80
 
             Row {
                 anchors {
-                    left: parent.left
-                    leftMargin: 2
-                    right: parent.right
-                    rightMargin: 2
+                    verticalCenter: parent.verticalCenter
+                    horizontalCenter: parent.horizontalCenter
                 }
 
-                spacing: 2
+                height: parent.height - 10
+                width: parent.width - 4
+
+                spacing: 10
 
                 Image {
                     id: contactImage
                     anchors.verticalCenter: parent.verticalCenter
 
-                    height: 100
+                    height: parent.height
                     width: height
 
                     source: imagePath ? imagePath : "qrc:/unknown_contact.png"
@@ -102,7 +103,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     text: name
 
-                    font.pixelSize: 45
+                    font.pixelSize: 35
                     smooth: true
                 }//Label (contact name)
             }//Row (image and contact name)

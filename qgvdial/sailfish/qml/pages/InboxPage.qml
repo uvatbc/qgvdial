@@ -48,6 +48,7 @@ Item {
 
         anchors {
             top: parent.top
+            horizontalCenter: parent.horizontalCenter
         }
         width: parent.width
 
@@ -102,7 +103,7 @@ Item {
             radius: 2
 
             width: inboxList.width - border.width
-            height: 100
+            height: 70
 
             property real margins: 1
 
@@ -115,7 +116,7 @@ Item {
                     verticalCenter: parent.verticalCenter
                 }
 
-                width: 70
+                width: 50
                 height: width
                 fillMode: Image.PreserveAspectFit
                 smooth: true
@@ -148,7 +149,7 @@ Item {
                 clip: true
                 text: name
 
-                font.pixelSize: 45
+                font.pixelSize: 35
                 smooth: true
             }//Label (name)
 
@@ -165,7 +166,7 @@ Item {
 
                 text: time
 
-                font.pixelSize: 25
+                font.pixelSize: 18
                 smooth: true
             }//Label (entry time)
 
