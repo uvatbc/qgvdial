@@ -303,6 +303,7 @@ MixPanel::onBatchSendDone(bool success, const QByteArray &response,
             m_eventList.push_front(mlist->takeLast ());
         }
 
+        // Retry after 10 seconds
         QTimer::singleShot (10 * 1000, this, SLOT(flushEvents()));
     } while (0);
 

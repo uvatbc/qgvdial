@@ -716,6 +716,25 @@ MainWindow::uiShowMessageBox(const QString &msg)
 }//MainWindow::uiShowMessageBox
 
 void
+MainWindow::uiShowMessageBox(const QString &msg, void *ctx)
+{
+    QMessageBox *dlg = new QMessageBox(m_view);
+    m_MapCtxToDlg[ctx] = dlg;
+    dlg->setText (msg);
+    dlg->show();
+}//MainWindow::uiShowMessageBox
+
+void
+MainWindow::uiHideMessageBox(void *ctx)
+{
+    QMessageBox *dlg = (QMessageBox *) m_MapCtxToDlg[ctx];
+    if (dlg) {
+        dlg->deleteLater();
+        m_MapCtxToDlg.remove (ctx);
+    }
+}//MainWindow::uiHideMessageBox
+
+void
 MainWindow::uiFailedToSendMessage(const QString &dest, const QString &text)
 {
     ContactInfo cinfo;

@@ -29,6 +29,7 @@ LibInbox::LibInbox(IMainWindow *parent)
 : QObject(parent)
 , m_inboxModel(NULL)
 , m_enableTimerUpdate(false)
+, m_reportUpdateFrequency(true) // Always report the frequency at the start
 {
     connect (&parent->gvApi,
              SIGNAL(oneInboxEntry(AsyncTaskToken*,GVInboxEntry)),
@@ -163,6 +164,17 @@ LibInbox::onRefreshDone()
     IMainWindow *win = (IMainWindow *) this->parent ();
     AsyncTaskToken *task = (AsyncTaskToken *) QObject::sender ();
     QString selection = task->inParams["initialType"].toString();
+
+    if (m_reportUpdateFrequency) {
+        m_reportUpdateFrequency = false;
+
+        MixPanelEvent mEvent;
+        mEvent.distinct_id = win->m_user;
+        mEvent.distinct_id = mEvent.distinct_id.toLower ();
+        mEvent.event = "Inbox refresh";
+        mEvent.properties["frequency"] = win->db.getContactsUpdateFreq ();
+        win->m_mixPanel.addEvent(mEvent);
+    }
 
     win->db.setQuickAndDirty (false);
 
@@ -410,6 +422,8 @@ LibInbox::setUpdateFrequency(quint32 mins)
     if (m_enableTimerUpdate) {
         win->db.setInboxUpdateFreq (mins);
         m_updateTimer.start ();
+
+        m_reportUpdateFrequency = true;
     }
 
     Q_DEBUG(QString("Update at %1 minute intervals set%2")

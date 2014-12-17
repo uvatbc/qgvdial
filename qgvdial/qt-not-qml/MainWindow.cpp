@@ -861,6 +861,7 @@ MainWindow::uiHideMessageBox(void *ctx)
     QMessageBox *dlg = (QMessageBox *) m_MapCtxToDlg[ctx];
     if (dlg) {
         dlg->deleteLater();
+        m_MapCtxToDlg.remove (ctx);
     }
 }//MainWindow::uiHideMessageBox
 

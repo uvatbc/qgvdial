@@ -177,6 +177,18 @@ DummyMainWindow::uiShowMessageBox(const QString &msg)
 }//DummyMainWindow::uiShowMessageBox
 
 void
+DummyMainWindow::uiShowMessageBox(const QString & /*msg*/, void * /*ctx*/)
+{
+    Q_ASSERT(0 == "Not implemented");
+}//DummyMainWindow::uiShowMessageBox
+
+void
+DummyMainWindow::uiHideMessageBox(void * /*ctx*/)
+{
+    Q_ASSERT(0 == "Not implemented");
+}//DummyMainWindow::uiHideMessageBox
+
+void
 DummyMainWindow::uiFailedToSendMessage(const QString & /*destination*/,
                                        const QString & /*text*/)
 {

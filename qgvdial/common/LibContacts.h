@@ -90,6 +90,7 @@ protected:
 
     QTimer      m_updateTimer;
     bool        m_enableTimerUpdate;
+    bool        m_reportUpdateFrequency;
 
     QMutex      m_photoMutex;
     PhotoLinkList m_noPhotos;

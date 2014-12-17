@@ -63,7 +63,10 @@ protected:
 
     virtual void uiShowStatusMessage(const QString &msg, quint64 millisec);
     virtual void uiClearStatusMessage();
+
     virtual void uiShowMessageBox(const QString &msg);
+    virtual void uiShowMessageBox(const QString &msg, void *ctx);
+    virtual void uiHideMessageBox(void *ctx);
 
     virtual void uiFailedToSendMessage(const QString &destination,
                                        const QString &text);

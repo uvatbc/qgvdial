@@ -49,7 +49,10 @@ protected slots:
 
     void uiShowStatusMessage(const QString &msg, quint64 millisec);
     void uiClearStatusMessage();
+
     void uiShowMessageBox(const QString &msg);
+    void uiShowMessageBox(const QString &msg, void *ctx);
+    void uiHideMessageBox(void *ctx);
 
     Q_INVOKABLE void onLoginButtonClicked();
 
@@ -139,6 +142,9 @@ private:
     QWebView *m_webView;
 
     bool     m_inboxDetailsShown;
+
+    // For saving ctx to dialog mapping for uiShowMessageBox,uiHideMessageBox
+    QMap<void *, void*> m_MapCtxToDlg;
 
 #ifdef DBUS_API
 protected:

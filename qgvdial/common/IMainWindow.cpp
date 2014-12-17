@@ -421,8 +421,6 @@ IMainWindow::onBrowserDialbackMsgTimeout()
 void
 IMainWindow::onGvCallTaskDone()
 {
-    uiHideMessageBox ((void*) BROWSER_DIALBACK_CTX_VALUE);
-
     MixPanelEvent mixEvent;
     mixEvent.distinct_id = m_user;
     mixEvent.event = "Dial error";
@@ -435,43 +433,40 @@ IMainWindow::onGvCallTaskDone()
     QString id = task->outParams["id"].toString();
     QString dest = task->inParams["destination"].toString();
 
-    if (ATTS_NOT_LOGGED_IN == task->status) {
-        Q_WARN(QString("Failed to initiate call to %1 using id %2 because a "
-                       "re-login is required.").arg(dest, id));
-        showStatusMessage ("Re-login required", SHOW_10SEC);
-        beginLogin (m_user, m_pass);
-
-        mixEvent.properties["Error"] = "Re-login required";
-        m_mixPanel.addEvent(mixEvent);
-        return;
-    }
-
-    if (ATTS_IN_PROGRESS == task->status) {
-        uiShowMessageBox ("A dial back call is in progress. If you did not "
-                          "want to dial back please change the dial settings "
-                          "from the qgvdial call tab");
-
-        mixEvent.properties["Error"] = "Call in progress";
-        m_mixPanel.addEvent(mixEvent);
-        return;
-    }
-
     if (ATTS_SUCCESS != task->status) {
-        Q_WARN(QString("Failed to initiate call to %1 using id %2. "
-                       "status = %3. Error reported by GV: '%4'")
-               .arg(dest, id).arg(task->status)).arg(task->errorString);
+        uiHideMessageBox ((void*) BROWSER_DIALBACK_CTX_VALUE);
 
-        QString msg;
-        if (task->errorString.isEmpty()) {
-            msg = QString("Failed to initiate call. Error = %1")
-                    .arg(task->status);
+        if (ATTS_NOT_LOGGED_IN == task->status) {
+            Q_WARN(QString("Failed to initiate call to %1 using id %2 because "
+                           "a re-login is required.").arg(dest, id));
+            showStatusMessage ("Re-login required", SHOW_10SEC);
+            beginLogin (m_user, m_pass);
+
+            mixEvent.properties["Error"] = "Re-login required";
+        } else if (ATTS_IN_PROGRESS == task->status) {
+            uiShowMessageBox ("A dial back call is in progress. If you did not "
+                              "want to dial back please change the dial "
+                              "settings from the qgvdial call tab");
+
+            mixEvent.properties["Error"] = "Call in progress";
         } else {
-            msg = QString("Google Voice error: '%1'.")
-                    .arg(task->errorString);
-        }
-        showStatusMessage(msg, SHOW_10SEC);
+            Q_WARN(QString("Failed to initiate call to %1 using id %2. "
+                           "status = %3. Error reported by GV: '%4'")
+                   .arg(dest, id).arg(task->status)).arg(task->errorString);
 
-        mixEvent.properties["Error"] = msg;
+            QString msg;
+            if (task->errorString.isEmpty()) {
+                msg = QString("Failed to initiate call. Error = %1")
+                        .arg(task->status);
+            } else {
+                msg = QString("Google Voice error: '%1'.")
+                        .arg(task->errorString);
+            }
+            showStatusMessage(msg, SHOW_10SEC);
+
+            mixEvent.properties["Error"] = msg;
+        }
+
         m_mixPanel.addEvent(mixEvent);
         return;
     }

@@ -72,6 +72,7 @@ protected:
     QTimer      m_modelRefreshTimer;
     QTimer      m_updateTimer;
     bool        m_enableTimerUpdate;
+    bool        m_reportUpdateFrequency;
 };
 
 #endif // LIBINBOX_H

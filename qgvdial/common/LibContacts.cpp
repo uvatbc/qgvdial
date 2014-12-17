@@ -31,6 +31,7 @@ Contact: yuvraaj@gmail.com
 LibContacts::LibContacts(IMainWindow *parent)
 : QObject(parent)
 , m_enableTimerUpdate(false)
+, m_reportUpdateFrequency(true) // Always report the frequency at the start
 , m_photoMutex(QMutex::Recursive)
 , m_simutaneousPhotoDownloads(0)
 , m_isFirstRefresh(true)
@@ -248,10 +249,22 @@ LibContacts::afterFirstRefresh()
 void
 LibContacts::onContactsFetched()
 {
+    IMainWindow *win = (IMainWindow *) this->parent ();
+
     AsyncTaskToken *task = (AsyncTaskToken *) QObject::sender ();
     task->deleteLater ();
 
-    IMainWindow *win = (IMainWindow *) this->parent ();
+    if (m_reportUpdateFrequency) {
+        m_reportUpdateFrequency = false;
+
+        MixPanelEvent mEvent;
+        mEvent.distinct_id = win->m_user;
+        mEvent.distinct_id = mEvent.distinct_id.toLower ();
+        mEvent.event = "Contacts refresh";
+        mEvent.properties["frequency"] = win->db.getInboxUpdateFreq ();
+        win->m_mixPanel.addEvent(mEvent);
+    }
+
     win->db.setQuickAndDirty (false);
 
     if (ATTS_SUCCESS != task->status) {
@@ -598,6 +611,8 @@ LibContacts::setUpdateFrequency(quint32 mins)
     if (m_enableTimerUpdate) {
         win->db.setContactsUpdateFreq (mins);
         m_updateTimer.start ();
+
+        m_reportUpdateFrequency = true;
     }
 
     Q_DEBUG(QString("Update at %1 minute intervals set%2")
