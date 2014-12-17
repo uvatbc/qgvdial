@@ -1,5 +1,9 @@
 qgvdial (__QGVDIAL_VERSION__) unstable; urgency=low
 
-  * Mixpanel integration and UI fixes
+  * Changes to make IOS work
+  * Sailfish: UI improvements. Cover page sync action
+  * all: Logout now clears out all cached info
+  * bb10: TFA page UI screwup fixed
+  * More reasonable mixpanel events
 
  -- Yuvraaj <yuvraaj@gmail.com>  __CHANGELOG_DATETIME__ -0700
