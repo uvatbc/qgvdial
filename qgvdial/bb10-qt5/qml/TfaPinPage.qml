@@ -37,7 +37,7 @@ Rectangle {
 
     Column {
         anchors.centerIn: parent
-        width: parent.width
+        width: parent.width * 4 / 5 // 80 %
         spacing: 5
 
         Label {
