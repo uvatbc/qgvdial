@@ -24,6 +24,8 @@ Contact: yuvraaj@gmail.com
 #include "GVNumModel.h"
 #include <QDesktopServices>
 
+#define BROWSER_DIALBACK_CTX_VALUE 0x3456
+
 IMainWindow::IMainWindow(QObject *parent)
 : QObject(parent)
 , db(this)
@@ -386,6 +388,15 @@ IMainWindow::onUserCall(QString number)
     task->inParams["source"] = num.number;
     task->outParams["id"] = num.id;
 
+    if (num.number.contains('@')) {
+        // Warn the user that this will result in a dialback to gmail
+        uiShowMessageBox ("Browser based callback initiated.\n"
+                          "Please make sure your browser is open and ready.",
+                          (void*)BROWSER_DIALBACK_CTX_VALUE);
+        QTimer::singleShot (10 * 1000,
+                            this, SLOT(onBrowserDialbackMsgTimeout()));
+    }
+
     bool rv;
     if (num.dialBack) {
         task->inParams["sourceType"] = QString(num.chType);
@@ -402,8 +413,16 @@ IMainWindow::onUserCall(QString number)
 }//IMainWindow::onUserCall
 
 void
+IMainWindow::onBrowserDialbackMsgTimeout()
+{
+    uiHideMessageBox ((void*) BROWSER_DIALBACK_CTX_VALUE);
+}//IMainWindow::onBrowserDialbackMsgTimeout
+
+void
 IMainWindow::onGvCallTaskDone()
 {
+    uiHideMessageBox ((void*) BROWSER_DIALBACK_CTX_VALUE);
+
     MixPanelEvent mixEvent;
     mixEvent.distinct_id = m_user;
     mixEvent.event = "Dial error";

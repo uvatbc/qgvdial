@@ -131,33 +131,57 @@ class IMainWindow : public QObject
     Q_OBJECT
 public:
     explicit IMainWindow(QObject *parent = 0);
+
+public:
     virtual void init() = 0;
+protected slots:
+    void onInitDone();
+    void onQuit();
+
+protected:
+    virtual void uiRequestLoginDetails() = 0;
+    virtual void uiSetUserPass(bool editable) = 0;
+    void beginLogin(QString user, QString pass);
+    virtual void uiRequestTFALoginDetails(void *ctx) = 0;
+protected slots:
+    void resumeTFAAuth(void *ctx, int pin, bool useAlt);
+private slots:
+    void onTFARequest(AsyncTaskToken *task);
+    void loginCompleted();
+protected:
+    virtual void uiLoginDone(int status, const QString &errStr) = 0;
+
+protected slots:
+    void onUserLogoutRequest();
+private slots:
+    void onLogoutDone();
+protected:
+    virtual void onUserLogoutDone() = 0;
+
+protected:
+    virtual void uiOpenBrowser(const QUrl &url) = 0;
+    virtual void uiCloseBrowser() = 0;
 
 public slots:
     Q_INVOKABLE void onUserCall(QString number);
-    void onUserSendSMS (QStringList arrNumbers, QString strText);
+private slots:
+    void onBrowserDialbackMsgTimeout();
+    void onGvCallTaskDone();
 
+public slots:
+    void onUserSendSMS (QStringList arrNumbers, QString strText);
+private slots:
+    void onGvTextTaskDone();
+
+public slots:
     QStringList getTextsByContact(const QString &strContact);
     QStringList getTextsByDate(QDateTime dtStart, QDateTime dtEnd);
 
 protected slots:
-    void onInitDone();
-    void resumeTFAAuth(void *ctx, int pin, bool useAlt);
-    void onQuit();
-
-    void onUserLogoutRequest();
     void onUserProxyRevert();
-
     void onUserAboutBtnClicked();
 
 private slots:
-    void onTFARequest(AsyncTaskToken *task);
-    void loginCompleted();
-    void onLogoutDone();
-
-    void onGvCallTaskDone();
-    void onGvTextTaskDone();
-
     void onTaskTimerTimeout();
     void onLogMessagesTimer();
 
@@ -165,18 +189,6 @@ private slots:
 
 protected:
     virtual void log(QDateTime dt, int level, const QString &strLog) = 0;
-
-    virtual void uiRequestLoginDetails() = 0;
-    virtual void uiRequestTFALoginDetails(void *ctx) = 0;
-    virtual void uiSetUserPass(bool editable) = 0;
-
-    void beginLogin(QString user, QString pass);
-    virtual void uiLoginDone(int status, const QString &errStr) = 0;
-
-    virtual void onUserLogoutDone() = 0;
-
-    virtual void uiOpenBrowser(const QUrl &url) = 0;
-    virtual void uiCloseBrowser() = 0;
 
     virtual void uiRefreshContacts(ContactsModel *model, QString query) = 0;
     virtual void uiRefreshInbox() = 0;
@@ -203,6 +215,8 @@ protected:
     virtual void uiClearStatusMessage() = 0;
 
     virtual void uiShowMessageBox(const QString &msg) = 0;
+    virtual void uiShowMessageBox(const QString &msg, void *ctx) = 0;
+    virtual void uiHideMessageBox(void *ctx) = 0;
 
     virtual void uiFailedToSendMessage(const QString &destination,
                                        const QString &text) = 0;
@@ -213,8 +227,8 @@ protected:
     virtual void uiSetInboxUpdateFrequency(quint32 mins) = 0;
 
 protected:
-    CacheDb db;
-    GVApi   gvApi;
+    CacheDb     db;
+    GVApi       gvApi;
 
     LibContacts oContacts;
     LibInbox    oInbox;
@@ -222,12 +236,12 @@ protected:
     LogUploader oLogUploader;
     LibVmail    oVmail;
 
-    QString m_user;
-    QString m_pass;
+    QString     m_user;
+    QString     m_pass;
 
     AsyncTaskToken *m_loginTask;
 
-    QTimer  m_taskTimer;
+    QTimer      m_taskTimer;
     LongTaskInfo m_taskInfo;
 
     QMutex      m_logMessageMutex;

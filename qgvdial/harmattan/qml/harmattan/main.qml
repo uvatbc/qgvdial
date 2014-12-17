@@ -47,6 +47,11 @@ PageStackWindow {
         msgBox.message = msg;
         pageStack.push(msgBox);
     }
+    function hideMsgBox() {
+        // Its the callers responsibility to make sure that the message box is
+        // actually visible.
+        popPageStackTop();
+    }
     function showContactDetails(imgSource, name, notes) {
         contactDetails.imageSource = imgSource;
         contactDetails.name = name;

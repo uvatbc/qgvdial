@@ -254,16 +254,15 @@ LibContacts::onContactsFetched()
     IMainWindow *win = (IMainWindow *) this->parent ();
     win->db.setQuickAndDirty (false);
 
-    MixPanelEvent mixEvent;
-    mixEvent.distinct_id = win->m_user;
-    mixEvent.event = "Contacts refresh";
-
     if (ATTS_SUCCESS != task->status) {
         Q_WARN("Failed to update contacts");
 
         startNextPhoto ();
 
-        mixEvent.properties["fail"] = "true";
+        MixPanelEvent mixEvent;
+        mixEvent.distinct_id = win->m_user;
+        mixEvent.event = "Contacts refresh failed";
+        win->m_mixPanel.addEvent(mixEvent);
     } else {
         Q_DEBUG("Contacts updated.");
 
@@ -286,8 +285,6 @@ LibContacts::onContactsFetched()
         startNextPhoto ();
         win->showStatusMessage ("Contacts fetched", SHOW_3SEC);
     }
-
-    win->m_mixPanel.addEvent(mixEvent);
 
     if (m_enableTimerUpdate && (m_updateTimer.interval () >= 60)) {
         m_updateTimer.stop ();

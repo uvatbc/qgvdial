@@ -56,7 +56,10 @@ public slots:
 
     void uiShowStatusMessage(const QString &msg, quint64 millisec);
     void uiClearStatusMessage();
+
     void uiShowMessageBox(const QString &msg);
+    void uiShowMessageBox(const QString &msg, void *ctx);
+    void uiHideMessageBox(void *ctx);
 
 protected:
     void uiUpdateProxySettings(const ProxyInfo &info);
@@ -119,12 +122,15 @@ protected slots:
 private:
     MainWindowPrivate *d;
 
-    QWebView        *m_webView;
+    QWebView       *m_webView;
 
-    QIcon            m_appIcon;
+    QIcon           m_appIcon;
     QSystemTrayIcon *m_systrayIcon;
 
-    bool m_ignoreCbInboxChange;
+    bool            m_ignoreCbInboxChange;
+
+    // For saving ctx to dialog mapping for uiShowMessageBox,uiHideMessageBox
+    QMap<void *, void*> m_MapCtxToDlg;
 
 #ifdef DBUS_API
 protected slots:

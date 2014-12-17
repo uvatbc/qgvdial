@@ -48,7 +48,10 @@ protected slots:
 
     void uiShowStatusMessage(const QString &msg, quint64 millisec);
     void uiClearStatusMessage();
+
     void uiShowMessageBox(const QString &msg);
+    void uiShowMessageBox(const QString &msg, void *ctx);
+    void uiHideMessageBox(void *ctx);
 
     Q_INVOKABLE void onLoginButtonClicked();
     Q_INVOKABLE void onTfaPinDlg(bool accepted);
@@ -148,9 +151,10 @@ protected:
     friend class QmlStubBase;
     QmlStubBase *m_qmlStub;
 
-    void    *loginCtx;
+    void   *m_tfaCtx;
 
-    bool     m_inboxDetailsShown;
+    bool    m_inboxDetailsShown;
+    bool    m_messageBoxShown;
 
 #ifdef DBUS_API
 protected:

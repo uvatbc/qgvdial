@@ -122,6 +122,9 @@ QmlMainWindow::QmlMainWindow(QObject *parent)
 , edContactsUpdateFreq(NULL)
 , edInboxUpdateFreq(NULL)
 , m_qmlStub(NULL)
+, m_tfaCtx(NULL)
+, m_inboxDetailsShown(false)
+, m_messageBoxShown(false)
 #ifdef DBUS_API
 , apiCall(this)
 , apiText(this)
@@ -565,7 +568,7 @@ QmlMainWindow::uiRequestLoginDetails()
 void
 QmlMainWindow::uiRequestTFALoginDetails(void *ctx)
 {
-    loginCtx = ctx;
+    m_tfaCtx = ctx;
 
     // Push the TFA dialog on to the main page
     QMetaObject::invokeMethod (mainPageStack, "pushTfaDlg");
@@ -583,9 +586,9 @@ QmlMainWindow::onTfaPinDlg(bool accepted)
 
     if (accepted) {
         if (pin == 0) {
-            resumeTFAAuth (loginCtx, pin, true);
+            resumeTFAAuth (m_tfaCtx, pin, true);
         } else {
-            resumeTFAAuth (loginCtx, pin, false);
+            resumeTFAAuth (m_tfaCtx, pin, false);
         }
     }
 }//QmlMainWindow::onTfaPinDlg
@@ -788,6 +791,23 @@ QmlMainWindow::uiShowMessageBox(const QString &msg)
     QMetaObject::invokeMethod (mainPageStack, "showMsgBox",
                                Q_ARG (QVariant, QVariant(msg)));
 }//QmlMainWindow::uiShowMessageBox
+
+void
+QmlMainWindow::uiShowMessageBox(const QString &msg, void * /*ctx*/)
+{
+    QMetaObject::invokeMethod (mainPageStack, "showMsgBox",
+                               Q_ARG (QVariant, QVariant(msg)));
+    m_messageBoxShown = true;
+}//QmlMainWindow::uiShowMessageBox
+
+void
+QmlMainWindow::uiHideMessageBox(void * /*ctx*/)
+{
+    if (m_messageBoxShown) {
+        QMetaObject::invokeMethod (mainPageStack, "hideMsgBox");
+        m_messageBoxShown = false;
+    }
+}//QmlMainWindow::uiHideMessageBox
 
 void
 QmlMainWindow::onUserTextBtnClicked(QString dest)

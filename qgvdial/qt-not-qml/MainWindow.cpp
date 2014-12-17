@@ -847,6 +847,24 @@ MainWindow::uiShowMessageBox(const QString &msg)
 }//MainWindow::uiShowMessageBox
 
 void
+MainWindow::uiShowMessageBox(const QString &msg, void *ctx)
+{
+    QMessageBox *dlg = new QMessageBox(this->d);
+    m_MapCtxToDlg[ctx] = dlg;
+    dlg->setText (msg);
+    dlg->show();
+}//MainWindow::uiShowMessageBox
+
+void
+MainWindow::uiHideMessageBox(void *ctx)
+{
+    QMessageBox *dlg = (QMessageBox *) m_MapCtxToDlg[ctx];
+    if (dlg) {
+        dlg->deleteLater();
+    }
+}//MainWindow::uiHideMessageBox
+
+void
 MainWindow::onSystrayActivated(QSystemTrayIcon::ActivationReason reason)
 {
     switch (reason) {
