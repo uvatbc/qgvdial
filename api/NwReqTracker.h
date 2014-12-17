@@ -71,7 +71,7 @@ protected slots:
     void onXferProgress(qint64 bytesReceived, qint64 bytesTotal);
 
 protected:
-    QNetworkReply  *reply;
+    QNetworkReply  *m_reply;
     QTimer          replyTimer;
 
     bool            aborted;
