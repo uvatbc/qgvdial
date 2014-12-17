@@ -77,7 +77,6 @@ LibInbox::refreshLatest(QString type)
     IMainWindow *win = (IMainWindow *) this->parent ();
 
     if (win->db.getLatestInboxEntry (latest)) {
-        IMainWindow *win = (IMainWindow *) this->parent ();
         win->showStatusMessage ("Starting inbox refresh", SHOW_3SEC);
         rv = this->refresh (type, latest);
     }
@@ -100,8 +99,30 @@ LibInbox::refreshFull()
 }//LibInbox::refreshFull
 
 bool
-LibInbox::beginRefresh(AsyncTaskToken *task, QString type, QDateTime after,
-                       int page, bool isExternal)
+LibInbox::refreshLatestNotrash()
+{
+    AsyncTaskToken *task = new AsyncTaskToken(this);
+    if (NULL == task) {
+        Q_WARN("Failed to allocate task");
+        return false;
+    }
+
+    QDateTime latest;
+    IMainWindow *win = (IMainWindow *) this->parent ();
+
+    win->db.getLatestInboxEntry (latest);
+    win->showStatusMessage ("Starting inbox refresh", SHOW_3SEC);
+
+    return (beginRefresh (task, "all", latest, 1, false, true));
+}//LibInbox::refreshLatest
+
+bool
+LibInbox::beginRefresh(AsyncTaskToken *task,
+                       QString type,
+                       QDateTime after,
+                       int page,
+                       bool isExternal, // = true
+                       bool notrash)    // = false
 {
     task->reinit ();
 
@@ -111,6 +132,10 @@ LibInbox::beginRefresh(AsyncTaskToken *task, QString type, QDateTime after,
     task->inParams["type"] = type;
     task->inParams["page"] = page;
     task->inParams["after"] = after;
+
+    if (notrash) {
+        task->inParams["notrash"] = 1;
+    }
 
     connect (task, SIGNAL(completed()), this, SLOT(onRefreshDone()));
 
@@ -201,6 +226,11 @@ LibInbox::onRefreshDone()
             msg = QString("Retrieved trash page %1").arg(page);
         } else {
             if ((page > 30) || overflow) {
+                if (task->inParams.contains ("notrash")) {
+                    task->status = ATTS_SUCCESS;
+                    break;
+                }
+
                 type = "trash";
                 page = 0;  // So that it becomes 1 on ++
                 after = QDateTime(); // Because we don't want a limit

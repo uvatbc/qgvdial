@@ -29,6 +29,7 @@ Contact: yuvraaj@gmail.com
 class ContactsModel;
 class IMainWindow;
 class ContactNumbersModel;
+class O2ContactsStore;
 
 struct PhotoLink {
     QString id;     // Contact ID
@@ -105,6 +106,7 @@ public:
     ContactsModel       *m_searchedContactsModel;
 
     ContactNumbersModel *m_contactPhonesModel;
+    O2ContactsStore     *m_contactStore;
 };
 
 #endif // LIBCONTACTS_H

@@ -43,6 +43,7 @@ public slots:
     bool refreshLatest(QString type);
     bool refreshLatest();
     bool refreshFull();
+    bool refreshLatestNotrash();
 
     Q_INVOKABLE bool markEntryAsRead(const QString &id);
     Q_INVOKABLE bool deleteEntry(const QString &id);
@@ -57,8 +58,12 @@ private slots:
     void onRefreshDone();
     void onOneInboxEntry (AsyncTaskToken *task, const GVInboxEntry &hevent);
 
-    bool beginRefresh(AsyncTaskToken *task, QString type, QDateTime after,
-                      int page, bool isExternal = true);
+    bool beginRefresh(AsyncTaskToken *task,
+                      QString type,
+                      QDateTime after,
+                      int page,
+                      bool isExternal = true,
+                      bool notrash = false);
 
     void onInboxEntryMarkedAsRead();
     void onInboxEntryDeleted();

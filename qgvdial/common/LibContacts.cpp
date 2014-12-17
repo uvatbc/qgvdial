@@ -38,6 +38,7 @@ LibContacts::LibContacts(IMainWindow *parent)
 , m_contactsModel(NULL)
 , m_searchedContactsModel(NULL)
 , m_contactPhonesModel(NULL)
+, m_contactStore(NULL)
 {
     Q_ASSERT(NULL != parent);
 
@@ -64,7 +65,8 @@ void
 LibContacts::init()
 {
     IMainWindow *win = (IMainWindow *) this->parent ();
-    api.initStore (win->db.createContactsStore ());
+    m_contactStore = win->db.createContactsStore ();
+    api.initStore (m_contactStore);
 }//LibContacts::init
 
 bool
@@ -98,6 +100,7 @@ LibContacts::logout()
 
     connect(task, SIGNAL(completed()), task, SLOT(deleteLater()));
     api.logout (task);
+    m_contactStore->logout ();
 }//LibContacts::logout
 
 void
@@ -175,6 +178,7 @@ LibContacts::refresh(QDateTime after /* = QDateTime()*/)
         win->db.setQuickAndDirty (false);
     }
 
+    win->uiShowStatusMessage ("Fetching contact updates", SHOW_INF);
     return (bval);
 }//LibContacts::refresh
 
@@ -250,6 +254,7 @@ void
 LibContacts::onContactsFetched()
 {
     IMainWindow *win = (IMainWindow *) this->parent ();
+    win->db.setQuickAndDirty (false);
 
     AsyncTaskToken *task = (AsyncTaskToken *) QObject::sender ();
     task->deleteLater ();
@@ -265,7 +270,7 @@ LibContacts::onContactsFetched()
         win->m_mixPanel.addEvent(mEvent);
     }
 
-    win->db.setQuickAndDirty (false);
+    win->uiShowStatusMessage ("Contacts fetched", SHOW_3SEC);
 
     if (ATTS_SUCCESS != task->status) {
         Q_WARN("Failed to update contacts");

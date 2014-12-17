@@ -571,6 +571,7 @@ QmlMainWindow::uiRequestTFALoginDetails(void *ctx)
     m_tfaCtx = ctx;
 
     // Push the TFA dialog on to the main page
+    tfaPinDlg->setProperty ("textPin", QString());
     QMetaObject::invokeMethod (mainPageStack, "pushTfaDlg");
 }//QmlMainWindow::uiRequestTFALoginDetails
 

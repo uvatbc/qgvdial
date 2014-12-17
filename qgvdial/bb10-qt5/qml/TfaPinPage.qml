@@ -34,12 +34,6 @@ Rectangle {
 
     color: "black"
     visible: false
-    
-    Label {
-        id: sizingLabel
-        visible: false
-        text: "0000"
-    }
 
     Column {
         anchors.centerIn: parent
@@ -57,7 +51,7 @@ Rectangle {
             id: textTfaPin
             placeholderText: "PIN"
             anchors.horizontalCenter: parent.horizontalCenter
-            width: sizingLabel.width * 110 / 100
+            width: container.width / 2
 
             inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhDigitsOnly | Qt.ImhDialableCharactersOnly
             validator: IntValidator {
@@ -71,8 +65,10 @@ Rectangle {
         Row {
             anchors.horizontalCenter: parent.horizontalCenter
             spacing: 5
+            width: parent.width
 
             Button {
+                id: btnCancel
                 text: "Cancel"
                 width: (parent.width - parent.spacing) / 2
                 onClicked: { container.done(false); }

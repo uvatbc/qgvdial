@@ -58,6 +58,7 @@ public:
     bool getTempFile(const QString &strLink, QString &strPath) const;
     bool clearTempFileByLink(const QString &strLink, bool deleteFile);
     quint32 clearTempFileByFile(const QString &strLink);
+    void deleteFilesInTempDir();
 
     void clearContacts ();
     void refreshContactsModel (ContactsModel *modelContacts,
@@ -97,20 +98,22 @@ public:
 
     bool getSelectedPhone (QString &id);
     bool putSelectedPhone (const QString &id);
+    bool clearSelectedPhone();
 
     QStringList getTextsByContact(const QString &strContact);
     QStringList getTextsByDate(QDateTime dtStart, QDateTime dtEnd);
 
     bool getCINumber(const QString &id, QString &num);
     bool setCINumber(const QString &id, const QString &num);
+    bool clearCINumbers();
 
     quint32 getContactsUpdateFreq();
     void    setContactsUpdateFreq(quint32 minutes);
-    void  clearContactsUpdateFreq();
+    void    clearContactsUpdateFreq();
 
     quint32 getInboxUpdateFreq();
     void    setInboxUpdateFreq(quint32 minutes);
-    void  clearInboxUpdateFreq();
+    void    clearInboxUpdateFreq();
 
 private:
     void cleanup_dangling_temp_ids();

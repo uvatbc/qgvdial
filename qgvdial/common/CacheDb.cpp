@@ -527,6 +527,18 @@ CacheDb::clearTempFileByFile(const QString &strFile)
     return deletions;
 }//CacheDb::clearTempFileByFile
 
+//! Delete all files in the temp directory. DOES NOT RECURSE!
+void
+CacheDb::deleteFilesInTempDir()
+{
+    Lib &lib = Lib::ref ();
+    QDir t(lib.getTempDir ());
+    QStringList l = t.entryList();
+    foreach (QString e, l) {
+        t.remove(e);
+    }
+}//CacheDb::deleteFilesInTempDir
+
 void
 CacheDb::clearContacts ()
 {
@@ -1277,6 +1289,14 @@ CacheDb::putSelectedPhone (const QString &id)
     return (true);
 }//CacheDb::putSelectedPhone
 
+bool
+CacheDb::clearSelectedPhone()
+{
+    CacheDbPrivate &p = CacheDbPrivate::ref();
+    p.settings->remove (GV_S_VAR_SELECTED_PHONE);
+    return (true);
+}//CacheDb::clearSelectedPhone
+
 QStringList
 CacheDb::getTextsByContact(const QString &strContact)
 {
@@ -1457,6 +1477,15 @@ CacheDb::setCINumber(const QString &id, const QString &num)
 
     return query.exec (strQ);
 }//CacheDb::setCINumber
+
+bool
+CacheDb::clearCINumbers()
+{
+    CacheDbPrivate &p = CacheDbPrivate::ref();
+    QSqlQuery query(p.db);
+    query.setForwardOnly (true);
+    return query.exec ("DELETE FROM " GV_CI_TABLE ";");
+}//CacheDb::clearCINumbers
 
 quint32
 CacheDb::getContactsUpdateFreq()

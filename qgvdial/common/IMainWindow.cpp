@@ -25,6 +25,7 @@ Contact: yuvraaj@gmail.com
 #include <QDesktopServices>
 
 #define BROWSER_DIALBACK_CTX_VALUE 0x3456
+#define MIXPANEL_FLUSH_TIMEOUT (60 * 1000)
 
 IMainWindow::IMainWindow(QObject *parent)
 : QObject(parent)
@@ -256,6 +257,7 @@ IMainWindow::loginCompleted()
             uiRequestLoginDetails();
             db.clearCookies ();
             oContacts.logout ();
+            gvApi.resetNwMgr ();
 
             mEvent.event = "Login failed";
             mEvent.properties["error"] = task->errorString;
@@ -266,6 +268,7 @@ IMainWindow::loginCompleted()
             uiRequestLoginDetails();
             db.clearCookies ();
             oContacts.logout ();
+            gvApi.resetNwMgr ();
 
             uiShowMessageBox ("Your Google Voice account is not set up. Please "
                               "access Google Voice from a desktop or laptop "
@@ -295,6 +298,7 @@ IMainWindow::loginCompleted()
             uiRequestLoginDetails();
             db.clearCookies ();
             oContacts.logout ();
+            gvApi.resetNwMgr ();
 
             mEvent.event = "Login failed";
             mEvent.properties["error"] = task->errorString;
@@ -327,7 +331,22 @@ IMainWindow::onLogoutDone()
         m_mixPanel.addEvent(m_user, "Logout");
     }
 
-    uiSetUserPass (true);
+    m_pass.clear ();
+    uiSetUserPass(true);
+    uiRequestLoginDetails();
+    oContacts.logout ();
+    gvApi.resetNwMgr ();
+
+    db.clearCookies ();
+    db.clearUserPass ();
+    db.clearContacts ();
+    db.clearInbox ();
+    db.clearSelectedPhone ();
+    db.clearCINumbers ();
+    db.deleteFilesInTempDir ();
+
+    Q_DEBUG("Logged out. Cleared out all cached info about user.");
+
     onUserLogoutDone();
     task->deleteLater();
 }//IMainWindow::onLogoutDone
@@ -571,6 +590,8 @@ IMainWindow::onGvTextTaskDone()
         showStatusMessage ("Text sent", SHOW_3SEC);
 
         m_mixPanel.addEvent(m_user, "SMS sent");
+
+        oInbox.refreshLatestNotrash ();
     }
 }//IMainWindow::onGvTextTaskDone
 
@@ -698,5 +719,5 @@ void
 IMainWindow::onMixEventAdded()
 {
     m_mixpanelTimer.stop ();
-    m_mixpanelTimer.start (15 * 1000);
+    m_mixpanelTimer.start (MIXPANEL_FLUSH_TIMEOUT);
 }//IMainWindow::onMixEventAdded

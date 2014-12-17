@@ -63,3 +63,9 @@ O2ContactsStore::setValue(const QString &key, const QString &value)
     m_s->setValue(key, QString (byD.toHex ()));
     m_s->endGroup ();
 }//O2ContactsStore::setValue
+
+void
+O2ContactsStore::logout()
+{
+    m_s->remove (O2_GRP);
+}//O2ContactsStore::logout
