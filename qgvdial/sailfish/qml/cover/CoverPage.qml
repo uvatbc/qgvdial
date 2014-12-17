@@ -26,22 +26,26 @@ CoverBackground {
     Label {
         id: label
         anchors.centerIn: parent
-        text: "QGVDial !"
+        text: "QGVDial!"
     }
 
-    /*
     CoverActionList {
         id: coverAction
 
         CoverAction {
-            iconSource: "image://theme/icon-cover-next"
+            iconSource: "image://theme/icon-cover-sync"
+            onTriggered: {
+                g_contacts.refreshLatest();
+                g_inbox.refreshLatest();
+            }
         }
 
+        /*
         CoverAction {
             iconSource: "image://theme/icon-cover-pause"
         }
+        */
     }
-    */
 }
 
 
