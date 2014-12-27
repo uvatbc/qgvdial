@@ -1078,11 +1078,25 @@ GVApi::lookForLoginErrorMessage(const QString &resp, AsyncTaskToken *task)
             break;
         }
 
-        // One last attempt at figuring out the response:
+        // Last attempts at figuring out the response:
         if (resp.contains ("smsauth-interstitial-heading") &&
             resp.contains ("smsauth-interstitial-reviewsettings"))
         {
             Q_WARN("Two factor authentication settings review page!");
+            task->errorString = tr("Please use your mobile browser to login to "
+                                   "Google Voice this one time. Thanks.");
+            break;
+        }
+
+        if (resp.contains ("AccountRecoveryOptionsPrompt")) {
+            Q_WARN("Account review page requested");
+            task->errorString = tr("Please use your mobile browser to login to "
+                                   "Google Voice this one time. Thanks.");
+            break;
+        }
+
+        if (resp.contains ("LoginVerification")) {
+            Q_WARN("Login verification requested");
             task->errorString = tr("Please use your mobile browser to login to "
                                    "Google Voice this one time. Thanks.");
             break;
