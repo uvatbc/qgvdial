@@ -166,7 +166,7 @@ Page {
                 id: lblNote
                 width: parent.width
                 visible: text.length == 0 ? false : true
-                font.pixelSize: 45
+                font.pixelSize: 35
                 wrapMode: Text.WordWrap
             }//Label: notes
 
@@ -174,7 +174,7 @@ Page {
                 id: lblSmsText
                 width: parent.width
                 visible: text.length == 0 ? false : true
-                font.pixelSize: 45
+                font.pixelSize: 35
                 wrapMode: Text.WordWrap
             }//Label: SMS text
 
@@ -221,13 +221,13 @@ Page {
                         onClicked: { container.stop(); }
                     }
                 }
-            }
+            }// Play/Stop buttons
 
             Label {
                 text: "Fetching voicemail"
                 visible: (container.isVmail && container.fetchingEmail)
                 anchors.horizontalCenter: parent.horizontalCenter
-            }
+            }// "Fetching voicemail"
         }//Column
     }//Flickable
 
@@ -264,5 +264,5 @@ Page {
                 container.done(true);
             }
         }
-    }//ButtonRow
+    }//ButtonRow: Delete and Reply
 }//Page
