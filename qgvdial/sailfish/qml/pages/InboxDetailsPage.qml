@@ -77,7 +77,7 @@ Page {
 
             Item {
                 width: parent.width
-                height: 200
+                height: 150
 
                 Rectangle {
                     id: hitRectContact
@@ -98,7 +98,7 @@ Page {
                     Label {
                         id: contactName
                         anchors.verticalCenter: parent.verticalCenter
-                        font.pixelSize: 70
+                        font.pixelSize: 50
                         smooth: true
                         width: parent.width - contactImage.width - parent.spacing
                         wrapMode: TextEdit.WordWrap
@@ -137,7 +137,7 @@ Page {
                         id: numberType
 
                         anchors.verticalCenter: parent.verticalCenter
-                        font.pixelSize: 50
+                        font.pixelSize: 40
                     }
 
                     Label {
@@ -145,7 +145,7 @@ Page {
 
                         anchors.verticalCenter: parent.verticalCenter
                         width: parent.width - numberType.width - parent.spacing
-                        font.pixelSize: 50
+                        font.pixelSize: numberType.font.pixelSize
                         horizontalAlignment: Text.AlignRight
                     }
                 }//Row: type (mobile/work/home) and actual number
@@ -174,7 +174,7 @@ Page {
                 id: lblSmsText
                 width: parent.width
                 visible: text.length == 0 ? false : true
-                font.pixelSize: 35
+                font.pixelSize: 30
                 wrapMode: Text.WordWrap
             }//Label: SMS text
 

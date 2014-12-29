@@ -95,7 +95,7 @@ Page {
                 id: lblInvisible
                 visible: false
                 opacity: 0
-                font.pixelSize: 50
+                font.pixelSize: 30
             }
 
             ListView {

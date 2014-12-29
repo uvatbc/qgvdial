@@ -53,7 +53,7 @@ Contact: yuvraaj@gmail.com
 
 #ifndef Q_OS_BLACKBERRY
 QCoreApplication *
-createAppObject(int argc, char *argv[])
+createAppObject(int &argc, char *argv[])
 {
     QtSingleApplication *app;
 //#ifdef Q_WS_WIN32
@@ -100,7 +100,7 @@ createAppObject(int argc, char *argv[])
 }//createAppObject
 #else
 QCoreApplication *
-createAppObject(int argc, char *argv[])
+createAppObject(int &argc, char *argv[])
 {
     QApplication *app = new QApplication(argc, argv);
     if (NULL == app) {
