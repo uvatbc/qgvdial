@@ -145,7 +145,7 @@ Page {
                         }
                     }
                 }//delegate
-            }//SilicaListView
+            }//ListView
         }//Column
     }//SilicaFlickable
 }//Contact details page

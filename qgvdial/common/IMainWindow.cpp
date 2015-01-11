@@ -389,6 +389,8 @@ IMainWindow::onUserCall(QString number)
     }
 
     if ((!num.dialBack) && num.number.isEmpty ()) {
+        Q_DEBUG("User requested call out but the callout number was empty.");
+
         // Roundabout way to show the CI selection UI:
         oPhones.onUserSelectPhone(num.id);
         // Cannot be certain that this completed in time, so just leave.
