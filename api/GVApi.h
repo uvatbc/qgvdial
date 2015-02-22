@@ -197,6 +197,9 @@ private:
     bool onCheckRecentInboxX(const QString &json, quint32 &totalSize,
                              QDateTime &serverLatest);
 
+    bool parseRnrXsrfTokenResponse(const QString &json);
+
+
     void inline
     warnAndLog(const QString &msg, const QString &json)
     {

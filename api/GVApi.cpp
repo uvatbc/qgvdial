@@ -2447,7 +2447,6 @@ GVApi::callOut(AsyncTaskToken *token)
 }//GVApi::callOut
 
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-
 bool
 GVApi::onCalloutX(const QString &json, QString &accessNumber)
 {
@@ -2500,7 +2499,6 @@ GVApi::onCalloutX(const QString &json, QString &accessNumber)
     }
     return true;
 }//GVApi::onCalloutX
-
 #endif
 
 void
@@ -3168,13 +3166,32 @@ GVApi::markInboxEntryAsRead(AsyncTaskToken *token)
         return true;
     }
 
-    // This method call needs to also be added as content data
-    QString strContent = QString("messages=%1&read=1&_rnr_se=%2")
-                            .arg(token->inParams["id"].toString(), m_rnr_se);
+    QString gvx;
+    foreach(QNetworkCookie cookie, m_jar->getAllCookies()) {
+        if (cookie.name() == "gvx") {
+            gvx = cookie.value ();
+            break;
+        }
+    }
 
-    QUrl url(GV_HTTPS "/b/0/inbox/mark");
+    if (gvx.isEmpty ()) {
+        token->status = ATTS_FAILURE;
+        token->emitCompleted ();
+        return true;
+    }
+
+    QUrl url(GV_HTTPS_M "/x");
+    QVariantMap fields;
+    fields["m"]  = "mod";
+    fields["id"] = token->inParams["id"].toString();
+    fields["rm"] = "unread";
+    fields["v"]  = "13";
+    NwHelpers::appendQueryItems (url, fields);
+
+    QString strContent = QString("{\"gvx\":\"%1\"}").arg(gvx);
+
     bool rv =
-    doPost(url, strContent.toLatin1(), POST_FORM, UA_DESKTOP, token, this,
+    doPost(url, strContent.toLatin1(), POST_TEXT, UA_IPHONE4, token, this,
            SLOT(onMarkAsRead(bool,const QByteArray&,QNetworkReply*,void*)));
     Q_ASSERT(rv);
 
@@ -3194,38 +3211,80 @@ GVApi::onMarkAsRead(bool success, const QByteArray &response, QNetworkReply *,
             token->status = ATTS_NW_ERROR;
             break;
         }
-        success = false;
+        token->status = ATTS_FAILURE;
 
 #if 0
         Q_DEBUG(strReply);
 #endif
 
-        QString strTemp = strReply.mid (strReply.indexOf (",\n"));
-        if (strTemp.startsWith (',')) {
-            strTemp = strTemp.mid (strTemp.indexOf ('{'));
+        if (!strReply.startsWith (")]}',")) {
+            Q_WARN("Invalid response! JSON = ") << strReply;
+            break;
         }
 
-        if (!checkJsonForOk (strTemp)) {
-            Q_WARN("Failed to mark read! JSON = ") << strTemp;
+        strReply = strReply.mid(sizeof(")]}',") - 1).trimmed ();
+
+        if (!parseRnrXsrfTokenResponse (strReply)) {
+            Q_WARN("Failed");
             break;
         }
 
         token->status = ATTS_SUCCESS;
-        token->emitCompleted ();
-        token = NULL;
-
-        success = true;
     } while (0);
 
-    if (!success) {
-        if (token) {
-            if (token->status == ATTS_SUCCESS) {
-                token->status = ATTS_FAILURE;
-            }
-            token->emitCompleted ();
-        }
-    }
+    token->emitCompleted ();
 }//GVApi::onMarkAsRead
+
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+bool
+GVApi::parseRnrXsrfTokenResponse(const QString &json)
+{
+    QJsonParseError pE;
+    QJsonDocument doc = QJsonDocument::fromJson (json.toUtf8 (), &pE);
+
+    if (QJsonParseError::NoError != pE.error) {
+        warnAndLog ("Failed to parse JSON", json);
+        return false;
+    }
+
+    if (!doc.isObject ()) {
+        warnAndLog ("JSON is not object", json);
+        return false;
+    }
+    QJsonObject jObj = doc.object ();
+
+    if (!jObj.contains ("rnr_xsrf_token")) {
+        warnAndLog ("rnr_xsrf_token not found", json);
+    } else {
+        m_rnr_se = jObj.value("rnr_xsrf_token").toVariant().toString();
+    }
+
+    return true;
+}//GVApi::parseRnrXsrfTokenResponse
+#else
+bool
+GVApi::parseRnrXsrfTokenResponse(const QString &json)
+{
+    QScriptEngine scriptEngine;
+    QString strTemp = QString("var o = %1;").arg(json);
+    strTemp = scriptEngine.evaluate (strTemp).toString ();
+    if (scriptEngine.hasUncaughtException ()) {
+        Q_WARN(QString("Failed to parse JSON: %1").arg(json));
+        return false;
+    }
+
+    // New rnr_se token
+    strTemp = scriptEngine.evaluate ("o.rnr_xsrf_token;").toString ();
+    if (scriptEngine.hasUncaughtException ()) {
+        Q_WARN(QString("Failed to parse rnr_se frrom JSON: %1").arg(json));
+    }
+    if ((strTemp != "undefined") && (!strTemp.isEmpty())) {
+        m_rnr_se = strTemp;
+    }
+
+    return true;
+}//GVApi::parseRnrXsrfTokenResponse
+#endif
 
 void
 GVApi::dbg_alwaysFailDialing(bool set /* = true*/)
