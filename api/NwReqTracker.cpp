@@ -363,7 +363,18 @@ NwReqTracker::hasMoved(QNetworkReply *reply)
 
         if (url.isRelative ()) {
             QUrl orig = url;
+
+            QString query;
+            int pos = orig.toString().indexOf ('?');
+            if (-1 != pos) {
+                query = orig.toString().mid(pos+1);
+            }
+
             url = url.resolved (reply->request().url());
+            if (!query.isEmpty ()) {
+                url = url.toString(QUrl::RemoveQuery) + "?" + query;
+            }
+
             Q_DEBUG(QString("unresolved = %1, resolved = %2")
                     .arg(orig.toString(), url.toString()));
         }
