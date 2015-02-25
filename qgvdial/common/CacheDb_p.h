@@ -54,6 +54,9 @@ protected:
 #define GV_S_VAR_CFREQ          "contacts_frequency"
 #define GV_S_VAR_IFREQ          "inbox_frequency"
 
+#define GV_S_VAR_CLEANDANGLING_LAST  "clean_dangling_last"
+#define GV_S_VAR_CLEANDANGLING_COUNT "clean_dangling_count"
+
 #define GV_S_VAR_DB_VER         "db_ver"
 #define GV_S_VAR_VER            "settings_ver"
 ////////////////////////////////////////////////////////////////////////////////
@@ -109,7 +112,9 @@ protected:
 // OSDCipher change
 //#define GV_SETTINGS_VER     "2013-12-13 00:55:52"
 // Use OAuth2 for contacts
-#define GV_SETTINGS_VER     "2014-01-02 18:10:40"
+//#define GV_SETTINGS_VER     "2014-01-02 18:10:40"
+// Throttle cleaning dangling pics
+#define GV_SETTINGS_VER     "2015-02-24 19:10:40"
 ////////////////////////////// GV Contacts table ///////////////////////////////
 #define GV_CONTACTS_TABLE   "gvcontacts"
 #define GV_C_ID             "id"

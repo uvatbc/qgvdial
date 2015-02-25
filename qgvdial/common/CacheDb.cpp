@@ -83,6 +83,38 @@ void
 CacheDb::cleanup_dangling_temp_ids()
 {
     CacheDbPrivate &p = CacheDbPrivate::ref ();
+    QSettings *s = p.settings;
+
+    bool shouldClean = false;
+    int cleanCount;
+    do {
+        if (!s->contains (GV_S_VAR_CLEANDANGLING_LAST) ||
+            !s->contains (GV_S_VAR_CLEANDANGLING_COUNT))
+        {
+            shouldClean = true;
+            break;
+        }
+
+        cleanCount = s->value(GV_S_VAR_CLEANDANGLING_COUNT).toInt();
+        if (cleanCount <= 10) {
+            s->setValue (GV_S_VAR_CLEANDANGLING_COUNT, cleanCount + 1);
+        } else {
+            shouldClean = true;
+            break;
+        }
+
+        QDateTime lastClean = s->value(GV_S_VAR_CLEANDANGLING_LAST).toDateTime ();
+        if (lastClean.daysTo (QDateTime::currentDateTime ()) > 1) {
+            shouldClean = true;
+            break;
+        }
+    } while(0);
+
+    if (!shouldClean) {
+        Q_DEBUG("Dangling files cleanup not required.");
+        return;
+    }
+
     QStringList arrPaths;
     QSqlQuery query(p.db);
     query.setForwardOnly (true);
@@ -112,6 +144,10 @@ CacheDb::cleanup_dangling_temp_ids()
         Q_DEBUG(QString("Deleted %1 links all pointing to the unknown qrc path")
                 .arg (del));
     }
+
+    cleanCount = 0;
+    s->setValue (GV_S_VAR_CLEANDANGLING_COUNT, cleanCount);
+    s->setValue(GV_S_VAR_CLEANDANGLING_LAST, QDateTime::currentDateTime ());
 }//CacheDb::cleanup_temp_files
 
 void
