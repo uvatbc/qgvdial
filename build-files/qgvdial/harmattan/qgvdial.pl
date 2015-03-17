@@ -5,7 +5,7 @@ my @days = qw(Sun Mon Tue Wed Thu Fri Sat Sun);
 ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime();
 my $dtstr = sprintf("%s, %d %s %d %02d:%02d:%02d", $days[$wday], $mday, $months[$mon], $year+1900, $hour, $min, $sec);
 
-my $repo = "https://qgvdial.googlecode.com/svn/trunk";
+my $repo = "https://yuvraaj.net/svn/qgvdial/trunk";
 my $cmd;
 
 # Delete any existing version file

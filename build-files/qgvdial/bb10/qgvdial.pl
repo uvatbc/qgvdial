@@ -4,7 +4,7 @@ if ($#ARGV != 1) {
 }
 
 my $makejobs=2;
-my $repo = "https://qgvdial.googlecode.com/svn/trunk";
+my $repo = "https://yuvraaj.net/svn/qgvdial/trunk";
 my $cmd;
 
 # Delete any existing version file

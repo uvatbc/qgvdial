@@ -1,4 +1,4 @@
-my $repo = "https://qgvdial.googlecode.com/svn/trunk";
+my $repo = "https://yuvraaj.net/svn/qgvdial/trunk";
 my $s_make = "make.exe";
 my $cmd;
 my $dest;

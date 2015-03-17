@@ -1,4 +1,4 @@
-my $repo = "https://qgvdial.googlecode.com/svn/trunk";
+my $repo = "https://yuvraaj.net/svn/qgvdial/trunk";
 my $wixbase='C:/Program Files (x86)/Windows Installer XML v3/bin';
 my $cmd;
 my $line;
