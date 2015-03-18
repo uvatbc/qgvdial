@@ -60,12 +60,12 @@ Item {
 
         PullDownMenu {
             MenuItem {
-                text: "Refresh"
-                onClicked: { container.sigRefreshContacts(); }
-            }
-            MenuItem {
                 text: "Full Refresh"
                 onClicked: { container.sigRefreshContactsFull(); }
+            }
+            MenuItem {
+                text: "Refresh"
+                onClicked: { container.sigRefreshContacts(); }
             }
         }
 

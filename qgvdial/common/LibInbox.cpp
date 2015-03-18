@@ -129,7 +129,7 @@ LibInbox::beginRefresh(AsyncTaskToken *task,
     if (isExternal) {
         task->inParams["initialType"] = type;
     }
-    task->inParams["type"] = type;
+    task->inParams["type"] = type.toLower();
     task->inParams["page"] = page;
     task->inParams["after"] = after;
 

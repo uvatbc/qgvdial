@@ -86,12 +86,12 @@ Item {
 
         PullDownMenu {
             MenuItem {
-                text: "Refresh"
-                onClicked: { container.sigRefreshInbox(); }
-            }
-            MenuItem {
                 text: "Full Refresh"
                 onClicked: { container.sigRefreshInboxFull(); }
+            }
+            MenuItem {
+                text: "Refresh"
+                onClicked: { g_inbox.refreshLatest(inboxSelector.value); }
             }
         }
 

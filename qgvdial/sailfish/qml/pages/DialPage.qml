@@ -30,6 +30,7 @@ Item {
 
     function setNumberInDisp(number) {
         numberField.text = number;
+        container.forceActiveFocus();
     }
 
     visible: true
