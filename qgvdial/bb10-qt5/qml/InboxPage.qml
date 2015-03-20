@@ -29,8 +29,6 @@ Item {
     property bool isSearchResults: false
 
     signal setNumberToDial(string number)
-    signal sigRefreshInbox
-    signal sigRefreshInboxFull
 
     Button {
         id: inboxSelectorBtn
@@ -78,8 +76,8 @@ Item {
                 bgRefreshBtn.visible = !visible;
             }
 
-            onClicked: { container.sigRefreshInbox(); }
-            onPressAndHold: { container.sigRefreshInboxFull(); }
+            onClicked: { g_inbox.refreshLatest(inboxSelector.value); }
+            onPressAndHold: { g_inbox.refreshFull(); }
         }
 
         delegate: Rectangle {
@@ -180,13 +178,14 @@ Item {
                 }
             }
         }
+        property string value
 
         anchors.fill: parent
 
         selectedIndex: 0
         onSelectedIndexChanged: {
-            var sel = model.get(selectedIndex).name;
-            inboxSelector.selectionChanged(sel);
+            inboxSelector.value = model.get(selectedIndex).name;
+            inboxSelector.selectionChanged(inboxSelector.value);
         }
 
         model: ListModel {

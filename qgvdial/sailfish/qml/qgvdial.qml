@@ -39,10 +39,7 @@ ApplicationWindow {
     signal sigShowContact(string cId)
 
     signal sigRefreshContacts
-    signal sigRefreshInbox
-
     signal sigRefreshContactsFull
-    signal sigRefreshInboxFull
 
     signal setNumberInDisp(string number)
 
@@ -109,8 +106,6 @@ ApplicationWindow {
         FirstPage {
             onSigRefreshContacts: { appWindow.sigRefreshContacts(); }
             onSigRefreshContactsFull: { appWindow.sigRefreshContactsFull(); }
-            onSigRefreshInbox: { appWindow.sigRefreshInbox(); }
-            onSigRefreshInboxFull: { appWindow.sigRefreshInboxFull(); }
             onRegNumBtnClicked: { appWindow.pageStack.push(regNumberSelector); }
         }
     }

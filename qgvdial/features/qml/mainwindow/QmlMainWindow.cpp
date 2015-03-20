@@ -315,12 +315,8 @@ QmlMainWindow::initQmlObjects()
                 &oContacts, SLOT(getContactInfoAndModel(QString)));
         connect(mainPageStack, SIGNAL(sigRefreshContacts()),
                 &oContacts, SLOT(refreshLatest()));
-        connect(mainPageStack, SIGNAL(sigRefreshInbox()),
-                &oInbox, SLOT(refreshLatest()));
         connect(mainPageStack, SIGNAL(sigRefreshContactsFull()),
                 &oContacts, SLOT(refreshFull()));
-        connect(mainPageStack, SIGNAL(sigRefreshInboxFull()),
-                &oInbox, SLOT(refreshFull()));
 
         mainTabGroup = getQMLObject ("MainTabGroup");
         if (NULL == mainTabGroup) {

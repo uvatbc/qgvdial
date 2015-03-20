@@ -29,8 +29,6 @@ Item {
     property bool isSearchResults: false
 
     signal setNumberToDial(string number)
-    signal sigRefreshInbox
-    signal sigRefreshInboxFull
 
     Button {
         id: inboxSelectorBtn
@@ -78,8 +76,8 @@ Item {
                 bgRefreshBtn.visible = !visible;
             }
 
-            onClicked: { container.sigRefreshInbox(); }
-            onPressAndHold: { container.sigRefreshInboxFull(); }
+            onClicked: { g_inbox.refreshLatest(inboxSelector.value); }
+            onPressAndHold: { g_inbox.refreshFull(); }
         }
 
         delegate: Rectangle {

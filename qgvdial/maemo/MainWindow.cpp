@@ -288,10 +288,6 @@ MainWindow::declStatusChanged(QDeclarativeView::Status status)
                 this, SLOT(onInboxClicked(QString)));
         connect(inboxList, SIGNAL(showInboxSelector()),
                 this, SLOT(onInboxSelBtnClicked()));
-        connect(inboxList, SIGNAL(sigRefreshInbox()),
-                &oInbox, SLOT(refreshLatest()));
-        connect(inboxList, SIGNAL(sigRefreshInboxFull()),
-                &oInbox, SLOT(refreshFull()));
 
         inboxSelector = getQMLObject ("InboxSelector");
         if (NULL == inboxList) {

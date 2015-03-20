@@ -26,10 +26,8 @@ Page {
     id: page
 
     signal sigRefreshContacts
-    signal sigRefreshInbox
 
     signal sigRefreshContactsFull
-    signal sigRefreshInboxFull
 
     signal regNumBtnClicked
 
@@ -97,9 +95,6 @@ Page {
 
                 width: page.onePageWidth
                 height: pageListRow.height
-
-                onSigRefreshInbox: { page.sigRefreshInbox(); }
-                onSigRefreshInboxFull: { page.sigRefreshInboxFull(); }
             }
 
             SettingsPage {

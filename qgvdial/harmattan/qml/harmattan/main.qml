@@ -30,10 +30,7 @@ PageStackWindow {
     signal sigShowContact(string cId)
 
     signal sigRefreshContacts
-    signal sigRefreshInbox
-
     signal sigRefreshContactsFull
-    signal sigRefreshInboxFull
 
     Component.onCompleted: {
         // Use the dark theme.
@@ -156,9 +153,6 @@ PageStackWindow {
                     dialTab.setNumberInDisp(number);
                     tabgroup.setTab(0);
                 }
-
-                onSigRefreshInbox: { appWindow.sigRefreshInbox(); }
-                onSigRefreshInboxFull: { appWindow.sigRefreshInboxFull(); }
             }
             SettingsPage {
                 id: settingsTab

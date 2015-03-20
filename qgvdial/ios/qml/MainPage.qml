@@ -33,10 +33,7 @@ Rectangle {
     signal regNumBtnClicked
 
     signal sigRefreshContacts
-    signal sigRefreshInbox
-
     signal sigRefreshContactsFull
-    signal sigRefreshInboxFull
 
     function setNumberInDisp(number) {
         var dPage = g_qmlstub.findChild("DialPage");
@@ -100,9 +97,6 @@ Rectangle {
                     container.setNumberInDisp(number);
                     tabView.setTab(0);
                 }
-
-                onSigRefreshInbox: { container.sigRefreshInbox(); }
-                onSigRefreshInboxFull: { container.sigRefreshInboxFull(); }
             }
         }
         Tab {

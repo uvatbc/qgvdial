@@ -28,8 +28,6 @@ Page {
     anchors.fill: parent
 
     signal setNumberToDial(string number)
-    signal sigRefreshInbox
-    signal sigRefreshInboxFull
 
     Button {
         id: inboxSelectorBtn
@@ -51,13 +49,14 @@ Page {
         signal selectionChanged(string sel)
         function setSelection(sel) {
             var i;
-            for (i = 0; inboxSelector.model.count; i = i + 1) {
+            for (i = 0; i < inboxSelector.model.count; i = i + 1) {
                 if (inboxSelector.model.get(i).name.toUpperCase() == sel.toUpperCase()) {
                     selectedIndex = i;
                     break;
                 }
             }
         }
+        property string value
 
         anchors {
             top: parent.top
@@ -66,8 +65,8 @@ Page {
 
         selectedIndex: 0
         onSelectedIndexChanged: {
-            var sel = model.get(selectedIndex).name;
-            inboxSelector.selectionChanged(sel);
+            inboxSelector.value = model.get(selectedIndex).name;
+            inboxSelector.selectionChanged(inboxSelector.value);
         }
 
         model: ListModel {
@@ -107,14 +106,14 @@ Page {
 
         header: RefreshButton {
             isHeader: true
-            width: parent.width
+            width: inboxList.width
             contentY: inboxList.contentY
             onVisibleChanged: {
                 bgRefreshBtn.visible = !visible;
             }
 
-            onClicked: { container.sigRefreshInbox(); }
-            onPressAndHold: { container.sigRefreshInboxFull(); }
+            onClicked: { g_inbox.refreshLatest(inboxSelector.value); }
+            onPressAndHold: { g_inbox.refreshFull(); }
         }
 
         delegate: Rectangle {

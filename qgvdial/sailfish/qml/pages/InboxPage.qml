@@ -28,8 +28,6 @@ Item {
     property bool isSearchResults: false
 
     signal setNumberToDial(string number)
-    signal sigRefreshInbox
-    signal sigRefreshInboxFull
 
     ComboBox {
         id: inboxSelector
@@ -87,7 +85,7 @@ Item {
         PullDownMenu {
             MenuItem {
                 text: "Full Refresh"
-                onClicked: { container.sigRefreshInboxFull(); }
+                onClicked: { g_inbox.refreshFull(); }
             }
             MenuItem {
                 text: "Refresh"

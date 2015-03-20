@@ -53,9 +53,6 @@ Rectangle {
         signal clicked(string id)
         signal showInboxSelector
 
-        signal sigRefreshInbox
-        signal sigRefreshInboxFull
-
         function setMyModel() {
             inboxList.model = g_InboxModel;
         }
@@ -79,8 +76,8 @@ Rectangle {
                 bgRefreshBtn.visible = !visible;
             }
 
-            onClicked: { inboxList.sigRefreshInbox(); }
-            onPressAndHold: { inboxList.sigRefreshInboxFull(); }
+            onClicked: { g_inbox.refreshLatest(inboxSelectorBtn.text); }
+            onPressAndHold: { g_inbox.refreshFull(); }
         }
 
         delegate: Rectangle {

@@ -33,10 +33,8 @@ ApplicationWindow {
     signal sigShowContact(string cId)
 
     signal sigRefreshContacts
-    signal sigRefreshInbox
 
     signal sigRefreshContactsFull
-    signal sigRefreshInboxFull
 
     function popPageStack() {
         if (pageStack.depth > 1) {
@@ -159,8 +157,6 @@ ApplicationWindow {
 
         onSigRefreshContacts: { appWindow.sigRefreshContacts(); }
         onSigRefreshContactsFull: { appWindow.sigRefreshContactsFull(); }
-        onSigRefreshInbox: { appWindow.sigRefreshInbox(); }
-        onSigRefreshInboxFull: { appWindow.sigRefreshInboxFull(); }
     }
 
     StackView {
