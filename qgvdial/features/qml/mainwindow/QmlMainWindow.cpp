@@ -311,8 +311,6 @@ QmlMainWindow::initQmlObjects()
         if (NULL == mainPageStack) {
             break;
         }
-        connect(mainPageStack, SIGNAL(sigShowContact(QString)),
-                &oContacts, SLOT(getContactInfoAndModel(QString)));
 
         mainTabGroup = getQMLObject ("MainTabGroup");
         if (NULL == mainTabGroup) {

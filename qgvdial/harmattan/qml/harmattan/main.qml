@@ -27,8 +27,6 @@ PageStackWindow {
     id: appWindow
     objectName: "MainPageStack"
 
-    signal sigShowContact(string cId)
-
     Component.onCompleted: {
         // Use the dark theme.
         theme.inverted = true;
@@ -219,8 +217,6 @@ PageStackWindow {
             dialTab.setNumberInDisp(number);
             tabgroup.setTab(0);
         }
-
-        onSigShowContact: { appWindow.sigShowContact(cId); }
     }
 
     MessageBox {

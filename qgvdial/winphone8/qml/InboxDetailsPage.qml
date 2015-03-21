@@ -27,7 +27,6 @@ Rectangle {
 
     signal done(bool accepted)
     signal setNumberToDial(string number)
-    signal sigShowContact(string cId)
     signal replySms(string iId)
 
     signal play
@@ -109,7 +108,7 @@ Rectangle {
                     onPressAndHold: {
                         hitRectContact.opacity = 0.0;
                         if (container.cId.length != 0) {
-                            container.sigShowContact(container.cId);
+                            g_contacts.getContactInfoAndModel(container.cId);
                         }
                     }
                 }

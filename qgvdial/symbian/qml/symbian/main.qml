@@ -27,8 +27,6 @@ PageStackWindow {
     id: appWindow
     objectName: "MainPageStack"
 
-    signal sigShowContact(string cId)
-
     function pushTfaDlg() {
         pageStack.push(tfaPinDlg);
     }
@@ -121,8 +119,6 @@ PageStackWindow {
             dialTab.setNumberInDisp(number);
             tabgroup.setTab(0);
         }
-
-        onSigShowContact: appWindow.sigShowContact(cId);
     }
 
     MessageBox {

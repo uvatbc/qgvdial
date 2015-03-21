@@ -36,7 +36,6 @@ ApplicationWindow {
     id: appWindow
     objectName: "MainPageStack"
 
-    signal sigShowContact(string cId)
     signal setNumberInDisp(string number)
 
     function pushTfaDlg() {
@@ -130,8 +129,6 @@ ApplicationWindow {
 
         onDone: { appWindow.pageStack.pop(); }
         onSetNumberToDial: { appWindow.setNumberInDisp(number); }
-
-        onSigShowContact: { appWindow.sigShowContact(cId); }
     }
 
     MessageBox {

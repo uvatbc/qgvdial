@@ -30,8 +30,6 @@ ApplicationWindow {
     visible: true
     title: qsTr("qgvdial")
 
-    signal sigShowContact(string cId)
-
     function popPageStack() {
         if (pageStack.depth > 1) {
             pageStack.pop();
@@ -137,8 +135,6 @@ ApplicationWindow {
             mainPage.setNumberInDisp(number);
             mainPage.setTab(0);
         }
-
-        onSigShowContact: appWindow.sigShowContact(cId);
     }
 
     MessageBox {
