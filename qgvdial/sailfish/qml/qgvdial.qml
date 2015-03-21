@@ -37,10 +37,6 @@ ApplicationWindow {
     objectName: "MainPageStack"
 
     signal sigShowContact(string cId)
-
-    signal sigRefreshContacts
-    signal sigRefreshContactsFull
-
     signal setNumberInDisp(string number)
 
     function pushTfaDlg() {
@@ -104,8 +100,6 @@ ApplicationWindow {
 
     initialPage: Component {
         FirstPage {
-            onSigRefreshContacts: { appWindow.sigRefreshContacts(); }
-            onSigRefreshContactsFull: { appWindow.sigRefreshContactsFull(); }
             onRegNumBtnClicked: { appWindow.pageStack.push(regNumberSelector); }
         }
     }

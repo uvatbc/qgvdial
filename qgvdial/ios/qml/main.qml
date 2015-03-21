@@ -32,9 +32,6 @@ ApplicationWindow {
 
     signal sigShowContact(string cId)
 
-    signal sigRefreshContacts
-    signal sigRefreshContactsFull
-
     function popPageStack() {
         if (pageStack.depth > 1) {
             pageStack.pop();
@@ -174,9 +171,6 @@ ApplicationWindow {
         pageStack: parent
 
         onRegNumBtnClicked: { pageStack.push(regNumberSelector); }
-
-        onSigRefreshContacts: { appWindow.sigRefreshContacts(); }
-        onSigRefreshContactsFull: { appWindow.sigRefreshContactsFull(); }
     }
 
     StackView {

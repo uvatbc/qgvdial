@@ -313,10 +313,6 @@ QmlMainWindow::initQmlObjects()
         }
         connect(mainPageStack, SIGNAL(sigShowContact(QString)),
                 &oContacts, SLOT(getContactInfoAndModel(QString)));
-        connect(mainPageStack, SIGNAL(sigRefreshContacts()),
-                &oContacts, SLOT(refreshLatest()));
-        connect(mainPageStack, SIGNAL(sigRefreshContactsFull()),
-                &oContacts, SLOT(refreshFull()));
 
         mainTabGroup = getQMLObject ("MainTabGroup");
         if (NULL == mainTabGroup) {

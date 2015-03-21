@@ -25,10 +25,6 @@ import Sailfish.Silica 1.0
 Page {
     id: page
 
-    signal sigRefreshContacts
-
-    signal sigRefreshContactsFull
-
     signal regNumBtnClicked
 
     property real onePageHeight: page.height - btnRow.height
@@ -85,9 +81,6 @@ Page {
 
                 width: page.onePageWidth
                 height: pageListRow.height
-
-                onSigRefreshContacts: { page.sigRefreshContacts(); }
-                onSigRefreshContactsFull: { page.sigRefreshContactsFull(); }
             }
 
             InboxPage {

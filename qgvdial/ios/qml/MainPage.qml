@@ -32,9 +32,6 @@ Rectangle {
 
     signal regNumBtnClicked
 
-    signal sigRefreshContacts
-    signal sigRefreshContactsFull
-
     function setNumberInDisp(number) {
         var dPage = g_qmlstub.findChild("DialPage");
         if (dPage) {
@@ -83,8 +80,6 @@ Rectangle {
             ContactsPage {
                 id: contactsTab
                 objectName: "ContactsPage"
-                onSigRefreshContacts: { container.sigRefreshContacts(); }
-                onSigRefreshContactsFull: { container.sigRefreshContactsFull(); }
             }
         }
         Tab {

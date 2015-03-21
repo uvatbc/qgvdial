@@ -27,8 +27,6 @@ Item {
 
     signal contactClicked(string id)
     signal searchContact(string searchTerm)
-    signal sigRefreshContacts
-    signal sigRefreshContactsFull
 
     onSearchContact: {
         console.debug("Searching for contact term \"" + searchTerm + "\"")
@@ -61,11 +59,11 @@ Item {
         PullDownMenu {
             MenuItem {
                 text: "Full Refresh"
-                onClicked: { container.sigRefreshContactsFull(); }
+                onClicked: { g_contacts.refreshFull(); }
             }
             MenuItem {
                 text: "Refresh"
-                onClicked: { container.sigRefreshContacts(); }
+                onClicked: { g_contacts.refreshLatest(); }
             }
         }
 

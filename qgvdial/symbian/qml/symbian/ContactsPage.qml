@@ -30,8 +30,6 @@ Page {
 
     signal contactClicked(string id)
     signal searchContact(string searchTerm)
-    signal sigRefreshContacts
-    signal sigRefreshContactsFull
 
     function setMyModel(searchTerm) {
         contactsList.model = g_ContactsModel;
@@ -136,8 +134,8 @@ Page {
                 bgRefreshBtn.visible = !visible;
             }
 
-            onClicked: { container.sigRefreshContacts(); }
-            onPressAndHold: { container.sigRefreshContactsFull(); }
+            onClicked: { g_contacts.refreshLatest(); }
+            onPressAndHold: { g_contacts.refreshFull(); }
         }
 
         delegate: Rectangle {

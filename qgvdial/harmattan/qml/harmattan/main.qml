@@ -29,9 +29,6 @@ PageStackWindow {
 
     signal sigShowContact(string cId)
 
-    signal sigRefreshContacts
-    signal sigRefreshContactsFull
-
     Component.onCompleted: {
         // Use the dark theme.
         theme.inverted = true;
@@ -142,8 +139,6 @@ PageStackWindow {
                 id: contactsTab
                 objectName: "ContactsPage"
                 toolbarHeight: appWindow.platformToolBarHeight
-                onSigRefreshContacts: { appWindow.sigRefreshContacts(); }
-                onSigRefreshContactsFull: { appWindow.sigRefreshContactsFull(); }
             }
             InboxPage {
                 id: inboxTab

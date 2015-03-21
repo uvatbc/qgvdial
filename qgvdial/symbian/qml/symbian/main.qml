@@ -29,10 +29,6 @@ PageStackWindow {
 
     signal sigShowContact(string cId)
 
-    signal sigRefreshContacts
-
-    signal sigRefreshContactsFull
-
     function pushTfaDlg() {
         pageStack.push(tfaPinDlg);
     }
@@ -205,8 +201,6 @@ PageStackWindow {
                 id: contactsTab
                 objectName: "ContactsPage"
                 tools: commonTools
-                onSigRefreshContacts: { appWindow.sigRefreshContacts(); }
-                onSigRefreshContactsFull: { appWindow.sigRefreshContactsFull(); }
             }
             InboxPage {
                 id: inboxTab
