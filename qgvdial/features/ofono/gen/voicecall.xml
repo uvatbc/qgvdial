@@ -1,0 +1,21 @@
+<node>
+  <interface name="org.ofono.VoiceCall">
+    <method name="GetProperties">
+      <arg type="a{sv}" direction="out"/>
+        <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="QVariantMap"/>
+    </method>
+    <method name="Deflect">
+      <arg type="s" direction="in"/>
+    </method>
+    <method name="Hangup"/>
+    <method name="Answer"/>
+    <signal name="PropertyChanged">
+      <arg type="s"/>
+      <arg type="v"/>
+    </signal>
+    <signal name="DisconnectReason">
+      <arg type="s"/>
+    </signal>
+  </interface>
+</node>
+
