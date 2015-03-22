@@ -130,6 +130,8 @@ TpPhoneFactory::onAllAccountsReady ()
     foreach (Tp::AccountPtr acc, allAccounts) {
         QString cmName = acc->cmName ();
         msg = QString ("Account cmName = %1").arg (cmName);
+
+        // Ignore everything but these connection managers:
         if ((cmName != "sofiasip") &&
             (cmName != "spirit") &&
             (cmName != "ring"))
@@ -140,6 +142,7 @@ TpPhoneFactory::onAllAccountsReady ()
             continue;
         }
 
+        // Create a callout initiator for sofiasip, spirit and ring
         IPhoneAccount *p = new TpCalloutInitiator (acc, this);
         if (NULL != p) {
             m_tpAcCounter++;
