@@ -338,7 +338,9 @@ MainWindow::uiRequestLoginDetails()
 void
 MainWindow::onLoginClicked()
 {
-    if ("Login" == d->ui->loginButton->text()) {
+    QString loginText = d->ui->loginButton->text();
+
+    if (loginText.contains ("login", Qt::CaseInsensitive)) {
         QString user, pass;
         user = d->ui->textUsername->text ();
         pass = d->ui->textPassword->text ();

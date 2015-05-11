@@ -2,10 +2,14 @@ INCLUDEPATH += $$PWD
 
 QT *= dbus
 
+DBUS_INTERFACES *= $$PWD/gen/api_server.xml
+
 HEADERS  += $$PWD/gen/api_adapter.h  \
             $$PWD/DBusApi.h
 SOURCES  += $$PWD/gen/api_adapter.cpp \
             $$PWD/DBusApi.cpp
+
+OTHER_FILES *= $$PWD/gen/api_server.xml
 
 DEFINES += DBUS_API
 
