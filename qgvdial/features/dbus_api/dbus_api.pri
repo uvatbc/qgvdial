@@ -2,7 +2,8 @@ INCLUDEPATH += $$PWD
 
 QT *= dbus
 
-DBUS_INTERFACES *= $$PWD/gen/api_server.xml
+# This doesn't cleanly work in all platforms
+#DBUS_INTERFACES *= $$PWD/gen/api_server.xml
 
 HEADERS  += $$PWD/gen/api_adapter.h  \
             $$PWD/DBusApi.h
