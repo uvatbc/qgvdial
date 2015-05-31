@@ -90,12 +90,13 @@ private slots:
                   QNetworkReply *reply, void *ctx);
     void onLogin2(bool success, const QByteArray &response,
                   QNetworkReply *reply, void *ctx);
-    void onGotRnr(bool success, const QByteArray &response,
-                  QNetworkReply *reply, void *ctx);
     void onTFAAltLoginResp(bool success, const QByteArray &response,
                            QNetworkReply *reply, void *ctx);
 
     void internalLogoutForReLogin();
+
+    void onInitGv(bool success, const QByteArray &response,
+                  QNetworkReply *reply, void *ctx);
 
     // Logout
     void onLogout(bool success, const QByteArray &response,
@@ -161,7 +162,7 @@ private:
     // Login and two factor
     bool postLogin(QUrl url, AsyncTaskToken *token);
     bool parseHiddenLoginFields(const QString &strResponse, QVariantMap &ret);
-    bool getRnr(AsyncTaskToken *token);
+    bool initGv(AsyncTaskToken *token);
     bool parseAlternateLogins(const QString &form, AsyncTaskToken *task);
 
     void lookForLoginErrorMessage(const QString &resp, AsyncTaskToken *task);
@@ -192,7 +193,9 @@ private:
 
     bool onCalloutX(const QString &json, QString &accessNumber);
     bool onCallbackX(const QString &json, quint32 &code, QString &errMsg);
+
     bool checkJsonForOk(const QString &json);
+
     bool onSendSmsX(const QString &json);
     bool onCheckRecentInboxX(const QString &json, quint32 &totalSize,
                              QDateTime &serverLatest);

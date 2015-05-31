@@ -24,6 +24,7 @@ Contact: yuvraaj@gmail.com
 #include "MyXmlErrorHandler.h"
 
 #define DEBUG_ONLY 0
+#define GV_X_METHOD_VER "13"
 
 GVApi::GVApi(bool bEmitLog, QObject *parent)
 : QObject(parent)
@@ -526,7 +527,7 @@ GVApi::onLogin1(bool success, const QByteArray &response, QNetworkReply *reply,
         updateLoggedInFlag (token, strResponse);
 
         if (m_loggedIn) {
-            success = getRnr (token);
+            success = initGv (token);
             break;
         }
 
@@ -899,7 +900,7 @@ GVApi::onLogin2(bool success, const QByteArray &response, QNetworkReply *reply,
                 break;
             }
 
-            success = getRnr (task);
+            success = initGv (task);
             break;
         }
 
@@ -1245,109 +1246,74 @@ GVApi::onTFAAltLoginResp(bool success, const QByteArray &response,
 }//GVApi::onTFAAltLoginResp
 
 bool
-GVApi::getRnr(AsyncTaskToken *task)
+GVApi::initGv(AsyncTaskToken *task)
 {
-    Q_DEBUG("User authenticated, now looking for RNR.");
+    Q_DEBUG("User authenticated, now initializing Google Voice interface.");
 
-    bool rv = doGet(QUrl(GV_HTTPS_M "/i/all"), task, this,
-                    SLOT(onGotRnr(bool,const QByteArray&,QNetworkReply*,void*)));
+    QUrl url(GV_HTTPS_M "/x");
+    QVariantMap m;
+    m["m"] = "init";
+    m["v"] = GV_X_METHOD_VER;
+    NwHelpers::appendQueryItems (url, m);
+
+    QByteArray content;
+    QList<QNetworkCookie> allCookies = m_jar->getAllCookies ();
+    foreach (QNetworkCookie cookie, allCookies) {
+        if (cookie.name () == "gvx") {
+            content = "{\"gvx\":\"" + cookie.value() + "\"}";
+        }
+    }
+
+    if (content.isEmpty ()) {
+        task->status = ATTS_FAILURE;
+        task->emitCompleted ();
+        return true;
+    }
+
+    bool rv =
+    doPostText(url, content, task, this,
+               SLOT(onInitGv(bool,const QByteArray&,QNetworkReply*,void*)));
     Q_ASSERT(rv);
 
     return rv;
-}//GVApi::getRnr
+}//GVApi::initGv
 
 void
-GVApi::onGotRnr(bool success, const QByteArray &response, QNetworkReply *reply,
-                void *ctx)
+GVApi::onInitGv(bool success, const QByteArray &response,
+                QNetworkReply *, void *ctx)
 {
     AsyncTaskToken *task = (AsyncTaskToken *)ctx;
-    QString strResponse = response;
-    QString strReplyUrl = reply->url().toString();
+    QString strReply = response;
 
     do {
         if (!success) {
+            Q_WARN("Failed to initialize GV interface");
             task->status = ATTS_NW_ERROR;
             break;
         }
+        task->status = ATTS_LOGIN_FAILURE;
 
-        success = false;
-        int pos = strResponse.indexOf ("_rnr_se");
-        if (pos == -1) {
-            if (task->outParams["attempts"].toInt() != 0) {
-                Q_WARN("Too many attempts at relogin");
+#if 0
+        Q_DEBUG(strReply);
+#endif
 
-                if (strReplyUrl.contains("setupMobile", Qt::CaseInsensitive)) {
-                    task->status = ATTS_SETUP_REQUIRED;
-                }
-                break;
-            }
-
-            Q_DEBUG(QString("Current URL = %1. Attempting re-login")
-                        .arg(strReplyUrl));
-
-            // Probably failed to login correctly. Try one more time.
-            AsyncTaskToken *internalLogoutTask = new AsyncTaskToken(this);
-            if (!internalLogoutTask) {
-                Q_WARN("Failed to login because failed to logout!!");
-                break;
-            }
-
-            internalLogoutTask->callerCtx = task;
-
-            success =
-            connect(internalLogoutTask, SIGNAL(completed()),
-                    this,  SLOT(internalLogoutForReLogin()));
-            Q_ASSERT(success);
-
-            success = logout(internalLogoutTask);
-            if (!success) {
-                internalLogoutTask->deleteLater ();
-                break;
-            }
-
-            int attempts = 1;
-            task->outParams["attempts"] = attempts;
-
-            success = true;
+        if (!strReply.startsWith (")]}',")) {
+            Q_WARN("Invalid response! JSON = ") << strReply;
             break;
         }
 
-        int pos1 = strResponse.indexOf (">", pos);
-        if (pos1 == -1) {
+        strReply = strReply.mid(sizeof(")]}',") - 1).trimmed ();
+
+        if (!parseRnrXsrfTokenResponse (strReply)) {
+            Q_WARN("Failed to login");
             break;
         }
 
-        QString searchIn = strResponse.mid (pos, pos1-pos);
-        QRegExp rx("value\\s*=\\s*\\\"(.*)\\\"");
-
-        if (rx.indexIn (searchIn) == -1) {
-            break;
-        }
-
-        m_rnr_se = rx.cap (1);
-
-        task->outParams["rnr_se"] = m_rnr_se;
         task->status = ATTS_SUCCESS;
-        task->emitCompleted ();
-        task = NULL;
-
-        success = true;
     } while (0);
 
-    if (!success) {
-        QString msg = QString("Failed to get RNR. User cannot be "
-                              "authenticated. URL = %1. Response = %2")
-                        .arg(strReplyUrl, strResponse);
-        Q_WARN(msg);
-
-        if (task) {
-            if (task->status == ATTS_SUCCESS) {
-                task->status = ATTS_LOGIN_FAILURE;
-            }
-            task->emitCompleted ();
-        }
-    }
-}//GVApi::onGotRnr
+    task->emitCompleted ();
+}//GVApi::onInitGv
 
 void
 GVApi::internalLogoutForReLogin()
@@ -2417,7 +2383,7 @@ GVApi::callOut(AsyncTaskToken *token)
     m["m"] = "call";
     m["n"] = dest;
     m["f"] = fwdingNum;
-    m["v"] = "11";
+    m["v"] = GV_X_METHOD_VER;
     NwHelpers::appendQueryItems (url, m);
 
     if (emitLog) {
@@ -2927,7 +2893,7 @@ GVApi::sendSms(AsyncTaskToken *token)
     m["m"]   = "sms";
     m["n"]   = token->inParams["destination"].toString();
     m["f"]   = "";
-    m["v"]   = "13";
+    m["v"]   = GV_X_METHOD_VER;
     m["txt"] = token->inParams["text"].toString();
     NwHelpers::appendQueryItems (url, m);
     url = QUrl(NwHelpers::fullyEncodedUrl (url));
