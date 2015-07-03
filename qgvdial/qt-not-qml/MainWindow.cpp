@@ -247,8 +247,27 @@ MainWindow::init()
                 this,
                 SLOT(onSystrayActivated(QSystemTrayIcon::ActivationReason)));
 
-        m_systrayIcon->setIcon (m_appIcon);
-        m_systrayIcon->setContextMenu (d->ui->menu_File);
+        QMenu *ctxMenu = new QMenu(d);
+        QList <QAction *> actions;
+
+        QAction *oneAction = new QAction("&Refresh", ctxMenu);
+        oneAction->setShortcut (QKeySequence("Ctrl+R"));
+        connect(oneAction, SIGNAL(triggered()),
+                &oContacts, SLOT(refreshLatest()));
+        connect(oneAction, SIGNAL(triggered()),
+                &oInbox, SLOT(refreshLatest()));
+        actions.append (oneAction);
+
+        oneAction = new QAction("Quit", ctxMenu);
+        oneAction->setShortcut (QKeySequence("Ctrl+Q"));
+        connect(oneAction, SIGNAL(triggered()), qApp, SLOT(quit()));
+        actions.append (oneAction);
+
+        ctxMenu->addActions(actions);
+
+        m_systrayIcon->setIcon (QIcon(":/qgv.png"));
+        //TODO: Unfuck this. Qt 5.5 has fucked it.
+        //m_systrayIcon->setContextMenu (ctxMenu);
         QTimer::singleShot (100, m_systrayIcon, SLOT(show()));
         //m_systrayIcon->show ();
     }
