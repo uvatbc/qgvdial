@@ -40,6 +40,7 @@ MyXmlErrorHandler::handleMessage (QtMsgType type, const QString &description,
 
     switch (type) {
     case QtDebugMsg:
+    case QtInfoMsg:
         Q_DEBUG(msg);
         break;
     case QtWarningMsg:

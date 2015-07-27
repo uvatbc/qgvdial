@@ -67,6 +67,9 @@ myMessageOutput(QtMsgType type, const char *msg)
 {
     int level = -1;
     switch (type) {
+    case QtInfoMsg:
+        level = 4;
+        break;
     case QtDebugMsg:
         level = 3;
         break;
