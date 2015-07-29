@@ -67,9 +67,11 @@ myMessageOutput(QtMsgType type, const char *msg)
 {
     int level = -1;
     switch (type) {
+#if QT_VERSION >= QT_VERSION_CHECK(5,5,0)
     case QtInfoMsg:
         level = 4;
         break;
+#endif
     case QtDebugMsg:
         level = 3;
         break;

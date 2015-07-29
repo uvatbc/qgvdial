@@ -40,7 +40,9 @@ MyXmlErrorHandler::handleMessage (QtMsgType type, const QString &description,
 
     switch (type) {
     case QtDebugMsg:
+#if QT_VERSION >= QT_VERSION_CHECK(5,5,0)
     case QtInfoMsg:
+#endif
         Q_DEBUG(msg);
         break;
     case QtWarningMsg:
