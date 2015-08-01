@@ -26,6 +26,7 @@ Contact: yuvraaj@gmail.com
 #include "CookieJar.h"
 #include <QObject>
 
+class GVApi_login;
 class GVApi : public QObject
 {
     Q_OBJECT
@@ -202,8 +203,8 @@ private:
 
     bool m_dbgAlwaysFailDialing;
 
-    friend class GVApi_login;
     GVApi_login *m_login;
+    friend class GVApi_login;
 };
 
 #endif // GVAPI_H
