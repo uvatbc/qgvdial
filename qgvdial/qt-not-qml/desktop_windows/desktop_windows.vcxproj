@@ -82,6 +82,7 @@
     <ClInclude Include="..\..\..\api\CookieJar.h" />
     <ClInclude Include="..\..\..\api\GContactsApi.h" />
     <ClInclude Include="..\..\..\api\GVApi.h" />
+    <ClInclude Include="..\..\..\api\GVApi_login.h" />
     <ClInclude Include="..\..\..\api\GvXMLParser.h" />
     <ClInclude Include="..\..\..\api\HtmlFieldParser.h" />
     <ClInclude Include="..\..\..\api\MyXmlErrorHandler.h" />
@@ -138,6 +139,7 @@
     <ClCompile Include="..\..\..\api\CookieJar.cpp" />
     <ClCompile Include="..\..\..\api\GContactsApi.cpp" />
     <ClCompile Include="..\..\..\api\GVApi.cpp" />
+    <ClCompile Include="..\..\..\api\GVApi_login.cpp" />
     <ClCompile Include="..\..\..\api\GvXMLParser.cpp" />
     <ClCompile Include="..\..\..\api\HtmlFieldParser.cpp" />
     <ClCompile Include="..\..\..\api\MyXmlErrorHandler.cpp" />

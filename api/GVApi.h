@@ -44,7 +44,6 @@ public:
     void dbg_alwaysFailDialing(bool set = true);
 
     QString getSelfNumber();
-    void cancel(AsyncTaskToken *token);
 
     static void
     simplify_number (QString &strNumber, bool bAddIntPrefix = true);
@@ -84,24 +83,6 @@ public slots:
     void resetNwMgr();
 
 private slots:
-
-    // Login and two factor
-    void onLogin1(bool success, const QByteArray &response,
-                  QNetworkReply *reply, void *ctx);
-    void onLogin2(bool success, const QByteArray &response,
-                  QNetworkReply *reply, void *ctx);
-    void onTFAAltLoginResp(bool success, const QByteArray &response,
-                           QNetworkReply *reply, void *ctx);
-
-    void internalLogoutForReLogin();
-
-    void onInitGv(bool success, const QByteArray &response,
-                  QNetworkReply *reply, void *ctx);
-
-    // Logout
-    void onLogout(bool success, const QByteArray &response,
-                  QNetworkReply *reply, void *ctx);
-
     // Get phones
     void onGetPhones(bool success, const QByteArray &response,
                      QNetworkReply *reply, void *ctx);
@@ -160,12 +141,7 @@ private:
     void updateLoggedInFlag(AsyncTaskToken *task, const QString &strResponse);
 
     // Login and two factor
-    bool postLogin(QUrl url, AsyncTaskToken *token);
-    bool parseHiddenLoginFields(const QString &strResponse, QVariantMap &ret);
     bool initGv(AsyncTaskToken *token);
-    bool parseAlternateLogins(const QString &form, AsyncTaskToken *task);
-
-    void lookForLoginErrorMessage(const QString &resp, AsyncTaskToken *task);
 
     // Send SMS
     bool doSendSms(QUrl url, AsyncTaskToken *token);
@@ -225,6 +201,9 @@ private:
     QVariantMap m_hiddenLoginFields;
 
     bool m_dbgAlwaysFailDialing;
+
+    friend class GVApi_login;
+    GVApi_login *m_login;
 };
 
 #endif // GVAPI_H

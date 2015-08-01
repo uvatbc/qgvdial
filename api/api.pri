@@ -1,6 +1,7 @@
 INCLUDEPATH += $$PWD
 
 SOURCES  += $$PWD/GVApi.cpp \
+            $$PWD/GVApi_login.cpp \
             $$PWD/NwReqTracker.cpp \
             $$PWD/AsyncTaskToken.cpp \
             $$PWD/CookieJar.cpp \
@@ -12,6 +13,7 @@ SOURCES  += $$PWD/GVApi.cpp \
 
 HEADERS  += $$PWD/api_common.h \
             $$PWD/GVApi.h \
+            $$PWD/GVApi_login.h \
             $$PWD/NwReqTracker.h \
             $$PWD/AsyncTaskToken.h \
             $$PWD/CookieJar.h \

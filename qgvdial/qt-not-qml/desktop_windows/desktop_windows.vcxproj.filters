@@ -306,6 +306,9 @@
     <ClInclude Include="..\..\features\osver\desktop\windows\OSVer.h">
       <Filter>features\osv-windows\headers</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\api\GVApi_login.h">
+      <Filter>api\headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MainApp.cpp">
@@ -463,6 +466,9 @@
     </ClCompile>
     <ClCompile Include="..\..\features\osver\desktop\windows\OSVer.cpp">
       <Filter>features\osv-windows\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\api\GVApi_login.cpp">
+      <Filter>api\sources</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
