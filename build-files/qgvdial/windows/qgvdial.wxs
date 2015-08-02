@@ -58,7 +58,7 @@
             <Component Id="Qt5Widgets.dll" Guid="12B851E1-165D-4C25-8D6F-CEB6C446DC37">
                 <File Id="Qt5Widgets.dll" Source="__QTDIR__\bin\Qt5Widgets.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
-            <Component Id="Qt5WebKitWidgets.dll" Guid="12B851E1-165D-4C25-8D6F-CEB6C446DC37">
+            <Component Id="Qt5WebKitWidgets.dll" Guid="CB4616B9-DDE9-4840-9AB2-B9A961708DDD">
                 <File Id="Qt5WebKitWidgets.dll" Source="__QTDIR__\bin\Qt5WebKitWidgets.dll" KeyPath="yes" Checksum="yes"/>
             </Component>
             <Component Id="Qt5Network.dll" Guid="5986CCCC-B1DD-462C-8866-0EF57136928B">
