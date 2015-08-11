@@ -95,7 +95,7 @@ print "$cmd\n";
 system("$cmd");
 
 # Speed up the make
-system("cd $basedir/qgvdial/qgvdial-$qver ; ../features/dbus_api/gen/create_ifaces.sh  ; qmake ; make -j4");
+system("cd $basedir/qgvdial/qgvdial-$qver ; ../features/dbus_api/gen/create_ifaces.sh ; qmake desktop_linux.pro ; make -j4");
 
 # Built it all!
 $cmd = "cd $basedir/qgvdial/qgvdial-$qver && dpkg-buildpackage -rfakeroot -nc -uc -us";
