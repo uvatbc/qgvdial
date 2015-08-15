@@ -613,7 +613,7 @@ GVApi_login::lookForLoginErrorMessage(const QString &resp, AsyncTaskToken *task)
             if (span.isEmpty ()) {
                 Q_WARN("Didn't find errormsg_0_Email");
 
-                if (resp.contains ("smsauth-interstitial-reviewsettings")) {
+                if (!resp.contains ("smsauth-interstitial-reviewsettings")) {
                     Q_WARN("Didn't find smsauth-interstitial-reviewsettings");
                 } else {
                     Q_WARN("TFA settings review is required!");
