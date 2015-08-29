@@ -581,3 +581,41 @@ NwHelpers::appendQVMap(QVariantMap &dst, const QVariantMap &src)
         dst[key] = src[key];
     }
 }//NwHelpers::appendQVMap
+
+QString
+NwHelpers::convertHtmlAmps(const QString &input)
+{
+    QString rv = input;
+    int pos;
+
+    while ((pos = rv.indexOf("&amp;", 0, Qt::CaseInsensitive)) != -1) {
+        int semipos = rv.indexOf(";", pos + 5);
+        if (-1 == semipos) {
+            Q_DEBUG(QString("'%1' malformed ampersands").arg(input));
+            break;
+        }
+
+        QString numStr = rv.mid(pos + 5, semipos - (pos + 4));
+        if (!numStr.startsWith("#")) {
+            Q_DEBUG(QString("'%1' malformed number: '%2'")
+                    .arg(input).arg(numStr));
+            break;
+        }
+
+        bool ok;
+        char number = numStr.mid(1, numStr.length() - 2).toInt(&ok);
+        if (!ok) {
+            Q_DEBUG(QString("'%1' numStr: '%2' parsed: '%3'")
+                    .arg(input).arg(numStr)
+                    .arg(numStr.mid(1, numStr.length() - 2)));
+            break;
+        }
+
+        rv = QString("%1%2%3")
+            .arg(rv.mid(0, pos))
+            .arg(QChar(number))
+            .arg(rv.mid(semipos + 1));
+    }
+
+    return rv;
+}//NwHelpers::convertHtmlAmps

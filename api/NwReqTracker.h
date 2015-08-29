@@ -100,6 +100,8 @@ public:
                                         QStringList ignoreKeys = QStringList());
     static QByteArray createPostContent(const QUrl &url);
     static void appendQVMap(QVariantMap &dst, const QVariantMap &src);
+
+    static QString convertHtmlAmps(const QString &input);
 };
 
 #endif // NWREQTRACKER_H

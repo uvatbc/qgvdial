@@ -593,7 +593,7 @@ IMainWindow::onGvTextTaskDone()
 
         m_mixPanel.addEvent(m_user, "SMS sent");
 
-        oInbox.refreshLatestNotrash ();
+        oInbox.refreshLatestNoTrash ();
     }
 }//IMainWindow::onGvTextTaskDone
 

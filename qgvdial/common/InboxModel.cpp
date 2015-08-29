@@ -27,7 +27,7 @@ Contact: yuvraaj@gmail.com
 
 InboxModel::InboxModel (QObject * parent)
 : QSqlQueryModel (parent)
-, strSelectType ("all")
+, m_selectedInbox ("all")
 , m_eSelectType (GVIE_Unknown)
 {
 #if QT_VERSION < QT_VERSION_CHECK(5,0,0)
@@ -338,12 +338,12 @@ bool
 InboxModel::refresh (const QString &strSelected)
 {
     GVI_Entry_Type eSelected = GVIE_Unknown;
-    if (strSelected != strSelectType) {
+    if (strSelected != m_selectedInbox) {
         eSelected = string_to_type (strSelected);
     }
     if ((GVIE_Unknown != eSelected) ||
         (0 == strSelected.compare ("all", Qt::CaseInsensitive))) {
-        strSelectType = strSelected;
+        m_selectedInbox = strSelected;
         m_eSelectType = eSelected;
     } else {
         return (false);
@@ -362,7 +362,7 @@ InboxModel::refresh (const QString &strSelected)
 bool
 InboxModel::refresh ()
 {
-    return this->refresh (strSelectType);
+    return this->refresh (m_selectedInbox);
 }//InboxModel::refresh
 
 bool

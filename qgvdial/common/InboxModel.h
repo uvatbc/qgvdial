@@ -63,9 +63,9 @@ public:
 private:
     bool searchById(const QString &id, quint32 &foundRow);
 
-    CacheDb db;
-    QString strSelectType;
-    GVI_Entry_Type m_eSelectType;
+    CacheDb         db;
+    QString         m_selectedInbox;
+    GVI_Entry_Type  m_eSelectType;
 };
 
 #define INBOX_ENTRY_READ_MASK  (1 << 0)

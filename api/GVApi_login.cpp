@@ -457,7 +457,6 @@ gonext:
     }
 
     return true;
-
 }//GVApi_login::parseAlternateLogins
 
 void
@@ -642,7 +641,7 @@ GVApi_login::lookForLoginErrorMessage(const QString &resp, AsyncTaskToken *task)
             break;
         }
 
-        span = span.mid (0, pos).trimmed ();
+        span = NwHelpers::convertHtmlAmps(span.mid(0, pos).trimmed());
 
         if (!span.isEmpty ()) {
             Q_WARN(QString("Google login failure reported: '%1'").arg(span));

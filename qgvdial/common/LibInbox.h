@@ -43,7 +43,7 @@ public slots:
     bool refreshLatest(QString type);
     bool refreshLatest();
     bool refreshFull();
-    bool refreshLatestNotrash();
+    bool refreshLatestNoTrash();
 
     Q_INVOKABLE bool markEntryAsRead(const QString &id);
     Q_INVOKABLE bool deleteEntry(const QString &id);
@@ -78,6 +78,7 @@ protected:
     QTimer      m_updateTimer;
     bool        m_enableTimerUpdate;
     bool        m_reportUpdateFrequency;
+    QString     m_selectedInbox;
 };
 
 #endif // LIBINBOX_H

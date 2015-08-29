@@ -943,6 +943,7 @@ GVApi::validateAndMatchInboxEntry(GVInboxEntry &inboxEntry,
         QString msgDiv = parseDomElement (strHtml, "div", "id",
                                           inboxEntry.id);
         if (msgDiv.isEmpty ()) {
+            Q_WARN(QString("Couldn't find inbox entry: %1").arg(inboxEntry.id));
             return;
         }
 
@@ -950,10 +951,14 @@ GVApi::validateAndMatchInboxEntry(GVInboxEntry &inboxEntry,
                 parseDomElement (msgDiv, "div", "class",
                                  "gc-message-message-display");
         if (msgDispDiv.isEmpty ()) {
+            Q_WARN(QString("Couldn't find gc-message-message-display for inbox "
+                           " entry: % 1").arg(inboxEntry.id));
             return;
         }
 
         if (!parseMessageDiv (msgDispDiv, inboxEntry)) {
+            Q_WARN(QString("Failed to parse inbox entry: %1")
+                   .arg(inboxEntry.id));
             return;
         }
     }
@@ -1324,7 +1329,6 @@ GVApi::parseDomElement(const QString &domStr,
     while (true) {
         pos = findDomElement (domStr, element, pos, isStart);
         if (-1 == pos) {
-            Q_WARN("Nothing found");
             return QString();
         }
 

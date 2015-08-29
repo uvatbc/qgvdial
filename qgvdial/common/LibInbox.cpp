@@ -30,6 +30,7 @@ LibInbox::LibInbox(IMainWindow *parent)
 , m_inboxModel(NULL)
 , m_enableTimerUpdate(false)
 , m_reportUpdateFrequency(true) // Always report the frequency at the start
+, m_selectedInbox("all")
 {
     connect (&parent->gvApi,
              SIGNAL(oneInboxEntry(AsyncTaskToken*,GVInboxEntry)),
@@ -87,7 +88,7 @@ LibInbox::refreshLatest(QString type)
 bool
 LibInbox::refreshLatest()
 {
-    return refreshLatest ("all");
+    return refreshLatest(m_selectedInbox);
 }//LibInbox::refreshLatest
 
 bool
@@ -99,7 +100,7 @@ LibInbox::refreshFull()
 }//LibInbox::refreshFull
 
 bool
-LibInbox::refreshLatestNotrash()
+LibInbox::refreshLatestNoTrash()
 {
     AsyncTaskToken *task = new AsyncTaskToken(this);
     if (NULL == task) {
@@ -322,6 +323,7 @@ LibInbox::onUserSelect(QString selection)
 
     IMainWindow *win = (IMainWindow *) this->parent ();
     win->uiSetSelelctedInbox (selection);
+    m_selectedInbox = selection;
 
     return (true);
 }//LibInbox::onUserSelect
@@ -411,7 +413,7 @@ LibInbox::onInboxEntryDeleted()
 void
 LibInbox::onModelRefreshTimeout()
 {
-    m_inboxModel->refresh ();
+    m_inboxModel->refresh (m_selectedInbox);
 }//LibInbox::onModelRefreshTimeout
 
 void
