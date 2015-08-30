@@ -242,6 +242,7 @@ GVApi_login::parseHiddenLoginFields(const QString &strResponse,
   <input type="hidden" name="continue" id="continue"
            value="https://www.google.com/voice/m" />
 */
+    GVApi *p = (GVApi *)this->parent();
     QRegExp rx1("\\<input(.*)\\>");
     rx1.setMinimal (true);
     if (!strResponse.contains (rx1)) {
@@ -269,12 +270,10 @@ GVApi_login::parseHiddenLoginFields(const QString &strResponse,
             goto gonext;
         }
         if (attrs["type"].toString() != "hidden") {
-#if DEBUG_ONLY
-            if (p->emitLog) {
+            if (DEBUG_ONLY && p->emitLog) {
                 Q_DEBUG(QString("Input field \"%1\" is not hidden")
                     .arg(oneInstance));
             }
-#endif
             goto gonext;
         }
 
@@ -283,13 +282,11 @@ GVApi_login::parseHiddenLoginFields(const QString &strResponse,
             value = attrs["value"].toString();
         }
 
-#if DEBUG_ONLY
-        if (ret.contains (name) &&
+        if (DEBUG_ONLY && ret.contains (name) &&
            (ret[name].toString() != value)) {
             Q_DEBUG(QString("Overwriting %1 value %2 with value %3")
                     .arg (name, ret[name].toString(), value));
         }
-#endif
 
         ret[name] = value;
 
@@ -328,7 +325,7 @@ GVApi_login::postLogin(QUrl url, AsyncTaskToken *task)
         allLoginFields[key] = m_hiddenLoginFields[key];
     }
 
-    allLoginFields["Email"]             = task->inParams["user"];
+    allLoginFields["Email"] = task->inParams["user"];
     if (!allLoginFields.contains("PersistentCookie")) {
         allLoginFields["PersistentCookie"] = "yes";
     }
@@ -371,12 +368,11 @@ GVApi_login::postLogin(QUrl url, AsyncTaskToken *task)
 bool
 GVApi_login::parseAlternateLogins(const QString &form, AsyncTaskToken *task)
 {
-    GVApi *p = (GVApi *)this->parent();
-
 /* To match:
   <input type="radio" name="retry" id="SMS_..."   value="SMS_..." />
   <input type="radio" name="retry" id="VOICE_..." value="VOICE_" />
 */
+    GVApi *p = (GVApi *)this->parent();
     QRegExp rx1("\\<input(.*)\\>");
     rx1.setMinimal (true);
     if (!form.contains (rx1)) {
@@ -424,12 +420,10 @@ GVApi_login::parseAlternateLogins(const QString &form, AsyncTaskToken *task)
                 goto gonext;
         }
         if (attrs["type"].toString() != "radio") {
-#if DEBUG_ONLY
-            if (p->emitLog) {
+            if (DEBUG_ONLY && p->emitLog) {
                 Q_DEBUG(QString("Input field \"%1\" is not a radio")
                     .arg(oneInstance));
             }
-#endif
             goto gonext;
         }
 
@@ -466,13 +460,11 @@ GVApi_login::onLogin2(bool success, const QByteArray &response,
     GVApi *p = (GVApi *)this->parent();
     AsyncTaskToken *task = (AsyncTaskToken *)ctx;
     QString strResponse = response;
-    bool accountConfigured = true;
     bool tfaRequired = false;
 
+#if 0
     QUrl replyUrl = reply->url ();
     QString strReplyUrl = replyUrl.toString();
-
-#if 0
     QFile fTemp("login2.html");
     fTemp.open (QFile::ReadWrite);
     fTemp.write(strReplyUrl.toLatin1());
@@ -530,6 +522,16 @@ GVApi_login::onLogin2(bool success, const QByteArray &response,
             break;
         }
 
+        // Is there a captcha?
+        if (strResponse.contains ("identifier-captcha-input")) {
+            Q_WARN("Captcha!!");
+            task->errorString = "User needs complete login with captcha";
+            task->status = ATTS_LOGIN_FAIL_SHOWURL;
+            task->outParams["showURL"] = GV_HTTPS_M;
+            success = false;
+            break;
+        }
+
         // Pull out the noscript part:
         QString noscript;
         QRegExp rxNoscript("\\<noscript\\>.*\\</noscript\\>");
@@ -573,21 +575,12 @@ GVApi_login::onLogin2(bool success, const QByteArray &response,
     } while (0);
 
     if (!success) {
-        if (task->status == ATTS_NW_ERROR) {
-        } else if (accountConfigured) {
+        if (task->status == ATTS_SUCCESS) {
+            // Generic failure
             Q_WARN("Login failed.") << strResponse << m_hiddenLoginFields;
 
             task->status = ATTS_LOGIN_FAILURE;
             lookForLoginErrorMessage (strResponse, task);
-        } else {
-            Q_WARN("Login failed because user account was not configured.");
-
-            task->errorString = tr("The username that you have entered is not "
-                                    "configured for Google Voice. Please go "
-                                    "to www.google.com/voice on a desktop "
-                                    "browser and complete the setup of your "
-                                    "Google Voice account.");
-            task->status = ATTS_AC_NOT_CONFIGURED;
         }
 
         if (p->m_jar) {
