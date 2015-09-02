@@ -84,6 +84,15 @@
     <Filter Include="features\osv-windows\sources">
       <UniqueIdentifier>{a3810f9d-b02b-4172-92fc-c0dd1f64f34d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="features\mqlib">
+      <UniqueIdentifier>{92d29f7a-2f29-486d-a823-c9a5bf29fe26}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="features\mqlib\headers">
+      <UniqueIdentifier>{0f926776-ca06-472d-b34f-9bd08115050a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="features\mqlib\sources">
+      <UniqueIdentifier>{5982602c-dc19-491c-8cf1-db10758754e9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="readme.txt" />
@@ -139,6 +148,9 @@
       <Filter>Source Files</Filter>
     </None>
     <None Include="..\..\..\build-files\qgvdial\windows\qgvdial.wxs" />
+    <None Include="..\..\features\mqlib\mqlib.pri">
+      <Filter>features\mqlib</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainApp.h">
@@ -309,6 +321,60 @@
     <ClInclude Include="..\..\..\api\GVApi_login.h">
       <Filter>api\headers</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\features\mqlib\dummypthread.h">
+      <Filter>features\mqlib\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\features\mqlib\logging_mosq.h">
+      <Filter>features\mqlib\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\features\mqlib\memory_mosq.h">
+      <Filter>features\mqlib\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\features\mqlib\messages_mosq.h">
+      <Filter>features\mqlib\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\features\mqlib\mosquitto.h">
+      <Filter>features\mqlib\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\features\mqlib\mosquitto_internal.h">
+      <Filter>features\mqlib\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\features\mqlib\mq_config.h">
+      <Filter>features\mqlib\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\features\mqlib\mqtt3_protocol.h">
+      <Filter>features\mqlib\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\features\mqlib\net_mosq.h">
+      <Filter>features\mqlib\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\features\mqlib\read_handle.h">
+      <Filter>features\mqlib\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\features\mqlib\send_mosq.h">
+      <Filter>features\mqlib\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\features\mqlib\time_mosq.h">
+      <Filter>features\mqlib\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\features\mqlib\tls_mosq.h">
+      <Filter>features\mqlib\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\features\mqlib\util_mosq.h">
+      <Filter>features\mqlib\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\features\mqlib\will_mosq.h">
+      <Filter>features\mqlib\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\features\mqlib\cpp\mosquittopp.h">
+      <Filter>features\mqlib\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\features\mqlib\socks_mosq.h">
+      <Filter>features\mqlib\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\MqClient.h">
+      <Filter>common\headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MainApp.cpp">
@@ -469,6 +535,63 @@
     </ClCompile>
     <ClCompile Include="..\..\..\api\GVApi_login.cpp">
       <Filter>api\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\features\mqlib\logging_mosq.c">
+      <Filter>features\mqlib\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\features\mqlib\memory_mosq.c">
+      <Filter>features\mqlib\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\features\mqlib\messages_mosq.c">
+      <Filter>features\mqlib\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\features\mqlib\mosquitto.c">
+      <Filter>features\mqlib\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\features\mqlib\net_mosq.c">
+      <Filter>features\mqlib\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\features\mqlib\read_handle.c">
+      <Filter>features\mqlib\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\features\mqlib\read_handle_client.c">
+      <Filter>features\mqlib\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\features\mqlib\read_handle_shared.c">
+      <Filter>features\mqlib\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\features\mqlib\send_client_mosq.c">
+      <Filter>features\mqlib\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\features\mqlib\send_mosq.c">
+      <Filter>features\mqlib\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\features\mqlib\srv_mosq.c">
+      <Filter>features\mqlib\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\features\mqlib\thread_mosq.c">
+      <Filter>features\mqlib\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\features\mqlib\time_mosq.c">
+      <Filter>features\mqlib\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\features\mqlib\tls_mosq.c">
+      <Filter>features\mqlib\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\features\mqlib\util_mosq.c">
+      <Filter>features\mqlib\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\features\mqlib\will_mosq.c">
+      <Filter>features\mqlib\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\features\mqlib\cpp\mosquittopp.cpp">
+      <Filter>features\mqlib\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\features\mqlib\socks_mosq.c">
+      <Filter>features\mqlib\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\MqClient.cpp">
+      <Filter>common\sources</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

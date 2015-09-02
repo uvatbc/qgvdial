@@ -895,7 +895,7 @@ GVApi_login::initGv(AsyncTaskToken *task)
 
 void
 GVApi_login::onInitGv(bool success, const QByteArray &response,
-                QNetworkReply *, void *ctx)
+                      QNetworkReply *, void *ctx)
 {
     GVApi *p = (GVApi *)this->parent();
     AsyncTaskToken *task = (AsyncTaskToken *)ctx;
@@ -974,7 +974,7 @@ GVApi_login::logout(AsyncTaskToken *token)
 
 void
 GVApi_login::onLogout(bool success, const QByteArray & /*response*/,
-                QNetworkReply * /*reply*/, void *ctx)
+                      QNetworkReply * /*reply*/, void *ctx)
 {
     GVApi *p = (GVApi *)this->parent();
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;

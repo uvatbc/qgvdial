@@ -12,6 +12,7 @@ SOURCES  += desktop_windows/PhoneFactory.cpp
 HEADERS  += desktop_windows/platform_specific.h \
             desktop_windows/PhoneFactory.h
 
+# This is because we don't support skype anymore
 #SOURCES  += desktop_windows/MainApp.cpp \
 #            desktop_windows/ObserverFactory.cpp
 #HEADERS  += desktop_windows/MainApp.h \

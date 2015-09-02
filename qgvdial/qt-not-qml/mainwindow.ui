@@ -302,8 +302,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>98</width>
-             <height>99</height>
+             <width>437</width>
+             <height>148</height>
             </rect>
            </property>
            <attribute name="label">
@@ -341,8 +341,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>262</width>
-             <height>231</height>
+             <width>220</width>
+             <height>211</height>
             </rect>
            </property>
            <attribute name="label">
@@ -455,8 +455,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>265</width>
-             <height>72</height>
+             <width>217</width>
+             <height>64</height>
             </rect>
            </property>
            <attribute name="label">
@@ -513,8 +513,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>432</width>
-             <height>141</height>
+             <width>437</width>
+             <height>148</height>
             </rect>
            </property>
            <attribute name="label">
@@ -525,6 +525,13 @@
              <widget class="QPushButton" name="btnAbout">
               <property name="text">
                <string>About</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btnDevNotifications">
+              <property name="text">
+               <string>Developer Notifications</string>
               </property>
              </widget>
             </item>
@@ -567,7 +574,7 @@
      <x>0</x>
      <y>0</y>
      <width>497</width>
-     <height>20</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">

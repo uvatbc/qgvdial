@@ -1,42 +1,29 @@
 /*
-Copyright (c) 2010-2013 Roger Light <roger@atchoo.org>
-All rights reserved.
+Copyright (c) 2010-2014 Roger Light <roger@atchoo.org>
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
-1. Redistributions of source code must retain the above copyright notice,
-   this list of conditions and the following disclaimer.
-2. Redistributions in binary form must reproduce the above copyright
-   notice, this list of conditions and the following disclaimer in the
-   documentation and/or other materials provided with the distribution.
-3. Neither the name of mosquitto nor the names of its
-   contributors may be used to endorse or promote products derived from
-   this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-POSSIBILITY OF SUCH DAMAGE.
+All rights reserved. This program and the accompanying materials
+are made available under the terms of the Eclipse Public License v1.0
+and Eclipse Distribution License v1.0 which accompany this distribution.
+ 
+The Eclipse Public License is available at
+   http://www.eclipse.org/legal/epl-v10.html
+and the Eclipse Distribution License is available at
+  http://www.eclipse.org/org/documents/edl-v10.php.
+ 
+Contributors:
+   Roger Light - initial implementation and documentation.
 */
 
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "mosquitto_internal.h"
-#include "mosquitto.h"
-#include "memory_mosq.h"
-#include "messages_mosq.h"
-#include "send_mosq.h"
-#include "time_mosq.h"
+#include <mosquitto_internal.h>
+#include <mosquitto.h>
+#include <memory_mosq.h>
+#include <messages_mosq.h>
+#include <send_mosq.h>
+#include <time_mosq.h>
 
 void _mosquitto_message_cleanup(struct mosquitto_message_all **message)
 {
@@ -119,8 +106,18 @@ void mosquitto_message_free(struct mosquitto_message **message)
 	_mosquitto_free(msg);
 }
 
-void _mosquitto_message_queue(struct mosquitto *mosq, struct mosquitto_message_all *message, enum mosquitto_msg_direction dir)
+
+/*
+ * Function: _mosquitto_message_queue
+ *
+ * Returns:
+ *	0 - to indicate an outgoing message can be started
+ *	1 - to indicate that the outgoing message queue is full (inflight limit has been reached)
+ */
+int _mosquitto_message_queue(struct mosquitto *mosq, struct mosquitto_message_all *message, enum mosquitto_msg_direction dir)
 {
+	int rc = 0;
+
 	/* mosq->*_message_mutex should be locked before entering this function */
 	assert(mosq);
 	assert(message);
@@ -134,11 +131,15 @@ void _mosquitto_message_queue(struct mosquitto *mosq, struct mosquitto_message_a
 			mosq->out_messages = message;
 		}
 		mosq->out_messages_last = message;
+		if(message->msg.qos > 0){
+			if(mosq->max_inflight_messages == 0 || mosq->inflight_messages < mosq->max_inflight_messages){
+				mosq->inflight_messages++;
+			}else{
+				rc = 1;
+			}
+		}
 	}else{
 		mosq->in_queue_len++;
-		if(message->msg.qos > 0 && (mosq->max_inflight_messages == 0 || mosq->inflight_messages < mosq->max_inflight_messages)){
-			mosq->inflight_messages++;
-		}
 		message->next = NULL;
 		if(mosq->in_messages_last){
 			mosq->in_messages_last->next = message;
@@ -147,6 +148,7 @@ void _mosquitto_message_queue(struct mosquitto *mosq, struct mosquitto_message_a
 		}
 		mosq->in_messages_last = message;
 	}
+	return rc;
 }
 
 void _mosquitto_messages_reconnect_reset(struct mosquitto *mosq)
@@ -290,9 +292,6 @@ int _mosquitto_message_remove(struct mosquitto *mosq, uint16_t mid, enum mosquit
 				}else if(!mosq->in_messages){
 					mosq->in_messages_last = NULL;
 				}
-				if(cur->msg.qos == 2){
-					mosq->inflight_messages--;
-				}
 				found = true;
 				break;
 			}
@@ -309,13 +308,18 @@ int _mosquitto_message_remove(struct mosquitto *mosq, uint16_t mid, enum mosquit
 	}
 }
 
-#if defined(WITH_THREADING)
-void _mosquitto_message_retry_check_actual(struct mosquitto *mosq, struct mosquitto_message_all *messages, pthread_mutex_t mutex)
+#ifdef WITH_THREADING
+void _mosquitto_message_retry_check_actual(struct mosquitto *mosq, struct mosquitto_message_all *messages, pthread_mutex_t *mutex)
+#else
+void _mosquitto_message_retry_check_actual(struct mosquitto *mosq, struct mosquitto_message_all *messages)
+#endif
 {
 	time_t now = mosquitto_time();
 	assert(mosq);
 
-	pthread_mutex_lock(&mutex);
+#ifdef WITH_THREADING
+	pthread_mutex_lock(mutex);
+#endif
 
 	while(messages){
 		if(messages->timestamp + mosq->message_retry < now){
@@ -334,7 +338,7 @@ void _mosquitto_message_retry_check_actual(struct mosquitto *mosq, struct mosqui
 				case mosq_ms_wait_for_pubcomp:
 					messages->timestamp = now;
 					messages->dup = true;
-					_mosquitto_send_pubrel(mosq, messages->msg.mid, true);
+					_mosquitto_send_pubrel(mosq, messages->msg.mid);
 					break;
 				default:
 					break;
@@ -342,15 +346,19 @@ void _mosquitto_message_retry_check_actual(struct mosquitto *mosq, struct mosqui
 		}
 		messages = messages->next;
 	}
-	pthread_mutex_unlock(&mutex);
-}
+#ifdef WITH_THREADING
+	pthread_mutex_unlock(mutex);
 #endif
+}
 
 void _mosquitto_message_retry_check(struct mosquitto *mosq)
 {
-#if defined(WITH_THREADING)
-	_mosquitto_message_retry_check_actual(mosq, mosq->out_messages, mosq->out_message_mutex);
-	_mosquitto_message_retry_check_actual(mosq, mosq->in_messages, mosq->in_message_mutex);
+#ifdef WITH_THREADING
+	_mosquitto_message_retry_check_actual(mosq, mosq->out_messages, &mosq->out_message_mutex);
+	_mosquitto_message_retry_check_actual(mosq, mosq->in_messages, &mosq->in_message_mutex);
+#else
+	_mosquitto_message_retry_check_actual(mosq, mosq->out_messages);
+	_mosquitto_message_retry_check_actual(mosq, mosq->in_messages);
 #endif
 }
 

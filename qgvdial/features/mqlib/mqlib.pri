@@ -15,6 +15,7 @@ HEADERS  += $$PWD/mosquitto.h           \
             $$PWD/will_mosq.h           \
             $$PWD/mosquitto_internal.h  \
             $$PWD/mqtt3_protocol.h      \
+            $$PWD/socks_mosq.h          \
             $$PWD/mq_config.h
 
 SOURCES  += $$PWD/mosquitto.c           \
@@ -32,7 +33,8 @@ SOURCES  += $$PWD/mosquitto.c           \
             $$PWD/tls_mosq.c            \
             $$PWD/util_mosq.c           \
             $$PWD/will_mosq.c           \
-            $$PWD/srv_mosq.c
+            $$PWD/srv_mosq.c            \
+            $$PWD/socks_mosq.c
 
 HEADERS  += $$PWD/cpp/mosquittopp.h
 SOURCES  += $$PWD/cpp/mosquittopp.cpp
