@@ -149,8 +149,6 @@ QmlMainWindow::init()
     ((QtSingleApplication*)qApp)->setActivationWindow(m_view);
 #endif
 
-    IMainWindow::init ();
-
     if (NULL == m_qmlStub) {
         m_qmlStub = new QmlStubBase(this);
     } else {

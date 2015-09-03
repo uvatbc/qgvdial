@@ -29,7 +29,6 @@ DummyMainWindow::DummyMainWindow(QObject *parent)
 void
 DummyMainWindow::init()
 {
-    IMainWindow::init ();
     Q_ASSERT(0 == "Not implemented");
 }//DummyMainWindow::init
 

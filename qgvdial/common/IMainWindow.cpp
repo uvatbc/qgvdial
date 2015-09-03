@@ -22,6 +22,7 @@ Contact: yuvraaj@gmail.com
 #include "IMainWindow.h"
 #include "Lib.h"
 #include "GVNumModel.h"
+#include "MqClient.h"
 #include <QDesktopServices>
 
 #define BROWSER_DIALBACK_CTX_VALUE 0x3456
@@ -36,9 +37,12 @@ IMainWindow::IMainWindow(QObject *parent)
 , oPhones(this)
 , oLogUploader(this)
 , oVmail(this)
+, m_srvInfo(this)
 , m_loginTask(NULL)
 , m_logMessageMutex(QMutex::Recursive)
 , m_mixPanel(this)
+, m_mqClient(NULL)
+, m_nwMgr(NULL)
 {
     qRegisterMetaType<ContactInfo>("ContactInfo");
     connect(&gvApi, SIGNAL(twoStepAuthentication(AsyncTaskToken*)),
@@ -57,13 +61,11 @@ IMainWindow::IMainWindow(QObject *parent)
     connect(&m_mixpanelTimer, SIGNAL(timeout()),
             &m_mixPanel, SLOT(flushEvents()));
     connect(&m_mixPanel, SIGNAL(eventAdded()), this, SLOT(onMixEventAdded()));
-}//IMainWindow::IMainWindow
 
-void
-IMainWindow::init()
-{
-    connect (qApp, SIGNAL(aboutToQuit()), this, SLOT(onQuit()));
-}//IMainWindow::init
+    connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(onQuit()));
+
+    resetNwMgr();
+}//IMainWindow::IMainWindow
 
 void
 IMainWindow::onQuit()
@@ -74,7 +76,50 @@ IMainWindow::onQuit()
     db.saveCookies (cookies);
 
     db.deinit ();
+
+    if (m_mqClient) {
+        m_mqClient->stopWork();
+        m_mqClient = NULL;
+    }
+
+    mosqpp::lib_cleanup();
 }//IMainWindow::onQuit
+
+void
+IMainWindow::onGotSrvInfo(bool success)
+{
+    if (!success) {
+        Q_WARN("Failed to get server info. Mq Client will NOT be initialized");
+        return;
+    }
+
+    if (!reinitMqClient()) {
+        qApp->quit();
+    }
+}//IMainWindow::onGotSrvInfo
+
+bool
+IMainWindow::reinitMqClient(void)
+{
+    if (m_mqClient) {
+        m_mqClient->stopWork();
+        m_mqClient = NULL;
+    }
+
+    m_mqClient = new MqClient;
+    if (NULL == m_mqClient) {
+        Q_WARN("Failed to allocate mq client");
+        return false;
+    }
+
+    m_mqClient->setupClient(&m_mqThread,
+                            m_srvInfo.m_userInfoHost, m_srvInfo.m_userInfoPort);
+    connect(&m_mqThread, SIGNAL(started()), m_mqClient, SLOT(startWork()));
+
+    m_mqClient->moveToThread(&m_mqThread);
+    m_mqThread.start();
+    return true;
+}//IMainWindow::reinitMqClient
 
 void
 IMainWindow::onInitDone()
@@ -82,6 +127,16 @@ IMainWindow::onInitDone()
     QString user, pass;
 
     do {
+        if (MOSQ_ERR_SUCCESS != mosqpp::lib_init()) {
+            Q_WARN("Failed to initialize mosquitto library");
+            qApp->quit();
+            break;
+        }
+
+        QObject::connect(&m_srvInfo, SIGNAL(done(bool)),
+                         this, SLOT(onGotSrvInfo(bool)));
+        m_srvInfo.getInfo ();
+
         db.init (Lib::ref().getDbDir());
         oContacts.init ();
         m_mixPanel.setToken(MIXPANEL_TOKEN);
@@ -723,3 +778,14 @@ IMainWindow::onMixEventAdded()
     m_mixpanelTimer.stop ();
     m_mixpanelTimer.start (MIXPANEL_FLUSH_TIMEOUT);
 }//IMainWindow::onMixEventAdded
+
+void
+IMainWindow::resetNwMgr()
+{
+    if (NULL != m_nwMgr) {
+        m_nwMgr->deleteLater ();
+        m_nwMgr = NULL;
+    }
+
+    m_nwMgr = new QNetworkAccessManager(this);
+}//IMainWindow::resetNwMgr

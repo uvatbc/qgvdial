@@ -19,30 +19,35 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#include "MainWindow.h"
-#include "qmlapplicationviewer.h"
+#ifndef LIBSERVERINFO_H
+#define LIBSERVERINFO_H
 
-QApplication *
-createAppObject(int &argc, char **argv)
-{
-    return createApplication (argc, argv);
-}//createAppObject
+#include "global.h"
+#include <QObject>  // S^1 :/
 
-MainWindow::MainWindow(QObject *parent)
-//: IMainWindow(parent)
-: DummyMainWindow(parent)
-, m_view(new QmlApplicationViewer)
+class IMainWindow;
+class LibServerInfo : public QObject
 {
-}//MainWindow::MainWindow
+    Q_OBJECT
+public:
+    explicit LibServerInfo(IMainWindow *parent = NULL);
 
-void
-MainWindow::init()
-{
-    m_view->setMainQmlFile(QLatin1String("qml/symbian/main.qml"));
-    m_view->showExpanded();
-}//MainWindow::init
+    void getInfo(void);
 
-void
-MainWindow::log(QDateTime /*dt*/, int /*level*/, const QString & /*strLog*/)
-{
-}//MainWindow::log
+private slots:
+    void onGotSrvInfo(bool success, const QByteArray &response,
+                      QNetworkReply *reply, void *ctx);
+
+private:
+    bool parseSrvInfo(const QString &json);
+
+signals:
+    void done(bool success);
+
+public:
+    QString m_userInfoHost;
+    quint16 m_userInfoPort;
+    QString m_userInfoTopic;
+};
+
+#endif // LIBSERVERINFO_H

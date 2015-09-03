@@ -30,28 +30,78 @@ class MqClient : public QObject, public mosqpp::mosquittopp
     Q_OBJECT
 
 public:
-    MqClient(const char *id = NULL, bool clean_session = true);
+    explicit MqClient(QObject *parent = NULL,
+                      const char *id = NULL,
+                      bool clean_session = true);
     ~MqClient();
 
+    void setupClient(QThread *thread,
+                     const QString &host,
+                     const int port = 1883,
+                     const int keepalive = 60);
+
+public slots:
+    virtual void stopWork(bool wait = true);
+
+// State machine work functions
+private slots:
+    void startWork();
+    void reinitMq(void);
+    void reinitConnection(void);
+    void doLimbo(void);
+    void doWorkLoop(void);
+
+// State machine transitions
 signals:
-    void connect(int rc);
-    void disconnect(int rc);
-    void publish(int mid);
-    void message(const struct mosquitto_message *message);
-    void subscribe(int mid, int qos_count, const int *granted_qos);
-    void unsubscribe(int mid);
-    void log(int level, const char *str);
-    void error();
+    void beginConnect(void);
+    void connectSuccess(void);
+    void connectFailure(void);
+    void sigStopWork(void);
+
+// Internal signals
+signals:
+    void sigConnect(int rc);
+    void sigDisconnect(int rc);
+    void sigPublish(int mid);
+    void sigMessage(const struct mosquitto_message *message);
+    void sigSubscribe(int mid, int qos_count, const int *granted_qos);
+    void sigUnsubscribe(int mid);
+    void sigLog(int level, const char *str);
+    void sigError();
+
+// Callbacks from mosqpp::mosquittopp
+protected:
+    virtual void on_connect(int rc);
+    virtual void on_disconnect(int rc);
+    virtual void on_publish(int mid);
+    virtual void on_message(const struct mosquitto_message *msg);
+    virtual void on_subscribe(int mid, int qos_count, const int *granted_qos);
+    virtual void on_unsubscribe(int mid);
+    virtual void on_log(int level, const char *str);
+    virtual void on_error();
+
+// Override these to provide your own implementation
+protected:
+    virtual quint32 getUptimePeriod(void) { return m_workUptimePeriod; }
+    virtual quint32 getDowntimePeriod(void) { return m_workDowntimePeriod; }
+    virtual quint32 getLimboPeriod(void) { return m_workLimboPeriod; }
 
 protected:
-    void on_connect(int rc);
-    void on_disconnect(int rc);
-    void on_publish(int mid);
-    void on_message(const struct mosquitto_message *msg);
-    void on_subscribe(int mid, int qos_count, const int *granted_qos);
-    void on_unsubscribe(int mid);
-    void on_log(int level, const char *str);
-    void on_error();
+    bool recreateSm(void);
+    bool recreateTimer(void);
+
+protected:
+    QThread        *m_thread;
+    QString         m_host;
+    int             m_port;
+    int             m_keepalive;
+
+    QStateMachine  *m_sm;
+    QTimer         *m_workTimer;
+
+    quint32         m_workUptimePeriod;
+    quint32         m_workDowntimePeriod;
+    quint32         m_workLimboPeriod;
 };
 
 #endif//_MQCLIENT_H_

@@ -105,8 +105,6 @@ MainWindow::MainWindow(QObject *parent)
 void
 MainWindow::init()
 {
-    IMainWindow::init ();
-
 #ifdef DBUS_API
     if (!initDBus ()) {
         qApp->quit ();

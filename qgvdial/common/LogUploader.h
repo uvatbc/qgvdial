@@ -33,8 +33,6 @@ public:
     explicit LogUploader(IMainWindow *parent);
 
 public slots:
-    void resetNwMgr();
-
     void sendLogs();
     void reportLogin();
 
@@ -44,9 +42,6 @@ private slots:
 
     void onReportedLogin(bool success, const QByteArray &response,
                          QNetworkReply *reply, void *ctx);
-
-protected:
-    QNetworkAccessManager *m_nwMgr;
 };
 
 #endif // LOGUPLOADER_H

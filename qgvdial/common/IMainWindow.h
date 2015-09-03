@@ -31,6 +31,7 @@ Contact: yuvraaj@gmail.com
 #include "LibGvPhones.h"
 #include "LogUploader.h"
 #include "LibVmail.h"
+#include "LibServerInfo.h"
 #include "Mixpanel.h"
 
 /*==============================================================================
@@ -52,7 +53,7 @@ Contact: yuvraaj@gmail.com
  *      execution with a dummy single shot timer OR (as in the case of QML) be
  *      started when the UI has successfully finished loading.
  * -> onInitDone(): This is where I decide whether to automatically begin login
- *      if the credendtionas are saved or request the user for credentials if
+ *      if the credentials are saved or request the user for credentials if
  *      they are not saved.
  *
  *==============================================================================
@@ -126,6 +127,7 @@ struct LongTaskInfo
     int seconds;
 };
 
+class MqClient;
 class IMainWindow : public QObject
 {
     Q_OBJECT
@@ -136,6 +138,10 @@ public:
     virtual void init() = 0;
 protected slots:
     void onInitDone();
+    void onGotSrvInfo(bool success);
+private:
+    bool reinitMqClient(void);
+protected slots:
     void onQuit();
 
 protected:
@@ -186,6 +192,7 @@ private slots:
     void onLogMessagesTimer();
 
     void onMixEventAdded();
+    void resetNwMgr();
 
 protected:
     virtual void log(QDateTime dt, int level, const QString &strLog) = 0;
@@ -230,11 +237,12 @@ protected:
     CacheDb     db;
     GVApi       gvApi;
 
-    LibContacts oContacts;
-    LibInbox    oInbox;
-    LibGvPhones oPhones;
-    LogUploader oLogUploader;
-    LibVmail    oVmail;
+    LibContacts     oContacts;
+    LibInbox        oInbox;
+    LibGvPhones     oPhones;
+    LogUploader     oLogUploader;
+    LibVmail        oVmail;
+    LibServerInfo   m_srvInfo;
 
     QString     m_user;
     QString     m_pass;
@@ -251,11 +259,17 @@ protected:
     MixPanel    m_mixPanel;
     QTimer      m_mixpanelTimer;
 
+    MqClient   *m_mqClient;
+    QThread     m_mqThread;
+
+    QNetworkAccessManager *m_nwMgr;
+
     friend class LibContacts;
     friend class LibInbox;
     friend class LibGvPhones;
     friend class LogUploader;
     friend class LibVmail;
+    friend class LibServerInfo;
 };
 
 #endif // IMAINWINDOW_H

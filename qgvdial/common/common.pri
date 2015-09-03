@@ -26,7 +26,8 @@ SOURCES  += $$PWD/main.cpp \
             $$PWD/LogUploader.cpp \
             $$PWD/LibVmail.cpp \
             $$PWD/O2ContactsStore.cpp \
-            $$PWD/MqClient.cpp
+            $$PWD/MqClient.cpp \
+            $$PWD/LibServerInfo.cpp
 
 HEADERS  += $$PWD/global.h \
             $$PWD/IOsDependent.h \
@@ -46,7 +47,8 @@ HEADERS  += $$PWD/global.h \
             $$PWD/LogUploader.h \
             $$PWD/LibVmail.h \
             $$PWD/O2ContactsStore.h \
-            $$PWD/MqClient.h
+            $$PWD/MqClient.h \
+            $$PWD/LibServerInfo.h
 
 include($$PWD/phone-account.pri)
 include($$PWD/../../api/api.pri)

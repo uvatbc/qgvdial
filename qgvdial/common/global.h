@@ -27,6 +27,9 @@ Contact: yuvraaj@gmail.com
 #include "api_common.h"
 #include <QtSql>
 
+//#define LOGS_SERVER "http://localhost:8000"
+#define LOGS_SERVER "https://qgvdial.yuvraaj.net"
+
 #define APPLICATION_NAME "qgvdial"
 #define ABOUT_URL "http://www.yuvraaj.net/qgvdial/about.html"
 

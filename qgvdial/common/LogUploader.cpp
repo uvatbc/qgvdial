@@ -23,32 +23,12 @@ Contact: yuvraaj@gmail.com
 #include "IMainWindow.h"
 #include "Lib.h"
 
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-   #include <QUrlQuery>
-#endif
-
-//#define LOGS_SERVER "http://localhost:8000"
-#define LOGS_SERVER "https://qgvdial.yuvraaj.net"
-
 extern QStringList g_arrLogFiles;
 
 LogUploader::LogUploader(IMainWindow *parent)
 : QObject(parent)
-, m_nwMgr(NULL)
 {
-    resetNwMgr ();
 }//LogUploader::LogUploader
-
-void
-LogUploader::resetNwMgr()
-{
-    if (NULL != m_nwMgr) {
-        m_nwMgr->deleteLater ();
-        m_nwMgr = NULL;
-    }
-
-    m_nwMgr = new QNetworkAccessManager(this);
-}//LogUploader::resetNwMgr
 
 /** Function to send logs to the log collector
  *
@@ -131,13 +111,14 @@ LogUploader::sendLogs()
         req.setHeader (QNetworkRequest::ContentTypeHeader, POST_TEXT);
 
         // Post the logs to my server
-        QNetworkReply *reply = m_nwMgr->post (req, doc.toString().toLatin1 ());
+        QNetworkReply *reply;
+        reply = win->m_nwMgr->post(req, doc.toString().toLatin1());
         if (!reply) {
             delete task;
             break;
         }
 
-        NwReqTracker *tracker = new NwReqTracker(reply, *m_nwMgr, task,
+        NwReqTracker *tracker = new NwReqTracker(reply, *win->m_nwMgr, task,
                                                  NW_REPLY_TIMEOUT, true, this);
         if (NULL == tracker) {
             Q_WARN("Failed to allocate tracker!");
@@ -204,9 +185,9 @@ LogUploader::reportLogin()
                     .arg(lib.getOsDetails ())
                     .arg("__QGVDIAL_VERSION__");
 
-    QNetworkReply *reply = m_nwMgr->post (req, json.toLatin1 ());
+    QNetworkReply *reply = win->m_nwMgr->post (req, json.toLatin1 ());
 
-    NwReqTracker *tracker = new NwReqTracker(reply, *m_nwMgr, task,
+    NwReqTracker *tracker = new NwReqTracker(reply, *win->m_nwMgr, task,
                                              NW_REPLY_TIMEOUT, true, this);
     connect(tracker, SIGNAL(sigDone(bool,QByteArray,QNetworkReply*,void*)),
             this, SLOT(onReportedLogin(bool,QByteArray,QNetworkReply*,void*)));
