@@ -35,20 +35,25 @@ public:
                       bool clean_session = true);
     ~MqClient();
 
-    void setupClient(QThread *thread,
+    void setupClient(const QString &topic,
                      const QString &host,
                      const int port = 1883,
                      const int keepalive = 60);
 
 public slots:
-    virtual void stopWork(bool wait = true);
+    void startWork();
+    void stopWork();
+signals:
+    void dataMessage(QByteArray msg);
+    void smCompleted(void);
 
 // State machine work functions
 private slots:
-    void startWork();
     void reinitMq(void);
     void reinitConnection(void);
     void doLimbo(void);
+    void doSubscribe(void);
+    void doDisconnect(void);
     void doWorkLoop(void);
 
 // State machine transitions
@@ -56,6 +61,8 @@ signals:
     void beginConnect(void);
     void connectSuccess(void);
     void connectFailure(void);
+    void subscribeSuccess(void);
+    void disconnectDone(void);
     void sigStopWork(void);
 
 // Internal signals
@@ -80,28 +87,30 @@ protected:
     virtual void on_log(int level, const char *str);
     virtual void on_error();
 
-// Override these to provide your own implementation
-protected:
-    virtual quint32 getUptimePeriod(void) { return m_workUptimePeriod; }
-    virtual quint32 getDowntimePeriod(void) { return m_workDowntimePeriod; }
-    virtual quint32 getLimboPeriod(void) { return m_workLimboPeriod; }
-
 protected:
     bool recreateSm(void);
-    bool recreateTimer(void);
+
+// For the notifiers:
+private slots:
+    void deleteNotifiers(void);
+    void onReadActivated(int s);
+    void onExceptActivated(int s);
 
 protected:
-    QThread        *m_thread;
+    QSocketNotifier *m_readNotifier;
+    QSocketNotifier *m_exceptNotifier;
+
     QString         m_host;
     int             m_port;
+    QString         m_topic;
     int             m_keepalive;
 
     QStateMachine  *m_sm;
-    QTimer         *m_workTimer;
 
-    quint32         m_workUptimePeriod;
-    quint32         m_workDowntimePeriod;
     quint32         m_workLimboPeriod;
+    quint32         m_eventsInLoop;
+
+    bool            m_quitSet;
 };
 
 #endif//_MQCLIENT_H_

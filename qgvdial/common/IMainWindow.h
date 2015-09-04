@@ -138,11 +138,14 @@ public:
     virtual void init() = 0;
 protected slots:
     void onInitDone();
+    void onQuit();
+
+protected slots:
     void onGotSrvInfo(bool success);
 private:
     bool reinitMqClient(void);
 protected slots:
-    void onQuit();
+    void onMqUserInfoReceived(QByteArray msg);
 
 protected:
     virtual void uiRequestLoginDetails() = 0;
@@ -234,8 +237,8 @@ protected:
     virtual void uiSetInboxUpdateFrequency(quint32 mins) = 0;
 
 protected:
-    CacheDb     db;
-    GVApi       gvApi;
+    CacheDb         db;
+    GVApi           gvApi;
 
     LibContacts     oContacts;
     LibInbox        oInbox;
@@ -244,23 +247,22 @@ protected:
     LibVmail        oVmail;
     LibServerInfo   m_srvInfo;
 
-    QString     m_user;
-    QString     m_pass;
+    QString         m_user;
+    QString         m_pass;
 
     AsyncTaskToken *m_loginTask;
 
-    QTimer      m_taskTimer;
-    LongTaskInfo m_taskInfo;
+    QTimer          m_taskTimer;
+    LongTaskInfo    m_taskInfo;
 
-    QMutex      m_logMessageMutex;
+    QMutex          m_logMessageMutex;
     QVector <LogMessage> m_logMessages;
-    QTimer      m_logMessageTimer;
+    QTimer          m_logMessageTimer;
 
-    MixPanel    m_mixPanel;
-    QTimer      m_mixpanelTimer;
+    MixPanel        m_mixPanel;
+    QTimer          m_mixpanelTimer;
 
-    MqClient   *m_mqClient;
-    QThread     m_mqThread;
+    MqClient       *m_mqClient;
 
     QNetworkAccessManager *m_nwMgr;
 

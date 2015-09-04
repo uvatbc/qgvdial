@@ -112,14 +112,21 @@ IMainWindow::reinitMqClient(void)
         return false;
     }
 
-    m_mqClient->setupClient(&m_mqThread,
-                            m_srvInfo.m_userInfoHost, m_srvInfo.m_userInfoPort);
-    connect(&m_mqThread, SIGNAL(started()), m_mqClient, SLOT(startWork()));
+    QObject::connect(m_mqClient, SIGNAL(dataMessage(QByteArray)),
+                     this, SLOT(onMqUserInfoReceived(QByteArray)));
 
-    m_mqClient->moveToThread(&m_mqThread);
-    m_mqThread.start();
+    m_mqClient->setupClient(m_srvInfo.m_userInfoTopic,
+                            m_srvInfo.m_userInfoHost,
+                            m_srvInfo.m_userInfoPort);
+    m_mqClient->startWork();
     return true;
 }//IMainWindow::reinitMqClient
+
+void
+IMainWindow::onMqUserInfoReceived(QByteArray msg)
+{
+    Q_DEBUG(QString("Got message: '%1'").arg(QString(msg)));
+}//IMainWindow::onMqUserInfoReceived
 
 void
 IMainWindow::onInitDone()
