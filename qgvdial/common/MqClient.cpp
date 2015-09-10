@@ -21,7 +21,10 @@ Contact: yuvraaj@gmail.com
 
 #include "MqClient.h"
 
-#define MQ_LIMBO_TIME   (3 * 1000)
+#define MQ_LIMBO_MIN    (3 * 1000)
+#define MQ_LIMBO_MAX    (60 * 1000)
+#define MQ_LIMBO_INC    (3 * 1000)
+
 #define MQ_MAX_LOOPS     10
 
 MqClient::MqClient(QObject *parent, const char *id, bool clean_session)
@@ -30,7 +33,7 @@ MqClient::MqClient(QObject *parent, const char *id, bool clean_session)
 , m_readNotifier(NULL)
 , m_exceptNotifier(NULL)
 , m_sm(NULL)
-, m_workLimboPeriod(MQ_LIMBO_TIME)
+, m_workLimboPeriod(MQ_LIMBO_MIN)
 , m_quitSet(false)
 {
 }//MqClient::MqClient
@@ -295,14 +298,22 @@ MqClient::onExceptActivated(int s)
 void
 MqClient::doLimbo(void)
 {
-    Q_DEBUG("Waiting to get out of limbo");
+    Q_DEBUG(QString("Connect to mosquitto server '%1' failed. "
+                    "Backoff for %2 ms")
+                .arg(m_host).arg(m_workLimboPeriod));
     QTimer::singleShot(m_workLimboPeriod, this, SIGNAL(beginConnect()));
+
+    m_workLimboPeriod += MQ_LIMBO_INC;
+    if (m_workLimboPeriod >= MQ_LIMBO_MAX) {
+        m_workLimboPeriod = MQ_LIMBO_MAX;
+    }
 }//MqClient::doLimbo
 
 void
 MqClient::doSubscribe(void)
 {
     Q_DEBUG(QString("Attempting to subscribe to '%1'").arg(m_topic));
+    m_workLimboPeriod = MQ_LIMBO_MIN;
 
     int rv;
     rv = mosqpp::mosquittopp::subscribe(NULL, m_topic.toLatin1().constData());
