@@ -30,7 +30,6 @@ include(../features/openssl/openssl-lin.pri)
 include(../features/dirs/bb10/bb10-dirs.pri)
 include(../features/cookie-cutter/osdependent/cc-osdependent.pri)
 include(../features/osver/bb10/osv-bb10.pri)
-include(../features/mqlib/mqlib.pri)
 include(../features/qml/mainwindow/qml-mainwindow.pri)
 include(../features/qml/qml5/qmlviewer.pri)
 

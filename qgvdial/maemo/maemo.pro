@@ -28,7 +28,6 @@ include(../features/dbus_api/dbus_api.pri)
 include(../features/qtsingleapplication/qtsingleapplication.pri)
 include(../features/cookie-cutter/osdependent/cc-osdependent.pri)
 include(../features/osver/nokia/maemo/osv-maemo.pri)
-include(../features/mqlib/mqlib.pri)
 
 simulator {
 include(../features/tp/linux/tp.pri)

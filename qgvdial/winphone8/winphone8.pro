@@ -22,7 +22,6 @@ include(../features/openssl/wp8/wp8-cipher.pri)
 include(../features/dirs/wp8/wp8-dirs.pri)
 include(../features/cookie-cutter/osdependent/cc-osdependent.pri)
 include(../features/osver/wp8/osv-wp8.pri)
-#include(../features/mqlib/mqlib.pri)
 include(../features/qml/mainwindow/qml-mainwindow.pri)
 include(../features/qml/qml5/qmlviewer.pri)
 

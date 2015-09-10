@@ -39,7 +39,6 @@ include(../features/openssl/openssl-lin.pri)
 include(../features/dirs/linux/linux-dirs.pri)
 include(../features/dummy/dummy.pri)
 include(../features/cookie-cutter/osdependent/cc-osdependent.pri)
-include(../features/mqlib/mqlib.pri)
 
 # Lets pretend that the dummy is a variant of Linux
 include(../features/osver/desktop/linux/osv-linux.pri)

@@ -61,4 +61,3 @@ include(../features/cookie-cutter/osdependent/cc-osdependent.pri)
 include(../features/osver/sailfish/osv-sailfish.pri)
 
 include(../features/tp/linux/tp.pri)
-include(../features/mqlib/mqlib.pri)
