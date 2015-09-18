@@ -59,7 +59,6 @@ FORMS    += $$PWD/mainwindow.ui \
 RESOURCES += $$PWD/qtnotqml.qrc
 
 include($$PWD/../common/common.pri)
-include($$PWD/../features/mqlib/mqlib.pri)
 
 !blackberry {
     include($$PWD/../features/qtsingleapplication/qtsingleapplication.pri)
