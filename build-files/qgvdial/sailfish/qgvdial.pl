@@ -9,7 +9,7 @@ my $repo = "https://yuvraaj.net/svn/qgvdial/trunk";
 my $cmd;
 
 # Delete any existing version file
-system("rm ver.cfg version.pl");
+system("rm -f ver.cfg version.pl");
 # Get the latest version file from the repository
 $cmd = "svn export $repo/build-files/ver.cfg";
 system($cmd);

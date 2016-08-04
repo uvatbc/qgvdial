@@ -1,6 +1,6 @@
 /*
 qgvdial is a cross platform Google Voice Dialer
-Copyright (C) 2009-2015  Yuvraaj Kelkar
+Copyright (C) 2009-2016  Yuvraaj Kelkar
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -42,6 +42,7 @@ Contact: yuvraaj@gmail.com
 #include "VmailDialog.h"
 
 #include "SmsDialog.h"
+#include "MyWebView.h"
 
 #ifdef Q_WS_WIN32
 #include "MainApp.h"
@@ -246,10 +247,7 @@ MainWindow::init()
                 SLOT(onSystrayActivated(QSystemTrayIcon::ActivationReason)));
 
         m_systrayIcon->setIcon (QIcon(":/qgv.png"));
-        //TODO: Unfuck this. Qt 5.5 has fucked it.
-#ifdef Q_OS_WIN32
         m_systrayIcon->setContextMenu (d->ui->menu_File);
-#endif
         QTimer::singleShot (100, m_systrayIcon, SLOT(show()));
         //m_systrayIcon->show ();
     }
@@ -373,31 +371,12 @@ MainWindow::uiOpenBrowser(const QUrl &url)
         m_webView->deleteLater();
     }
 
-    m_webView = new QWebView(NULL);
+    m_webView = new MyWebView(NULL);
     if (NULL == m_webView) {
         return;
     }
 
-    do {
-        QWebPage *page = m_webView->page();
-        if (NULL == page) {
-            break;
-        }
-        QNetworkAccessManager *qnam = page->networkAccessManager ();
-        if (NULL == qnam) {
-            break;
-        }
-
-        CookieJar *jar = new CookieJar;
-        if (NULL == jar) {
-            break;
-        }
-
-        QList<QNetworkCookie> allCookies = gvApi.getAllCookies ();
-        jar->setNewCookies (allCookies);
-        qnam->setCookieJar (jar);
-    } while (0);
-
+    m_webView->setCookies(gvApi.getAllCookies ());
     m_webView->load(url);
     m_webView->show();
 }//MainWindow::uiOpenBrowser

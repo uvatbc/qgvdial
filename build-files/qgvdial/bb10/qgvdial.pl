@@ -81,17 +81,17 @@ print "$cmd\n";
 system($cmd);
 
 system("rm -f tmp.sh ; echo '#!/bin/bash' > tmp.sh ; echo source $ARGV[0] qt5 arm >> tmp.sh ; echo 'cd $basedir/qgvdial/bb10-qt5 ; qmake ; make -j$makejobs ; ntoarmv7-strip qgvdial' >> tmp.sh");
-$cmd = "chmod +x tmp.sh ; cat tmp.sh ; ./tmp.sh ; rm tmp.sh";
+$cmd = "chmod +x tmp.sh ; cat tmp.sh ; ./tmp.sh ; rm -f tmp.sh";
 print "$cmd\n";
 system($cmd);
 
 system("rm -f tmp.sh ; echo '#!/bin/bash' > tmp.sh ; echo source $ARGV[0] qt4 arm >> tmp.sh ; echo 'cd $basedir/qgvdial/bb10-qt5/qt4srv ; qmake ; make -j$makejobs ; ntoarmv7-strip qt4srv' >> tmp.sh");
-$cmd = "chmod +x tmp.sh ; cat tmp.sh ; ./tmp.sh ; rm tmp.sh";
+$cmd = "chmod +x tmp.sh ; cat tmp.sh ; ./tmp.sh ; rm -f tmp.sh";
 print "$cmd\n";
 system($cmd);
 
 system("rm -f tmp.sh ; echo '#!/bin/bash' > tmp.sh ; echo source $ARGV[0] qt5 arm >> tmp.sh ; echo 'cd $basedir/qgvdial/bb10-qt5 ; blackberry-nativepackager -package qgvdial_$qver.bar bar-descriptor.xml' >> tmp.sh");
-$cmd = "chmod +x tmp.sh ; cat tmp.sh ; ./tmp.sh ; rm tmp.sh";
+$cmd = "chmod +x tmp.sh ; cat tmp.sh ; ./tmp.sh ; rm -f tmp.sh";
 print "$cmd\n";
 system($cmd);
 

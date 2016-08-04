@@ -4,6 +4,9 @@ include(../features/openssl/openssl-lin.pri)
 include(../features/osver/nokia/diablo/osv-diablo.pri)
 include(../features/dbus_api/dbus_api.pri)
 
+# Diablo uses qt4 and webkit
+include($$PWD/../features/webview/webkitview.pri)
+
 DEFINES += OS_DIABLO
 QT *= phonon
 

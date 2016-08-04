@@ -5,6 +5,9 @@ include(../features/openssl/openssl-win.pri)
 # Surprisingly enough, this works just perfectly in Windows
 include(../features/dirs/linux/linux-dirs.pri)
 
+# Windows uses qt5 and webengine
+include($$PWD/../features/webview/webengineview.pri)
+
 PRECOMPILED_HEADER *= desktop_windows/platform_specific.h
 
 INCLUDEPATH += desktop_windows

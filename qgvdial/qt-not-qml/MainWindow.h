@@ -1,6 +1,6 @@
 /*
 qgvdial is a cross platform Google Voice Dialer
-Copyright (C) 2009-2015  Yuvraaj Kelkar
+Copyright (C) 2009-2016  Yuvraaj Kelkar
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -31,7 +31,7 @@ Contact: yuvraaj@gmail.com
 
 class MainWindowPrivate;
 class QSystemTrayIcon;
-class QWebView;
+class MyWebView;
 
 class MainWindow : public IMainWindow
 {
@@ -122,10 +122,9 @@ protected slots:
 private:
     MainWindowPrivate *d;
 
-    QWebView       *m_webView;
-
+    MyWebView      *m_webView;
     QIcon           m_appIcon;
-    QSystemTrayIcon *m_systrayIcon;
+    QSystemTrayIcon*m_systrayIcon;
 
     bool            m_ignoreCbInboxChange;
 

@@ -1,6 +1,6 @@
 /*
 qgvdial is a cross platform Google Voice Dialer
-Copyright (C) 2009-2015  Yuvraaj Kelkar
+Copyright (C) 2009-2016  Yuvraaj Kelkar
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -27,12 +27,20 @@ Contact: yuvraaj@gmail.com
 
 #define UNKNOWN_CONTACT_QRC_PATH ":/unknown_contact.png"
 
+#if 0 // This needs to be revisited when ubuntu starts using webengine instead of webkit
 #if QT_VERSION >= 0x050000
-#include <QtWidgets>
-#include <QtWebKitWidgets/QWebView>
-#define PHONON_ENABLED 0
+#include <QtWebEngine>
 #else
 #include <QtWebKit/QtWebKit>
+#endif
+#else
+#include <QtWebKit/QtWebKit>
+#endif
+
+#if QT_VERSION >= 0x050000
+#include <QtWidgets>
+#define PHONON_ENABLED 0
+#else
 #define PHONON_ENABLED 1
 #endif
 
