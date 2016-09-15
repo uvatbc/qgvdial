@@ -236,6 +236,13 @@ protected:
     virtual void uiEnableInboxUpdateFrequency(bool enable) = 0;
     virtual void uiSetInboxUpdateFrequency(quint32 mins) = 0;
 
+public:
+    Q_PROPERTY(QString version READ getVersion NOTIFY versionChanged)
+    QString m_version;
+    QString getVersion() { return m_version; }
+signals:
+    void versionChanged();
+
 protected:
     CacheDb         db;
     GVApi           gvApi;
@@ -273,5 +280,7 @@ protected:
     friend class LibVmail;
     friend class LibServerInfo;
 };
+
+extern QString g_version;
 
 #endif // IMAINWINDOW_H

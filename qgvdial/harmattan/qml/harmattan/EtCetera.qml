@@ -56,7 +56,7 @@ Item {
         Label {
             width: container.width
             horizontalAlignment: TextEdit.AlignHCenter
-            text: "Version __QGVDIAL_VERSION__"
+            text: "Version " + g_mainwindow.version
         }
     }//Column of everything
 }//Page (container)

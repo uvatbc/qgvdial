@@ -39,6 +39,7 @@ int   logCounter = 0; //! Number of log entries since the last log flush
 #define LOG_FLUSH_LEVEL 0
 
 QStringList g_arrLogFiles;
+QString g_version = "__QGVDIAL_VERSION__";
 
 const char *ignoreMsgs[] = {
     "MPanRecognizerTouch",

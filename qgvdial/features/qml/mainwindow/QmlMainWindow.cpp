@@ -154,6 +154,7 @@ QmlMainWindow::init()
     } else {
         m_qmlStub->setParent(this);
     }
+
     /*
      * Look at the Q_INVOKABLE functions in the header and use them in QML.
      */

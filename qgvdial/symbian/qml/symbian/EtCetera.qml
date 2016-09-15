@@ -1,6 +1,6 @@
 /*
 qgvdial is a cross platform Google Voice Dialer
-Copyright (C) 2009-2015  Yuvraaj Kelkar
+Copyright (C) 2009-2016 Yuvraaj Kelkar
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -59,7 +59,7 @@ Item {
         Label {
             width: container.width
             horizontalAlignment: TextEdit.AlignHCenter
-            text: "Version __QGVDIAL_VERSION__"
+            text: "Version " + g_mainwindow.version
         }
     }//Column of everything
 }//Page (container)

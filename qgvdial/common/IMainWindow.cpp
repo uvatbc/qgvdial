@@ -30,6 +30,7 @@ Contact: yuvraaj@gmail.com
 
 IMainWindow::IMainWindow(QObject *parent)
 : QObject(parent)
+, m_version(g_version)
 , db(this)
 , gvApi(true, this)
 , oContacts(this)
@@ -265,7 +266,7 @@ IMainWindow::loginCompleted()
     mEvent.distinct_id = m_user;
     mEvent.distinct_id = mEvent.distinct_id.toLower ();
     mEvent.properties["os"] = Lib::ref().getOsDetails();
-    mEvent.properties["version"] = "__QGVDIAL_VERSION__";
+    mEvent.properties["version"] = g_version;
 
     do {
         if (ATTS_SUCCESS == task->status) {

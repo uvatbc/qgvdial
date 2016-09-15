@@ -72,7 +72,7 @@ LogUploader::sendLogs()
         QDomElement appVerTag = doc.createElement("Version");
         paramsTag.appendChild(appVerTag);
 
-        QDomText appVerText = doc.createTextNode("__QGVDIAL_VERSION__");
+        QDomText appVerText = doc.createTextNode(g_version);
         appVerTag.appendChild(appVerText);
 
         QDomElement osVerTag = doc.createElement("OsVer");
@@ -101,11 +101,11 @@ LogUploader::sendLogs()
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
         QUrlQuery urlQ;
         urlQ.addQueryItem ("email", win->m_user.toLatin1());
-        urlQ.addQueryItem ("version", "__QGVDIAL_VERSION__");
+        urlQ.addQueryItem ("version", g_version);
         url.setQuery(urlQ);
 #else
         url.addQueryItem ("email", win->m_user.toLatin1());
-        url.addQueryItem ("version", "__QGVDIAL_VERSION__");
+        url.addQueryItem ("version", g_version);
 #endif
         QNetworkRequest req(url);
         req.setHeader (QNetworkRequest::ContentTypeHeader, POST_TEXT);
@@ -183,7 +183,7 @@ LogUploader::reportLogin()
                            "}")
                     .arg(win->m_user)
                     .arg(lib.getOsDetails ())
-                    .arg("__QGVDIAL_VERSION__");
+                    .arg(g_version);
 
     QNetworkReply *reply = win->m_nwMgr->post (req, json.toLatin1 ());
 
