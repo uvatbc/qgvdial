@@ -1,0 +1,29 @@
+#summary How to invoke qgvdial through dbus commands
+
+*To call a number*
+ {{{dbus-send --dest=org.QGVDial.APIServer --session --print-reply /org/QGVDial/CallServer org.QGVDial.CallServer.Call string:"121212121"}}}
+
+*To text a number*
+ {{{dbus-send --dest=org.QGVDial.APIServer --session --print-reply /org/QGVDial/TextServer org.QGVDial.TextServer.Text array:string:"+1aaabbbcccc" string:"Some text"}}}
+
+*To text a number without any text (open a text input dialog)*
+ {{{dbus-send --dest=org.QGVDial.APIServer --session --print-reply /org/QGVDial/TextServer org.QGVDial.TextServer.TextWithoutData array:string:"+1aaabbbcccc"}}}
+
+*To get the list of registered phones*
+ {{{dbus-send --dest=org.QGVDial.APIServer --session --print-reply /org/QGVDial/SettingsServer org.QGVDial.SettingsServer.GetPhoneNames}}}
+
+*To get the currently selected registered phone*
+ {{{dbus-send --dest=org.QGVDial.APIServer --session --print-reply /org/QGVDial/SettingsServer org.QGVDial.SettingsServer.GetCurrentPhone}}}
+
+*To set the registered phone*
+ {{{dbus-send --dest=org.QGVDial.APIServer --session --print-reply /org/QGVDial/SettingsServer org.QGVDial.SettingsServer.SetCurrentPhone int32:0}}}
+
+
+*Get an array of cached texts in a date range*
+ {{{dbus-send --dest=org.QGVDial.APIServer --session --print-reply /org/QGVDial/TextServer org.QGVDial.TextServer.getTextsByDate string:"2011-01-01T00:00:00.000Z" string:"2011-07-05T00:00:00.000"}}}
+
+*Get an array of cached texts sent by a contact or number*
+ {{{dbus-send --dest=org.QGVDial.APIServer --session --print-reply /org/QGVDial/TextServer org.QGVDial.TextServer.getTextsByContact string:"1112223333"}}}
+
+OR
+ {{{dbus-send --dest=org.QGVDial.APIServer --session --print-reply /org/QGVDial/TextServer org.QGVDial.TextServer.getTextsByContact string:"contact name"}}}

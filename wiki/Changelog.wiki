@@ -1,0 +1,484 @@
+#summary Change log
+
+*2014-03-28*
+ * Nearly a year later and a lot has changed
+ * UI is totally rewritten
+ * GV Api updated to latest
+
+*2013-04-16*
+ * GV login mechanism changed. Adapted to it.
+ * GV dial out mechanism changed. Adapted to it.
+
+*2012-10-31*
+ * Buttons for Meego are different from generic
+ * When the NW configuratio changes, recreate the access manager so that the default connection is re-created.
+
+*2012-10-23*
+ * Rewrote the sms/vmail parse routine to fix blank inbox entries.
+ * Also fixed unicode characters in texts and voicemail
+
+*2012-09-21*
+ * Added a refresh GV API. Updated notify to use it.
+
+*2012-09-04*
+ * New Login page
+ * Symbian build fix for qt-components
+
+*2012-08-27*
+ * Fix deletion of entries
+ * GPlus link in texts
+
+*2012-08-09*
+ * Fixed a dial bug
+ * Delete inbox entry
+
+*2012-08-08*
+ * Two factor authentication now works again
+
+*2012-07-16*
+ * Voicemail funkiness fixed
+ * Contacts list images were sometimes not seen
+ * Probably fixed the Symbian Belle FP1 bug.
+
+*2012-06-23*
+ * Long press for full refresh (inbox and contacts)
+ * Login failure at rnr_se: Fixed this code path to work correctly.
+
+*2012-06-10*
+ * Changed all the build scripts to work properly.
+
+*2012-05-11*
+ * Changed the NW code to better handle HTTP redirects.
+ * Changed the Cookie code to be consistent across all platforms.
+
+*2012-05-09*
+ * Fallback dialout works correctly for Symbian, Maemo and Harmattan!!
+ * Added Haptic feedback to Symbian and Harmattan
+
+*2012-04-26*
+ * Small QML improvements and fixed (and so enabled) the Symbian fallback dial.
+
+*2012-04-13*
+ * Dial settings moved
+
+*2012-04-10*
+ * Fix the GVAPI so that calls can be canceled and add a bunch of fixes to the QML.
+
+*2012-04-01*
+ * More fixes based on log messages from collected logs.
+
+*2012-03-18*
+ * Minor fixes to the error messages and a fix for the QML.
+
+*2012-03-13*
+ * Fix the Windows installer
+
+*2012-03-06*
+ * Better identification of accounts that have not completed GV set up.
+ * Google accounts form outside the US use a longer more protracted method of login. I've finally nailed it.
+
+*2012-03-03*
+ * Fixed the fonts on the message box for Harmattan, Maemo, Symbian and desktop
+ * Account Review Prompt from Google. Show the webpage and drop login.
+
+*2012-03-01*
+ * Fixed the Inbox and contacts refresh
+ * Fixed the message box to look as classy as Meego
+
+*2012-02-29*
+ * Accounts that are not configured can now be pointed out to the user
+
+*2012-02-14*
+ * Pull down to refresh: Contacts and Inbox
+
+*2012-02-08*
+ * Fixed compile for Harmattan
+
+*2012-02-07*
+ * Fix orientation code so that compilation works. Also made display size fixed on all platforms except Symbian.
+ * Desktop version gets back its borders, without resize and maximize
+
+*2012-02-06*
+ * GVApi: Removed duplicated log message
+ * TpObserver: this should fix the crashes on Telepathy capable platforms on incoming phone calls.
+
+*2012-01-11*
+ * Flush log file before sending logs to the server
+ * Fix the mosquitto update issue
+
+*2012-01-05*
+ * Logs can now be uploaded
+
+*2012-01-02*
+ * Improved speed of cleanup of temp files.
+ * Contacts search should now be faster.
+
+*2011-12-29*
+ * No webkit.
+
+*2011-12-28*
+ * The main qgvdial code no longer uses webkit to log in or make calls or anything. There's now a coalasced API class that uses QNAM classes for HTTP GET and POST.
+ * This class is capable of multiple simultaneous requests - it does not serialize access to Google Voice.
+ * It should pave the way for a cleaner and more robust application.
+
+*2011-10-01*
+ * software input panel closes on second click in the text box
+ * Made it possible for the SMS view to also close the sip.
+ * This should pass the Ovi Store QA.
+
+*2011-09-27*
+ * Change the logging method. Do most of it in main.cpp
+ * There's no need for a debug logging level.
+ * FocusScope and more trying to make SIP go away.
+
+*2011-09-21*
+ * Inbox view will now show unread items with a yellow border. Opening the entry will mark it as read and remove the yellow border.
+ * Fixed a bug in the contact list for contacts that had no image.
+
+*2011-09-07*
+ * Bugfix: Inbox and voicemail needs to be picked up from a different URL
+ * Bugfix: Marking an inbox entry as read also needs to be done at a different URL.
+
+*2011-09-06*
+ * Bugfix: Registerd numbers need to be picked up from a different URL
+
+*2011-09-05*
+ * Bugfix: Contacts update last date was not UTC.
+ * Shifted some of the plaform specific code to the OsDependent class
+
+*2011-09-03*
+ * Lots of fixes for the Harmattan build
+ * Icon changes and fixes
+
+*2011-08-31*
+ * Shut the damn input panel
+
+*2011-08-31*
+ * QML fixes for the search box
+ * Save and cancel buttons put into a separate qml file
+ * Added input method hints for MyTextEdit
+
+*2011-08-29*
+ * Bugfix: Mq never started without user intervention
+
+*2011-08-12*
+ * Fix the Settings page layout: The heights of some ExpandViews were not taken into account.
+
+*2011-08-11*
+ * Settings page new ui
+ * Login load progress
+
+*2011-08-05*
+ * GV added a messageText field in the inbox entry. This allows me to show the text of a voicemail or an SMS if I haven't been able to parse it from the HTML.
+ * Added updated field in each contact
+
+*2011-08-04*
+ * Bugfix: Cookie settings error
+
+*2011-08-03*
+ * Two step authentication
+
+*2011-07-31*
+ * Bugfix: Clear out the old cookies before saving the new ones.
+ * Bugfix: Don't crash if there's a contact search query before login
+
+*2011-07-30*
+ * Serialize cookies and shorten the login time!
+
+*2011-07-29*
+ * Use Phonon instead of mobility multimedia
+
+*2011-07-26*
+ * mqlib 12.0
+ * Improvements to the mqlib inclusion logic in the pro file
+ * Call and text "text buttons" are now "image buttons"
+
+*2011-07-19*
+ * Bugfix: SMS and voicemail parsing logic
+
+*2011-07-18*
+ * Mark opened inbox entries as read
+ * Bugfix: About page links did not work
+
+*2011-07-14*
+ * Debug info
+
+*2011-07-11*
+ * Changed the contacts parser code so that it gets the temp directory when it's constructed. This also allows notify to compile.
+
+*2011-07-10*
+ * Logs start off muted.
+ * Contact pics stored in temp file inside qgvdial folder.
+ * Fix binding loop in contacts
+
+*2011-07-05*
+ * Added dbus api to retrieve texts
+
+*2011-07-04*
+ * Upgrade mqlib to 0.11.2
+ * Attempts at making the contacts list work faster on Symbian
+ * All this while, the page timeout timer wasn't actually working. Fixed now.
+
+*2011-06-30*
+ * Fix SMS parsing - yet again
+
+*2011-06-28*
+ * Remove the SMS Dlg and embed it within the QML.
+
+*2011-06-25*
+ * Slightly smaller SMS dialog for symbian
+ * Child window base code cleanup
+
+*2011-06-24*
+ * Code cleanup and fix an uninitialized variable.
+ * Resize SMS dialog of rotation for Symbian
+
+*2011-06-22*
+ * Code refactoring for the Inbox XML handling code.
+ * Registered numbers are retrieved by requesting an XML instead of loading a webpage.
+ * Removed the stringent requirements of havinf rnr_se. It will fails later, but at least it will login.
+
+*2011-06-19*
+ * DBus API to get and set registered phones.
+
+*2011-06-17*
+ * Don't get photos if you're not logged into the Contacts API 
+
+*2011-06-16*
+ * Contact photos!
+ * Bubble up an error string for misconfigured or unconfigured user accounts.
+ * When a different user logs in, make sure that the old cached data is purged
+
+*2011-06-14*
+ * Added photo link to contacts table
+
+*2011-06-06*
+ * Minor UI improvement: Dialpad had a blue line at the bottom edge.'
+ * Symbian build restarted: Got new dev certs.
+ 
+*2011-06-04*
+ * Minor UI improvements
+ * Don't clean up the QML.
+
+*2011-06-03*
+ * Fixed icons for Maemo
+ * Inbox icons updated
+
+*2011-06-02*
+ * Fixed icons for Maemo and Symbian. Hopefully it works.
+
+*2011-05-31*
+ * Add special effects and a close button.
+
+*2011-05-27*
+ * Both SMS and Voicemail parsed and fixed once and for all.
+
+*2011-05-26*
+ * SMS Text fixed once and for all.
+
+*2011-05-21*
+ * UI improvements and icons changed
+ * Fix the inbox view time strings
+
+*2011-05-21*
+ * Tabbed UI.
+ * Fixed some debug error messages.
+
+*2011-05-14*
+ * Search contacts
+ 
+*2011-05-08*
+ * Changed the fallback DTMF based on kbyork's suggestion
+
+*2011-05-04*
+ * Fix the inbox font messup in Symbian and in everything else.
+
+*2011-05-03*
+ * Start using ini settings. Almost everything other than the data that needs to be searched is now in settings.
+
+*2011-04-30*
+ * Lots of code for the Symbian DTMF. Unsuccessful so far.
+
+*2011-04-28*
+ * Fallback mode for Maemo.
+
+*2011-04-26*
+ * Retry on Mosquitto connection a few more times before giving up. I do this because when the connection changes, the mosquitto thread gives up too soon.
+
+*2011-04-23*
+ * The GV interface classes are now backwards compatible with Qt 4.5 This will allow me to code up the notify app for Diablo. Also qgvdial might make it to Diablo as well.
+
+*2011-04-20*
+ * Inbox icons changed
+ * Scroll bars for Inbox and Contacts List.
+
+*2011-04-19*
+ * All platforms now use AES
+
+*2011-04-18*
+ * Incorporate encryption into qgvdial. Only username and password encrypted.
+ * Right now the encryption key is open to public (in the source code). I'll fix this later. It's better than what I had previously.
+ * Blocked passwords from the log dump.
+ * Added icons to inbox view
+ * Fixed voicemail and text parsing
+
+*2011-04-14*
+ * Mosquitto now works in Symbian
+ * Logs in QML
+ * qgvdial and qgvtp now split up
+
+*2011-04-08*
+ * Web widget is now embedded in QML
+ * Voicemail transcription from Google!
+
+*2011-04-05*
+ * Symbian needs all paths to use backslash
+ * sqlite db moved into $home/.qgvdial/qgvdial.sqlite.db for all platforms.
+ * Word wrap contact notes in QML
+
+*2011-04-04*
+ * Contact and inbox notes functionality added.
+ * Massive code cleanup. merged duplicate structures, removed redundant classes.
+
+*2011-04-03*
+ * SIP instead of sofiasip. Also add the account after "SIP:" to be more descriptive.
+ * Mosquitto settings never made it to the cpp code !! - Now fixed.
+ * Fix for the dialout/dialback number not being saved across reboot/restart.
+ * Fix user name and password entry and display in QML.
+
+*2011-04-01*
+ * Vmail no longer uses the QtMobility QML element. I cannot afford to use qtm 1.1 unless it is fully supported on the n900.
+
+*2011-03-30*
+ * VMail now plays using QtMobility QML element
+
+*2011-03-30*
+ * QML fix: Stop using 3 different MainView files. Simplify things.
+ * Minor width corrections on the Settings page.
+
+*2011-03-25*
+ * Registered numbers now say Dial out or Dial back. Easier to understand.
+ * If the dial out method is not enabled, not valid or otherwise unusable, don't show it.
+ * qgvdial has been submitted to the Ovi store for QA and in the calling all innovators contest!
+ * Upper bound check on the registered number array
+ * Special case for Desktop Skype and Symbian Phone: Always online.
+
+*2011-03-19*
+ * Removed version to the pro file and added it only at build time.
+ * Cancel msgbox did not disappear when Observer notices that call has occured.
+
+*2011-03-18*
+ * Fixed the QML message box so that is is definitely visible.
+ * Introduced a perl script that clears out leading whitespace and comments from QML so that the resource section is smaller.
+ * Eliminated TextButton. It wasn't being used anywhere.
+ * Added version to the pro file
+ * Dial back to gtalk works!!
+
+*2011-03-17*
+ * Differentiate the text input boxes from labels
+ * Added tab order to most text fields
+
+*2011-03-16*
+ * Lots of Symbian work. UI works as expected finally, and sizes are all fine.
+ * Call out with Symbian version works. Phone only. No SIP or Skype.
+ * Icon for Symbian. Hide window also works.
+ * Stop using the Qt MessageBox for the dial cancel dialog. Use inbuilt QML.
+ * Made it look proper on Maemo and others as well.
+
+*2011-03-11*
+ * Changed all the QML elements to use pixel size instead of font point.
+
+*2011-03-10*
+ * Fix the symbian build. It needs to be signed. Thats what breaks! Dammit!
+ * Lots of debug messages and an attempt at fixing high CPU load.
+ * If the mq server is invalid, don't crash.
+ * Timer delay in deleting the NwCfg object.
+ * Fix the CPU hogging bug
+
+*2011-03-08*
+ * Lots of improvements for the Symbian build. It runs and actually attempts to connect, but no full login yet. Soon. Soon.
+ * Quit qgvdial on uninstall.
+ * No more hard wait on Mq thread. Slot it.
+ * Stop throwing away Mq settings when it is disabled.
+ * Added a lot of debug messages catch the intermittent high CPU usage
+ * Status message about the number of new Inbox entries.
+ * Mq thread termination bug fix.
+
+*2011-03-03*
+ * Stop using the Mosquitto cpp class. Use the bare bones C functions and build the class around it. This passes the Windows build, and we shall use it as the gold standard.
+ * Windows build now works, has mosquitto support!
+
+*2011-03-02*
+ * Mosquitto support. qgvdial can now subscribe to a mosquitto topic that will inform it of inbox updates. This is at present, Linux and Maemo only.
+ * Added changelog to Maemo and Linux build.
+
+*2011-02-22*
+ * Proxy settings - user entered or system or none, with support for username and password. Proxy settings are saved.
+ * All network traffic now has time outs associated. This allows for qgvdial to recover itself to a stable state in case the network is too slow or flaky or not present or borked because of captive portals (the "Starbucks effect")
+ * Fixed contacts update and inbox update so that the time it used to take to commit the entries to disk is now much almost non-existent.
+ * Cleaned up the QML to be more QML-like instead of C like.
+ * Long press on backspace button clears the number on the dialpad.
+ * Added an about page with version number, and URL links to project specific info
+ * Maemo builds now happen on the maemo.org build farm.
+ * Windows build is now an MSI.
+ * Settings page has tab order!
+ * Inbox selection is saved.
+
+*2011-01-09 (since the last time)*
+ * Inbox now updated based on latest inbox entry.
+ * UI is almost entirely in QML. Only some components remain in QtCreator form format.
+ * Rotation is really truly complete
+ * Call ui, contacts UI and inbox UI all work.
+ * SMS and call buttons on contacts and inbox pages.
+ * SMSes are shown in the inbox and sending SMS actually works!
+ * log goes into logfile at ~/.qgvdial/qgvdial.log
+ * use a model view design for using QML
+ * DBus activation for Call and Text service. Used by MyContacts and my own qgv-tp on Maemo5
+ * Added a telepathy connection manager "qgv-tp" to integrate into the n900 phone book. Calls are now possible directly from the phone book.
+ * Added network proxy support.
+
+*2010-10-04*
+ * Windows build now uses VS 2010 and QT 4.7 with qtmobility 1.1
+ * Inbox view changed. Should now be much faster to load and less quirky to display.
+
+*2010-08-28*
+ * Revamped the entire UI.
+ * Auto-rotation
+ * Initial support for QT CSS
+
+*2010-08-14:*
+ * Inbox how uses data API instead of screen scraping the website.
+ * Calls, sms and voicemail all work from the Inbox page.
+ * Contacts and Inbox page use the same interface to make calls and send texts.
+
+*2010-08-07:*
+ * Provided a dbus listening service so that fcrochik's MyContacts can call out using that.
+ * Contacts using Google Contacts Data API. Additions, modifications and deletions all taken care of.
+ * Callbacks now work once again.
+
+*2010-08-04:*
+ * Dial out directly works for telepathy CM: ring and spirit. sofiasip also works, but the GV announcer says that the call could not be completed.
+ * Dial out works is desktop skype: Windows and Linux
+ * Two different deb files for n900: One for old mobility and one for the new version
+ * Contacts now use the Google contacts API. This means lesser data to process on contacts refresh.
+
+*2010-07-19:*
+ * Desktop Skype integration: If you have a Skype subscription and you use it as a callback phone with GV, then qgvdial will attempt to recognize this and behave just like the phone version: Dismiss the cancel window.
+
+*2010-07-16:*
+ * Dial out using POST. Much faster.
+
+*2010-07-02:*
+ * Linux and maemo5 now uses a telepathy observer component to listen for incoming calls. When there is an incoming call from the GV number, it will understand that this call is because of our dialing through GV. The intended result was to auto-accept the call. For the moment, it will just automatically dismiss the dialog box that allows the user to cancel the call.
+ * Cached the numbers registered with GV
+
+*Up to 2010-07-02:*
+
+Tested in Windows, Linux, and maemo5
+ * Standard dialer (a bit incomplete)
+ * GV contacts list, settings, history inbox
+ * Dial any number from dialer, dial/sms contact from contact list, dial.sms contact from history list
+ * Download and play voicemail
+ * Cache contacts, settings and voicemail so that network traffic is reduced
+ * Single instance of the application per user
+ * Linux and Windows (actually any OS that supports system trays) will show a system tray.

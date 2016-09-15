@@ -1,0 +1,16 @@
+#summary Features to be added, bugs to be fixed, R&D to be done
+
+*Planned features:*
+ * Auto-accept dialback phone call in desktop skype
+ * Auto-accept dialback phone call in phone
+ * Convert the GV access class into a QtMobility connection manager so that anyone else can access it and create other interesting apps.
+
+*R&D:*
+ * Find out how to use the telepathy observer component to auto-accept a call
+
+*Unsorted TTD:*
+ * Fix the notification code to terminate when Inbox update fails
+
+*TTD for the new incarnation:*
+ * bb10: tie click on contact -> cpp. Follow the same pattern as harmattan to show details.
+ * bb10: contact details page design
