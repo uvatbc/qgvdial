@@ -1,0 +1,270 @@
+<node>
+  <interface name="org.freedesktop.Telepathy.Connection.Interface.ContactBlocking">
+    <method name="RequestBlockedContacts">
+      <arg name="Contacts" type="a{us}" direction="out"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="Qt_Type_dict_us"/>
+    </method>
+    <method name="UnblockContacts">
+      <arg name="Contacts" type="au" direction="in"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_au"/>
+    </method>
+    <method name="BlockContacts">
+      <arg name="Contacts" type="au" direction="in"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_au"/>
+      <arg name="Report_Abusive" type="b" direction="in"/>
+    </method>
+    <signal name="BlockedContactsChanged">
+      <arg type="a{us}"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_dict_us"/>
+      <arg type="a{us}"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="Qt_Type_dict_us"/>
+    </signal>
+  </interface>
+  <interface name="org.freedesktop.Telepathy.Connection.Interface.ContactGroups">
+    <method name="RenameGroup">
+      <arg name="Old_Name" type="s" direction="in"/>
+      <arg name="New_Name" type="s" direction="in"/>
+    </method>
+    <method name="RemoveGroup">
+      <arg name="Group" type="s" direction="in"/>
+    </method>
+    <method name="RemoveFromGroup">
+      <arg name="Group" type="s" direction="in"/>
+      <arg name="Members" type="au" direction="in"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="Qt_Type_au"/>
+    </method>
+    <method name="AddToGroup">
+      <arg name="Group" type="s" direction="in"/>
+      <arg name="Members" type="au" direction="in"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="Qt_Type_au"/>
+    </method>
+    <method name="SetGroupMembers">
+      <arg name="Group" type="s" direction="in"/>
+      <arg name="Members" type="au" direction="in"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="Qt_Type_au"/>
+    </method>
+    <method name="SetContactGroups">
+      <arg name="Contact" type="u" direction="in"/>
+      <arg name="Groups" type="as" direction="in"/>
+    </method>
+    <signal name="GroupsRemoved">
+      <arg type="as"/>
+    </signal>
+    <signal name="GroupRenamed">
+      <arg type="s"/>
+      <arg type="s"/>
+    </signal>
+    <signal name="GroupsCreated">
+      <arg type="as"/>
+    </signal>
+    <signal name="GroupsChanged">
+      <arg type="au"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_au"/>
+      <arg type="as"/>
+      <arg type="as"/>
+    </signal>
+  </interface>
+  <interface name="org.freedesktop.Telepathy.Connection.Interface.ContactList">
+    <method name="Download">
+    </method>
+    <method name="Unpublish">
+      <arg name="Contacts" type="au" direction="in"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_au"/>
+    </method>
+    <method name="Unsubscribe">
+      <arg name="Contacts" type="au" direction="in"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_au"/>
+    </method>
+    <method name="RemoveContacts">
+      <arg name="Contacts" type="au" direction="in"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_au"/>
+    </method>
+    <method name="AuthorizePublication">
+      <arg name="Contacts" type="au" direction="in"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_au"/>
+    </method>
+    <method name="RequestSubscription">
+      <arg name="Contacts" type="au" direction="in"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_au"/>
+      <arg name="Message" type="s" direction="in"/>
+    </method>
+    <method name="GetContactListAttributes">
+      <arg name="Interfaces" type="as" direction="in"/>
+      <arg name="Hold" type="b" direction="in"/>
+      <arg name="Attributes" type="a{ua{sv}}" direction="out"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="Qt_Type_dict_u_dict_sv"/>
+    </method>
+    <signal name="ContactsChanged">
+      <arg type="a{u(uus)}"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_dict_u_uus"/>
+      <arg type="au"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="Qt_Type_au"/>
+    </signal>
+    <signal name="ContactsChangedWithID">
+      <arg type="a{u(uus)}"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_dict_u_uus"/>
+      <arg type="a{us}"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="Qt_Type_dict_us"/>
+      <arg type="a{us}"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In2" value="Qt_Type_dict_us"/>
+    </signal>
+    <signal name="ContactListStateChanged">
+      <arg type="u"/>
+    </signal>
+  </interface>
+  <interface name="org.freedesktop.Telepathy.Connection.Interface.Contacts">
+    <method name="GetContactAttributes">
+      <arg name="Handles" type="au" direction="in"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_au"/>
+      <arg name="Interfaces" type="as" direction="in"/>
+      <arg name="Hold" type="b" direction="in"/>
+      <arg name="Attributes" type="a{ua{sv}}" direction="out"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="Qt_Type_dict_u_dict_sv"/>
+    </method>
+  </interface>
+  <interface name="org.freedesktop.Telepathy.Connection.Interface.Capabilities">
+    <method name="GetCapabilities">
+      <arg name="Handles" type="au" direction="in"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_au"/>
+      <arg name="Contact_Capabilities" type="a(usuu)" direction="out"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="Qt_Type_a_usuu"/>
+    </method>
+    <method name="AdvertiseCapabilities">
+      <arg name="Add" type="a(su)" direction="in"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_a_su"/>
+      <arg name="Remove" type="as" direction="in"/>
+      <arg name="Self_Capabilities" type="a(su)" direction="out"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="Qt_Type_a_su"/>
+    </method>
+    <signal name="CapabilitiesChanged">
+      <arg type="a(usuuuu)"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_a_usuuuu"/>
+    </signal>
+  </interface>
+  <interface name="org.freedesktop.Telepathy.Connection.Interface.Avatars">
+    <method name="ClearAvatar">
+    </method>
+    <method name="SetAvatar">
+      <arg name="Avatar" type="ay" direction="in"/>
+      <arg name="MIME_Type" type="s" direction="in"/>
+      <arg name="Token" type="s" direction="out"/>
+    </method>
+    <method name="RequestAvatars">
+      <arg name="Contacts" type="au" direction="in"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_au"/>
+    </method>
+    <method name="RequestAvatar">
+      <arg name="Contact" type="u" direction="in"/>
+      <arg name="Data" type="ay" direction="out"/>
+      <arg name="MIME_Type" type="s" direction="out"/>
+    </method>
+    <method name="GetKnownAvatarTokens">
+      <arg name="Contacts" type="au" direction="in"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_au"/>
+      <arg name="Tokens" type="a{us}" direction="out"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="Qt_Type_dict_us"/>
+    </method>
+    <method name="GetAvatarTokens">
+      <arg name="Contacts" type="au" direction="in"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_au"/>
+      <arg name="Tokens" type="as" direction="out"/>
+    </method>
+    <method name="GetAvatarRequirements">
+      <arg name="MIME_Types" type="as" direction="out"/>
+      <arg name="Min_Width" type="q" direction="out"/>
+      <arg name="Min_Height" type="q" direction="out"/>
+      <arg name="Max_Width" type="q" direction="out"/>
+      <arg name="Max_Height" type="q" direction="out"/>
+      <arg name="Max_Bytes" type="u" direction="out"/>
+    </method>
+    <signal name="AvatarRetrieved">
+      <arg type="u"/>
+      <arg type="s"/>
+      <arg type="ay"/>
+      <arg type="s"/>
+    </signal>
+    <signal name="AvatarUpdated">
+      <arg type="u"/>
+      <arg type="s"/>
+    </signal>
+  </interface>
+  <interface name="org.freedesktop.Telepathy.Connection.Interface.Aliasing">
+    <method name="SetAliases">
+      <arg name="Aliases" type="a{us}" direction="in"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_dict_us"/>
+    </method>
+    <method name="GetAliases">
+      <arg name="Contacts" type="au" direction="in"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_au"/>
+      <arg name="Aliases" type="a{us}" direction="out"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="Qt_Type_dict_us"/>
+    </method>
+    <method name="RequestAliases">
+      <arg name="Contacts" type="au" direction="in"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_au"/>
+      <arg name="Aliases" type="as" direction="out"/>
+    </method>
+    <method name="GetAliasFlags">
+      <arg name="Alias_Flags" type="u" direction="out"/>
+    </method>
+    <signal name="AliasesChanged">
+      <arg type="a(us)"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_a_us"/>
+    </signal>
+  </interface>
+  <interface name="org.freedesktop.Telepathy.Connection.Interface.SimplePresence">
+    <method name="GetPresences">
+      <arg name="Contacts" type="au" direction="in"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_au"/>
+      <arg name="Presence" type="a{u(uss)}" direction="out"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="Qt_Type_dict_u_uss"/>
+    </method>
+    <method name="SetPresence">
+      <arg name="Status" type="s" direction="in"/>
+      <arg name="Status_Message" type="s" direction="in"/>
+    </method>
+    <signal name="PresencesChanged">
+      <arg type="a{u(uss)}"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_dict_u_uss"/>
+    </signal>
+  </interface>
+  <interface name="org.freedesktop.Telepathy.Connection.Interface.Presence">
+    <method name="SetStatus">
+      <arg name="Statuses" type="a{sa{sv}}" direction="in"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_dict_s_dict_sv"/>
+    </method>
+    <method name="SetLastActivityTime">
+      <arg name="Time" type="u" direction="in"/>
+    </method>
+    <method name="RequestPresence">
+      <arg name="Contacts" type="au" direction="in"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_au"/>
+    </method>
+    <method name="RemoveStatus">
+      <arg name="Status" type="s" direction="in"/>
+    </method>
+    <method name="GetStatuses">
+      <arg name="Available_Statuses" type="a{s(ubba{ss})}" direction="out"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="Qt_Type_dict_s_ubb_dict_ss"/>
+    </method>
+    <method name="GetPresence">
+      <arg name="Contacts" type="au" direction="in"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_au"/>
+      <arg name="Presence" type="a{u(ua{sa{sv}})}" direction="out"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="Qt_Type_dict_u_u_dict_s_dict_sv"/>
+    </method>
+    <method name="ClearStatus">
+    </method>
+    <method name="AddStatus">
+      <arg name="Status" type="s" direction="in"/>
+      <arg name="Parameters" type="a{sv}" direction="in"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="QVariantMap"/>
+    </method>
+    <signal name="PresenceUpdate">
+      <arg type="a{u(ua{sa{sv}})}"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_dict_u_u_dict_s_dict_sv"/>
+    </signal>
+  </interface>
+<!--
+-->
+</node>
