@@ -33,8 +33,6 @@ Contact: yuvraaj@gmail.com
 #define APPLICATION_NAME "qgvdial"
 #define ABOUT_URL "http://www.yuvraaj.net/qgvdial/about.html"
 
-#define MIXPANEL_TOKEN  "__MY_MIXPANEL_TOKEN__"
-
 struct ProxyInfo {
     bool enableProxy;
     bool useSystemProxy;

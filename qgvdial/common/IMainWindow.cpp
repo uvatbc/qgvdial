@@ -28,6 +28,8 @@ Contact: yuvraaj@gmail.com
 #define BROWSER_DIALBACK_CTX_VALUE 0x3456
 #define MIXPANEL_FLUSH_TIMEOUT (60 * 1000)
 
+extern QString g_mixpaneltoken;
+
 IMainWindow::IMainWindow(QObject *parent)
 : QObject(parent)
 , m_version(g_version)
@@ -147,7 +149,7 @@ IMainWindow::onInitDone()
 
         db.init (Lib::ref().getDbDir());
         oContacts.init ();
-        m_mixPanel.setToken(MIXPANEL_TOKEN);
+        m_mixPanel.setToken(g_mixpaneltoken);
 
         QList<QNetworkCookie> cookies;
         if (db.loadCookies (cookies)) {

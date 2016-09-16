@@ -19,9 +19,11 @@ build: prep_build_target
 	cd $(BUILDDIR)/$(TARGET)/qgvdial-$(VERSION) ; qmake $(ABSPROPATH)
 	cd $(BUILDDIR)/$(TARGET)/qgvdial-$(VERSION) ; $(MAKE)
 
-prep_build_target:
+clean:
 	# Set TARGET to "ubuntu" / "sailfish" / etc
 	rm -rf $(BUILDDIR)/$(TARGET)
+
+prep_build_target:
 	mkdir -p $(BUILDDIR)/$(TARGET)/qgvdial-$(VERSION)
 
 test:

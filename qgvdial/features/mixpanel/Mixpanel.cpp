@@ -32,6 +32,8 @@ Contact: yuvraaj@gmail.com
 #define MP_BATCH_SIZE     50
 #define MP_MAX_BATCH_SIZE 50
 
+extern QString g_mixpaneltoken;
+
 MixPanel::MixPanel(QObject *parent)
 : QObject(parent)
 {
@@ -46,7 +48,7 @@ MixPanel::setToken(const QString &token)
 {
     m_token = token;
 
-    if (QString(MIXPANEL_TOKEN).startsWith ("__")) {
+    if (g_mixpaneltoken.startsWith ("__")) {
         QString tokenPath = Lib::ref().getDbDir() + QDir::separator ()
                           + "mixpanel.token";
         if (QFileInfo(tokenPath).exists ()) {

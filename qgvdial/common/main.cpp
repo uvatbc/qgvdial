@@ -40,6 +40,7 @@ int   logCounter = 0; //! Number of log entries since the last log flush
 
 QStringList g_arrLogFiles;
 QString g_version = "__QGVDIAL_VERSION__";
+QString g_mixpaneltoken = "__MY_MIXPANEL_TOKEN__";
 
 const char *ignoreMsgs[] = {
     "MPanRecognizerTouch",
