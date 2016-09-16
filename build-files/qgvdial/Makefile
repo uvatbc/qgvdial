@@ -25,6 +25,7 @@ clean:
 
 prep_build_target:
 	mkdir -p $(BUILDDIR)/$(TARGET)/qgvdial-$(VERSION)
+	./qgvdial/features/dbus_api/gen/create_ifaces.sh
 
 test:
 	@echo $(ABSPROPATH)
