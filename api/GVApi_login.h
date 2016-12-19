@@ -55,13 +55,8 @@ public:
 
 private slots:
     // Login and two factor
-    void onLogin2(bool success, const QByteArray &response,
-                  QNetworkReply *reply, void *ctx);
     void onTFAAltLoginResp(bool success, const QByteArray &response,
                            QNetworkReply *reply, void *ctx);
-
-    void onInitGv(bool success, const QByteArray &response,
-                  QNetworkReply *reply, void *ctx);
 
     void internalLogoutForReLogin();
 
@@ -72,6 +67,8 @@ private slots:
     // All SM slots
     void doLoginFailure();
     void doLoginSuccess();
+    void doLoginEndState();
+
     void doGetVoicePage();
     void doUsernamePage();
     void doPasswordPage();
@@ -84,10 +81,13 @@ private slots:
                             QNetworkReply *reply, void *ctx);
     void onPostPasswordPage(bool success, const QByteArray &response,
                             QNetworkReply *reply, void *ctx);
+    void onPostInboxPage(bool success, const QByteArray &response,
+                         QNetworkReply *reply, void *ctx);
 
 signals: // Private
     void sigLoginFail();
     void sigLoginSuccess();
+    void sigLoginCompleted();
 
     void sigDoUsernamePage();
     void sigDoPasswordPage();
@@ -106,17 +106,11 @@ private:
     bool parseForm(const QString &strResponse,// IN
                          QGVLoginForm *form);  // OUT
 
-    bool parseFormAction(const QString &strResponse,    // IN
-                         QString &action);              // OUT
     bool parseXmlAttrs(QString fullMatch,       // IN
                        const QString &xmlTag,   // IN
                        QVariantMap &attrs);     // OUT
-    bool parseLoginFields(const QString &strResponse,
-                                bool wantHidden,
-                                QVariantMap &ret);
     bool parseFormFields(const QString &strResponse,    // IN
                                QGVLoginForm *form);     // OUT
-    bool initGv(AsyncTaskToken *token);
     bool parseAlternateLogins(const QString &form, AsyncTaskToken *task);
 
     void lookForLoginErrorMessage(const QString &resp, AsyncTaskToken *task);

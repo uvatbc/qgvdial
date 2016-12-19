@@ -37,168 +37,6 @@ GVApi_login::GVApi_login(GVApi *parent)
 }//GVApi_login::GVApi_login
 
 bool
-GVApi_login::recreateSM()
-{
-    SAFE_DELETE(m_sm);
-
-    m_sm = new QStateMachine(this);
-    QState *loginFailed  = new QState;
-    QState *loginSuccess = new QState;
-    QState *getVoicePage = new QState;
-    QState *usernamePage = new QState;
-    QState *passwordPage = new QState;
-    QState *tfaSmsPage   = new QState;
-    QState *inboxPage    = new QState;
-    QFinalState *endState = new QFinalState;
-
-    if ((NULL == m_sm) ||
-        (NULL == loginFailed) ||
-        (NULL == loginSuccess) ||
-        (NULL == getVoicePage) ||
-        (NULL == usernamePage) ||
-        (NULL == passwordPage) ||
-        (NULL == tfaSmsPage) ||
-        (NULL == inboxPage) ||
-        (NULL == endState))
-    {
-        Q_WARN("Some states could not be created!!");
-
-        SAFE_DELETE(endState);
-        SAFE_DELETE(inboxPage);
-        SAFE_DELETE(tfaSmsPage);
-        SAFE_DELETE(passwordPage);
-        SAFE_DELETE(usernamePage);
-        SAFE_DELETE(getVoicePage);
-        SAFE_DELETE(loginSuccess);
-        SAFE_DELETE(loginFailed);
-        SAFE_DELETE(m_sm);
-        return false;
-    }
-
-    // Login failure: set flags, clear variables and return status
-    QObject::connect(loginFailed, SIGNAL(entered()),
-                     this, SLOT(doLoginFailure()));
-    // Login success:
-    QObject::connect(loginSuccess, SIGNAL(entered()),
-                     this, SLOT(doLoginSuccess()));
-    // Begin at: get the voice page
-    QObject::connect(getVoicePage, SIGNAL(entered()),
-                     this, SLOT(doGetVoicePage()));
-    // Handle the username page:
-    QObject::connect(usernamePage, SIGNAL(entered()),
-                     this, SLOT(doUsernamePage()));
-    // Handle the password page:
-    QObject::connect(passwordPage, SIGNAL(entered()),
-                     this, SLOT(doPasswordPage()));
-    // Handle the TFA page:
-    QObject::connect(tfaSmsPage, SIGNAL(entered()),
-                     this, SLOT(doTfaSmsPage()));
-    // After login success, handle the initial inbox page:
-    QObject::connect(inboxPage, SIGNAL(entered()),
-                     this, SLOT(doInboxPage()));
-
-    // Setup transitions
-#define ADD_TRANSITION(_src, _sig, _dst) \
-    (_src)->addTransition(this, SIGNAL(_sig()), (_dst))
-
-    // All these can result in login failures
-    ADD_TRANSITION(getVoicePage, sigLoginFail, loginFailed);
-    ADD_TRANSITION(usernamePage, sigLoginFail, loginFailed);
-    ADD_TRANSITION(passwordPage, sigLoginFail, loginFailed);
-    ADD_TRANSITION(  tfaSmsPage, sigLoginFail, loginFailed);
-
-    // All these can result in login success
-    ADD_TRANSITION(getVoicePage, sigLoginSuccess, loginSuccess);
-    ADD_TRANSITION(passwordPage, sigLoginSuccess, loginSuccess);
-    ADD_TRANSITION(  tfaSmsPage, sigLoginSuccess, loginSuccess);
-
-    // getVoicePage -> usernamePage
-    ADD_TRANSITION(getVoicePage, sigDoUsernamePage, usernamePage);
-    // usernamePage -> passwordPage
-    ADD_TRANSITION(usernamePage, sigDoPasswordPage, passwordPage);
-
-    // passwordPage -> tfaSmsPage
-    ADD_TRANSITION(passwordPage, sigDoTfaPage, tfaSmsPage);
-
-    // loginSuccess -> inboxPage
-    ADD_TRANSITION(loginSuccess, sigDoInboxPage, inboxPage);
-
-#undef ADD_TRANSITION
-
-    m_sm->addState(loginFailed);
-    m_sm->addState(loginSuccess);
-    m_sm->addState(getVoicePage);
-    m_sm->addState(usernamePage);
-    m_sm->addState(passwordPage);
-    m_sm->addState(tfaSmsPage);
-    m_sm->addState(inboxPage);
-    m_sm->addState(endState);
-
-    m_sm->setInitialState (getVoicePage);
-
-    m_sm->start();
-    return true;
-}//GVApi_login::recreateSM
-
-void
-GVApi_login::doLoginFailure()
-{
-    GVApi *p = (GVApi *)this->parent();
-    p->m_loggedIn = false;
-    p->m_rnr_se.clear ();
-
-    if (ATTS_SUCCESS == m_loginToken->status) {
-        m_loginToken->status = ATTS_FAILURE;
-    }
-    m_loginToken->emitCompleted ();
-    m_loginToken = NULL;
-}//GVApi_login::doLoginFailure
-
-void
-GVApi_login::doLoginSuccess()
-{
-    GVApi *p = (GVApi *)this->parent();
-    p->m_loggedIn = true;
-
-    if (p->m_rnr_se.isEmpty()) {
-        Q_WARN("User was already logged in, but there is no rnr_se!");
-    } else if (p->emitLog) {
-        Q_DEBUG("User was already logged in...");
-    }
-
-    m_loginToken->outParams["rnr_se"] = p->m_rnr_se;
-    m_loginToken->status = ATTS_SUCCESS;
-    m_loginToken->emitCompleted ();
-    m_loginToken = NULL;
-}//GVApi_login::doLoginSuccess
-
-/*
- * GET http://google.com/voice
- * Should result in a bunch of redirects (to FQDN, then to mobile https)
- * eventually landing on
- * https://accounts.google.com/ServiceLogin?service=grandcentral
- *      &continue=https://www.google.com/voice/m?initialauth
- *      &followup=https://www.google.com/voice/m?initialauth
- * ... which is handled by onGetVoicePage.
- */
-void
-GVApi_login::doGetVoicePage()
-{
-    GVApi *p = (GVApi *)this->parent();
-
-    QUrl url(GV_HTTP);
-    bool rv =
-    p->doGet(url, m_loginToken, this,
-             SLOT(onGetVoicePage(bool,const QByteArray&,QNetworkReply*,void*)));
-    Q_ASSERT(rv);
-    if (!rv) {
-        emit sigLoginFail ();
-    } else if (p->emitLog) {
-        Q_DEBUG("Voice page requested");
-    }
-}//GVApi_login::doGetVoicePage
-
-bool
 GVApi_login::checkForLogin(AsyncTaskToken *task,
                            const QString &strResponse)
 {
@@ -224,6 +62,109 @@ GVApi_login::checkForLogin(AsyncTaskToken *task,
 
     return rv;
 }//GVApi_login::checkForLogin
+
+bool
+GVApi_login::parseXmlAttrs(QString fullMatch,       // IN
+                           const QString &xmlTag,   // IN
+                           QVariantMap &attrs)      // OUT
+{
+    GVApi *p = (GVApi *)this->parent();
+
+    QString name, value;
+    if (!fullMatch.endsWith("/>")) {
+        fullMatch = fullMatch.mid(0, fullMatch.length() - 1) + "/>";
+    }
+
+    QXmlInputSource inputSource;
+    QXmlSimpleReader simpleReader;
+    inputSource.setData(fullMatch);
+    HtmlFieldParser xmlHandler;
+    xmlHandler.setEmitLog(p->emitLog);
+
+    simpleReader.setContentHandler(&xmlHandler);
+    simpleReader.setErrorHandler(&xmlHandler);
+
+    if (!simpleReader.parse(&inputSource, false)) {
+        Q_WARN(QString("Failed to parse field: '%1'").arg(xmlTag));
+        return false;
+    }
+
+    if (!xmlHandler.elems.contains(xmlTag) ||
+        !xmlHandler.attrMap.contains(xmlTag)) {
+        Q_WARN(QString("Failed to parse field: '%1'").arg(xmlTag));
+        return false;
+    }
+
+    attrs = xmlHandler.attrMap[xmlTag];
+    return true;
+}//GVApi_login::parseXmlAttrs
+
+bool
+GVApi_login::parseFormFields(const QString &strResponse,
+                                   QGVLoginForm *form)
+{
+/* To match:
+  <input type="hidden" name="continue" id="continue"
+           value="https://www.google.com/voice/m" />
+*/
+    QRegExp rx1("\\<input(.*)\\>");
+    rx1.setMinimal (true);
+    if (!strResponse.contains (rx1)) {
+        Q_WARN("Invalid login page: No input fields");
+        return false;
+    }
+
+    form->visible.clear ();
+    form->hidden.clear ();
+    form->no_name.clear ();
+
+    int pos = 0;
+    while ((pos = rx1.indexIn (strResponse, pos)) != -1) {
+        QString fullMatch = rx1.cap(0);
+        QString oneInstance = rx1.cap(1);
+        QVariantMap attrs;
+        QString key, value;
+        bool hidden, no_name;
+
+        if (!parseXmlAttrs(fullMatch, "input", attrs)) {
+            Q_WARN("Failed to parse input field.");
+            goto gonext;
+        }
+
+        if (!attrs.contains ("id") && !attrs.contains ("name")) {
+            Q_WARN(QString("Input field doesn't have name/id: '%1'")
+                   .arg(oneInstance));
+            goto gonext;
+        }
+
+        hidden = attrs["type"].toString() == "hidden";
+
+        if (attrs.contains("value")) {
+            value = attrs["value"].toString();
+        }
+
+        if (attrs.contains ("name")) {
+            key = attrs["name"].toString ();
+            no_name = false;
+        } else {
+            key = attrs["id"].toString ();
+            no_name = true;
+        }
+
+        if (no_name) {
+            form->no_name[key] = value;
+        } else if (hidden) {
+            form->hidden[key] = value;
+        } else {
+            form->visible[key] = value;
+        }
+
+gonext:
+        pos += fullMatch.indexOf (oneInstance);
+    }
+
+    return true;
+}//GVApi_login::parseFormFields
 
 bool
 GVApi_login::parseForm(const QString &strResponse,      // IN
@@ -275,13 +216,228 @@ GVApi_login::postForm(QUrl url, QGVLoginForm *form,
     return p->doPostForm(url, content, task, this, nwSlot);
 }//GVApi_login::postForm
 
+bool
+GVApi_login::login(AsyncTaskToken *token)
+{
+    Q_ASSERT(token);
+    if (!token) {
+        return false;
+    }
+
+    // Ensure valid parameters
+    if (!token->inParams.contains("user") ||
+        !token->inParams.contains("pass")) {
+        Q_WARN("Invalid params");
+        token->status = ATTS_INVALID_PARAMS;
+        return true;
+    }
+
+    // Allow only one login at a time.
+    if (NULL != m_loginToken) {
+        token->status = ATTS_IN_PROGRESS;
+        Q_WARN("Login is in progress already");
+        return true;
+    }
+    m_loginToken = token;
+
+    if (!recreateSM ()) {
+        Q_WARN("Failed to start login");
+        token->status = ATTS_FAILURE;
+    }
+
+    return true;
+}//GVApi_login::login
+
+bool
+GVApi_login::recreateSM()
+{
+    SAFE_DELETE(m_sm);
+
+    m_sm = new QStateMachine(this);
+    QState *loginFailed  = new QState;
+    QState *loginSuccess = new QState;
+    QState *getVoicePage = new QState;
+    QState *usernamePage = new QState;
+    QState *passwordPage = new QState;
+    QState *tfaSmsPage   = new QState;
+    QState *inboxPage    = new QState;
+    QFinalState *endState = new QFinalState;
+
+    if ((NULL == m_sm) ||
+        (NULL == loginFailed) ||
+        (NULL == loginSuccess) ||
+        (NULL == getVoicePage) ||
+        (NULL == usernamePage) ||
+        (NULL == passwordPage) ||
+        (NULL == tfaSmsPage) ||
+        (NULL == inboxPage) ||
+        (NULL == endState))
+    {
+        Q_WARN("Some states could not be created!!");
+
+        SAFE_DELETE(endState);
+        SAFE_DELETE(inboxPage);
+        SAFE_DELETE(tfaSmsPage);
+        SAFE_DELETE(passwordPage);
+        SAFE_DELETE(usernamePage);
+        SAFE_DELETE(getVoicePage);
+        SAFE_DELETE(loginSuccess);
+        SAFE_DELETE(loginFailed);
+        SAFE_DELETE(m_sm);
+        return false;
+    }
+
+    // Login failure: set flags, clear variables and return status
+    QObject::connect(loginFailed, SIGNAL(entered()),
+                     this, SLOT(doLoginFailure()));
+    // Login success:
+    QObject::connect(loginSuccess, SIGNAL(entered()),
+                     this, SLOT(doLoginSuccess()));
+    // End state:
+    QObject::connect(endState, SIGNAL(entered()),
+                     this, SLOT(doLoginEndState()));
+
+    // Begin at: get the voice page
+    QObject::connect(getVoicePage, SIGNAL(entered()),
+                     this, SLOT(doGetVoicePage()));
+    // Handle the username page:
+    QObject::connect(usernamePage, SIGNAL(entered()),
+                     this, SLOT(doUsernamePage()));
+    // Handle the password page:
+    QObject::connect(passwordPage, SIGNAL(entered()),
+                     this, SLOT(doPasswordPage()));
+    // Handle the TFA page:
+    QObject::connect(tfaSmsPage, SIGNAL(entered()),
+                     this, SLOT(doTfaSmsPage()));
+    // After login success (password or TFA), handle the initial inbox page:
+    QObject::connect(inboxPage, SIGNAL(entered()),
+                     this, SLOT(doInboxPage()));
+
+    // Setup transitions
+#define ADD_TRANSITION(_src, _sig, _dst) \
+    (_src)->addTransition(this, SIGNAL(_sig()), (_dst))
+
+    // All these can result in login failures
+    ADD_TRANSITION(getVoicePage, sigLoginFail, loginFailed);
+    ADD_TRANSITION(usernamePage, sigLoginFail, loginFailed);
+    ADD_TRANSITION(passwordPage, sigLoginFail, loginFailed);
+    ADD_TRANSITION(  tfaSmsPage, sigLoginFail, loginFailed);
+
+    // All these can result in login success and need us to get the inbox page
+    ADD_TRANSITION(getVoicePage, sigDoInboxPage, inboxPage);
+    ADD_TRANSITION(passwordPage, sigDoInboxPage, inboxPage);
+    ADD_TRANSITION(  tfaSmsPage, sigDoInboxPage, inboxPage);
+
+    // Success and failure both need to terminate the state machine
+    ADD_TRANSITION(loginSuccess, sigLoginCompleted, endState);
+    ADD_TRANSITION( loginFailed, sigLoginCompleted, endState);
+
+    // getVoicePage -> usernamePage
+    ADD_TRANSITION(getVoicePage, sigDoUsernamePage, usernamePage);
+    // usernamePage -> passwordPage
+    ADD_TRANSITION(usernamePage, sigDoPasswordPage, passwordPage);
+
+    // passwordPage -> tfaSmsPage
+    ADD_TRANSITION(passwordPage, sigDoTfaPage, tfaSmsPage);
+
+    // loginSuccess -> inboxPage
+    ADD_TRANSITION(loginSuccess, sigDoInboxPage, inboxPage);
+
+#undef ADD_TRANSITION
+
+    m_sm->addState(loginFailed);
+    m_sm->addState(loginSuccess);
+    m_sm->addState(getVoicePage);
+    m_sm->addState(usernamePage);
+    m_sm->addState(passwordPage);
+    m_sm->addState(tfaSmsPage);
+    m_sm->addState(inboxPage);
+    m_sm->addState(endState);
+
+    m_sm->setInitialState (getVoicePage);
+
+    m_sm->start();
+    return true;
+}//GVApi_login::recreateSM
+
+void
+GVApi_login::doLoginFailure()
+{
+    GVApi *p = (GVApi *)this->parent();
+    p->m_loggedIn = false;
+    p->m_rnr_se.clear ();
+
+    if (ATTS_SUCCESS == m_loginToken->status) {
+        m_loginToken->status = ATTS_LOGIN_FAILURE;
+    }
+
+    emit sigLoginCompleted();
+}//GVApi_login::doLoginFailure
+
+void
+GVApi_login::doLoginSuccess()
+{
+    GVApi *p = (GVApi *)this->parent();
+    p->m_loggedIn = true;
+
+    if (p->m_rnr_se.isEmpty()) {
+        Q_WARN("User was already logged in, but there is no rnr_se!");
+    } else if (p->emitLog) {
+        Q_DEBUG("User was already logged in...");
+    }
+
+    m_loginToken->outParams["rnr_se"] = p->m_rnr_se;
+    m_loginToken->status = ATTS_SUCCESS;
+
+    emit sigLoginCompleted();
+}//GVApi_login::doLoginSuccess
+
+void
+GVApi_login::doLoginEndState()
+{
+    m_loginToken->emitCompleted ();
+    m_loginToken = NULL;
+
+    SAFE_DELETE(m_form);
+    SAFE_DELETE(m_sm);
+}//GVApi_login::doLoginEndState
+
+/*
+ * GET http://google.com/voice
+ * Should result in a bunch of redirects (to FQDN, then to mobile https)
+ * eventually landing on
+ * https://accounts.google.com/ServiceLogin?service=grandcentral
+ *      &continue=https://www.google.com/voice/m?initialauth
+ *      &followup=https://www.google.com/voice/m?initialauth
+ * ... which is handled by onGetVoicePage.
+ */
+void
+GVApi_login::doGetVoicePage()
+{
+    GVApi *p = (GVApi *)this->parent();
+
+    QUrl url(GV_HTTP);
+    bool rv =
+    p->doGet(url, m_loginToken, this,
+             SLOT(onGetVoicePage(bool,const QByteArray&,QNetworkReply*,void*)));
+    Q_ASSERT(rv);
+    if (!rv) {
+        emit sigLoginFail ();
+    } else if (p->emitLog) {
+        Q_DEBUG("Voice page requested");
+    }
+}//GVApi_login::doGetVoicePage
+
 void
 GVApi_login::onGetVoicePage(bool success, const QByteArray &response,
                             QNetworkReply *reply, void *ctx)
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QString strResponse = response;
-    //Q_DEBUG(strResponse);
+
+#if 0
+    Q_DEBUG(strResponse);
+#endif
 
     do {
         if (!success) {
@@ -296,7 +452,7 @@ GVApi_login::onGetVoicePage(bool success, const QByteArray &response,
         }
 
         if (checkForLogin(token, strResponse)) {
-            emit sigLoginSuccess ();
+            emit sigDoInboxPage ();
             break;
         }
 
@@ -389,7 +545,9 @@ GVApi_login::onPostUsernamePage(bool success, const QByteArray &response,
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QString strResponse = response;
 
-    //Q_DEBUG(strResponse);
+#if 0
+    Q_DEBUG(strResponse);
+#endif
 
     do {
         if (!success) {
@@ -404,7 +562,7 @@ GVApi_login::onPostUsernamePage(bool success, const QByteArray &response,
         }
 
         if (checkForLogin(token, strResponse)) {
-            emit sigLoginSuccess ();
+            emit sigDoInboxPage ();
             break;
         }
 
@@ -499,7 +657,9 @@ GVApi_login::onPostPasswordPage(bool success, const QByteArray &response,
     QString strResponse = response;
     SAFE_DELETE(m_form);
 
-    //Q_DEBUG(strResponse);
+#if 0
+    Q_DEBUG(strResponse);
+#endif
 
     do {
         if (!success) {
@@ -514,7 +674,7 @@ GVApi_login::onPostPasswordPage(bool success, const QByteArray &response,
         }
 
         if (checkForLogin(token, strResponse)) {
-            emit sigLoginSuccess ();
+            emit sigDoInboxPage ();
             break;
         }
 
@@ -542,6 +702,10 @@ GVApi_login::onPostPasswordPage(bool success, const QByteArray &response,
             break;
         }
         noscript = rxNoscript.cap(0);
+
+#if 0
+        Q_DEBUG(noscript);
+#endif
 
         SAFE_DELETE(m_form);
         m_form = new QGVLoginForm(this);
@@ -583,261 +747,7 @@ GVApi_login::doTfaSmsPage()
         token->inParams["tfaAction"] = action;
         emit p->twoStepAuthentication(token);
     } while (0);
-
-    SAFE_DELETE(m_form);
 }//GVApi_login::doTfaSmsPage
-
-void
-GVApi_login::doInboxPage()
-{
-}//GVApi_login::doInboxPage
-
-bool
-GVApi_login::login(AsyncTaskToken *token)
-{
-    Q_ASSERT(token);
-    if (!token) {
-        return false;
-    }
-
-    // Ensure valid parameters
-    if (!token->inParams.contains("user") ||
-        !token->inParams.contains("pass")) {
-        Q_WARN("Invalid params");
-        token->status = ATTS_INVALID_PARAMS;
-        return true;
-    }
-
-    // Allow only one login at a time.
-    if (NULL != m_loginToken) {
-        token->status = ATTS_IN_PROGRESS;
-        Q_WARN("Login is in progress already");
-        return true;
-    }
-    m_loginToken = token;
-
-    if (!recreateSM ()) {
-        Q_WARN("Failed to start login");
-        token->status = ATTS_FAILURE;
-    }
-
-    return true;
-}//GVApi_login::login
-
-bool
-GVApi_login::parseFormAction(const QString &strResponse,    // IN
-                                   QString &action)         // OUT
-{
-    QRegExp rxForm("\\<form(.*)\\>");
-    rxForm.setMinimal(true);
-    int pos = strResponse.indexOf(rxForm);
-    if (-1 == pos) {
-        Q_WARN("Failed to parse login form");
-        return false;
-    }
-
-    QString fullMatch = rxForm.cap(0);
-    fullMatch = fullMatch.remove("novalidate");
-    QVariantMap attrs;
-    if (!parseXmlAttrs(fullMatch, "form", attrs)) {
-        Q_WARN("Failed to parse form attributes");
-        return false;
-    }
-
-    if (!attrs.contains("action")) {
-        Q_WARN("Form doesn't have an action");
-        return false;
-    }
-
-    action = attrs["action"].toString();
-    return true;
-}//GVApi_login::parseFormAction
-
-bool
-GVApi_login::parseXmlAttrs(QString fullMatch,       // IN
-                           const QString &xmlTag,   // IN
-                           QVariantMap &attrs)      // OUT
-{
-    GVApi *p = (GVApi *)this->parent();
-
-    QString name, value;
-    if (!fullMatch.endsWith("/>")) {
-        fullMatch = fullMatch.mid(0, fullMatch.length() - 1) + "/>";
-    }
-
-    QXmlInputSource inputSource;
-    QXmlSimpleReader simpleReader;
-    inputSource.setData(fullMatch);
-    HtmlFieldParser xmlHandler;
-    xmlHandler.setEmitLog(p->emitLog);
-
-    simpleReader.setContentHandler(&xmlHandler);
-    simpleReader.setErrorHandler(&xmlHandler);
-
-    if (!simpleReader.parse(&inputSource, false)) {
-        Q_WARN(QString("Failed to parse field: '%1'").arg(xmlTag));
-        return false;
-    }
-
-    if (!xmlHandler.elems.contains(xmlTag) ||
-        !xmlHandler.attrMap.contains(xmlTag)) {
-        Q_WARN(QString("Failed to parse field: '%1'").arg(xmlTag));
-        return false;
-    }
-
-    attrs = xmlHandler.attrMap[xmlTag];
-    return true;
-}//GVApi_login::parseXmlAttrs
-
-bool
-GVApi_login::parseLoginFields(const QString &strResponse,
-                                    bool wantHidden,
-                                    QVariantMap &ret)
-{
-/* To match:
-  <input type="hidden" name="continue" id="continue"
-           value="https://www.google.com/voice/m" />
-*/
-    GVApi *p = (GVApi *)this->parent();
-    QRegExp rx1("\\<input(.*)\\>");
-    rx1.setMinimal (true);
-    if (!strResponse.contains (rx1)) {
-        Q_WARN("Invalid login page: No input fields");
-        return false;
-    }
-
-    ret.clear ();
-    int pos = 0;
-    while ((pos = rx1.indexIn (strResponse, pos)) != -1) {
-        QString fullMatch = rx1.cap(0);
-        QString oneInstance = rx1.cap(1);
-        QVariantMap attrs;
-        QString key, value;
-
-        if (!parseXmlAttrs(fullMatch, "input", attrs)) {
-            Q_WARN("Failed to parse input field.");
-            goto gonext;
-        }
-
-        if (!attrs.contains ("id") && !attrs.contains ("name")) {
-            Q_WARN(QString("Input field doesn't have name/id: '%1'")
-                   .arg(oneInstance));
-            goto gonext;
-        }
-
-        if (wantHidden) {
-            if (attrs["type"].toString() != "hidden") {
-                if (DEBUG_ONLY && p->emitLog) {
-                    Q_DEBUG(QString("Input field \"%1\" is not hidden")
-                        .arg(oneInstance));
-                }
-                goto gonext;
-            }
-        } else {
-            if (attrs["type"].toString() == "hidden") {
-                if (DEBUG_ONLY && p->emitLog) {
-                    Q_DEBUG(QString("Input field \"%1\" is hidden")
-                        .arg(oneInstance));
-                }
-                goto gonext;
-            }
-        }
-
-        if (attrs.contains ("id")) {
-            key = attrs["id"].toString ();
-        } else {
-            key = attrs["name"].toString ();
-        }
-        if (attrs.contains("value")) {
-            value = attrs["value"].toString();
-        }
-
-        if (DEBUG_ONLY && ret.contains (key) &&
-           (ret[key].toString() != value)) {
-            Q_DEBUG(QString("Overwriting %1 value %2 with value %3")
-                    .arg (key, ret[key].toString(), value));
-        }
-
-        ret[key] = value;
-
-gonext:
-        pos += fullMatch.indexOf (oneInstance);
-    }
-
-    if (ret.count() == 0) {
-        Q_WARN("No hidden fields!!");
-        return false;
-    }
-
-    return true;
-}//GVApi_login::parseLoginFields
-
-bool
-GVApi_login::parseFormFields(const QString &strResponse,
-                                   QGVLoginForm *form)
-{
-/* To match:
-  <input type="hidden" name="continue" id="continue"
-           value="https://www.google.com/voice/m" />
-*/
-    QRegExp rx1("\\<input(.*)\\>");
-    rx1.setMinimal (true);
-    if (!strResponse.contains (rx1)) {
-        Q_WARN("Invalid login page: No input fields");
-        return false;
-    }
-
-    form->visible.clear ();
-    form->hidden.clear ();
-    form->no_name.clear ();
-
-    int pos = 0;
-    while ((pos = rx1.indexIn (strResponse, pos)) != -1) {
-        QString fullMatch = rx1.cap(0);
-        QString oneInstance = rx1.cap(1);
-        QVariantMap attrs;
-        QString key, value;
-        bool hidden, no_name;
-
-        if (!parseXmlAttrs(fullMatch, "input", attrs)) {
-            Q_WARN("Failed to parse input field.");
-            goto gonext;
-        }
-
-        if (!attrs.contains ("id") && !attrs.contains ("name")) {
-            Q_WARN(QString("Input field doesn't have name/id: '%1'")
-                   .arg(oneInstance));
-            goto gonext;
-        }
-
-        hidden = attrs["type"].toString() == "hidden";
-
-        if (attrs.contains("value")) {
-            value = attrs["value"].toString();
-        }
-
-        if (attrs.contains ("name")) {
-            key = attrs["name"].toString ();
-            no_name = false;
-        } else {
-            key = attrs["id"].toString ();
-            no_name = true;
-        }
-
-        if (no_name) {
-            form->no_name[key] = value;
-        } else if (hidden) {
-            form->hidden[key] = value;
-        } else {
-            form->visible[key] = value;
-        }
-
-gonext:
-        pos += fullMatch.indexOf (oneInstance);
-    }
-
-    return true;
-}//GVApi_login::parseFormFields
 
 bool
 GVApi_login::parseAlternateLogins(const QString &form, AsyncTaskToken *task)
@@ -926,145 +836,6 @@ gonext:
 
     return true;
 }//GVApi_login::parseAlternateLogins
-
-void
-GVApi_login::onLogin2(bool success, const QByteArray &response,
-                      QNetworkReply *reply, void *ctx)
-{
-    GVApi *p = (GVApi *)this->parent();
-    AsyncTaskToken *task = (AsyncTaskToken *)ctx;
-    QString strResponse = response;
-    bool tfaRequired = false;
-
-#if 0
-    QUrl replyUrl = reply->url ();
-    QString strReplyUrl = replyUrl.toString();
-    QFile fTemp("login2.html");
-    fTemp.open (QFile::ReadWrite);
-    fTemp.write(strReplyUrl.toLatin1());
-    fTemp.write ("\n");
-    fTemp.write (response);
-    fTemp.close ();
-#endif
-
-    task->errorString.clear();
-    do {
-        if (!success) {
-            task->status = ATTS_NW_ERROR;
-            break;
-        }
-
-        if (strResponse.contains("signin/challenge", Qt::CaseInsensitive)) {
-            tfaRequired = true;
-        }
-
-        // Check to see if 2 factor auth is required.
-        if (!tfaRequired) {
-            p->m_loggedIn = checkForLogin(task, strResponse);
-            if (!p->m_loggedIn) {
-                success = false;
-
-                // Dump out cookie names
-                QString msg;
-                QStringList cookieNames;
-
-#if 0
-                msg = "Cookies:\n";
-                foreach (QNetworkCookie cookie, jar->getAllCookies ()) {
-                    cookieNames += QString("[%1] = %2")
-                                    .arg(QString(cookie.name()))
-                                    .arg(QString(cookie.value()));
-                }
-                msg += cookieNames.join ("\n");
-#else
-                msg = "Cookie names: ";
-                foreach (QNetworkCookie cookie, p->m_jar->getAllCookies ()) {
-                    cookieNames += cookie.name();
-                }
-                msg += cookieNames.join (", ");
-#endif
-                Q_DEBUG(msg);
-
-                msg = QString("Last request URL = %1")
-                        .arg (reply->request ().url ().toString ());
-                Q_DEBUG(msg);
-
-                break;
-            }
-
-            success = initGv (task);
-            break;
-        }
-
-        // Is there a captcha?
-        if (strResponse.contains ("identifier-captcha-input")) {
-            Q_WARN("Captcha!!");
-            task->errorString = "User needs complete login with captcha";
-            task->status = ATTS_LOGIN_FAIL_SHOWURL;
-            task->outParams["showURL"] = GV_HTTPS_M;
-            success = false;
-            break;
-        }
-
-        // Pull out the noscript part:
-        QString noscript;
-        QRegExp rxNoscript("\\<noscript\\>.*\\</noscript\\>");
-        rxNoscript.setMinimal(true);
-        int pos = strResponse.indexOf(rxNoscript);
-        if (-1 == pos) {
-            break;
-        }
-        noscript = rxNoscript.cap(0);
-
-        // 2 factor auth is required.
-        m_hiddenLoginFields.clear ();
-        if (!parseLoginFields (noscript, true, m_hiddenLoginFields)) {
-            Q_WARN("Failed to parse hidden fields");
-            success = false;
-            break;
-        }
-
-        QString action;
-        if (!parseFormAction(noscript, action)) {
-            Q_WARN("Failed to parse form action");
-            break;
-        }
-
-        if (action.startsWith("/")) {
-            action = GOOGLE_ACCOUNTS + action;
-        }
-
-/*
-        if (!parseAlternateLogins (rxForm.cap(0), task)) {
-            Q_WARN("Failed to get alternate delivery");
-        }
-*/
-
-        if (p->emitLog) {
-            Q_DEBUG("Two factor AUTH required!");
-        }
-        task->inParams["tfaAction"] = action;
-        emit p->twoStepAuthentication(task);
-        success = true;
-    } while (0);
-
-    if (!success) {
-        if (task->status == ATTS_SUCCESS) {
-            // Generic failure
-            Q_WARN("Login failed.") << strResponse << m_hiddenLoginFields;
-
-            task->status = ATTS_LOGIN_FAILURE;
-            lookForLoginErrorMessage (strResponse, task);
-        }
-
-        if (p->m_jar) {
-            p->m_jar->clearAllCookies();
-        }
-
-        // In all cases, emit completed
-        task->emitCompleted ();
-    }
-}//GVApi_login::onLogin2
 
 void
 GVApi_login::lookForLoginErrorMessage(const QString &resp, AsyncTaskToken *task)
@@ -1207,6 +978,8 @@ GVApi_login::resumeTFALogin(AsyncTaskToken *task)
     GVApi *p = (GVApi *)this->parent();
     bool rv = false;
 
+    Q_ASSERT(task == m_loginToken);
+
     do {
         QString smsUserPin = task->inParams["user_pin"].toString();
         if (smsUserPin.isEmpty ()) {
@@ -1256,7 +1029,7 @@ GVApi_login::resumeTFALogin(AsyncTaskToken *task)
         QByteArray content = NwHelpers::createPostContent (m);
 
         rv = p->doPostForm(twoFactorUrl, content, task, this,
-                           SLOT(onLogin2(bool,QByteArray,QNetworkReply*,void*)));
+                           SLOT(onPostPasswordPage(bool,QByteArray,QNetworkReply*,void*)));
         Q_ASSERT(rv);
     } while (0);
 
@@ -1268,7 +1041,7 @@ GVApi_login::resumeTFALogin(AsyncTaskToken *task)
                                     "is incorrect.");
         }
         task->status = ATTS_LOGIN_FAILURE;
-        task->emitCompleted ();
+        emit sigLoginFail ();
     }
 
     return (true);
@@ -1292,7 +1065,7 @@ GVApi_login::resumeTFAAltLogin(AsyncTaskToken *token)
 
     if (!rv) {
         token->status = ATTS_LOGIN_FAILURE;
-        token->emitCompleted ();
+        emit sigLoginFail ();
     }
 
     return (rv);
@@ -1324,17 +1097,14 @@ GVApi_login::onTFAAltLoginResp(bool success, const QByteArray &response,
                         .arg(strReplyUrl, strResponse);
         Q_WARN(msg);
 
-        if (token) {
-            if (token->status == ATTS_SUCCESS) {
-                token->status = ATTS_LOGIN_FAILURE;
-            }
-            token->emitCompleted ();
-        }
+        emit sigLoginFail ();
+    } else {
+        emit sigDoInboxPage();
     }
 }//GVApi_login::onTFAAltLoginResp
 
-bool
-GVApi_login::initGv(AsyncTaskToken *task)
+void
+GVApi_login::doInboxPage()
 {
     Q_DEBUG("User authenticated, now initializing Google Voice interface.");
 
@@ -1354,22 +1124,23 @@ GVApi_login::initGv(AsyncTaskToken *task)
     }
 
     if (content.isEmpty ()) {
-        task->status = ATTS_FAILURE;
-        task->emitCompleted ();
-        return true;
+        m_loginToken->status = ATTS_FAILURE;
+        emit sigLoginFail ();
+        return;
     }
 
     bool rv =
-    p->doPostText(url, content, task, this,
-                  SLOT(onInitGv(bool,const QByteArray&,QNetworkReply*,void*)));
+    p->doPostText(url, content, m_loginToken, this,
+                  SLOT(onPostInboxPage(bool,const QByteArray&,QNetworkReply*,void*)));
+    if (!rv) {
+        emit sigLoginFail ();
+    }
     Q_ASSERT(rv);
-
-    return rv;
-}//GVApi_login::initGv
+}//GVApi_login::doInboxPage
 
 void
-GVApi_login::onInitGv(bool success, const QByteArray &response,
-                      QNetworkReply *, void *ctx)
+GVApi_login::onPostInboxPage(bool success, const QByteArray &response,
+                             QNetworkReply *, void *ctx)
 {
     GVApi *p = (GVApi *)this->parent();
     AsyncTaskToken *task = (AsyncTaskToken *)ctx;
@@ -1402,8 +1173,12 @@ GVApi_login::onInitGv(bool success, const QByteArray &response,
         task->status = ATTS_SUCCESS;
     } while (0);
 
-    task->emitCompleted ();
-}//GVApi_login::onInitGv
+    if (task->status == ATTS_SUCCESS) {
+        emit sigLoginSuccess ();
+    } else {
+        emit sigLoginFail ();
+    }
+}//GVApi_login::onPostInboxPage
 
 void
 GVApi_login::internalLogoutForReLogin()
