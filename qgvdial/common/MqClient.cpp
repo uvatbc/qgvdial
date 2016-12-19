@@ -142,10 +142,7 @@ MqClient::stopWork()
 bool
 MqClient::recreateSm(void)
 {
-    if (m_sm) {
-        delete m_sm;
-        m_sm = NULL;
-    }
+    SAFE_DELETE(m_sm);
 
     m_sm = new QStateMachine(this);
 
@@ -157,7 +154,8 @@ MqClient::recreateSm(void)
     QState *disconnectState = new QState;
     QFinalState *endState = new QFinalState;
 
-    if ((NULL == initialState) ||
+    if ((NULL == m_sm) ||
+        (NULL == initialState) ||
         (NULL == connectingState) ||
         (NULL == limboState) ||
         (NULL == subscribeState) ||
@@ -166,6 +164,14 @@ MqClient::recreateSm(void)
         (NULL == endState))
     {
         Q_WARN("Some states could not be created!!");
+        SAFE_DELETE(endState);
+        SAFE_DELETE(disconnectState);
+        SAFE_DELETE(workState);
+        SAFE_DELETE(subscribeState);
+        SAFE_DELETE(limboState);
+        SAFE_DELETE(connectingState);
+        SAFE_DELETE(initialState);
+        SAFE_DELETE(m_sm);
         return false;
     }
 

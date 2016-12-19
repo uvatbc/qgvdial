@@ -33,6 +33,8 @@ Contact: yuvraaj@gmail.com
 #define APPLICATION_NAME "qgvdial"
 #define ABOUT_URL "http://www.yuvraaj.net/qgvdial/about.html"
 
+#define SAFE_DELETE(__a) if (NULL == (__a)) { delete (__a); (__a) = NULL; }
+
 struct ProxyInfo {
     bool enableProxy;
     bool useSystemProxy;
