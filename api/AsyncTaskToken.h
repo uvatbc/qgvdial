@@ -28,15 +28,16 @@ Contact: yuvraaj@gmail.com
 #define ATTS_SUCCESS            0
 #define ATTS_FAILURE            1
 #define ATTS_INVALID_PARAMS     2
-#define ATTS_LOGIN_FAILURE      3
-#define ATTS_AC_NOT_CONFIGURED  4
-#define ATTS_NOT_LOGGED_IN      5
-#define ATTS_LOGIN_FAIL_SHOWURL 6
-#define ATTS_NW_ERROR           7
-#define ATTS_USER_CANCEL        8
-#define ATTS_IN_PROGRESS        9
-#define ATTS_MALLOC_FAIL       10
-#define ATTS_SETUP_REQUIRED    11
+#define ATTS_INPROGRESS         3
+#define ATTS_LOGIN_FAILURE      4
+#define ATTS_AC_NOT_CONFIGURED  5
+#define ATTS_NOT_LOGGED_IN      6
+#define ATTS_LOGIN_FAIL_SHOWURL 7
+#define ATTS_NW_ERROR           8
+#define ATTS_USER_CANCEL        9
+#define ATTS_IN_PROGRESS       10
+#define ATTS_MALLOC_FAIL       11
+#define ATTS_SETUP_REQUIRED    12
 
 class AsyncTaskToken : public QObject
 {

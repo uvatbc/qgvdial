@@ -25,6 +25,20 @@ Contact: yuvraaj@gmail.com
 #include "api_common.h"
 
 class GVApi;
+
+class QGVLoginForm : public QObject
+{
+    Q_OBJECT
+public:
+    explicit QGVLoginForm(QObject *parent = NULL) : QObject(parent) {}
+
+    QVariantMap visible;
+    QVariantMap hidden;
+    QVariantMap no_name;
+    QVariantMap attrs;
+    QNetworkReply *reply;
+};
+
 class GVApi_login : public QObject
 {
     Q_OBJECT
@@ -41,8 +55,6 @@ public:
 
 private slots:
     // Login and two factor
-    void on1GetHttpGv(bool success, const QByteArray &response,
-                      QNetworkReply *reply, void *ctx);
     void onLogin2(bool success, const QByteArray &response,
                   QNetworkReply *reply, void *ctx);
     void onTFAAltLoginResp(bool success, const QByteArray &response,
@@ -57,18 +69,53 @@ private slots:
     void onLogout(bool success, const QByteArray &response,
                   QNetworkReply *reply, void *ctx);
 
+    // All SM slots
+    void doLoginFailure();
+    void doLoginSuccess();
+    void doGetVoicePage();
+    void doUsernamePage();
+    void doPasswordPage();
+    void doTfaSmsPage();
+    void doInboxPage();
+
+    void onGetVoicePage(bool success, const QByteArray &response,
+                        QNetworkReply *reply, void *ctx);
+    void onPostUsernamePage(bool success, const QByteArray &response,
+                            QNetworkReply *reply, void *ctx);
+    void onPostPasswordPage(bool success, const QByteArray &response,
+                            QNetworkReply *reply, void *ctx);
+
+signals: // Private
+    void sigLoginFail();
+    void sigLoginSuccess();
+
+    void sigDoUsernamePage();
+    void sigDoPasswordPage();
+    void sigDoTfaPage();
+    void sigDoInboxPage();
+
 private:
-    void updateLoggedInFlag(AsyncTaskToken *task, const QString &strResponse);
+    bool recreateSM();
+
+    bool checkForLogin(AsyncTaskToken *task, const QString &strResponse);
 
     // Login and two factor
-    bool postLogin(QUrl url, AsyncTaskToken *token);
+    bool postForm(QUrl url, QGVLoginForm *form,
+                  AsyncTaskToken *task, const char *nwSlot);
+
+    bool parseForm(const QString &strResponse,// IN
+                         QGVLoginForm *form);  // OUT
 
     bool parseFormAction(const QString &strResponse,    // IN
                          QString &action);              // OUT
     bool parseXmlAttrs(QString fullMatch,       // IN
                        const QString &xmlTag,   // IN
                        QVariantMap &attrs);     // OUT
-    bool parseHiddenLoginFields(const QString &strResponse, QVariantMap &ret);
+    bool parseLoginFields(const QString &strResponse,
+                                bool wantHidden,
+                                QVariantMap &ret);
+    bool parseFormFields(const QString &strResponse,    // IN
+                               QGVLoginForm *form);     // OUT
     bool initGv(AsyncTaskToken *token);
     bool parseAlternateLogins(const QString &form, AsyncTaskToken *task);
 
@@ -76,6 +123,13 @@ private:
 
 private:
     QVariantMap m_hiddenLoginFields;
+
+    // The state machine for the login process
+    QStateMachine *m_sm;
+    // There should be only one such login token at a time
+    AsyncTaskToken *m_loginToken;
+    // GV Login Form
+    QGVLoginForm *m_form;
 };
 
 #endif//GVAPI_LOGIN_H
