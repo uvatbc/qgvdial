@@ -323,25 +323,24 @@ GVApi_login::recreateSM()
     ADD_TRANSITION(passwordPage, sigLoginFail, loginFailed);
     ADD_TRANSITION(  tfaSmsPage, sigLoginFail, loginFailed);
 
+    // getVoicePage -> usernamePage
+    ADD_TRANSITION(getVoicePage, sigDoUsernamePage, usernamePage);
+    // usernamePage -> passwordPage
+    ADD_TRANSITION(usernamePage, sigDoPasswordPage, passwordPage);
+    // passwordPage -> tfaSmsPage (if TFA enabled)
+    ADD_TRANSITION(passwordPage, sigDoTfaPage, tfaSmsPage);
+
     // All these can result in login success and need us to get the inbox page
     ADD_TRANSITION(getVoicePage, sigDoInboxPage, inboxPage);
     ADD_TRANSITION(passwordPage, sigDoInboxPage, inboxPage);
     ADD_TRANSITION(  tfaSmsPage, sigDoInboxPage, inboxPage);
 
+    // inboxPage -> loginSuccess: This is the only true successful login.
+    ADD_TRANSITION(inboxPage, sigLoginSuccess, loginSuccess);
+
     // Success and failure both need to terminate the state machine
     ADD_TRANSITION(loginSuccess, sigLoginCompleted, endState);
     ADD_TRANSITION( loginFailed, sigLoginCompleted, endState);
-
-    // getVoicePage -> usernamePage
-    ADD_TRANSITION(getVoicePage, sigDoUsernamePage, usernamePage);
-    // usernamePage -> passwordPage
-    ADD_TRANSITION(usernamePage, sigDoPasswordPage, passwordPage);
-
-    // passwordPage -> tfaSmsPage
-    ADD_TRANSITION(passwordPage, sigDoTfaPage, tfaSmsPage);
-
-    // loginSuccess -> inboxPage
-    ADD_TRANSITION(loginSuccess, sigDoInboxPage, inboxPage);
 
 #undef ADD_TRANSITION
 
@@ -731,7 +730,14 @@ GVApi_login::doTfaSmsPage()
     do {
         QString action = m_form->attrs["action"].toString ();
         if (action.startsWith("/")) {
-            action = GOOGLE_ACCOUNTS + action;
+            if (m_form->reply->url().host().length() != 0) {
+                action = m_form->reply->url().scheme()
+                       + "://"
+                       + m_form->reply->url().host()
+                       + action;
+            } else {
+                action = GOOGLE_ACCOUNTS + action;
+            }
         }
 
 /*
@@ -748,6 +754,100 @@ GVApi_login::doTfaSmsPage()
         emit p->twoStepAuthentication(token);
     } while (0);
 }//GVApi_login::doTfaSmsPage
+
+void
+GVApi_login::keepOnlyAllowedPostParams(QGVLoginForm *form)
+{
+    const char *allowed[] = {"challengeId", "challengeType", "continue",
+                             "service", "TL", "gxf", "Pin", "TrustDevice"};
+    QVariantMap collected, final;
+
+    foreach (QString key, form->visible.keys()) {
+        collected[key] = form->visible[key];
+    }
+    foreach (QString key, form->hidden.keys()) {
+        collected[key] = form->hidden[key];
+    }
+    foreach (QString key, form->no_name.keys()) {
+        collected[key] = form->no_name[key];
+    }
+
+    foreach (QString key, collected.keys()) {
+        bool found = false;
+        for (size_t i = 0; i < ARRAYSIZE(allowed); i++) {
+            if (allowed[i] == key) {
+                found = true;
+                break;
+            }
+        }
+
+        if (found) {
+            final[key] = collected[key];
+        }
+    }
+
+    form->visible.clear();
+    form->hidden.clear();
+    form->no_name.clear();
+
+    form->visible = final;
+}//GVApi_login::keepOnlyAllowedPostParams
+
+bool
+GVApi_login::resumeTFALogin(AsyncTaskToken *task)
+{
+    GVApi *p = (GVApi *)this->parent();
+    bool rv = false;
+
+    Q_ASSERT(task == m_loginToken);
+
+    do {
+        QString smsUserPin = task->inParams["user_pin"].toString();
+        if (smsUserPin.isEmpty ()) {
+            Q_WARN("User didn't enter 2-step auth pin");
+            break;
+        }
+
+        QString action = task->inParams["tfaAction"].toString();
+        if (action.isEmpty ()) {
+            Q_CRIT("Two factor auth cannot continue without the form action");
+            break;
+        }
+
+        QUrl url(action);
+
+        // Store the pin and the TrustDevice flag
+        m_form->visible["Pin"]         = smsUserPin;
+        m_form->visible["TrustDevice"] = "on";
+
+        // Remove all useless parameters
+        keepOnlyAllowedPostParams (m_form);
+
+        rv = postForm(url, m_form, task,
+                      SLOT(onPostPasswordPage(bool,const QByteArray&,QNetworkReply*,void*)));
+        if (!rv) {
+            Q_WARN("Failed to post password form!");
+            break;
+        }
+    } while (0);
+
+    if (!rv) {
+        Q_WARN("Two factor authentication failed.");
+
+        if (task->errorString.isEmpty()) {
+            task->errorString = tr("The username or password you entered "
+                                    "is incorrect.");
+        }
+        task->status = ATTS_LOGIN_FAILURE;
+        emit sigLoginFail ();
+    } else {
+        if (p->emitLog) {
+            Q_DEBUG("TFA POST started");
+        }
+    }
+
+    return (true);
+}//GVApi_login::resumeTFALogin
 
 bool
 GVApi_login::parseAlternateLogins(const QString &form, AsyncTaskToken *task)
@@ -971,81 +1071,6 @@ GVApi_login::lookForLoginErrorMessage(const QString &resp, AsyncTaskToken *task)
                                "is incorrect.");
     }
 }//GVApi_login::lookForLoginErrorMessage
-
-bool
-GVApi_login::resumeTFALogin(AsyncTaskToken *task)
-{
-    GVApi *p = (GVApi *)this->parent();
-    bool rv = false;
-
-    Q_ASSERT(task == m_loginToken);
-
-    do {
-        QString smsUserPin = task->inParams["user_pin"].toString();
-        if (smsUserPin.isEmpty ()) {
-            Q_WARN("User didn't enter 2-step auth pin");
-            break;
-        }
-
-        QString formAction = task->inParams["tfaAction"].toString();
-        if (formAction.isEmpty ()) {
-            Q_CRIT("Two factor auth cannot continue without the form action");
-            break;
-        }
-
-        QUrl twoFactorUrl = QUrl::fromPercentEncoding(formAction.toLatin1 ());
-
-        QVariantMap m;
-        m["Pin"]         = smsUserPin;
-        m["TrustDevice"] = "on";
-
-        NwHelpers::appendQVMap(m, m_hiddenLoginFields);
-
-        QStringList matchList;
-        matchList.append("challengeId");
-        matchList.append("challengeType");
-        matchList.append("continue");
-        matchList.append("service");
-        matchList.append("gxf");
-        matchList.append("Pin");
-        matchList.append("TrustDevice");
-
-        // Must have these
-        foreach (QString k, matchList) {
-            if (!m.contains(k)) {
-                Q_WARN(QString("Post data doesn't have '%1").arg(k));
-            }
-        }
-
-        // Remove extraneous data
-        QStringList keys = m.keys();
-        foreach(QString k, keys) {
-            if (!matchList.contains(k)) {
-                Q_DEBUG(QString("Removed '%1' from data").arg(k));
-                m.remove(k);
-            }
-        }
-
-        QByteArray content = NwHelpers::createPostContent (m);
-
-        rv = p->doPostForm(twoFactorUrl, content, task, this,
-                           SLOT(onPostPasswordPage(bool,QByteArray,QNetworkReply*,void*)));
-        Q_ASSERT(rv);
-    } while (0);
-
-    if (!rv) {
-        Q_WARN("Two factor authentication failed.");
-
-        if (task->errorString.isEmpty()) {
-            task->errorString = tr("The username or password you entered "
-                                    "is incorrect.");
-        }
-        task->status = ATTS_LOGIN_FAILURE;
-        emit sigLoginFail ();
-    }
-
-    return (true);
-}//GVApi_login::resumeTFALogin
 
 bool
 GVApi_login::resumeTFAAltLogin(AsyncTaskToken *token)

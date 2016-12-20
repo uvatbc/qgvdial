@@ -34,6 +34,9 @@ Contact: yuvraaj@gmail.com
 #define ABOUT_URL "http://www.yuvraaj.net/qgvdial/about.html"
 
 #define SAFE_DELETE(__a) if (NULL == (__a)) { delete (__a); (__a) = NULL; }
+#ifndef ARRAYSIZE
+#define ARRAYSIZE(__a) (sizeof(__a) / sizeof(__a[0]))
+#endif
 
 struct ProxyInfo {
     bool enableProxy;

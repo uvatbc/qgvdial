@@ -112,7 +112,7 @@ private:
     bool parseFormFields(const QString &strResponse,    // IN
                                QGVLoginForm *form);     // OUT
     bool parseAlternateLogins(const QString &form, AsyncTaskToken *task);
-
+    void keepOnlyAllowedPostParams(QGVLoginForm *form);
     void lookForLoginErrorMessage(const QString &resp, AsyncTaskToken *task);
 
 private:
