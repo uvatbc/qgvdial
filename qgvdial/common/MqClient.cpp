@@ -282,7 +282,7 @@ MqClient::reinitConnection(void)
 }//MqClient::reinitConnection
 
 void
-MqClient::onReadActivated(int s)
+MqClient::onReadActivated(int /*s*/)
 {
     if (m_readNotifier) {
         m_readNotifier->setEnabled(false);
@@ -292,7 +292,7 @@ MqClient::onReadActivated(int s)
 }//MqClient::onReadActivated
 
 void
-MqClient::onExceptActivated(int s)
+MqClient::onExceptActivated(int /*s*/)
 {
     if (m_exceptNotifier) {
         m_exceptNotifier->setEnabled(false);
