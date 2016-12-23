@@ -1,5 +1,5 @@
-qgvdial (0.4.1576) unstable; urgency=low
+qgvdial ($VERSION) unstable; urgency=low
 
-  * Initial 0.4 Release of qt-not-qml
+  * New 0.4 Release of qt-not-qml version of qgvdial
 
- -- Yuvraaj <yuvraaj@gmail.com>  Thu, 12 Dec 2013 09:37:10 -0700
+ -- Yuvraaj <yuvraaj@gmail.com>  $DATESTR
