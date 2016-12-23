@@ -1,10 +1,10 @@
 Source: qgvdial
 Section: user/network
-Priority: extra
-Maintainer: Yuvraaj <yuvraaj@gmail.com>
-Build-Depends: debhelper (>= 7), libqt4-dev
-Standards-Version: 3.8.3
-Homepage: http://code.google.com/p/qgvdial/
+Priority: optional
+Maintainer: Yuvraaj Kelkar <yuvraaj@gmail.com>
+Build-Depends: debhelper (>= 9), libqt4-dev
+Standards-Version: 3.9.6
+Homepage: https://github.com/uvatbc/qgvdial
 
 Package: qgvdial
 Architecture: any

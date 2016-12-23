@@ -12,12 +12,15 @@
 %:
 	dh $@ 
 
+override_dh_auto_install:
+	echo CURDIR is $(CURDIR)
+	$(MAKE) DESTDIR=$(CURDIR)/debian/qgvdial INSTALL_ROOT=$(CURDIR)/debian/qgvdial install
+
 override_dh_install:
 	echo CURDIR is $(CURDIR)
-	$(MAKE) DESTDIR=$(CURDIR)/debian/qgvdial INSTALL_ROOT="$(CURDIR)"/debian/qgvdial install
+	$(MAKE) DESTDIR=$(CURDIR)/debian/qgvdial INSTALL_ROOT=$(CURDIR)/debian/qgvdial install
 
 override_dh_auto_configure:
-	../features/dbus_api/gen/create_ifaces.sh
-	qmake desktop_linux.pro
-	../../build-files/qgvdial/ubuntu/fix_ubuntu_Makefile.pl
-
+	../../../qgvdial/features/dbus_api/gen/create_ifaces.sh
+	qmake ../../../qgvdial/qt-not-qml/desktop_linux.pro
+	#../../build-files/qgvdial/ubuntu/fix_ubuntu_Makefile.pl

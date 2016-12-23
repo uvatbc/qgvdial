@@ -6,26 +6,30 @@ GITREV   := $(shell git rev-list --count $(GITHASH))
 VERSION  := $(VER_CFG).$(GITREV)
 BUILDDIR := $(GITROOT)/builds
 
-ABSPROPATH := $(shell readlink -f $(PROPATH))
+ABSPRO := $(shell readlink -f $(PRO))
 
 help:
+	@echo "Run make inside the appropriate container or build environment"
 	@echo "Example usage:"
-	@echo "make -f ./build-files/qgvdial/Makefile build TARGET=ubuntu_x86_64 PROPATH=./qgvdial/qt-not-qml/desktop_linux.pro"
-	@echo "make -f ./build-files/qgvdial/Makefile build TARGET=ubuntu_x86    PROPATH=./qgvdial/qt-not-qml/desktop_linux.pro"
-	@echo "make -f ./build-files/qgvdial/Makefile build TARGET=maemo         PROPATH=./qgvdial/maemo/maemo.pro"
-	@echo "make -f ./build-files/qgvdial/Makefile build TARGET=harmattan     PROPATH=./qgvdial/harmattan/harmattan.pro"
+	@echo "make -f ./build-files/qgvdial/Makefile build FOR=ubuntu_x86_64 PRO=./qgvdial/qt-not-qml/desktop_linux.pro DEBMAKE=build-files/qgvdial/ubuntu"
+	@echo "make -f ./build-files/qgvdial/Makefile build FOR=ubuntu_x86    PRO=./qgvdial/qt-not-qml/desktop_linux.pro DEBMAKE=build-files/qgvdial/ubuntu"
+	@echo "make -f ./build-files/qgvdial/Makefile build FOR=harmattan     PRO=./qgvdial/harmattan/harmattan.pro      DEBMAKE=build-files/qgvdial/harmattan"
+	@echo "make -f ./build-files/qgvdial/Makefile build FOR=maemo         PRO=./qgvdial/maemo/maemo.pro              DEBMAKE=build-files/qgvdial/harmattan"
 
 build: prep_build_target
-	cd $(BUILDDIR)/$(TARGET)/qgvdial-$(VERSION) ; qmake $(ABSPROPATH)
-	cd $(BUILDDIR)/$(TARGET)/qgvdial-$(VERSION) ; $(MAKE)
+	cd $(BUILDDIR)/$(FOR)/qgvdial-$(VERSION) ; qmake $(ABSPRO)
+	cd $(BUILDDIR)/$(FOR)/qgvdial-$(VERSION) ; $(MAKE)
+ifdef DEBMAKE
+	$(MAKE) -C $(GITROOT)/$(DEBMAKE) build BUILDDIR=$(BUILDDIR) FOR=$(FOR) VERSION=$(VERSION)
+endif
 
 clean:
-	# Set TARGET to "ubuntu" / "sailfish" / etc
-	rm -rf $(BUILDDIR)/$(TARGET)
+	# Set FOR to "ubuntu" / "sailfish" / etc
+	rm -rf $(BUILDDIR)/$(FOR)
 
 prep_build_target:
-	mkdir -p $(BUILDDIR)/$(TARGET)/qgvdial-$(VERSION)
+	mkdir -p $(BUILDDIR)/$(FOR)/qgvdial-$(VERSION)
 	./qgvdial/features/dbus_api/gen/create_ifaces.sh
 
 test:
-	@echo $(ABSPROPATH)
+	@echo $(ABSPRO)
