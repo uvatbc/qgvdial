@@ -20,7 +20,7 @@ build: prep_build_target
 	cd $(BUILDDIR)/$(FOR)/qgvdial-$(VERSION) ; qmake $(ABSPRO)
 	cd $(BUILDDIR)/$(FOR)/qgvdial-$(VERSION) ; $(MAKE)
 ifdef DEBMAKE
-	$(MAKE) -C $(GITROOT)/$(DEBMAKE) build BUILDDIR=$(BUILDDIR) FOR=$(FOR) VERSION=$(VERSION) DATESTR=$(DATESTR)
+	$(MAKE) -C $(GITROOT)/$(DEBMAKE) build BUILDDIR=$(BUILDDIR) FOR=$(FOR) VERSION=$(VERSION) DATESTR="$(DATESTR)"
 endif
 
 clean:
