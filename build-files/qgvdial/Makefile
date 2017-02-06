@@ -4,7 +4,7 @@ VER_CFG  := $(shell cat $(GITROOT)/build-files/ver.cfg)
 GITHASH  := $(shell git log -1 --format=%H)
 GITREV   := $(shell git rev-list --count $(GITHASH))
 VERSION  := $(VER_CFG).$(GITREV)
-BUILDDIR := $(GITROOT)/builds
+BUILDDIR := $(GITROOT)/build
 
 ABSPRO := $(shell readlink -f $(PRO))
 
