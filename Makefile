@@ -108,10 +108,10 @@ qgvdial_maemo_nodeb_ctr:
 		make -C /scratchbox/users/admin/home/admin/src/ qgvdial_maemo_nodeb
 
 ############################### harmattan #################################
-qgvdial_harmattan:
+qgvdial_harmattan_arm:
 	sudo /scratchbox/sbin/sbox_ctl start
 	sudo /scratchbox/sbin/sbox_sync
-	sb-conf select FREMANTLE_ARMEL
+	sb-conf select HARMATTAN_ARMEL
 	/scratchbox/login \
 		make -j4 -C ~/src -f ./build-files/qgvdial/Makefile \
 			GITROOT=~/src \
@@ -120,18 +120,18 @@ qgvdial_harmattan:
 			DEBMAKE=build-files/qgvdial/harmattan \
 			build
 
-qgvdial_harmattan_ctr:
+qgvdial_harmattan_arm_ctr:
 	docker run \
 		--rm -it \
 		-v $(GITROOT):/scratchbox/users/admin/home/admin/src \
 		--privileged \
 		accupara/harmattan \
-		make -C /scratchbox/users/admin/home/admin/src/ qgvdial_harmattan
+		make -C /scratchbox/users/admin/home/admin/src/ qgvdial_harmattan_arm
 
-qgvdial_harmattan_nodeb:
+qgvdial_harmattan_arm_nodeb:
 	sudo /scratchbox/sbin/sbox_ctl start
 	sudo /scratchbox/sbin/sbox_sync
-	sb-conf select FREMANTLE_ARMEL
+	sb-conf select HARMATTAN_ARMEL
 	/scratchbox/login \
 		make -j4 -C ~/src -f ./build-files/qgvdial/Makefile \
 			GITROOT=~/src \
@@ -139,10 +139,49 @@ qgvdial_harmattan_nodeb:
 			PRO=./qgvdial/harmattan/harmattan.pro \
 			build
 
-qgvdial_harmattan_nodeb_ctr:
+qgvdial_harmattan_arm_nodeb_ctr:
 	docker run \
 		--rm -it \
 		-v $(GITROOT):/scratchbox/users/admin/home/admin/src \
 		--privileged \
 		accupara/harmattan \
-		make -C /scratchbox/users/admin/home/admin/src/ qgvdial_harmattan_nodeb
+		make -C /scratchbox/users/admin/home/admin/src/ qgvdial_harmattan_arm_nodeb
+
+qgvdial_harmattan_x86:
+	sudo /scratchbox/sbin/sbox_ctl start
+	sudo /scratchbox/sbin/sbox_sync
+	sb-conf select HARMATTAN_X86
+	/scratchbox/login \
+		make -j4 -C ~/src -f ./build-files/qgvdial/Makefile \
+			GITROOT=~/src \
+			FOR=harmattan \
+			PRO=./qgvdial/harmattan/harmattan.pro \
+			DEBMAKE=build-files/qgvdial/harmattan \
+			build
+
+qgvdial_harmattan_x86_ctr:
+	docker run \
+		--rm -it \
+		-v $(GITROOT):/scratchbox/users/admin/home/admin/src \
+		--privileged \
+		accupara/harmattan \
+		make -C /scratchbox/users/admin/home/admin/src/ qgvdial_harmattan_x86
+
+qgvdial_harmattan_x86_nodeb:
+	sudo /scratchbox/sbin/sbox_ctl start
+	sudo /scratchbox/sbin/sbox_sync
+	sb-conf select HARMATTAN_X86
+	/scratchbox/login \
+		make -j4 -C ~/src -f ./build-files/qgvdial/Makefile \
+			GITROOT=~/src \
+			FOR=harmattan \
+			PRO=./qgvdial/harmattan/harmattan.pro \
+			build
+
+qgvdial_harmattan_x86_nodeb_ctr:
+	docker run \
+		--rm -it \
+		-v $(GITROOT):/scratchbox/users/admin/home/admin/src \
+		--privileged \
+		accupara/harmattan \
+		make -C /scratchbox/users/admin/home/admin/src/ qgvdial_harmattan_x86_nodeb

@@ -13,5 +13,5 @@ it:
 		--rm -it \
 		-v $(GITROOT):/scratchbox/users/admin/home/admin/src \
 		--privileged \
-		accupara/maemo \
+		accupara/harmattan \
 		/bin/bash
