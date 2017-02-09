@@ -1,4 +1,4 @@
-GITROOT  := $(shell git rev-parse --show-toplevel)
+GITROOT ?= $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
 nothing:
 	@echo "The default target will do nothing. Please use one of the defined targets"

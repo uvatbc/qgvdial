@@ -1,4 +1,4 @@
-GITROOT  := $(shell git rev-parse --show-toplevel)
+GITROOT ?= $(shell git rev-parse --show-toplevel)
 
 build:
 	cd $(BUILDDIR)/$(FOR)/qgvdial-$(VERSION) ; rm -rf debian temp ../qgvdial*tar*

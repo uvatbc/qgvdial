@@ -1,5 +1,5 @@
 DATESTR  := $(shell date +'%a, %d %b %Y %H:%M:%S %z')
-GITROOT  := $(shell git rev-parse --show-toplevel)
+GITROOT  ?= $(shell git rev-parse --show-toplevel)
 VER_CFG  := $(shell cat $(GITROOT)/build-files/ver.cfg)
 GITHASH  := $(shell git log -1 --format=%H)
 GITREV   := $(shell git rev-list --count $(GITHASH))
