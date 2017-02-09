@@ -12,7 +12,6 @@ qgvdial_ubuntu_x86_64:
 		FOR=ubuntu_x86_64 \
 		PRO=./qgvdial/qt-not-qml/desktop_linux.pro \
 		DEBMAKE=build-files/qgvdial/ubuntu \
-		GITROOT=$(GITROOT) GITHASH=$(GITHASH) GITREV=$(GITREV) \
 		build
 
 qgvdial_ubuntu_x86_64_ctr:
@@ -21,7 +20,6 @@ qgvdial_ubuntu_x86_64_ctr:
 		-v $(GITROOT):/tmp/src \
 		accupara/qgvdial_qt5_amd64 \
 		make -C /tmp/src \
-		GITROOT=$(GITROOT) GITHASH=$(GITHASH) GITREV=$(GITREV) \
 		qgvdial_ubuntu_x86_64
 
 qgvdial_ubuntu_x86_64_nodeb:
@@ -29,7 +27,6 @@ qgvdial_ubuntu_x86_64_nodeb:
 		-f ./build-files/qgvdial/Makefile \
 		FOR=ubuntu_x86_64 \
 		PRO=./qgvdial/qt-not-qml/desktop_linux.pro \
-		GITROOT=$(GITROOT) GITHASH=$(GITHASH) GITREV=$(GITREV) \
 		build
 
 qgvdial_ubuntu_x86_64_nodeb_ctr:
@@ -38,7 +35,6 @@ qgvdial_ubuntu_x86_64_nodeb_ctr:
 		-v $(GITROOT):/tmp/src \
 		accupara/qgvdial_qt5_amd64 \
 		make -C /tmp/src \
-		GITROOT=$(GITROOT) GITHASH=$(GITHASH) GITREV=$(GITREV) \
 		qgvdial_ubuntu_x86_64_nodeb
 
 ############################### x86 #################################
@@ -48,7 +44,6 @@ qgvdial_ubuntu_x86:
 		FOR=ubuntu_x86 \
 		PRO=./qgvdial/qt-not-qml/desktop_linux.pro \
 		DEBMAKE=build-files/qgvdial/ubuntu \
-		GITROOT=$(GITROOT) GITHASH=$(GITHASH) GITREV=$(GITREV) \
 		build
 
 qgvdial_ubuntu_x86_ctr:
@@ -57,7 +52,6 @@ qgvdial_ubuntu_x86_ctr:
 		-v $(GITROOT):/tmp/src \
 		accupara/qgvdial_qt5_i386 \
 		make -C /tmp/src \
-		GITROOT=$(GITROOT) GITHASH=$(GITHASH) GITREV=$(GITREV) \
 		qgvdial_ubuntu_x86
 
 qgvdial_ubuntu_x86_nodeb:
@@ -65,7 +59,6 @@ qgvdial_ubuntu_x86_nodeb:
 		-f ./build-files/qgvdial/Makefile \
 		FOR=ubuntu_x86 \
 		PRO=./qgvdial/qt-not-qml/desktop_linux.pro \
-		GITROOT=$(GITROOT) GITHASH=$(GITHASH) GITREV=$(GITREV) \
 		build
 
 qgvdial_ubuntu_x86_nodeb_ctr:
@@ -74,7 +67,6 @@ qgvdial_ubuntu_x86_nodeb_ctr:
 		-v $(GITROOT):/tmp/src \
 		accupara/qgvdial_qt5_i386 \
 		make -C /tmp/src \
-		GITROOT=$(GITROOT) GITHASH=$(GITHASH) GITREV=$(GITREV) \
 		qgvdial_ubuntu_x86_nodeb
 
 ############################### maemo #################################

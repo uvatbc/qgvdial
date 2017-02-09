@@ -1,12 +1,12 @@
-DATESTR  := $(shell date +'%a, %d %b %Y %H:%M:%S %z')
+DATESTR  ?= $(shell date +'%a, %d %b %Y %H:%M:%S %z')
 GITROOT  ?= $(shell git rev-parse --show-toplevel)
-VER_CFG  := $(shell cat $(GITROOT)/build-files/ver.cfg)
+VER_CFG  ?= $(shell cat $(GITROOT)/build-files/ver.cfg)
 GITHASH  ?= $(shell git log -1 --format=%H)
 GITREV   ?= $(shell git rev-list --count $(GITHASH))
-VERSION  := $(VER_CFG).$(GITREV)
-BUILDDIR := $(GITROOT)/build
+VERSION  ?= $(VER_CFG).$(GITREV)
+BUILDDIR ?= $(GITROOT)/build
 
-ABSPRO := $(shell readlink -f $(PRO))
+ABSPRO   ?= $(shell readlink -f $(PRO))
 
 help:
 	@echo "Run make inside the appropriate container or build environment"
