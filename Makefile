@@ -1,13 +1,14 @@
-GITROOT ?= $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
-GITHASH ?= $(shell git log -1 --format=%H)
-GITREV  ?= $(shell git rev-list --count $(GITHASH))
+GITROOT  ?= $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+GITHASH  ?= $(shell git log -1 --format=%H)
+GITREV   ?= $(shell git rev-list --count $(GITHASH))
+NUMCORES ?= 4
 
 nothing:
 	@echo "The default target will do nothing. Please use one of the defined targets"
 
 ############################### x86_64 #################################
 qgvdial_ubuntu_x86_64:
-	$(MAKE) -j4 \
+	$(MAKE) -j$(NUMCORES) \
 		-f ./build-files/qgvdial/Makefile \
 		FOR=ubuntu_x86_64 \
 		PRO=./qgvdial/qt-not-qml/desktop_linux.pro \
@@ -23,7 +24,7 @@ qgvdial_ubuntu_x86_64_ctr:
 		qgvdial_ubuntu_x86_64
 
 qgvdial_ubuntu_x86_64_nodeb:
-	$(MAKE) -j4 \
+	$(MAKE) -j$(NUMCORES) \
 		-f ./build-files/qgvdial/Makefile \
 		FOR=ubuntu_x86_64 \
 		PRO=./qgvdial/qt-not-qml/desktop_linux.pro \
@@ -39,7 +40,7 @@ qgvdial_ubuntu_x86_64_nodeb_ctr:
 
 ############################### x86 #################################
 qgvdial_ubuntu_x86:
-	$(MAKE) -j4 \
+	$(MAKE) -j$(NUMCORES) \
 		-f ./build-files/qgvdial/Makefile \
 		FOR=ubuntu_x86 \
 		PRO=./qgvdial/qt-not-qml/desktop_linux.pro \
@@ -55,7 +56,7 @@ qgvdial_ubuntu_x86_ctr:
 		qgvdial_ubuntu_x86
 
 qgvdial_ubuntu_x86_nodeb:
-	$(MAKE) -j4 \
+	$(MAKE) -j$(NUMCORES) \
 		-f ./build-files/qgvdial/Makefile \
 		FOR=ubuntu_x86 \
 		PRO=./qgvdial/qt-not-qml/desktop_linux.pro \
@@ -75,7 +76,7 @@ qgvdial_maemo_armel:
 	sudo /scratchbox/sbin/sbox_sync
 	sb-conf select FREMANTLE_ARMEL
 	/scratchbox/login \
-		make -j4 -C ~/src -f ./build-files/qgvdial/Makefile \
+		make -j$(NUMCORES) -C ~/src -f ./build-files/qgvdial/Makefile \
 			GITROOT=~/src \
 			FOR=maemo \
 			PRO=./qgvdial/maemo/maemo.pro \
@@ -96,7 +97,7 @@ qgvdial_maemo_armel_nodeb:
 	sudo /scratchbox/sbin/sbox_sync
 	sb-conf select FREMANTLE_ARMEL
 	/scratchbox/login \
-		make -j4 -C ~/src -f ./build-files/qgvdial/Makefile \
+		make -j$(NUMCORES) -C ~/src -f ./build-files/qgvdial/Makefile \
 			GITROOT=~/src \
 			FOR=maemo \
 			PRO=./qgvdial/maemo/maemo.pro \
@@ -118,7 +119,7 @@ qgvdial_maemo_x86:
 	sudo /scratchbox/sbin/sbox_sync
 	sb-conf select FREMANTLE_ARMEL
 	/scratchbox/login \
-		make -j4 -C ~/src -f ./build-files/qgvdial/Makefile \
+		make -j$(NUMCORES) -C ~/src -f ./build-files/qgvdial/Makefile \
 			GITROOT=~/src \
 			FOR=maemo \
 			PRO=./qgvdial/maemo/maemo.pro \
@@ -139,7 +140,7 @@ qgvdial_maemo_x86_nodeb:
 	sudo /scratchbox/sbin/sbox_sync
 	sb-conf select FREMANTLE_ARMEL
 	/scratchbox/login \
-		make -j4 -C ~/src -f ./build-files/qgvdial/Makefile \
+		make -j$(NUMCORES) -C ~/src -f ./build-files/qgvdial/Makefile \
 			GITROOT=~/src \
 			FOR=maemo \
 			PRO=./qgvdial/maemo/maemo.pro \
@@ -162,7 +163,7 @@ qgvdial_harmattan_arm:
 	sudo /scratchbox/sbin/sbox_sync
 	sb-conf select HARMATTAN_ARMEL
 	/scratchbox/login \
-		make -j4 -C ~/src -f ./build-files/qgvdial/Makefile \
+		make -j$(NUMCORES) -C ~/src -f ./build-files/qgvdial/Makefile \
 			GITROOT=~/src \
 			FOR=harmattan \
 			PRO=./qgvdial/harmattan/harmattan.pro \
@@ -185,7 +186,7 @@ qgvdial_harmattan_arm_nodeb:
 	sudo /scratchbox/sbin/sbox_sync
 	sb-conf select HARMATTAN_ARMEL
 	/scratchbox/login \
-		make -j4 -C ~/src -f ./build-files/qgvdial/Makefile \
+		make -j$(NUMCORES) -C ~/src -f ./build-files/qgvdial/Makefile \
 			GITROOT=~/src \
 			FOR=harmattan \
 			PRO=./qgvdial/harmattan/harmattan.pro \
@@ -207,7 +208,7 @@ qgvdial_harmattan_x86:
 	sudo /scratchbox/sbin/sbox_sync
 	sb-conf select HARMATTAN_X86
 	/scratchbox/login \
-		make -j4 -C ~/src -f ./build-files/qgvdial/Makefile \
+		make -j$(NUMCORES) -C ~/src -f ./build-files/qgvdial/Makefile \
 			GITROOT=~/src \
 			FOR=harmattan \
 			PRO=./qgvdial/harmattan/harmattan.pro \
@@ -230,7 +231,7 @@ qgvdial_harmattan_x86_nodeb:
 	sudo /scratchbox/sbin/sbox_sync
 	sb-conf select HARMATTAN_X86
 	/scratchbox/login \
-		make -j4 -C ~/src -f ./build-files/qgvdial/Makefile \
+		make -j$(NUMCORES) -C ~/src -f ./build-files/qgvdial/Makefile \
 			GITROOT=~/src \
 			FOR=harmattan \
 			PRO=./qgvdial/harmattan/harmattan.pro \
