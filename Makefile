@@ -78,7 +78,7 @@ qgvdial_ubuntu_x86_nodeb_ctr:
 		qgvdial_ubuntu_x86_nodeb
 
 ############################### maemo #################################
-qgvdial_maemo:
+qgvdial_maemo_armel:
 	sudo /scratchbox/sbin/sbox_ctl start
 	sudo /scratchbox/sbin/sbox_sync
 	sb-conf select FREMANTLE_ARMEL
@@ -91,15 +91,15 @@ qgvdial_maemo:
 			GITHASH=$(GITHASH) GITREV=$(GITREV) \
 			build
 
-qgvdial_maemo_ctr:
+qgvdial_maemo_armel_ctr:
 	docker run \
 		--rm -it \
 		-v $(GITROOT):/scratchbox/users/admin/home/admin/src \
 		--privileged \
 		accupara/maemo \
-		make -C /scratchbox/users/admin/home/admin/src/ qgvdial_maemo
+		make -C /scratchbox/users/admin/home/admin/src/ qgvdial_maemo_armel
 
-qgvdial_maemo_nodeb:
+qgvdial_maemo_armel_nodeb:
 	sudo /scratchbox/sbin/sbox_ctl start
 	sudo /scratchbox/sbin/sbox_sync
 	sb-conf select FREMANTLE_ARMEL
@@ -111,7 +111,7 @@ qgvdial_maemo_nodeb:
 			GITHASH=$(GITHASH) GITREV=$(GITREV) \
 			build
 
-qgvdial_maemo_nodeb_ctr:
+qgvdial_maemo_armel_nodeb_ctr:
 	docker run \
 		--rm -it \
 		-v $(GITROOT):/scratchbox/users/admin/home/admin/src \
@@ -119,7 +119,50 @@ qgvdial_maemo_nodeb_ctr:
 		accupara/maemo \
 		make -C /scratchbox/users/admin/home/admin/src/ \
 			GITROOT=$(GITROOT) GITHASH=$(GITHASH) GITREV=$(GITREV) \
-			qgvdial_maemo_nodeb
+			qgvdial_maemo_armel_nodeb
+
+qgvdial_maemo_x86:
+	sudo /scratchbox/sbin/sbox_ctl start
+	sudo /scratchbox/sbin/sbox_sync
+	sb-conf select FREMANTLE_ARMEL
+	/scratchbox/login \
+		make -j4 -C ~/src -f ./build-files/qgvdial/Makefile \
+			GITROOT=~/src \
+			FOR=maemo \
+			PRO=./qgvdial/maemo/maemo.pro \
+			DEBMAKE=build-files/qgvdial/maemo \
+			GITHASH=$(GITHASH) GITREV=$(GITREV) \
+			build
+
+qgvdial_maemo_x86_ctr:
+	docker run \
+		--rm -it \
+		-v $(GITROOT):/scratchbox/users/admin/home/admin/src \
+		--privileged \
+		accupara/maemo \
+		make -C /scratchbox/users/admin/home/admin/src/ qgvdial_maemo_x86
+
+qgvdial_maemo_x86_nodeb:
+	sudo /scratchbox/sbin/sbox_ctl start
+	sudo /scratchbox/sbin/sbox_sync
+	sb-conf select FREMANTLE_ARMEL
+	/scratchbox/login \
+		make -j4 -C ~/src -f ./build-files/qgvdial/Makefile \
+			GITROOT=~/src \
+			FOR=maemo \
+			PRO=./qgvdial/maemo/maemo.pro \
+			GITHASH=$(GITHASH) GITREV=$(GITREV) \
+			build
+
+qgvdial_maemo_x86_nodeb_ctr:
+	docker run \
+		--rm -it \
+		-v $(GITROOT):/scratchbox/users/admin/home/admin/src \
+		--privileged \
+		accupara/maemo \
+		make -C /scratchbox/users/admin/home/admin/src/ \
+			GITROOT=$(GITROOT) GITHASH=$(GITHASH) GITREV=$(GITREV) \
+			qgvdial_maemo_x86_nodeb
 
 ############################### harmattan #################################
 qgvdial_harmattan_arm:
