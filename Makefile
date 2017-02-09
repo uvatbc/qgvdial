@@ -87,7 +87,7 @@ qgvdial_maemo_armel:
 	/scratchbox/login \
 		make -j$(NUMCORES) -C ~/src -f ./build-files/qgvdial/Makefile \
 			GITROOT=~/src \
-			FOR=maemo \
+			FOR=maemo_armel \
 			PRO=./qgvdial/maemo/maemo.pro \
 			DEBMAKE=build-files/qgvdial/maemo \
 			GITHASH=$(GITHASH) GITREV=$(GITREV) \
@@ -108,7 +108,7 @@ qgvdial_maemo_armel_nodeb:
 	/scratchbox/login \
 		make -j$(NUMCORES) -C ~/src -f ./build-files/qgvdial/Makefile \
 			GITROOT=~/src \
-			FOR=maemo \
+			FOR=maemo_armel \
 			PRO=./qgvdial/maemo/maemo.pro \
 			GITHASH=$(GITHASH) GITREV=$(GITREV) \
 			build
@@ -130,7 +130,7 @@ qgvdial_maemo_x86:
 	/scratchbox/login \
 		make -j$(NUMCORES) -C ~/src -f ./build-files/qgvdial/Makefile \
 			GITROOT=~/src \
-			FOR=maemo \
+			FOR=maemo_x86 \
 			PRO=./qgvdial/maemo/maemo.pro \
 			DEBMAKE=build-files/qgvdial/maemo \
 			GITHASH=$(GITHASH) GITREV=$(GITREV) \
@@ -151,7 +151,7 @@ qgvdial_maemo_x86_nodeb:
 	/scratchbox/login \
 		make -j$(NUMCORES) -C ~/src -f ./build-files/qgvdial/Makefile \
 			GITROOT=~/src \
-			FOR=maemo \
+			FOR=maemo_x86 \
 			PRO=./qgvdial/maemo/maemo.pro \
 			GITHASH=$(GITHASH) GITREV=$(GITREV) \
 			build
@@ -174,7 +174,7 @@ qgvdial_harmattan_arm:
 	/scratchbox/login \
 		make -j$(NUMCORES) -C ~/src -f ./build-files/qgvdial/Makefile \
 			GITROOT=~/src \
-			FOR=harmattan \
+			FOR=harmattan_armel \
 			PRO=./qgvdial/harmattan/harmattan.pro \
 			DEBMAKE=build-files/qgvdial/harmattan \
 			GITHASH=$(GITHASH) GITREV=$(GITREV) \
@@ -197,7 +197,7 @@ qgvdial_harmattan_arm_nodeb:
 	/scratchbox/login \
 		make -j$(NUMCORES) -C ~/src -f ./build-files/qgvdial/Makefile \
 			GITROOT=~/src \
-			FOR=harmattan \
+			FOR=harmattan_armel \
 			PRO=./qgvdial/harmattan/harmattan.pro \
 			GITHASH=$(GITHASH) GITREV=$(GITREV) \
 			build
@@ -219,7 +219,7 @@ qgvdial_harmattan_x86:
 	/scratchbox/login \
 		make -j$(NUMCORES) -C ~/src -f ./build-files/qgvdial/Makefile \
 			GITROOT=~/src \
-			FOR=harmattan \
+			FOR=harmattan_x86 \
 			PRO=./qgvdial/harmattan/harmattan.pro \
 			DEBMAKE=build-files/qgvdial/harmattan \
 			GITHASH=$(GITHASH) GITREV=$(GITREV) \
@@ -242,7 +242,7 @@ qgvdial_harmattan_x86_nodeb:
 	/scratchbox/login \
 		make -j$(NUMCORES) -C ~/src -f ./build-files/qgvdial/Makefile \
 			GITROOT=~/src \
-			FOR=harmattan \
+			FOR=harmattan_x86 \
 			PRO=./qgvdial/harmattan/harmattan.pro \
 			GITHASH=$(GITHASH) GITREV=$(GITREV) \
 			build
