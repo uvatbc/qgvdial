@@ -11,7 +11,7 @@ override_dh_install:
 	echo CURDIR is $(CURDIR)
 	$(MAKE) INSTALL_ROOT="$(CURDIR)"/debian/qgvdial install
 
-override_dh_auto_configure:
-	pushd ../features/dbus_api/gen/ ; ./create_ifaces.sh ; popd
-	qmake
+#override_dh_auto_configure:
+#	pushd ../features/dbus_api/gen/ ; ./create_ifaces.sh ; popd
+#	qmake
 
