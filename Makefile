@@ -1,4 +1,6 @@
 GITROOT ?= $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+GITHASH ?= $(shell git log -1 --format=%H)
+GITREV  ?= $(shell git rev-list --count $(GITHASH))
 
 nothing:
 	@echo "The default target will do nothing. Please use one of the defined targets"
@@ -10,6 +12,7 @@ qgvdial_ubuntu_x86_64:
 		FOR=ubuntu_x86_64 \
 		PRO=./qgvdial/qt-not-qml/desktop_linux.pro \
 		DEBMAKE=build-files/qgvdial/ubuntu \
+		GITROOT=$(GITROOT) GITHASH=$(GITHASH) GITREV=$(GITREV) \
 		build
 
 qgvdial_ubuntu_x86_64_ctr:
@@ -18,6 +21,7 @@ qgvdial_ubuntu_x86_64_ctr:
 		-v $(GITROOT):/tmp/src \
 		accupara/qgvdial_qt5_amd64 \
 		make -C /tmp/src \
+		GITROOT=$(GITROOT) GITHASH=$(GITHASH) GITREV=$(GITREV) \
 		qgvdial_ubuntu_x86_64
 
 qgvdial_ubuntu_x86_64_nodeb:
@@ -25,6 +29,7 @@ qgvdial_ubuntu_x86_64_nodeb:
 		-f ./build-files/qgvdial/Makefile \
 		FOR=ubuntu_x86_64 \
 		PRO=./qgvdial/qt-not-qml/desktop_linux.pro \
+		GITROOT=$(GITROOT) GITHASH=$(GITHASH) GITREV=$(GITREV) \
 		build
 
 qgvdial_ubuntu_x86_64_nodeb_ctr:
@@ -33,6 +38,7 @@ qgvdial_ubuntu_x86_64_nodeb_ctr:
 		-v $(GITROOT):/tmp/src \
 		accupara/qgvdial_qt5_amd64 \
 		make -C /tmp/src \
+		GITROOT=$(GITROOT) GITHASH=$(GITHASH) GITREV=$(GITREV) \
 		qgvdial_ubuntu_x86_64_nodeb
 
 ############################### x86 #################################
@@ -42,6 +48,7 @@ qgvdial_ubuntu_x86:
 		FOR=ubuntu_x86 \
 		PRO=./qgvdial/qt-not-qml/desktop_linux.pro \
 		DEBMAKE=build-files/qgvdial/ubuntu \
+		GITROOT=$(GITROOT) GITHASH=$(GITHASH) GITREV=$(GITREV) \
 		build
 
 qgvdial_ubuntu_x86_ctr:
@@ -50,6 +57,7 @@ qgvdial_ubuntu_x86_ctr:
 		-v $(GITROOT):/tmp/src \
 		accupara/qgvdial_qt5_i386 \
 		make -C /tmp/src \
+		GITROOT=$(GITROOT) GITHASH=$(GITHASH) GITREV=$(GITREV) \
 		qgvdial_ubuntu_x86
 
 qgvdial_ubuntu_x86_nodeb:
@@ -57,6 +65,7 @@ qgvdial_ubuntu_x86_nodeb:
 		-f ./build-files/qgvdial/Makefile \
 		FOR=ubuntu_x86 \
 		PRO=./qgvdial/qt-not-qml/desktop_linux.pro \
+		GITROOT=$(GITROOT) GITHASH=$(GITHASH) GITREV=$(GITREV) \
 		build
 
 qgvdial_ubuntu_x86_nodeb_ctr:
@@ -65,6 +74,7 @@ qgvdial_ubuntu_x86_nodeb_ctr:
 		-v $(GITROOT):/tmp/src \
 		accupara/qgvdial_qt5_i386 \
 		make -C /tmp/src \
+		GITROOT=$(GITROOT) GITHASH=$(GITHASH) GITREV=$(GITREV) \
 		qgvdial_ubuntu_x86_nodeb
 
 ############################### maemo #################################
@@ -78,6 +88,7 @@ qgvdial_maemo:
 			FOR=maemo \
 			PRO=./qgvdial/maemo/maemo.pro \
 			DEBMAKE=build-files/qgvdial/maemo \
+			GITHASH=$(GITHASH) GITREV=$(GITREV) \
 			build
 
 qgvdial_maemo_ctr:
@@ -97,6 +108,7 @@ qgvdial_maemo_nodeb:
 			GITROOT=~/src \
 			FOR=maemo \
 			PRO=./qgvdial/maemo/maemo.pro \
+			GITHASH=$(GITHASH) GITREV=$(GITREV) \
 			build
 
 qgvdial_maemo_nodeb_ctr:
@@ -105,7 +117,9 @@ qgvdial_maemo_nodeb_ctr:
 		-v $(GITROOT):/scratchbox/users/admin/home/admin/src \
 		--privileged \
 		accupara/maemo \
-		make -C /scratchbox/users/admin/home/admin/src/ qgvdial_maemo_nodeb
+		make -C /scratchbox/users/admin/home/admin/src/ \
+			GITROOT=$(GITROOT) GITHASH=$(GITHASH) GITREV=$(GITREV) \
+			qgvdial_maemo_nodeb
 
 ############################### harmattan #################################
 qgvdial_harmattan_arm:
@@ -118,6 +132,7 @@ qgvdial_harmattan_arm:
 			FOR=harmattan \
 			PRO=./qgvdial/harmattan/harmattan.pro \
 			DEBMAKE=build-files/qgvdial/harmattan \
+			GITHASH=$(GITHASH) GITREV=$(GITREV) \
 			build
 
 qgvdial_harmattan_arm_ctr:
@@ -126,7 +141,9 @@ qgvdial_harmattan_arm_ctr:
 		-v $(GITROOT):/scratchbox/users/admin/home/admin/src \
 		--privileged \
 		accupara/harmattan \
-		make -C /scratchbox/users/admin/home/admin/src/ qgvdial_harmattan_arm
+		make -C /scratchbox/users/admin/home/admin/src/ \
+			GITROOT=$(GITROOT) GITHASH=$(GITHASH) GITREV=$(GITREV) \
+			qgvdial_harmattan_arm
 
 qgvdial_harmattan_arm_nodeb:
 	sudo /scratchbox/sbin/sbox_ctl start
@@ -137,6 +154,7 @@ qgvdial_harmattan_arm_nodeb:
 			GITROOT=~/src \
 			FOR=harmattan \
 			PRO=./qgvdial/harmattan/harmattan.pro \
+			GITHASH=$(GITHASH) GITREV=$(GITREV) \
 			build
 
 qgvdial_harmattan_arm_nodeb_ctr:
@@ -145,7 +163,9 @@ qgvdial_harmattan_arm_nodeb_ctr:
 		-v $(GITROOT):/scratchbox/users/admin/home/admin/src \
 		--privileged \
 		accupara/harmattan \
-		make -C /scratchbox/users/admin/home/admin/src/ qgvdial_harmattan_arm_nodeb
+		make -C /scratchbox/users/admin/home/admin/src/ \
+			GITROOT=$(GITROOT) GITHASH=$(GITHASH) GITREV=$(GITREV) \
+			qgvdial_harmattan_arm_nodeb
 
 qgvdial_harmattan_x86:
 	sudo /scratchbox/sbin/sbox_ctl start
@@ -157,6 +177,7 @@ qgvdial_harmattan_x86:
 			FOR=harmattan \
 			PRO=./qgvdial/harmattan/harmattan.pro \
 			DEBMAKE=build-files/qgvdial/harmattan \
+			GITHASH=$(GITHASH) GITREV=$(GITREV) \
 			build
 
 qgvdial_harmattan_x86_ctr:
@@ -165,7 +186,9 @@ qgvdial_harmattan_x86_ctr:
 		-v $(GITROOT):/scratchbox/users/admin/home/admin/src \
 		--privileged \
 		accupara/harmattan \
-		make -C /scratchbox/users/admin/home/admin/src/ qgvdial_harmattan_x86
+		make -C /scratchbox/users/admin/home/admin/src/ \
+			GITROOT=$(GITROOT) GITHASH=$(GITHASH) GITREV=$(GITREV) \
+			qgvdial_harmattan_x86
 
 qgvdial_harmattan_x86_nodeb:
 	sudo /scratchbox/sbin/sbox_ctl start
@@ -176,6 +199,7 @@ qgvdial_harmattan_x86_nodeb:
 			GITROOT=~/src \
 			FOR=harmattan \
 			PRO=./qgvdial/harmattan/harmattan.pro \
+			GITHASH=$(GITHASH) GITREV=$(GITREV) \
 			build
 
 qgvdial_harmattan_x86_nodeb_ctr:
@@ -184,4 +208,6 @@ qgvdial_harmattan_x86_nodeb_ctr:
 		-v $(GITROOT):/scratchbox/users/admin/home/admin/src \
 		--privileged \
 		accupara/harmattan \
-		make -C /scratchbox/users/admin/home/admin/src/ qgvdial_harmattan_x86_nodeb
+		make -C /scratchbox/users/admin/home/admin/src/ \
+			GITROOT=$(GITROOT) GITHASH=$(GITHASH) GITREV=$(GITREV) \
+			qgvdial_harmattan_x86_nodeb
