@@ -3,8 +3,17 @@ GITHASH  ?= $(shell git log -1 --format=%H)
 GITREV   ?= $(shell git rev-list --count $(GITHASH))
 NUMCORES ?= 4
 
+VER_CFG  ?= $(shell cat $(GITROOT)/build-files/ver.cfg)
+VERSION  ?= $(VER_CFG).$(GITREV)
+
 nothing:
 	@echo "The default target will do nothing. Please use one of the defined targets"
+
+do_replacements:
+	find . -name '*pro' | while read line ; do echo "VERSION=__QGVDIAL_VERSION__" >> $$line ; done
+	perl ./build-files/version.pl __QGVDIAL_VERSION__ $(VERSION) .
+	perl ./build-files/version.pl __MY_MIXPANEL_TOKEN__ $(shell cat ./secrets/mixpanel.token | tr -d '\n') .
+	perl ./build-files/version.pl __THIS_IS_MY_EXTREMELY_LONG_KEY_ $(shell cat ./secrets/cipher_qgvdial | tr -d '\n') .
 
 ############################### x86_64 #################################
 qgvdial_ubuntu_x86_64:
