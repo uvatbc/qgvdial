@@ -256,3 +256,34 @@ qgvdial_harmattan_x86_nodeb_ctr:
 		make -C /scratchbox/users/admin/home/admin/src/ \
 			GITROOT=$(GITROOT) GITHASH=$(GITHASH) GITREV=$(GITREV) \
 			qgvdial_harmattan_x86_nodeb
+
+############################### bb10 #################################
+qgvdial_bb10_arm:
+	$(MAKE) -j$(NUMCORES) \
+		-f ./build-files/qgvdial/Makefile \
+		FOR=bb10_arm \
+		PRO=./qgvdial/bb10-qt5/bb10.pro \
+		build
+
+qgvdial_bb10_arm_ctr:
+	docker run \
+		--rm -it \
+		-v $(GITROOT):/tmp/src \
+		accupara/bb10_qt5:arm \
+		make -C /tmp/src \
+		qgvdial_bb10_arm
+
+qgvdial_bb10_x86:
+	$(MAKE) -j$(NUMCORES) \
+		-f ./build-files/qgvdial/Makefile \
+		FOR=bb10_x86 \
+		PRO=./qgvdial/bb10-qt5/bb10.pro \
+		build
+
+qgvdial_bb10_x86_ctr:
+	docker run \
+		--rm -it \
+		-v $(GITROOT):/tmp/src \
+		accupara/bb10_qt5:x86 \
+		make -C /tmp/src \
+		qgvdial_bb10_x86
