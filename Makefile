@@ -14,6 +14,7 @@ do_replacements:
 	perl ./build-files/version.pl __QGVDIAL_VERSION__ $(VERSION) .
 	perl ./build-files/version.pl __MY_MIXPANEL_TOKEN__ $(shell cat ./secrets/mixpanel.token | tr -d '\n') .
 	perl ./build-files/version.pl __THIS_IS_MY_EXTREMELY_LONG_KEY_ $(shell cat ./secrets/cipher_qgvdial | tr -d '\n') .
+	perl ./build-files/version.pl __QT5_BB10__ /home/admin/bin/qt5/armle .
 
 ############################### x86_64 #################################
 qgvdial_ubuntu_x86_64:
@@ -265,7 +266,18 @@ qgvdial_bb10_arm:
 		PRO=./qgvdial/bb10-qt5/bb10.pro \
 		build
 
+qgvdial_bb10_arm_srv:
+	mkdir -p /tmp/src/build/bb10_arm/qt4srv
+	cd /tmp/src/build/bb10_arm/qt4srv ; qmake /tmp/src/qgvdial/bb10-qt5/qt4srv/qt4srv.pro
+	make -C /tmp/src/build/bb10_arm/qt4srv all
+
 qgvdial_bb10_arm_ctr:
+	docker run \
+		--rm -it \
+		-v $(GITROOT):/tmp/src \
+		accupara/bbndk \
+		make -C /tmp/src \
+		qgvdial_bb10_arm_srv
 	docker run \
 		--rm -it \
 		-v $(GITROOT):/tmp/src \
