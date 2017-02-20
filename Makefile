@@ -14,7 +14,7 @@ do_replacements:
 	perl ./build-files/version.pl __QGVDIAL_VERSION__ $(VERSION) .
 	perl ./build-files/version.pl __MY_MIXPANEL_TOKEN__ $(shell cat ./secrets/mixpanel.token | tr -d '\n') .
 	perl ./build-files/version.pl __THIS_IS_MY_EXTREMELY_LONG_KEY_ $(shell cat ./secrets/cipher_qgvdial | tr -d '\n') .
-	perl ./build-files/version.pl __QT5_BB10__ /home/admin/bin/qt5/armle .
+	perl ./build-files/version.pl __QT5_BB10__ '\/home\/admin\/bin\/qt5\/armle' .
 
 ############################### x86_64 #################################
 qgvdial_ubuntu_x86_64:
@@ -272,17 +272,20 @@ qgvdial_bb10_arm_srv:
 	make -C /tmp/src/build/bb10_arm/qt4srv all
 
 qgvdial_bb10_arm_ctr:
+	# Create the qt4srv first
 	docker run \
 		--rm -it \
 		-v $(GITROOT):/tmp/src \
 		accupara/bbndk \
 		make -C /tmp/src \
 		qgvdial_bb10_arm_srv
+	# Then create the rest of the app. This should create the bar package too
 	docker run \
 		--rm -it \
 		-v $(GITROOT):/tmp/src \
 		accupara/bb10_qt5:arm \
 		make -C /tmp/src \
+		DEBMAKE=build-files/qgvdial/bb10 \
 		qgvdial_bb10_arm
 
 qgvdial_bb10_x86:
@@ -292,10 +295,26 @@ qgvdial_bb10_x86:
 		PRO=./qgvdial/bb10-qt5/bb10.pro \
 		build
 
+qgvdial_bb10_x86_srv:
+	mkdir -p /tmp/src/build/bb10_x86/qt4srv
+	cd /tmp/src/build/bb10_x86/qt4srv ; qmake /tmp/src/qgvdial/bb10-qt5/qt4srv/qt4srv.pro
+	make -C /tmp/src/build/bb10_x86/qt4srv all
+
 qgvdial_bb10_x86_ctr:
+	# Create the qt4srv first
+	docker run \
+		--rm -it \
+		-v $(GITROOT):/tmp/src \
+		-e CPUVARDIR=x86 \
+		accupara/bbndk \
+		make -C /tmp/src \
+		CPUVARDIR=x86 \
+		qgvdial_bb10_x86_srv
+	# Then create the rest of the app. This should create the bar package too
 	docker run \
 		--rm -it \
 		-v $(GITROOT):/tmp/src \
 		accupara/bb10_qt5:x86 \
 		make -C /tmp/src \
+		DEBMAKE=build-files/qgvdial/bb10 \
 		qgvdial_bb10_x86

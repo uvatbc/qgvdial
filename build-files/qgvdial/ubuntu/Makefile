@@ -1,5 +1,3 @@
-GITROOT ?= $(shell git rev-parse --show-toplevel)
-
 build:
 	cd $(BUILDDIR)/$(FOR)/qgvdial-$(VERSION) ; rm -rf debian temp ../qgvdial*tar*
 	cd $(BUILDDIR)/$(FOR)/qgvdial-$(VERSION) ; USER=admin dh_make --yes --createorig --single -e 'yuvraaj@gmail.com' -c lgpl

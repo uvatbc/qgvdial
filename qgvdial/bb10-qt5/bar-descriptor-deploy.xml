@@ -5,7 +5,7 @@
   <name>qgvdial</name>
   <versionNumber>__QGVDIAL_VERSION__</versionNumber>
   <description>Google Voice client for BB10</description>
-  <copyright>LGPL v2 (2009-2014)</copyright>
+  <copyright>LGPL v2 (2009-2017)</copyright>
   <initialWindow>
     <autoOrients>true</autoOrients>
     <systemChrome>none</systemChrome>
@@ -22,13 +22,13 @@
   <!-- <permission>_sys_run_headless</permission> -->
 
   <asset path="qgvdial">qgvdial</asset>
-  <asset path="qt4srv/qt4srv">qt4srv</asset>
+  <asset path="../qt4srv/qt4srv">qt4srv</asset>
   <env var="LD_LIBRARY_PATH" value="app/native/runtime/qt/lib:/accounts/devuser/qt/lib:/usr/lib/qt4/lib/:$LD_LIBRARY_PATH"/>
   <env var="QT_PLUGIN_PATH" value="app/native/runtime/qt/plugins:/accounts/devuser/qt/plugins:$QT_PLUGIN_PATH"/>
   <env var="QML2_IMPORT_PATH" value="app/native/runtime/qt/qml:/accounts/devuser/qt/qml:$QML2_IMPORT_PATH"/>
   <action system="true">run_native</action>
     
-  <asset path="../../icons/qgv.png">qgvdial.png</asset>
+  <asset path="../../../icons/qgv.png">qgvdial.png</asset>
   <icon>
      <image>qgvdial.png</image>
   </icon>
