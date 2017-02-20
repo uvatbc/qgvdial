@@ -264,6 +264,7 @@ qgvdial_bb10_arm:
 		-f ./build-files/qgvdial/Makefile \
 		FOR=bb10_arm \
 		PRO=./qgvdial/bb10-qt5/bb10.pro \
+		KEYPASS=$(KEYPASS) \
 		build
 
 qgvdial_bb10_arm_srv:
@@ -283,9 +284,12 @@ qgvdial_bb10_arm_ctr:
 	docker run \
 		--rm -it \
 		-v $(GITROOT):/tmp/src \
+		-v $(GITROOT)/secrets/author.p12:/home/admin/.rim/author.p12 \
+		-v $(GITROOT)/secrets/bbidtoken.csk:/home/admin/.rim/bbidtoken.csk \
 		accupara/bb10_qt5:arm \
 		make -C /tmp/src \
 		DEBMAKE=build-files/qgvdial/bb10 \
+		KEYPASS=$(KEYPASS) \
 		qgvdial_bb10_arm
 
 qgvdial_bb10_x86:
@@ -293,6 +297,7 @@ qgvdial_bb10_x86:
 		-f ./build-files/qgvdial/Makefile \
 		FOR=bb10_x86 \
 		PRO=./qgvdial/bb10-qt5/bb10.pro \
+		KEYPASS=$(KEYPASS) \
 		build
 
 qgvdial_bb10_x86_srv:
@@ -314,7 +319,10 @@ qgvdial_bb10_x86_ctr:
 	docker run \
 		--rm -it \
 		-v $(GITROOT):/tmp/src \
+		-v $(GITROOT)/secrets/author.p12:/home/admin/.rim/author.p12 \
+		-v $(GITROOT)/secrets/bbidtoken.csk:/home/admin/.rim/bbidtoken.csk \
 		accupara/bb10_qt5:x86 \
 		make -C /tmp/src \
 		DEBMAKE=build-files/qgvdial/bb10 \
+		KEYPASS=$(KEYPASS) \
 		qgvdial_bb10_x86
