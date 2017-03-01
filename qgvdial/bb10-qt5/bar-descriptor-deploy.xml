@@ -52,7 +52,7 @@
   <asset path="__QT5_BB10__/plugins/imageformats">runtime/qt/plugins/imageformats</asset>
   <asset path="__QT5_BB10__/plugins/mediaservice">runtime/qt/plugins/mediaservice</asset>
   <asset path="__QT5_BB10__/plugins/platforms">runtime/qt/plugins/platforms</asset>
-  <!-- <asset path="__QT5_BB10__/plugins/sqldrivers">runtime/qt/plugins/sqldrivers</asset> -->
+  <asset path="__QT5_BB10__/plugins/sqldrivers">runtime/qt/plugins/sqldrivers</asset>
   
   <asset path="__QT5_BB10__/qml/Qt">runtime/qt/qml/Qt</asset>
   <asset path="__QT5_BB10__/qml/QtAudioEngine">runtime/qt/qml/QtAudioEngine</asset>

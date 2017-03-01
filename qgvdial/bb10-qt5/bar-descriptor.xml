@@ -54,7 +54,7 @@
   <asset path="../../../../external/qt5/qt5_bb10/target/plugins/imageformats">runtime/qt/plugins/imageformats</asset>
   <asset path="../../../../external/qt5/qt5_bb10/target/plugins/mediaservice">runtime/qt/plugins/mediaservice</asset>
   <asset path="../../../../external/qt5/qt5_bb10/target/plugins/platforms">runtime/qt/plugins/platforms</asset>
-  <!-- <asset path="../../../../external/qt5/qt5_bb10/target/plugins/sqldrivers">runtime/qt/plugins/sqldrivers</asset> -->
+  <asset path="../../../../external/qt5/qt5_bb10/target/plugins/sqldrivers">runtime/qt/plugins/sqldrivers</asset>
   
   <asset path="../../../../external/qt5/qt5_bb10/target/qml/Qt">runtime/qt/qml/Qt</asset>
   <asset path="../../../../external/qt5/qt5_bb10/target/qml/QtAudioEngine">runtime/qt/qml/QtAudioEngine</asset>
