@@ -144,7 +144,9 @@ NwReqTracker::onReplyFinished()
         }
 
         if (QNetworkReply::NoError != origReply->error ()) {
-            Q_WARN(QString("Response error: %1").arg(origReply->errorString()));
+            if (!m_dontWarnTheseErrors.contains(origReply->error ())) {
+                Q_WARN(QString("Response error: %1").arg(origReply->errorString()));
+            }
             break;
         }
 
@@ -291,8 +293,10 @@ NwReqTracker::onReplySslErrors(const QList<QSslError> &errors)
 void
 NwReqTracker::onReplyError(QNetworkReply::NetworkError code)
 {
-    QString strErr = QString("NW error %1").arg((int)code);
-    Q_WARN(strErr);
+    if (!m_dontWarnTheseErrors.contains(code)) {
+        QString strErr = QString("NW error %1").arg((int)code);
+        Q_WARN(strErr);
+    }
 }//NwReqTracker::onReplyError
 
 void
@@ -447,6 +451,12 @@ NwReqTracker::dumpReplyInfo(QNetworkReply *reply)
 
     Q_DEBUG(msg);
 }//NwReqTracker::dumpReplyInfo
+
+void
+NwReqTracker::setDontWarnOnErrors(QList<int> ignoreErrors)
+{
+    m_dontWarnTheseErrors = ignoreErrors;
+}//NwReqTracker::setDontWarnOnErrors
 
 //////////////////////////////////// Helpers ///////////////////////////////////
 QString

@@ -37,11 +37,11 @@ public:
 
     void abort();
     void setTimeout(quint32 timeout);
+    inline bool isTimedOut() { return timedOut; }
+    inline bool isAborted() { return aborted; }
 
     void setAutoRedirect(QNetworkCookieJar *j, bool set);
-
-    inline bool isAborted() { return aborted; }
-    inline bool isTimedOut() { return timedOut; }
+    void setDontWarnOnErrors(QList<int> ignoreErrors);
 
     static void setCookies(QNetworkCookieJar *jar, QNetworkRequest &req);
     static QUrl hasMoved(QNetworkReply *reply);
@@ -84,6 +84,8 @@ protected:
     bool            autoRedirect;
     QNetworkCookieJar *jar;
     QNetworkAccessManager &nwMgr;
+
+    QList<int> m_dontWarnTheseErrors;
 };
 
 class NwHelpers {

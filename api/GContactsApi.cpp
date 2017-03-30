@@ -357,8 +357,9 @@ GContactsApi::getContacts(AsyncTaskToken *task)
           SLOT(onGotContactsFeed(bool,const QByteArray&,QNetworkReply*,void*)));
     Q_ASSERT(rv);
 
-    if (rv) { // And emitlog?
-        Q_DEBUG(msg);
+    if (rv) {
+        NwReqTracker *tracker = (NwReqTracker *)task->apiCtx;
+        tracker->setDontWarnOnErrors(QList<int>() << 203 << 403);
     }
 
     return (rv);
@@ -521,6 +522,11 @@ GContactsApi::getPhotoFromLink(AsyncTaskToken *task)
     bool ok =
     doGet (url, task, this,
            SLOT(onGotPhoto(bool,QByteArray,QNetworkReply*,void*)));
+
+    if (ok) {
+        NwReqTracker *tracker = (NwReqTracker *)task->apiCtx;
+        tracker->setDontWarnOnErrors(QList<int>() << 203 << 403);
+    }
 
     return (ok);
 }//GContactsApi::getPhotoFromLink
