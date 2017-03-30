@@ -114,7 +114,9 @@ protected:
 // Use OAuth2 for contacts
 //#define GV_SETTINGS_VER     "2014-01-02 18:10:40"
 // Throttle cleaning dangling pics
-#define GV_SETTINGS_VER     "2015-02-24 19:10:40"
+//#define GV_SETTINGS_VER     "2015-02-24 19:10:40"
+// Change after more than two years
+#define GV_SETTINGS_VER     "2017-03-30 00:14:18"
 ////////////////////////////// GV Contacts table ///////////////////////////////
 #define GV_CONTACTS_TABLE   "gvcontacts"
 #define GV_C_ID             "id"
