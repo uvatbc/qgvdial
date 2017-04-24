@@ -1,4 +1,4 @@
-QT      *= core network sql xml xmlpatterns script
+QT      *= core network sql xml xmlpatterns
 TARGET   = qgvnotify
 TEMPLATE = app
 INCLUDEPATH += ../src ../src/tp-capable
