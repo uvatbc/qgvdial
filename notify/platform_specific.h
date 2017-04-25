@@ -19,38 +19,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 Contact: yuvraaj@gmail.com
 */
 
-#ifndef MQPUBLISHER_H
-#define MQPUBLISHER_H
+#ifndef PLATFORMSPECIFIC_H
+#define PLATFORMSPECIFIC_H
 
-#include "global.h"
-#include <mosquitto.h>
-#include <stdint.h>
+#include <QtDBus>
+#include <QtCore>
 
-class MqPublisher : public QObject
-{
-    Q_OBJECT
+#define PHONON_ENABLED 0
 
-public:
-    MqPublisher(const QString &name,
-                const QString &strServer, int port,
-                const QString &strTopic,
-                QObject *parent = 0);
-
-public slots:
-    void publish(const QByteArray &byPayload);
-    void on_mqConnected(int result);
-    void on_mqDisonnected();
-    void on_mqPublish(uint16_t mid);
-
-private:
-    QString m_strName;
-    QString m_strServer;
-    int m_port;
-    QString m_strTopic;
-    QByteArray m_byPayload;
-
-    bool bConnected;
-    struct mosquitto *mosq;
-};
-
-#endif // MQPUBLISHER_H
+#endif // PLATFORMSPECIFIC_H

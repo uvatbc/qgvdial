@@ -1,3 +1,24 @@
+/*
+qgvnotify is a cross platform Google Voice Notification tool
+Copyright (C) 2009-2017  Yuvraaj Kelkar
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
+Contact: yuvraaj@gmail.com
+*/
+
 #include "MainWindow.h"
 #include "MqPublisher.h"
 #include <iostream>
@@ -5,21 +26,21 @@ using namespace std;
 
 // Forward function declarations
 QString baseDir();
-void initLogging (const QString &userIni);
+void initLogging(const QString &userIni);
 extern QString strLogfile;
 
 MainWindow::MainWindow(QObject *parent /*= 0*/)
 : QObject(parent)
-, gvApi (false, this)
-, bIsLoggedIn (false)
-, oContacts (this)
-, oInbox (gvApi, this)
-, checkCounter (0)
-, client (NULL)
+, gvApi(false, this)
+, bIsLoggedIn(false)
+, oContacts(this)
+, oInbox(gvApi, this)
+, checkCounter(0)
+, client(NULL)
 {
     qRegisterMetaType<ContactInfo>("ContactInfo");
 
-    QTimer::singleShot (10, this, SLOT(init()));
+    QTimer::singleShot(10, this, SLOT(init()));
 }//MainWindow::MainWindow
 
 void
@@ -35,38 +56,38 @@ MainWindow::init()
              this , SLOT(onTwoStepAuthentication(AsyncTaskToken*)));
 
     // Status from contacts object
-    QObject::connect (&oContacts, SIGNAL(status(const QString&,int)),
-                       this     , SLOT(setStatus(const QString&,int)));
+    QObject::connect(&oContacts, SIGNAL(status(const QString&,int)),
+                      this     , SLOT(setStatus(const QString&,int)));
     // oContacts.allContacts -> this.getContactsDone
-    QObject::connect (&oContacts, SIGNAL(allContacts(bool,bool)),
-                      this      , SLOT(getContactsDone(bool,bool)));
+    QObject::connect(&oContacts, SIGNAL(allContacts(bool,bool)),
+                     this      , SLOT(getContactsDone(bool,bool)));
     // Status from inbox object
-    QObject::connect (&oInbox, SIGNAL(status(const QString&,int)),
-                       this  , SLOT(setStatus(const QString&,int)));
+    QObject::connect(&oInbox, SIGNAL(status(const QString&,int)),
+                      this  , SLOT(setStatus(const QString&,int)));
     // Inbox has updated
-    QObject::connect (&oInbox, SIGNAL(inboxChanged()),
-                       this  , SLOT(inboxChanged()));
+    QObject::connect(&oInbox, SIGNAL(inboxChanged()),
+                      this  , SLOT(inboxChanged()));
     // Timer tick
-    QObject::connect (&mainTimer, SIGNAL(timeout()), this, SLOT(doWork()));
+    QObject::connect(&mainTimer, SIGNAL(timeout()), this, SLOT(doWork()));
 
-    if (!checkParams ()) {
+    if (!checkParams()) {
         qApp->quit();
         return;
     }
 
-    QDateTime dtNow = QDateTime::currentDateTime ();
-    QDateTime dtTomorrow = dtNow.addDays (1);
-    dtTomorrow.setTime (QTime(0, 0));
+    QDateTime dtNow = QDateTime::currentDateTime();
+    QDateTime dtTomorrow = dtNow.addDays(1);
+    dtTomorrow.setTime(QTime(0, 0));
     int sec = dtTomorrow.toTime_t() - dtNow.toTime_t();
     if (sec < 0) sec = 1;
-    QTimer::singleShot (sec * 1000, this, SLOT(dailyTimeout()));
-    Q_DEBUG(QString("Daily timer first shot after %1 seconds").arg (sec));
+    QTimer::singleShot(sec * 1000, this, SLOT(dailyTimeout()));
+    Q_DEBUG(QString("Daily timer first shot after %1 seconds").arg(sec));
 
     client = new QGVNotifyProxyIface("net.yuvraaj.qgvnotify.control", "/",
                                      QDBusConnection::sessionBus(), 0);
     if (NULL == client) {
         Q_CRIT("Failed to initialize DBus client");
-        getOut ();
+        getOut();
         return;
     }
     connect(client, SIGNAL(CommandForClient(const QString&)),
@@ -74,215 +95,215 @@ MainWindow::init()
 
     onCommandForClient("getUser");
 
-    doWork ();
+    doWork();
 }//MainWindow::init
 
 void
-MainWindow::doWork ()
+MainWindow::doWork()
 {
     if (!bIsLoggedIn) {
-        doLogin ();
+        doLogin();
         return;
     }
 
     checkCounter++;
     if (0 == checkCounter % 100) {
-        Q_DEBUG(QString("Checked %1 times").arg (checkCounter));
+        Q_DEBUG(QString("Checked %1 times").arg(checkCounter));
     }
 
     // Get the contacts
-    oContacts.refreshContacts ();
+    oContacts.refreshContacts();
     // Get inbox
-    oInbox.refresh ();
+    oInbox.refresh();
 }//MainWindow::doWork
 
 bool
-MainWindow::checkParams ()
+MainWindow::checkParams()
 {
     bool rv = false, bUseDefaultIni = false, tempBool;
-    QStringList args = qApp->arguments ();
-    if (args.length () < 2) {
-        qWarning ("No ini file specified, using default");
+    QStringList args = qApp->arguments();
+    if (args.length() < 2) {
+        qWarning("No ini file specified, using default");
         bUseDefaultIni = true;
     } else {
         QFileInfo fi(args[1]);
-        strIni = fi.absoluteFilePath ();
+        strIni = fi.absoluteFilePath();
 
-        initLogging (strIni);
+        initLogging(strIni);
     }
 
     if (bUseDefaultIni) {
-        strIni = baseDir ();
+        strIni = baseDir();
         strIni += QDir::separator();
         strIni += "notify.ini";
     }
 
-    Q_DEBUG(QString("Using ini file at %1").arg (strIni));
+    Q_DEBUG(QString("Using ini file at %1").arg(strIni));
 
     bool bUseProxy = false, bUseSystemProxy = false, bProxyAuth = false;
     QString strProxy, strProxyUser, strProxyPass;
     int proxyport;
 
     do { // Begin cleanup block (not a loop)
-        QSettings settings (strIni, QSettings::IniFormat, this);
+        QSettings settings(strIni, QSettings::IniFormat, this);
 
         QByteArray byD;
         QTextStream in(stdin);
-        if (!settings.contains ("user")) {
-            qWarning ("Ini file does not contain a username");
+        if (!settings.contains("user")) {
+            qWarning("Ini file does not contain a username");
             cout << "Enter username:";
             in >> strUser;
-            settings.setValue ("user", strUser);
+            settings.setValue("user", strUser);
         } else {
-            strUser = settings.value ("user").toString ();
+            strUser = settings.value("user").toString();
         }
 
-        if (!settings.contains ("password")) {
-            qWarning ("Ini file does not contain a password");
+        if (!settings.contains("password")) {
+            qWarning("Ini file does not contain a password");
             cout << "Enter password:";
             in >> strPass;
-            cipher (strPass.toLocal8Bit (), byD, true);
-            settings.setValue ("password", QString(byD.toHex ()));
+            cipher(strPass.toLocal8Bit(), byD, true);
+            settings.setValue("password", QString(byD.toHex()));
         } else {
             byD = settings.value("password").toByteArray();
-            cipher (QByteArray::fromHex (byD), byD, false);
+            cipher(QByteArray::fromHex(byD), byD, false);
             strPass = byD;
         }
 
-        if (!settings.contains ("tfaRequired")) {
+        if (!settings.contains("tfaRequired")) {
             tempBool = false;
-            settings.setValue ("tfaRequired", tempBool);
+            settings.setValue("tfaRequired", tempBool);
             tfaRequired = false;
         } else {
             tfaRequired = settings.value("tfaRequired").toBool();
         }
 
         if (tfaRequired) {
-            if (!settings.contains ("cpass")) {
-                qWarning ("Ini file does not contain an application specific "
-                          "password");
+            if (!settings.contains("cpass")) {
+                qWarning("Ini file does not contain an application specific "
+                         "password");
                 cout << "Enter application specific password:";
                 in >> strCPass;
-                cipher (strCPass.toLocal8Bit (), byD, true);
-                settings.setValue ("cpass", QString(byD.toHex ()));
+                cipher(strCPass.toLocal8Bit(), byD, true);
+                settings.setValue("cpass", QString(byD.toHex()));
             } else {
                 byD = settings.value("cpass").toByteArray();
-                cipher (QByteArray::fromHex (byD), byD, false);
+                cipher(QByteArray::fromHex(byD), byD, false);
                 strCPass = byD;
             }
         }
 
         checkTimeout = 0;
-        if (settings.contains ("check_timeout")) {
-            checkTimeout = settings.value ("check_timeout").toUInt ();
+        if (settings.contains("check_timeout")) {
+            checkTimeout = settings.value("check_timeout").toUInt();
         }
         if (checkTimeout < 5) {
-            qWarning () << "Check frequency =" << checkTimeout
-                        << "is not valid. Resetting to lowest value = 5";
+            qWarning() << "Check frequency =" << checkTimeout
+                       << "is not valid. Resetting to lowest value = 5";
             checkTimeout = 5;
-            settings.setValue ("check_timeout", checkTimeout);
+            settings.setValue("check_timeout", checkTimeout);
         }
 
-        if (!settings.contains ("mqserver")) {
-            qWarning ("Ini file does not contain the mq server hostname");
+        if (!settings.contains("mqserver")) {
+            qWarning("Ini file does not contain the mq server hostname");
             cout << "Enter server hostname:";
             in >> m_strMqServer;
-            settings.setValue ("mqserver", m_strMqServer);
+            settings.setValue("mqserver", m_strMqServer);
         } else {
-            m_strMqServer = settings.value ("mqserver").toString ();
+            m_strMqServer = settings.value("mqserver").toString();
         }
 
-        if (!settings.contains ("mqport")) {
-            qWarning ("Ini file does not contain the mq server port");
+        if (!settings.contains("mqport")) {
+            qWarning("Ini file does not contain the mq server port");
             cout << "Enter server port:";
             in >> m_mqPort;
             if (0 == m_mqPort) m_mqPort = 1883;
-            settings.setValue ("mqport", m_mqPort);
+            settings.setValue("mqport", m_mqPort);
         } else {
-            m_mqPort = settings.value ("mqport").toInt (&rv);
+            m_mqPort = settings.value("mqport").toInt(&rv);
             if (!rv) break;
             if (0 == m_mqPort) m_mqPort = 1883;
-            settings.setValue ("mqport", m_mqPort);
+            settings.setValue("mqport", m_mqPort);
             rv = false;
         }
 
-        if (!settings.contains ("mqtopic")) {
-            qWarning ("Ini file does not contain the mq topic");
+        if (!settings.contains("mqtopic")) {
+            qWarning("Ini file does not contain the mq topic");
             cout << "Enter topic:";
             in >> m_strMqTopic;
-            if (m_strMqTopic.startsWith ('-')) {
-                qWarning ("Using gv_notify as topic instead");
+            if (m_strMqTopic.startsWith('-')) {
+                qWarning("Using gv_notify as topic instead");
                 m_strMqTopic = "gv_notify";
             }
-            settings.setValue ("mqtopic", m_strMqTopic);
+            settings.setValue("mqtopic", m_strMqTopic);
         } else {
-            m_strMqTopic = settings.value ("mqtopic").toString ();
+            m_strMqTopic = settings.value("mqtopic").toString();
         }
 
-        if (!settings.contains ("useproxy")) {
-            settings.setValue ("useproxy", false);
+        if (!settings.contains("useproxy")) {
+            settings.setValue("useproxy", false);
             bUseProxy = false;
         } else {
-            bUseProxy = settings.value ("useproxy", false).toBool ();
+            bUseProxy = settings.value("useproxy", false).toBool();
         }
 
-        if (!settings.contains ("usesystemproxy")) {
-            settings.setValue ("usesystemproxy", false);
+        if (!settings.contains("usesystemproxy")) {
+            settings.setValue("usesystemproxy", false);
             bUseSystemProxy = false;
         } else {
-            bUseSystemProxy = settings.value ("usesystemproxy", false).toBool();
+            bUseSystemProxy = settings.value("usesystemproxy", false).toBool();
         }
 
-        if (!settings.contains ("proxyserver")) {
-            settings.setValue ("proxyserver", "proxy.example.com");
+        if (!settings.contains("proxyserver")) {
+            settings.setValue("proxyserver", "proxy.example.com");
         } else {
-            strProxy = settings.value ("proxyserver", "").toString ();
+            strProxy = settings.value("proxyserver", "").toString();
         }
 
-        if (!settings.contains ("proxyport")) {
-            settings.setValue ("proxyport", 80);
+        if (!settings.contains("proxyport")) {
+            settings.setValue("proxyport", 80);
             proxyport = 80;
         } else {
-            proxyport = settings.value ("proxyport", 80).toInt ();
+            proxyport = settings.value("proxyport", 80).toInt();
         }
 
-        if (!settings.contains ("proxyauth")) {
-            settings.setValue ("proxyauth", false);
+        if (!settings.contains("proxyauth")) {
+            settings.setValue("proxyauth", false);
             bProxyAuth = false;
         } else {
-            bProxyAuth = settings.value ("proxyauth", false).toBool ();
+            bProxyAuth = settings.value("proxyauth", false).toBool();
         }
 
-        if (!settings.contains ("proxyuser")) {
+        if (!settings.contains("proxyuser")) {
             if (bUseProxy & !bUseSystemProxy && bProxyAuth) {
-                qWarning ("Ini file needs proxy authentication user");
+                qWarning("Ini file needs proxy authentication user");
                 cout << "Enter proxy user:";
                 in >> strProxyUser;
-                settings.setValue ("proxyuser", "proxy_user");
+                settings.setValue("proxyuser", "proxy_user");
             }
         } else {
-            strProxyUser = settings.value ("proxyuser", "").toString ();
+            strProxyUser = settings.value("proxyuser", "").toString();
         }
 
-        if (!settings.contains ("proxypass")) {
+        if (!settings.contains("proxypass")) {
             if (bUseProxy & !bUseSystemProxy && bProxyAuth) {
-                qWarning ("Ini file needs proxy authentication password");
+                qWarning("Ini file needs proxy authentication password");
                 cout << "Enter proxy password:";
                 in >> strProxyPass;
-                cipher (strPass.toLocal8Bit (), byD, true);
-                settings.setValue ("proxypass", QString(byD.toHex ()));
+                cipher(strPass.toLocal8Bit(), byD, true);
+                settings.setValue("proxypass", QString(byD.toHex()));
             }
         } else {
-            byD = settings.value("proxypass", "").toByteArray ();
-            cipher (QByteArray::fromHex (byD), byD, false);
+            byD = settings.value("proxypass", "").toByteArray();
+            cipher(QByteArray::fromHex(byD), byD, false);
             strProxyPass = byD;
         }
 
         if (bUseProxy) {
-            gvApi.setProxySettings (bUseProxy, bUseSystemProxy,
-                                    strProxy, proxyport,
-                                    bProxyAuth,
-                                    strProxyUser, strProxyPass);
+            gvApi.setProxySettings(bUseProxy, bUseSystemProxy,
+                                   strProxy, proxyport,
+                                   bProxyAuth,
+                                   strProxyUser, strProxyPass);
         }
         rv = true;
     } while (0); // End cleanup block (not a loop)
@@ -296,33 +317,33 @@ MainWindow::cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt)
     int iEVP, inl, outl, c;
     EVP_CIPHER_CTX cipherCtx;
     char cipherIv[16], cipherIn[16], cipherOut[16 + EVP_MAX_BLOCK_LENGTH];
-    memset (&cipherCtx, 0, sizeof cipherCtx);
-    memset (&cipherIv, 0xFA, sizeof cipherIv);
+    memset(&cipherCtx, 0, sizeof cipherCtx);
+    memset(&cipherIv, 0xFA, sizeof cipherIv);
 
 #define QGV_CIPHER_KEY "01234567890123456789012345678901"
-    EVP_CIPHER_CTX_init (&cipherCtx);
-    iEVP = EVP_CipherInit_ex (&cipherCtx, EVP_aes_256_cbc (), NULL, NULL, NULL,
+    EVP_CIPHER_CTX_init(&cipherCtx);
+    iEVP = EVP_CipherInit_ex(&cipherCtx, EVP_aes_256_cbc(), NULL, NULL, NULL,
                               bEncrypt?1:0);
     if (1 != iEVP) return false;
     EVP_CIPHER_CTX_set_key_length(&cipherCtx, sizeof(QGV_CIPHER_KEY)-1);
-    iEVP = EVP_CipherInit_ex (&cipherCtx, EVP_aes_256_cbc (), NULL,
-                              (quint8 *) QGV_CIPHER_KEY, (quint8 *) cipherIv,
-                               bEncrypt?1:0);
+    iEVP = EVP_CipherInit_ex(&cipherCtx, EVP_aes_256_cbc(), NULL,
+                             (quint8 *) QGV_CIPHER_KEY, (quint8 *) cipherIv,
+                             bEncrypt?1:0);
     if (1 != iEVP) return false;
 
-    byOut.clear ();
+    byOut.clear();
     c = 0;
-    while (c < byIn.size ()) {
-        inl = byIn.size () - c;
-        inl = (uint)inl > sizeof (cipherIn) ? sizeof (cipherIn) : inl;
-        memcpy (cipherIn, &(byIn.constData()[c]), inl);
-        memset (&cipherOut, 0, sizeof cipherOut);
+    while (c < byIn.size()) {
+        inl = byIn.size() - c;
+        inl = (uint)inl > sizeof(cipherIn) ? sizeof(cipherIn) : inl;
+        memcpy(cipherIn, &(byIn.constData()[c]), inl);
+        memset(&cipherOut, 0, sizeof cipherOut);
         outl = sizeof cipherOut;
-        iEVP = EVP_CipherUpdate (&cipherCtx,
+        iEVP = EVP_CipherUpdate(&cipherCtx,
                                 (quint8 *) &cipherOut, &outl,
-                                 (quint8 *) &cipherIn , inl);
+                                (quint8 *) &cipherIn , inl);
         if (1 != iEVP) {
-            qWarning ("Cipher update failed. Aborting");
+            qWarning("Cipher update failed. Aborting");
             break;
         }
         byOut += QByteArray(cipherOut, outl);
@@ -331,8 +352,8 @@ MainWindow::cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt)
 
     if (1 == iEVP) {
         outl = sizeof cipherOut;
-        memset (&cipherOut, 0, sizeof cipherOut);
-        iEVP = EVP_CipherFinal_ex (&cipherCtx, (quint8 *) &cipherOut, &outl);
+        memset(&cipherOut, 0, sizeof cipherOut);
+        iEVP = EVP_CipherFinal_ex(&cipherCtx, (quint8 *) &cipherOut, &outl);
         if (1 == iEVP) {
             byOut += QByteArray(cipherOut, outl);
         }
@@ -348,7 +369,7 @@ MainWindow::cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt)
  * website. The async completion routine is loginCompleted.
  */
 void
-MainWindow::doLogin ()
+MainWindow::doLogin()
 {
     bool bOk = false;
     AsyncTaskToken *token = new AsyncTaskToken(this);
@@ -358,7 +379,7 @@ MainWindow::doLogin ()
             break;
         }
 
-        //loadCookies ();
+        //loadCookies();
 
         bOk = connect(token, SIGNAL(completed()),
                       this , SLOT(loginCompleted()));
@@ -369,7 +390,7 @@ MainWindow::doLogin ()
         Q_DEBUG("Logging in...");
 
         // webPage.workCompleted -> this.loginCompleted
-        if (!gvApi.login (token)) {
+        if (!gvApi.login(token)) {
             Q_CRIT("Login returned immediately with failure!");
             break;
         }
@@ -379,26 +400,26 @@ MainWindow::doLogin ()
 
     if (!bOk) {
         if (token) {
-            token->deleteLater ();
+            token->deleteLater();
             token = NULL;
         }
 
         // Cleanup if any
-        strUser.clear ();
-        strPass.clear ();
+        strUser.clear();
+        strPass.clear();
 
-        qApp->quit ();
+        qApp->quit();
     }
 }//MainWindow::doLogin
 
 void
 MainWindow::loginCompleted()
 {
-    AsyncTaskToken *token = (AsyncTaskToken *) QObject::sender ();
+    AsyncTaskToken *token = (AsyncTaskToken *) QObject::sender();
 
     if (!token || (token->status != ATTS_SUCCESS)) {
         Q_CRIT("User login failed");
-        qApp->quit ();
+        qApp->quit();
     } else {
         Q_DEBUG("User logged in");
 
@@ -407,7 +428,7 @@ MainWindow::loginCompleted()
         if (tfaRequired) {
             Q_DEBUG("TFA");
 
-            if (strCPass.isEmpty ()) {
+            if (strCPass.isEmpty()) {
                 QTextStream in(stdin);
 
                 cout << "Enter application specific password:";
@@ -415,21 +436,21 @@ MainWindow::loginCompleted()
             }
 
             QByteArray byD;
-            QSettings settings (strIni, QSettings::IniFormat, this);
+            QSettings settings(strIni, QSettings::IniFormat, this);
 
-            cipher (strCPass.toLocal8Bit (), byD, true);
-            settings.setValue ("cpass", QString(byD.toHex ()));
-            settings.setValue ("tfaRequired", tfaRequired);
+            cipher(strCPass.toLocal8Bit(), byD, true);
+            settings.setValue("cpass", QString(byD.toHex()));
+            settings.setValue("tfaRequired", tfaRequired);
         } else {
             strCPass = strPass;
         }
 
-        //saveCookies ();
+        //saveCookies();
 
-        oContacts.login (strUser, strCPass);
-        oInbox.loginSuccess ();
+        oContacts.login(strUser, strCPass);
+        oInbox.loginSuccess();
 
-        QTimer::singleShot (100, this, SLOT(doWork ()));
+        QTimer::singleShot(100, this, SLOT(doWork()));
     }
 
     if (token) {
@@ -438,31 +459,31 @@ MainWindow::loginCompleted()
 }//MainWindow::loginCompleted
 
 void
-MainWindow::doLogout ()
+MainWindow::doLogout()
 {
     AsyncTaskToken *token = new AsyncTaskToken(this);
-    connect (token, SIGNAL(completed()),
-             this, SLOT(logoutCompleted()));
+    connect(token, SIGNAL(completed()),
+            this, SLOT(logoutCompleted()));
 
-    if (!gvApi.logout (token)) {
-        token->deleteLater ();
+    if (!gvApi.logout(token)) {
+        token->deleteLater();
         return;
     }
 }//MainWindow::doLogout
 
 void
-MainWindow::logoutCompleted ()
+MainWindow::logoutCompleted()
 {
-    AsyncTaskToken *token = (AsyncTaskToken *) QObject::sender ();
+    AsyncTaskToken *token = (AsyncTaskToken *) QObject::sender();
 
     // This clears out the table and the view as well
-    oContacts.logout ();
-    oInbox.loggedOut ();
+    oContacts.logout();
+    oInbox.loggedOut();
 
     bIsLoggedIn = false;
 
     if (token) {
-        token->deleteLater ();
+        token->deleteLater();
     }
 }//MainWindow::logoutCompleted
 
@@ -471,24 +492,24 @@ MainWindow::onTwoStepAuthentication(AsyncTaskToken *token)
 {
     QTextStream in(stdin);
 
-    qWarning ("Two step authentication PIN required.");
+    qWarning("Two step authentication PIN required.");
 
     QString strPIN;
     cout << "Enter PIN:";
     in >> strPIN;
 
-    if (strPIN.startsWith ('-')) {
-        qWarning ("Requesting GV Api to call you:");
-        gvApi.resumeTFAAltLogin (token);
+    if (strPIN.startsWith('-')) {
+        qWarning("Requesting GV Api to call you:");
+        gvApi.resumeTFAAltLogin(token);
     } else {
         token->inParams["user_pin"] = strPIN;
         tfaRequired = true;
-        gvApi.resumeTFALogin (token);
+        gvApi.resumeTFALogin(token);
     }
 }//MainWindow::onTwoStepAuthentication
 
 void
-MainWindow::getContactsDone (bool bChanges, bool bOK)
+MainWindow::getContactsDone(bool bChanges, bool bOK)
 {
     if (bOK && bChanges) {
         Q_DEBUG("Contacts changed, update mosquitto");
@@ -498,14 +519,14 @@ MainWindow::getContactsDone (bool bChanges, bool bOK)
                         this);
         pub.publish(QString("contact %1")
                     .arg(QDateTime::currentDateTime().toUTC().toTime_t())
-                    .toAscii());
+                    .toLatin1());
     }
 
-    startTimer ();
+    startTimer();
 }//MainWindow::getContactsDone
 
 void
-MainWindow::inboxChanged ()
+MainWindow::inboxChanged()
 {
     Q_DEBUG("Inbox changed, update mosquitto");
 
@@ -514,34 +535,34 @@ MainWindow::inboxChanged ()
                     this);
     pub.publish(QString("inbox %1")
                 .arg(QDateTime::currentDateTime().toUTC().toTime_t())
-                .toAscii());
+                .toLatin1());
 
-    startTimer ();
+    startTimer();
 }//MainWindow::inboxChanged
 
 void
-MainWindow::startTimer ()
+MainWindow::startTimer()
 {
-    mainTimer.stop ();
-    mainTimer.setSingleShot (true);
-    mainTimer.setInterval (checkTimeout * 1000);
-    mainTimer.start ();
+    mainTimer.stop();
+    mainTimer.setSingleShot(true);
+    mainTimer.setInterval(checkTimeout * 1000);
+    mainTimer.start();
 }//MainWindow::startTimer
 
 void
-MainWindow::dailyTimeout ()
+MainWindow::dailyTimeout()
 {
     Q_DEBUG(QString("Daily timer timed out at %1")
-                .arg (QDateTime::currentDateTime().toString()));
-    inboxChanged ();
-    QTimer::singleShot (24 * 60 * 60 * 1000, this, SLOT(dailyTimeout()));
+                .arg(QDateTime::currentDateTime().toString()));
+    inboxChanged();
+    QTimer::singleShot(24 * 60 * 60 * 1000, this, SLOT(dailyTimeout()));
 }//MainWindow::dailyTimeout
 
 void
 MainWindow::getOut()
 {
     Q_DEBUG("quit!!");
-    qApp->quit ();
+    qApp->quit();
 }//MainWindow::getOut
 
 void
@@ -558,7 +579,7 @@ MainWindow::onCommandForClient(const QString &command)
         client->ReportUser(strUser, strIni, strLogfile,
                            qApp->applicationPid());
     } else if (command == "quitAll") {
-        getOut ();
+        getOut();
     }
 }//MainWindow::onCommandForClient
 
@@ -566,12 +587,12 @@ void
 MainWindow::loadCookies()
 {
     QList<QNetworkCookie> cookies;
-    QSettings settings (strIni, QSettings::IniFormat, this);
+    QSettings settings(strIni, QSettings::IniFormat, this);
     QByteArray name, value;
     quint32 expiration;
     int i;
 
-    int size = settings.beginReadArray ("cookies");
+    int size = settings.beginReadArray("cookies");
     for (i = 0; i < size; i++) {
         name       = settings.value("name").toByteArray();
         value      = settings.value("value").toByteArray();
@@ -581,18 +602,18 @@ MainWindow::loadCookies()
         cookie.setDomain(settings.value("domain").toString());
 
         if (settings.value("isSession").toBool()) {
-            cookie.setExpirationDate (QDateTime::fromTime_t (expiration));
+            cookie.setExpirationDate(QDateTime::fromTime_t(expiration));
         }
 
         cookie.setHttpOnly(settings.value("isHttpOnly").toBool());
         cookie.setSecure(settings.value("isSecure").toBool());
         cookie.setPath(settings.value("path").toString());
 
-        cookies.append (cookie);
+        cookies.append(cookie);
     }
-    settings.endArray ();
+    settings.endArray();
 
-    gvApi.setAllCookies (cookies);
+    gvApi.setAllCookies(cookies);
 
     Q_DEBUG(QString("Loaded %1 cookies").arg(i));
 }//MainWindow::loadCookies
@@ -600,26 +621,26 @@ MainWindow::loadCookies()
 void
 MainWindow::saveCookies()
 {
-    QList<QNetworkCookie> cookies = gvApi.getAllCookies ();
-    QSettings settings (strIni, QSettings::IniFormat, this);
+    QList<QNetworkCookie> cookies = gvApi.getAllCookies();
+    QSettings settings(strIni, QSettings::IniFormat, this);
     int i;
 
-    settings.remove ("cookies");
-    settings.beginWriteArray ("cookies");
+    settings.remove("cookies");
+    settings.beginWriteArray("cookies");
 
     for (i = 0; i < cookies.count(); i++) {
-        settings.setArrayIndex (i);
-        settings.setValue ("name",       cookies.at(i).name());
-        settings.setValue ("value",      cookies.at(i).value());
-        settings.setValue ("expiration", cookies.at(i).expirationDate().toTime_t());
-        settings.setValue ("domain",     cookies.at(i).domain());
-        settings.setValue ("isSession",  cookies.at(i).isSessionCookie());
-        settings.setValue ("isSecure",   cookies.at(i).isSecure());
-        settings.setValue ("isHttpOnly", cookies.at(i).isHttpOnly());
-        settings.setValue ("path",       cookies.at(i).path());
+        settings.setArrayIndex(i);
+        settings.setValue("name",       cookies.at(i).name());
+        settings.setValue("value",      cookies.at(i).value());
+        settings.setValue("expiration", cookies.at(i).expirationDate().toTime_t());
+        settings.setValue("domain",     cookies.at(i).domain());
+        settings.setValue("isSession",  cookies.at(i).isSessionCookie());
+        settings.setValue("isSecure",   cookies.at(i).isSecure());
+        settings.setValue("isHttpOnly", cookies.at(i).isHttpOnly());
+        settings.setValue("path",       cookies.at(i).path());
     }
 
-    settings.endArray ();
+    settings.endArray();
 
     Q_DEBUG(QString("Saved %1 cookies").arg(i));
 }//MainWindow::saveCookies
