@@ -121,7 +121,7 @@ IMainWindow::reinitMqClient(void)
     m_mqClient->setupClient(m_srvInfo.m_userInfoTopic,
                             m_srvInfo.m_userInfoHost,
                             m_srvInfo.m_userInfoPort);
-    m_mqClient->startWork();
+    m_mqClient->startSubWork();
     return true;
 }//IMainWindow::reinitMqClient
 

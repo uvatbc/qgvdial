@@ -20,7 +20,7 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "MainWindow.h"
-#include "MqPublisher.h"
+#include "MqClient.h"
 #include <iostream>
 using namespace std;
 
@@ -514,12 +514,17 @@ MainWindow::getContactsDone(bool bChanges, bool bOK)
     if (bOK && bChanges) {
         Q_DEBUG("Contacts changed, update mosquitto");
 
-        MqPublisher pub(QString("qgvnotify:%1").arg(QHostInfo::localHostName()),
+/*
+        MqClient pub(QString("qgvnotify:%1").arg(QHostInfo::localHostName()),
                         m_strMqServer, m_mqPort, m_strMqTopic,
                         this);
-        pub.publish(QString("contact %1")
-                    .arg(QDateTime::currentDateTime().toUTC().toTime_t())
-                    .toLatin1());
+*/
+        QString id = QString("qgvnotify:%1").arg(QHostInfo::localHostName());
+        MqClient pub(this, id.toLatin1().constData());
+        pub.setupClient(m_strMqTopic, m_strMqServer, m_mqPort);
+        pub.startPubWork(QString("contact %1")
+                         .arg(QDateTime::currentDateTime().toUTC().toTime_t())
+                         .toLatin1());
     }
 
     startTimer();
@@ -530,12 +535,17 @@ MainWindow::inboxChanged()
 {
     Q_DEBUG("Inbox changed, update mosquitto");
 
-    MqPublisher pub(QString("qgvnotify:%1").arg(QHostInfo::localHostName()),
+/*
+    MqClient pub(QString("qgvnotify:%1").arg(QHostInfo::localHostName()),
                     m_strMqServer, m_mqPort, m_strMqTopic,
                     this);
-    pub.publish(QString("inbox %1")
-                .arg(QDateTime::currentDateTime().toUTC().toTime_t())
-                .toLatin1());
+*/
+    QString id = QString("qgvnotify:%1").arg(QHostInfo::localHostName());
+    MqClient pub(this, id.toLatin1().constData());
+    pub.setupClient(m_strMqTopic, m_strMqServer, m_mqPort);
+    pub.startPubWork(QString("inbox %1")
+                     .arg(QDateTime::currentDateTime().toUTC().toTime_t())
+                     .toLatin1());
 
     startTimer();
 }//MainWindow::inboxChanged

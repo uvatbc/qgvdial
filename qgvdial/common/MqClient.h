@@ -41,7 +41,8 @@ public:
                      const int keepalive = 60);
 
 public slots:
-    void startWork();
+    void startSubWork();
+    void startPubWork(const QByteArray &payload);
     void stopWork();
 signals:
     void dataMessage(QByteArray msg);
@@ -53,6 +54,7 @@ private slots:
     void reinitConnection(void);
     void doLimbo(void);
     void doSubscribe(void);
+    void doPublish(void);
     void doDisconnect(void);
     void doWorkLoop(void);
 
@@ -88,22 +90,26 @@ protected:
     virtual void on_error();
 
 protected:
-    bool recreateSm(void);
+    bool recreateSubSm(void);
+    bool recreatePubSm(void);
 
 // For the notifiers:
 private slots:
     void deleteNotifiers(void);
     void onReadActivated(int s);
+    void onWriteActivated(int s);
     void onExceptActivated(int s);
 
 protected:
     QSocketNotifier *m_readNotifier;
+    QSocketNotifier *m_writeNotifier;
     QSocketNotifier *m_exceptNotifier;
 
     QString         m_host;
     int             m_port;
     QString         m_topic;
     int             m_keepalive;
+    QByteArray      m_byPayload;
 
     QStateMachine  *m_sm;
 

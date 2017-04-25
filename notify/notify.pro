@@ -15,18 +15,18 @@ SOURCES  += main.cpp                        \
             MainWindow.cpp                  \
             NotifyGVContactsTable.cpp       \
             NotifyGVInbox.cpp               \
-            MqPublisher.cpp                 \
             dbusinterface/qgvn_adapter.cpp  \
-            dbusinterface/qgvn_proxy.cpp
+            dbusinterface/qgvn_proxy.cpp    \
+            $$PWD/../qgvdial/common/MqClient.cpp
 
-HEADERS  += $$PWD/../qgvdial/common/global.h    \
-            platform_specific.h                 \
-            MainWindow.h                        \
-            NotifyGVContactsTable.h             \
-            NotifyGVInbox.h                     \
-            MqPublisher.h                       \
-            dbusinterface/qgvn_adapter.h        \
-            dbusinterface/qgvn_proxy.h
-
+HEADERS  += platform_specific.h             \
+            MainWindow.h                    \
+            NotifyGVContactsTable.h         \
+            NotifyGVInbox.h                 \
+            dbusinterface/qgvn_adapter.h    \
+            dbusinterface/qgvn_proxy.h      \
+            $$PWD/../qgvdial/common/global.h    \
+            $$PWD/../qgvdial/common/MqClient.h
+            
 include($$PWD/../api/api.pri)
 include($$PWD/../qgvdial/features/mqlib/mqlib.pri)

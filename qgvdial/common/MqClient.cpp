@@ -31,6 +31,7 @@ MqClient::MqClient(QObject *parent, const char *id, bool clean_session)
 : QObject(parent)
 , mosquittopp(id, clean_session)
 , m_readNotifier(NULL)
+, m_writeNotifier(NULL)
 , m_exceptNotifier(NULL)
 , m_sm(NULL)
 , m_workLimboPeriod(MQ_LIMBO_MIN)
@@ -125,12 +126,20 @@ MqClient::on_error()
 }//MqClient::on_error
 
 void
-MqClient::startWork()
+MqClient::startSubWork()
 {
-    if (!recreateSm()) {
+    if (!recreateSubSm()) {
         Q_WARN("Failed to create SM");
     }
-}//MqClient::startWork
+}//MqClient::startSubWork
+
+void
+MqClient::startPubWork(const QByteArray &payload)
+{
+    if (!recreatePubSm()) {
+        Q_WARN("Failed to create SM");
+    }
+}//MqClient::startPubWork
 
 void
 MqClient::stopWork()
@@ -140,7 +149,7 @@ MqClient::stopWork()
 }//MqClient::stopWork
 
 bool
-MqClient::recreateSm(void)
+MqClient::recreateSubSm(void)
 {
     SAFE_DELETE(m_sm);
 
@@ -221,7 +230,83 @@ MqClient::recreateSm(void)
 
     m_sm->start();
     return true;
-}//MqClient::recreateSm
+}//MqClient::recreateSubSm
+
+bool
+MqClient::recreatePubSm(void)
+{
+    SAFE_DELETE(m_sm);
+
+    m_sm = new QStateMachine(this);
+
+    QState *initialState    = new QState;
+    QState *connectingState = new QState;
+    QState *limboState      = new QState;
+    QState *workState       = new QState;
+    QState *disconnectState = new QState;
+    QFinalState *endState = new QFinalState;
+
+    if ((NULL == m_sm) ||
+        (NULL == initialState) ||
+        (NULL == connectingState) ||
+        (NULL == limboState) ||
+        (NULL == workState) ||
+        (NULL == disconnectState) ||
+        (NULL == endState))
+    {
+        Q_WARN("Some states could not be created!!");
+        SAFE_DELETE(endState);
+        SAFE_DELETE(disconnectState);
+        SAFE_DELETE(workState);
+        SAFE_DELETE(limboState);
+        SAFE_DELETE(connectingState);
+        SAFE_DELETE(initialState);
+        SAFE_DELETE(m_sm);
+        return false;
+    }
+
+    // Begin at init
+    QObject::connect(initialState, SIGNAL(entered()),
+                     this, SLOT(reinitMq()));
+    // Work done in connecting state
+    QObject::connect(connectingState, SIGNAL(entered()),
+                     this, SLOT(reinitConnection()));
+    // Work done in limbo state
+    QObject::connect(limboState, SIGNAL(entered()),
+                     this, SLOT(doLimbo()));
+    // Work done in work state
+    QObject::connect(workState, SIGNAL(entered()),
+                     this, SLOT(doPublish()));
+    // Work done in disconnect state
+    QObject::connect(disconnectState, SIGNAL(entered()),
+                     this, SLOT(doDisconnect()));
+
+#define ADD_TRANSITION(_src, _sig, _dst) \
+    (_src)->addTransition(this, SIGNAL(_sig()), (_dst))
+
+    ADD_TRANSITION(   initialState,     beginConnect, connectingState);
+    ADD_TRANSITION(connectingState,   connectSuccess, workState);
+    ADD_TRANSITION(connectingState,   connectFailure, limboState);
+    ADD_TRANSITION(     limboState,     beginConnect, connectingState);
+    ADD_TRANSITION(      workState,      sigStopWork, disconnectState);
+    ADD_TRANSITION(disconnectState,   disconnectDone, endState);
+
+#undef ADD_TRANSITION
+
+    QObject::connect(m_sm, SIGNAL(finished()), this, SIGNAL(smCompleted()));
+    QObject::connect(m_sm, SIGNAL(finished()), this, SLOT(deleteLater()));
+
+    m_sm->addState(initialState);
+    m_sm->addState(connectingState);
+    m_sm->addState(limboState);
+    m_sm->addState(workState);
+    m_sm->addState(disconnectState);
+    m_sm->addState(endState);
+    m_sm->setInitialState(initialState);
+
+    m_sm->start();
+    return true;
+}//MqClient::recreatePubSm
 
 void
 MqClient::reinitMq(void)
@@ -235,6 +320,10 @@ MqClient::deleteNotifiers(void)
     if (m_readNotifier) {
         m_readNotifier->deleteLater();
         m_readNotifier = NULL;
+    }
+    if (m_writeNotifier) {
+        m_writeNotifier->deleteLater();
+        m_writeNotifier = NULL;
     }
     if (m_exceptNotifier) {
         m_exceptNotifier->deleteLater();
@@ -258,12 +347,16 @@ MqClient::reinitConnection(void)
     deleteNotifiers();
 
     m_readNotifier = new QSocketNotifier(this->socket(),
-                                           QSocketNotifier::Read,
-                                           this);
+                                         QSocketNotifier::Read,
+                                         this);
+    m_writeNotifier = new QSocketNotifier(this->socket(),
+                                          QSocketNotifier::Write,
+                                          this);
     m_exceptNotifier = new QSocketNotifier(this->socket(),
                                            QSocketNotifier::Exception,
                                            this);
     if ((NULL == m_readNotifier) ||
+        (NULL == m_writeNotifier) ||
         (NULL == m_exceptNotifier))
     {
         Q_WARN("Failed to allocate one of the socket notifiers!");
@@ -274,6 +367,8 @@ MqClient::reinitConnection(void)
 
     QObject::connect(m_readNotifier, SIGNAL(activated(int)),
                      this, SLOT(onReadActivated(int)));
+    QObject::connect(m_writeNotifier, SIGNAL(activated(int)),
+                     this, SLOT(onWriteActivated(int)));
     QObject::connect(m_exceptNotifier, SIGNAL(activated(int)),
                      this, SLOT(onExceptActivated(int)));
 
@@ -290,6 +385,16 @@ MqClient::onReadActivated(int /*s*/)
         m_readNotifier->setEnabled(true);
     }
 }//MqClient::onReadActivated
+
+void
+MqClient::onWriteActivated(int /*s*/)
+{
+    if (m_writeNotifier) {
+        m_writeNotifier->setEnabled(false);
+        doWorkLoop();
+        m_writeNotifier->setEnabled(true);
+    }
+}//MqClient::onWriteActivated
 
 void
 MqClient::onExceptActivated(int /*s*/)
@@ -329,6 +434,25 @@ MqClient::doSubscribe(void)
                .arg(rv));
     }
 }//MqClient::doSubscribe
+
+void
+MqClient::doPublish(void)
+{
+    Q_DEBUG(QString("Attempting to publish to '%1'").arg(m_topic));
+    m_workLimboPeriod = MQ_LIMBO_MIN;
+
+    int rv, mid_sent = 0;
+    rv = mosqpp::mosquittopp::publish(
+            &mid_sent,
+             m_topic.toLatin1().data(),
+             m_byPayload.length(),
+             (const void *) m_byPayload.constData(),
+             0, // QOS: guaranteed delivery. 4 way handshake
+             true);
+    if (MOSQ_ERR_SUCCESS != rv) {
+        Q_WARN(QString("publish to '%1' failed: %2").arg(m_topic).arg(rv));
+    }
+}//MqClient::doPublish
 
 void
 MqClient::doDisconnect(void)
