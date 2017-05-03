@@ -1,8 +1,8 @@
 QT      *= core network sql xml xmlpatterns dbus
-LIBS	*= -lmosquitto -lssl -lcrypto
 TARGET   = qgvnotify
 TEMPLATE = app
 INCLUDEPATH += $$PWD/../qgvdial/common/
+LIBS    *= -lssl -lcrypto
 
 MOC_DIR = moc
 OBJECTS_DIR = obj

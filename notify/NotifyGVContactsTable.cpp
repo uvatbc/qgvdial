@@ -20,7 +20,6 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "NotifyGVContactsTable.h"
-#include "ContactsParserObject.h"
 
 GVContactsTable::GVContactsTable (QObject *parent)
 : QObject (parent)
