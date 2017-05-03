@@ -629,3 +629,82 @@ NwHelpers::convertHtmlAmps(const QString &input)
 
     return rv;
 }//NwHelpers::convertHtmlAmps
+
+const char *
+NwHelpers::nwErrorToString(QNetworkReply::NetworkError err)
+{
+    switch (err) {
+    case QNetworkReply::NoError:
+        return "QNetworkReply::NoError";
+    case QNetworkReply::ConnectionRefusedError:
+        return "QNetworkReply::ConnectionRefusedError";
+    case QNetworkReply::RemoteHostClosedError:
+        return "QNetworkReply::RemoteHostClosedError";
+    case QNetworkReply::HostNotFoundError:
+        return "QNetworkReply::HostNotFoundError";
+    case QNetworkReply::TimeoutError:
+        return "QNetworkReply::TimeoutError";
+    case QNetworkReply::OperationCanceledError:
+        return "QNetworkReply::OperationCanceledError";
+    case QNetworkReply::SslHandshakeFailedError:
+        return "QNetworkReply::SslHandshakeFailedError";
+    case QNetworkReply::TemporaryNetworkFailureError:
+        return "QNetworkReply::TemporaryNetworkFailureError";
+    case QNetworkReply::NetworkSessionFailedError:
+        return "QNetworkReply::NetworkSessionFailedError";
+    case QNetworkReply::BackgroundRequestNotAllowedError:
+        return "QNetworkReply::BackgroundRequestNotAllowedError";
+/*
+    case QNetworkReply::TooManyRedirectsError:
+        return "QNetworkReply::TooManyRedirectsError";
+    case QNetworkReply::InsecureRedirectError:
+        return "QNetworkReply::InsecureRedirectError";
+*/
+    case QNetworkReply::ProxyConnectionRefusedError:
+        return "QNetworkReply::ProxyConnectionRefusedError";
+    case QNetworkReply::ProxyConnectionClosedError:
+        return "QNetworkReply::ProxyConnectionClosedError";
+    case QNetworkReply::ProxyNotFoundError:
+        return "QNetworkReply::ProxyNotFoundError";
+    case QNetworkReply::ProxyTimeoutError:
+        return "QNetworkReply::ProxyTimeoutError";
+    case QNetworkReply::ProxyAuthenticationRequiredError:
+        return "QNetworkReply::ProxyAuthenticationRequiredError";
+    case QNetworkReply::ContentAccessDenied:
+        return "QNetworkReply::ContentAccessDenied";
+    case QNetworkReply::ContentOperationNotPermittedError:
+        return "QNetworkReply::ContentOperationNotPermittedError";
+    case QNetworkReply::ContentNotFoundError:
+        return "QNetworkReply::ContentNotFoundError";
+    case QNetworkReply::AuthenticationRequiredError:
+        return "QNetworkReply::AuthenticationRequiredError";
+    case QNetworkReply::ContentReSendError:
+        return "QNetworkReply::ContentReSendError";
+    case QNetworkReply::ContentConflictError:
+        return "QNetworkReply::ContentConflictError";
+    case QNetworkReply::ContentGoneError:
+        return "QNetworkReply::ContentGoneError";
+    case QNetworkReply::InternalServerError:
+        return "QNetworkReply::InternalServerError";
+    case QNetworkReply::OperationNotImplementedError:
+        return "QNetworkReply::OperationNotImplementedError";
+    case QNetworkReply::ServiceUnavailableError:
+        return "QNetworkReply::ServiceUnavailableError";
+    case QNetworkReply::ProtocolUnknownError:
+        return "QNetworkReply::ProtocolUnknownError";
+    case QNetworkReply::ProtocolInvalidOperationError:
+        return "QNetworkReply::ProtocolInvalidOperationError";
+    case QNetworkReply::UnknownNetworkError:
+        return "QNetworkReply::UnknownNetworkError";
+    case QNetworkReply::UnknownProxyError:
+        return "QNetworkReply::UnknownProxyError";
+    case QNetworkReply::UnknownContentError:
+        return "QNetworkReply::UnknownContentError";
+    case QNetworkReply::ProtocolFailure:
+        return "QNetworkReply::ProtocolFailure";
+    case QNetworkReply::UnknownServerError:
+        return "QNetworkReply::UnknownServerError";
+    default:
+        return "QNetworkReply::??????";
+    }
+}//NwHelpers::nwErrorToString

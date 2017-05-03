@@ -104,6 +104,8 @@ public:
     static void appendQVMap(QVariantMap &dst, const QVariantMap &src);
 
     static QString convertHtmlAmps(const QString &input);
+
+    static const char * nwErrorToString(QNetworkReply::NetworkError err);
 };
 
 #endif // NWREQTRACKER_H
