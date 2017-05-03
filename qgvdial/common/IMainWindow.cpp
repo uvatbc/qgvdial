@@ -354,8 +354,13 @@ IMainWindow::loginCompleted()
             mEvent.properties["error"] = "TFA review required";
             m_mixPanel.addEvent(mEvent);
         } else {
-            task->errorString = QString("Login failed: %1")
-                                    .arg(task->errorString);
+            if (task->errorString.length() != 0) {
+                task->errorString = QString("Login failed: %1")
+                                        .arg(task->errorString);
+            } else {
+                task->errorString = QString("Login failed: %1")
+                                        .arg(int(task->status));
+            }
             Q_WARN(task->errorString);
 
             m_pass.clear ();

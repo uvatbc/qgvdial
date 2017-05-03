@@ -41,7 +41,8 @@ GVApi_login::checkForLogin(AsyncTaskToken *task,
                            const QString &strResponse)
 {
     GVApi *p = (GVApi *)this->parent();
-    bool rv = false;
+    bool ok = false;
+    bool sid, lsid, hsid, apisid, sapisid, nid;
 
 #ifdef Q_OS_IOS
     QString user = task->inParams["user"].toString();
@@ -52,15 +53,43 @@ GVApi_login::checkForLogin(AsyncTaskToken *task,
 #else
     Q_UNUSED(task); Q_UNUSED(strResponse);
 
+    sid = lsid = hsid = apisid = sapisid = nid = false;
     foreach(QNetworkCookie cookie, p->m_jar->getAllCookies()) {
+        Q_DEBUG(QString("%1 = %2")
+                .arg(cookie.name().constData())
+                .arg(cookie.value().constData()));
         if (cookie.name() == "gvx") {
-            rv = true;
+            ok = true;
             break;
+        }
+
+        if (cookie.value().length() == 0) {
+            continue;
+        }
+
+        if (cookie.name() == "SID") {
+            sid = true;
+        } else if (cookie.name() == "LSID") {
+            lsid = true;
+        } else if (cookie.name() == "HSID") {
+            hsid = true;
+        } else if (cookie.name() == "APISID") {
+            apisid = true;
+        } else if (cookie.name() == "SAPISID") {
+            sapisid = true;
+        } else if (cookie.name() == "NID") {
+            nid = true;
         }
     }
 #endif
 
-    return rv;
+    if (!ok) {
+        if (sid && lsid && hsid && apisid && sapisid && nid) {
+            ok = true;
+        }
+    }
+
+    return ok;
 }//GVApi_login::checkForLogin
 
 bool
@@ -440,6 +469,8 @@ GVApi_login::onGetVoicePage(bool success, const QByteArray &response,
 
     do {
         if (!success) {
+            Q_WARN(QString("success = false. error = %1")
+                   .arg(NwHelpers::nwErrorToString(reply->error())));
             emit sigLoginFail ();
             break;
         }
@@ -550,6 +581,8 @@ GVApi_login::onPostUsernamePage(bool success, const QByteArray &response,
 
     do {
         if (!success) {
+            Q_WARN(QString("success = false. error = %1")
+                   .arg(NwHelpers::nwErrorToString(reply->error())));
             emit sigLoginFail ();
             break;
         }
@@ -662,6 +695,8 @@ GVApi_login::onPostPasswordPage(bool success, const QByteArray &response,
 
     do {
         if (!success) {
+            Q_WARN(QString("success = false. error = %1")
+                   .arg(NwHelpers::nwErrorToString(reply->error())));
             emit sigLoginFail ();
             break;
         }
@@ -797,7 +832,7 @@ bool
 GVApi_login::resumeTFALogin(AsyncTaskToken *task)
 {
     GVApi *p = (GVApi *)this->parent();
-    bool rv = false;
+    bool ok = false;
 
     Q_ASSERT(task == m_loginToken);
 
@@ -823,20 +858,20 @@ GVApi_login::resumeTFALogin(AsyncTaskToken *task)
         // Remove all useless parameters
         keepOnlyAllowedPostParams (m_form);
 
-        rv = postForm(url, m_form, task,
+        ok = postForm(url, m_form, task,
                       SLOT(onPostPasswordPage(bool,const QByteArray&,QNetworkReply*,void*)));
-        if (!rv) {
+        if (!ok) {
             Q_WARN("Failed to post password form!");
             break;
         }
     } while (0);
 
-    if (!rv) {
+    if (!ok) {
         Q_WARN("Two factor authentication failed.");
 
         if (task->errorString.isEmpty()) {
             task->errorString = tr("The username or password you entered "
-                                    "is incorrect.");
+                                   "is incorrect.");
         }
         task->status = ATTS_LOGIN_FAILURE;
         emit sigLoginFail ();
@@ -1089,6 +1124,7 @@ GVApi_login::resumeTFAAltLogin(AsyncTaskToken *token)
     } while (0);
 
     if (!rv) {
+        Q_WARN("Failed to resume TFA Alt Login");
         token->status = ATTS_LOGIN_FAILURE;
         emit sigLoginFail ();
     }
@@ -1107,6 +1143,8 @@ GVApi_login::onTFAAltLoginResp(bool success, const QByteArray &response,
 
     do {
         if (!success) {
+            Q_WARN(QString("success = false. error = %1")
+                   .arg(NwHelpers::nwErrorToString(reply->error())));
             token->status = ATTS_NW_ERROR;
             break;
         }
@@ -1165,7 +1203,7 @@ GVApi_login::doInboxPage()
 
 void
 GVApi_login::onPostInboxPage(bool success, const QByteArray &response,
-                             QNetworkReply *, void *ctx)
+                             QNetworkReply *reply, void *ctx)
 {
     GVApi *p = (GVApi *)this->parent();
     AsyncTaskToken *task = (AsyncTaskToken *)ctx;
@@ -1173,7 +1211,8 @@ GVApi_login::onPostInboxPage(bool success, const QByteArray &response,
 
     do {
         if (!success) {
-            Q_WARN("Failed to initialize GV interface");
+            Q_WARN(QString("success = false. error = %1")
+                   .arg(NwHelpers::nwErrorToString(reply->error())));
             task->status = ATTS_NW_ERROR;
             break;
         }
@@ -1248,14 +1287,15 @@ GVApi_login::logout(AsyncTaskToken *token)
 
 void
 GVApi_login::onLogout(bool success, const QByteArray & /*response*/,
-                      QNetworkReply * /*reply*/, void *ctx)
+                      QNetworkReply *reply, void *ctx)
 {
     GVApi *p = (GVApi *)this->parent();
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     p->m_loggedIn = false;
 
     if (!success) {
-        Q_WARN("Logout failed!");
+        Q_WARN(QString("success = false. error = %1")
+               .arg(NwHelpers::nwErrorToString(reply->error())));
         token->status = ATTS_FAILURE;
     }
     else {
