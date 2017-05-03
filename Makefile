@@ -16,6 +16,14 @@ do_replacements:
 	perl ./build-files/version.pl __THIS_IS_MY_EXTREMELY_LONG_KEY_ $(shell cat ./secrets/cipher_qgvdial | tr -d '\n') .
 	perl ./build-files/version.pl __QT5_BB10__ '\/home\/admin\/bin\/qt5\/armle' .
 
+############################### dev x86_64 #################################
+dev:
+	docker run \
+		--rm -it \
+		-v $(GITROOT):/tmp/src \
+		accupara/qgvdial_qt5_amd64 \
+		/bin/bash
+
 ############################### x86_64 #################################
 qgvdial_ubuntu_x86_64:
 	$(MAKE) -j$(NUMCORES) \
