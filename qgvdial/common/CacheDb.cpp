@@ -922,13 +922,22 @@ CacheDb::refreshInboxModel (InboxModel *modelInbox,
                          "," GV_IN_ATTIME
                          "," GV_IN_FLAGS
                    " FROM "  GV_INBOX_TABLE;
-    if (GVIE_Unknown != Type) {
+    if (GVIE_Unread == Type) {
+        strQ += QString (" WHERE (" GV_IN_FLAGS " & %1) == 0")
+                    .arg (INBOX_ENTRY_READ_MASK);
+    } else if (GVIE_Unknown != Type) {
         strQ += QString (" WHERE " GV_IN_TYPE "=%1 ").arg (Type);
     }
     strQ += " ORDER BY " GV_IN_ATTIME " DESC";
+    //Q_DEBUG(strQ);
 
     CacheDbPrivate &p = CacheDbPrivate::ref ();
     modelInbox->setQuery (strQ, p.db);
+
+    QSqlError err = modelInbox->lastError();
+    if (err.type() != QSqlError::NoError) {
+        Q_WARN(err.text());
+    }
 }//CacheDb::refreshInboxModel
 
 quint32

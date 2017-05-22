@@ -230,6 +230,8 @@ MainWindow::init()
     d->ui->cbInboxSelector->addItem("Received");
     d->ui->cbInboxSelector->addItem("Voicemail");
     d->ui->cbInboxSelector->addItem("SMS");
+    d->ui->cbInboxSelector->addItem("Unread");
+
     connect(d->ui->cbInboxSelector, SIGNAL(currentIndexChanged(const QString&)),
             this, SLOT(onCbInboxChanged(const QString&)));
 

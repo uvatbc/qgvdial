@@ -24,6 +24,13 @@ dev:
 		accupara/qgvdial_qt5_amd64 \
 		/bin/bash
 
+dev_make:
+	docker run \
+		--rm -it \
+		-v $(GITROOT):/tmp/src \
+		accupara/qgvdial_qt5_amd64 \
+		make -C /tmp/src/build/dev -j 4
+
 ############################### x86_64 #################################
 qgvdial_ubuntu_x86_64:
 	$(MAKE) -j$(NUMCORES) \

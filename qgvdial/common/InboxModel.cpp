@@ -258,30 +258,23 @@ InboxModel::type_to_string (GVI_Entry_Type Type)
 GVI_Entry_Type
 InboxModel::string_to_type (const QString &strType)
 {
-    GVI_Entry_Type Type = GVIE_Unknown;
+    GVI_Entry_Type Type;
 
-    do {
-        if (0 == strType.compare ("Placed", Qt::CaseInsensitive)) {
-            Type = GVIE_Placed;
-            break;
-        }
-        if (0 == strType.compare ("Received", Qt::CaseInsensitive)) {
-            Type = GVIE_Received;
-            break;
-        }
-        if (0 == strType.compare ("Missed", Qt::CaseInsensitive)) {
-            Type = GVIE_Missed;
-            break;
-        }
-        if (0 == strType.compare ("Voicemail", Qt::CaseInsensitive)) {
-            Type = GVIE_Voicemail;
-            break;
-        }
-        if (0 == strType.compare ("SMS", Qt::CaseInsensitive)) {
-            Type = GVIE_TextMessage;
-            break;
-        }
-    } while (0);
+    if (0 == strType.compare("Placed", Qt::CaseInsensitive)) {
+        Type = GVIE_Placed;
+    } else if (0 == strType.compare ("Received", Qt::CaseInsensitive)) {
+        Type = GVIE_Received;
+    } else if (0 == strType.compare ("Missed", Qt::CaseInsensitive)) {
+        Type = GVIE_Missed;
+    } else if (0 == strType.compare ("Voicemail", Qt::CaseInsensitive)) {
+        Type = GVIE_Voicemail;
+    } else if (0 == strType.compare ("SMS", Qt::CaseInsensitive)) {
+        Type = GVIE_TextMessage;
+    } else if (0 == strType.compare ("Unread", Qt::CaseInsensitive)) {
+        Type = GVIE_Unread;
+    } else {
+        Type = GVIE_Unknown;
+    }
 
     return (Type);
 }//InboxModel::string_to_type
@@ -350,7 +343,7 @@ InboxModel::refresh (const QString &strSelected)
     }
 
     beginResetModel ();
-    db.refreshInboxModel (this, strSelected);
+    db.refreshInboxModel(this, strSelected);
     while (this->canFetchMore ()) {
         this->fetchMore ();
     }

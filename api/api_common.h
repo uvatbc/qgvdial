@@ -98,7 +98,8 @@ enum GVI_Entry_Type {
     GVIE_Received,
     GVIE_Missed,
     GVIE_Voicemail,
-    GVIE_TextMessage
+    GVIE_TextMessage,
+    GVIE_Unread
 };
 
 struct ConversationEntry {
