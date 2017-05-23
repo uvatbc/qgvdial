@@ -650,6 +650,7 @@ NwHelpers::nwErrorToString(QNetworkReply::NetworkError err)
         return "QNetworkReply::SslHandshakeFailedError";
     case QNetworkReply::TemporaryNetworkFailureError:
         return "QNetworkReply::TemporaryNetworkFailureError";
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
     case QNetworkReply::NetworkSessionFailedError:
         return "QNetworkReply::NetworkSessionFailedError";
     case QNetworkReply::BackgroundRequestNotAllowedError:
@@ -704,6 +705,7 @@ NwHelpers::nwErrorToString(QNetworkReply::NetworkError err)
         return "QNetworkReply::ProtocolFailure";
     case QNetworkReply::UnknownServerError:
         return "QNetworkReply::UnknownServerError";
+#endif
     default:
         return "QNetworkReply::??????";
     }
