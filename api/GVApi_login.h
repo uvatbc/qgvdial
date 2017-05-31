@@ -115,6 +115,11 @@ private:
     void keepOnlyAllowedPostParams(QGVLoginForm *form);
     void lookForLoginErrorMessage(const QString &resp, AsyncTaskToken *task);
 
+    void doNoScriptWithSkip(const QString &strResponse, QNetworkReply *reply,
+                            AsyncTaskToken *token);
+    void doNoScriptWithoutSkip(const QString &strResponse, QNetworkReply *reply,
+                               AsyncTaskToken *token);
+
 private:
     QVariantMap m_hiddenLoginFields;
 

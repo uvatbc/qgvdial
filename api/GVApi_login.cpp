@@ -682,6 +682,85 @@ GVApi_login::doPasswordPage()
 }//GVApi_login::doPasswordPage
 
 void
+GVApi_login::doNoScriptWithoutSkip(const QString &strResponse,
+                                   QNetworkReply *reply,
+                                   AsyncTaskToken *token)
+{
+    // Pull out the noscript part:
+    QString noscript;
+    QRegExp rxNoscript("\\<noscript\\>.*\\</noscript\\>");
+    rxNoscript.setMinimal(true);
+    if (-1 == strResponse.indexOf(rxNoscript)) {
+        Q_WARN("Noscript part not found");
+        emit sigLoginFail();
+        return;
+    }
+    noscript = rxNoscript.cap(0);
+
+#if 0
+        Q_DEBUG(noscript);
+#endif
+
+    SAFE_DELETE(m_form);
+    m_form = new QGVLoginForm(this);
+    m_form->reply = reply;
+
+    if (!parseForm(noscript, m_form)) {
+        Q_WARN("Failed to parse login form");
+        emit sigLoginFail();
+        return;
+    }
+
+    emit sigDoTfaPage();
+} //GVApi_login::doNoScriptWithoutSkip
+
+void
+GVApi_login::doNoScriptWithSkip(const QString &strResponse,
+                                QNetworkReply *reply,
+                                AsyncTaskToken *token)
+{
+    int pos = strResponse.indexOf("/signin/challenge/skip");
+    int form_start = strResponse.lastIndexOf("<form", pos);
+    int form_end = strResponse.indexOf("</form>", form_start);
+
+    if (-1 == pos) {
+        Q_WARN("Challenge could not be skipped: Did not find the form");
+        emit sigLoginFail();
+        return;
+    }
+
+    if (-1 == form_start) {
+        Q_WARN("Challenge could not be skipped: Did not find the start of form");
+        emit sigLoginFail();
+        return;
+    }
+
+    if (-1 == form_end) {
+        Q_WARN("Challenge could not be skipped: Did not find the end of form");
+        emit sigLoginFail();
+        return;
+    }
+
+    QString strForm = strResponse.mid(form_start, form_end);
+
+    SAFE_DELETE(m_form);
+    m_form = new QGVLoginForm(this);
+    m_form->reply = reply;
+
+    if (!parseForm(strForm, m_form)) {
+        Q_WARN("Failed to parse skip challenge form");
+        emit sigLoginFail();
+        return;
+    }
+
+    Q_WARN("Failing just because");
+    emit sigLoginFail();
+    return;
+
+    //emit sigDoTfaPage();
+}//GVApi_login::doNoScriptWithSkip
+
+void
 GVApi_login::onPostPasswordPage(bool success, const QByteArray &response,
                                 QNetworkReply *reply, void *ctx)
 {
@@ -728,32 +807,11 @@ GVApi_login::onPostPasswordPage(bool success, const QByteArray &response,
             break;
         }
 
-        // Pull out the noscript part:
-        QString noscript;
-        QRegExp rxNoscript("\\<noscript\\>.*\\</noscript\\>");
-        rxNoscript.setMinimal(true);
-        if (-1 == strResponse.indexOf(rxNoscript)) {
-            Q_WARN("Noscript part not found");
-            emit sigLoginFail ();
-            break;
+        if (strResponse.contains ("/signin/challenge/skip")) {
+            doNoScriptWithSkip(strResponse, reply, token);
+        } else {
+            doNoScriptWithoutSkip(strResponse, reply, token);
         }
-        noscript = rxNoscript.cap(0);
-
-#if 0
-        Q_DEBUG(noscript);
-#endif
-
-        SAFE_DELETE(m_form);
-        m_form = new QGVLoginForm(this);
-        m_form->reply = reply;
-
-        if (!parseForm(noscript, m_form)) {
-            Q_WARN("Failed to parse login form");
-            emit sigLoginFail ();
-            break;
-        }
-
-        emit sigDoTfaPage();
     } while(0);
 }//GVApi_login::onPostPasswordPage
 
