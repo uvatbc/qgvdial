@@ -723,6 +723,7 @@ GVApi_login::onPostPasswordPage(bool success, const QByteArray &response,
         }
 
         if (!strResponse.contains ("/signin/challenge")) {
+            Q_WARN("Signing challenge not found");
             emit sigLoginFail ();
             break;
         }
@@ -732,6 +733,7 @@ GVApi_login::onPostPasswordPage(bool success, const QByteArray &response,
         QRegExp rxNoscript("\\<noscript\\>.*\\</noscript\\>");
         rxNoscript.setMinimal(true);
         if (-1 == strResponse.indexOf(rxNoscript)) {
+            Q_WARN("Noscript part not found");
             emit sigLoginFail ();
             break;
         }

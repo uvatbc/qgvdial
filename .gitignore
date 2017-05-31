@@ -6,6 +6,7 @@ ui_*h
 *suo
 *vcxproj*
 **swp
+cscope.out
 
 # Windows specific
 qgvdial/qt-not-qml/desktop_windows/Makefile*
@@ -30,3 +31,6 @@ notify/dbusinterface/*h
 
 # All secrets
 secrets
+
+# log files
+logs/**

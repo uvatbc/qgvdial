@@ -1,4 +1,4 @@
-    /*
+/*
 qgvdial is a cross platform Google Voice Dialer
 Copyright (C) 2009-2017 Yuvraaj Kelkar
 
