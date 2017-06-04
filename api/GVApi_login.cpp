@@ -862,6 +862,84 @@ GVApi_login::doNoScriptWithSkip(const QString &strResponse,
     //emit sigDoTfaPage();
 }//GVApi_login::doNoScriptWithSkip
 
+bool
+GVApi_login::extractChallengeUL(const QString &strResponse, QString &challengeUL)
+{
+    bool success = false;
+
+    do {
+        // Lets parse out the various options that we have here:
+        int startpos = strResponse.indexOf("challengePickerList");
+        if (-1 == startpos) {
+            Q_WARN("Failed to find challenge picker id!");
+            break;
+        }
+
+        startpos = strResponse.lastIndexOf("<ol ", startpos);
+        if (-1 == startpos) {
+            Q_WARN("Failed to find challenge picker ol tag!");
+            break;
+        }
+
+        int endpos = strResponse.indexOf("</ol>", startpos);
+        if (-1 == endpos) {
+            Q_WARN("Failed to find challenge picker end ol tag!");
+            break;
+        }
+        endpos += sizeof("</ol>") - 1;
+
+        challengeUL = strResponse.mid(startpos, endpos);
+        success = true;
+    } while (0);
+
+    return success;
+}//GVApi_login::extractChallengeUL
+
+bool
+GVApi_login::parseChallengeUL(const QString &challengeUL, QList<QGVChallengeListEntry *> &entries)
+{
+    bool ok = true;
+
+    int startli = challengeUL.indexOf("<li>");
+    while (-1 != startli) {
+        int endli = challengeUL.indexOf("</li>", startli);
+        if (-1 == endli) {
+            Q_WARN("Failed to find the end of the list. Giving up.");
+            ok = false;
+            break;
+        }
+
+        QGVChallengeListEntry *entry = new QGVChallengeListEntry(this);
+        if (NULL == entry) {
+            Q_WARN("Failed to allocate entry. Giving up.");
+            ok = false;
+            break;
+        }
+
+        startli += sizeof("<li>") - 1;
+        entry->li = challengeUL.mid(startli, endli-startli);
+
+        // Parse it into a form
+        if (!parseFormFields(entry->li, &entry->form)) {
+            Q_WARN("Failed to parse form fields. Giving up.");
+            ok = false;
+            break;
+        }
+
+        if (!entry->form.hidden.contains("challengeType")) {
+            Q_WARN("No challengeType here!!");
+            delete entry;
+        } else {
+            Q_DEBUG(QString("type: %1").arg(entry->form.hidden["challengeType"].toString()));
+            entries.append(entry);
+        }
+
+        startli = challengeUL.indexOf("<li>", endli);
+    }
+
+    return ok;
+}//GVApi_login::parseChallengeUL
+
 void
 GVApi_login::onChallengeSkipPage(bool success, const QByteArray &response,
                                  QNetworkReply *reply, void *ctx)
@@ -869,6 +947,7 @@ GVApi_login::onChallengeSkipPage(bool success, const QByteArray &response,
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QString strResponse = response;
     SAFE_DELETE(m_form);
+    QList<QGVChallengeListEntry *> entries;
 
 #if 0
     Q_DEBUG(strResponse);
@@ -881,10 +960,30 @@ GVApi_login::onChallengeSkipPage(bool success, const QByteArray &response,
             token->status = ATTS_NW_ERROR;
             break;
         }
+        success = false;
+
+        QString challengeUL;
+        if (!extractChallengeUL(strResponse, challengeUL)) {
+            Q_WARN("Failed to extract challenge UL");
+            break;
+        }
+
+        if (!parseChallengeUL(challengeUL, entries)) {
+            Q_WARN("Failed to parse challenge UL");
+            break;
+        }
+
+        Q_WARN("Failing just because");
+        success = false;
     } while (0);
 
-    Q_WARN("Failing just because");
-    emit sigLoginFail();
+    if (!success) {
+        while (entries.length() != 0) {
+            delete entries.front();
+            entries.pop_front();
+        }
+        emit sigLoginFail();
+    }
     return;
 }//GVApi_login::onChallengeSkipPage
 

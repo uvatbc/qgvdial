@@ -32,11 +32,22 @@ class QGVLoginForm : public QObject
 public:
     explicit QGVLoginForm(QObject *parent = NULL) : QObject(parent) {}
 
+    // Input fields:
     QVariantMap visible;
     QVariantMap hidden;
     QVariantMap no_name;
     QVariantMap attrs;
     QNetworkReply *reply;
+};
+
+class QGVChallengeListEntry : public QObject
+{
+    Q_OBJECT
+public:
+    explicit QGVChallengeListEntry(QObject *parent = NULL) : QObject(parent) {}
+
+    QString      li;
+    QGVLoginForm form;
 };
 
 class GVApi_login : public QObject
@@ -119,6 +130,8 @@ private:
     void lookForLoginErrorMessage(const QString &resp, AsyncTaskToken *task);
 
     QString fixActionUrl(const QString &incoming);
+    bool extractChallengeUL(const QString &strResponse, QString &challengeUL);
+    bool parseChallengeUL(const QString &challengeUL, QList<QGVChallengeListEntry *> &entries);
     void doNoScriptWithSkip(const QString &strResponse, QNetworkReply *reply,
                             AsyncTaskToken *token);
     void doNoScriptWithoutSkip(const QString &strResponse, QNetworkReply *reply,
