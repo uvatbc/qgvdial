@@ -888,7 +888,7 @@ GVApi_login::extractChallengeUL(const QString &strResponse, QString &challengeUL
         }
         endpos += sizeof("</ol>") - 1;
 
-        challengeUL = strResponse.mid(startpos, endpos);
+        challengeUL = strResponse.mid(startpos, endpos-startpos);
         success = true;
     } while (0);
 
@@ -927,12 +927,14 @@ GVApi_login::parseChallengeUL(const QString &challengeUL, QList<QGVChallengeList
         }
 
         if (!entry->form.hidden.contains("challengeType")) {
-            Q_WARN("No challengeType here!!");
+            Q_WARN(QString("No challengeType here!!\nli=%1").arg(entry->li));
             delete entry;
         } else {
             Q_DEBUG(QString("type: %1").arg(entry->form.hidden["challengeType"].toString()));
             entries.append(entry);
         }
+
+        // Q_DEBUG(QString("%1").arg(challengeUL.mid(endli)));
 
         startli = challengeUL.indexOf("<li>", endli);
     }
