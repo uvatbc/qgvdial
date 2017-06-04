@@ -72,6 +72,7 @@ private slots:
     void doGetVoicePage();
     void doUsernamePage();
     void doPasswordPage();
+    void doSkipChallengePage();
     void doTfaSmsPage();
     void doInboxPage();
 
@@ -81,6 +82,8 @@ private slots:
                             QNetworkReply *reply, void *ctx);
     void onPostPasswordPage(bool success, const QByteArray &response,
                             QNetworkReply *reply, void *ctx);
+    void onChallengeSkipPage(bool success, const QByteArray &response,
+                             QNetworkReply *reply, void *ctx);
     void onPostInboxPage(bool success, const QByteArray &response,
                          QNetworkReply *reply, void *ctx);
 
@@ -115,6 +118,7 @@ private:
     void keepOnlyAllowedPostParams(QGVLoginForm *form);
     void lookForLoginErrorMessage(const QString &resp, AsyncTaskToken *task);
 
+    QString fixActionUrl(const QString &incoming);
     void doNoScriptWithSkip(const QString &strResponse, QNetworkReply *reply,
                             AsyncTaskToken *token);
     void doNoScriptWithoutSkip(const QString &strResponse, QNetworkReply *reply,

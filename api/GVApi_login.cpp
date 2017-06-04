@@ -283,14 +283,15 @@ GVApi_login::recreateSM()
     SAFE_DELETE(m_sm);
 
     m_sm = new QStateMachine(this);
-    QState *loginFailed  = new QState;
-    QState *loginSuccess = new QState;
-    QState *getVoicePage = new QState;
-    QState *usernamePage = new QState;
-    QState *passwordPage = new QState;
-    QState *tfaSmsPage   = new QState;
-    QState *inboxPage    = new QState;
-    QFinalState *endState = new QFinalState;
+    QState *loginFailed       = new QState;
+    QState *loginSuccess      = new QState;
+    QState *getVoicePage      = new QState;
+    QState *usernamePage      = new QState;
+    QState *passwordPage      = new QState;
+    QState *skipChallengePage = new QState;
+    QState *tfaSmsPage        = new QState;
+    QState *inboxPage         = new QState;
+    QFinalState *endState     = new QFinalState;
 
     if ((NULL == m_sm) ||
         (NULL == loginFailed) ||
@@ -298,6 +299,7 @@ GVApi_login::recreateSM()
         (NULL == getVoicePage) ||
         (NULL == usernamePage) ||
         (NULL == passwordPage) ||
+        (NULL == skipChallengePage) ||
         (NULL == tfaSmsPage) ||
         (NULL == inboxPage) ||
         (NULL == endState))
@@ -306,6 +308,7 @@ GVApi_login::recreateSM()
 
         SAFE_DELETE(endState);
         SAFE_DELETE(inboxPage);
+        SAFE_DELETE(skipChallengePage);
         SAFE_DELETE(tfaSmsPage);
         SAFE_DELETE(passwordPage);
         SAFE_DELETE(usernamePage);
@@ -335,6 +338,9 @@ GVApi_login::recreateSM()
     // Handle the password page:
     QObject::connect(passwordPage, SIGNAL(entered()),
                      this, SLOT(doPasswordPage()));
+    // Handle the skip challenge page:
+    QObject::connect(skipChallengePage, SIGNAL(entered()),
+                     this, SLOT(doSkipChallengePage()));
     // Handle the TFA page:
     QObject::connect(tfaSmsPage, SIGNAL(entered()),
                      this, SLOT(doTfaSmsPage()));
@@ -347,17 +353,23 @@ GVApi_login::recreateSM()
     (_src)->addTransition(this, SIGNAL(_sig()), (_dst))
 
     // All these can result in login failures
-    ADD_TRANSITION(getVoicePage, sigLoginFail, loginFailed);
-    ADD_TRANSITION(usernamePage, sigLoginFail, loginFailed);
-    ADD_TRANSITION(passwordPage, sigLoginFail, loginFailed);
-    ADD_TRANSITION(  tfaSmsPage, sigLoginFail, loginFailed);
+    ADD_TRANSITION(     getVoicePage, sigLoginFail, loginFailed);
+    ADD_TRANSITION(     usernamePage, sigLoginFail, loginFailed);
+    ADD_TRANSITION(     passwordPage, sigLoginFail, loginFailed);
+    ADD_TRANSITION(skipChallengePage, sigLoginFail, loginFailed);
+    ADD_TRANSITION(       tfaSmsPage, sigLoginFail, loginFailed);
 
     // getVoicePage -> usernamePage
     ADD_TRANSITION(getVoicePage, sigDoUsernamePage, usernamePage);
     // usernamePage -> passwordPage
     ADD_TRANSITION(usernamePage, sigDoPasswordPage, passwordPage);
-    // passwordPage -> tfaSmsPage (if TFA enabled)
+    // passwordPage -> skipChallengePage (if TFA enabled and skip required)
     ADD_TRANSITION(passwordPage, sigDoTfaPage, tfaSmsPage);
+    // passwordPage -> tfaSmsPage (if TFA enabled and skip not required)
+    ADD_TRANSITION(passwordPage, sigDoTfaPage, tfaSmsPage);
+
+    // skipChallengePage -> tfaSmsPage (after skip)
+    ADD_TRANSITION(skipChallengePage, sigDoTfaPage, tfaSmsPage);
 
     // All these can result in login success and need us to get the inbox page
     ADD_TRANSITION(getVoicePage, sigDoInboxPage, inboxPage);
@@ -682,85 +694,6 @@ GVApi_login::doPasswordPage()
 }//GVApi_login::doPasswordPage
 
 void
-GVApi_login::doNoScriptWithoutSkip(const QString &strResponse,
-                                   QNetworkReply *reply,
-                                   AsyncTaskToken *token)
-{
-    // Pull out the noscript part:
-    QString noscript;
-    QRegExp rxNoscript("\\<noscript\\>.*\\</noscript\\>");
-    rxNoscript.setMinimal(true);
-    if (-1 == strResponse.indexOf(rxNoscript)) {
-        Q_WARN("Noscript part not found");
-        emit sigLoginFail();
-        return;
-    }
-    noscript = rxNoscript.cap(0);
-
-#if 0
-        Q_DEBUG(noscript);
-#endif
-
-    SAFE_DELETE(m_form);
-    m_form = new QGVLoginForm(this);
-    m_form->reply = reply;
-
-    if (!parseForm(noscript, m_form)) {
-        Q_WARN("Failed to parse login form");
-        emit sigLoginFail();
-        return;
-    }
-
-    emit sigDoTfaPage();
-} //GVApi_login::doNoScriptWithoutSkip
-
-void
-GVApi_login::doNoScriptWithSkip(const QString &strResponse,
-                                QNetworkReply *reply,
-                                AsyncTaskToken *token)
-{
-    int pos = strResponse.indexOf("/signin/challenge/skip");
-    int form_start = strResponse.lastIndexOf("<form", pos);
-    int form_end = strResponse.indexOf("</form>", form_start);
-
-    if (-1 == pos) {
-        Q_WARN("Challenge could not be skipped: Did not find the form");
-        emit sigLoginFail();
-        return;
-    }
-
-    if (-1 == form_start) {
-        Q_WARN("Challenge could not be skipped: Did not find the start of form");
-        emit sigLoginFail();
-        return;
-    }
-
-    if (-1 == form_end) {
-        Q_WARN("Challenge could not be skipped: Did not find the end of form");
-        emit sigLoginFail();
-        return;
-    }
-
-    QString strForm = strResponse.mid(form_start, form_end);
-
-    SAFE_DELETE(m_form);
-    m_form = new QGVLoginForm(this);
-    m_form->reply = reply;
-
-    if (!parseForm(strForm, m_form)) {
-        Q_WARN("Failed to parse skip challenge form");
-        emit sigLoginFail();
-        return;
-    }
-
-    Q_WARN("Failing just because");
-    emit sigLoginFail();
-    return;
-
-    //emit sigDoTfaPage();
-}//GVApi_login::doNoScriptWithSkip
-
-void
 GVApi_login::onPostPasswordPage(bool success, const QByteArray &response,
                                 QNetworkReply *reply, void *ctx)
 {
@@ -816,6 +749,151 @@ GVApi_login::onPostPasswordPage(bool success, const QByteArray &response,
 }//GVApi_login::onPostPasswordPage
 
 void
+GVApi_login::doNoScriptWithoutSkip(const QString &strResponse,
+                                   QNetworkReply *reply,
+                                   AsyncTaskToken *token)
+{
+    // Pull out the noscript part:
+    QString noscript;
+    QRegExp rxNoscript("\\<noscript\\>.*\\</noscript\\>");
+    rxNoscript.setMinimal(true);
+    if (-1 == strResponse.indexOf(rxNoscript)) {
+        Q_WARN("Noscript part not found");
+        emit sigLoginFail();
+        return;
+    }
+    noscript = rxNoscript.cap(0);
+
+#if 0
+        Q_DEBUG(noscript);
+#endif
+
+    SAFE_DELETE(m_form);
+    m_form = new QGVLoginForm(this);
+    m_form->reply = reply;
+
+    if (!parseForm(noscript, m_form)) {
+        Q_WARN("Failed to parse login form");
+        emit sigLoginFail();
+        return;
+    }
+
+    emit sigDoTfaPage();
+} //GVApi_login::doNoScriptWithoutSkip
+
+QString
+GVApi_login::fixActionUrl(const QString &incoming)
+{
+    QString action = incoming;
+    if (action.startsWith("/")) {
+        if (m_form->reply->url().host().length() != 0) {
+            action = m_form->reply->url().scheme()
+                + "://"
+                + m_form->reply->url().host()
+                + action;
+        } else {
+            action = GOOGLE_ACCOUNTS + action;
+        }
+    }
+
+    return action;
+}//GVApi_login::fixActionUrl
+
+void
+GVApi_login::doNoScriptWithSkip(const QString &strResponse,
+                                QNetworkReply *reply,
+                                AsyncTaskToken *token)
+{
+    bool ok;
+    int pos = strResponse.indexOf("/signin/challenge/skip");
+    int form_start = strResponse.lastIndexOf("<form", pos);
+    int form_end = strResponse.indexOf("</form>", form_start);
+
+    do {
+        ok = false;
+
+        if (-1 == pos) {
+            Q_WARN("Challenge could not be skipped: Did not find the form");
+            break;
+        }
+
+        if (-1 == form_start) {
+            Q_WARN("Challenge could not be skipped: Did not find the start of form");
+            break;
+        }
+
+        if (-1 == form_end) {
+            Q_WARN("Challenge could not be skipped: Did not find the end of form");
+            break;
+        }
+
+        QString strForm = strResponse.mid(form_start, form_end);
+
+        SAFE_DELETE(m_form);
+        m_form = new QGVLoginForm(this);
+        m_form->reply = reply;
+
+        if (!parseForm(strForm, m_form)) {
+            Q_WARN("Failed to parse skip challenge form");
+            break;
+        }
+
+        QString action = fixActionUrl(m_form->attrs["action"].toString());
+        if (action.isEmpty ()) {
+            Q_CRIT("Skip challenge action not found");
+            break;
+        }
+        QUrl url(action);
+
+        ok = postForm(url, m_form, token,
+                SLOT(onChallengeSkipPage(bool,const QByteArray&,QNetworkReply*,void*)));
+        if (!ok) {
+            Q_WARN("Failed to post skip challenge page!");
+            break;
+        }
+
+        ok = true;
+    } while (0);
+    if (!ok) {
+        emit sigLoginFail();
+        return;
+    }
+
+    //emit sigDoTfaPage();
+}//GVApi_login::doNoScriptWithSkip
+
+void
+GVApi_login::onChallengeSkipPage(bool success, const QByteArray &response,
+                                 QNetworkReply *reply, void *ctx)
+{
+    AsyncTaskToken *token = (AsyncTaskToken *)ctx;
+    QString strResponse = response;
+    SAFE_DELETE(m_form);
+
+#if 0
+    Q_DEBUG(strResponse);
+#endif
+
+    do {
+        if (!success) {
+            Q_WARN(QString("success = false. error = %1")
+                   .arg(NwHelpers::nwErrorToString(reply->error())));
+            token->status = ATTS_NW_ERROR;
+            break;
+        }
+    } while (0);
+
+    Q_WARN("Failing just because");
+    emit sigLoginFail();
+    return;
+}//GVApi_login::onChallengeSkipPage
+
+void
+GVApi_login::doSkipChallengePage()
+{
+}//GVApi_login::doSkipChallengePage
+
+void
 GVApi_login::doTfaSmsPage()
 {
     GVApi *p = (GVApi *)this->parent();
@@ -823,17 +901,7 @@ GVApi_login::doTfaSmsPage()
     Q_ASSERT(m_form);
 
     do {
-        QString action = m_form->attrs["action"].toString ();
-        if (action.startsWith("/")) {
-            if (m_form->reply->url().host().length() != 0) {
-                action = m_form->reply->url().scheme()
-                       + "://"
-                       + m_form->reply->url().host()
-                       + action;
-            } else {
-                action = GOOGLE_ACCOUNTS + action;
-            }
-        }
+        QString action = fixActionUrl(m_form->attrs["action"].toString());
 
 /*
         if (!parseAlternateLogins (rxForm.cap(0), task)) {
