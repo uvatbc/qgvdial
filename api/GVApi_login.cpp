@@ -139,7 +139,7 @@ GVApi_login::parseFormFields(const QString &strResponse,
     QRegExp rx1("\\<input(.*)\\>");
     rx1.setMinimal (true);
     if (!strResponse.contains (rx1)) {
-        Q_WARN("Invalid login page: No input fields");
+        Q_WARN(QString("Invalid login page: No input fields in:\n%1").arg(strResponse));
         return false;
     }
 
@@ -896,6 +896,51 @@ GVApi_login::extractChallengeUL(const QString &strResponse, QString &challengeUL
 }//GVApi_login::extractChallengeUL
 
 bool
+GVApi_login::parseChallengeSpanText(QGVChallengeListEntry *entry)
+{
+    bool ok = false;
+    GVApi *p = (GVApi *)this->parent();
+
+    do {
+        // Parse out the option text
+        int startspan = entry->li.indexOf("<span");
+        int endspan = entry->li.lastIndexOf("</span>");
+        if ((-1 == startspan) || (-1 == endspan)) {
+            Q_WARN(QString("Failed to get start (%1) or end (%2) of span in li: %3")
+                    .arg(startspan).arg(endspan).arg(entry->li));
+            break;
+        }
+        endspan += sizeof("</span>") - 1;
+
+        // Parse span text
+        QXmlInputSource inputSource;
+        QXmlSimpleReader simpleReader;
+        inputSource.setData (entry->li.mid(startspan, endspan-startspan));
+        HtmlFieldParser xmlHandler;
+        xmlHandler.setEmitLog (p->emitLog);
+
+        simpleReader.setContentHandler (&xmlHandler);
+        simpleReader.setErrorHandler (&xmlHandler);
+
+        if (!simpleReader.parse (&inputSource, false)) {
+            Q_WARN("Failed to parse span.");
+            break;
+        }
+
+        if (entry->form.hidden["challengeType"].toString() == "4") {
+            entry->optionText = "Tap yes on your phone or tablet";
+        } else if (entry->form.hidden["challengeType"].toString() == "9") {
+            entry->optionText = "Send a text message to your phone: "
+                              + xmlHandler.elems["span"].toString();
+        }
+
+        ok = true;
+    } while (0);
+
+    return ok;
+}//GVApi_login::parseChallengeSpanText
+
+bool
 GVApi_login::parseChallengeUL(const QString &challengeUL, QList<QGVChallengeListEntry *> &entries)
 {
     bool ok = true;
@@ -919,23 +964,36 @@ GVApi_login::parseChallengeUL(const QString &challengeUL, QList<QGVChallengeList
         startli += sizeof("<li>") - 1;
         entry->li = challengeUL.mid(startli, endli-startli);
 
-        // Parse it into a form
+        // Parse li into a form
         if (!parseFormFields(entry->li, &entry->form)) {
             Q_WARN("Failed to parse form fields. Giving up.");
             ok = false;
             break;
         }
 
+        // Make sure this entry has a challenge type. Without it, this entry is useless.
         if (!entry->form.hidden.contains("challengeType")) {
             Q_WARN(QString("No challengeType here!!\nli=%1").arg(entry->li));
             delete entry;
-        } else {
-            Q_DEBUG(QString("type: %1").arg(entry->form.hidden["challengeType"].toString()));
-            entries.append(entry);
+            goto next_entry;
         }
 
+        // What is the text to be shown in the option?
+        if (!parseChallengeSpanText(entry)) {
+            Q_WARN("Unable to parse span text");
+            delete entry;
+            goto next_entry;
+        }
+
+        Q_DEBUG(QString("type: %1. Span text: \"%2\"")
+                .arg(entry->form.hidden["challengeType"].toString())
+                .arg(entry->optionText));
+        entries.append(entry);
+
+        // Show the UL from current endli to the end of ul
         // Q_DEBUG(QString("%1").arg(challengeUL.mid(endli)));
 
+next_entry:
         startli = challengeUL.indexOf("<li>", endli);
     }
 

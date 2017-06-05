@@ -48,6 +48,7 @@ public:
 
     QString      li;
     QGVLoginForm form;
+    QString      optionText;
 };
 
 class GVApi_login : public QObject
@@ -129,13 +130,14 @@ private:
     void keepOnlyAllowedPostParams(QGVLoginForm *form);
     void lookForLoginErrorMessage(const QString &resp, AsyncTaskToken *task);
 
-    QString fixActionUrl(const QString &incoming);
-    bool extractChallengeUL(const QString &strResponse, QString &challengeUL);
-    bool parseChallengeUL(const QString &challengeUL, QList<QGVChallengeListEntry *> &entries);
     void doNoScriptWithSkip(const QString &strResponse, QNetworkReply *reply,
                             AsyncTaskToken *token);
     void doNoScriptWithoutSkip(const QString &strResponse, QNetworkReply *reply,
                                AsyncTaskToken *token);
+    QString fixActionUrl(const QString &incoming);
+    bool extractChallengeUL(const QString &strResponse, QString &challengeUL);
+    bool parseChallengeUL(const QString &challengeUL, QList<QGVChallengeListEntry *> &entries);
+    bool parseChallengeSpanText(QGVChallengeListEntry *entry);
 
 private:
     QVariantMap m_hiddenLoginFields;
