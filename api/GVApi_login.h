@@ -60,16 +60,13 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 // GV API:
     bool login(AsyncTaskToken *token);
-    bool resumeTFALogin(AsyncTaskToken *token);
-    bool resumeTFAAltLogin(AsyncTaskToken *token);
+    void resumeWithTFAOption(AsyncTaskToken *token);
+    void resumeWithTFAAuth(AsyncTaskToken *token, int pin);
     bool logout(AsyncTaskToken *token);
 ////////////////////////////////////////////////////////////////////////////////
 
 private slots:
     // Login and two factor
-    void onTFAAltLoginResp(bool success, const QByteArray &response,
-                           QNetworkReply *reply, void *ctx);
-
     void internalLogoutForReLogin();
 
     // Logout
@@ -84,8 +81,6 @@ private slots:
     void doGetVoicePage();
     void doUsernamePage();
     void doPasswordPage();
-    void doSkipChallengePage();
-    void doTfaSmsPage();
     void doInboxPage();
 
     void onGetVoicePage(bool success, const QByteArray &response,
@@ -126,18 +121,17 @@ private:
                        QVariantMap &attrs);     // OUT
     bool parseFormFields(const QString &strResponse,    // IN
                                QGVLoginForm *form);     // OUT
-    bool parseAlternateLogins(const QString &form, AsyncTaskToken *task);
     void keepOnlyAllowedPostParams(QGVLoginForm *form);
     void lookForLoginErrorMessage(const QString &resp, AsyncTaskToken *task);
 
     void doNoScriptWithSkip(const QString &strResponse, QNetworkReply *reply,
                             AsyncTaskToken *token);
-    void doNoScriptWithoutSkip(const QString &strResponse, QNetworkReply *reply,
-                               AsyncTaskToken *token);
     QString fixActionUrl(const QString &incoming);
     bool extractChallengeUL(const QString &strResponse, QString &challengeUL);
-    bool parseChallengeUL(const QString &challengeUL, QList<QGVChallengeListEntry *> &entries);
+    bool parseChallengeUL(const QString &challengeUL, QList<QGVChallengeListEntry *> *entries);
     bool parseChallengeSpanText(QGVChallengeListEntry *entry);
+
+    void freeChallengeList(QList<QGVChallengeListEntry *> *entries);
 
 private:
     QVariantMap m_hiddenLoginFields;

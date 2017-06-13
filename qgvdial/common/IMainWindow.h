@@ -60,26 +60,28 @@ Contact: yuvraaj@gmail.com
  *
  * Login credentials NOT saved:
  * onInitDone() -> uiRequestLoginDetails() -> beginLogin()
- *    [ -> uiRequestTFALoginDetails() -> resumeTFAAuth() ]
+ *    [ -> uiRequestTFAOption() -> resumeWithTFAOption()
+ *      -> uiRequestTFAAuth() -> resumeWithTFAAuth() ]
  *      -> uiLoginDone(...)
  *
  * -> onInitDone(): If the credentials are NOT saved in the cache, then I need
  *      to go ask the user for it. This varies based on the UI and thus must be
  *      implemented by the derived class (DC). As so:
- * -> uiRequestTFALoginDetails(): In this function, the DC must open the
- *      settings page and present the user with the dialog to enter the user
- *      name (email) and the password. On getting the email and password the
- *      next step is to invoke beginLogin()
+ * -> uiRequestLoginDetails(): In this function, the DC must open the settings
+ *      page and present the user with the dialog to enter the user name (email)
+ *      and the password. On getting the email and password the next step is to
+ *      invoke beginLogin()
  * -> beginLogin(): This will invoke the GV api class to begin the login. If the
  *      user has configured two-factor authentication, then I will invoke the
- *      uiRequestTFALoginDetails()
- * -> uiRequestTFALoginDetails(): DC must present the user with a dialog to get
- *      the two factor authentication pin. If the user provides the pin, DC must
- *      invoke resumeTFAAuth(ctx, pin, false)
- *      If the user is unable to provide the pin because he couldn't get the
- *      text message with the pin, then there is the option of asking Google
- *      Voice to provide the pin with an automated voice call. To do this, DC
- *      must call resumeTFAAuth(ctx, pin, true).
+ *      uiRequestTFAOption()
+ * -> uiRequestTFAOption(): DC must present the user with a dialog with the TFA
+ *      options. Once the user selects one of the TFA options, DC must invoke
+ *      resumeWithTFAOption(ctx, optionIndex).
+ * -> uiRequestTFAAuth(): DC must present the user with a dialog to either
+ *      complete TFA by clicking the auth prompt on their phone or enter the
+ *      Auth PIN received by text message.
+ *      Once the user enters the PIN (or clicks the auth button), DC must call
+ *      resumeWithTFAAuth(ctx)
  * -> uiLoginDone(): At the end of the login process, the BC will invoke this
  *      function - with either a success status or an error with a non-empty
  *      error string.
@@ -151,11 +153,17 @@ protected:
     virtual void uiRequestLoginDetails() = 0;
     virtual void uiSetUserPass(bool editable) = 0;
     void beginLogin(QString user, QString pass);
-    virtual void uiRequestTFALoginDetails(void *ctx) = 0;
-protected slots:
-    void resumeTFAAuth(void *ctx, int pin, bool useAlt);
 private slots:
-    void onTFARequest(AsyncTaskToken *task);
+    void onTFARequest(AsyncTaskToken *task, QStringList options);
+protected:
+    virtual void uiRequestTFAOption(void *ctx, QStringList options) = 0;
+protected slots:
+    void resumeWithTFAOption(void *ctx, int optionIndex);
+protected:
+    virtual void uiRequestTFAAuth(void *ctx, QString option) = 0;
+protected slots:
+    void resumeWithTFAAuth(void *ctx, int pin);
+private slots:
     void loginCompleted();
 protected:
     virtual void uiLoginDone(int status, const QString &errStr) = 0;

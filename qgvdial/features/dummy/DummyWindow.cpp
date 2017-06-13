@@ -61,7 +61,7 @@ DummyMainWindow::onLoginButtonClicked()
 }//DummyMainWindow::onLoginButtonClicked
 
 void
-DummyMainWindow::uiRequestTFALoginDetails(void *ctx)
+DummyMainWindow::uiRequestTFALoginDetails(void *ctx, QStringList options)
 {
     //TODO: Show a dialog to the user to get the TFA pin
     Q_ASSERT(0 == "Not implemented");

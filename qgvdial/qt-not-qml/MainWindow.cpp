@@ -393,19 +393,43 @@ MainWindow::uiCloseBrowser()
 }//MainWindow::uiCloseBrowser
 
 void
-MainWindow::uiRequestTFALoginDetails(void *ctx)
+MainWindow::uiRequestTFAOption(void *ctx, QStringList options)
 {
-    QString strPin = QInputDialog::getText(d,
-                                           tr("Enter PIN"),
-                                           tr("Two factor authentication"));
-
-    int pin = strPin.toInt ();
-    if (pin == 0) {
-        resumeTFAAuth (ctx, pin, true);
-    } else {
-        resumeTFAAuth (ctx, pin, false);
+    bool ok = false;
+    QString item = QInputDialog::getItem(d, tr("Two factor Authentication"),
+                                         tr("Select TFA method"),
+                                         options, 0, false, &ok);
+    if (!ok || item.isEmpty()) {
+        Q_WARN("User refused to proceed with TFA");
+        //TODO: Cleanup login
+        return;
     }
-}//MainWindow::uiRequestTFALoginDetails
+
+    for (int i = 0; i < options.length(); i++) {
+        if (item == options[i]) {
+            resumeWithTFAOption(ctx, i);
+            return;
+        }
+    }
+
+    Q_WARN(QString("User selected unknown TFA option %1. Available: %2")
+            .arg(item).arg(options.join(", ")));
+
+    //TODO: Fail login and cleanup
+}//MainWindow::uiRequestTFAOption
+
+void
+MainWindow::uiRequestTFAAuth(void *ctx, QString option)
+{
+    int pin = QInputDialog::getInt(d, tr("Two factor authentication"), option, 0);
+    if (0 == pin) {
+        Q_WARN("User refused to proceed with TFA");
+        //TODO: Cleanup login
+        return;
+    }
+
+    resumeWithTFAAuth(ctx, pin);
+}//MainWindow::uiRequestTFAAuth
 
 void
 MainWindow::uiSetUserPass(bool editable)

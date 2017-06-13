@@ -288,8 +288,6 @@ GVApi_login::recreateSM()
     QState *getVoicePage      = new QState;
     QState *usernamePage      = new QState;
     QState *passwordPage      = new QState;
-    QState *skipChallengePage = new QState;
-    QState *tfaSmsPage        = new QState;
     QState *inboxPage         = new QState;
     QFinalState *endState     = new QFinalState;
 
@@ -299,8 +297,6 @@ GVApi_login::recreateSM()
         (NULL == getVoicePage) ||
         (NULL == usernamePage) ||
         (NULL == passwordPage) ||
-        (NULL == skipChallengePage) ||
-        (NULL == tfaSmsPage) ||
         (NULL == inboxPage) ||
         (NULL == endState))
     {
@@ -308,8 +304,6 @@ GVApi_login::recreateSM()
 
         SAFE_DELETE(endState);
         SAFE_DELETE(inboxPage);
-        SAFE_DELETE(skipChallengePage);
-        SAFE_DELETE(tfaSmsPage);
         SAFE_DELETE(passwordPage);
         SAFE_DELETE(usernamePage);
         SAFE_DELETE(getVoicePage);
@@ -338,12 +332,6 @@ GVApi_login::recreateSM()
     // Handle the password page:
     QObject::connect(passwordPage, SIGNAL(entered()),
                      this, SLOT(doPasswordPage()));
-    // Handle the skip challenge page:
-    QObject::connect(skipChallengePage, SIGNAL(entered()),
-                     this, SLOT(doSkipChallengePage()));
-    // Handle the TFA page:
-    QObject::connect(tfaSmsPage, SIGNAL(entered()),
-                     this, SLOT(doTfaSmsPage()));
     // After login success (password or TFA), handle the initial inbox page:
     QObject::connect(inboxPage, SIGNAL(entered()),
                      this, SLOT(doInboxPage()));
@@ -356,25 +344,15 @@ GVApi_login::recreateSM()
     ADD_TRANSITION(     getVoicePage, sigLoginFail, loginFailed);
     ADD_TRANSITION(     usernamePage, sigLoginFail, loginFailed);
     ADD_TRANSITION(     passwordPage, sigLoginFail, loginFailed);
-    ADD_TRANSITION(skipChallengePage, sigLoginFail, loginFailed);
-    ADD_TRANSITION(       tfaSmsPage, sigLoginFail, loginFailed);
 
     // getVoicePage -> usernamePage
     ADD_TRANSITION(getVoicePage, sigDoUsernamePage, usernamePage);
     // usernamePage -> passwordPage
     ADD_TRANSITION(usernamePage, sigDoPasswordPage, passwordPage);
-    // passwordPage -> skipChallengePage (if TFA enabled and skip required)
-    ADD_TRANSITION(passwordPage, sigDoTfaPage, tfaSmsPage);
-    // passwordPage -> tfaSmsPage (if TFA enabled and skip not required)
-    ADD_TRANSITION(passwordPage, sigDoTfaPage, tfaSmsPage);
-
-    // skipChallengePage -> tfaSmsPage (after skip)
-    ADD_TRANSITION(skipChallengePage, sigDoTfaPage, tfaSmsPage);
 
     // All these can result in login success and need us to get the inbox page
     ADD_TRANSITION(getVoicePage, sigDoInboxPage, inboxPage);
     ADD_TRANSITION(passwordPage, sigDoInboxPage, inboxPage);
-    ADD_TRANSITION(  tfaSmsPage, sigDoInboxPage, inboxPage);
 
     // inboxPage -> loginSuccess: This is the only true successful login.
     ADD_TRANSITION(inboxPage, sigLoginSuccess, loginSuccess);
@@ -390,7 +368,6 @@ GVApi_login::recreateSM()
     m_sm->addState(getVoicePage);
     m_sm->addState(usernamePage);
     m_sm->addState(passwordPage);
-    m_sm->addState(tfaSmsPage);
     m_sm->addState(inboxPage);
     m_sm->addState(endState);
 
@@ -740,46 +717,14 @@ GVApi_login::onPostPasswordPage(bool success, const QByteArray &response,
             break;
         }
 
-        if (strResponse.contains ("/signin/challenge/skip")) {
-            doNoScriptWithSkip(strResponse, reply, token);
-        } else {
-            doNoScriptWithoutSkip(strResponse, reply, token);
+        if (!strResponse.contains ("/signin/challenge/skip")) {
+            emit sigLoginFail ();
+            break;
         }
+
+        doNoScriptWithSkip(strResponse, reply, token);
     } while(0);
 }//GVApi_login::onPostPasswordPage
-
-void
-GVApi_login::doNoScriptWithoutSkip(const QString &strResponse,
-                                   QNetworkReply *reply,
-                                   AsyncTaskToken *token)
-{
-    // Pull out the noscript part:
-    QString noscript;
-    QRegExp rxNoscript("\\<noscript\\>.*\\</noscript\\>");
-    rxNoscript.setMinimal(true);
-    if (-1 == strResponse.indexOf(rxNoscript)) {
-        Q_WARN("Noscript part not found");
-        emit sigLoginFail();
-        return;
-    }
-    noscript = rxNoscript.cap(0);
-
-#if 0
-        Q_DEBUG(noscript);
-#endif
-
-    SAFE_DELETE(m_form);
-    m_form = new QGVLoginForm(this);
-    m_form->reply = reply;
-
-    if (!parseForm(noscript, m_form)) {
-        Q_WARN("Failed to parse login form");
-        emit sigLoginFail();
-        return;
-    }
-
-    emit sigDoTfaPage();
-} //GVApi_login::doNoScriptWithoutSkip
 
 QString
 GVApi_login::fixActionUrl(const QString &incoming)
@@ -854,12 +799,11 @@ GVApi_login::doNoScriptWithSkip(const QString &strResponse,
 
         ok = true;
     } while (0);
+
     if (!ok) {
         emit sigLoginFail();
         return;
     }
-
-    //emit sigDoTfaPage();
 }//GVApi_login::doNoScriptWithSkip
 
 bool
@@ -941,7 +885,7 @@ GVApi_login::parseChallengeSpanText(QGVChallengeListEntry *entry)
 }//GVApi_login::parseChallengeSpanText
 
 bool
-GVApi_login::parseChallengeUL(const QString &challengeUL, QList<QGVChallengeListEntry *> &entries)
+GVApi_login::parseChallengeUL(const QString &challengeUL, QList<QGVChallengeListEntry *> *entries)
 {
     bool ok = true;
 
@@ -988,7 +932,7 @@ GVApi_login::parseChallengeUL(const QString &challengeUL, QList<QGVChallengeList
         Q_DEBUG(QString("type: %1. Span text: \"%2\"")
                 .arg(entry->form.hidden["challengeType"].toString())
                 .arg(entry->optionText));
-        entries.append(entry);
+        entries->append(entry);
 
         // Show the UL from current endli to the end of ul
         // Q_DEBUG(QString("%1").arg(challengeUL.mid(endli)));
@@ -1004,10 +948,11 @@ void
 GVApi_login::onChallengeSkipPage(bool success, const QByteArray &response,
                                  QNetworkReply *reply, void *ctx)
 {
+    GVApi *p = (GVApi *)this->parent();
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QString strResponse = response;
     SAFE_DELETE(m_form);
-    QList<QGVChallengeListEntry *> entries;
+    QList<QGVChallengeListEntry *> *entries = new QList<QGVChallengeListEntry *>;
 
 #if 0
     Q_DEBUG(strResponse);
@@ -1033,49 +978,127 @@ GVApi_login::onChallengeSkipPage(bool success, const QByteArray &response,
             break;
         }
 
-        Q_WARN("Failing just because");
-        success = false;
+        token->apiCtx = entries;
+
+        QStringList options;
+        for (int i = 0; i < entries->length(); i++) {
+            options += (*entries)[i]->optionText;
+        }
+
+        emit p->twoStepAuthentication(token, options);
     } while (0);
 
     if (!success) {
-        while (entries.length() != 0) {
-            delete entries.front();
-            entries.pop_front();
-        }
+        token->apiCtx = NULL;
+
+        freeChallengeList(entries);
         emit sigLoginFail();
     }
-    return;
 }//GVApi_login::onChallengeSkipPage
 
 void
-GVApi_login::doSkipChallengePage()
+GVApi_login::freeChallengeList(QList<QGVChallengeListEntry *> *entries)
 {
-}//GVApi_login::doSkipChallengePage
+    if (NULL == entries) {
+        return;
+    }
+    while (entries->length() != 0) {
+        delete entries->front();
+        entries->pop_front();
+    }
+} //GVApi_login::freeChallengeList
 
 void
-GVApi_login::doTfaSmsPage()
+GVApi_login::resumeWithTFAOption(AsyncTaskToken *task)
 {
-    GVApi *p = (GVApi *)this->parent();
-    AsyncTaskToken *token = m_loginToken;
-    Q_ASSERT(m_form);
+    bool ok;
+    QList<QGVChallengeListEntry *> *entries = NULL;
+    int optionIndex;
 
     do {
-        QString action = fixActionUrl(m_form->attrs["action"].toString());
+        ok = false;
 
-/*
-        if (!parseAlternateLogins (rxForm.cap(0), task)) {
-            Q_WARN("Failed to get alternate delivery");
-        }
-*/
-
-        if (p->emitLog) {
-            Q_DEBUG("Two factor AUTH required!");
+        entries = (QList<QGVChallengeListEntry *> *)task->apiCtx;
+        task->apiCtx = NULL;
+        if (NULL == entries) {
+            Q_WARN("No entries in task!");
+            break;
         }
 
-        token->inParams["tfaAction"] = action;
-        emit p->twoStepAuthentication(token);
+        if (!task->inParams.contains("tfaOption")) {
+            Q_WARN("tfaOption not provided");
+            break;
+        }
+        optionIndex = task->inParams["tfaOption"].toString().toInt();
+
+        if ((optionIndex < 0) || (optionIndex > entries->length())) {
+            Q_WARN(QString("Out of bounds option. Max = %1. Selected = %2")
+                .arg(entries->length()).arg(optionIndex));
+            break;
+        }
+
+        //TODO: Send the form in entries
+
+        ok = true;
+        ok = false;
     } while (0);
-}//GVApi_login::doTfaSmsPage
+
+    if (!ok) {
+        freeChallengeList(entries);
+        emit sigLoginFail();
+    }
+}//GVApi_login::resumeWithTFAOption
+
+void
+GVApi_login::resumeWithTFAAuth(AsyncTaskToken *task, int pin)
+{
+    GVApi *p = (GVApi *)this->parent();
+    bool ok = false;
+
+    Q_ASSERT(task == m_loginToken);
+
+    do {
+        QString smsUserPin = QString::number(pin);
+
+        QString action = task->inParams["tfaAction"].toString();
+        if (action.isEmpty()) {
+            Q_CRIT("Two factor auth cannot continue without the form action");
+            break;
+        }
+
+        QUrl url(action);
+
+        // Store the pin and the TrustDevice flag
+        m_form->visible["Pin"] = smsUserPin;
+        m_form->visible["TrustDevice"] = "on";
+
+        // Remove all useless parameters
+        keepOnlyAllowedPostParams(m_form);
+
+        ok = postForm(url, m_form, task,
+            SLOT(onPostPasswordPage(bool, const QByteArray&, QNetworkReply*, void*)));
+        if (!ok) {
+            Q_WARN("Failed to post password form!");
+            break;
+        }
+    } while (0);
+
+    if (!ok) {
+        Q_WARN("Two factor authentication failed.");
+
+        if (task->errorString.isEmpty()) {
+            task->errorString = tr("The username or password you entered "
+                "is incorrect.");
+        }
+        task->status = ATTS_LOGIN_FAILURE;
+        emit sigLoginFail();
+    }
+    else {
+        if (p->emitLog) {
+            Q_DEBUG("TFA POST started");
+        }
+    }
+}//GVApi_login::resumeWithTFAAuth
 
 void
 GVApi_login::keepOnlyAllowedPostParams(QGVLoginForm *form)
@@ -1114,150 +1137,6 @@ GVApi_login::keepOnlyAllowedPostParams(QGVLoginForm *form)
 
     form->visible = final;
 }//GVApi_login::keepOnlyAllowedPostParams
-
-bool
-GVApi_login::resumeTFALogin(AsyncTaskToken *task)
-{
-    GVApi *p = (GVApi *)this->parent();
-    bool ok = false;
-
-    Q_ASSERT(task == m_loginToken);
-
-    do {
-        QString smsUserPin = task->inParams["user_pin"].toString();
-        if (smsUserPin.isEmpty ()) {
-            Q_WARN("User didn't enter 2-step auth pin");
-            break;
-        }
-
-        QString action = task->inParams["tfaAction"].toString();
-        if (action.isEmpty ()) {
-            Q_CRIT("Two factor auth cannot continue without the form action");
-            break;
-        }
-
-        QUrl url(action);
-
-        // Store the pin and the TrustDevice flag
-        m_form->visible["Pin"]         = smsUserPin;
-        m_form->visible["TrustDevice"] = "on";
-
-        // Remove all useless parameters
-        keepOnlyAllowedPostParams (m_form);
-
-        ok = postForm(url, m_form, task,
-                      SLOT(onPostPasswordPage(bool,const QByteArray&,QNetworkReply*,void*)));
-        if (!ok) {
-            Q_WARN("Failed to post password form!");
-            break;
-        }
-    } while (0);
-
-    if (!ok) {
-        Q_WARN("Two factor authentication failed.");
-
-        if (task->errorString.isEmpty()) {
-            task->errorString = tr("The username or password you entered "
-                                   "is incorrect.");
-        }
-        task->status = ATTS_LOGIN_FAILURE;
-        emit sigLoginFail ();
-    } else {
-        if (p->emitLog) {
-            Q_DEBUG("TFA POST started");
-        }
-    }
-
-    return (true);
-}//GVApi_login::resumeTFALogin
-
-bool
-GVApi_login::parseAlternateLogins(const QString &form, AsyncTaskToken *task)
-{
-/* To match:
-  <input type="radio" name="retry" id="SMS_..."   value="SMS_..." />
-  <input type="radio" name="retry" id="VOICE_..." value="VOICE_" />
-*/
-    GVApi *p = (GVApi *)this->parent();
-    QRegExp rx1("\\<input(.*)\\>");
-    rx1.setMinimal (true);
-    if (!form.contains (rx1)) {
-        Q_WARN("No input fields");
-        return false;
-    }
-
-    int pos = 0;
-    while ((pos = rx1.indexIn (form, pos)) != -1) {
-        QString fullMatch = rx1.cap(0);
-        QString oneInstance = rx1.cap(1);
-        QString name, value;
-        QVariantMap attrs;
-
-        if (!fullMatch.endsWith("/>")) {
-            fullMatch = fullMatch.mid(0, fullMatch.length()-1) + "/>";
-        }
-
-        QXmlInputSource inputSource;
-        QXmlSimpleReader simpleReader;
-        inputSource.setData (fullMatch);
-        HtmlFieldParser xmlHandler;
-        xmlHandler.setEmitLog (p->emitLog);
-
-        simpleReader.setContentHandler (&xmlHandler);
-        simpleReader.setErrorHandler (&xmlHandler);
-
-        if (!simpleReader.parse (&inputSource, false)) {
-            Q_WARN("Failed to parse input field.");
-            goto gonext;
-        }
-
-        if (!xmlHandler.elems.contains ("input") ||
-            !xmlHandler.attrMap.contains("input")) {
-                Q_WARN("Failed to parse input field.");
-                goto gonext;
-        }
-
-        attrs = xmlHandler.attrMap["input"];
-        if (!attrs.contains ("name") ||
-            !attrs.contains ("value") ||
-            !attrs.contains ("type")) {
-                Q_WARN(QString("Input field \"%1\" doesn't have name/type/value")
-                    .arg(oneInstance));
-                goto gonext;
-        }
-        if (attrs["type"].toString() != "radio") {
-            if (DEBUG_ONLY && p->emitLog) {
-                Q_DEBUG(QString("Input field \"%1\" is not a radio")
-                    .arg(oneInstance));
-            }
-            goto gonext;
-        }
-
-        name  = attrs["name"].toString ();
-        value = attrs["value"].toString ();
-
-        if (name != "retry") {
-            goto gonext;
-        }
-
-        if (value.startsWith("VOICE_")) {
-            task->inParams["tfaAlternate"] = value;
-        }
-        if (value.startsWith("SMS_")) {
-            task->inParams["tfaAltSMS"] = value;
-        }
-
-gonext:
-        pos += fullMatch.indexOf (oneInstance);
-    }
-
-    // This is the only MUST return field
-    if (!task->inParams.contains("tfaAlternate")) {
-        return false;
-    }
-
-    return true;
-}//GVApi_login::parseAlternateLogins
 
 void
 GVApi_login::lookForLoginErrorMessage(const QString &resp, AsyncTaskToken *task)
@@ -1393,65 +1272,6 @@ GVApi_login::lookForLoginErrorMessage(const QString &resp, AsyncTaskToken *task)
                                "is incorrect.");
     }
 }//GVApi_login::lookForLoginErrorMessage
-
-bool
-GVApi_login::resumeTFAAltLogin(AsyncTaskToken *token)
-{
-    GVApi *p = (GVApi *)this->parent();
-    bool rv = false;
-    QString strUrl;
-
-    do {
-        strUrl = token->inParams["tfaAlternate"].toString ();
-        strUrl.replace ("&amp;", "&");
-        QUrl url = QUrl::fromPercentEncoding (strUrl.toLatin1 ());
-        rv =
-        p->doGet(url, token, this,
-                 SLOT(onTFAAltLoginResp(bool,QByteArray,QNetworkReply*,void*)));
-    } while (0);
-
-    if (!rv) {
-        Q_WARN("Failed to resume TFA Alt Login");
-        token->status = ATTS_LOGIN_FAILURE;
-        emit sigLoginFail ();
-    }
-
-    return (rv);
-}//GVApi_login::resumeTFAAltLogin
-
-void
-GVApi_login::onTFAAltLoginResp(bool success, const QByteArray &response,
-                               QNetworkReply *reply, void *ctx)
-{
-    GVApi *p = (GVApi *)this->parent();
-    AsyncTaskToken *token = (AsyncTaskToken *)ctx;
-    QString strResponse = response;
-    QString strReplyUrl = reply->url().toString();
-
-    do {
-        if (!success) {
-            Q_WARN(QString("success = false. error = %1")
-                   .arg(NwHelpers::nwErrorToString(reply->error())));
-            token->status = ATTS_NW_ERROR;
-            break;
-        }
-
-        emit p->twoStepAuthentication(token);
-
-        success = true;
-    } while (0);
-
-    if (!success) {
-        QString msg = QString("Failed to get response to alternate login! "
-                              "URL = %1. Response = %2")
-                        .arg(strReplyUrl, strResponse);
-        Q_WARN(msg);
-
-        emit sigLoginFail ();
-    } else {
-        emit sigDoInboxPage();
-    }
-}//GVApi_login::onTFAAltLoginResp
 
 void
 GVApi_login::doInboxPage()

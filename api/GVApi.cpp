@@ -438,17 +438,17 @@ GVApi::login(AsyncTaskToken *task)
     return m_login->login(task);
 }//GVApi::login
 
-bool
-GVApi::resumeTFALogin(AsyncTaskToken *task)
+void
+GVApi::resumeWithTFAOption(AsyncTaskToken *task)
 {
-    return m_login->resumeTFALogin(task);
-}//GVApi::resumeTFALogin
+    return m_login->resumeWithTFAOption(task);
+}//GVApi::resumeWithTFAOption
 
-bool
-GVApi::resumeTFAAltLogin(AsyncTaskToken *task)
+void
+GVApi::resumeWithTFAAuth(AsyncTaskToken *task, int pin)
 {
-    return m_login->resumeTFAAltLogin(task);
-}//GVApi::resumeTFAAltLogin
+    return m_login->resumeWithTFAAuth(task, pin);
+}//GVApi::resumeWithTFAAuth
 
 bool
 GVApi::logout(AsyncTaskToken *token)

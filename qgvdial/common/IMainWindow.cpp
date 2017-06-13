@@ -48,8 +48,8 @@ IMainWindow::IMainWindow(QObject *parent)
 , m_nwMgr(NULL)
 {
     qRegisterMetaType<ContactInfo>("ContactInfo");
-    connect(&gvApi, SIGNAL(twoStepAuthentication(AsyncTaskToken*)),
-            this, SLOT(onTFARequest(AsyncTaskToken*)));
+    connect(&gvApi, SIGNAL(twoStepAuthentication(AsyncTaskToken*,QStringList)),
+            this, SLOT(onTFARequest(AsyncTaskToken*,QStringList)));
 
     m_taskTimer.setSingleShot (true);
     m_taskTimer.setInterval (1 * 1000); // 1 second
@@ -234,27 +234,34 @@ IMainWindow::beginLogin(QString user, QString pass)
 }//IMainWindow::beginLogin
 
 void
-IMainWindow::onTFARequest(AsyncTaskToken *task)
+IMainWindow::onTFARequest(AsyncTaskToken *task, QStringList options)
 {
     Q_ASSERT(m_loginTask == task);
-    Q_DEBUG("TFA required. Ask user for TFA PIN");
-    uiRequestTFALoginDetails(task);
+    Q_DEBUG("TFA required. Ask user to choose a TFA option");
+    uiRequestTFAOption(task, options);
 }//IMainWindow::onTFARequest
 
 void
-IMainWindow::resumeTFAAuth(void *ctx, int pin, bool useAlt)
+IMainWindow::resumeWithTFAOption(void *ctx, int optionIndex)
 {
     Q_ASSERT(m_loginTask == ctx);
     if (m_loginTask != ctx) {
         Q_CRIT("Context mismatch!!");
     }
 
-    if (useAlt) {
-        gvApi.resumeTFAAltLogin (m_loginTask);
-    } else {
-        m_loginTask->inParams["user_pin"] = QString::number (pin);
-        gvApi.resumeTFALogin (m_loginTask);
+    m_loginTask->inParams["tfaOption"] = optionIndex;
+    gvApi.resumeWithTFAOption(m_loginTask);
+}//IMainWindow::resumeTFAAuth
+
+void
+IMainWindow::resumeWithTFAAuth(void *ctx, int pin)
+{
+    Q_ASSERT(m_loginTask == ctx);
+    if (m_loginTask != ctx) {
+        Q_CRIT("Context mismatch!!");
     }
+
+    gvApi.resumeWithTFAAuth(m_loginTask, pin);
 }//IMainWindow::resumeTFAAuth
 
 void

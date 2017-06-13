@@ -54,9 +54,10 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 // GV API:
     bool login(AsyncTaskToken *token);
-    bool resumeTFALogin(AsyncTaskToken *token);
-    bool resumeTFAAltLogin(AsyncTaskToken *token);
+    void resumeWithTFAOption(AsyncTaskToken *token);
+    void resumeWithTFAAuth(AsyncTaskToken *token, int pin);
     bool logout(AsyncTaskToken *token);
+
     bool getPhones(AsyncTaskToken *token);
     bool getInbox(AsyncTaskToken *token);
     bool callOut(AsyncTaskToken *token);
@@ -71,7 +72,7 @@ public:
 
 signals:
     //! Two factor auth requires a PIN. Get it.
-    void twoStepAuthentication(AsyncTaskToken *token);
+    void twoStepAuthentication(AsyncTaskToken *token, QStringList options);
     //! Emitted for each registered phone number
     void registeredPhone (const GVRegisteredNumber &info);
     //! Emitted for every inbox entry

@@ -64,7 +64,8 @@ public slots:
 protected:
     void uiUpdateProxySettings(const ProxyInfo &info);
     void uiRequestLoginDetails();
-    void uiRequestTFALoginDetails(void *ctx);
+    void uiRequestTFAOption(void *ctx, QStringList options);
+    void uiRequestTFAAuth(void *ctx, QString option);
     void uiSetUserPass(bool editable);
 
     void uiLoginDone(int status, const QString &errStr);
