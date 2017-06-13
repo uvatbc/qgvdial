@@ -450,6 +450,12 @@ GVApi::resumeWithTFAAuth(AsyncTaskToken *task, int pin)
     return m_login->resumeWithTFAAuth(task, pin);
 }//GVApi::resumeWithTFAAuth
 
+void
+GVApi::cancelLogin(AsyncTaskToken *token)
+{
+    return m_login->cancelLogin(token);
+}//GVApi::cancelLogin
+
 bool
 GVApi::logout(AsyncTaskToken *token)
 {

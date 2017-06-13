@@ -389,6 +389,20 @@ IMainWindow::loginCompleted()
 }//IMainWindow::loginCompleted
 
 void
+IMainWindow::cancelLogin(void *ctx)
+{
+    Q_ASSERT(m_loginTask == ctx);
+    if (m_loginTask != ctx) {
+        Q_CRIT("Context mismatch!!");
+        return;
+    }
+
+    uiLoginDone(ATTS_USER_CANCEL, "User canceled login");
+    m_loginTask->deleteLater();
+    m_loginTask = NULL;
+}//IMainWindow::cancelLogin
+
+void
 IMainWindow::onUserLogoutRequest()
 {
     AsyncTaskToken *task = new AsyncTaskToken(this);

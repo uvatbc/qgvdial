@@ -167,6 +167,8 @@ private slots:
     void loginCompleted();
 protected:
     virtual void uiLoginDone(int status, const QString &errStr) = 0;
+protected slots:
+    void cancelLogin(void *ctx);
 
 protected slots:
     void onUserLogoutRequest();

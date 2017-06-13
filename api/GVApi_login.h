@@ -62,6 +62,7 @@ public:
     bool login(AsyncTaskToken *token);
     void resumeWithTFAOption(AsyncTaskToken *token);
     void resumeWithTFAAuth(AsyncTaskToken *token, int pin);
+    void cancelLogin(AsyncTaskToken *token);
     bool logout(AsyncTaskToken *token);
 ////////////////////////////////////////////////////////////////////////////////
 

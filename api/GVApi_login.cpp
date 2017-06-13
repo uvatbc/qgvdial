@@ -1368,6 +1368,16 @@ GVApi_login::internalLogoutForReLogin()
     token->deleteLater ();
 }//GVApi_login::internalLogoutForReLogin
 
+void
+GVApi_login::cancelLogin(AsyncTaskToken *token)
+{
+    QList<QGVChallengeListEntry *> *entries;
+    entries = (QList<QGVChallengeListEntry *> *)token->apiCtx;
+    token->apiCtx = NULL;
+    freeChallengeList(entries);
+    emit sigLoginFail();
+}//GVApi_login::cancelLogin
+
 bool
 GVApi_login::logout(AsyncTaskToken *token)
 {
