@@ -155,6 +155,7 @@ protected:
     void beginLogin(QString user, QString pass);
 private slots:
     void onTFARequest(AsyncTaskToken *task, QStringList options);
+    void onTFAPinRequest(AsyncTaskToken *task, QString option);
 protected:
     virtual void uiRequestTFAOption(void *ctx, QStringList options) = 0;
 protected slots:
@@ -162,7 +163,7 @@ protected slots:
 protected:
     virtual void uiRequestTFAAuth(void *ctx, QString option) = 0;
 protected slots:
-    void resumeWithTFAAuth(void *ctx, int pin);
+    void resumeWithTFAAuth(void *ctx, QString pin);
 private slots:
     void loginCompleted();
 protected:

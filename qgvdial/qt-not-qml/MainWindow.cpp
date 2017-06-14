@@ -421,8 +421,10 @@ MainWindow::uiRequestTFAOption(void *ctx, QStringList options)
 void
 MainWindow::uiRequestTFAAuth(void *ctx, QString option)
 {
-    int pin = QInputDialog::getInt(d, tr("Two factor authentication"), option, 0);
-    if (0 == pin) {
+    bool ok;
+    QString pin = QInputDialog::getText(d, tr("Two factor authentication"), option,
+                                        QLineEdit::Normal, "", &ok);
+    if (!ok) {
         Q_WARN("User refused to proceed with TFA");
         cancelLogin(ctx);
         return;

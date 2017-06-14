@@ -30,13 +30,21 @@ class QGVLoginForm : public QObject
 {
     Q_OBJECT
 public:
-    explicit QGVLoginForm(QObject *parent = NULL) : QObject(parent) {}
+    explicit QGVLoginForm(QObject *parent = NULL) : QObject(parent), reply(NULL) {}
 
     // Input fields:
     QVariantMap visible;
     QVariantMap hidden;
     QVariantMap no_name;
+
+    // Attributes of the form XML tag
+    // The form action should be present in this map: attrs["action"]
     QVariantMap attrs;
+
+    // This form was parsed out of this reply. This field is used to fix 
+    // the form's action URL if the action URL is a relative URL.
+    // Absolute form POST URLs need no fixing. Relative URLs need the
+    // originating host URL.
     QNetworkReply *reply;
 };
 
@@ -49,6 +57,7 @@ public:
     QString      li;
     QGVLoginForm form;
     QString      optionText;
+    QString      challengeType;
 };
 
 class GVApi_login : public QObject
@@ -61,7 +70,7 @@ public:
 // GV API:
     bool login(AsyncTaskToken *token);
     void resumeWithTFAOption(AsyncTaskToken *token);
-    void resumeWithTFAAuth(AsyncTaskToken *token, int pin);
+    void resumeWithTFAAuth(AsyncTaskToken *token);
     void cancelLogin(AsyncTaskToken *token);
     bool logout(AsyncTaskToken *token);
 ////////////////////////////////////////////////////////////////////////////////
@@ -82,6 +91,7 @@ private slots:
     void doGetVoicePage();
     void doUsernamePage();
     void doPasswordPage();
+    void doResumeTFAForm();
     void doInboxPage();
 
     void onGetVoicePage(bool success, const QByteArray &response,
@@ -90,6 +100,8 @@ private slots:
                             QNetworkReply *reply, void *ctx);
     void onPostPasswordPage(bool success, const QByteArray &response,
                             QNetworkReply *reply, void *ctx);
+    void onPostAuthOption(bool success, const QByteArray &response,
+                          QNetworkReply *reply, void *ctx);
     void onChallengeSkipPage(bool success, const QByteArray &response,
                              QNetworkReply *reply, void *ctx);
     void onPostInboxPage(bool success, const QByteArray &response,
@@ -102,7 +114,7 @@ signals: // Private
 
     void sigDoUsernamePage();
     void sigDoPasswordPage();
-    void sigDoTfaPage();
+    void sigDoResumeTFAForm();
     void sigDoInboxPage();
 
 private:
@@ -127,7 +139,7 @@ private:
 
     void doNoScriptWithSkip(const QString &strResponse, QNetworkReply *reply,
                             AsyncTaskToken *token);
-    QString fixActionUrl(const QString &incoming);
+    QString fixActionUrl(QGVLoginForm *form, const QString &incoming);
     bool extractChallengeUL(const QString &strResponse, QString &challengeUL);
     bool parseChallengeUL(const QString &challengeUL, QList<QGVChallengeListEntry *> *entries);
     bool parseChallengeSpanText(QGVChallengeListEntry *entry);

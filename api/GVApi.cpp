@@ -445,9 +445,9 @@ GVApi::resumeWithTFAOption(AsyncTaskToken *task)
 }//GVApi::resumeWithTFAOption
 
 void
-GVApi::resumeWithTFAAuth(AsyncTaskToken *task, int pin)
+GVApi::resumeWithTFAAuth(AsyncTaskToken *task)
 {
-    return m_login->resumeWithTFAAuth(task, pin);
+    return m_login->resumeWithTFAAuth(task);
 }//GVApi::resumeWithTFAAuth
 
 void
