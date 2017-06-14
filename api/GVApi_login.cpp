@@ -1113,6 +1113,7 @@ GVApi_login::onPostAuthOption(bool ok, const QByteArray &response,
     AsyncTaskToken *task = (AsyncTaskToken *)ctx;
     QString strResponse = response;
     QList<QGVChallengeListEntry *> *entries = NULL;
+    QGVChallengeListEntry *entry = NULL;
     int optionIndex;
 
 #if 0
@@ -1143,8 +1144,43 @@ GVApi_login::onPostAuthOption(bool ok, const QByteArray &response,
                 .arg(entries->length()).arg(optionIndex));
             break;
         }
+        entry = (*entries)[optionIndex];
 
-        QGVChallengeListEntry *entry = (*entries)[optionIndex];
+        if (entry->challengeType != "9") {
+            Q_WARN("TFA methods other than SMS not supported yet.");
+            break;
+        }
+
+        // Look for the appropriate form:
+        int startpos = strResponse.indexOf("/signin/challenge/ip");
+        if (-1 == startpos) {
+            Q_WARN("Failed to find the form");
+            break;
+        }
+
+        startpos = strResponse.lastIndexOf("<form", startpos);
+        if (-1 == startpos) {
+            Q_WARN("Failed to find the start of the form");
+            break;
+        }
+
+        int endpos = strResponse.indexOf("</form>");
+        if (-1 == endpos) {
+            Q_WARN("Failed to find the end of the form");
+            break;
+        }
+        endpos += sizeof("</form>") - 1;
+
+        SAFE_DELETE(m_form);
+        m_form = new QGVLoginForm(this);
+        m_form->reply = reply;
+
+        ok = parseForm(strResponse.mid(startpos, endpos-startpos), m_form);
+        if (!ok) {
+            Q_WARN("Failed to parse form");
+            break;
+        }
+
         emit p->twoStepAuthPin(task, entry->optionText);
         ok = true;
     } while (0);
@@ -1200,9 +1236,7 @@ GVApi_login::resumeWithTFAAuth(AsyncTaskToken *task)
             break;
         }
 
-        //TODO: Continue new TFA code path from here
-
-        QString action = task->inParams["tfaAction"].toString();
+        QString action = m_form->attrs["action"].toString();
         if (action.isEmpty()) {
             Q_CRIT("Two factor auth cannot continue without the form action");
             break;
