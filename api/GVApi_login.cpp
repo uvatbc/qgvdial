@@ -288,7 +288,6 @@ GVApi_login::recreateSM()
     QState *getVoicePage      = new QState;
     QState *usernamePage      = new QState;
     QState *passwordPage      = new QState;
-    QState *resumeTFAForm     = new QState;
     QState *inboxPage         = new QState;
     QFinalState *endState     = new QFinalState;
 
@@ -298,7 +297,6 @@ GVApi_login::recreateSM()
         (NULL == getVoicePage) ||
         (NULL == usernamePage) ||
         (NULL == passwordPage) ||
-        (NULL == resumeTFAForm) ||
         (NULL == inboxPage) ||
         (NULL == endState))
     {
@@ -306,7 +304,6 @@ GVApi_login::recreateSM()
 
         SAFE_DELETE(endState);
         SAFE_DELETE(inboxPage);
-        SAFE_DELETE(resumeTFAForm);
         SAFE_DELETE(passwordPage);
         SAFE_DELETE(usernamePage);
         SAFE_DELETE(getVoicePage);
@@ -335,9 +332,6 @@ GVApi_login::recreateSM()
     // Handle the password page:
     QObject::connect(passwordPage, SIGNAL(entered()),
                      this, SLOT(doPasswordPage()));
-    // Handle resuming TFA after user input
-    QObject::connect(resumeTFAForm, SIGNAL(entered()),
-                     this, SLOT(doResumeTFAForm()));
     // After login success (password or TFA), handle the initial inbox page:
     QObject::connect(inboxPage, SIGNAL(entered()),
                      this, SLOT(doInboxPage()));
@@ -350,19 +344,15 @@ GVApi_login::recreateSM()
     ADD_TRANSITION(     getVoicePage, sigLoginFail, loginFailed);
     ADD_TRANSITION(     usernamePage, sigLoginFail, loginFailed);
     ADD_TRANSITION(     passwordPage, sigLoginFail, loginFailed);
-    ADD_TRANSITION(    resumeTFAForm, sigLoginFail, loginFailed);
 
     // getVoicePage -> usernamePage
     ADD_TRANSITION(getVoicePage, sigDoUsernamePage, usernamePage);
     // usernamePage -> passwordPage
     ADD_TRANSITION(usernamePage, sigDoPasswordPage, passwordPage);
-    // passwordPage -> resumeTFAForm
-    ADD_TRANSITION(passwordPage, sigDoResumeTFAForm, resumeTFAForm);
 
     // All these can result in login success and need us to get the inbox page
     ADD_TRANSITION( getVoicePage, sigDoInboxPage, inboxPage);
     ADD_TRANSITION( passwordPage, sigDoInboxPage, inboxPage);
-    ADD_TRANSITION(resumeTFAForm, sigDoInboxPage, inboxPage);
 
     // inboxPage -> loginSuccess: This is the only true successful login.
     ADD_TRANSITION(inboxPage, sigLoginSuccess, loginSuccess);
@@ -1276,11 +1266,6 @@ GVApi_login::resumeWithTFAAuth(AsyncTaskToken *task)
         }
     }
 }//GVApi_login::resumeWithTFAAuth
-
-void
-GVApi_login::doResumeTFAForm()
-{
-}//GVApi_login::doResumeTFAForm
 
 void
 GVApi_login::keepOnlyAllowedPostParams(QGVLoginForm *form)

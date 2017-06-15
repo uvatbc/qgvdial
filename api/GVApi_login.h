@@ -91,7 +91,6 @@ private slots:
     void doGetVoicePage();
     void doUsernamePage();
     void doPasswordPage();
-    void doResumeTFAForm();
     void doInboxPage();
 
     void onGetVoicePage(bool success, const QByteArray &response,
