@@ -459,7 +459,7 @@ GVApi_login::onGetVoicePage(bool success, const QByteArray &response,
     do {
         if (!success) {
             Q_WARN(QString("success = false. error = %1")
-                   .arg(NwHelpers::nwErrorToString(reply->error())));
+                   .arg(NwHelpers::nwErrorToString(reply)));
             emit sigLoginFail ();
             break;
         }
@@ -571,7 +571,7 @@ GVApi_login::onPostUsernamePage(bool success, const QByteArray &response,
     do {
         if (!success) {
             Q_WARN(QString("success = false. error = %1")
-                   .arg(NwHelpers::nwErrorToString(reply->error())));
+                   .arg(NwHelpers::nwErrorToString(reply)));
             emit sigLoginFail ();
             break;
         }
@@ -685,7 +685,7 @@ GVApi_login::onPostPasswordPage(bool success, const QByteArray &response,
     do {
         if (!success) {
             Q_WARN(QString("success = false. error = %1")
-                   .arg(NwHelpers::nwErrorToString(reply->error())));
+                   .arg(NwHelpers::nwErrorToString(reply)));
             emit sigLoginFail ();
             break;
         }
@@ -988,7 +988,7 @@ GVApi_login::onChallengeSkipPage(bool success, const QByteArray &response,
     do {
         if (!success) {
             Q_WARN(QString("success = false. error = %1")
-                   .arg(NwHelpers::nwErrorToString(reply->error())));
+                   .arg(NwHelpers::nwErrorToString(reply)));
             token->status = ATTS_NW_ERROR;
             break;
         }
@@ -1182,7 +1182,7 @@ GVApi_login::onPostAuthOption(bool ok, const QByteArray &response,
     do {
         if (!ok) {
             Q_WARN(QString("success = false. error = %1")
-                   .arg(NwHelpers::nwErrorToString(reply->error())));
+                   .arg(NwHelpers::nwErrorToString(reply)));
             break;
         }
 
@@ -1486,7 +1486,7 @@ GVApi_login::onPostInboxPage(bool success, const QByteArray &response,
     do {
         if (!success) {
             Q_WARN(QString("success = false. error = %1")
-                   .arg(NwHelpers::nwErrorToString(reply->error())));
+                   .arg(NwHelpers::nwErrorToString(reply)));
             task->status = ATTS_NW_ERROR;
             break;
         }
@@ -1579,7 +1579,7 @@ GVApi_login::onLogout(bool success, const QByteArray & /*response*/,
 
     if (!success) {
         Q_WARN(QString("success = false. error = %1")
-               .arg(NwHelpers::nwErrorToString(reply->error())));
+               .arg(NwHelpers::nwErrorToString(reply)));
         token->status = ATTS_FAILURE;
     }
     else {

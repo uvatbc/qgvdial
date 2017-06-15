@@ -105,6 +105,7 @@ public:
 
     static QString convertHtmlAmps(const QString &input);
 
+    static const char * nwErrorToString(QNetworkReply *reply);
     static const char * nwErrorToString(QNetworkReply::NetworkError err);
 };
 

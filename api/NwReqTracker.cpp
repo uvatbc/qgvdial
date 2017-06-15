@@ -631,6 +631,12 @@ NwHelpers::convertHtmlAmps(const QString &input)
 }//NwHelpers::convertHtmlAmps
 
 const char *
+NwHelpers::nwErrorToString(QNetworkReply *reply)
+{
+    return nwErrorToString(reply->error());
+}//NwHelpers::nwErrorToString
+
+const char *
 NwHelpers::nwErrorToString(QNetworkReply::NetworkError err)
 {
     switch (err) {
