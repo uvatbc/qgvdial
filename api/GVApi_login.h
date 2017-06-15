@@ -146,6 +146,8 @@ private:
 
     void freeChallengeList(QList<QGVChallengeListEntry *> *entries);
 
+    bool searchForAuthPinForm(const QString &strResponse, QNetworkReply *reply);
+
 private:
     QVariantMap m_hiddenLoginFields;
 

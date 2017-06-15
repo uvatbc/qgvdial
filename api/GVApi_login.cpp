@@ -1086,6 +1086,9 @@ GVApi_login::resumeWithTFAOption(AsyncTaskToken *task)
             Q_WARN(QString("Unknown challenge type: %1").arg(entry->challengeType));
         }
 
+        task->inParams["challengeType"] = entry->challengeType;
+        task->inParams["optionText"] = entry->optionText;
+
         QString action = entry->form.attrs["action"].toString();
         QUrl url = fixActionUrl(&entry->form, action);
         ok = postForm(url, &entry->form, task,
@@ -1098,12 +1101,81 @@ GVApi_login::resumeWithTFAOption(AsyncTaskToken *task)
         ok = true;
     } while (0);
 
+    task->apiCtx = NULL;
+    freeChallengeList(entries);
+
     if (!ok) {
-        task->apiCtx = NULL;
-        freeChallengeList(entries);
         emit sigLoginFail();
     }
 }//GVApi_login::resumeWithTFAOption
+
+bool
+GVApi_login::searchForAuthPinForm(const QString &strResponse, QNetworkReply *reply)
+{
+    int startpos = 0, endpos = 0;
+    bool ok = false;
+
+    do {
+        // Look for the appropriate form:
+        startpos = strResponse.indexOf("/signin/challenge/ip", endpos);
+        if (-1 == startpos) {
+            Q_WARN("Failed to find the form");
+            break;
+        }
+
+        startpos = strResponse.lastIndexOf("<form", startpos);
+        if (-1 == startpos) {
+            Q_WARN("Failed to find the start of the form");
+            break;
+        }
+
+        if (startpos < endpos) {
+            Q_WARN(QString("Invalid form start point: start=%1 is before the end of the previous form end=%2")
+                    .arg(startpos).arg(endpos));
+            break;
+        }
+
+        endpos = strResponse.indexOf("</form>");
+        if (-1 == endpos) {
+            Q_WARN("Failed to find the end of the form");
+            break;
+        }
+        endpos += sizeof("</form>") - 1;
+
+        if (strResponse.mid(startpos, endpos-startpos).indexOf("<content>") == -1) {
+            Q_DEBUG(QString("Ignore mid[%1,%2]").arg(startpos).arg(endpos));
+            continue;
+        }
+
+        SAFE_DELETE(m_form);
+        m_form = new QGVLoginForm(this);
+        m_form->reply = reply;
+
+        ok = parseForm(strResponse.mid(startpos, endpos-startpos), m_form);
+        if (!ok) {
+            SAFE_DELETE(m_form);
+            Q_WARN("Failed to parse form");
+            break;
+        }
+
+#if 0
+        Q_DEBUG("Hidden");
+        for (QVariantMap::const_iterator iter = m_form->hidden.begin(); iter != m_form->hidden.end(); ++iter) {
+            Q_DEBUG(QString("[%1] = %2").arg(iter.key()).arg(iter.value().toString()));
+        }
+        Q_DEBUG("Visible");
+        for (QVariantMap::const_iterator iter = m_form->visible.begin(); iter != m_form->visible.end(); ++iter) {
+            Q_DEBUG(QString("[%1] = %2").arg(iter.key()).arg(iter.value().toString()));
+        }
+        Q_DEBUG("*****");
+#endif
+
+        ok = true;
+        break;
+    } while (1);
+
+    return ok;
+}//GVApi_login::searchForAuthPinForm
 
 void
 GVApi_login::onPostAuthOption(bool ok, const QByteArray &response,
@@ -1112,9 +1184,6 @@ GVApi_login::onPostAuthOption(bool ok, const QByteArray &response,
     GVApi *p = (GVApi *)this->parent();
     AsyncTaskToken *task = (AsyncTaskToken *)ctx;
     QString strResponse = response;
-    QList<QGVChallengeListEntry *> *entries = NULL;
-    QGVChallengeListEntry *entry = NULL;
-    int optionIndex;
 
 #if 0
     Q_DEBUG(strResponse);
@@ -1127,67 +1196,22 @@ GVApi_login::onPostAuthOption(bool ok, const QByteArray &response,
             break;
         }
 
-        entries = (QList<QGVChallengeListEntry *> *)task->apiCtx;
-        if (NULL == entries) {
-            Q_WARN("No entries in task!");
-            break;
-        }
-
-        if (!task->inParams.contains("tfaOption")) {
-            Q_WARN("tfaOption not provided");
-            break;
-        }
-        optionIndex = task->inParams["tfaOption"].toInt();
-
-        if ((optionIndex < 0) || (optionIndex > entries->length())) {
-            Q_WARN(QString("Out of bounds option. Max = %1. Selected = %2")
-                .arg(entries->length()).arg(optionIndex));
-            break;
-        }
-        entry = (*entries)[optionIndex];
-
-        if (entry->challengeType != "9") {
+        if (task->inParams["challengeType"].toString() != "9") {
             Q_WARN("TFA methods other than SMS not supported yet.");
             break;
         }
 
-        // Look for the appropriate form:
-        int startpos = strResponse.indexOf("/signin/challenge/ip");
-        if (-1 == startpos) {
-            Q_WARN("Failed to find the form");
-            break;
-        }
-
-        startpos = strResponse.lastIndexOf("<form", startpos);
-        if (-1 == startpos) {
-            Q_WARN("Failed to find the start of the form");
-            break;
-        }
-
-        int endpos = strResponse.indexOf("</form>");
-        if (-1 == endpos) {
-            Q_WARN("Failed to find the end of the form");
-            break;
-        }
-        endpos += sizeof("</form>") - 1;
-
-        SAFE_DELETE(m_form);
-        m_form = new QGVLoginForm(this);
-        m_form->reply = reply;
-
-        ok = parseForm(strResponse.mid(startpos, endpos-startpos), m_form);
+        ok = searchForAuthPinForm(strResponse, reply);
         if (!ok) {
-            Q_WARN("Failed to parse form");
+            Q_WARN("Failed to search for the auth pin form");
             break;
         }
 
-        emit p->twoStepAuthPin(task, entry->optionText);
+        emit p->twoStepAuthPin(task, task->inParams["optionText"].toString());
         ok = true;
     } while (0);
 
     if (!ok) {
-        task->apiCtx = NULL;
-        freeChallengeList(entries);
         emit sigLoginFail();
     }
 }//GVApi_login::onPostAuthOption
@@ -1197,38 +1221,11 @@ GVApi_login::resumeWithTFAAuth(AsyncTaskToken *task)
 {
     bool ok;
     GVApi *p = (GVApi *)this->parent();
-    QList<QGVChallengeListEntry *> *entries = NULL;
-    QGVChallengeListEntry *entry = NULL;
-    int optionIndex;
 
     Q_ASSERT(task == m_loginToken);
 
     do {
         ok = false;
-
-        entries = (QList<QGVChallengeListEntry *> *)task->apiCtx;
-        if (NULL == entries) {
-            Q_WARN("No entries in task!");
-            break;
-        }
-
-        if (!task->inParams.contains("tfaOption")) {
-            Q_WARN("tfaOption not provided");
-            break;
-        }
-        optionIndex = task->inParams["tfaOption"].toInt();
-
-        if ((optionIndex < 0) || (optionIndex > entries->length())) {
-            Q_WARN(QString("Out of bounds option. Max = %1. Selected = %2")
-                .arg(entries->length()).arg(optionIndex));
-            break;
-        }
-        entry = (*entries)[optionIndex];
-
-        if (!task->inParams.contains("tfaPin")) {
-            Q_WARN("TFA Pin not provided. Aborting login.");
-            break;
-        }
 
         QString smsUserPin = task->inParams["tfaPin"].toString();
         if (smsUserPin.isEmpty()) {
@@ -1236,21 +1233,25 @@ GVApi_login::resumeWithTFAAuth(AsyncTaskToken *task)
             break;
         }
 
-        QString action = m_form->attrs["action"].toString();
+        QString action = fixActionUrl(m_form, m_form->attrs["action"].toString());
         if (action.isEmpty()) {
             Q_CRIT("Two factor auth cannot continue without the form action");
             break;
         }
 
-        QUrl url(action);
-
-        // Store the pin and the TrustDevice flag
-        m_form->visible["Pin"] = smsUserPin;
-        m_form->visible["TrustDevice"] = "on";
+        if (task->inParams["challengeType"].toString() == "9") {
+            // Store the pin and the TrustDevice flag
+            m_form->visible["Pin"] = smsUserPin;
+            m_form->visible["TrustDevice"] = "on";
+        } else {
+            Q_CRIT("NOT SUPPORTED YET!");
+            break;
+        }
 
         // Remove all useless parameters
         keepOnlyAllowedPostParams(m_form);
 
+        QUrl url(action);
         ok = postForm(url, m_form, task,
             SLOT(onPostPasswordPage(bool,const QByteArray&,QNetworkReply*,void*)));
         if (!ok) {
