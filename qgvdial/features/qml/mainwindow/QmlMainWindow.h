@@ -91,7 +91,8 @@ protected:
 
     void uiUpdateProxySettings(const ProxyInfo &info);
     void uiRequestLoginDetails();
-    void uiRequestTFALoginDetails(void *ctx);
+    void uiRequestTFAOption(void *ctx, QStringList options);
+    void uiRequestTFAAuth(void *ctx, QString option);
     void uiSetUserPass(bool editable);
 
     virtual void uiOpenBrowser(const QUrl &url);

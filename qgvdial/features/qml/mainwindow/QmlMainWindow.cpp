@@ -555,14 +555,21 @@ QmlMainWindow::uiRequestLoginDetails()
 }//QmlMainWindow::uiRequestLoginDetails
 
 void
-QmlMainWindow::uiRequestTFALoginDetails(void *ctx)
+QmlMainWindow::uiRequestTFAOption(void *ctx, QStringList options)
+{
+    Q_CRIT("This does not work as expected!");
+    Q_ASSERT(NULL == "This does not work as expected!");
+}//QmlMainWindow::uiRequestTFAOption
+
+void
+QmlMainWindow::uiRequestTFAAuth(void *ctx, QString option)
 {
     m_tfaCtx = ctx;
 
     // Push the TFA dialog on to the main page
     tfaPinDlg->setProperty ("textPin", QString());
     QMetaObject::invokeMethod (mainPageStack, "pushTfaDlg");
-}//QmlMainWindow::uiRequestTFALoginDetails
+}//QmlMainWindow::uiRequestTFAAuth
 
 void
 QmlMainWindow::onTfaPinDlg(bool accepted)
@@ -572,15 +579,7 @@ QmlMainWindow::onTfaPinDlg(bool accepted)
         Q_WARN("pin is empty");
     }
 
-    int pin = strPin.toInt();
-
-    if (accepted) {
-        if (pin == 0) {
-            resumeTFAAuth (m_tfaCtx, pin, true);
-        } else {
-            resumeTFAAuth (m_tfaCtx, pin, false);
-        }
-    }
+    resumeWithTFAAuth(m_tfaCtx, strPin);
 }//QmlMainWindow::onTfaPinDlg
 
 void
