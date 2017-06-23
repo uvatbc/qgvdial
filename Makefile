@@ -24,16 +24,13 @@ dev_enter:
 		accupara/qgvdial_qt5_amd64 \
 		/bin/bash
 
-dev_make_prep: $(GITROOT)/build/dev/Makefile
+dev_make:
 	mkdir -p $(GITROOT)/build/dev
 	docker run \
 		--rm -it \
 		-v $(GITROOT):/tmp/src \
 		accupara/qgvdial_qt5_amd64 \
 		bash -c 'cd /tmp/src/build/dev ; qmake ../../qgvdial/qt-not-qml/desktop_linux.pro'
-
-dev_make: dev_make_prep
-	mkdir -p $(GITROOT)/build/dev
 	docker run \
 		--rm -it \
 		-v $(GITROOT):/tmp/src \
