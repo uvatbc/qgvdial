@@ -30,6 +30,11 @@ dev_make:
 		--rm -it \
 		-v $(GITROOT):/tmp/src \
 		accupara/qgvdial_qt5_amd64 \
+		bash -c 'cd /tmp/src/qgvdial/features/dbus_api/gen ; ./create_ifaces.sh'
+	docker run \
+		--rm -it \
+		-v $(GITROOT):/tmp/src \
+		accupara/qgvdial_qt5_amd64 \
 		bash -c 'cd /tmp/src/build/dev ; qmake ../../qgvdial/qt-not-qml/desktop_linux.pro'
 	docker run \
 		--rm -it \
