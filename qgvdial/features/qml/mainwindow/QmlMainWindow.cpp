@@ -202,9 +202,15 @@ bool
 QmlMainWindow::initDBus()
 {
     QDBusConnection sessionBus = QDBusConnection::sessionBus ();
+    if (sessionBus.lastError().isValid() && (sessionBus.lastError().type() != QDBusError::NoError)) {
+        Q_WARN(QString("Failed to connect to session bus. Error: %1")
+               .arg(sessionBus.lastError().message()));
+        return false;
+    }
     if (!sessionBus.registerService ("org.QGVDial.APIServer")) {
-        Q_WARN("Failed to register Dbus Settings server in this instance... "
-               "Attempting to show the other instance");
+        Q_WARN(QString("Failed to register Dbus Settings server in this instance... "
+                       "Attempting to show the other instance. Error: %1")
+               .arg(sessionBus.lastError().message()));
 
         QDBusMessage msg =
         QDBusMessage::createMethodCall ("org.QGVDial.APIServer",
