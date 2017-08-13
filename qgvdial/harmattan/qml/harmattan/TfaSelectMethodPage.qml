@@ -25,34 +25,81 @@ import com.nokia.meego 1.1
 Page {
     id: container
 
-    property variant tfaMethodModel: []
-    property alias selectedIndex: optionsList.selectedIndex
-
     signal done(bool accepted, int selection)
     onDone: { g_mainwindow.onTfaMethodDlg(accepted, selection); }
 
-    onTfaMethodModelChanged: {
-        console.log("Model changed. len = " + optionsList.model.count)
+    function clearModel() {
+        optionsList.model.clear();
+    }
+    function setModel(option) {
+        optionsList.model.append({name: option});
     }
 
-    SelectionDialog {
-        id: optionsList
+    Label {
+        id: topLabel
+        text: "Select the TFA method"
+        anchors {
+            top: parent.top
+        }
 
-        model: container.tfaMethodModel
+        color: "white"
+        font.pixelSize: 45
+    }
+
+    ListView {
+        id: optionsList
 
         width: parent.width
         anchors {
-            top: parent.top
-            bottom: buttonRow.top - 5
+            top: topLabel.bottom
+            topMargin: 5
+            bottom: buttonRow.top
+            bottomMargin: 5
         }
-    }//SelectionDialog
+
+        clip: true
+
+        model: ListModel {
+            ListElement { name: "who" }
+            ListElement { name: "why" }
+        }
+
+        delegate: Label {
+            text: name
+            color: "white"
+            font.pixelSize: 40
+
+            width: optionsList.width - 5
+
+            Rectangle {
+                anchors.fill: parent
+                color: "transparent"
+                border.color: (index == optionsList.currentIndex ? "orange" : "transparent")
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    var i;
+                    for (i = 0; i < optionsList.model.count; i++) {
+                        if (optionsList.model.get(i).name == text) {
+                            optionsList.currentIndex = i;
+                        }
+                    }
+                    console.log("Text = " + text + ", index = " + optionsList.currentIndex)
+                }
+            }
+        }
+    }
 
     ButtonRow {
         id: buttonRow
 
+        width: parent.width * 8/10
         anchors {
+            bottom: parent.bottom
+            bottomMargin: 15
             horizontalCenter: parent.horizontalCenter
-            bottom: parent.bottom - 15
         }
 
         exclusive: false

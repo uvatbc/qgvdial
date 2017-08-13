@@ -574,6 +574,12 @@ QmlMainWindow::uiRequestTFAOption(void *ctx, QStringList options)
     // Push the TFA dialog on to the main page
     tfaMethodPage->setProperty ("tfaMethodModel", QVariant::fromValue(options));
     QMetaObject::invokeMethod (mainPageStack, "pushTfaMethodDlg");
+
+    QMetaObject::invokeMethod(tfaMethodPage, "clearModel");
+    for (int i = 0; i < options.length(); i++) {
+        QMetaObject::invokeMethod(tfaMethodPage, "setModel",
+                                  Q_ARG(QVariant, options[i]));
+    }
 }//QmlMainWindow::uiRequestTFAOption
 
 void
@@ -703,8 +709,8 @@ QmlMainWindow::uiRefreshNumbers()
 void
 QmlMainWindow::uiSetNewContactDetailsModel()
 {
-    m_view->rootContext() ->setContextProperty("g_ContactPhonesModel",
-                                               oContacts.m_contactPhonesModel);
+    m_view->rootContext()->setContextProperty("g_ContactPhonesModel",
+                                              oContacts.m_contactPhonesModel);
 }//QmlMainWindow::uiSetNewContactDetailsModel
 
 void
@@ -712,10 +718,10 @@ QmlMainWindow::uiShowContactDetails(const ContactInfo &cinfo)
 {
     QString photoPath = correctedPhotoUrlPath (cinfo.strPhotoPath);
 
-    QMetaObject::invokeMethod (mainPageStack, "showContactDetails",
-                               Q_ARG(QVariant, QVariant(photoPath)),
-                               Q_ARG(QVariant, QVariant(cinfo.strTitle)),
-                               Q_ARG(QVariant, QVariant(cinfo.strNotes)));
+    QMetaObject::invokeMethod(mainPageStack, "showContactDetails",
+                              Q_ARG(QVariant, QVariant(photoPath)),
+                              Q_ARG(QVariant, QVariant(cinfo.strTitle)),
+                              Q_ARG(QVariant, QVariant(cinfo.strNotes)));
 }//QmlMainWindow::uiShowContactDetails
 
 QString
