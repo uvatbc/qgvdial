@@ -284,6 +284,19 @@ qgvdial_harmattan_x86_nodeb_ctr:
 			GITROOT=$(GITROOT) GITHASH=$(GITHASH) GITREV=$(GITREV) \
 			qgvdial_harmattan_x86_nodeb
 
+qgvdial_harmattan_start_ctr:
+	@echo "Run these commands:"
+	@echo "  sudo /scratchbox/sbin/sbox_ctl start"
+	@echo "  sudo /scratchbox/sbin/sbox_sync"
+	@echo "  sb-conf select HARMATTAN_X86"
+	@echo "  sb-conf select HARMATTAN_ARMEL"
+	docker run \
+		--rm -it \
+		-v $(GITROOT):/scratchbox/users/admin/home/admin/src \
+		--privileged \
+		accupara/harmattan \
+		bash
+
 ############################### bb10 #################################
 qgvdial_bb10_arm:
 	$(MAKE) -j$(NUMCORES) \
