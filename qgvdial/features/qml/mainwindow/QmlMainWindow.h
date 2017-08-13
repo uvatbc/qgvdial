@@ -55,6 +55,7 @@ protected slots:
 
     Q_INVOKABLE void onLoginButtonClicked();
     Q_INVOKABLE void onTfaPinDlg(bool accepted);
+    Q_INVOKABLE void onTfaMethodDlg(bool accepted, int selection);
 
     void onSigProxyChanges(bool enable, bool useSystemProxy, QString server,
                            int port, bool authRequired, QString user,
@@ -130,6 +131,7 @@ protected:
     QObject *mainTabGroup;
     QObject *loginExpand;
     QObject *loginButton;
+    QObject *tfaMethodPage;
     QObject *tfaPinDlg;
     QObject *textUsername;
     QObject *textPassword;

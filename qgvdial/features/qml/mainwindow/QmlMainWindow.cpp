@@ -103,6 +103,7 @@ QmlMainWindow::QmlMainWindow(QObject *parent)
 , mainTabGroup(NULL)
 , loginExpand(NULL)
 , loginButton(NULL)
+, tfaMethodPage(NULL)
 , tfaPinDlg(NULL)
 , textUsername(NULL)
 , textPassword(NULL)
@@ -337,6 +338,11 @@ QmlMainWindow::initQmlObjects()
             break;
         }
 
+        tfaMethodPage = getQMLObject ("TFASelectMethodPage");
+        if (NULL == tfaMethodPage) {
+            break;
+        }
+
         tfaPinDlg = getQMLObject ("TFAPinDialog");
         if (NULL == tfaPinDlg) {
             break;
@@ -563,9 +569,25 @@ QmlMainWindow::uiRequestLoginDetails()
 void
 QmlMainWindow::uiRequestTFAOption(void *ctx, QStringList options)
 {
-    Q_CRIT("This does not work as expected!");
-    Q_ASSERT(NULL == "This does not work as expected!");
+    m_tfaCtx = ctx;
+
+    // Push the TFA dialog on to the main page
+    tfaMethodPage->setProperty ("tfaMethodModel", QVariant::fromValue(options));
+    QMetaObject::invokeMethod (mainPageStack, "pushTfaMethodDlg");
 }//QmlMainWindow::uiRequestTFAOption
+
+void
+QmlMainWindow::onTfaMethodDlg(bool accepted, int selection)
+{
+    if ((!accepted) || (-1 == selection)) {
+        Q_WARN("User requested cancel.");
+        cancelLogin(m_tfaCtx);
+    } else {
+        resumeWithTFAOption(m_tfaCtx, selection);
+    }
+
+    m_tfaCtx = NULL;
+}//QmlMainWindow::onTfaMethodDlg
 
 void
 QmlMainWindow::uiRequestTFAAuth(void *ctx, QString option)
@@ -586,6 +608,7 @@ QmlMainWindow::onTfaPinDlg(bool accepted)
     }
 
     resumeWithTFAAuth(m_tfaCtx, strPin);
+    m_tfaCtx = NULL;
 }//QmlMainWindow::onTfaPinDlg
 
 void

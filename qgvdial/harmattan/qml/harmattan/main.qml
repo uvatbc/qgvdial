@@ -32,6 +32,9 @@ PageStackWindow {
         theme.inverted = true;
     }
 
+    function pushTfaMethodDlg() {
+        pageStack.push(tfaMethodDlg);
+    }
     function pushTfaDlg() {
         pageStack.push(tfaPinDlg);
     }
@@ -185,6 +188,12 @@ PageStackWindow {
             }
         }//ToolBarLayout
     }
+
+    TfaSelectMethodPage {
+        id: tfaMethodDlg
+        objectName: "TFASelectMethodPage"
+        onDone: { appWindow.popPageStackTop(); }
+    }//TFA Dialog
 
     TfaPinPage {
         id: tfaPinDlg
