@@ -77,6 +77,7 @@ Page {
             ListElement { name: "Received" }
             ListElement { name: "Voicemail" }
             ListElement { name: "SMS" }
+            ListElement { name: "Unread" }
         }
     }
 
