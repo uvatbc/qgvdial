@@ -76,6 +76,9 @@ Page {
                 smooth: true
                 wrapMode: TextEdit.Wrap
                 readOnly: true
+                style: TextAreaStyle {
+                    textColor: "white"
+                }
                 width: parent.width - 40
             }
 
