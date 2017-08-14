@@ -938,8 +938,8 @@ GVApi_login::parseChallengeUL(const QString &challengeUL, QList<QGVChallengeList
         // Parse li into a form
         if (!parseForm(entry->li, &entry->form)) {
             Q_WARN("Failed to parse form fields. Giving up.");
-            ok = false;
-            break;
+            delete entry;
+            goto next_entry;
         }
 
         // Make sure this entry has a challenge type. Without it, this entry is useless.
