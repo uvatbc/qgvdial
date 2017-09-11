@@ -23,6 +23,8 @@ Contact: yuvraaj@gmail.com
 #include <iostream>
 using namespace std;
 
+#define DIRNAME ".qgvnotify"
+
 QStringList arrLogFiles;
 QFile fLogfile;       //! Logfile
 int   logCounter = 0; //! Number of log entries since the last log flush
@@ -97,11 +99,11 @@ baseDir()
 {
     QString strBasedir = QDir::homePath();
     QDir baseDir(strBasedir);
-    if (!baseDir.exists(".qgvdial")) {
-        baseDir.mkdir(".qgvdial");
+    if (!baseDir.exists(DIRNAME)) {
+        baseDir.mkdir(DIRNAME);
     }
     strBasedir += QDir::separator();
-    strBasedir += ".qgvdial";
+    strBasedir += DIRNAME;
     return strBasedir;
 }//baseDir
 

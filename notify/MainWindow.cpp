@@ -24,6 +24,8 @@ Contact: yuvraaj@gmail.com
 #include <iostream>
 using namespace std;
 
+#define QGV_CIPHER_KEY "01234567890123456789012345678901"
+
 // Forward function declarations
 QString baseDir();
 void initLogging(const QString &userIni);
@@ -36,7 +38,6 @@ MainWindow::MainWindow(QObject *parent /*= 0*/)
 , oContacts(this)
 , oInbox(gvApi, this)
 , checkCounter(0)
-, client(NULL)
 {
     qRegisterMetaType<ContactInfo>("ContactInfo");
 
@@ -84,18 +85,6 @@ MainWindow::init()
     if (sec < 0) sec = 1;
     QTimer::singleShot(sec * 1000, this, SLOT(dailyTimeout()));
     Q_DEBUG(QString("Daily timer first shot after %1 seconds").arg(sec));
-
-    client = new QGVNotifyProxyIface("net.yuvraaj.qgvnotify.control", "/",
-                                     QDBusConnection::sessionBus(), 0);
-    if (NULL == client) {
-        Q_CRIT("Failed to initialize DBus client");
-        getOut();
-        return;
-    }
-    connect(client, SIGNAL(CommandForClient(const QString&)),
-            this  , SLOT(onCommandForClient(const QString&)));
-
-    onCommandForClient("getUser");
 
     doWork();
 }//MainWindow::init
@@ -307,6 +296,8 @@ MainWindow::checkParams()
                                    bProxyAuth,
                                    strProxyUser, strProxyPass);
         }
+
+        settings.sync();
         rv = true;
     } while (0); // End cleanup block (not a loop)
 
@@ -322,7 +313,6 @@ MainWindow::cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt)
     memset(&cipherCtx, 0, sizeof cipherCtx);
     memset(&cipherIv, 0xFA, sizeof cipherIv);
 
-#define QGV_CIPHER_KEY "01234567890123456789012345678901"
     EVP_CIPHER_CTX_init(&cipherCtx);
     iEVP = EVP_CipherInit_ex(&cipherCtx, EVP_aes_256_cbc(), NULL, NULL, NULL,
                               bEncrypt?1:0);
@@ -597,24 +587,6 @@ MainWindow::getOut()
     Q_DEBUG("quit!!");
     qApp->quit();
 }//MainWindow::getOut
-
-void
-MainWindow::onCommandForClient(const QString &command)
-{
-    Q_DEBUG(QString("command = %1").arg(command));
-
-    if (NULL == client) {
-        Q_WARN("client is NULL");
-        return;
-    }
-
-    if (command == "getUser") {
-        client->ReportUser(strUser, strIni, strLogfile,
-                           qApp->applicationPid());
-    } else if (command == "quitAll") {
-        getOut();
-    }
-}//MainWindow::onCommandForClient
 
 void
 MainWindow::loadCookies()

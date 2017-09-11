@@ -29,7 +29,6 @@ Contact: yuvraaj@gmail.com
 #include "GVApi.h"
 #include "NotifyGVContactsTable.h"
 #include "NotifyGVInbox.h"
-#include "dbusinterface/qgvn_proxy.h"
 
 class MainWindow : public QObject
 {
@@ -54,7 +53,6 @@ private slots:
     void dailyTimeout();
 
     void getOut();
-    void onCommandForClient(const QString &command);
 
 private:
     void doLogin ();
@@ -102,9 +100,6 @@ private:
 
     //! Number of times we checked
     quint64         checkCounter;
-
-    //! Object for DBus client
-    QGVNotifyProxyIface *client;
 };
 
 #endif //_MAINWINDOW_H_

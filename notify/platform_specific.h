@@ -22,7 +22,6 @@ Contact: yuvraaj@gmail.com
 #ifndef PLATFORMSPECIFIC_H
 #define PLATFORMSPECIFIC_H
 
-#include <QtDBus>
 #include <QtCore>
 
 #define PHONON_ENABLED 0
