@@ -64,7 +64,7 @@ Contact: yuvraaj@gmail.com
  *      -> uiRequestTFAAuth() -> resumeWithTFAAuth() ]
  *      -> uiLoginDone(...)
  *
- * -> onInitDone(): If the credentials are NOT saved in the cache, then I need
+ * -> onInitDone(): If the credentials are NOT saved in the cache, then we need
  *      to go ask the user for it. This varies based on the UI and thus must be
  *      implemented by the derived class (DC). As so:
  * -> uiRequestLoginDetails(): In this function, the DC must open the settings

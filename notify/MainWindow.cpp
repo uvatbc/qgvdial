@@ -52,8 +52,10 @@ MainWindow::setStatus(const QString &strText, int /*timeout = 3000*/)
 void
 MainWindow::init()
 {
-    connect(&gvApi, SIGNAL(twoStepAuthentication(AsyncTaskToken*)),
-             this , SLOT(onTwoStepAuthentication(AsyncTaskToken*)));
+    connect(&gvApi, SIGNAL(twoStepAuthOptions(AsyncTaskToken*,QStringList)),
+            this, SLOT(onTFARequest(AsyncTaskToken*,QStringList)));
+    connect(&gvApi, SIGNAL(twoStepAuthPin(AsyncTaskToken*,QString)),
+            this, SLOT(onTFAPinRequest(AsyncTaskToken*,QString)));
 
     // Status from contacts object
     QObject::connect(&oContacts, SIGNAL(status(const QString&,int)),
@@ -488,25 +490,46 @@ MainWindow::logoutCompleted()
 }//MainWindow::logoutCompleted
 
 void
-MainWindow::onTwoStepAuthentication(AsyncTaskToken *token)
+MainWindow::onTFARequest(AsyncTaskToken *token, QStringList options)
 {
     QTextStream in(stdin);
 
-    qWarning("Two step authentication PIN required.");
-
-    QString strPIN;
-    cout << "Enter PIN:";
-    in >> strPIN;
-
-    if (strPIN.startsWith('-')) {
-        qWarning("Requesting GV Api to call you:");
-        gvApi.resumeTFAAltLogin(token);
-    } else {
-        token->inParams["user_pin"] = strPIN;
-        tfaRequired = true;
-        gvApi.resumeTFALogin(token);
+    qWarning("Two step authentication method needs to be chosen:");
+    cout << "TFA Options:" << endl;
+    for (int i = 0; i < options.length(); i++) {
+        cout << (i+1) << " : " << options[i].toLatin1().constData() << endl;
     }
-}//MainWindow::onTwoStepAuthentication
+
+    bool valid = false;
+    int optnum;
+    do {
+        cout << "Choose a method: " << endl;
+        in >> optnum;
+
+        if ((optnum > 0) && (optnum <= options.length())) {
+            optnum--;
+            valid = true;
+        }
+    } while (!valid);
+
+    token->inParams["tfaOption"] = optnum;
+    gvApi.resumeWithTFAOption(token);
+}//MainWindow::onTFARequest
+
+void
+MainWindow::onTFAPinRequest(AsyncTaskToken *task, QString option)
+{
+    QTextStream in(stdin);
+
+    qWarning("Two step PIN required");
+
+    cout << option.toLatin1().constData() << " : " << endl;
+    QString pin;
+    in >> pin;
+
+    task->inParams["tfaPin"] = pin;
+    gvApi.resumeWithTFAAuth(task);
+}//MainWindow::onTFAPinRequest
 
 void
 MainWindow::getContactsDone(bool bChanges, bool bOK)

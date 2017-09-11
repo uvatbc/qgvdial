@@ -1,4 +1,4 @@
-QT      *= core network sql xml xmlpatterns dbus
+QT      *= core network sql xml xmlpatterns
 TARGET   = qgvnotify
 TEMPLATE = app
 INCLUDEPATH += $$PWD/../qgvdial/common/
@@ -15,16 +15,12 @@ SOURCES  += main.cpp                        \
             MainWindow.cpp                  \
             NotifyGVContactsTable.cpp       \
             NotifyGVInbox.cpp               \
-            dbusinterface/qgvn_adapter.cpp  \
-            dbusinterface/qgvn_proxy.cpp    \
             $$PWD/../qgvdial/common/MqClient.cpp
 
 HEADERS  += platform_specific.h             \
             MainWindow.h                    \
             NotifyGVContactsTable.h         \
             NotifyGVInbox.h                 \
-            dbusinterface/qgvn_adapter.h    \
-            dbusinterface/qgvn_proxy.h      \
             $$PWD/../qgvdial/common/global.h    \
             $$PWD/../qgvdial/common/MqClient.h
             
