@@ -30,9 +30,6 @@ qgvdial/features/dbus_api/gen/api_adapter.h
 notify/dbusinterface/*cpp
 notify/dbusinterface/*h
 
-# All secrets
-secrets
-
 # log files
 logs/**
 
