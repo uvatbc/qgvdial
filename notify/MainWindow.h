@@ -42,24 +42,24 @@ private slots:
     void doWork();
     void setStatus(const QString &strText, int timeout  = 3000);
 
-    void loginCompleted ();
-    void logoutCompleted ();
+    void loginCompleted();
+    void logoutCompleted();
 
     void onTFARequest(AsyncTaskToken *token, QStringList options);
     void onTFAPinRequest(AsyncTaskToken *token, QString pin);
 
-    void getContactsDone (bool bChanges, bool bOK);
-    void inboxChanged ();
+    void getContactsDone(bool bChanges, bool bOK);
+    void inboxChanged();
     void dailyTimeout();
 
     void getOut();
 
 private:
-    void doLogin ();
-    void doLogout ();
-    void startTimer ();
+    void doLogin();
+    void doLogout();
+    void startTimer();
 
-    bool checkParams ();
+    bool checkParams();
     bool cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt);
 
     void loadCookies();
