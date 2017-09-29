@@ -21,7 +21,7 @@ dev_enter:
 	docker run \
 		--rm -it \
 		-v $(GITROOT):/tmp/src \
-		accupara/qgvdial_qt5_amd64 \
+		accupara/qgvdial:qt5_amd64 \
 		/bin/bash
 
 dev_make:
@@ -29,17 +29,17 @@ dev_make:
 	docker run \
 		--rm -it \
 		-v $(GITROOT):/tmp/src \
-		accupara/qgvdial_qt5_amd64 \
+		accupara/qgvdial:qt5_amd64 \
 		bash -c 'cd /tmp/src/qgvdial/features/dbus_api/gen ; ./create_ifaces.sh'
 	docker run \
 		--rm -it \
 		-v $(GITROOT):/tmp/src \
-		accupara/qgvdial_qt5_amd64 \
+		accupara/qgvdial:qt5_amd64 \
 		bash -c 'cd /tmp/src/build/dev ; qmake ../../qgvdial/qt-not-qml/desktop_linux.pro'
 	docker run \
 		--rm -it \
 		-v $(GITROOT):/tmp/src \
-		accupara/qgvdial_qt5_amd64 \
+		accupara/qgvdial:qt5_amd64 \
 		make -C /tmp/src/build/dev -j 4
 
 ############################### x86_64 #################################
@@ -55,7 +55,7 @@ qgvdial_ubuntu_x86_64_ctr:
 	docker run \
 		--rm -it \
 		-v $(GITROOT):/tmp/src \
-		accupara/qgvdial_qt5_amd64 \
+		accupara/qgvdial:qt5_amd64 \
 		make -C /tmp/src \
 		qgvdial_ubuntu_x86_64
 
@@ -70,7 +70,7 @@ qgvdial_ubuntu_x86_64_nodeb_ctr:
 	docker run \
 		--rm -it \
 		-v $(GITROOT):/tmp/src \
-		accupara/qgvdial_qt5_amd64 \
+		accupara/qgvdial:qt5_amd64 \
 		make -C /tmp/src \
 		qgvdial_ubuntu_x86_64_nodeb
 
@@ -87,7 +87,7 @@ qgvdial_ubuntu_x86_ctr:
 	docker run \
 		--rm -it \
 		-v $(GITROOT):/tmp/src \
-		accupara/qgvdial_qt5_i386 \
+		accupara/qgvdial:qt5_i386 \
 		make -C /tmp/src \
 		qgvdial_ubuntu_x86
 
@@ -102,7 +102,7 @@ qgvdial_ubuntu_x86_nodeb_ctr:
 	docker run \
 		--rm -it \
 		-v $(GITROOT):/tmp/src \
-		accupara/qgvdial_qt5_i386 \
+		accupara/qgvdial:qt5_i386 \
 		make -C /tmp/src \
 		qgvdial_ubuntu_x86_nodeb
 
