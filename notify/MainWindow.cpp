@@ -98,7 +98,7 @@ MainWindow::doWork()
     }
 
     checkCounter++;
-    if (0 == checkCounter % 100) {
+    if (0 == (checkCounter % 100)) {
         Q_DEBUG(QString("Checked %1 times").arg(checkCounter));
     }
 
