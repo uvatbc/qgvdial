@@ -45,7 +45,7 @@ MainWindow::MainWindow(QObject *parent /*= 0*/)
 }//MainWindow::MainWindow
 
 void
-MainWindow::setStatus(const QString &strText, int /*timeout = 3000*/)
+MainWindow::setStatus(const QString &strText, int /* timeout = 3000 */ )
 {
     Q_DEBUG(strText);
 }//MainWindow::setStatus
@@ -363,7 +363,7 @@ MainWindow::cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt)
 void
 MainWindow::doLogin()
 {
-    bool bOk = false;
+    bool ok = false;
     AsyncTaskToken *token = new AsyncTaskToken(this);
     do { // Begin cleanup block (not a loop)
         if (!token) {
@@ -373,8 +373,8 @@ MainWindow::doLogin()
 
         //loadCookies();
 
-        bOk = connect(token, SIGNAL(completed()),
-                      this , SLOT(loginCompleted()));
+        ok = connect(token, SIGNAL(completed()),
+                     this , SLOT(loginCompleted()));
 
         token->inParams["user"] = strUser;
         token->inParams["pass"] = strPass;
@@ -387,10 +387,10 @@ MainWindow::doLogin()
             break;
         }
 
-        bOk = true;
+        ok = true;
     } while (0); // End cleanup block (not a loop)
 
-    if (!bOk) {
+    if (!ok) {
         if (token) {
             token->deleteLater();
             token = NULL;
