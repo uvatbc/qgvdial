@@ -33,4 +33,4 @@ notify/dbusinterface/*h
 # log files
 logs/**
 
-crave.conf
+crave*.conf
