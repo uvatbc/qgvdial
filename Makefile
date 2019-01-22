@@ -16,6 +16,12 @@ do_replacements:
 	perl ./build-files/version.pl __THIS_IS_MY_EXTREMELY_LONG_KEY_ $(shell cat ./secrets/cipher_qgvdial | tr -d '\n') .
 	perl ./build-files/version.pl __QT5_BB10__ '\/home\/admin\/bin\/qt5\/armle' .
 
+# Using Crave
+crave_full:
+	./qgvdial/features/dbus_api/gen/create_ifaces.sh
+	mkdir -p build/ubuntu_x86_64
+	cd build/ubuntu_x86_64 ; qmake ../../qgvdial/qt-not-qml/desktop_linux.pro ; make -j
+
 ############################### dev x86_64 #################################
 dev_enter:
 	docker run \
