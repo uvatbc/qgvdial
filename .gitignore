@@ -8,6 +8,7 @@ ui_*h
 **swp
 cscope.out
 .vs
+.vscode
 
 # Windows specific
 qgvdial/qt-not-qml/desktop_windows/Makefile*
