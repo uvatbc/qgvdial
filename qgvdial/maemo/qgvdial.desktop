@@ -1,9 +1,0 @@
-[Desktop Entry]
-Encoding=UTF-8
-Version=__QGVDIAL_VERSION__
-Type=Application
-Name=qgvdial
-Exec=/opt/qgvdial/bin/qgvdial
-Icon=qgvdial
-X-HildonDesk-ShowInToolbar=true
-X-Osso-Type=application/x-executable
