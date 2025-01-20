@@ -23,9 +23,12 @@ HEADERS  += $$PWD/api_common.h \
             $$PWD/ContactsXmlHandler.h \
             $$PWD/HtmlFieldParser.h
 
-QT *= network xml xmlpatterns
+QT *= network xml
 lessThan(QT_MAJOR_VERSION, 5) {
 QT *= script
+}
+lessThan(QT_MAJOR_VERSION, 6) {
+QT *= xmlpatterns
 }
 
 RESOURCES += $$PWD/api.qrc

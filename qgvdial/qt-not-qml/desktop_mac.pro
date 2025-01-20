@@ -4,8 +4,9 @@ include(../features/openssl/openssl-lin.pri)
 #include(../features/skype-desktop/skype.pri)
 include(../features/osver/desktop/mac/osv-mac.pri)
 
-# Mac uses qt5 and webengine
-include($$PWD/../features/webview/webengineview.pri)
+# Mac uses qt6 and webkit
+#include($$PWD/../features/webview/webengineview.pri)
+include($$PWD/../features/webview/webkitview.pri)
 
 INCLUDEPATH += desktop_mac
 SOURCES  += desktop_mac/PhoneFactory.cpp
