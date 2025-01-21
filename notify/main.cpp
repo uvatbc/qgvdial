@@ -42,17 +42,15 @@ qgv_LogFlush()
 }//qgv_LogFlush
 
 void
-myMessageOutput(QtMsgType type, const char *msg)
+myMessageOutput(QtMsgType type, const QMessageLogContext & /*context*/, const QString &msg)
 {
-    QString strMsg = msg;
+    QString strMsg;
     int level = -1;
     switch (type) {
-#if QT_VERSION >= QT_VERSION_CHECK(5,5,0)
-    case QtInfoMsg:
+    case QtDebugMsg:
         level = 4;
         break;
-#endif
-    case QtDebugMsg:
+    case QtInfoMsg:
         level = 3;
         break;
     case QtWarningMsg:
@@ -66,11 +64,10 @@ myMessageOutput(QtMsgType type, const char *msg)
     }
 
     QDateTime dt = QDateTime::currentDateTime();
-    QString strLog = QString("%1 : %2 : %3")
+    QString strLog = QString("%1 : %2 : %3\n")
                      .arg(dt.toString("yyyy-MM-dd hh:mm:ss.zzz"))
                      .arg(level)
-                     .arg(msg)
-                   + "\n";
+                     .arg(msg);
 
     // Send to standard output
     cout << strLog.toStdString();
@@ -84,15 +81,6 @@ myMessageOutput(QtMsgType type, const char *msg)
         abort();
     }
 }//myMessageOutput
-
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-void
-myQt5MessageOutput(QtMsgType type, const QMessageLogContext & /*ctx*/,
-                   const QString &msg)
-{
-    myMessageOutput(type, msg.toLatin1().constData());
-}//myQt5MessageOutput
-#endif
 
 QString
 baseDir()
@@ -141,11 +129,7 @@ initLogging(const QString &userIni = QString())
     }
 
     if (NULL == pOldHandler) {
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-        pOldHandler = qInstallMessageHandler(myQt5MessageOutput);
-#else
-        pOldHandler = qInstallMsgHandler(myMessageOutput);
-#endif
+        pOldHandler = qInstallMessageHandler(myMessageOutput);
     }
 }//initLogging
 

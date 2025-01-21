@@ -57,6 +57,5 @@ RESOURCES += $$PWD/qtnotqml.qrc
 
 include($$PWD/../common/common.pri)
 
-!blackberry {
-    include($$PWD/../features/qtsingleapplication/qtsingleapplication.pri)
-}
+# Every platform has single application functionality
+include($$PWD/../features/qtsingleapplication/qtsingleapplication.pri)

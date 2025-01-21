@@ -62,7 +62,7 @@ void qgv_LogFlush();
 #define DIABLO_OS 0
 #endif
 
-#if (defined(Q_OS_LINUX) || defined(Q_WS_X11)) && !defined(Q_WS_MAEMO_5) && !defined(MEEGO_HARMATTAN) && !defined(Q_OS_BLACKBERRY) && !DIABLO_OS
+#if (defined(Q_OS_LINUX) || defined(Q_WS_X11))
 #define LINUX_DESKTOP 1
 #else
 #define LINUX_DESKTOP 0
@@ -74,13 +74,13 @@ void qgv_LogFlush();
 #define DESKTOP_OS 0
 #endif
 
-#if defined(Q_OS_SYMBIAN) || defined(Q_WS_MAEMO_5) || DIABLO_OS || defined(MEEGO_HARMATTAN) || defined(Q_OS_BLACKBERRY)
+#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
 #define MOBILE_OS 1
 #else
 #define MOBILE_OS 0
 #endif
 
-#if defined(Q_WS_X11) && !defined(DISABLE_TELEPATHY) && !defined(Q_OS_BLACKBERRY)
+#if defined(Q_WS_X11) && !defined(DISABLE_TELEPATHY)
 #define TELEPATHY_CAPABLE 1
 #else
 #define TELEPATHY_CAPABLE 0

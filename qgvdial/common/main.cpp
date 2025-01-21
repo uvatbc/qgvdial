@@ -25,13 +25,8 @@ Contact: yuvraaj@gmail.com
 #include <iostream>
 using namespace std;
 
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-QtMessageHandler pOldHandler = NULL;
-#else
-QtMsgHandler     pOldHandler = NULL;
-#endif
-
-MainWindow     *win = NULL;
+QtMessageHandler pOldHandler = nullptr;
+MainWindow     *win = nullptr;
 
 QFile fLogfile;       //! Logfile
 int   logLevel = 5;   //! Log level
@@ -65,16 +60,15 @@ qgv_LogFlush()
 }
 
 void
-myMessageOutput(QtMsgType type, const char *msg)
+myMessageOutput(QtMsgType type, const QMessageLogContext & /*context*/, const QString &msg)
 {
+    QString strMsg;
     int level = -1;
     switch (type) {
-#if QT_VERSION >= QT_VERSION_CHECK(5,5,0)
-    case QtInfoMsg:
+    case QtDebugMsg:
         level = 4;
         break;
-#endif
-    case QtDebugMsg:
+    case QtInfoMsg:
         level = 3;
         break;
     case QtWarningMsg:
@@ -85,7 +79,6 @@ myMessageOutput(QtMsgType type, const char *msg)
         break;
     case QtFatalMsg:
         level = 0;
-        break;
     }
 
     QDateTime dt = QDateTime::currentDateTime ();
@@ -127,15 +120,6 @@ myMessageOutput(QtMsgType type, const char *msg)
     }
 }//myMessageOutput
 
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-void
-myQt5MessageOutput(QtMsgType type, const QMessageLogContext & /*ctx*/,
-                   const QString &msg)
-{
-   myMessageOutput(type, msg.toLatin1().constData());
-}//myQt5MessageOutput
-#endif
-
 static void
 initLogging ()
 {
@@ -147,11 +131,7 @@ initLogging ()
     fLogfile.setFileName (strLogfile);
     fLogfile.open (QIODevice::ReadWrite);
 
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-    pOldHandler = qInstallMessageHandler(myQt5MessageOutput);
-#else
-    pOldHandler = qInstallMsgHandler(myMessageOutput);
-#endif
+    pOldHandler = qInstallMessageHandler(myMessageOutput);
 }//initLogging
 
 static void
