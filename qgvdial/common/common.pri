@@ -53,4 +53,6 @@ HEADERS  += $$PWD/global.h \
 include($$PWD/phone-account.pri)
 include($$PWD/../../api/api.pri)
 include($$PWD/../features/mixpanel/mixpanel.pri)
-include($$PWD/../features/mqlib/mqlib.pri)
+
+# We shall not use mqtt right now
+#include($$PWD/../features/mqlib/mqlib.pri)

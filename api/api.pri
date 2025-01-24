@@ -33,4 +33,4 @@ QT *= xmlpatterns
 
 RESOURCES += $$PWD/api.qrc
 
-include($$PWD/o2/o2.pri)
+include($$PWD/../third-party/o2/src/o2.pri)
