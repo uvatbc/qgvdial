@@ -61,7 +61,7 @@ qgvdial_ubuntu_x86_64_ctr:
 	docker run \
 		--rm -it \
 		-v $(GITROOT):/tmp/src \
-		accupara/qgvdial:qt5_amd64 \
+		accupara/qgvdial:qt6_amd64 \
 		make -C /tmp/src \
 		qgvdial_ubuntu_x86_64
 
