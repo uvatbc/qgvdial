@@ -23,9 +23,9 @@ Contact: yuvraaj@gmail.com
 #define MYWEBVIEW_H
 
 #include "global.h"
-#include <QWebView>
+#include <QWebEngineView>
 
-class MyWebView : public QWebView
+class MyWebView : public QWebEngineView
 {
     Q_OBJECT
 public:

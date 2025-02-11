@@ -1,7 +1,7 @@
 TARGET=qgvdial
 
 # Common to Qt4 and Qt5:
-QT *= core gui
+QT *= widgets
 
 message(Qt version $$QT_MAJOR_VERSION)
 

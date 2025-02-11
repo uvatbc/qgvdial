@@ -79,3 +79,10 @@ qgvdial_ubuntu_x86_64_nodeb_ctr:
 		accupara/qgvdial:qt6 \
 		make -C /tmp/src \
 		qgvdial_ubuntu_x86_64_nodeb
+
+build/mac/Makefile:
+	mkdir -p build/mac
+	cd build/mac ; qmake ../../qgvdial/qt-not-qml/desktop_mac.pro
+
+qgvdial_mac: build/mac/Makefile
+	make -C build/mac

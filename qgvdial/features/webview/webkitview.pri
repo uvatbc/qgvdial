@@ -1,10 +1,6 @@
 INCLUDEPATH += $$PWD/webkit
 
-lessThan(QT_MAJOR_VERSION, 6) {
-QT *= webkit
-} else {
-QT *= webview
-}
+QT *= webenginewidgets
 
 SOURCES  += $$PWD/webkit/MyWebView.cpp
 HEADERS  += $$PWD/webkit/MyWebView.h

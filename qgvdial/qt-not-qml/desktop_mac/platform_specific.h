@@ -26,13 +26,8 @@ Contact: yuvraaj@gmail.com
 
 #define UNKNOWN_CONTACT_QRC_PATH ":/unknown_contact.png"
 
-#if QT_VERSION >= 0x050000
 #include <QtWidgets>
-#include <QtWebKitWidgets/QWebView>
+#include <QWebEngineView>
 #define PHONON_ENABLED 0
-#else
-#include <QtWebKit/QtWebKit>
-#define PHONON_ENABLED 1
-#endif
 
 #endif // PLATFORMSPECIFIC_H
