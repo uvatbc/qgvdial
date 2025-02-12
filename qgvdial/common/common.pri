@@ -54,5 +54,4 @@ include($$PWD/phone-account.pri)
 include($$PWD/../../api/api.pri)
 include($$PWD/../features/mixpanel/mixpanel.pri)
 
-# We shall not use mqtt right now
-#include($$PWD/../features/mqlib/mqlib.pri)
+include($$PWD/../features/mqlib/mqlib.pri)
