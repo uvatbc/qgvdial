@@ -22,25 +22,10 @@ Contact: yuvraaj@gmail.com
 #include "LibVmail.h"
 #include "IMainWindow.h"
 #include "Lib.h"
-
-#if PHONON_ENABLED
-    #if defined(OS_DIABLO) && !defined(QT_WS_SIMULATOR)
-        #include <Phonon/AudioOutput>
-        #include <Phonon/AudioOutputDevice>
-    #else
-        #include <phonon/AudioOutput>
-        #include <phonon/AudioOutputDevice>
-    #endif
-#else
-    #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-        #include <QtMultimedia/QMediaContent>
-        #include <QtMultimedia/QMediaPlaylist>
-        #include <QtMultimedia/QMediaPlayer>
-    #else
-        #include <QtMultimediaKit/QMediaContent>
-        #include <QtMultimediaKit/QMediaPlaylist>
-    #endif
-#endif
+    
+#include <QtMultimedia/QMediaContent>
+#include <QtMultimedia/QMediaPlaylist>
+#include <QtMultimedia/QMediaPlayer>
 
 #define NOTIFY_INTERVAL 100
 
@@ -151,38 +136,11 @@ LibVmail::createVmailPlayer()
     }
 
     bool rv;
-
-#if PHONON_ENABLED
-    m_player = new Phonon::MediaObject(this);
-    Phonon::AudioOutput *audioOutput =
-        new Phonon::AudioOutput(Phonon::MusicCategory, m_player);
-    Phonon::createPath(m_player, audioOutput);
-
-    rv = connect (
-        m_player, SIGNAL(stateChanged(Phonon::State,Phonon::State)),
-        this, SLOT(onPhononPlayerStateChanged(Phonon::State,Phonon::State)));
-    Q_ASSERT(rv);
-    if (!rv) { exit(1); }
-    rv = connect (m_player, SIGNAL(finished()),
-                  this, SLOT(onVmailPlayerFinished()));
-    Q_ASSERT(rv);
-    if (!rv) { exit(1); }
-    rv = connect (m_player, SIGNAL(totalTimeChanged(qint64)),
-                  this, SLOT(onDurationChanged(qint64)));
-    Q_ASSERT(rv);
-    if (!rv) { exit(1); }
-    rv = connect (m_player, SIGNAL(tick(qint64)),
-                  this, SLOT(onCurrentPositionChanged(qint64)));
-    Q_ASSERT(rv);
-    if (!rv) { exit(1); }
-
-    m_player->setTickInterval (NOTIFY_INTERVAL);
-#else
     m_player = new QMediaPlayer(this);
 
     rv = connect (
         m_player, SIGNAL(stateChanged(QMediaPlayer::State)),
-        this, SLOT(onMMKitPlayerStateChanged(QMediaPlayer::State)));
+        this, SLOT(onMMKitPlayerStateChanged(QMediaPlayer::PlaybackState)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
     rv = connect (m_player, SIGNAL(durationChanged(qint64)),
@@ -195,7 +153,6 @@ LibVmail::createVmailPlayer()
     if (!rv) { exit(1); }
 
     m_player->setNotifyInterval (NOTIFY_INTERVAL);
-#endif
 }//LibVmail::createVmailPlayer
 
 void
@@ -228,45 +185,8 @@ LibVmail::onVmailPlayerFinished()
     m_player->stop ();   // Present in Phonon and MMKit
 }//LibVmail::onVmailPlayerFinished
 
-#if PHONON_ENABLED
-
 void
-LibVmail::onPhononPlayerStateChanged(Phonon::State newState,
-                                     Phonon::State /*oldState*/)
-{
-    m_state = LVPS_Invalid;
-    Q_DEBUG(QString("Vmail player state changed to %1").arg(newState));
-
-    switch (newState) {
-    case Phonon::LoadingState:
-        // Invalid state
-        break;
-    case Phonon::ErrorState:
-        Q_DEBUG(QString("Phonon error: %1").arg(m_player->errorString()));
-        // Invalid state
-        break;
-    case Phonon::StoppedState:
-        m_state = LVPS_Stopped;
-        ensureVmailPlaying ();
-        break;
-    case Phonon::PlayingState:
-        m_state = LVPS_Playing;
-        break;
-    case Phonon::PausedState:
-        m_state = LVPS_Paused;
-        break;
-    default:
-        Q_WARN("Unknown state!");
-        break;
-    }
-
-    emit playerStateUpdate (m_state);
-}//LibVmail::onPhononPlayerStateChanged
-
-#else
-
-void
-LibVmail::onMMKitPlayerStateChanged(QMediaPlayer::State state)
+LibVmail::onMMKitPlayerStateChanged(QMediaPlayer::PlaybackState state)
 {
     Q_DEBUG(QString("Vmail player state changed to %1").arg(state));
 
@@ -289,8 +209,6 @@ LibVmail::onMMKitPlayerStateChanged(QMediaPlayer::State state)
 
     emit playerStateUpdate (m_state);
 }//LibVmail::onMMKitPlayerStateChanged
-
-#endif
 
 void
 LibVmail::ensureVmailPlaying()
@@ -320,12 +238,7 @@ LibVmail::loadVmail(const QString &path)
     m_state = LVPS_Invalid;
 
     createVmailPlayer ();
-#if PHONON_ENABLED
-    m_player->setCurrentSource (Phonon::MediaSource(url));
-//        m_player->setVolume (50);
-#else
     m_player->setMedia(url);
-#endif
 
     m_player->stop ();
 

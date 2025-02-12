@@ -37,11 +37,6 @@ Contact: yuvraaj@gmail.com
 #include <QtWebKit/QtWebKit>
 #endif
 
-#if QT_VERSION >= 0x050000
 #include <QtWidgets>
-#define PHONON_ENABLED 0
-#else
-#define PHONON_ENABLED 1
-#endif
 
 #endif // PLATFORMSPECIFIC_H

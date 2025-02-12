@@ -28,6 +28,5 @@ Contact: yuvraaj@gmail.com
 
 #include <QtWidgets>
 #include <QWebEngineView>
-#define PHONON_ENABLED 0
 
 #endif // PLATFORMSPECIFIC_H

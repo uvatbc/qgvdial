@@ -27,22 +27,7 @@ Contact: yuvraaj@gmail.com
 // S^1 seems to enjoy torturing me: Failed to compile without this. WTF?
 // It is included at the end of global.h!!
 #include "platform_specific.h"
-
-#ifndef PHONON_ENABLED
-#error Must define PHONON_ENABLED
-#endif
-
-#if PHONON_ENABLED
-    #if defined(OS_DIABLO) && !defined(QT_WS_SIMULATOR)
-        #include <Phonon/MediaObject>
-    #else
-        #include <phonon/MediaObject>
-    #endif
-#elif QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-    #include <QtMultimedia/QtMultimedia>
-#else
-    #include <QtMultimediaKit/QMediaPlayer>
-#endif
+#include <QtMultimedia/QtMultimedia>
 
 enum LVPlayerState {
     LVPS_Invalid = -1,
@@ -87,13 +72,7 @@ private slots:
     void onDurationChanged(qint64 duration);
     void onCurrentPositionChanged(qint64 position);
 
-#if PHONON_ENABLED
-    //! Invoked when the vmail player changes state
-    void onPhononPlayerStateChanged(Phonon::State newState,
-                                    Phonon::State oldState);
-#else
-    void onMMKitPlayerStateChanged(QMediaPlayer::State state);
-#endif
+    void onMMKitPlayerStateChanged(QMediaPlayer::PlaybackState state);
 
 private:
     void createVmailPlayer();
@@ -102,13 +81,7 @@ private:
     bool bBeginPlayAfterLoad;
     quint64 m_duration;
     LVPlayerState m_state;
-
-#if PHONON_ENABLED
-    //! The Phonon vmail player
-    Phonon::MediaObject *m_player;
-#else
     QMediaPlayer *m_player;
-#endif
 };
 
 #endif // LIBVMAIL_H
