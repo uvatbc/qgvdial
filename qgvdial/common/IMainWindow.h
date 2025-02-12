@@ -273,7 +273,7 @@ protected:
     QTimer          m_taskTimer;
     LongTaskInfo    m_taskInfo;
 
-    QMutex          m_logMessageMutex;
+    QRecursiveMutex m_logMessageMutex;
     QVector <LogMessage> m_logMessages;
     QTimer          m_logMessageTimer;
 

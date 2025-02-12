@@ -25,6 +25,8 @@ Contact: yuvraaj@gmail.com
 #include "mosquittopp.h"
 #include "global.h"
 
+#include <QStateMachine>
+
 class MqClient : public QObject, public mosqpp::mosquittopp
 {
     Q_OBJECT
