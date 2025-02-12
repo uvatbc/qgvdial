@@ -23,9 +23,9 @@ Contact: yuvraaj@gmail.com
 #define O2CONTACTSSTORE_H
 
 #include "global.h"
-#include "o2abstractstore.h"
+#include "o0abstractstore.h"
 
-class O2ContactsStore : public O2AbstractStore
+class O2ContactsStore : public O0AbstractStore
 {
     Q_OBJECT
 public:

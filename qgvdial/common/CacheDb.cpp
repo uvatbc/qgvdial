@@ -350,7 +350,7 @@ CacheDb::saveCookies(QList<QNetworkCookie> cookies)
         isSession = cookie.isSessionCookie ();
         name = cookie.name ();
         value = cookie.value ();
-        expiration = cookie.expirationDate().toTime_t ();
+        expiration = cookie.expirationDate().toSecsSinceEpoch ();
 
         domain.replace ("'", "''");
         path.replace ("'", "''");
@@ -425,7 +425,7 @@ CacheDb::loadCookies(QList<QNetworkCookie> &cookies)
         QNetworkCookie cookie(name, value);
         cookie.setDomain (domain);
         if (!isSession) {
-            cookie.setExpirationDate (QDateTime::fromTime_t (expiration));
+            cookie.setExpirationDate (QDateTime::fromSecsSinceEpoch (expiration));
         }
         cookie.setHttpOnly (isHttpOnly);
         cookie.setSecure (isSecure);
@@ -700,7 +700,7 @@ CacheDb::insertContact (const ContactInfo &info)
                         .arg (scrubInfo.strTitle)
                         .arg (scrubInfo.strNotes)
                         .arg (scrubInfo.hrefPhoto)
-                        .arg (scrubInfo.dtUpdate.toTime_t());
+                        .arg (scrubInfo.dtUpdate.toSecsSinceEpoch());
         rv = query.exec (strQ);
         if (!rv) {
             Q_WARN(QString("Failed to insert row into contacts table. "
@@ -833,7 +833,7 @@ CacheDb::getContactFromLink (ContactInfo &info) const
     info.strTitle  = query.value(0).toString ();
     info.strNotes  = query.value(1).toString ();
     info.hrefPhoto = query.value(2).toString ();
-    info.dtUpdate  = QDateTime::fromTime_t (query.value(3).toInt());
+    info.dtUpdate  = QDateTime::fromSecsSinceEpoch (query.value(3).toInt());
 
     getTempFile (info.hrefPhoto, info.strPhotoPath);
 
@@ -1019,7 +1019,7 @@ CacheDb::insertInboxEntry (const GVInboxEntry &hEvent)
                                   "('%1', %2 , %3, '%4', '%5', %6, '%7', '%8')")
                             .arg (scrubEvent.id)
                             .arg (scrubEvent.Type)
-                            .arg (scrubEvent.startTime.toTime_t())
+                            .arg (scrubEvent.startTime.toSecsSinceEpoch())
                             .arg (scrubEvent.strDisplayNumber)
                             .arg (scrubEvent.strPhoneNumber)
                             .arg (flags)
@@ -1128,7 +1128,7 @@ CacheDb::getInboxEntryById (GVInboxEntry &hEvent)
         hEvent.Type = (GVI_Entry_Type) query.value(0).toInt(&ok);
         if (!ok) { break; }
 
-        hEvent.startTime = QDateTime::fromTime_t(query.value(1).toULongLong(&ok));
+        hEvent.startTime = QDateTime::fromSecsSinceEpoch(query.value(1).toULongLong(&ok));
         if (!ok) { break; }
 
         hEvent.strDisplayNumber = query.value(2).toString();
@@ -1192,7 +1192,7 @@ CacheDb::getLatestContact (QDateTime &dateTime)
             break;
         }
 
-        dateTime = QDateTime::fromTime_t (dtVal);
+        dateTime = QDateTime::fromSecsSinceEpoch (dtVal);
 
         rv = true;
     } while (0); // End cleanup block (not a loop)
@@ -1226,7 +1226,7 @@ CacheDb::getLatestInboxEntry (QDateTime &dateTime)
             break;
         }
 
-        dateTime = QDateTime::fromTime_t (dtVal);
+        dateTime = QDateTime::fromSecsSinceEpoch (dtVal);
 
         rv = true;
     } while (0);
@@ -1414,7 +1414,7 @@ CacheDb::getTextsByContact(const QString &strContact)
         getContactFromNumber (strNum, info);
 
         // date,'dispnum','num','text'
-        oneLine = QDateTime::fromTime_t(iDtTime).toString (Qt::ISODate);
+        oneLine = QDateTime::fromSecsSinceEpoch(iDtTime).toString (Qt::ISODate);
         oneLine += ",'";
         oneLine += info.strTitle.replace("'", "''");
         oneLine += "','";
@@ -1445,8 +1445,8 @@ CacheDb::getTextsByDate(QDateTime dtStart, QDateTime dtEnd)
                              "AND " GV_IN_ATTIME " <= %2 "
                              "AND " GV_IN_TYPE " == %3 "
                            "ORDER BY " GV_IN_ATTIME " DESC")
-            .arg (dtStart.toTime_t ())
-            .arg (dtEnd.toTime_t ())
+            .arg (dtStart.toSecsSinceEpoch ())
+            .arg (dtEnd.toSecsSinceEpoch ())
             .arg (GVIE_TextMessage);
 
     QStringList rv;
@@ -1466,7 +1466,7 @@ CacheDb::getTextsByDate(QDateTime dtStart, QDateTime dtEnd)
         getContactFromNumber (strNum, info);
 
         // date,'name','num','text'
-        oneLine = QDateTime::fromTime_t(iDtTime).toString (Qt::ISODate);
+        oneLine = QDateTime::fromSecsSinceEpoch(iDtTime).toString (Qt::ISODate);
         oneLine += ",'";
         oneLine += info.strTitle.replace("'", "''");
         oneLine += "','";

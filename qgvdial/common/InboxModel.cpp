@@ -207,7 +207,7 @@ InboxModel::data (const QModelIndex &index, int role) const
             var.clear ();
             if (!ok) break;
 
-            QDateTime dt = QDateTime::fromTime_t (num);
+            QDateTime dt = QDateTime::fromSecsSinceEpoch (num);
             var = dateToString (dt, (IN_TimeDetail == role));
         } else if (5 == column) {   // GV_IN_FLAGS
             if (IN_ReadFlag == role) {
