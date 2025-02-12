@@ -169,20 +169,6 @@ struct GVInboxEntry
 };
 Q_DECLARE_METATYPE (GVInboxEntry)
 
-template <class T> class VConv
-{
-public:
-    static T* toPtr(QVariant v)
-    {
-        return  (T *) v.value<void *>();
-    }
-
-    static QVariant toQVariant(T* ptr)
-    {
-        return qVariantFromValue((void *) ptr);
-    }
-};
-
 typedef QPair<QString,QString> QStringPair;
 typedef QList<QStringPair> QStringPairList;
 
