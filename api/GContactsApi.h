@@ -33,14 +33,14 @@ enum GContactPhotoType {
 };
 
 class O2;
-class O2AbstractStore;
+class O0AbstractStore;
 class GContactsApi : public QObject
 {
     Q_OBJECT
 public:
     explicit GContactsApi(QObject *parent = 0);
 
-    void initStore(O2AbstractStore *s);
+    void initStore(O0AbstractStore *s);
 
     bool login(AsyncTaskToken *task);
     inline bool isLoggedIn() { return !m_GoogleAuthToken.isEmpty (); }

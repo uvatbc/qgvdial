@@ -23,8 +23,6 @@ Contact: yuvraaj@gmail.com
 #include "IMainWindow.h"
 #include "Lib.h"
     
-#include <QtMultimedia/QMediaContent>
-#include <QtMultimedia/QMediaPlaylist>
 #include <QtMultimedia/QMediaPlayer>
 
 #define NOTIFY_INTERVAL 100

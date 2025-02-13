@@ -146,7 +146,7 @@ GContactsApi::GContactsApi(QObject *parent)
 }//GContactsApi::GContactsApi
 
 void
-GContactsApi::initStore(O2AbstractStore *s)
+GContactsApi::initStore(O0AbstractStore *s)
 {
     m_o2->setStore (s);
 }//GContactsApi::initStore

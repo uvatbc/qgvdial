@@ -86,18 +86,18 @@ protected slots:
     void onGotPhoto();
 
 protected:
-    GContactsApi api;
-    QTimer      m_gotPhotoTimer;
+    GContactsApi    api;
+    QTimer          m_gotPhotoTimer;
 
-    QTimer      m_updateTimer;
-    bool        m_enableTimerUpdate;
-    bool        m_reportUpdateFrequency;
+    QTimer          m_updateTimer;
+    bool            m_enableTimerUpdate;
+    bool            m_reportUpdateFrequency;
 
-    QMutex      m_photoMutex;
-    PhotoLinkList m_noPhotos;
-    quint32     m_simutaneousPhotoDownloads;
+    QRecursiveMutex m_photoMutex;
+    PhotoLinkList   m_noPhotos;
+    quint32         m_simutaneousPhotoDownloads;
 
-    bool        m_isFirstRefresh;
+    bool            m_isFirstRefresh;
 
 public:
     ContactsModel       *m_contactsModel;

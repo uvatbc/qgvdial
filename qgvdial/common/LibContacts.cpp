@@ -32,7 +32,7 @@ LibContacts::LibContacts(IMainWindow *parent)
 : QObject(parent)
 , m_enableTimerUpdate(false)
 , m_reportUpdateFrequency(true) // Always report the frequency at the start
-, m_photoMutex(QMutex::Recursive)
+, m_photoMutex()
 , m_simutaneousPhotoDownloads(0)
 , m_isFirstRefresh(true)
 , m_contactsModel(NULL)

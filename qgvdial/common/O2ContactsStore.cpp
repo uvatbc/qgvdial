@@ -25,7 +25,7 @@ Contact: yuvraaj@gmail.com
 #define O2_GRP "O2ContactStore"
 
 O2ContactsStore::O2ContactsStore(QSettings *s, QObject *parent)
-: O2AbstractStore(parent)
+: O0AbstractStore(parent)
 , m_s(s)
 {
 }//O2ContactsStore::O2ContactsStore
