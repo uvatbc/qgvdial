@@ -27,16 +27,7 @@ Contact: yuvraaj@gmail.com
 
 #define UNKNOWN_CONTACT_QRC_PATH ":/unknown_contact.png"
 
-#if 0 // This needs to be revisited when ubuntu starts using webengine instead of webkit
-#if QT_VERSION >= 0x050000
-#include <QtWebEngine>
-#else
-#include <QtWebKit/QtWebKit>
-#endif
-#else
-#include <QtWebKit/QtWebKit>
-#endif
-
 #include <QtWidgets>
+#include <QWebEngineView>
 
 #endif // PLATFORMSPECIFIC_H
