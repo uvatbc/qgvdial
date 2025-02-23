@@ -25,8 +25,6 @@ Contact: yuvraaj@gmail.com
     
 #include <QtMultimedia/QMediaPlayer>
 
-#define NOTIFY_INTERVAL 100
-
 LibVmail::LibVmail(IMainWindow *parent)
 : QObject(parent)
 , bBeginPlayAfterLoad(false)
@@ -149,8 +147,6 @@ LibVmail::createVmailPlayer()
                   this, SLOT(onCurrentPositionChanged(qint64)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
-
-    m_player->setNotifyInterval (NOTIFY_INTERVAL);
 }//LibVmail::createVmailPlayer
 
 void
@@ -236,7 +232,7 @@ LibVmail::loadVmail(const QString &path)
     m_state = LVPS_Invalid;
 
     createVmailPlayer ();
-    m_player->setMedia(url);
+    m_player->setSource(url);
 
     m_player->stop ();
 

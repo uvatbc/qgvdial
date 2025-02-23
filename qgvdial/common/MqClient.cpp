@@ -20,6 +20,7 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "MqClient.h"
+#include <QFinalState>
 
 #define MQ_LIMBO_MIN    (3 * 1000)
 #define MQ_LIMBO_MAX    (60 * 1000)
@@ -134,7 +135,7 @@ MqClient::startSubWork()
 }//MqClient::startSubWork
 
 void
-MqClient::startPubWork(const QByteArray &payload)
+MqClient::startPubWork(const QByteArray & /*payload*/)
 {
     if (!recreatePubSm()) {
         Q_WARN("Failed to create SM");
