@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "NwReqTracker.h"
 
+#include <QRegularExpression>
+
 #define GV_LOGIN_1 "https://accounts.google.com/ServiceLogin?nui=5&service=grandcentral&ltmpl=mobile&btmpl=mobile&passive=true&continue=https://www.google.com/voice/m"
 #define GV_ACCOUNT_SERVICELOGIN "https://accounts.google.com/ServiceLogin"
 #define GV_ACCOUNT_SMSAUTH      "https://accounts.google.com/SmsAuth"
@@ -11,7 +13,7 @@ MainWindow::MainWindow(QWidget *parent)
 , strUser("yuvraaj@gmail.com")
 , nwMgr(this)
 , jar(this)
-, logsMutex(QMutex::Recursive)
+, logsMutex()
 , logsTimer(this)
 {
     bool rv;
@@ -62,61 +64,6 @@ MainWindow::~MainWindow()
     }
 }//MainWindow::~MainWindow
 
-void MainWindow::setOrientation(ScreenOrientation orientation)
-{
-#if defined(Q_OS_SYMBIAN)
-    // If the version of Qt on the device is < 4.7.2, that attribute won't work
-    if (orientation != ScreenOrientationAuto) {
-        const QStringList v = QString::fromAscii(qVersion()).split(QLatin1Char('.'));
-        if (v.count() == 3 && (v.at(0).toInt() << 16 | v.at(1).toInt() << 8 | v.at(2).toInt()) < 0x040702) {
-            qWarning("Screen orientation locking only supported with Qt 4.7.2 and above");
-            return;
-        }
-    }
-#endif // Q_OS_SYMBIAN
-
-    Qt::WidgetAttribute attribute;
-    switch (orientation) {
-#if QT_VERSION < 0x040702
-    // Qt < 4.7.2 does not yet have the Qt::WA_*Orientation attributes
-    case ScreenOrientationLockPortrait:
-        attribute = static_cast<Qt::WidgetAttribute>(128);
-        break;
-    case ScreenOrientationLockLandscape:
-        attribute = static_cast<Qt::WidgetAttribute>(129);
-        break;
-    default:
-    case ScreenOrientationAuto:
-        attribute = static_cast<Qt::WidgetAttribute>(130);
-        break;
-#else // QT_VERSION < 0x040702
-    case ScreenOrientationLockPortrait:
-        attribute = Qt::WA_LockPortraitOrientation;
-        break;
-    case ScreenOrientationLockLandscape:
-        attribute = Qt::WA_LockLandscapeOrientation;
-        break;
-    default:
-    case ScreenOrientationAuto:
-        attribute = Qt::WA_AutoOrientation;
-        break;
-#endif // QT_VERSION < 0x040702
-    };
-    setAttribute(attribute, true);
-}
-
-void MainWindow::showExpanded()
-{
-#if defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR)
-//    showFullScreen();
-    show();
-#elif defined(Q_WS_MAEMO_5)
-    showMaximized();
-#else
-    show();
-#endif
-}
-
 void
 MainWindow::log(const QString &strLog)
 {
@@ -157,12 +104,14 @@ MainWindow::on_actionDo_it()
     // First, HTTP GET the Service login page. This loads up the cookies.
 
     QUrl url(GV_ACCOUNT_SERVICELOGIN);
-    url.addQueryItem("nui"      , "5");
-    url.addQueryItem("service"  , "grandcentral");
-    url.addQueryItem("ltmpl"    , "mobile");
-    url.addQueryItem("btmpl"    , "mobile");
-    url.addQueryItem("passive"  , "true");
-    url.addQueryItem("continue" , "https://www.google.com/voice/m");
+    QUrlQuery urlQuery;
+    urlQuery.addQueryItem("nui"      , "5");
+    urlQuery.addQueryItem("service"  , "grandcentral");
+    urlQuery.addQueryItem("ltmpl"    , "mobile");
+    urlQuery.addQueryItem("btmpl"    , "mobile");
+    urlQuery.addQueryItem("passive"  , "true");
+    urlQuery.addQueryItem("continue" , "https://www.google.com/voice/m");
+    url.setQuery(urlQuery);
 
     QNetworkRequest req(url);
     req.setRawHeader("User-Agent", UA_IPHONE4);
@@ -264,13 +213,13 @@ MainWindow::hasMoved(const QString &strResponse)
             break;
         }
 
-        QRegExp rx("a\\s+href=\"(.*)\"\\>", Qt::CaseInsensitive);
-        rx.setMinimal (true);
-        if (!strResponse.contains (rx) || (rx.captureCount () != 1)) {
+        QRegularExpression rx("a\\s+href=\"(.*?)\"\\>", QRegularExpression::CaseInsensitiveOption);
+        QRegularExpressionMatch match = rx.match(strResponse);
+        if (!match.hasMatch()) {
             break;
         }
 
-        rv = rx.cap(1);
+        rv = match.captured(1);
         Q_DEBUG("Moved temporarily to") << rv;
     } while (0); // End cleanup block (not a loop)
 
@@ -301,9 +250,9 @@ MainWindow::parseHiddenLoginFields(const QString &strResponse, QVariantMap &ret)
   <input type="hidden" name="continue" id="continue"
            value="https://www.google.com/voice/m" />
 */
-    QRegExp rx1("\\<input\\s*type\\s*=\\s*\"hidden\"(.*)\\>");
-    rx1.setMinimal (true);
-    if (!strResponse.contains (rx1)) {
+    QRegularExpression rx1("\\<input\\s*?type\\s*?=\\s*?\"hidden\"(.*?)\\>", QRegularExpression::CaseInsensitiveOption);
+    QRegularExpressionMatch match = rx1.match(strResponse);
+    if (!match.hasMatch()) {
         Q_WARN("Invalid login page!");
         return false;
     }

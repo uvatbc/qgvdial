@@ -37,8 +37,8 @@ GVApi_login::GVApi_login(GVApi *parent)
 }//GVApi_login::GVApi_login
 
 bool
-GVApi_login::checkForLogin(AsyncTaskToken *task,
-                           const QString &strResponse)
+GVApi_login::checkForLogin(AsyncTaskToken * /*task*/,
+                           const QString & /*strResponse*/)
 {
     GVApi *p = (GVApi *)this->parent();
     bool ok = false;
@@ -51,8 +51,6 @@ GVApi_login::checkForLogin(AsyncTaskToken *task,
         rv = true;
     }
 #else
-    Q_UNUSED(task); Q_UNUSED(strResponse);
-
     sid = lsid = hsid = apisid = sapisid = nid = false;
     foreach(QNetworkCookie cookie, p->m_jar->getAllCookies()) {
         Q_DEBUG(QString("%1 = %2")
@@ -197,7 +195,7 @@ gonext:
 
 bool
 GVApi_login::parseForm(const QString &strResponse,      // IN
-                             QGVLoginForm *form)         // OUT
+                             QGVLoginForm *form)        // OUT
 {
     if (!parseFormFields(strResponse, form)) {
         Q_WARN("Failed to parse form fields");

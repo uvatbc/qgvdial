@@ -1,6 +1,8 @@
 .svn/*
 client*json
+moc_*
 ui_*h
+*.o
 *opensdf
 *sdf
 *suo
@@ -9,6 +11,7 @@ ui_*h
 cscope.out
 .vs
 .vscode
+.qmake.stash
 
 # Windows specific
 qgvdial/qt-not-qml/desktop_windows/Makefile*
@@ -30,6 +33,9 @@ qgvdial/features/dbus_api/gen/api_adapter.cpp
 qgvdial/features/dbus_api/gen/api_adapter.h
 notify/dbusinterface/*cpp
 notify/dbusinterface/*h
+
+# Experimental outputs
+experiments/01-login/01login.app
 
 # log files
 logs/**

@@ -2,7 +2,6 @@
 #define MAINWINDOW_H
 
 #include "global.h"
-#include <QObject>
 
 class MainWindow : public QMainWindow
 {
@@ -17,10 +16,6 @@ public:
 
     explicit MainWindow(QWidget *parent = 0);
     virtual ~MainWindow();
-
-    // Note that this will only have an effect on Symbian and Fremantle.
-    void setOrientation(ScreenOrientation orientation);
-    void showExpanded();
 
     void log(const QString &strLog);
 
@@ -55,9 +50,9 @@ private:
     QNetworkAccessManager nwMgr;
     CookieJar jar;
 
-    QMutex      logsMutex;
-    QStringList logsList;
-    QTimer      logsTimer;
+    QRecursiveMutex logsMutex;
+    QStringList     logsList;
+    QTimer          logsTimer;
 };
 
 #endif // MAINWINDOW_H

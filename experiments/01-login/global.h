@@ -4,9 +4,8 @@
 #ifdef __cplusplus
 
 #include <QtCore>
-#include <QtGui>
+#include <QtWidgets>
 #include <QtNetwork>
-#include <QtScript>
 
 #include "CookieJar.h"
 

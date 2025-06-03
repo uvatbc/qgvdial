@@ -3,15 +3,18 @@
 #include <iostream>
 using namespace std;
 
-QtMsgHandler pOldHandler = NULL;
-MainWindow *pw = NULL;
+QtMessageHandler pOldHandler = nullptr;
+MainWindow *pw = nullptr;
 
 void
-myMessageOutput(QtMsgType type, const char *msg)
+myMessageOutput(QtMsgType type, const QMessageLogContext & context, const QString &msg)
 {
     int level = -1;
     switch (type) {
     case QtDebugMsg:
+        level = 4;
+        break;
+    case QtInfoMsg:
         level = 3;
         break;
     case QtWarningMsg:
@@ -42,21 +45,20 @@ myMessageOutput(QtMsgType type, const char *msg)
             abort();
         }
     } else {
-        pOldHandler (type, strLog.toLatin1 ());
+        pOldHandler (type, context, msg);
     }
 }//myMessageOutput
 
 int
 main(int argc, char *argv[])
 {
-    pOldHandler = qInstallMsgHandler(myMessageOutput);
+    pOldHandler = qInstallMessageHandler(myMessageOutput);
 
     QApplication app(argc, argv);
     MainWindow mainWindow;
     pw = &mainWindow;
 
-    mainWindow.setOrientation(MainWindow::ScreenOrientationAuto);
-    mainWindow.showExpanded();
+    mainWindow.show();
 
     int rv = app.exec();
     pw = NULL;
