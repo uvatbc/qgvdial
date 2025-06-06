@@ -1,8 +1,9 @@
 #pragma once
 
-#include <QWebEngineView>
 #include <QMainWindow>
 
+class QWebEngineProfile;
+class QWebEngineView;
 class MainWindow : public QMainWindow {
     Q_OBJECT
 
@@ -14,6 +15,19 @@ private slots:
     void handleLoadFinishedWithOk() {handleLoadFinished(true);}
     void initiatePhoneCall();
 
+
+/** Private signals/slots within this object only **/
+signals:
+    void _sigUrlUpdated(const QString &url);
+private slots:
+    void _slotUrlUpdated(const QUrl &url);
+/***************************************************/
+
 private:
-    QWebEngineView *webView;
+    void initLoginSM();
+    void initWebview();
+
+private:
+    QWebEngineProfile *p_webProfile;
+    QWebEngineView *p_webView;
 };

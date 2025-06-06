@@ -1,27 +1,75 @@
 #include "mainwindow.h"
 
 #include <QTimer>
-#include <QVBoxLayout>
+#include <QStateMachine>
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
+#include <QVBoxLayout>
+#include <QLineEdit>
+
+#include <QWebEngineView>
+#include <QWebEngineProfile>
+
+#define URL_GV_MAINPAGE "https://voice.google.com"
+#define UA_ANDROID_NORD_N200 "Mozilla/5.0 (Linux; Android 12; DE2118) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Mobile Safari/537.36"
+#define UA_IPHONE_16E        "Mozilla/5.0 (iPhone17,5; CPU iPhone OS 18_3_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 FireKeepers/1.7.0"
+
+MainWindow::MainWindow(QWidget *parent)
+: QMainWindow(parent) {
     // Set up the main window
     setWindowTitle("Google Voice Login and Call");
     resize(360, 640); // Mobile-like dimensions
 
+    initWebview();
+}
+
+void
+MainWindow::initLoginSM() {
+    auto loginSM = new QStateMachine(this);
+}
+
+void
+MainWindow::initWebview() {
     // Create a widget and layout
     QWidget *centralWidget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(centralWidget);
     setCentralWidget(centralWidget);
 
-    // Set up the web view
-    webView = new QWebEngineView(this);
-    layout->addWidget(webView);
+    // Create a URL bar
+    auto urlBar = new QLineEdit(this);
+    layout->addWidget(urlBar);
+    urlBar->setReadOnly(true);
+    urlBar->setEnabled(false);
 
-    // Load the Google Voice mobile login page
-    webView->load(QUrl("https://voice.google.com"));
+    // Create a default web profile
+    p_webProfile = new QWebEngineProfile("Default", this);
+
+    // Set up the web view
+    p_webView = new QWebEngineView(p_webProfile, this);
+    layout->addWidget(p_webView);
+
+    // Set persistent cookie policy: Allow it!
+    p_webProfile->setPersistentCookiesPolicy(QWebEngineProfile::AllowPersistentCookies);
+    // Set user agent to the Android OnePlus Nord N200 device string
+    p_webProfile->setHttpUserAgent(UA_ANDROID_NORD_N200);
+
+    qDebug() << "Storage name: " << p_webProfile->storageName();
+    qDebug() << "Storage path: " << p_webProfile->persistentStoragePath();
+    qDebug() << "Persistent cookie policy: " << p_webProfile->persistentCookiesPolicy();
+    qDebug() << "User agent: " << p_webProfile->httpUserAgent();
 
     // Connect page load finished signal
-    QObject::connect(webView, &QWebEngineView::loadFinished, this, &MainWindow::handleLoadFinished);
+    QObject::connect(p_webView, &QWebEngineView::loadFinished, this, &MainWindow::handleLoadFinished);
+    // Connect page url change signal to the slot that updates the URL bar
+    QObject::connect(p_webView, &QWebEngineView::urlChanged, this, &MainWindow::_slotUrlUpdated);
+    QObject::connect(this, &MainWindow::_sigUrlUpdated, urlBar, &QLineEdit::setText);
+
+    // Load the Google Voice mobile login page
+    p_webView->load(QUrl(URL_GV_MAINPAGE));
+}
+
+void
+MainWindow::_slotUrlUpdated(const QUrl &url) {
+    emit this->_sigUrlUpdated(url.toDisplayString());
 }
 
 void
@@ -31,16 +79,23 @@ MainWindow::handleLoadFinished(bool ok) {
         return;
     }
 
+    auto page = p_webView->page();
+    qDebug() << "Storage name: " << p_webProfile->storageName();
+    qDebug() << "Storage path: " << p_webProfile->persistentStoragePath();
+    qDebug() << "Persistent cookie policy: " << p_webProfile->persistentCookiesPolicy();
+    qDebug() << "User agent: " << p_webProfile->httpUserAgent();
+
     // Check if we're on the Google Voice main page after login
-    if (webView->url().toString().contains("voice.google.com/u/"))
+    if (p_webView->url().toString().contains("voice.google.com/u/"))
     {
-        initiatePhoneCall();
+        qDebug("Starting a phone call");
+        //initiatePhoneCall();
         return;
     }
 
     // JavaScript to handle Google login steps
-    QString username = "your_email@example.com"; // Replace with actual email
-    QString password = "your_password";          // Replace with actual password
+    QString username = "yuvraaj@gmail.com"; // Replace with actual email
+    QString password = "oaprvdzeogayxnix";  // Replace with actual password
 
     QString jsCode = QString(R"(
         (function() {
@@ -78,8 +133,8 @@ MainWindow::handleLoadFinished(bool ok) {
     .arg(username, password);
 
     // Execute JavaScript and handle result
-    webView->page()->runJavaScript(jsCode, [](const QVariant &result)
-                                   { qDebug() << "JavaScript result:" << result.toString(); });
+    page->runJavaScript(jsCode, [](const QVariant &result)
+                        { qDebug() << "JavaScript result:" << result.toString(); });
 
     // Poll for page changes (Google login redirects multiple times)
     QTimer::singleShot(2000, this, &MainWindow::handleLoadFinishedWithOk);
@@ -113,7 +168,7 @@ MainWindow::initiatePhoneCall() {
     )").arg(phoneNumber);
 
     // Execute JavaScript to make the call
-    webView->page()->runJavaScript(jsCallCode, [](const QVariant &result) {
+    p_webView->page()->runJavaScript(jsCallCode, [](const QVariant &result) {
         qDebug() << "Call JavaScript result:" << result.toString();
     });
 }

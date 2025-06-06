@@ -9,10 +9,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
 
 # Find Qt6 components
-find_package(Qt6 REQUIRED COMPONENTS Core Widgets WebEngineWidgets)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets WebEngineWidgets StateMachine)
 
 # Add the executable
 add_executable(GoogleVoiceLogin main.cpp mainwindow.cpp)
 
 # Link Qt6 libraries
-target_link_libraries(GoogleVoiceLogin PRIVATE Qt6::Widgets Qt6::WebEngineWidgets)
+target_link_libraries(GoogleVoiceLogin PRIVATE Qt6::Widgets Qt6::WebEngineWidgets Qt6::StateMachine)
