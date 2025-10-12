@@ -5,6 +5,9 @@ project(GoogleVoiceLogin LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Set the path to Qt: Set QTDIR=/path/to/qt-bin-version
+set(Qt6Core_DIR "$ENV{QTDIR}")
+
 # Enable Qt's automatic MOC processing
 set(CMAKE_AUTOMOC ON)
 
