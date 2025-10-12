@@ -1,7 +1,7 @@
 TARGET=qgvdial
 
 # Common to Qt4 and Qt5:
-QT *= widgets
+QT *= widgets statemachine
 
 message(Qt version $$QT_MAJOR_VERSION)
 
