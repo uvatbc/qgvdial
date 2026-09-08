@@ -23,31 +23,21 @@ Contact: yuvraaj@gmail.com
 #define HTMLFIELDPARSER_H
 
 #include "api_common.h"
+#include <QXmlStreamReader>
 
-class HtmlFieldParser : public QXmlDefaultHandler
+class HtmlFieldParser
 {
 public:
     explicit HtmlFieldParser();
     void setEmitLog (bool enable);
 
+    bool parse(const QString &xmlData);
+
 public:
     QVariantMap                 elems;
     QMap<QString, QVariantMap>  attrMap;
 
-protected:
-    bool startElement (const QString        &namespaceURI,
-                       const QString        &localName   ,
-                       const QString        &qName       ,
-                       const QXmlAttributes &atts        );
-
-    bool endElement (const QString &namespaceURI,
-                     const QString &localName   ,
-                     const QString &qName       );
-
-    bool characters (const QString &ch);
-
 private:
-    QString strChars;
     bool m_emitLog;
 };
 

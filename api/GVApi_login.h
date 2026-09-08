@@ -23,6 +23,9 @@ Contact: yuvraaj@gmail.com
 #define GVAPI_LOGIN_H
 
 #include "api_common.h"
+#include <QStateMachine>
+#include <QState>
+#include <QFinalState>
 
 class GVApi;
 

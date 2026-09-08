@@ -31,20 +31,41 @@ bool
 OsdCipher::_cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt)
 {
     int iEVP, inl, outl, c;
-    EVP_CIPHER_CTX cipherCtx;
     char cipherIv[16], cipherIn[16], cipherOut[16 + EVP_MAX_BLOCK_LENGTH];
-    memset (&cipherCtx, 0, sizeof cipherCtx);
     memset (&cipherIv, 0xFA, sizeof cipherIv);
 
-    EVP_CIPHER_CTX_init (&cipherCtx);
-    iEVP = EVP_CipherInit_ex (&cipherCtx, EVP_aes_256_cbc (), NULL, NULL, NULL,
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+    EVP_CIPHER_CTX *cipherCtx = EVP_CIPHER_CTX_new();
+    if (!cipherCtx) return false;
+#else
+    EVP_CIPHER_CTX ctx;
+    EVP_CIPHER_CTX *cipherCtx = &ctx;
+    memset (cipherCtx, 0, sizeof(ctx));
+    EVP_CIPHER_CTX_init (cipherCtx);
+#endif
+
+    iEVP = EVP_CipherInit_ex (cipherCtx, EVP_aes_256_cbc (), NULL, NULL, NULL,
                               bEncrypt?1:0);
-    if (1 != iEVP) return false;
-    EVP_CIPHER_CTX_set_key_length(&cipherCtx, sizeof(QGV_CIPHER_KEY)-1);
-    iEVP = EVP_CipherInit_ex (&cipherCtx, EVP_aes_256_cbc (), NULL,
+    if (1 != iEVP) {
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+        EVP_CIPHER_CTX_free(cipherCtx);
+#else
+        EVP_CIPHER_CTX_cleanup(cipherCtx);
+#endif
+        return false;
+    }
+    EVP_CIPHER_CTX_set_key_length(cipherCtx, sizeof(QGV_CIPHER_KEY)-1);
+    iEVP = EVP_CipherInit_ex (cipherCtx, EVP_aes_256_cbc (), NULL,
                               (quint8 *) QGV_CIPHER_KEY, (quint8 *) cipherIv,
                                bEncrypt?1:0);
-    if (1 != iEVP) return false;
+    if (1 != iEVP) {
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+        EVP_CIPHER_CTX_free(cipherCtx);
+#else
+        EVP_CIPHER_CTX_cleanup(cipherCtx);
+#endif
+        return false;
+    }
 
     byOut.clear ();
     c = 0;
@@ -54,7 +75,7 @@ OsdCipher::_cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt)
         memcpy (cipherIn, &(byIn.constData()[c]), inl);
         memset (&cipherOut, 0, sizeof cipherOut);
         outl = sizeof cipherOut;
-        iEVP = EVP_CipherUpdate (&cipherCtx,
+        iEVP = EVP_CipherUpdate (cipherCtx,
                                 (quint8 *) &cipherOut, &outl,
                                  (quint8 *) &cipherIn , inl);
         if (1 != iEVP) {
@@ -68,13 +89,17 @@ OsdCipher::_cipher(const QByteArray &byIn, QByteArray &byOut, bool bEncrypt)
     if (1 == iEVP) {
         outl = sizeof cipherOut;
         memset (&cipherOut, 0, sizeof cipherOut);
-        iEVP = EVP_CipherFinal_ex (&cipherCtx, (quint8 *) &cipherOut, &outl);
+        iEVP = EVP_CipherFinal_ex (cipherCtx, (quint8 *) &cipherOut, &outl);
         if (1 == iEVP) {
             byOut += QByteArray(cipherOut, outl);
         }
     }
 
-    EVP_CIPHER_CTX_cleanup(&cipherCtx);
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+    EVP_CIPHER_CTX_free(cipherCtx);
+#else
+    EVP_CIPHER_CTX_cleanup(cipherCtx);
+#endif
 
     return (1 == iEVP);
 }//OsdCipher::cipher

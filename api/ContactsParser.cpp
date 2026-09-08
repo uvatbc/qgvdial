@@ -37,16 +37,12 @@ void
 ContactsParser::doXmlWork ()
 {
     bool rv;
-    QXmlInputSource inputSource;
-    QXmlSimpleReader simpleReader;
     ContactsXmlHandler contactsHandler;
     contactsHandler.setEmitLog (bEmitLog);
 
 #if QGC_MEASURE_TIME
     QDateTime startTime = QDateTime::currentDateTime ();
 #endif
-
-    inputSource.setData (byData);
 
     rv = connect (&contactsHandler, SIGNAL(status(const QString&,int)),
                   this,             SIGNAL(status(const QString&,int)));
@@ -56,10 +52,7 @@ ContactsParser::doXmlWork ()
             this,             SIGNAL(gotOneContact(ContactInfo)));
     Q_ASSERT(rv);
 
-    simpleReader.setContentHandler (&contactsHandler);
-    simpleReader.setErrorHandler (&contactsHandler);
-
-    rv = simpleReader.parse (&inputSource, false);
+    rv = contactsHandler.parse (byData);
 
 #if QGC_MEASURE_TIME
     QDateTime endTime = QDateTime::currentDateTime ();

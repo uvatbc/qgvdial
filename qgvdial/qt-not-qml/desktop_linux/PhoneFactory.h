@@ -24,7 +24,9 @@ Contact: yuvraaj@gmail.com
 
 #include "global.h"
 #include "IPhoneAccountFactory.h"
+#ifdef TP_ENABLED
 #include "TpPhoneFactory.h"
+#endif
 
 class PhoneFactory : public IPhoneAccountFactory
 {
@@ -34,6 +36,7 @@ public:
 
     bool identifyAll(AsyncTaskToken *task);
 
+#ifdef TP_ENABLED
 private slots:
     void onOnePhone(IPhoneAccount *p);
     void onTpIdentified();
@@ -45,6 +48,7 @@ private:
     AsyncTaskToken *m_identifyTask;
 
     TpPhoneFactory m_tpFactory;
+#endif
 };
 
 #endif // PHONEFACTORY_H

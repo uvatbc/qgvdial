@@ -23,7 +23,6 @@ Contact: yuvraaj@gmail.com
 
 ContactsXmlHandler::ContactsXmlHandler (QObject *parent)
 : QObject(parent)
-, QXmlDefaultHandler ()
 , bEntryStarted (false)
 , countContacts (0)
 , countUsableContacts (0)
@@ -36,152 +35,138 @@ ContactsXmlHandler::~ContactsXmlHandler(void)
 }//ContactsXmlHandler::~ContactsXmlHandler
 
 bool
-ContactsXmlHandler::startElement (const QString        & /*namespaceURI*/,
-                                  const QString        &localName   ,
-                                  const QString        &qName       ,
-                                  const QXmlAttributes &atts        )
+ContactsXmlHandler::parse (const QByteArray &data)
 {
-    QString rel;
+    QXmlStreamReader reader(data);
+    bEntryStarted = false;
+    countContacts = 0;
+    countUsableContacts = 0;
     strCurrentChars.clear ();
+    currInfo.init ();
 
-    do {
-        if (localName == "entry") {
-            bEntryStarted = true;
-            countContacts++;
+    while (!reader.atEnd()) {
+        QXmlStreamReader::TokenType token = reader.readNext();
+        if (token == QXmlStreamReader::StartElement) {
+            QString localName = reader.name().toString();
+            QString qName = reader.qualifiedName().toString();
+            strCurrentChars.clear ();
 
-            currInfo.init ();
-            break;
-        }
-
-        if (!bEntryStarted) {
-            break;
-        }
-
-        if (localName == "phoneNumber") {
-            currPhone.init ();
-            rel = atts.value ("rel");
-            if (rel.endsWith ("mobile")) {
-                currPhone.Type = PType_Mobile;
-            } else if (rel.endsWith ("home")) {
-                currPhone.Type = PType_Home;
-            } else if (rel.endsWith ("work")) {
-                currPhone.Type = PType_Work;
-            } else if (rel.endsWith ("pager")) {
-                currPhone.Type = PType_Pager;
-            } else {
-                currPhone.Type = PType_Other;
+            if (localName == "entry") {
+                bEntryStarted = true;
+                countContacts++;
+                currInfo.init ();
+                continue;
             }
-        }
 
-        if (localName == "email") {
-            currEmail.init ();
-            currEmail.address = atts.value ("address");
-            currEmail.primary = (atts.value ("primary") == "true");
-            rel = atts.value ("rel");
-            if (rel.endsWith ("home")) {
-                currEmail.type = EType_Home;
-            } else if (rel.endsWith ("work")) {
-                currEmail.type = EType_Work;
-            } else {
-                currEmail.type = EType_Other;
+            if (!bEntryStarted) {
+                continue;
             }
-        }
 
-        if (localName == "postalAddress") {
-            currPostal.init ();
-            rel = atts.value ("rel");
-            if (rel.endsWith ("home")) {
-                currPostal.type = PAType_Home;
-            } else if (rel.endsWith ("work")) {
-                currPostal.type = PAType_Work;
-            } else {
-                currPostal.type = PAType_Other;
-            }
-        }
+            const QXmlStreamAttributes &atts = reader.attributes();
 
-        if (qName == "gd:deleted") {
-            currInfo.bDeleted = true;
-        }
-
-        if (qName == "link") {
-            rel = atts.value ("rel");
-            if (rel.endsWith ("#photo")) {
-                currInfo.hrefPhoto = atts.value ("href");
-            }
-        }
-    } while (0);
-    return (true);
-}//ContactsXmlHandler::startElement
-
-bool
-ContactsXmlHandler::endElement (const QString & /*namespaceURI*/,
-                                const QString &localName        ,
-                                const QString & /*qName*/       )
-{
-    do {
-        if (localName == "id") {
-            currInfo.strId = strCurrentChars.trimmed ();
-            break;
-        }
-        if (localName == "title") {
-            currInfo.strTitle = strCurrentChars.trimmed ();
-            break;
-        }
-        if (bEntryStarted) {
-            if (localName == "postalAddress") {
-                currPostal.address = strCurrentChars.trimmed ();
-                currPostal.address.replace ("\\n", "\n");
-                currInfo.arrPostal += currPostal;
-                break;
-            }
-            if (localName == "email") {
-                currInfo.arrEmails += currEmail;
-                break;
-            }
             if (localName == "phoneNumber") {
-                currPhone.strNumber = strCurrentChars.trimmed ();
-                currInfo.arrPhones += currPhone;
-                break;
+                currPhone.init ();
+                QString rel = atts.value ("rel").toString();
+                if (rel.endsWith ("mobile")) {
+                    currPhone.Type = PType_Mobile;
+                } else if (rel.endsWith ("home")) {
+                    currPhone.Type = PType_Home;
+                } else if (rel.endsWith ("work")) {
+                    currPhone.Type = PType_Work;
+                } else if (rel.endsWith ("pager")) {
+                    currPhone.Type = PType_Pager;
+                } else {
+                    currPhone.Type = PType_Other;
+                }
+            }
+
+            if (localName == "email") {
+                currEmail.init ();
+                currEmail.address = atts.value ("address").toString();
+                currEmail.primary = (atts.value ("primary") == "true");
+                QString rel = atts.value ("rel").toString();
+                if (rel.endsWith ("home")) {
+                    currEmail.type = EType_Home;
+                } else if (rel.endsWith ("work")) {
+                    currEmail.type = EType_Work;
+                } else {
+                    currEmail.type = EType_Other;
+                }
+            }
+
+            if (localName == "postalAddress") {
+                currPostal.init ();
+                QString rel = atts.value ("rel").toString();
+                if (rel.endsWith ("home")) {
+                    currPostal.type = PAType_Home;
+                } else if (rel.endsWith ("work")) {
+                    currPostal.type = PAType_Work;
+                } else {
+                    currPostal.type = PAType_Other;
+                }
+            }
+
+            if (qName == "gd:deleted") {
+                currInfo.bDeleted = true;
+            }
+
+            if (qName == "link") {
+                QString rel = atts.value ("rel").toString();
+                if (rel.endsWith ("#photo")) {
+                    currInfo.hrefPhoto = atts.value ("href").toString();
+                }
+            }
+        } else if (token == QXmlStreamReader::Characters) {
+            strCurrentChars += reader.text().toString();
+        } else if (token == QXmlStreamReader::EndElement) {
+            QString localName = reader.name().toString();
+            if (localName == "id") {
+                currInfo.strId = strCurrentChars.trimmed ();
+            }
+            if (localName == "title") {
+                currInfo.strTitle = strCurrentChars.trimmed ();
+            }
+            if (bEntryStarted) {
+                if (localName == "postalAddress") {
+                    currPostal.address = strCurrentChars.trimmed ();
+                    currPostal.address.replace ("\\n", "\n");
+                    currInfo.arrPostal += currPostal;
+                }
+                if (localName == "email") {
+                    currInfo.arrEmails += currEmail;
+                }
+                if (localName == "phoneNumber") {
+                    currPhone.strNumber = strCurrentChars.trimmed ();
+                    currInfo.arrPhones += currPhone;
+                }
+            }
+            if (localName == "content") {
+                currInfo.strNotes = strCurrentChars.trimmed ();
+            }
+            if (localName == "updated") {
+                currInfo.dtUpdate = QDateTime::fromString(strCurrentChars,
+                                                          Qt::ISODate);
+            }
+
+            if (localName == "entry") {
+                bEntryStarted = false;
+                countUsableContacts ++;
+                currInfo.hrefPhoto.replace ("%40", "@");
+                emit oneContact (currInfo);
+                currInfo.init ();
             }
         }
-        if (localName == "content") {
-            currInfo.strNotes = strCurrentChars.trimmed ();
-            break;
+    }
+
+    if (reader.hasError()) {
+        if (bEmitLog) {
+            Q_WARN(QString("Contacts XML parse error: %1").arg(reader.errorString()));
         }
-        if (localName == "updated") {
-            currInfo.dtUpdate = QDateTime::fromString(strCurrentChars,
-                                                      Qt::ISODate);
-        }
+        return false;
+    }
 
-        if (localName != "entry") break;
-        // If execution reaches here then it means it's the end of an entry.
-        bEntryStarted = false;
-
-#ifdef DBG_VERBOSE
-        // For debug
-        if (currInfo.strTitle.contains ("Jamie", Qt::CaseInsensitive)) {
-            if (bEmitLog) qDebug ("It's Jamie");
-        }
-#endif
-
-        countUsableContacts ++;
-
-        currInfo.hrefPhoto.replace ("%40", "@");
-
-        emit oneContact (currInfo);
-
-        currInfo.init ();
-    } while (0);
-    return (true);
-}//ContactsXmlHandler::endElement
-
-bool
-ContactsXmlHandler::characters (const QString &ch)
-{
-    strCurrentChars += ch;
-
-    return (true);
-}//ContactsXmlHandler::characters
+    return true;
+}//ContactsXmlHandler::parse
 
 quint32
 ContactsXmlHandler::getTotalContacts ()

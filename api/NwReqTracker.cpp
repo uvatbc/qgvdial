@@ -65,8 +65,8 @@ NwReqTracker::init(QNetworkReply *r, void *c, bool bEmitlog, bool autoDel)
                   this   , SLOT(onReplySslErrors(QList<QSslError>)));
     Q_ASSERT(rv);
 #endif
-    rv = connect (m_reply, SIGNAL(error(QNetworkReply::NetworkError)),
-                  this   , SLOT(onReplyError(QNetworkReply::NetworkError)));
+    rv = connect (m_reply, &QNetworkReply::errorOccurred,
+                  this   , &NwReqTracker::onReplyError);
     Q_ASSERT(rv);
 
     rv = connect (m_reply, SIGNAL(downloadProgress(qint64,qint64)),
@@ -97,8 +97,8 @@ NwReqTracker::disconnectReply()
                      this   , SLOT(onReplySslErrors(QList<QSslError>)));
     Q_ASSERT(rv);
 #endif
-    rv = disconnect (m_reply, SIGNAL(error(QNetworkReply::NetworkError)),
-                     this   , SLOT(onReplyError(QNetworkReply::NetworkError)));
+    rv = disconnect (m_reply, &QNetworkReply::errorOccurred,
+                     this   , &NwReqTracker::onReplyError);
     Q_ASSERT(rv);
 
     rv = disconnect (m_reply, SIGNAL(downloadProgress(qint64,qint64)),

@@ -20,7 +20,6 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "HtmlFieldParser.h"
-#include <QtXmlPatterns>
 
 HtmlFieldParser::HtmlFieldParser ()
 : m_emitLog (true)
@@ -28,45 +27,42 @@ HtmlFieldParser::HtmlFieldParser ()
 }//HtmlFieldParser::HtmlFieldParser
 
 bool
-HtmlFieldParser::startElement (const QString        & /*namespaceURI*/,
-                               const QString        & localName       ,
-                               const QString        & /*qName       */,
-                               const QXmlAttributes & attrs           )
+HtmlFieldParser::parse (const QString &xmlData)
 {
-    strChars.clear ();
+    elems.clear ();
+    attrMap.clear ();
 
-    QVariantMap aMap;
-    for (int i = 0; i < attrs.count(); ++i) {
-        aMap[attrs.localName(i)] = attrs.value(i);
+    QXmlStreamReader reader(xmlData);
+    QString currentChars;
+
+    while (!reader.atEnd()) {
+        QXmlStreamReader::TokenType token = reader.readNext();
+        if (token == QXmlStreamReader::StartElement) {
+            QString localName = reader.name().toString();
+            currentChars.clear();
+
+            QVariantMap aMap;
+            const QXmlStreamAttributes &attrs = reader.attributes();
+            for (int i = 0; i < attrs.count(); ++i) {
+                aMap[attrs.at(i).name().toString()] = attrs.at(i).value().toString();
+            }
+            attrMap[localName] = aMap;
+        } else if (token == QXmlStreamReader::Characters) {
+            currentChars += reader.text().toString();
+        } else if (token == QXmlStreamReader::EndElement) {
+            elems[reader.name().toString()] = currentChars;
+        }
     }
-    attrMap[localName] = aMap;
 
-    return (true);
-}//HtmlFieldParser::startElement
+    if (reader.hasError()) {
+        if (m_emitLog) {
+            Q_WARN(QString("HtmlFieldParser XML error: %1").arg(reader.errorString()));
+        }
+        return false;
+    }
 
-bool
-HtmlFieldParser::endElement (const QString & /*namespaceURI*/,
-                             const QString &   localName     ,
-                             const QString & /*qName       */)
-{
-    elems[localName] = strChars;
-
-#if 0
-    QFile temp(QString("dump-%1.txt").arg(localName));
-    temp.open (QIODevice::ReadWrite);
-    temp.write (strChars.toLatin1 ());
-    temp.close ();
-#endif
-
-    return (true);
-}//HtmlFieldParser::endElement
-
-bool
-HtmlFieldParser::characters (const QString &ch)
-{
-    strChars += ch;
-    return (true);
-}//HtmlFieldParser::characters
+    return true;
+}//HtmlFieldParser::parse
 
 void
 HtmlFieldParser::setEmitLog (bool enable)

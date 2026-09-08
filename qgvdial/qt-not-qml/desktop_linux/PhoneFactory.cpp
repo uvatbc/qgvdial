@@ -30,16 +30,21 @@ createPhoneAccountFactory(QObject *parent)
 
 PhoneFactory::PhoneFactory(QObject *parent)
 : IPhoneAccountFactory(parent)
+#ifdef TP_ENABLED
 , m_identifyTask(NULL)
 , m_tpFactory(this)
+#endif
 {
+#ifdef TP_ENABLED
     connect (&m_tpFactory, SIGNAL(onePhone(IPhoneAccount*)),
              this, SLOT(onOnePhone(IPhoneAccount*)));
+#endif
 }//PhoneFactory::PhoneFactory
 
 bool
 PhoneFactory::identifyAll(AsyncTaskToken *task)
 {
+#ifdef TP_ENABLED
     // If there is an identify in progress, deny another one
     if (NULL != m_identifyTask) {
         task->status = ATTS_IN_PROGRESS;
@@ -73,8 +78,21 @@ PhoneFactory::identifyAll(AsyncTaskToken *task)
     }
 
     return true;
+#else
+    // Get rid of any of the accounts we already had
+    foreach (IPhoneAccount *pa, m_accounts) {
+        pa->deleteLater ();
+    }
+    m_accounts.clear ();
+
+    task->status = ATTS_SUCCESS;
+    task->emitCompleted ();
+
+    return true;
+#endif
 }//PhoneFactory::identifyAll
 
+#ifdef TP_ENABLED
 void
 PhoneFactory::completeIdentifyTask(int status)
 {
@@ -101,3 +119,4 @@ PhoneFactory::onTpIdentified()
 
     completeIdentifyTask (subTask->status);
 }//PhoneFactory::onTpIdentified
+#endif

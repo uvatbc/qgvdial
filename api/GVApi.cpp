@@ -21,7 +21,6 @@ Contact: yuvraaj@gmail.com
 
 #include "GVApi.h"
 #include "HtmlFieldParser.h"
-#include "MyXmlErrorHandler.h"
 
 #include "GVApi_login.h"
 
@@ -177,7 +176,7 @@ GVApi::simplify_number (QString &strNumber, bool bAddIntPrefix /* = true*/)
             break;
         }
 
-        if (!strNumber.contains (QRegExp("^\\d*$"))) {
+        if (!strNumber.contains (QRegularExpression("^\\d*$"))) {
             // Not numbers. Dont touch it! (anymore!!)
             break;
         }
@@ -197,7 +196,7 @@ GVApi::isNumberValid (const QString &strNumber)
     QString strTemp = strNumber;
     simplify_number (strTemp);
     strTemp.remove ('+');
-    strTemp.remove (QRegExp ("\\d"));
+    strTemp.remove (QRegularExpression ("\\d"));
 
     return (strTemp.size () == 0);
 }//GVApi::isNumberValid
@@ -780,15 +779,9 @@ GVApi::onGetPhones(bool success, const QByteArray &response, QNetworkReply *,
         }
         success = false;
 
-        QXmlInputSource inputSource;
-        QXmlSimpleReader simpleReader;
-        inputSource.setData (strReply);
         HtmlFieldParser xmlHandler;
         xmlHandler.setEmitLog (emitLog);
-
-        simpleReader.setContentHandler (&xmlHandler);
-        simpleReader.setErrorHandler (&xmlHandler);
-        simpleReader.parse (&inputSource, false);
+        xmlHandler.parse (strReply);
 
         if (!xmlHandler.elems.contains ("json") ||
             !xmlHandler.elems.contains ("html")) {
@@ -874,16 +867,10 @@ GVApi::onGetInbox(bool success, const QByteArray &response, QNetworkReply *,
         fTemp.close ();
 #endif
 
-        QXmlInputSource inputSource;
-        QXmlSimpleReader simpleReader;
-        inputSource.setData (strReply);
         HtmlFieldParser xmlHandler;
         xmlHandler.setEmitLog (emitLog);
 
-        simpleReader.setContentHandler (&xmlHandler);
-        simpleReader.setErrorHandler (&xmlHandler);
-
-        if (!simpleReader.parse (&inputSource, false)) {
+        if (!xmlHandler.parse (strReply)) {
             Q_WARN("Failed to parse GV Inbox XML. Data =") << strReply;
             break;
         }
@@ -1029,7 +1016,7 @@ GVApi::parseInboxJsonQtX(AsyncTaskToken *token, const QString &json,
 
             quint64 iVal = p.value("startTime").toString().toLongLong() / 1000;
             if (iVal) {
-                inboxEntry.startTime = QDateTime::fromTime_t (iVal);
+                inboxEntry.startTime = QDateTime::fromSecsSinceEpoch (iVal);
             }
 
             inboxEntry.bRead = p.value("isRead").toBool ();
@@ -1143,7 +1130,7 @@ GVApi::parseInboxJsonQtX(AsyncTaskToken *token, const QString &strJson,
                     bool bOk = false;
                     quint64 iVal = strVal.toULongLong (&bOk) / 1000;
                     if (bOk) {
-                        inboxEntry.startTime = QDateTime::fromTime_t (iVal);
+                        inboxEntry.startTime = QDateTime::fromSecsSinceEpoch (iVal);
                     }
                 } else if (strPName == "isRead") {
                     inboxEntry.bRead = (strVal == "true");
@@ -1233,14 +1220,13 @@ static inline void
 fixAmpersandEncoded(QString &strTemp)
 {
     strTemp.replace ("&amp", "&");
-    QRegExp rx("&#(.*)\\;");
-    rx.setMinimal (true);
-    while (strTemp.contains (rx)) {
+    static const QRegularExpression rx("&#(.*?);");
+    QRegularExpressionMatch match;
+    while ((match = rx.match (strTemp)).hasMatch()) {
         bool bOk;
-        QString strHex = rx.cap(0).remove("#").remove(";")
-                .remove("&");
+        QString strHex = match.captured(0).remove("#").remove(";").remove("&");
         char iVal = strHex.toInt (&bOk);
-        strTemp.replace (rx.cap (0), QString(iVal));
+        strTemp.replace (match.captured(0), QString(iVal));
     }
 }//fixAmpersandEncoded
 
@@ -1297,16 +1283,10 @@ GVApi::parseMessageDiv(QString strRows, GVInboxEntry &entry)
 QString
 GVApi::getSmsSpanText(QString span)
 {
-    QXmlInputSource inputSource;
-    QXmlSimpleReader simpleReader;
-    inputSource.setData (span);
     HtmlFieldParser xmlHandler;
     xmlHandler.setEmitLog (emitLog);
 
-    simpleReader.setContentHandler (&xmlHandler);
-    simpleReader.setErrorHandler (&xmlHandler);
-
-    if (!simpleReader.parse (&inputSource, false)) {
+    if (!xmlHandler.parse (span)) {
         Q_WARN("Failed to parse span.");
         return "";
     }
@@ -2501,7 +2481,7 @@ GVApi::onCheckRecentInboxX(const QString &json, quint32 &totalSize,
             QJsonObject p = it.value().toObject ();
             quint64 iVal = p.value("startTime").toString().toLongLong() / 1000;
             if (iVal) {
-                serverLatest = QDateTime::fromTime_t (iVal);
+                serverLatest = QDateTime::fromSecsSinceEpoch (iVal);
             }
         } else {
             serverLatest = QDateTime();
@@ -2563,7 +2543,7 @@ GVApi::onCheckRecentInboxX(const QString &json, quint32 &totalSize,
             return false;
         }
 
-        serverLatest = QDateTime::fromTime_t (iVal);
+        serverLatest = QDateTime::fromSecsSinceEpoch (iVal);
     } else {
         //Q_DEBUG("Empty list");
         serverLatest = QDateTime();
@@ -2596,16 +2576,10 @@ GVApi::onCheckRecentInbox(bool success, const QByteArray &response,
         }
         success = false;
 
-        QXmlInputSource inputSource;
-        QXmlSimpleReader simpleReader;
-        inputSource.setData (strReply);
         HtmlFieldParser xmlHandler;
         xmlHandler.setEmitLog (emitLog);
 
-        simpleReader.setContentHandler (&xmlHandler);
-        simpleReader.setErrorHandler (&xmlHandler);
-
-        if (!simpleReader.parse (&inputSource, false)) {
+        if (!xmlHandler.parse (strReply)) {
             Q_WARN("Failed to parse GV Inbox XML. Data =") << strReply;
             break;
         }

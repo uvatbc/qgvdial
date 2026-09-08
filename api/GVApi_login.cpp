@@ -23,7 +23,6 @@ Contact: yuvraaj@gmail.com
 #include "GVApi.h"
 #include "GVApi_login.h"
 #include "HtmlFieldParser.h"
-#include "MyXmlErrorHandler.h"
 
 #define DEBUG_ONLY 0
 #define GV_X_METHOD_VER "13"
@@ -102,16 +101,10 @@ GVApi_login::parseXmlAttrs(QString fullMatch,       // IN
         fullMatch = fullMatch.mid(0, fullMatch.length() - 1) + "/>";
     }
 
-    QXmlInputSource inputSource;
-    QXmlSimpleReader simpleReader;
-    inputSource.setData(fullMatch);
     HtmlFieldParser xmlHandler;
     xmlHandler.setEmitLog(p->emitLog);
 
-    simpleReader.setContentHandler(&xmlHandler);
-    simpleReader.setErrorHandler(&xmlHandler);
-
-    if (!simpleReader.parse(&inputSource, false)) {
+    if (!xmlHandler.parse(fullMatch)) {
         Q_WARN(QString("Failed to parse field: '%1'").arg(xmlTag));
         return false;
     }
@@ -134,9 +127,9 @@ GVApi_login::parseFormFields(const QString &strResponse,
   <input type="hidden" name="continue" id="continue"
            value="https://www.google.com/voice/m" />
 */
-    QRegExp rx1("\\<input(.*)\\>");
-    rx1.setMinimal (true);
-    if (!strResponse.contains (rx1)) {
+    QRegularExpression rx1("<input(.*?)>");
+    QRegularExpressionMatchIterator it = rx1.globalMatch (strResponse);
+    if (!it.hasNext()) {
         Q_WARN(QString("Invalid login page: No input fields in:\n%1").arg(strResponse));
         return false;
     }
@@ -145,23 +138,23 @@ GVApi_login::parseFormFields(const QString &strResponse,
     form->hidden.clear ();
     form->no_name.clear ();
 
-    int pos = 0;
-    while ((pos = rx1.indexIn (strResponse, pos)) != -1) {
-        QString fullMatch = rx1.cap(0);
-        QString oneInstance = rx1.cap(1);
+    while (it.hasNext()) {
+        QRegularExpressionMatch match = it.next();
+        QString fullMatch = match.captured(0);
+        QString oneInstance = match.captured(1);
         QVariantMap attrs;
         QString key, value;
         bool hidden, no_name;
 
         if (!parseXmlAttrs(fullMatch, "input", attrs)) {
             Q_WARN("Failed to parse input field.");
-            goto gonext;
+            continue;
         }
 
         if (!attrs.contains ("id") && !attrs.contains ("name")) {
             Q_WARN(QString("Input field doesn't have name/id: '%1'")
                    .arg(oneInstance));
-            goto gonext;
+            continue;
         }
 
         hidden = attrs["type"].toString() == "hidden";
@@ -185,9 +178,6 @@ GVApi_login::parseFormFields(const QString &strResponse,
         } else {
             form->visible[key] = value;
         }
-
-gonext:
-        pos += fullMatch.indexOf (oneInstance);
     }
 
     return true;
@@ -202,15 +192,14 @@ GVApi_login::parseForm(const QString &strResponse,      // IN
         return false;
     }
 
-    QRegExp rxForm("\\<form(.*)\\>");
-    rxForm.setMinimal(true);
-    int pos = strResponse.indexOf(rxForm);
-    if (-1 == pos) {
+    QRegularExpression rxForm("<form(.*?)>");
+    QRegularExpressionMatch match = rxForm.match(strResponse);
+    if (!match.hasMatch()) {
         Q_WARN("Failed to parse login form");
         return false;
     }
 
-    QString fullMatch = rxForm.cap(0);
+    QString fullMatch = match.captured(0);
     fullMatch = fullMatch.remove("novalidate");
     if (!parseXmlAttrs(fullMatch, "form", form->attrs)) {
         Q_WARN("Failed to parse form attributes");
@@ -871,16 +860,10 @@ GVApi_login::parseChallengeSpanText(QGVChallengeListEntry *entry)
         endspan += sizeof("</span>") - 1;
 
         // Parse span text
-        QXmlInputSource inputSource;
-        QXmlSimpleReader simpleReader;
-        inputSource.setData (entry->li.mid(startspan, endspan-startspan));
         HtmlFieldParser xmlHandler;
         xmlHandler.setEmitLog (p->emitLog);
 
-        simpleReader.setContentHandler (&xmlHandler);
-        simpleReader.setErrorHandler (&xmlHandler);
-
-        if (!simpleReader.parse (&inputSource, false)) {
+        if (!xmlHandler.parse (entry->li.mid(startspan, endspan-startspan))) {
             Q_WARN("Failed to parse span.");
             break;
         }

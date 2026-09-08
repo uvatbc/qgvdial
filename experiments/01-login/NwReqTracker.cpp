@@ -21,8 +21,8 @@ NwReqTracker::NwReqTracker(QNetworkReply *r, QObject *parent, bool autoDel)
     rv = connect (reply, SIGNAL(sslErrors(QList<QSslError>)),
                   this , SLOT(onReplySslErrors(QList<QSslError>)));
     Q_ASSERT(rv);
-    rv = connect (reply, SIGNAL(error(QNetworkReply::NetworkError)),
-                  this , SLOT(onReplyError(QNetworkReply::NetworkError)));
+    rv = connect (reply, &QNetworkReply::errorOccurred,
+                  this , &NwReqTracker::onReplyError);
     Q_ASSERT(rv);
 
     replyTimer.setSingleShot (true);

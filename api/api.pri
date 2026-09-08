@@ -5,7 +5,6 @@ SOURCES  += $$PWD/GVApi.cpp \
             $$PWD/NwReqTracker.cpp \
             $$PWD/AsyncTaskToken.cpp \
             $$PWD/CookieJar.cpp \
-            $$PWD/MyXmlErrorHandler.cpp \
             $$PWD/GContactsApi.cpp \
             $$PWD/ContactsParser.cpp \
             $$PWD/ContactsXmlHandler.cpp \
@@ -17,7 +16,6 @@ HEADERS  += $$PWD/api_common.h \
             $$PWD/NwReqTracker.h \
             $$PWD/AsyncTaskToken.h \
             $$PWD/CookieJar.h \
-            $$PWD/MyXmlErrorHandler.h \
             $$PWD/GContactsApi.h \
             $$PWD/ContactsParser.h \
             $$PWD/ContactsXmlHandler.h \
@@ -29,6 +27,8 @@ QT *= script
 }
 lessThan(QT_MAJOR_VERSION, 6) {
 QT *= xmlpatterns
+SOURCES += $$PWD/MyXmlErrorHandler.cpp
+HEADERS += $$PWD/MyXmlErrorHandler.h
 }
 
 RESOURCES += $$PWD/api.qrc

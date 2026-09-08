@@ -251,7 +251,9 @@ GContactsApi::login(AsyncTaskToken *task)
     }
     m_loginTask = task;
 
-    m_o2->setClientEmailHint (task->inParams["user"].toString());
+    QVariantMap extraParams = m_o2->extraRequestParams();
+    extraParams.insert("login_hint", task->inParams["user"].toString());
+    m_o2->setExtraRequestParams(extraParams);
     m_o2->link ();
 
     return (true);

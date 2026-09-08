@@ -20,29 +20,21 @@ Contact: yuvraaj@gmail.com
 */
 
 #include "MyWebView.h"
-#include "CookieJar.h"
+#include <QWebEngineProfile>
+#include <QWebEngineCookieStore>
 
 MyWebView::MyWebView(QWidget *parent)
-: QWebView(parent)
+: QWebEngineView(parent)
 {
 }//MyWebView::MyWebView
 
 void
 MyWebView::setCookies(QList<QNetworkCookie> cookies)
 {
-    do {
-        if ((NULL == page()) ||
-            (NULL == page()->networkAccessManager())) {
-            break;
+    if (page() && page()->profile() && page()->profile()->cookieStore()) {
+        QWebEngineCookieStore *store = page()->profile()->cookieStore();
+        for (const QNetworkCookie &cookie : cookies) {
+            store->setCookie (cookie);
         }
-
-        QNetworkAccessManager *qnam = page()->networkAccessManager ();
-        CookieJar *jar = new CookieJar;
-        if (NULL == jar) {
-            break;
-        }
-
-        jar->setNewCookies (cookies);
-        qnam->setCookieJar (jar);
-    } while (0);
+    }
 }//MyWebView::setCookies

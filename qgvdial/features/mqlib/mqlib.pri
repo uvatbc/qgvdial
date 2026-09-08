@@ -1,7 +1,7 @@
 QT *= network statemachine
 
 MQLIB = $$PWD/../../../third-party/mosquitto/lib
-INCLUDEPATH	 += $$MQLIB $$MQLIB/cpp $$MQLIB/../include
+INCLUDEPATH	 += $$MQLIB $$MQLIB/cpp $$MQLIB/.. $$MQLIB/../include $$MQLIB/../deps
 
 HEADERS  += $$MQLIB/alias_mosq.h \
             $$MQLIB/logging_mosq.h \
