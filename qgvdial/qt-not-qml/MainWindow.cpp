@@ -324,6 +324,11 @@ MainWindow::uiRequestLoginDetails()
 void
 MainWindow::onLoginClicked()
 {
+    if (m_loginTask != NULL) {
+        Q_WARN("Login is already in progress");
+        return;
+    }
+
     QString loginText = d->ui->loginButton->text();
 
     if (loginText.contains ("login", Qt::CaseInsensitive)) {
@@ -430,6 +435,7 @@ MainWindow::uiSetUserPass(bool editable)
     d->ui->textPassword->setEnabled (editable);
 
     d->ui->loginButton->setText (editable ? "Login" : "Logout");
+    d->ui->loginButton->setEnabled (editable);
 }//MainWindow::uiSetUserPass
 
 void
@@ -441,6 +447,7 @@ MainWindow::uiLoginDone(int status, const QString &errStr)
             d->ui->dialTab->setEnabled (true);
             d->ui->contactsTab->setEnabled (true);
             d->ui->inboxTab->setEnabled (true);
+            d->ui->loginButton->setEnabled (true);
 
             d->ui->statusBar->showMessage ("Login successful", SHOW_5SEC);
             break;

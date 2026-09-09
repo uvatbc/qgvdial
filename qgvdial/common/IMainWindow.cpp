@@ -416,6 +416,11 @@ IMainWindow::cancelLogin(void *ctx)
 void
 IMainWindow::onUserLogoutRequest()
 {
+    if (m_loginTask != NULL) {
+        Q_WARN("Cannot logout while login is in progress");
+        return;
+    }
+
     AsyncTaskToken *task = new AsyncTaskToken(this);
     connect(task, &AsyncTaskToken::completed,
             this, &IMainWindow::onLogoutDone);

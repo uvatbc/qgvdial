@@ -678,7 +678,7 @@
  <connections>
   <connection>
    <sender>textPassword</sender>
-   <signal>editingFinished()</signal>
+   <signal>returnPressed()</signal>
    <receiver>loginButton</receiver>
    <slot>click()</slot>
    <hints>
