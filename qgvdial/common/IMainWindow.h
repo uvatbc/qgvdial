@@ -148,11 +148,11 @@ private:
     bool reinitMqClient(void);
 protected slots:
     void onMqUserInfoReceived(QByteArray msg);
-
 protected:
     virtual void uiRequestLoginDetails() = 0;
     virtual void uiSetUserPass(bool editable) = 0;
     void beginLogin(QString user, QString pass);
+    void beginCookieLogin(QString user, const QList<QNetworkCookie> &cookies = QList<QNetworkCookie>());
 private slots:
     void onTFARequest(AsyncTaskToken *task, QStringList options);
     void onTFAPinRequest(AsyncTaskToken *task, QString option);

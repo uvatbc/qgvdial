@@ -46,6 +46,8 @@ public:
 
 public slots:
     void onLoginClicked();
+    void onWebLoginSuccess(const QList<QNetworkCookie> &cookies, const QString &userEmail);
+    void onWebLoginCanceled();
 
     void onUserProxyEnableChanged(bool newValue);
     void onUserUseSystemProxyChanged(bool newValue);

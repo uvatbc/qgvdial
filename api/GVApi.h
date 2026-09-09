@@ -54,6 +54,8 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 // GV API:
     bool login(AsyncTaskToken *token);
+    bool initSessionFromCookies(AsyncTaskToken *token);
+    bool isLoggedIn() const { return m_loggedIn; }
     void resumeWithTFAOption(AsyncTaskToken *token);
     void resumeWithTFAAuth(AsyncTaskToken *token);
     void cancelLogin(AsyncTaskToken *token);
@@ -87,6 +89,10 @@ public slots:
     void resetNwMgr();
 
 private slots:
+    // Session init
+    void onInitSessionVerify(bool success, const QByteArray &response,
+                             QNetworkReply *reply, void *ctx);
+
     // Get phones
     void onGetPhones(bool success, const QByteArray &response,
                      QNetworkReply *reply, void *ctx);

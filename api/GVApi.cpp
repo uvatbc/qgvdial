@@ -293,7 +293,76 @@ bool
 GVApi::login(AsyncTaskToken *task)
 {
     return m_login->login(task);
-}//GVApi::login
+}
+
+bool
+GVApi::initSessionFromCookies(AsyncTaskToken *token)
+{
+    Q_ASSERT(token);
+    if (!token) {
+        return false;
+    }
+
+    m_loggedIn = true;
+    m_rnr_se.clear();
+
+    bool rv = doGet(GV_HTTPS "/b/0/settings/tab/phones", token, this,
+                    &GVApi::onInitSessionVerify);
+    Q_ASSERT(rv);
+    return rv;
+}
+
+void
+GVApi::onInitSessionVerify(bool success, const QByteArray &response,
+                           QNetworkReply *reply, void *ctx)
+{
+    AsyncTaskToken *token = (AsyncTaskToken *)ctx;
+    QString strReply = response;
+
+    do {
+        if (!success) {
+            Q_WARN(QString("Failed to verify session: %1")
+                   .arg(NwHelpers::nwErrorToString(reply)));
+            break;
+        }
+
+        HtmlFieldParser xmlHandler;
+        xmlHandler.setEmitLog(emitLog);
+        xmlHandler.parse(strReply);
+
+        if (!xmlHandler.elems.contains("json") ||
+            !xmlHandler.elems.contains("html")) {
+            Q_WARN("Couldn't parse settings JSON/HTML. Session cookies may be expired.");
+            break;
+        }
+
+        QString strHtml = xmlHandler.elems["html"].toString();
+        int pos = strHtml.indexOf("_rnr_se");
+        if (pos != -1) {
+            int pos1 = strHtml.indexOf(">", pos);
+            if (pos1 != -1) {
+                QString searchIn = strHtml.mid(pos, pos1 - pos);
+                QRegularExpression rx(R"(value\s*=\s*["']([^"']*)["'])");
+                QRegularExpressionMatch m = rx.match(searchIn);
+                if (m.hasMatch()) {
+                    m_rnr_se = m.captured(1);
+                }
+            }
+        }
+
+        if (onGetPhonesQtX(token, xmlHandler.elems["json"].toString())) {
+            m_loggedIn = true;
+            return;
+        }
+    } while (0);
+
+    m_loggedIn = false;
+    if (token) {
+        token->status = ATTS_LOGIN_FAILURE;
+        token->emitCompleted();
+    }
+}
+//GVApi::login
 
 void
 GVApi::resumeWithTFAOption(AsyncTaskToken *task)

@@ -154,7 +154,8 @@ IMainWindow::onInitDone()
         m_mixPanel.setToken(g_mixpaneltoken);
 
         QList<QNetworkCookie> cookies;
-        if (db.loadCookies (cookies)) {
+        bool hasCookies = db.loadCookies (cookies) && !cookies.isEmpty();
+        if (hasCookies) {
             gvApi.setAllCookies (cookies);
         }
 
@@ -167,17 +168,66 @@ IMainWindow::onInitDone()
             Q_DEBUG("Updated proxy settings");
         }
 
-        if (db.usernameIsCached () && db.getUserPass (user,pass)) {
-            Q_DEBUG("Init done, starting login");
-            // Begin login
-            beginLogin (user, pass);
+        if (db.usernameIsCached()) {
+            db.getUserPass(user, pass);
+        }
+
+        if (hasCookies) {
+            Q_DEBUG("Init done, restoring session from saved cookies");
+            beginCookieLogin(user, cookies);
         } else {
             Q_DEBUG("Init done, asking for login info");
-            // Ask the user for login credentials
             uiRequestLoginDetails();
         }
     } while (0);
 }//IMainWindow::onInitDone
+
+void
+IMainWindow::beginCookieLogin(QString user, const QList<QNetworkCookie> &cookies)
+{
+    bool ok;
+    do {
+        if (m_loginTask) {
+            Q_WARN("Login is in progress");
+            break;
+        }
+
+        if (!cookies.isEmpty()) {
+            gvApi.setAllCookies(cookies);
+            db.saveCookies(cookies);
+        }
+
+        uiEnableContactUpdateFrequency (false);
+        uiEnableInboxUpdateFrequency (false);
+
+        m_loginTask = new AsyncTaskToken(this);
+        if (NULL == m_loginTask) {
+            Q_WARN("Failed to allocate token");
+            break;
+        }
+
+        ok = connect(m_loginTask, &AsyncTaskToken::completed,
+                     this, &IMainWindow::loginCompleted);
+        Q_ASSERT(ok);
+        if (!ok) {
+            Q_CRIT("Failed to connect signal");
+        }
+
+        m_loginTask->inParams["user"] = user;
+
+        Q_DEBUG(QString("Login using user %1 with cookies").arg(user));
+        startLongTask (LT_Login);
+
+        if (!gvApi.initSessionFromCookies(m_loginTask)) {
+            Q_WARN("Failed to initialize session from cookies");
+            break;
+        }
+
+        m_user = user;
+        m_pass.clear();
+        uiSetUserPass(false);
+    } while (0);
+}//IMainWindow::beginCookieLogin
 
 void
 IMainWindow::beginLogin(QString user, QString pass)

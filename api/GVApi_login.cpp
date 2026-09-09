@@ -94,28 +94,37 @@ GVApi_login::parseXmlAttrs(QString fullMatch,       // IN
                            const QString &xmlTag,   // IN
                            QVariantMap &attrs)      // OUT
 {
-    GVApi *p = (GVApi *)this->parent();
+    attrs.clear();
 
-    QString name, value;
-    if (!fullMatch.endsWith("/>")) {
-        fullMatch = fullMatch.mid(0, fullMatch.length() - 1) + "/>";
-    }
-
-    HtmlFieldParser xmlHandler;
-    xmlHandler.setEmitLog(p->emitLog);
-
-    if (!xmlHandler.parse(fullMatch)) {
-        Q_WARN(QString("Failed to parse field: '%1'").arg(xmlTag));
+    QRegularExpression tagRegex(QString("^<\\s*%1(\\s+[^>]*)?/?>").arg(QRegularExpression::escape(xmlTag)),
+                                QRegularExpression::CaseInsensitiveOption);
+    QRegularExpressionMatch tagMatch = tagRegex.match(fullMatch.trimmed());
+    if (!tagMatch.hasMatch()) {
+        Q_WARN(QString("Failed to parse field '%1' from: %2").arg(xmlTag, fullMatch));
         return false;
     }
 
-    if (!xmlHandler.elems.contains(xmlTag) ||
-        !xmlHandler.attrMap.contains(xmlTag)) {
-        Q_WARN(QString("Failed to parse field: '%1'").arg(xmlTag));
-        return false;
+    QString attrString = tagMatch.captured(1);
+    if (!attrString.isEmpty()) {
+        QRegularExpression attrRegex(R"(([a-zA-Z0-9_:-]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s/>]+)))?)");
+        QRegularExpressionMatchIterator it = attrRegex.globalMatch(attrString);
+        while (it.hasNext()) {
+            QRegularExpressionMatch m = it.next();
+            QString attrName = m.captured(1);
+            QString attrVal;
+            if (m.hasCaptured(2)) {
+                attrVal = m.captured(2);
+            } else if (m.hasCaptured(3)) {
+                attrVal = m.captured(3);
+            } else if (m.hasCaptured(4)) {
+                attrVal = m.captured(4);
+            } else {
+                attrVal = attrName;
+            }
+            attrs[attrName] = attrVal;
+        }
     }
 
-    attrs = xmlHandler.attrMap[xmlTag];
     return true;
 }//GVApi_login::parseXmlAttrs
 

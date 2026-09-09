@@ -6,9 +6,7 @@ include(../features/openssl/openssl-lin.pri)
 include(../features/osver/desktop/linux/osv-linux.pri)
 include(../features/dbus_api/dbus_api.pri)
 
-# Desktop linux still uses webkit and not webengine even with qt5!!
-include($$PWD/../features/webview/webkitview.pri)
-#include($$PWD/../features/webview/webengineview.pri)
+include($$PWD/../features/webview/webengineview.pri)
 
 INCLUDEPATH += desktop_linux
 SOURCES  += desktop_linux/PhoneFactory.cpp

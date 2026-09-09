@@ -42,6 +42,7 @@ Contact: yuvraaj@gmail.com
 
 #include "SmsDialog.h"
 #include "MyWebView.h"
+#include "WebLoginDialog.h"
 #include "GvNumComboBox.h"
 
 #ifdef Q_WS_WIN32
@@ -315,7 +316,7 @@ MainWindow::uiUpdateProxySettings(const ProxyInfo &info)
 void
 MainWindow::uiRequestLoginDetails()
 {
-    d->ui->statusBar->showMessage ("Please enter a user and password",
+    d->ui->statusBar->showMessage ("Please click Login to sign in with Google",
                                    SHOW_INF);
     d->ui->tabWidget->setCurrentIndex (3);
     d->ui->toolBox->setCurrentIndex (0);
@@ -332,23 +333,40 @@ MainWindow::onLoginClicked()
     QString loginText = d->ui->loginButton->text();
 
     if (loginText.contains ("login", Qt::CaseInsensitive)) {
-        QString user, pass;
-        user = d->ui->textUsername->text ();
-        pass = d->ui->textPassword->text ();
+        QString user = d->ui->textUsername->text().trimmed();
 
-        if (user.isEmpty () || pass.isEmpty ()) {
-            Q_WARN("Invalid username or password");
-            QMessageBox msg;
-            msg.setText (tr("Invalid username or password"));
-            msg.exec ();
-            return;
-        }
-
-        beginLogin (user, pass);
+        WebLoginDialog *dlg = new WebLoginDialog(d, user);
+        connect(dlg, &WebLoginDialog::loginSucceeded,
+                this, &MainWindow::onWebLoginSuccess);
+        connect(dlg, &WebLoginDialog::loginCanceled,
+                this, &MainWindow::onWebLoginCanceled);
+        dlg->exec();
+        dlg->deleteLater();
     } else {
         onUserLogoutRequest ();
     }
 }//MainWindow::onLoginClicked
+
+void
+MainWindow::onWebLoginSuccess(const QList<QNetworkCookie> &cookies, const QString &userEmail)
+{
+    QString user = userEmail.trimmed();
+    if (user.isEmpty()) {
+        user = d->ui->textUsername->text().trimmed();
+    }
+    if (!user.isEmpty()) {
+        d->ui->textUsername->setText(user);
+    }
+    d->ui->textPassword->clear();
+
+    beginCookieLogin(user, cookies);
+}
+
+void
+MainWindow::onWebLoginCanceled()
+{
+    uiSetUserPass(true);
+}
 
 void
 MainWindow::onUserLogoutDone()
@@ -427,12 +445,13 @@ void
 MainWindow::uiSetUserPass(bool editable)
 {
     d->ui->textUsername->setText (m_user);
-    d->ui->textPassword->setText (m_pass);
+    d->ui->textPassword->setText ("");
+    d->ui->textPassword->setPlaceholderText(tr("(Sign in via browser)"));
 
     d->ui->textUsername->setReadOnly (!editable);
-    d->ui->textPassword->setReadOnly (!editable);
+    d->ui->textPassword->setReadOnly (true);
     d->ui->textUsername->setEnabled (editable);
-    d->ui->textPassword->setEnabled (editable);
+    d->ui->textPassword->setEnabled (false);
 
     d->ui->loginButton->setText (editable ? "Login" : "Logout");
     d->ui->loginButton->setEnabled (editable);

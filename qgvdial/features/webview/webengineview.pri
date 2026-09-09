@@ -1,5 +1,7 @@
 INCLUDEPATH += $$PWD/webengine
-QT *= widgets webengine webenginewidgets
+QT *= widgets webenginewidgets
 
-SOURCES  += $$PWD/webengine/MyWebView.cpp
-HEADERS  += $$PWD/webengine/MyWebView.h
+SOURCES  += $$PWD/webengine/MyWebView.cpp \
+            $$PWD/webengine/WebLoginDialog.cpp
+HEADERS  += $$PWD/webengine/MyWebView.h \
+            $$PWD/webengine/WebLoginDialog.h
