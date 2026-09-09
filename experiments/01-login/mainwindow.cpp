@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "NwReqTracker.h"
+#include <QAction>
 
 #include <QRegularExpression>
 
@@ -35,14 +36,14 @@ MainWindow::MainWindow(QWidget *parent)
     actDoIt->setShortcut (QKeySequence("Ctrl+D"));
     actExit->setShortcut (QKeySequence("Ctrl+Q"));
 
-    rv = connect(actDoIt, SIGNAL(triggered()), this, SLOT(on_actionDo_it()));
+    rv = (bool)connect(actDoIt, &QAction::triggered, this, &MainWindow::on_actionDo_it);
     Q_ASSERT(rv);
-    rv = connect(actExit, SIGNAL(triggered()), this, SLOT(on_actionExit()));
+    rv = (bool)connect(actExit, &QAction::triggered, this, &MainWindow::on_actionExit);
     Q_ASSERT(rv);
 
     nwMgr.setCookieJar(&jar);
 
-    rv = connect(&logsTimer, SIGNAL(timeout()), this, SLOT(onLogsTimer()));
+    rv = (bool)connect(&logsTimer, &QTimer::timeout, this, &MainWindow::onLogsTimer);
     Q_ASSERT(rv);
 
     QNetworkProxy httpProxy, httpsProxy;
@@ -117,8 +118,8 @@ MainWindow::on_actionDo_it()
     req.setRawHeader("User-Agent", UA_IPHONE4);
     NwReqTracker *tracker = new NwReqTracker(nwMgr.get(req), this);
 
-    bool rv = connect(tracker, SIGNAL(sigDone(bool,const QByteArray &)),
-                      this   , SLOT (onLogin1(bool,const QByteArray &)));
+    bool rv = (bool)connect(tracker, &NwReqTracker::sigDone,
+                            this   , &MainWindow::onLogin1);
     Q_ASSERT(rv);
 }//MainWindow::on_actionDo_it
 
@@ -357,8 +358,8 @@ MainWindow::postLogin(QString strUrl)
     QNetworkReply *reply = nwMgr.post(req, url.encodedQuery ());
     NwReqTracker *tracker = new NwReqTracker(reply, this);
 
-    found = connect(tracker, SIGNAL(sigDone(bool,const QByteArray &)),
-                    this   , SLOT (onLogin2(bool,const QByteArray &)));
+    found = (bool)connect(tracker, &NwReqTracker::sigDone,
+                          this   , &MainWindow::onLogin2);
     Q_ASSERT(found);
 
     return found;
@@ -417,8 +418,8 @@ MainWindow::beginTwoFactorAuth(const QString &strUrl)
     NwReqTracker *tracker = new NwReqTracker(reply, this);
 
     bool rv =
-    connect(tracker, SIGNAL(sigDone(bool,const QByteArray &)),
-            this   , SLOT  (onTwoFactorLogin(bool,const QByteArray &)));
+    (bool)connect(tracker, &NwReqTracker::sigDone,
+                  this   , &MainWindow::onTwoFactorLogin);
     Q_ASSERT(rv);
 
     return rv;
@@ -520,8 +521,8 @@ MainWindow::doTwoFactorAuth(const QString &strResponse)
         QNetworkReply *reply = nwMgr.post(req, url1.encodedQuery ());
         NwReqTracker *tracker = new NwReqTracker(reply, this);
 
-        rv = connect(tracker, SIGNAL(sigDone(bool,const QByteArray &)),
-                     this   , SLOT  (onTwoFactorAutoPost(bool,const QByteArray &)));
+        rv = (bool)connect(tracker, &NwReqTracker::sigDone,
+                           this   , &MainWindow::onTwoFactorAutoPost);
         Q_ASSERT(rv);
     } while (0); // End cleanup block (not a loop)
 
@@ -568,8 +569,8 @@ MainWindow::getRnr()
     NwReqTracker *tracker = new NwReqTracker(nwMgr.get(req), this);
 
     bool rv =
-    connect(tracker, SIGNAL(sigDone(bool,const QByteArray &)),
-            this   , SLOT  (onGotRnr(bool,const QByteArray &)));
+    (bool)connect(tracker, &NwReqTracker::sigDone,
+                  this   , &MainWindow::onGotRnr);
     Q_ASSERT(rv);
 
     return rv;
@@ -588,8 +589,8 @@ MainWindow::onGotRnr(bool success, const QByteArray &response)
             QNetworkRequest req(strMoved);
             NwReqTracker *tracker = new NwReqTracker(nwMgr.get(req), this);
             success =
-            connect(tracker, SIGNAL(sigDone(bool,const QByteArray &)),
-                    this   , SLOT  (onGotRnr(bool,const QByteArray &)));
+            (bool)connect(tracker, &NwReqTracker::sigDone,
+                          this   , &MainWindow::onGotRnr);
             Q_ASSERT(success);
             break;
         }

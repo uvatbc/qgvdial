@@ -44,12 +44,11 @@ ContactsParser::doXmlWork ()
     QDateTime startTime = QDateTime::currentDateTime ();
 #endif
 
-    rv = connect (&contactsHandler, SIGNAL(status(const QString&,int)),
-                  this,             SIGNAL(status(const QString&,int)));
+    rv = connect (&contactsHandler, &ContactsXmlHandler::status,
+                  this,             &ContactsParser::status);
     Q_ASSERT(rv);
-    rv = connect (
-            &contactsHandler, SIGNAL   (oneContact(ContactInfo)),
-            this,             SIGNAL(gotOneContact(ContactInfo)));
+    rv = connect (&contactsHandler, &ContactsXmlHandler::oneContact,
+                  this,             &ContactsParser::gotOneContact);
     Q_ASSERT(rv);
 
     rv = contactsHandler.parse (byData);

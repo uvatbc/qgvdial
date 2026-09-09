@@ -32,7 +32,8 @@ enum GContactPhotoType {
     GCPT_JPEG   //  = 3
 };
 
-class O2;
+#include "o2.h"
+
 class O0AbstractStore;
 class GContactsApi : public QObject
 {
@@ -57,9 +58,77 @@ signals:
     void oneContact(ContactInfo cinfo);
 
 private:
-    bool doGet(QUrl url, void *ctx, QObject *obj, const char *method);
+    template <typename Receiver, typename Func>
+    bool doGet(QUrl url, void *ctx, Receiver *obj, Func method)
+    {
+        AsyncTaskToken *task = (AsyncTaskToken *)ctx;
+        if (!task) {
+            return false;
+        }
+
+        QNetworkRequest req(url);
+        QByteArray byAuth = QString("Bearer %1")
+                                    .arg(m_GoogleAuthToken).toLatin1 ();
+        req.setRawHeader ("Authorization", byAuth);
+        req.setRawHeader ("Gdata-version", "3.0");
+
+        QNetworkReply *reply = nwMgr.get(req);
+        if (!reply) {
+            return false;
+        }
+
+        NwReqTracker *tracker =
+        new NwReqTracker(reply, nwMgr, ctx, NW_REPLY_TIMEOUT, false, true, this);
+        if (!tracker) {
+            reply->abort ();
+            reply->deleteLater ();
+            return false;
+        }
+
+        tracker->setAutoRedirect (NULL, true);
+        task->apiCtx = tracker;
+
+        bool rv = connect(tracker, &NwReqTracker::sigDone, obj, method);
+        Q_ASSERT(rv);
+
+        return rv;
+    }
+
+    template <typename Receiver, typename Func>
     bool doPost(QUrl url, QByteArray postData, const char *contentType,
-                void *ctx, QObject *receiver, const char *method);
+                void *ctx, Receiver *receiver, Func method)
+    {
+        AsyncTaskToken *task = (AsyncTaskToken *)ctx;
+        if (!task) {
+            return false;
+        }
+
+        QNetworkRequest req(url);
+        req.setHeader (QNetworkRequest::ContentTypeHeader, contentType);
+        req.setRawHeader("User-Agent", UA_IPHONE4);
+
+        QNetworkReply *reply = nwMgr.post(req, postData);
+        if (!reply) {
+            return false;
+        }
+
+        NwReqTracker *tracker =
+        new NwReqTracker(reply, nwMgr, ctx, NW_REPLY_TIMEOUT, false, this);
+        if (!tracker) {
+            reply->abort ();
+            reply->deleteLater ();
+            return false;
+        }
+
+        tracker->setAutoRedirect (NULL, true);
+        task->apiCtx = tracker;
+
+        bool rv = connect(tracker, &NwReqTracker::sigDone, receiver, method);
+        Q_ASSERT(rv);
+
+        return (rv);
+    }
+
     bool getClientSecret(const QString &json, QString &clientID,
                          QString &clientSecret);
 

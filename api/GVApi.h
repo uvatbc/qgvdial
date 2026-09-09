@@ -125,22 +125,137 @@ private slots:
 private:
     bool getSystemProxies (QNetworkProxy &http, QNetworkProxy &https);
 
+    template <typename Receiver, typename Func>
     bool doGet(QUrl url, AsyncTaskToken *token, const char *ua,
-               QObject *receiver, const char *method);
-    bool doGet(QUrl url, AsyncTaskToken *token, QObject *receiver,
-               const char *method);
-    bool doGet(const QString &strUrl, AsyncTaskToken *token, QObject *receiver,
-               const char *method);
+               Receiver *receiver, Func method)
+    {
+        if (!token) {
+            return false;
+        }
 
+        QNetworkRequest req(url);
+        if (NULL != ua) {
+            req.setHeader(QNetworkRequest::UserAgentHeader, ua);
+        }
+
+        NwReqTracker::setCookies (m_jar, req);
+
+        QNetworkReply *reply = m_nwMgr->get(req);
+        if (reply == NULL) {
+            return false;
+        }
+
+#if DEBUG_ONLY
+        NwReqTracker::dumpRequestInfo (req);
+#endif
+
+        NwReqTracker *tracker = new NwReqTracker(reply, *m_nwMgr, token,
+                                            NW_REPLY_TIMEOUT, emitLog, true, this);
+        if (tracker == NULL) {
+            reply->abort ();
+            reply->deleteLater ();
+            return false;
+        }
+
+        tracker->setAutoRedirect (m_jar, true);
+        token->apiCtx = tracker;
+        token->status = ATTS_SUCCESS;
+
+        bool rv =
+        connect(tracker, &NwReqTracker::sigDone,
+                receiver, method);
+        Q_ASSERT(rv);
+        rv = connect(tracker, &NwReqTracker::sigProgress,
+                     this, &GVApi::sigProgress);
+        Q_ASSERT(rv);
+
+        return rv;
+    }
+
+    template <typename Receiver, typename Func>
+    bool doGet(QUrl url, AsyncTaskToken *token, Receiver *receiver,
+               Func method)
+    {
+        return doGet(url, token, UA_IPHONE4, receiver, method);
+    }
+
+    template <typename Receiver, typename Func>
+    bool doGet(const QString &strUrl, AsyncTaskToken *token, Receiver *receiver,
+               Func method)
+    {
+        return doGet(QUrl(strUrl), token, receiver, method);
+    }
+
+    template <typename Receiver, typename Func>
     bool doPost(QUrl url, QByteArray postData, const char *contentType,
-                const char *ua, AsyncTaskToken *token, QObject *receiver,
-                const char *method);
+                const char *ua, AsyncTaskToken *token, Receiver *receiver,
+                Func method)
+    {
+        if (!token) {
+            return false;
+        }
+
+        QNetworkRequest req(url);
+        if (NULL != ua) {
+            req.setHeader(QNetworkRequest::UserAgentHeader, ua);
+        }
+        req.setHeader (QNetworkRequest::ContentTypeHeader, contentType);
+
+        NwReqTracker::setCookies (m_jar, req);
+
+        QNetworkReply *reply = m_nwMgr->post(req, postData);
+        if (!reply) {
+            return false;
+        }
+
+#if DEBUG_ONLY
+        NwReqTracker::dumpRequestInfo (req, postData);
+#endif
+
+        NwReqTracker *tracker =
+        new NwReqTracker(reply, *m_nwMgr, token, NW_REPLY_TIMEOUT, emitLog, this);
+        if (!tracker) {
+            reply->abort ();
+            reply->deleteLater ();
+            return false;
+        }
+
+        tracker->setAutoRedirect (m_jar, true);
+        token->apiCtx = tracker;
+        token->status = ATTS_SUCCESS;
+
+        bool rv =
+        connect(tracker, &NwReqTracker::sigDone,
+                receiver, method);
+        Q_ASSERT(rv);
+        rv = connect(tracker, &NwReqTracker::sigProgress,
+                     this, &GVApi::sigProgress);
+        Q_ASSERT(rv);
+
+        return (rv);
+    }
+
+    template <typename Receiver, typename Func>
     bool doPost(QUrl url, QByteArray postData, const char *contentType,
-                AsyncTaskToken *token, QObject *receiver, const char *method);
+                AsyncTaskToken *token, Receiver *receiver, Func method)
+    {
+        return doPost(url, postData, contentType, UA_IPHONE4, token, receiver,
+                      method);
+    }
+
+    template <typename Receiver, typename Func>
     bool doPostForm(QUrl url, QByteArray postData, AsyncTaskToken *token,
-                    QObject *receiver, const char *method);
+                    Receiver *receiver, Func method)
+    {
+        return doPost (url, postData, POST_FORM, token, receiver, method);
+    }
+
+    template <typename Receiver, typename Func>
     bool doPostText(QUrl url, QByteArray postData, AsyncTaskToken *token,
-                    QObject *receiver, const char *method);
+                    Receiver *receiver, Func method)
+    {
+        return doPost (url, postData, POST_TEXT, token, receiver, method);
+    }
 
     void updateLoggedInFlag(AsyncTaskToken *task, const QString &strResponse);
 

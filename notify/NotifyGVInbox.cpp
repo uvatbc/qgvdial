@@ -54,8 +54,8 @@ GVInbox::refresh ()
         Q_WARN("Failed to allocate token for gvapi call");
         return;
     }
-    bool rv = connect(token, SIGNAL(completed()),
-                      this, SLOT(onCheckInboxDone()));
+    bool rv = (bool)connect(token, &AsyncTaskToken::completed,
+                            this, &GVInbox::onCheckInboxDone);
     Q_ASSERT(rv);
     if (!rv) {
         qApp->quit ();

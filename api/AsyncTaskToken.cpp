@@ -42,5 +42,5 @@ AsyncTaskToken::reinit()
     callerCtx = NULL;
     apiCtx = NULL;
 
-    this->disconnect (SIGNAL(completed()));
+    disconnect (this, &AsyncTaskToken::completed, nullptr, nullptr);
 }//AsyncTaskToken::reinit

@@ -33,18 +33,18 @@ LibInbox::LibInbox(IMainWindow *parent)
 , m_selectedInbox("all")
 {
     connect (&parent->gvApi,
-             SIGNAL(oneInboxEntry(AsyncTaskToken*,GVInboxEntry)),
+             &GVApi::oneInboxEntry,
              this,
-             SLOT(onOneInboxEntry(AsyncTaskToken*,GVInboxEntry)));
+             &LibInbox::onOneInboxEntry);
 
     m_modelRefreshTimer.setSingleShot (true);
     m_modelRefreshTimer.setInterval (REFRESH_TIMEOUT);
-    connect (&m_modelRefreshTimer, SIGNAL(timeout()),
-             this, SLOT(onModelRefreshTimeout()));
+    connect (&m_modelRefreshTimer, &QTimer::timeout,
+             this, &LibInbox::onModelRefreshTimeout);
 
     m_updateTimer.setSingleShot (true);
-    connect(&m_updateTimer, SIGNAL(timeout()),
-            this, SLOT(refreshLatest()));
+    connect(&m_updateTimer, &QTimer::timeout,
+            this, [this]() { refreshLatest(); });
 }//LibInbox::LibInbox
 
 InboxModel *
@@ -138,7 +138,7 @@ LibInbox::beginRefresh(AsyncTaskToken *task,
         task->inParams["notrash"] = 1;
     }
 
-    connect (task, SIGNAL(completed()), this, SLOT(onRefreshDone()));
+    connect (task, &AsyncTaskToken::completed, this, &LibInbox::onRefreshDone);
 
     IMainWindow *win = (IMainWindow *) this->parent ();
     bool rv = win->gvApi.getInbox (task);
@@ -336,7 +336,7 @@ LibInbox::markEntryAsRead(const QString &id)
         Q_WARN("Failed to allocate AsyncTaskToken");
         return false;
     }
-    connect(task, SIGNAL(completed()), this, SLOT(onInboxEntryMarkedAsRead()));
+    connect(task, &AsyncTaskToken::completed, this, &LibInbox::onInboxEntryMarkedAsRead);
 
     task->inParams["id"] = id;
     IMainWindow *win = (IMainWindow *) this->parent ();
@@ -377,7 +377,7 @@ LibInbox::deleteEntry(const QString &id)
         Q_WARN("Failed to allocate AsyncTaskToken");
         return false;
     }
-    connect(task, SIGNAL(completed()), this, SLOT(onInboxEntryDeleted()));
+    connect(task, &AsyncTaskToken::completed, this, &LibInbox::onInboxEntryDeleted);
 
     task->inParams["id"] = id;
     IMainWindow *win = (IMainWindow *) this->parent ();

@@ -53,25 +53,25 @@ MainWindow::setStatus(const QString &strText, int /* timeout = 3000 */ )
 void
 MainWindow::init()
 {
-    connect(&gvApi, SIGNAL(twoStepAuthOptions(AsyncTaskToken*,QStringList)),
-            this, SLOT(onTFARequest(AsyncTaskToken*,QStringList)));
-    connect(&gvApi, SIGNAL(twoStepAuthPin(AsyncTaskToken*,QString)),
-            this, SLOT(onTFAPinRequest(AsyncTaskToken*,QString)));
+    connect(&gvApi, &GVApi::twoStepAuthOptions,
+            this, &MainWindow::onTFARequest);
+    connect(&gvApi, &GVApi::twoStepAuthPin,
+            this, &MainWindow::onTFAPinRequest);
 
     // Status from contacts object
-    QObject::connect(&oContacts, SIGNAL(status(const QString&,int)),
-                      this     , SLOT(setStatus(const QString&,int)));
+    connect(&oContacts, &GVContactsTable::status,
+            this      , &MainWindow::setStatus);
     // oContacts.allContacts -> this.getContactsDone
-    QObject::connect(&oContacts, SIGNAL(allContacts(bool,bool)),
-                     this      , SLOT(getContactsDone(bool,bool)));
+    connect(&oContacts, &GVContactsTable::allContacts,
+            this      , &MainWindow::getContactsDone);
     // Status from inbox object
-    QObject::connect(&oInbox, SIGNAL(status(const QString&,int)),
-                      this  , SLOT(setStatus(const QString&,int)));
+    connect(&oInbox, &GVInbox::status,
+            this   , &MainWindow::setStatus);
     // Inbox has updated
-    QObject::connect(&oInbox, SIGNAL(inboxChanged()),
-                      this  , SLOT(inboxChanged()));
+    connect(&oInbox, &GVInbox::inboxChanged,
+            this   , &MainWindow::inboxChanged);
     // Timer tick
-    QObject::connect(&mainTimer, SIGNAL(timeout()), this, SLOT(doWork()));
+    connect(&mainTimer, &QTimer::timeout, this, &MainWindow::doWork);
 
     if (!checkParams()) {
         qApp->quit();
@@ -373,8 +373,8 @@ MainWindow::doLogin()
 
         //loadCookies();
 
-        ok = connect(token, SIGNAL(completed()),
-                     this , SLOT(loginCompleted()));
+        ok = (bool)connect(token, &AsyncTaskToken::completed,
+                           this , &MainWindow::loginCompleted);
 
         token->inParams["user"] = strUser;
         token->inParams["pass"] = strPass;
@@ -454,8 +454,8 @@ void
 MainWindow::doLogout()
 {
     AsyncTaskToken *token = new AsyncTaskToken(this);
-    connect(token, SIGNAL(completed()),
-            this, SLOT(logoutCompleted()));
+    connect(token, &AsyncTaskToken::completed,
+            this, &MainWindow::logoutCompleted);
 
     if (!gvApi.logout(token)) {
         token->deleteLater();

@@ -35,8 +35,8 @@ MainWindow::initLogging ()
     // Initialize logging
     logsTimer.setSingleShot (true);
     logsTimer.start (3 * 1000);
-    bool rv = connect (&logsTimer, SIGNAL(timeout()),
-                        this     , SLOT(onCleanupLogsArray()));
+    bool rv = (bool)connect (&logsTimer, &QTimer::timeout,
+                             this     , &MainWindow::onCleanupLogsArray);
     Q_ASSERT(rv); Q_UNUSED(rv);
 }//MainWindow::initLogging
 
@@ -93,8 +93,8 @@ MainWindow::init()
     if (option == 1) {          // Client
         client = new QGVNotifyProxyIface("net.yuvraaj.qgvnotify.control", "/",
                                          QDBusConnection::sessionBus(), 0);
-        connect(client, SIGNAL(CommandForClient(const QString &)),
-                this  , SLOT(onCommandForClient(const QString &)));
+        connect(client, &QGVNotifyProxyIface::CommandForClient,
+                this  , &MainWindow::onCommandForClient);
     } else if (option == 2) {   // Server
         ctrlService = new CtrlService(this);
         new QGVNotifyIfaceAdapter(ctrlService);

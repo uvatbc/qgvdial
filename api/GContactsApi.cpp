@@ -119,10 +119,10 @@ GContactsApi::GContactsApi(QObject *parent)
     m_o2->setRefreshTokenUrl ("https://accounts.google.com/o/oauth2/token");
     m_o2->setRequestUrl ("https://accounts.google.com/o/oauth2/auth");
 
-    connect(m_o2, SIGNAL(linkingFailed()), this, SLOT(onLinkingFailed()));
-    connect(m_o2, SIGNAL(linkingSucceeded()), this, SLOT(onLinkingSucceeded()));
-    connect(m_o2, SIGNAL(openBrowser(QUrl)), this, SIGNAL(openBrowser(QUrl)));
-    connect(m_o2, SIGNAL(closeBrowser()), this, SIGNAL(closeBrowser()));
+    connect(m_o2, &O2::linkingFailed, this, &GContactsApi::onLinkingFailed);
+    connect(m_o2, &O2::linkingSucceeded, this, &GContactsApi::onLinkingSucceeded);
+    connect(m_o2, &O2::openBrowser, this, &GContactsApi::openBrowser);
+    connect(m_o2, &O2::closeBrowser, this, &GContactsApi::closeBrowser);
 
     QFile f(":/goog_client_secret.json");
     if (!f.open (QFile::ReadOnly)) {
@@ -130,19 +130,17 @@ GContactsApi::GContactsApi(QObject *parent)
         return;
     }
 
-    do {
-        QByteArray baData = f.readAll ();
-
-        QString clientID, clientSecret;
-        if (!getClientSecret(QString(baData), clientID, clientSecret)) {
-            Q_WARN("Failed to get client ID and/or secret");
-            break;
-        }
-        m_o2->setClientId (clientID);
-        m_o2->setClientSecret (clientSecret);
-    } while (0);
-
+    QString json = f.readAll ();
     f.close ();
+
+    QString clientID, clientSecret;
+    if (!getClientSecret(json, clientID, clientSecret)) {
+        Q_WARN("Failed to parse client secret JSON");
+        return;
+    }
+
+    m_o2->setClientId (clientID);
+    m_o2->setClientSecret (clientSecret);
 }//GContactsApi::GContactsApi
 
 void
@@ -150,83 +148,6 @@ GContactsApi::initStore(O0AbstractStore *s)
 {
     m_o2->setStore (s);
 }//GContactsApi::initStore
-
-bool
-GContactsApi::doGet(QUrl url, void *ctx, QObject *obj, const char *method)
-{
-    AsyncTaskToken *task = (AsyncTaskToken *)ctx;
-    if (!task) {
-        return false;
-    }
-
-    QNetworkRequest req(url);
-
-    QByteArray byAuth = QString("Bearer %1")
-                                .arg(m_GoogleAuthToken).toLatin1 ();
-    req.setRawHeader ("Authorization", byAuth);
-    req.setRawHeader ("Gdata-version", "3.0");
-
-    QNetworkReply *reply = nwMgr.get(req);
-    if (!reply) {
-        return false;
-    }
-
-    NwReqTracker *tracker =
-    new NwReqTracker(reply, nwMgr, ctx, NW_REPLY_TIMEOUT, false, true, this);
-    if (!tracker) {
-        reply->abort ();
-        reply->deleteLater ();
-        return false;
-    }
-
-    tracker->setAutoRedirect (NULL, true);
-    task->apiCtx = tracker;
-
-    bool rv =
-    connect(tracker,
-            SIGNAL(sigDone(bool,const QByteArray&,QNetworkReply*,void*)),
-            obj, method);
-    Q_ASSERT(rv);
-
-    return rv;
-}//GContactsApi::doGet
-
-bool
-GContactsApi::doPost(QUrl url, QByteArray postData, const char *contentType,
-                     void *ctx, QObject *receiver, const char *method)
-{
-    AsyncTaskToken *task = (AsyncTaskToken *)ctx;
-    if (!task) {
-        return false;
-    }
-
-    QNetworkRequest req(url);
-    req.setHeader (QNetworkRequest::ContentTypeHeader, contentType);
-    req.setRawHeader("User-Agent", UA_IPHONE4);
-
-    QNetworkReply *reply = nwMgr.post(req, postData);
-    if (!reply) {
-        return false;
-    }
-
-    NwReqTracker *tracker =
-    new NwReqTracker(reply, nwMgr, ctx, NW_REPLY_TIMEOUT, false, this);
-    if (!tracker) {
-        reply->abort ();
-        reply->deleteLater ();
-        return false;
-    }
-
-    tracker->setAutoRedirect (NULL, true);
-    task->apiCtx = tracker;
-
-    bool rv = connect(tracker,
-                      SIGNAL(sigDone(bool,QByteArray,QNetworkReply*,void*)),
-                      receiver, method);
-    Q_ASSERT(rv);
-
-    return (rv);
-}//GContactsApi::doPost
 
 bool
 GContactsApi::login(AsyncTaskToken *task)
@@ -356,7 +277,7 @@ GContactsApi::getContacts(AsyncTaskToken *task)
 
     bool rv =
     doGet(url, task, this,
-          SLOT(onGotContactsFeed(bool,const QByteArray&,QNetworkReply*,void*)));
+          &GContactsApi::onGotContactsFeed);
     Q_ASSERT(rv);
 
     if (rv) {
@@ -388,8 +309,8 @@ GContactsApi::onGotContactsFeed(bool success, const QByteArray &response,
 
                 Q_DEBUG("Relinking contacts OAuth");
 
-                connect(relink, SIGNAL(completed()),
-                        relink, SLOT(deleteLater()));
+                connect(relink, &AsyncTaskToken::completed,
+                        relink, &QObject::deleteLater);
 
                 relink->inParams["user"] = m_user;
                 if (!this->login (relink)) {
@@ -421,49 +342,49 @@ GContactsApi::onGotContactsFeed(bool success, const QByteArray &response,
         // Thread start -> parser->doWork
 #if USE_JSON_FEED
         success =
-        connect (workerThread, SIGNAL(started()), parser, SLOT(doJsonWork()));
+        connect (workerThread, &QThread::started, parser, &ContactsParser::doJsonWork);
         Q_ASSERT(success);
 #else
         success =
-        connect (workerThread, SIGNAL(started()), parser, SLOT(doXmlWork()));
+        connect (workerThread, &QThread::started, parser, &ContactsParser::doXmlWork);
         Q_ASSERT(success);
 #endif
         // parser.done -> this.onContactsParsed
         success =
-        connect (parser, SIGNAL(done(AsyncTaskToken*,bool,quint32,quint32)),
-                 this, SLOT(onContactsParsed(AsyncTaskToken*,bool,quint32,quint32)));
+        connect (parser, &ContactsParser::done,
+                 this, &GContactsApi::onContactsParsed);
         Q_ASSERT(success);
 
         //- Cleanup -//
         // parser.done -> parser.deleteLater
         success =
-        connect (parser, SIGNAL(done(AsyncTaskToken*,bool,quint32,quint32)),
-                 parser, SLOT(deleteLater()));
+        connect (parser, &ContactsParser::done,
+                 parser, &QObject::deleteLater);
         Q_ASSERT(success);
         // parser done -> thread.quit
         success =
-        connect (parser      , SIGNAL(done(AsyncTaskToken*,bool,quint32,quint32)),
-                 workerThread, SLOT  (quit()));
+        connect (parser      , &ContactsParser::done,
+                 workerThread, &QThread::quit);
         Q_ASSERT(success);
         // thread.quit -> thread.deleteLater
         success =
-        connect (workerThread, SIGNAL(finished()),
-                 workerThread, SLOT  (deleteLater()));
+        connect (workerThread, &QThread::finished,
+                 workerThread, &QObject::deleteLater);
         Q_ASSERT(success);
 
         //- status -//
         /*
         success =
-        connect (parser, SIGNAL(status(const QString&,int)),
-                 this  , SIGNAL(status(const QString&,int)));
+        connect (parser, &ContactsParser::status,
+                 this  , &GContactsApi::status);
         Q_ASSERT(success);
         */
 
         //- Plumb the parsed contact signal -//
         // parser.gotOneContact -> this.gotOneContact
         success =
-        connect (parser, SIGNAL (gotOneContact(ContactInfo)),
-                 this  , SLOT (onGotOneContact(ContactInfo)));
+        connect (parser, &ContactsParser::gotOneContact,
+                 this  , &GContactsApi::onGotOneContact);
         Q_ASSERT(success);
 
         /*
@@ -523,7 +444,7 @@ GContactsApi::getPhotoFromLink(AsyncTaskToken *task)
     QUrl url(task->inParams["href"].toString());
     bool ok =
     doGet (url, task, this,
-           SLOT(onGotPhoto(bool,QByteArray,QNetworkReply*,void*)));
+           &GContactsApi::onGotPhoto);
 
     if (ok) {
         NwReqTracker *tracker = (NwReqTracker *)task->apiCtx;

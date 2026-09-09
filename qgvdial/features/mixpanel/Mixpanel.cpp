@@ -260,9 +260,9 @@ MixPanel::batchSend()
             break;
         }
         connect(tracker,
-                SIGNAL(sigDone(bool,const QByteArray&,QNetworkReply*,void*)),
+                &NwReqTracker::sigDone,
                 this,
-                SLOT(onBatchSendDone(bool,const QByteArray&,QNetworkReply*,void*)));
+                &MixPanel::onBatchSendDone);
 
         task->callerCtx = new MixPanelEventList(revertMixList);
 

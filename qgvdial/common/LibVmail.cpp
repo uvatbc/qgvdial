@@ -75,8 +75,8 @@ LibVmail::fetchVmail(const QString &id)
             break;
         }
 
-        rv = connect (task, SIGNAL(completed()),
-                      this, SLOT(onVmailDownloaded()));
+        rv = connect (task, &AsyncTaskToken::completed,
+                      this, &LibVmail::onVmailDownloaded);
         Q_ASSERT(rv);
 
         task->inParams["vmail_link"] = id;
@@ -135,16 +135,16 @@ LibVmail::createVmailPlayer()
     m_player = new QMediaPlayer(this);
 
     rv = connect (
-        m_player, SIGNAL(stateChanged(QMediaPlayer::State)),
-        this, SLOT(onMMKitPlayerStateChanged(QMediaPlayer::PlaybackState)));
+        m_player, &QMediaPlayer::playbackStateChanged,
+        this, &LibVmail::onMMKitPlayerStateChanged);
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
-    rv = connect (m_player, SIGNAL(durationChanged(qint64)),
-                  this, SLOT(onDurationChanged(qint64)));
+    rv = connect (m_player, &QMediaPlayer::durationChanged,
+                  this, &LibVmail::onDurationChanged);
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
-    rv = connect (m_player, SIGNAL(positionChanged(qint64)),
-                  this, SLOT(onCurrentPositionChanged(qint64)));
+    rv = connect (m_player, &QMediaPlayer::positionChanged,
+                  this, &LibVmail::onCurrentPositionChanged);
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
 }//LibVmail::createVmailPlayer
@@ -211,7 +211,7 @@ LibVmail::ensureVmailPlaying()
         bBeginPlayAfterLoad = false;
         if (NULL != m_player) {
             // Phonon as well as MultimediaKit have the same slot. Yay for Qt.
-            QTimer::singleShot(500, m_player, SLOT(play()));
+            QTimer::singleShot(500, m_player, &QMediaPlayer::play);
         }
     }
 }//LibVmail::ensureVmailPlaying
@@ -250,7 +250,7 @@ LibVmail::play()
     if (LVPS_Invalid == m_state) {
         Q_WARN("State not valid to play");
         bBeginPlayAfterLoad = true;
-        QTimer::singleShot(1000, this, SLOT(ensureVmailPlaying()));
+        QTimer::singleShot(1000, this, &LibVmail::ensureVmailPlaying);
         return;
     }
 

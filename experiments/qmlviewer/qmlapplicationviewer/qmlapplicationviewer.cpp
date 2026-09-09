@@ -76,7 +76,7 @@ QmlApplicationViewer::QmlApplicationViewer(QWidget *parent)
     : QDeclarativeView(parent)
     , d(new QmlApplicationViewerPrivate())
 {
-    connect(engine(), SIGNAL(quit()), SLOT(close()));
+    connect(engine(), &QDeclarativeEngine::quit, this, &QWidget::close);
     setResizeMode(QDeclarativeView::SizeRootObjectToView);
     // Qt versions prior to 4.8.0 don't have QML/JS debugging services built in
 #if defined(QMLJSDEBUGGER) && QT_VERSION < 0x040800

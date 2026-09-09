@@ -36,20 +36,20 @@ InboxEntryDialog::InboxEntryDialog(QWidget *parent)
 {
     ui->setupUi(this);
 
-    connect(ui->lblNumber, SIGNAL(doubleClicked()),
-            this, SLOT(onNumberDoubleClicked()));
-    connect(ui->lblTime, SIGNAL(doubleClicked()),
-            this, SLOT(onNumberDoubleClicked()));
+    connect(ui->lblNumber, &DblClickLabel::doubleClicked,
+            this, &InboxEntryDialog::onNumberDoubleClicked);
+    connect(ui->lblTime, &DblClickLabel::doubleClicked,
+            this, &InboxEntryDialog::onNumberDoubleClicked);
 
-    connect(ui->lblImage, SIGNAL(doubleClicked()),
-            this, SLOT(onContactDoubleClicked()));
-    connect(ui->lblName, SIGNAL(doubleClicked()),
-            this, SLOT(onContactDoubleClicked()));
+    connect(ui->lblImage, &DblClickLabel::doubleClicked,
+            this, &InboxEntryDialog::onContactDoubleClicked);
+    connect(ui->lblName, &DblClickLabel::doubleClicked,
+            this, &InboxEntryDialog::onContactDoubleClicked);
 
-    connect(ui->btnDelete, SIGNAL(clicked()),
-            this, SLOT(onDeleteClicked()));
-    connect(ui->btnReply, SIGNAL(clicked()),
-            this, SLOT(onReplyClicked()));
+    connect(ui->btnDelete, &QPushButton::clicked,
+            this, &InboxEntryDialog::onDeleteClicked);
+    connect(ui->btnReply, &QPushButton::clicked,
+            this, &InboxEntryDialog::onReplyClicked);
 }//InboxEntryDialog::InboxEntryDialog
 
 InboxEntryDialog::~InboxEntryDialog()

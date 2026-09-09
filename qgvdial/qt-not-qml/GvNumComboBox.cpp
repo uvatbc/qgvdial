@@ -25,18 +25,18 @@ GvNumComboBox::GvNumComboBox(QWidget *parent)
 : QComboBox(parent)
 , m_longPressRow(-1)
 {
-    connect(view(), SIGNAL(doubleClicked(QModelIndex)),
-            this, SLOT(onViewDoubleClicked(QModelIndex)));
+    connect(view(), &QAbstractItemView::doubleClicked,
+            this, &GvNumComboBox::onViewDoubleClicked);
 
     m_longPressTimer.setInterval (1000);
     m_longPressTimer.setSingleShot (true);
-    connect(&m_longPressTimer, SIGNAL(timeout()),
-            this, SLOT(onViewTimerTimeout()));
+    connect(&m_longPressTimer, &QTimer::timeout,
+            this, &GvNumComboBox::onViewTimerTimeout);
 
-    connect (view (), SIGNAL(pressed(QModelIndex)),
-             this, SLOT(onViewEntryPressed(QModelIndex)));
-    connect (this, SIGNAL(currentIndexChanged(int)),
-             this, SLOT(onViewEntryClicked(int)));
+    connect (view (), &QAbstractItemView::pressed,
+             this, &GvNumComboBox::onViewEntryPressed);
+    connect (this, &QComboBox::currentIndexChanged,
+             this, &GvNumComboBox::onViewEntryClicked);
 }//GvNumComboBox::GvNumComboBox
 
 void

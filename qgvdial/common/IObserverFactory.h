@@ -23,6 +23,7 @@ Contact: yuvraaj@gmail.com
 #define IOBSERVERFACTORY_H
 
 #include <QObject>
+#include "global.h"
 #include "IObserver.h"
 
 class IObserverFactory : public QObject
@@ -33,9 +34,22 @@ public:
     explicit IObserverFactory(QObject *parent = 0);
     virtual ~IObserverFactory();
 
+    template <typename Receiver, typename Func>
     void startObservers (const QString &strContact,
-                               QObject *receiver  ,
-                         const char    *method    );
+                               Receiver *receiver  ,
+                               Func      method    )
+    {
+        bool rv;
+        foreach (IObserver *observer, listObservers) {
+            rv = connect (observer, &IObserver::callStarted,
+                          receiver, method);
+            if (!rv) {
+                Q_WARN(QString("Failed to connect observer \"%1\"")
+                        .arg(observer->name()));
+            }
+            observer->startMonitoring (strContact);
+        }
+    }
     void stopObservers ();
 
 signals:

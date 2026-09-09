@@ -209,9 +209,10 @@ GVApi_login::parseForm(const QString &strResponse,      // IN
     return true;
 }//GVApi_login::parseForm
 
+template <typename Func>
 bool
 GVApi_login::postForm(QUrl url, QGVLoginForm *form,
-                      AsyncTaskToken *task, const char *nwSlot)
+                      AsyncTaskToken *task, Func nwSlot)
 {
     GVApi *p = (GVApi *)this->parent();
 
@@ -301,31 +302,31 @@ GVApi_login::recreateSM()
     }
 
     // Login failure: set flags, clear variables and return status
-    QObject::connect(loginFailed, SIGNAL(entered()),
-                     this, SLOT(doLoginFailure()));
+    QObject::connect(loginFailed, &QState::entered,
+                     this, &GVApi_login::doLoginFailure);
     // Login success:
-    QObject::connect(loginSuccess, SIGNAL(entered()),
-                     this, SLOT(doLoginSuccess()));
+    QObject::connect(loginSuccess, &QState::entered,
+                     this, &GVApi_login::doLoginSuccess);
     // End state:
-    QObject::connect(endState, SIGNAL(entered()),
-                     this, SLOT(doLoginEndState()));
+    QObject::connect(endState, &QState::entered,
+                     this, &GVApi_login::doLoginEndState);
 
     // Begin at: get the voice page
-    QObject::connect(getVoicePage, SIGNAL(entered()),
-                     this, SLOT(doGetVoicePage()));
+    QObject::connect(getVoicePage, &QState::entered,
+                     this, &GVApi_login::doGetVoicePage);
     // Handle the username page:
-    QObject::connect(usernamePage, SIGNAL(entered()),
-                     this, SLOT(doUsernamePage()));
+    QObject::connect(usernamePage, &QState::entered,
+                     this, &GVApi_login::doUsernamePage);
     // Handle the password page:
-    QObject::connect(passwordPage, SIGNAL(entered()),
-                     this, SLOT(doPasswordPage()));
+    QObject::connect(passwordPage, &QState::entered,
+                     this, &GVApi_login::doPasswordPage);
     // After login success (password or TFA), handle the initial inbox page:
-    QObject::connect(inboxPage, SIGNAL(entered()),
-                     this, SLOT(doInboxPage()));
+    QObject::connect(inboxPage, &QState::entered,
+                     this, &GVApi_login::doInboxPage);
 
     // Setup transitions
 #define ADD_TRANSITION(_src, _sig, _dst) \
-    (_src)->addTransition(this, SIGNAL(_sig()), (_dst))
+    (_src)->addTransition(this, &GVApi_login::_sig, (_dst))
 
     // All these can result in login failures
     ADD_TRANSITION(     getVoicePage, sigLoginFail, loginFailed);
@@ -423,7 +424,7 @@ GVApi_login::doGetVoicePage()
     QUrl url(GV_HTTP);
     bool rv =
     p->doGet(url, m_loginToken, this,
-             SLOT(onGetVoicePage(bool,const QByteArray&,QNetworkReply*,void*)));
+             &GVApi_login::onGetVoicePage);
     Q_ASSERT(rv);
     if (!rv) {
         emit sigLoginFail ();
@@ -529,7 +530,7 @@ GVApi_login::doUsernamePage()
 
         bool rv;
         rv = postForm(url, m_form, token,
-                      SLOT(onPostUsernamePage(bool,const QByteArray&,QNetworkReply*,void*)));
+                      &GVApi_login::onPostUsernamePage);
         if (!rv) {
             Q_WARN("Failed to post username form!");
             emit sigLoginFail ();
@@ -642,7 +643,7 @@ GVApi_login::doPasswordPage()
 
         bool rv;
         rv = postForm(url, m_form, token,
-                      SLOT(onPostPasswordPage(bool,const QByteArray&,QNetworkReply*,void*)));
+                      &GVApi_login::onPostPasswordPage);
         if (!rv) {
             Q_WARN("Failed to post password form!");
             emit sigLoginFail ();
@@ -794,7 +795,7 @@ GVApi_login::doNoScriptWithSkip(const QString &strResponse,
         QUrl url(action);
 
         ok = postForm(url, m_form, token,
-                SLOT(onChallengeSkipPage(bool,const QByteArray&,QNetworkReply*,void*)));
+                      &GVApi_login::onChallengeSkipPage);
         if (!ok) {
             Q_WARN("Failed to post skip challenge page!");
             break;
@@ -1063,7 +1064,7 @@ GVApi_login::resumeWithTFAOption(AsyncTaskToken *task)
         QString action = entry->form.attrs["action"].toString();
         QUrl url = fixActionUrl(&entry->form, action);
         ok = postForm(url, &entry->form, task,
-            SLOT(onPostAuthOption(bool,const QByteArray&,QNetworkReply*,void*)));
+                      &GVApi_login::onPostAuthOption);
         if (!ok) {
             Q_WARN("Failed to post auth option");
             break;
@@ -1224,7 +1225,7 @@ GVApi_login::resumeWithTFAAuth(AsyncTaskToken *task)
 
         QUrl url(action);
         ok = postForm(url, m_form, task,
-            SLOT(onPostPasswordPage(bool,const QByteArray&,QNetworkReply*,void*)));
+                      &GVApi_login::onPostPasswordPage);
         if (!ok) {
             Q_WARN("Failed to post password form!");
             break;
@@ -1449,7 +1450,7 @@ GVApi_login::doInboxPage()
 
     bool rv =
     p->doPostText(url, content, m_loginToken, this,
-                  SLOT(onPostInboxPage(bool,const QByteArray&,QNetworkReply*,void*)));
+                  &GVApi_login::onPostInboxPage);
     if (!rv) {
         emit sigLoginFail ();
     }
@@ -1544,7 +1545,7 @@ GVApi_login::logout(AsyncTaskToken *token)
 
     bool rv =
     p->doGet(GV_HTTPS "/account/signout", token, this,
-             SLOT(onLogout(bool,const QByteArray&,QNetworkReply*,void*)));
+             &GVApi_login::onLogout);
     Q_ASSERT(rv);
 
     return rv;

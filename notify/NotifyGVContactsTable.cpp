@@ -27,8 +27,8 @@ GVContactsTable::GVContactsTable (QObject *parent)
 , mutex(QMutex::Recursive)
 , bRefreshRequested (false)
 {
-    connect(&api, SIGNAL(oneContact(ContactInfo)),
-            this, SLOT(gotOneContact(ContactInfo)));
+    connect(&api, &GContactsApi::oneContact,
+            this, &GVContactsTable::gotOneContact);
 }//GVContactsTable::GVContactsTable
 
 GVContactsTable::~GVContactsTable ()
@@ -68,7 +68,7 @@ GVContactsTable::logout ()
         return;
     }
 
-    connect(task, SIGNAL(completed()), task, SLOT(deleteLater()));
+    connect(task, &AsyncTaskToken::completed, task, &QObject::deleteLater);
     if (!api.logout (task)) {
         Q_WARN("Failed to logout");
         delete task;
@@ -129,7 +129,7 @@ GVContactsTable::refreshContacts ()
     bool showDeleted = true;
     task->inParams["updatedMin"] = dtUpdate;
     task->inParams["showDeleted"] = showDeleted;
-    connect(task, SIGNAL(completed()), this, SLOT(onContactsParsed()));
+    connect(task, &AsyncTaskToken::completed, this, &GVContactsTable::onContactsParsed);
     if (!api.getContacts (task)) {
         Q_WARN("Failed to get contacts");
         delete task;

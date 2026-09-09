@@ -7,11 +7,11 @@
 MainObject::MainObject(QObject *parent)
 : QObject(parent)
 {
-    connect(&mgr, SIGNAL(finished(QNetworkReply*)),
-            this, SLOT(onFinished(QNetworkReply*)));
+    connect(&mgr, &QNetworkAccessManager::finished,
+            this, &MainObject::onFinished);
 
-//    QTimer::singleShot(10, this, SLOT(doPost()));
-    QTimer::singleShot(10, this, SLOT(doGet()));
+//    QTimer::singleShot(10, this, &MainObject::doPost);
+    QTimer::singleShot(10, this, &MainObject::doGet);
 }//MainObject::MainObject
 
 void

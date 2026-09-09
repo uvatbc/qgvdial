@@ -36,8 +36,8 @@ PhoneFactory::PhoneFactory(QObject *parent)
 #endif
 {
 #ifdef TP_ENABLED
-    connect (&m_tpFactory, SIGNAL(onePhone(IPhoneAccount*)),
-             this, SLOT(onOnePhone(IPhoneAccount*)));
+    connect (&m_tpFactory, &TpPhoneFactory::onePhone,
+             this, &PhoneFactory::onOnePhone);
 #endif
 }//PhoneFactory::PhoneFactory
 
@@ -68,7 +68,7 @@ PhoneFactory::identifyAll(AsyncTaskToken *task)
     }
     subTask->callerCtx = m_identifyTask;
 
-    connect(subTask, SIGNAL(completed()), this, SLOT(onTpIdentified()));
+    connect(subTask, &AsyncTaskToken::completed, this, &PhoneFactory::onTpIdentified);
 
     bool rv = m_tpFactory.identifyAll (subTask);
     if (!rv) {

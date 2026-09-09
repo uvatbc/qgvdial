@@ -30,8 +30,8 @@ ObserverFactory::ObserverFactory(QObject *parent)
     // Observer for Skype on desktop Linux and desktop Windows
     SkypeObserver *skypeObs = new SkypeObserver ();
 
-    rv = connect (skypeObs, SIGNAL (status(const QString &, int)),
-                  this    , SIGNAL (status(const QString &, int)));
+    rv = (bool)connect (skypeObs, &IObserver::status,
+                        this    , &IObserverFactory::status);
     if (!rv) {
         Q_WARN("Could not connect skype observer");
     }

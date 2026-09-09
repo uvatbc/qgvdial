@@ -20,11 +20,11 @@ MainWindow::MainWindow(QWidget *parent)
         return;
     }
 
-    connect(o2, SIGNAL(linkedChanged()), this, SLOT(onLinkedChanged()));
-    connect(o2, SIGNAL(linkingFailed()), this, SLOT(onLinkingFailed()));
-    connect(o2, SIGNAL(linkingSucceeded()), this, SLOT(onLinkingSucceeded()));
-    connect(o2, SIGNAL(openBrowser(QUrl)), this, SLOT(onOpenBrowser(QUrl)));
-    connect(o2, SIGNAL(closeBrowser()), this, SLOT(onCloseBrowser()));
+    connect(o2, &O2::linkedChanged, this, &MainWindow::onLinkedChanged);
+    connect(o2, &O2::linkingFailed, this, &MainWindow::onLinkingFailed);
+    connect(o2, &O2::linkingSucceeded, this, &MainWindow::onLinkingSucceeded);
+    connect(o2, &O2::openBrowser, this, &MainWindow::onOpenBrowser);
+    connect(o2, &O2::closeBrowser, this, &MainWindow::onCloseBrowser);
 
     QByteArray baData = f.readAll ();
     QString temp = QString("var o = %1;").arg(QString(baData));

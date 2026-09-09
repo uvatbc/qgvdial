@@ -42,6 +42,7 @@ Contact: yuvraaj@gmail.com
 
 #include "SmsDialog.h"
 #include "MyWebView.h"
+#include "GvNumComboBox.h"
 
 #ifdef Q_WS_WIN32
 #include "MainApp.h"
@@ -134,8 +135,8 @@ MainWindow::init()
 #endif
 
     //** Every platform has single application functionality **//
-    bool rv = connect(qApp, SIGNAL(messageReceived(QString)),
-                      this, SLOT(messageReceived(QString)));
+    bool rv = (bool)connect((QtSingleApplication *)qApp, &QtSingleApplication::messageReceived,
+                            this, &MainWindow::messageReceived);
     if (!rv) {
         Q_WARN("Failed to connect to message received signal");
         qApp->quit();
@@ -153,60 +154,60 @@ MainWindow::init()
 #endif
 
     d->setOrientation(MainWindowPrivate::ScreenOrientationAuto);
-    QTimer::singleShot (100, d, SLOT(showExpanded()));
+    QTimer::singleShot (100, d, &MainWindowPrivate::showExpanded);
     //d->showExpanded();
 
     Lib &lib = Lib::ref ();
     ((OsDependant *)lib.osd())->setMainWidget (d);
 
-    connect(d->ui->loginButton, SIGNAL(clicked()),
-            this, SLOT(onLoginClicked()));
+    connect(d->ui->loginButton, &QPushButton::clicked,
+            this, &MainWindow::onLoginClicked);
 
-    connect(d->ui->enableProxy, SIGNAL(clicked(bool)),
-            this, SLOT(onUserProxyEnableChanged(bool)));
+    connect(d->ui->enableProxy, &QAbstractButton::clicked,
+            this, &MainWindow::onUserProxyEnableChanged);
     onUserProxyEnableChanged(false);
 
-    connect(d->ui->useSystemProxy, SIGNAL(clicked(bool)),
-            this, SLOT(onUserUseSystemProxyChanged(bool)));
+    connect(d->ui->useSystemProxy, &QAbstractButton::clicked,
+            this, &MainWindow::onUserUseSystemProxyChanged);
     onUserUseSystemProxyChanged(false);
 
-    connect(d->ui->proxyAuthRequired, SIGNAL(clicked(bool)),
-            this, SLOT(onUserProxyAuthRequiredChanged(bool)));
+    connect(d->ui->proxyAuthRequired, &QAbstractButton::clicked,
+            this, &MainWindow::onUserProxyAuthRequiredChanged);
     onUserProxyAuthRequiredChanged(false);
 
-    connect (d->ui->proxyButtonBox, SIGNAL(accepted()),
-             this, SLOT(onUserProxyChange()));
-    connect (d->ui->proxyButtonBox, SIGNAL(rejected()),
-             this, SLOT(onUserProxyRevert()));
+    connect (d->ui->proxyButtonBox, &QDialogButtonBox::accepted,
+             this, &MainWindow::onUserProxyChange);
+    connect (d->ui->proxyButtonBox, &QDialogButtonBox::rejected,
+             this, &MainWindow::onUserProxyRevert);
 
-    connect(d->ui->k0, SIGNAL(clicked()), this, SLOT(onKeypadKeyClicked()));
-    connect(d->ui->k1, SIGNAL(clicked()), this, SLOT(onKeypadKeyClicked()));
-    connect(d->ui->k2, SIGNAL(clicked()), this, SLOT(onKeypadKeyClicked()));
-    connect(d->ui->k3, SIGNAL(clicked()), this, SLOT(onKeypadKeyClicked()));
-    connect(d->ui->k4, SIGNAL(clicked()), this, SLOT(onKeypadKeyClicked()));
-    connect(d->ui->k5, SIGNAL(clicked()), this, SLOT(onKeypadKeyClicked()));
-    connect(d->ui->k6, SIGNAL(clicked()), this, SLOT(onKeypadKeyClicked()));
-    connect(d->ui->k7, SIGNAL(clicked()), this, SLOT(onKeypadKeyClicked()));
-    connect(d->ui->k8, SIGNAL(clicked()), this, SLOT(onKeypadKeyClicked()));
-    connect(d->ui->k9, SIGNAL(clicked()), this, SLOT(onKeypadKeyClicked()));
-    connect(d->ui->kstar, SIGNAL(clicked()), this, SLOT(onKeypadKeyClicked()));
-    connect(d->ui->khash, SIGNAL(clicked()), this, SLOT(onKeypadKeyClicked()));
+    connect(d->ui->k0, &QPushButton::clicked, this, &MainWindow::onKeypadKeyClicked);
+    connect(d->ui->k1, &QPushButton::clicked, this, &MainWindow::onKeypadKeyClicked);
+    connect(d->ui->k2, &QPushButton::clicked, this, &MainWindow::onKeypadKeyClicked);
+    connect(d->ui->k3, &QPushButton::clicked, this, &MainWindow::onKeypadKeyClicked);
+    connect(d->ui->k4, &QPushButton::clicked, this, &MainWindow::onKeypadKeyClicked);
+    connect(d->ui->k5, &QPushButton::clicked, this, &MainWindow::onKeypadKeyClicked);
+    connect(d->ui->k6, &QPushButton::clicked, this, &MainWindow::onKeypadKeyClicked);
+    connect(d->ui->k7, &QPushButton::clicked, this, &MainWindow::onKeypadKeyClicked);
+    connect(d->ui->k8, &QPushButton::clicked, this, &MainWindow::onKeypadKeyClicked);
+    connect(d->ui->k9, &QPushButton::clicked, this, &MainWindow::onKeypadKeyClicked);
+    connect(d->ui->kstar, &QPushButton::clicked, this, &MainWindow::onKeypadKeyClicked);
+    connect(d->ui->khash, &QPushButton::clicked, this, &MainWindow::onKeypadKeyClicked);
 
-    connect(d->ui->cbNumbers, SIGNAL(currentIndexChanged(int)),
-            &oPhones, SLOT(onUserSelectPhone(int)));
-    connect(d->ui->cbNumbers, SIGNAL(doModify(int)),
-            this, SLOT(onCbNumDoModify(int)));
+    connect(d->ui->cbNumbers, &QComboBox::currentIndexChanged,
+            &oPhones, [this](int index) { oPhones.onUserSelectPhone(index); });
+    connect(d->ui->cbNumbers, &GvNumComboBox::doModify,
+            this, &MainWindow::onCbNumDoModify);
 
-    connect(d->ui->btnCall, SIGNAL(clicked()),
-            this, SLOT(onUserCallBtnClicked()));
-    connect(d->ui->btnText, SIGNAL(clicked()),
-            this, SLOT(onUserTextBtnClicked()));
+    connect(d->ui->btnCall, &QPushButton::clicked,
+            this, &MainWindow::onUserCallBtnClicked);
+    connect(d->ui->btnText, &QPushButton::clicked,
+            this, &MainWindow::onUserTextBtnClicked);
 
-    connect(d->ui->contactsView, SIGNAL(doubleClicked(const QModelIndex&)),
-            this, SLOT(onContactDoubleClicked(const QModelIndex&)));
+    connect(d->ui->contactsView, &QAbstractItemView::doubleClicked,
+            this, &MainWindow::onContactDoubleClicked);
 
-    connect(d->ui->inboxView, SIGNAL(doubleClicked(const QModelIndex&)),
-            this, SLOT(onInboxDoubleClicked(const QModelIndex&)));
+    connect(d->ui->inboxView, &QAbstractItemView::doubleClicked,
+            this, &MainWindow::onInboxDoubleClicked);
 
     d->ui->cbInboxSelector->addItem("All");
     d->ui->cbInboxSelector->addItem("Placed");
@@ -216,8 +217,8 @@ MainWindow::init()
     d->ui->cbInboxSelector->addItem("SMS");
     d->ui->cbInboxSelector->addItem("Unread");
 
-    connect(d->ui->cbInboxSelector, SIGNAL(currentIndexChanged(const QString&)),
-            this, SLOT(onCbInboxChanged(const QString&)));
+    connect(d->ui->cbInboxSelector, &QComboBox::currentTextChanged,
+            this, &MainWindow::onCbInboxChanged);
 
     if (QSystemTrayIcon::isSystemTrayAvailable ()) {
         m_systrayIcon = new QSystemTrayIcon(d);
@@ -228,47 +229,47 @@ MainWindow::init()
         }
 
         connect(m_systrayIcon,
-                SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
+                &QSystemTrayIcon::activated,
                 this,
-                SLOT(onSystrayActivated(QSystemTrayIcon::ActivationReason)));
+                &MainWindow::onSystrayActivated);
 
         m_systrayIcon->setIcon (QIcon(":/qgv.png"));
         m_systrayIcon->setContextMenu (d->ui->menu_File);
-        QTimer::singleShot (100, m_systrayIcon, SLOT(show()));
+        QTimer::singleShot (100, m_systrayIcon, &QSystemTrayIcon::show);
         //m_systrayIcon->show ();
     }
 
     d->setWindowIcon (m_appIcon);
     d->setAllowClose (false);
-    connect(d->ui->action_Quit, SIGNAL(triggered()), qApp, SLOT(quit()));
+    connect(d->ui->action_Quit, &QAction::triggered, qApp, &QCoreApplication::quit);
 
-    connect(d->ui->actionRefresh, SIGNAL(triggered()),
-            &oContacts, SLOT(refreshLatest()));
-    connect(d->ui->actionRefresh, SIGNAL(triggered()),
-            &oInbox, SLOT(refreshLatest()));
+    connect(d->ui->actionRefresh, &QAction::triggered,
+            &oContacts, [this]() { oContacts.refreshLatest(); });
+    connect(d->ui->actionRefresh, &QAction::triggered,
+            &oInbox, [this]() { oInbox.refreshLatest(); });
 
-    connect(d->ui->tabWidget, SIGNAL(currentChanged(int)),
-            this, SLOT(onTabWidgetCurrentChanged(int)));
+    connect(d->ui->tabWidget, &QTabWidget::currentChanged,
+            this, &MainWindow::onTabWidgetCurrentChanged);
 
-    connect(d->ui->actionFind, SIGNAL(triggered()),
-            this, SLOT(onUserContactSearchTriggered()));
+    connect(d->ui->actionFind, &QAction::triggered,
+            this, &MainWindow::onUserContactSearchTriggered);
 
-    connect(d->ui->dispNum, SIGNAL(textChanged()),
-            this, SLOT(onDispNumTextChanged()));
+    connect(d->ui->dispNum, &QPlainTextEdit::textChanged,
+            this, &MainWindow::onDispNumTextChanged);
 
-    connect(d->ui->btnAbout, SIGNAL(clicked()),
-            this, SLOT(onUserAboutBtnClicked()));
-    connect(d->ui->btnSendLogs, SIGNAL(clicked()),
-            &oLogUploader, SLOT(sendLogs()));
+    connect(d->ui->btnAbout, &QPushButton::clicked,
+            this, &MainWindow::onUserAboutBtnClicked);
+    connect(d->ui->btnSendLogs, &QPushButton::clicked,
+            &oLogUploader, &LogUploader::sendLogs);
 
-    connect(d->ui->optContacts, SIGNAL(clicked()),
-            this, SLOT(onOptContactsFreqClicked()));
-    connect(d->ui->optInbox, SIGNAL(clicked()),
-            this, SLOT(onOptInboxFreqClicked()));
-    connect(d->ui->sbContactsFreq, SIGNAL(valueChanged(int)),
-            this, SLOT(onSbContactsFreqChanged(int)));
-    connect(d->ui->sbInboxFreq, SIGNAL(valueChanged(int)),
-            this, SLOT(onSbInboxFreqChanged(int)));
+    connect(d->ui->optContacts, &QAbstractButton::clicked,
+            this, [this]() { onOptContactsFreqClicked(true); });
+    connect(d->ui->optInbox, &QAbstractButton::clicked,
+            this, [this]() { onOptInboxFreqClicked(true); });
+    connect(d->ui->sbContactsFreq, &QSpinBox::valueChanged,
+            this, &MainWindow::onSbContactsFreqChanged);
+    connect(d->ui->sbInboxFreq, &QSpinBox::valueChanged,
+            this, &MainWindow::onSbInboxFreqChanged);
 
     // Do this so that the update frequency UI elements are fixed up
     d->ui->optContacts->setChecked (false);
@@ -694,8 +695,8 @@ void
 MainWindow::uiShowContactDetails(const ContactInfo &cinfo)
 {
     ContactDialog dlg;
-    connect(&dlg, SIGNAL(selected(QString)),
-            this, SLOT(setNumberToDial(QString)));
+    connect(&dlg, &ContactDialog::selected,
+            this, &MainWindow::setNumberToDial);
     dlg.fillAndExec (cinfo);
 }//MainWindow::uiShowContactDetails
 
@@ -765,8 +766,8 @@ MainWindow::onInboxDoubleClicked(const QModelIndex &index)
     if (contactDoubleClicked) {
         if (!cinfo.strId.isEmpty ()) {
             ContactDialog dlg;
-            connect(&dlg, SIGNAL(selected(QString)),
-                    this, SLOT(setNumberToDial(QString)));
+            connect(&dlg, &ContactDialog::selected,
+                    this, &MainWindow::setNumberToDial);
             dlg.fillAndExec (cinfo);
         } else {
             numberDoubleClicked = true;
@@ -1022,7 +1023,7 @@ MainWindow::initDBus()
 
     Q_DEBUG("DBus API registered!");
 
-    connect(&apiUi, SIGNAL(sigShow()), this, SLOT(onSigShow()));
+    connect(&apiUi, &QGVDBusUiApi::sigShow, this, &MainWindow::onSigShow);
 
     return true;
 }//MainWindow::initDBus

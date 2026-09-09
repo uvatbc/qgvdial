@@ -9,26 +9,26 @@ NwReqTracker::NwReqTracker(QNetworkReply *r, QObject *parent, bool autoDel)
 , aborted (false)
 , autoDelete(autoDel)
 {
-    bool rv = connect (reply, SIGNAL(finished()),
-                       this , SLOT(onReplyFinished()));
+    bool rv = (bool)connect (reply, &QNetworkReply::finished,
+                             this , &NwReqTracker::onReplyFinished);
     Q_ASSERT(rv);
-    rv = connect (reply, SIGNAL(downloadProgress(qint64,qint64)),
-                  this , SLOT(onReplyProgress(qint64,qint64)));
+    rv = (bool)connect (reply, &QNetworkReply::downloadProgress,
+                        this , &NwReqTracker::onReplyProgress);
     Q_ASSERT(rv);
-    rv = connect (reply, SIGNAL(uploadProgress(qint64,qint64)),
-                  this , SLOT(onReplyProgress(qint64,qint64)));
+    rv = (bool)connect (reply, &QNetworkReply::uploadProgress,
+                        this , &NwReqTracker::onReplyProgress);
     Q_ASSERT(rv);
-    rv = connect (reply, SIGNAL(sslErrors(QList<QSslError>)),
-                  this , SLOT(onReplySslErrors(QList<QSslError>)));
+    rv = (bool)connect (reply, &QNetworkReply::sslErrors,
+                        this , &NwReqTracker::onReplySslErrors);
     Q_ASSERT(rv);
-    rv = connect (reply, &QNetworkReply::errorOccurred,
-                  this , &NwReqTracker::onReplyError);
+    rv = (bool)connect (reply, &QNetworkReply::errorOccurred,
+                        this , &NwReqTracker::onReplyError);
     Q_ASSERT(rv);
 
     replyTimer.setSingleShot (true);
     replyTimer.setInterval (REPLY_TIMEOUT);
 
-    rv = connect (&replyTimer, SIGNAL(timeout()), this, SLOT(onTimedOut()));
+    rv = (bool)connect (&replyTimer, &QTimer::timeout, this, &NwReqTracker::onTimedOut);
     Q_ASSERT(rv);
 
     replyTimer.start ();

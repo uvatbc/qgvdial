@@ -225,148 +225,6 @@ GVApi::beautify_number (QString &strNumber)
 }//GVApi::beautify_number
 
 bool
-GVApi::doGet(QUrl url, AsyncTaskToken *token, const char *ua,
-             QObject *receiver, const char *method)
-{
-    if (!token) {
-        return false;
-    }
-
-    QNetworkRequest req(url);
-    if (NULL != ua) {
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-        req.setHeader(QNetworkRequest::UserAgentHeader, ua);
-#else
-        req.setRawHeader("User-Agent", ua);
-#endif
-    }
-
-    NwReqTracker::setCookies (m_jar, req);
-
-    QNetworkReply *reply = m_nwMgr->get(req);
-    if (reply == NULL) {
-        return false;
-    }
-
-#if DEBUG_ONLY
-    NwReqTracker::dumpRequestInfo (req);
-#endif
-
-    NwReqTracker *tracker = new NwReqTracker(reply, *m_nwMgr, token,
-                                        NW_REPLY_TIMEOUT, emitLog, true, this);
-    if (tracker == NULL) {
-        reply->abort ();
-        reply->deleteLater ();
-        return false;
-    }
-
-    tracker->setAutoRedirect (m_jar, true);
-    token->apiCtx = tracker;
-    token->status = ATTS_SUCCESS;
-
-    bool rv =
-    connect(tracker, SIGNAL(sigDone(bool,const QByteArray&,QNetworkReply*,void*)),
-            receiver, method);
-    Q_ASSERT(rv);
-    rv = connect(tracker, SIGNAL(sigProgress(double)),
-                    this, SIGNAL(sigProgress(double)));
-    Q_ASSERT(rv);
-
-    return rv;
-}//GVApi::doGet
-
-bool
-GVApi::doGet(QUrl url, AsyncTaskToken *token, QObject *receiver,
-             const char *method)
-{
-    return doGet(url, token, UA_IPHONE4, receiver, method);
-}//GVApi::doGet
-
-bool
-GVApi::doGet(const QString &strUrl, AsyncTaskToken *token, QObject *receiver,
-             const char *method)
-{
-    return doGet(QUrl(strUrl), token, receiver, method);
-}//GVApi::doGet
-
-bool
-GVApi::doPost(QUrl url, QByteArray postData, const char *contentType,
-              const char *ua, AsyncTaskToken *token, QObject *receiver,
-              const char *method)
-{
-    if (!token) {
-        return false;
-    }
-
-    QNetworkRequest req(url);
-    if (NULL != ua) {
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-        req.setHeader(QNetworkRequest::UserAgentHeader, ua);
-#else
-        req.setRawHeader("User-Agent", ua);
-#endif
-    }
-    req.setHeader (QNetworkRequest::ContentTypeHeader, contentType);
-
-    NwReqTracker::setCookies (m_jar, req);
-
-    QNetworkReply *reply = m_nwMgr->post(req, postData);
-    if (!reply) {
-        return false;
-    }
-
-#if DEBUG_ONLY
-    NwReqTracker::dumpRequestInfo (req, postData);
-#endif
-
-    NwReqTracker *tracker =
-    new NwReqTracker(reply, *m_nwMgr, token, NW_REPLY_TIMEOUT, emitLog, this);
-    if (!tracker) {
-        reply->abort ();
-        reply->deleteLater ();
-        return false;
-    }
-
-    tracker->setAutoRedirect (m_jar, true);
-    token->apiCtx = tracker;
-    token->status = ATTS_SUCCESS;
-
-    bool rv =
-    connect(tracker,
-            SIGNAL(sigDone(bool,const QByteArray&,QNetworkReply*,void*)),
-            receiver,
-            method);
-    Q_ASSERT(rv);
-    rv = connect(tracker, SIGNAL(sigProgress(double)),
-                    this, SIGNAL(sigProgress(double)));
-    Q_ASSERT(rv);
-
-    return (rv);
-}//GVApi::doPost
-
-bool
-GVApi::doPost(QUrl url, QByteArray postData, const char *contentType,
-              AsyncTaskToken *token, QObject *receiver, const char *method)
-{
-    return doPost(url, postData, contentType, UA_IPHONE4, token, receiver,
-                  method);
-}//GVApi::doPost
-
-bool
-GVApi::doPostForm(QUrl url, QByteArray postData, AsyncTaskToken *token,
-                  QObject *receiver, const char *method)
-{
-    return doPost (url, postData, POST_FORM, token, receiver, method);
-}//GVApi::doPostForm
-
-bool
-GVApi::doPostText(QUrl url, QByteArray postData, AsyncTaskToken *token,
-                  QObject *receiver, const char *method)
-{
-    return doPost (url, postData, POST_TEXT, token, receiver, method);
-}//GVApi::doPostForm
-
-bool
 GVApi::setProxySettings (bool bEnable,
                          bool bUseSystemProxy,
                          const QString &host, int port,
@@ -477,7 +335,7 @@ GVApi::getPhones(AsyncTaskToken *token)
 
     bool rv =
     doGet(GV_HTTPS "/b/0/settings/tab/phones", token, this,
-          SLOT(onGetPhones(bool,const QByteArray&,QNetworkReply*,void*)));
+          &GVApi::onGetPhones);
     Q_ASSERT(rv);
 
     return rv;
@@ -838,7 +696,7 @@ GVApi::getInbox(AsyncTaskToken *token)
 
     bool rv =
     doGet(strLink, token, this,
-          SLOT(onGetInbox(bool,const QByteArray&,QNetworkReply*,void*)));
+          &GVApi::onGetInbox);
     Q_ASSERT(rv);
 
     return rv;
@@ -1482,7 +1340,7 @@ GVApi::callOut(AsyncTaskToken *token)
 
     bool rv =
     doPostText(url, content, token, this,
-               SLOT(onCallout(bool,const QByteArray&,QNetworkReply*,void*)));
+               &GVApi::onCallout);
     Q_ASSERT(rv);
 
     return rv;
@@ -1651,7 +1509,7 @@ GVApi::callBack(AsyncTaskToken *token)
 
     bool rv =
     doPostForm(url, strContent.toLatin1 (), token, this,
-               SLOT(onCallback(bool,const QByteArray&,QNetworkReply*,void*)));
+               &GVApi::onCallback);
     Q_ASSERT(rv);
 
     return (rv);
@@ -1841,7 +1699,7 @@ GVApi::cancelDialBack(AsyncTaskToken *token)
 
     bool rv =
     doPostForm(url, strContent.toLatin1 (), token, this,
-               SLOT(onCallback(bool,const QByteArray&,QNetworkReply*,void*)));
+               &GVApi::onCallback);
     Q_ASSERT(rv);
 
     return (rv);
@@ -1996,7 +1854,7 @@ GVApi::doSendSms(QUrl url, AsyncTaskToken *token)
 
     bool rv =
     doPostText(url, content, token, this,
-               SLOT(onSendSms(bool,const QByteArray&,QNetworkReply*,void*)));
+               &GVApi::onSendSms);
     Q_ASSERT(rv);
 
     return (rv);
@@ -2139,7 +1997,7 @@ GVApi::getVoicemail(AsyncTaskToken *token)
     QString strLink = QString (GV_HTTPS "/b/0/media/send_voicemail/%1")
                         .arg(token->inParams["vmail_link"].toString());
     return doGet(strLink, token, this,
-                 SLOT(onVmail(bool,const QByteArray&,QNetworkReply*,void*)));
+                 &GVApi::onVmail);
 }//GVApi::getVoicemail
 
 void
@@ -2234,7 +2092,7 @@ GVApi::markInboxEntryAsRead(AsyncTaskToken *token)
 
     bool rv =
     doPost(url, strContent.toLatin1(), POST_TEXT, UA_IPHONE4, token, this,
-           SLOT(onMarkAsRead(bool,const QByteArray&,QNetworkReply*,void*)));
+           &GVApi::onMarkAsRead);
     Q_ASSERT(rv);
 
     return (rv);
@@ -2363,7 +2221,7 @@ GVApi::deleteInboxEntry(AsyncTaskToken *token)
     QUrl url(GV_HTTPS "/inbox/deleteMessages");
     bool rv =
     doPost(url, strContent.toLatin1(), POST_FORM, UA_DESKTOP, token, this,
-           SLOT(onEntryDeleted(bool,const QByteArray&,QNetworkReply*,void*)));
+           &GVApi::onEntryDeleted);
     Q_ASSERT(rv);
 
     return (rv);
@@ -2431,7 +2289,7 @@ GVApi::checkRecentInbox(AsyncTaskToken *token)
 
     bool rv =
     doGet(GV_HTTPS "/b/0/inbox/recent/all", token, this,
-          SLOT(onCheckRecentInbox(bool,const QByteArray&,QNetworkReply*,void*)));
+          &GVApi::onCheckRecentInbox);
     Q_ASSERT(rv);
 
     return rv;
@@ -2621,7 +2479,7 @@ GVApi::onCheckRecentInbox(bool success, const QByteArray &response,
             token->outParams["allCount"] = totalSize;
 
             success = doGet(GV_HTTPS "/b/0/inbox/recent/trash", token, this,
-                            SLOT(onCheckRecentInbox(bool,const QByteArray&,QNetworkReply*,void*)));
+                            &GVApi::onCheckRecentInbox);
             Q_ASSERT(success);
 
             if (!success) {

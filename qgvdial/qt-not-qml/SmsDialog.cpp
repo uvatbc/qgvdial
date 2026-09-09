@@ -33,8 +33,8 @@ SmsDialog::SmsDialog(QWidget *parent)
     ui->lblSoFar->hide ();
     ui->txtConversation->hide ();
 
-    connect(ui->plainSmsText, SIGNAL(textChanged()),
-            this, SLOT(onSmsTextChanged()));
+    connect(ui->plainSmsText, &QPlainTextEdit::textChanged,
+            this, &SmsDialog::onSmsTextChanged);
     onSmsTextChanged ();
 }//SmsDialog::SmsDialog
 

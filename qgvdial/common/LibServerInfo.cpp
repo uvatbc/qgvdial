@@ -48,8 +48,8 @@ LibServerInfo::getInfo(void)
 
     NwReqTracker *tracker = new NwReqTracker(reply, *win->m_nwMgr, task,
                                              NW_REPLY_TIMEOUT, true, this);
-    connect(tracker, SIGNAL(sigDone(bool,QByteArray,QNetworkReply*,void*)),
-            this, SLOT(onGotSrvInfo(bool,QByteArray,QNetworkReply*,void*)));
+    connect(tracker, &NwReqTracker::sigDone,
+            this, &LibServerInfo::onGotSrvInfo);
 }//LibServerInfo::getInfo
 
 void

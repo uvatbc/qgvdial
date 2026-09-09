@@ -32,27 +32,10 @@ IObserverFactory::~IObserverFactory ()
 }//IObserverFactory::~IObserverFactory
 
 void
-IObserverFactory::startObservers (const QString &strContact,
-                                        QObject *receiver  ,
-                                  const char    *method    )
-{
-    bool rv;
-    foreach (IObserver *observer, listObservers) {
-        rv = connect (observer, SIGNAL(callStarted()),
-                      receiver, method);
-        if (!rv) {
-            Q_WARN(QString("Failed to connect observer \"%1\"")
-                    .arg(observer->name()));
-        }
-        observer->startMonitoring (strContact);
-    }
-}//IObserverFactory::createObservers
-
-void
 IObserverFactory::stopObservers ()
 {
     foreach (IObserver *observer, listObservers) {
         observer->stopMonitoring ();
-        observer->disconnect (SIGNAL(callStarted()));
+        disconnect(observer, &IObserver::callStarted, nullptr, nullptr);
     }
 }//IObserverFactory::stopObservers

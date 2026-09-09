@@ -23,6 +23,7 @@ Contact: yuvraaj@gmail.com
 #include "ui_VmailDialog.h"
 #include "MainWindow.h"
 #include "InboxModel.h"
+#include "DblClickLabel.h"
 
 #define PIXMAP_SCALED_W 85
 #define PIXMAP_SCALED_H 85
@@ -40,33 +41,33 @@ VmailDialog::VmailDialog(MainWindow *parent)
     ui->progressBar->setValue (0);
     ui->progressBar->setFormat ("%v sec");
 
-    connect(ui->lblNumber, SIGNAL(doubleClicked()),
-            this, SLOT(onNumberDoubleClicked()));
-    connect(ui->lblTime, SIGNAL(doubleClicked()),
-            this, SLOT(onNumberDoubleClicked()));
+    connect(ui->lblNumber, &DblClickLabel::doubleClicked,
+            this, &VmailDialog::onNumberDoubleClicked);
+    connect(ui->lblTime, &DblClickLabel::doubleClicked,
+            this, &VmailDialog::onNumberDoubleClicked);
 
-    connect(ui->lblImage, SIGNAL(doubleClicked()),
-            this, SLOT(onContactDoubleClicked()));
-    connect(ui->lblName, SIGNAL(doubleClicked()),
-            this, SLOT(onContactDoubleClicked()));
+    connect(ui->lblImage, &DblClickLabel::doubleClicked,
+            this, &VmailDialog::onContactDoubleClicked);
+    connect(ui->lblName, &DblClickLabel::doubleClicked,
+            this, &VmailDialog::onContactDoubleClicked);
 
-    connect(ui->btnDelete, SIGNAL(clicked()),
-            this, SLOT(onDeleteClicked()));
-    connect(ui->btnReply, SIGNAL(clicked()),
-            this, SLOT(onReplyClicked()));
+    connect(ui->btnDelete, &QPushButton::clicked,
+            this, &VmailDialog::onDeleteClicked);
+    connect(ui->btnReply, &QPushButton::clicked,
+            this, &VmailDialog::onReplyClicked);
 
     ui->btnPlayPause->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
     ui->btnStop->setIcon(style()->standardIcon(QStyle::SP_MediaStop));
 
-    connect(ui->btnPlayPause, SIGNAL(clicked()),
-            this, SLOT(onPlayPauseClicked()));
-    connect(ui->btnStop, SIGNAL(clicked()),
-            this, SLOT(onStopClicked()));
+    connect(ui->btnPlayPause, &QPushButton::clicked,
+            this, &VmailDialog::onPlayPauseClicked);
+    connect(ui->btnStop, &QPushButton::clicked,
+            this, &VmailDialog::onStopClicked);
 
-    connect (&win->oVmail, SIGNAL(currentPositionChanged(quint64,quint64)),
-             this, SLOT(onPlayerPositionChanged(quint64,quint64)));
-    connect (&win->oVmail, SIGNAL(playerStateUpdate(LVPlayerState)),
-             this, SLOT(onPlayerStateUpdate(LVPlayerState)));
+    connect (&win->oVmail, &LibVmail::currentPositionChanged,
+             this, &VmailDialog::onPlayerPositionChanged);
+    connect (&win->oVmail, &LibVmail::playerStateUpdate,
+             this, &VmailDialog::onPlayerStateUpdate);
 }//VmailDialog::VmailDialog
 
 VmailDialog::~VmailDialog()
@@ -96,8 +97,8 @@ VmailDialog::fill(const GVInboxEntry &event)
         ui->wPlayerButtons->hide ();
         ui->progressBar->hide ();
 
-        connect (&win->oVmail, SIGNAL(vmailFetched(QString,QString,bool)),
-                 this, SLOT(onVmailFetched(QString,QString,bool)));
+        connect (&win->oVmail, &LibVmail::vmailFetched,
+                 this, &VmailDialog::onVmailFetched);
         rv = win->oVmail.fetchVmail (event.id);
     } else {
         rv = true;
@@ -156,8 +157,8 @@ VmailDialog::onReplyClicked()
 void
 VmailDialog::onVmailFetched(const QString &, const QString &path, bool ok)
 {
-    disconnect(&win->oVmail, SIGNAL(vmailFetched(QString,QString,bool)),
-               this, SLOT(onVmailFetched(QString,QString,bool)));
+    disconnect(&win->oVmail, &LibVmail::vmailFetched,
+               this, &VmailDialog::onVmailFetched);
 
     const char *msg;
     if (!ok) {

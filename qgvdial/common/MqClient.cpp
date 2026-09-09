@@ -186,24 +186,24 @@ MqClient::recreateSubSm(void)
     }
 
     // Begin at init
-    QObject::connect(initialState, SIGNAL(entered()),
-                     this, SLOT(reinitMq()));
+    QObject::connect(initialState, &QState::entered,
+                     this, &MqClient::reinitMq);
     // Work done in connecting state
-    QObject::connect(connectingState, SIGNAL(entered()),
-                     this, SLOT(reinitConnection()));
+    QObject::connect(connectingState, &QState::entered,
+                     this, &MqClient::reinitConnection);
     // Work done in limbo state
-    QObject::connect(limboState, SIGNAL(entered()),
-                     this, SLOT(doLimbo()));
+    QObject::connect(limboState, &QState::entered,
+                     this, &MqClient::doLimbo);
     // Work done in subscribe state
-    QObject::connect(subscribeState, SIGNAL(entered()),
-                     this, SLOT(doSubscribe()));
+    QObject::connect(subscribeState, &QState::entered,
+                     this, &MqClient::doSubscribe);
     // Work done in disconnect state
-    QObject::connect(disconnectState, SIGNAL(entered()),
-                     this, SLOT(doDisconnect()));
+    QObject::connect(disconnectState, &QState::entered,
+                     this, &MqClient::doDisconnect);
     // There is no work to be done in the "workState" :)
 
 #define ADD_TRANSITION(_src, _sig, _dst) \
-    (_src)->addTransition(this, SIGNAL(_sig()), (_dst))
+    (_src)->addTransition(this, &MqClient::_sig, (_dst))
 
     ADD_TRANSITION(   initialState,     beginConnect, connectingState);
     ADD_TRANSITION(connectingState,   connectSuccess, subscribeState);
@@ -217,8 +217,8 @@ MqClient::recreateSubSm(void)
 
 #undef ADD_TRANSITION
 
-    QObject::connect(m_sm, SIGNAL(finished()), this, SIGNAL(smCompleted()));
-    QObject::connect(m_sm, SIGNAL(finished()), this, SLOT(deleteLater()));
+    QObject::connect(m_sm, &QStateMachine::finished, this, &MqClient::smCompleted);
+    QObject::connect(m_sm, &QStateMachine::finished, this, &QObject::deleteLater);
 
     m_sm->addState(initialState);
     m_sm->addState(connectingState);
@@ -267,23 +267,23 @@ MqClient::recreatePubSm(void)
     }
 
     // Begin at init
-    QObject::connect(initialState, SIGNAL(entered()),
-                     this, SLOT(reinitMq()));
+    QObject::connect(initialState, &QState::entered,
+                     this, &MqClient::reinitMq);
     // Work done in connecting state
-    QObject::connect(connectingState, SIGNAL(entered()),
-                     this, SLOT(reinitConnection()));
+    QObject::connect(connectingState, &QState::entered,
+                     this, &MqClient::reinitConnection);
     // Work done in limbo state
-    QObject::connect(limboState, SIGNAL(entered()),
-                     this, SLOT(doLimbo()));
+    QObject::connect(limboState, &QState::entered,
+                     this, &MqClient::doLimbo);
     // Work done in work state
-    QObject::connect(workState, SIGNAL(entered()),
-                     this, SLOT(doPublish()));
+    QObject::connect(workState, &QState::entered,
+                     this, &MqClient::doPublish);
     // Work done in disconnect state
-    QObject::connect(disconnectState, SIGNAL(entered()),
-                     this, SLOT(doDisconnect()));
+    QObject::connect(disconnectState, &QState::entered,
+                     this, &MqClient::doDisconnect);
 
 #define ADD_TRANSITION(_src, _sig, _dst) \
-    (_src)->addTransition(this, SIGNAL(_sig()), (_dst))
+    (_src)->addTransition(this, &MqClient::_sig, (_dst))
 
     ADD_TRANSITION(   initialState,     beginConnect, connectingState);
     ADD_TRANSITION(connectingState,   connectSuccess, workState);
@@ -294,8 +294,8 @@ MqClient::recreatePubSm(void)
 
 #undef ADD_TRANSITION
 
-    QObject::connect(m_sm, SIGNAL(finished()), this, SIGNAL(smCompleted()));
-    QObject::connect(m_sm, SIGNAL(finished()), this, SLOT(deleteLater()));
+    QObject::connect(m_sm, &QStateMachine::finished, this, &MqClient::smCompleted);
+    QObject::connect(m_sm, &QStateMachine::finished, this, &QObject::deleteLater);
 
     m_sm->addState(initialState);
     m_sm->addState(connectingState);
@@ -366,12 +366,12 @@ MqClient::reinitConnection(void)
         return;
     }
 
-    QObject::connect(m_readNotifier, SIGNAL(activated(int)),
-                     this, SLOT(onReadActivated(int)));
-    QObject::connect(m_writeNotifier, SIGNAL(activated(int)),
-                     this, SLOT(onWriteActivated(int)));
-    QObject::connect(m_exceptNotifier, SIGNAL(activated(int)),
-                     this, SLOT(onExceptActivated(int)));
+    QObject::connect(m_readNotifier, &QSocketNotifier::activated,
+                     this, [this]() { onReadActivated(0); });
+    QObject::connect(m_writeNotifier, &QSocketNotifier::activated,
+                     this, [this]() { onWriteActivated(0); });
+    QObject::connect(m_exceptNotifier, &QSocketNotifier::activated,
+                     this, [this]() { onExceptActivated(0); });
 
     Q_DEBUG("Connection attempt started");
     doWorkLoop();
@@ -413,7 +413,7 @@ MqClient::doLimbo(void)
     Q_DEBUG(QString("Connect to mosquitto server '%1' failed. "
                     "Backoff for %2 ms")
                 .arg(m_host).arg(m_workLimboPeriod));
-    QTimer::singleShot(m_workLimboPeriod, this, SIGNAL(beginConnect()));
+    QTimer::singleShot(m_workLimboPeriod, this, &MqClient::beginConnect);
 
     m_workLimboPeriod += MQ_LIMBO_INC;
     if (m_workLimboPeriod >= MQ_LIMBO_MAX) {

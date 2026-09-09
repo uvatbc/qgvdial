@@ -35,8 +35,8 @@ LibGvPhones::LibGvPhones(IMainWindow *parent)
 , m_acctFactory(NULL)
 {
     IMainWindow *win = (IMainWindow *) this->parent ();
-    connect(&win->gvApi, SIGNAL(registeredPhone(const GVRegisteredNumber &)),
-            this, SLOT(onGotRegisteredPhone(const GVRegisteredNumber &)));
+    connect(&win->gvApi, &GVApi::registeredPhone,
+            this, &LibGvPhones::onGotRegisteredPhone);
 }//LibGvPhones::LibGvPhones
 
 LibGvPhones::~LibGvPhones()
@@ -56,7 +56,7 @@ LibGvPhones::refresh()
         return false;
     }
 
-    connect(task, SIGNAL(completed()), this, SLOT(onGotPhones()));
+    connect(task, &AsyncTaskToken::completed, this, &LibGvPhones::onGotPhones);
 
     IMainWindow *win = (IMainWindow *) this->parent ();
     m_numModel->m_dialBack.clear ();
@@ -248,7 +248,7 @@ LibGvPhones::refreshOutgoing()
         Q_WARN("Failed to allocate task token for account identification");
         return false;
     }
-    connect(task, SIGNAL(completed()), this, SLOT(onAllAccountsIdentified()));
+    connect(task, &AsyncTaskToken::completed, this, &LibGvPhones::onAllAccountsIdentified);
     if (!m_acctFactory->identifyAll (task)) {
         Q_WARN("Failed to identify phone accounts");
         delete task;
@@ -399,7 +399,7 @@ LibGvPhones::dialOut(const QString &id, const QString &num)
             Q_WARN("Failed to allocate task");
             break;
         }
-        connect (task, SIGNAL(completed()), this, SLOT(onDialoutCompleted()));
+        connect (task, &AsyncTaskToken::completed, this, &LibGvPhones::onDialoutCompleted);
         task->inParams["destination"] = num;
 
         rv = m_acctFactory->m_accounts[id]->initiateCall (task);

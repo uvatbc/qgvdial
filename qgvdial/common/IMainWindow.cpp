@@ -48,26 +48,26 @@ IMainWindow::IMainWindow(QObject *parent)
 , m_nwMgr(NULL)
 {
     qRegisterMetaType<ContactInfo>("ContactInfo");
-    connect(&gvApi, SIGNAL(twoStepAuthOptions(AsyncTaskToken*,QStringList)),
-            this, SLOT(onTFARequest(AsyncTaskToken*,QStringList)));
-    connect(&gvApi, SIGNAL(twoStepAuthPin(AsyncTaskToken*,QString)),
-            this, SLOT(onTFAPinRequest(AsyncTaskToken*,QString)));
+    connect(&gvApi, &GVApi::twoStepAuthOptions,
+            this, &IMainWindow::onTFARequest);
+    connect(&gvApi, &GVApi::twoStepAuthPin,
+            this, &IMainWindow::onTFAPinRequest);
 
     m_taskTimer.setSingleShot (true);
     m_taskTimer.setInterval (1 * 1000); // 1 second
-    connect (&m_taskTimer, SIGNAL(timeout()), this, SLOT(onTaskTimerTimeout()));
+    connect (&m_taskTimer, &QTimer::timeout, this, &IMainWindow::onTaskTimerTimeout);
 
-    connect(&m_logMessageTimer, SIGNAL(timeout()),
-            this, SLOT(onLogMessagesTimer()));
+    connect(&m_logMessageTimer, &QTimer::timeout,
+            this, &IMainWindow::onLogMessagesTimer);
     m_logMessageTimer.setSingleShot (true);
     m_logMessageTimer.start (10);
 
     m_mixpanelTimer.setSingleShot (true);
-    connect(&m_mixpanelTimer, SIGNAL(timeout()),
-            &m_mixPanel, SLOT(flushEvents()));
-    connect(&m_mixPanel, SIGNAL(eventAdded()), this, SLOT(onMixEventAdded()));
+    connect(&m_mixpanelTimer, &QTimer::timeout,
+            &m_mixPanel, &MixPanel::flushEvents);
+    connect(&m_mixPanel, &MixPanel::eventAdded, this, &IMainWindow::onMixEventAdded);
 
-    connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(onQuit()));
+    connect(qApp, &QCoreApplication::aboutToQuit, this, &IMainWindow::onQuit);
 
     resetNwMgr();
 }//IMainWindow::IMainWindow
@@ -117,8 +117,8 @@ IMainWindow::reinitMqClient(void)
         return false;
     }
 
-    QObject::connect(m_mqClient, SIGNAL(dataMessage(QByteArray)),
-                     this, SLOT(onMqUserInfoReceived(QByteArray)));
+    QObject::connect(m_mqClient, &MqClient::dataMessage,
+                     this, &IMainWindow::onMqUserInfoReceived);
 
     m_mqClient->setupClient(m_srvInfo.m_userInfoTopic,
                             m_srvInfo.m_userInfoHost,
@@ -145,8 +145,8 @@ IMainWindow::onInitDone()
             break;
         }
 
-        QObject::connect(&m_srvInfo, SIGNAL(done(bool)),
-                         this, SLOT(onGotSrvInfo(bool)));
+        QObject::connect(&m_srvInfo, &LibServerInfo::done,
+                         this, &IMainWindow::onGotSrvInfo);
         m_srvInfo.getInfo ();
 
         db.init (Lib::ref().getDbDir());
@@ -211,8 +211,8 @@ IMainWindow::beginLogin(QString user, QString pass)
             break;
         }
 
-        ok = connect(m_loginTask, SIGNAL(completed()),
-                     this, SLOT(loginCompleted()));
+        ok = connect(m_loginTask, &AsyncTaskToken::completed,
+                     this, &IMainWindow::loginCompleted);
         Q_ASSERT(ok);
         if (!ok) {
             Q_CRIT("Failed to connect signal");
@@ -417,8 +417,8 @@ void
 IMainWindow::onUserLogoutRequest()
 {
     AsyncTaskToken *task = new AsyncTaskToken(this);
-    connect(task, SIGNAL(completed()),
-            this, SLOT(onLogoutDone()));
+    connect(task, &AsyncTaskToken::completed,
+            this, &IMainWindow::onLogoutDone);
     gvApi.logout (task);
 }//IMainWindow::onUserLogoutRequest
 
@@ -505,7 +505,7 @@ IMainWindow::onUserCall(QString number)
         Q_WARN("Failed to allocate task!");
         return;
     }
-    connect(task, SIGNAL(completed()), this, SLOT(onGvCallTaskDone()));
+    connect(task, &AsyncTaskToken::completed, this, &IMainWindow::onGvCallTaskDone);
 
     task->inParams["destination"] = number;
     task->inParams["source"] = num.number;
@@ -517,7 +517,7 @@ IMainWindow::onUserCall(QString number)
                           "Please make sure your browser is open and ready.",
                           (void*)BROWSER_DIALBACK_CTX_VALUE);
         QTimer::singleShot (10 * 1000,
-                            this, SLOT(onBrowserDialbackMsgTimeout()));
+                            this, &IMainWindow::onBrowserDialbackMsgTimeout);
     }
 
     bool rv;
@@ -637,7 +637,7 @@ IMainWindow::onUserSendSMS (QStringList arrNumbers, QString strText)
             arrFailed += arrNumbers[i];
             continue;
         }
-        connect(task, SIGNAL(completed()), this, SLOT(onGvTextTaskDone()));
+        connect(task, &AsyncTaskToken::completed, this, &IMainWindow::onGvTextTaskDone);
 
         task->inParams["destination"] = arrNumbers[i];
         task->inParams["text"] = strText;

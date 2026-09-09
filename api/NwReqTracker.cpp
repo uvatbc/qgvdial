@@ -35,7 +35,7 @@ NwReqTracker::NwReqTracker(QNetworkReply *r, QNetworkAccessManager &nwManager,
     replyTimer.setSingleShot (true);
     replyTimer.setInterval (timeout);
 
-    rv = connect (&replyTimer, SIGNAL(timeout()), this, SLOT(onTimedOut()));
+    rv = connect (&replyTimer, &QTimer::timeout, this, &NwReqTracker::onTimedOut);
     Q_ASSERT(rv); Q_UNUSED(rv);
 
     init (r, c, bEmitlog, autoDel);
@@ -51,29 +51,29 @@ NwReqTracker::init(QNetworkReply *r, void *c, bool bEmitlog, bool autoDel)
     ctx = c;
     autoRedirect = false;
 
-    bool rv = connect (m_reply, SIGNAL(finished()),
-                       this   , SLOT(onReplyFinished()));
+    bool rv = connect (m_reply, &QNetworkReply::finished,
+                       this   , &NwReqTracker::onReplyFinished);
     Q_ASSERT(rv); Q_UNUSED(rv);
-    rv = connect (m_reply, SIGNAL(downloadProgress(qint64,qint64)),
-                  this   , SLOT(onReplyProgress(qint64,qint64)));
+    rv = connect (m_reply, &QNetworkReply::downloadProgress,
+                  this   , &NwReqTracker::onReplyProgress);
     Q_ASSERT(rv);
-    rv = connect (m_reply, SIGNAL(uploadProgress(qint64,qint64)),
-                  this   , SLOT(onReplyProgress(qint64,qint64)));
+    rv = connect (m_reply, &QNetworkReply::uploadProgress,
+                  this   , &NwReqTracker::onReplyProgress);
     Q_ASSERT(rv);
 #ifndef QT_NO_SSL
-    rv = connect (m_reply, SIGNAL(sslErrors(QList<QSslError>)),
-                  this   , SLOT(onReplySslErrors(QList<QSslError>)));
+    rv = connect (m_reply, &QNetworkReply::sslErrors,
+                  this   , &NwReqTracker::onReplySslErrors);
     Q_ASSERT(rv);
 #endif
     rv = connect (m_reply, &QNetworkReply::errorOccurred,
                   this   , &NwReqTracker::onReplyError);
     Q_ASSERT(rv);
 
-    rv = connect (m_reply, SIGNAL(downloadProgress(qint64,qint64)),
-                  this   , SLOT(onXferProgress(qint64,qint64)));
+    rv = connect (m_reply, &QNetworkReply::downloadProgress,
+                  this   , &NwReqTracker::onXferProgress);
     Q_ASSERT(rv);
-    rv = connect (m_reply, SIGNAL(uploadProgress(qint64,qint64)),
-                  this   , SLOT(onXferProgress(qint64,qint64)));
+    rv = connect (m_reply, &QNetworkReply::uploadProgress,
+                  this   , &NwReqTracker::onXferProgress);
     Q_ASSERT(rv);
 
     replyTimer.stop ();
@@ -83,29 +83,29 @@ NwReqTracker::init(QNetworkReply *r, void *c, bool bEmitlog, bool autoDel)
 void
 NwReqTracker::disconnectReply()
 {
-    bool rv = disconnect (m_reply, SIGNAL(finished()),
-                          this   , SLOT(onReplyFinished()));
+    bool rv = disconnect (m_reply, &QNetworkReply::finished,
+                          this   , &NwReqTracker::onReplyFinished);
     Q_ASSERT(rv); Q_UNUSED(rv);
-    rv = disconnect (m_reply, SIGNAL(downloadProgress(qint64,qint64)),
-                     this   , SLOT(onReplyProgress(qint64,qint64)));
+    rv = disconnect (m_reply, &QNetworkReply::downloadProgress,
+                     this   , &NwReqTracker::onReplyProgress);
     Q_ASSERT(rv);
-    rv = disconnect (m_reply, SIGNAL(uploadProgress(qint64,qint64)),
-                     this   , SLOT(onReplyProgress(qint64,qint64)));
+    rv = disconnect (m_reply, &QNetworkReply::uploadProgress,
+                     this   , &NwReqTracker::onReplyProgress);
     Q_ASSERT(rv);
 #ifndef QT_NO_SSL
-    rv = disconnect (m_reply, SIGNAL(sslErrors(QList<QSslError>)),
-                     this   , SLOT(onReplySslErrors(QList<QSslError>)));
+    rv = disconnect (m_reply, &QNetworkReply::sslErrors,
+                     this   , &NwReqTracker::onReplySslErrors);
     Q_ASSERT(rv);
 #endif
     rv = disconnect (m_reply, &QNetworkReply::errorOccurred,
                      this   , &NwReqTracker::onReplyError);
     Q_ASSERT(rv);
 
-    rv = disconnect (m_reply, SIGNAL(downloadProgress(qint64,qint64)),
-                     this   , SLOT(onXferProgress(qint64,qint64)));
+    rv = disconnect (m_reply, &QNetworkReply::downloadProgress,
+                     this   , &NwReqTracker::onXferProgress);
     Q_ASSERT(rv);
-    rv = disconnect (m_reply, SIGNAL(uploadProgress(qint64,qint64)),
-                     this   , SLOT(onXferProgress(qint64,qint64)));
+    rv = disconnect (m_reply, &QNetworkReply::uploadProgress,
+                     this   , &NwReqTracker::onXferProgress);
     Q_ASSERT(rv);
 }//NwReqTracker::disconnectReply
 

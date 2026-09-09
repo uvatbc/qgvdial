@@ -25,7 +25,7 @@ Contact: yuvraaj@gmail.com
 #include <QObject>
 #include "IObserverFactory.h"
 
-class ObserverFactory : public QObject
+class ObserverFactory : public IObserverFactory
 {
     Q_OBJECT
 

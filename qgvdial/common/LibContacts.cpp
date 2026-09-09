@@ -42,23 +42,23 @@ LibContacts::LibContacts(IMainWindow *parent)
 {
     Q_ASSERT(NULL != parent);
 
-    connect(&api, SIGNAL(presentCaptcha(AsyncTaskToken*,QString)),
-            this, SLOT(onPresentCaptcha(AsyncTaskToken*,QString)));
-    connect(&api, SIGNAL(oneContact(ContactInfo)),
-            this, SLOT(onOneContact(ContactInfo)));
-    connect(&api, SIGNAL(openBrowser(QUrl)),
-            this, SLOT(onOpenBrowser(QUrl)));
-    connect(&api, SIGNAL(closeBrowser()),
-            this, SLOT(onCloseBrowser()));
+    connect(&api, &GContactsApi::presentCaptcha,
+            this, &LibContacts::onPresentCaptcha);
+    connect(&api, &GContactsApi::oneContact,
+            this, &LibContacts::onOneContact);
+    connect(&api, &GContactsApi::openBrowser,
+            this, &LibContacts::onOpenBrowser);
+    connect(&api, &GContactsApi::closeBrowser,
+            this, &LibContacts::onCloseBrowser);
 
     m_gotPhotoTimer.setSingleShot (true);
     m_gotPhotoTimer.setInterval (GOT_PHOTO_TIMEOUT);
-    connect (&m_gotPhotoTimer, SIGNAL(timeout()),
-             this, SLOT(refreshModel()));
+    connect (&m_gotPhotoTimer, &QTimer::timeout,
+             this, &LibContacts::refreshModel);
 
     m_updateTimer.setSingleShot (true);
-    connect(&m_updateTimer, SIGNAL(timeout()),
-            this, SLOT(refreshLatest()));
+    connect(&m_updateTimer, &QTimer::timeout,
+            this, &LibContacts::refreshLatest);
 }//LibContacts::LibContacts
 
 void
@@ -80,8 +80,8 @@ LibContacts::login(const QString &user)
 
     Q_DEBUG("Starting contacts login");
 
-    connect(token, SIGNAL(completed()),
-            this, SLOT(loginCompleted()));
+    connect(token, &AsyncTaskToken::completed,
+            this, &LibContacts::loginCompleted);
 
     token->inParams["user"] = user;
     api.login (token);
@@ -98,7 +98,7 @@ LibContacts::logout()
         return;
     }
 
-    connect(task, SIGNAL(completed()), task, SLOT(deleteLater()));
+    connect(task, &AsyncTaskToken::completed, task, &QObject::deleteLater);
     api.logout (task);
     m_contactStore->logout ();
 }//LibContacts::logout
@@ -155,8 +155,8 @@ LibContacts::refresh(QDateTime after /* = QDateTime()*/)
         return false;
     }
 
-    connect (task, SIGNAL(completed()),
-             this, SLOT(onContactsFetched()));
+    connect (task, &AsyncTaskToken::completed,
+             this, &LibContacts::onContactsFetched);
 
     IMainWindow *win = (IMainWindow *) this->parent ();
     bool bval = true;
@@ -287,8 +287,8 @@ LibContacts::onContactsFetched()
         ContactsModel *oldModel = m_contactsModel;
         m_contactsModel = this->createModel ();
         if (NULL != m_contactsModel) {
-            connect(m_contactsModel,SIGNAL(noContactPhoto(QString,QString)),
-                    this, SLOT(onNoContactPhoto(QString,QString)));
+            connect(m_contactsModel, &ContactsModel::noContactPhoto,
+                    this, &LibContacts::onNoContactPhoto);
 
             win->uiRefreshContacts (m_contactsModel, QString());
             if (NULL != oldModel) {
@@ -370,7 +370,7 @@ LibContacts::getOnePhoto(QString contactId, QString photoUrl)
 
     task->inParams["id"] = contactId;
     task->inParams["href"] = photoUrl;
-    connect(task, SIGNAL(completed()), this, SLOT(onGotPhoto()));
+    connect(task, &AsyncTaskToken::completed, this, &LibContacts::onGotPhoto);
 
     if (!api.getPhotoFromLink (task)) {
         Q_WARN("Unable to get photo");
@@ -543,8 +543,8 @@ LibContacts::searchContacts(const QString &query)
                 return false;
             }
 
-            connect(m_contactsModel,SIGNAL(noContactPhoto(QString,QString)),
-                    this, SLOT(onNoContactPhoto(QString,QString)));
+            connect(m_contactsModel, &ContactsModel::noContactPhoto,
+                    this, &LibContacts::onNoContactPhoto);
         }
 
         win->uiRefreshContacts (m_contactsModel, QString());
@@ -564,10 +564,10 @@ LibContacts::searchContacts(const QString &query)
         return false;
     }
     m_searchQuery = query;
-    connect(m_searchedContactsModel, SIGNAL(noContactPhoto(QString,QString)),
-            this, SLOT(onNoContactPhoto(QString,QString)));
-    connect(m_contactsModel, SIGNAL(noContactPhoto(QString,QString)),
-            this, SLOT(onNoContactPhoto(QString,QString)));
+    connect(m_searchedContactsModel, &ContactsModel::noContactPhoto,
+            this, &LibContacts::onNoContactPhoto);
+    connect(m_contactsModel, &ContactsModel::noContactPhoto,
+            this, &LibContacts::onNoContactPhoto);
 
     win->uiRefreshContacts(m_searchedContactsModel, query);
 

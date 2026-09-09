@@ -32,8 +32,8 @@ ContactDialog::ContactDialog(QWidget *parent)
 {
     ui->setupUi(this);
 
-    connect(ui->listNumbers, SIGNAL(doubleClicked(const QModelIndex &)),
-            this, SLOT(onDoubleClicked(const QModelIndex &)));
+    connect(ui->listNumbers, &QAbstractItemView::doubleClicked,
+            this, &ContactDialog::onDoubleClicked);
 }
 
 ContactDialog::~ContactDialog()

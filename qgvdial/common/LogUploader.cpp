@@ -125,8 +125,8 @@ LogUploader::sendLogs()
             delete task;
             break;
         }
-        connect(tracker, SIGNAL(sigDone(bool,QByteArray,QNetworkReply*,void*)),
-                this, SLOT(onLogPosted(bool,QByteArray,QNetworkReply*,void*)));
+        connect(tracker, &NwReqTracker::sigDone,
+                this, &LogUploader::onLogPosted);
 
         ok = true;
     } while (0); // End cleanup block (not a loop)
@@ -189,8 +189,8 @@ LogUploader::reportLogin()
 
     NwReqTracker *tracker = new NwReqTracker(reply, *win->m_nwMgr, task,
                                              NW_REPLY_TIMEOUT, true, this);
-    connect(tracker, SIGNAL(sigDone(bool,QByteArray,QNetworkReply*,void*)),
-            this, SLOT(onReportedLogin(bool,QByteArray,QNetworkReply*,void*)));
+    connect(tracker, &NwReqTracker::sigDone,
+            this, &LogUploader::onReportedLogin);
 }//LogUploader::reportLogin
 
 void

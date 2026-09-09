@@ -124,9 +124,9 @@ private:
 
     bool checkForLogin(AsyncTaskToken *task, const QString &strResponse);
 
-    // Login and two factor
+    template <typename Func>
     bool postForm(QUrl url, QGVLoginForm *form,
-                  AsyncTaskToken *task, const char *nwSlot);
+                  AsyncTaskToken *task, Func nwSlot);
 
     bool parseForm(const QString &strResponse,// IN
                          QGVLoginForm *form);  // OUT
