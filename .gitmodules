@@ -1,6 +1,6 @@
 [submodule "third-party/o2"]
 	path = third-party/o2
-	url = https://github.com/uvatbc/o2.git
+	url = git@github.com:uvatbc/o2.git
 	branch = master
 [submodule "third-party/mosquitto"]
 	path = third-party/mosquitto
